@@ -24,6 +24,7 @@ dependencies = [
 langchain = [
   "langchain",
   "langchain-openai>=0.3.10",
+  "langgraph",
   "openinference-instrumentation-langchain"
 ]
 smolagents = [
