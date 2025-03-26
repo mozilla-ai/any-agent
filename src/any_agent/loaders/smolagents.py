@@ -4,7 +4,11 @@ from typing import Optional, TYPE_CHECKING
 from loguru import logger
 
 from any_agent.schema import AgentSchema
-from any_agent.tools.wrappers import import_and_wrap_tools, wrap_mcp_server_smolagents, wrap_tool_smolagents
+from any_agent.tools.wrappers import (
+    import_and_wrap_tools,
+    wrap_mcp_server_smolagents,
+    wrap_tool_smolagents,
+)
 
 if TYPE_CHECKING:
     from smolagents.agents import MultiStepAgent
