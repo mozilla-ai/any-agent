@@ -13,19 +13,21 @@ dependencies = [
   "fire",
   "loguru",
   "markdownify",
+  "mcp>=1.5.0",
   "opentelemetry-exporter-otlp",
   "opentelemetry-sdk",
   "pydantic",
-  "requests"
+  "requests",
 ]
 
 [project.optional-dependencies]
 langchain = [
   "langchain",
+  "langchain-openai>=0.3.10",
   "openinference-instrumentation-langchain"
 ]
 smolagents = [
-  "smolagents[litellm]>=1.10.0",
+  "smolagents[litellm,mcp]>=1.10.0",
   "openinference-instrumentation-smolagents>=0.1.4"
 ]
 
