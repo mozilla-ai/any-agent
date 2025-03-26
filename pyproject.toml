@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=48", "setuptools_scm[toml]>=6.3.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "any-agent"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.11"
+dynamic = ["version"]
+dependencies = [
+  "duckduckgo_search",
+  "fire",
+  "loguru",
+  "markdownify",
+  "opentelemetry-exporter-otlp",
+  "opentelemetry-sdk",
+  "pydantic",
+  "requests"
+]
+
+[project.optional-dependencies]
+langchain = [
+  "langchain",
+  "openinference-instrumentation-langchain"
+]
+smolagents = [
+  "smolagents[litellm]>=1.10.0",
+  "openinference-instrumentation-smolagents>=0.1.4"
+]
+
+openai = [
+  "openai-agents",
+  "openinference-instrumentation-openai-agents"
+]
+
+docs = [
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings-python",
+]
+
+tests = [
+  "pytest>=8,<9",
+  "pytest-sugar>=0.9.6",
+  "debugpy>=1.8.13",
+]
+
+[project.urls]
+Documentation = "https://mozilla-ai.github.io/any-agent/"
+Issues = "https://github.com/mozilla-ai/any-agent/issues"
+Source = "https://github.com/mozilla-ai/any-agent"
+
+[tool.setuptools.packages.find]
+exclude = ["tests", "tests.*"]
+where = ["src"]
+namespaces = false
+
+[tool.setuptools_scm]

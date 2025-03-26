@@ -1,0 +1,37 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: "pip"
+
+      - name: Install
+        run: pip install -e '.[langchain,smolagents,openai,tests]'
+
+      - name: Run Unit tests
+        run: pytest -v tests/unit
+
+      - name: Run Integration tests
+        run: pytest -v tests/integration

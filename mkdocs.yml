@@ -1,0 +1,49 @@
+site_name: Any Agent
+
+repo_url: https://github.com/mozilla-ai/any-agent
+repo_name: any-agent
+
+nav:
+  - Home: index.md
+  - API Reference: api.md
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: black
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - scheme: slate
+      primary: grey
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+  logo: images/Blueprint-logo-white.png
+  favicon: images/Blueprint-logo-black-flavicon.png
+  extra_css:
+    - assets/custom.css
+  features:
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_root_heading: true
+          heading_level: 3
