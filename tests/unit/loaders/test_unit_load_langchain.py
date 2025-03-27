@@ -2,7 +2,7 @@ from unittest.mock import patch, MagicMock
 
 from any_agent.schema import AgentSchema
 from any_agent.loaders.langchain import (
-    load_lanchain_agent,
+    load_langchain_agent,
 )
 from any_agent.tools import (
     search_web,
@@ -22,7 +22,7 @@ def test_load_langchain_agent_default():
         patch("any_agent.loaders.langchain.init_chat_model", model_mock),
         patch("langchain_core.tools.tool", tool_mock),
     ):
-        load_lanchain_agent(AgentSchema(model_id="gpt-4o"))
+        load_langchain_agent(AgentSchema(model_id="gpt-4o"))
         model_mock.assert_called_once_with("gpt-4o")
         create_mock.assert_called_once_with(
             model=model_mock.return_value,

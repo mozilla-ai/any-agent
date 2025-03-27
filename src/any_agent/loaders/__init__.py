@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Union
 
 from any_agent.schema import AgentFramework
 
-from .langchain import load_lanchain_agent
+from .langchain import load_langchain_agent
 from .openai import load_openai_agent
 from .smolagents import load_smolagents_agent
 
@@ -33,7 +33,7 @@ def load_agent(
     """
     match framework:
         case AgentFramework.LANGCHAIN:
-            return load_lanchain_agent(main_agent, managed_agents)
+            return load_langchain_agent(main_agent, managed_agents)
         case AgentFramework.OPENAI:
             return load_openai_agent(main_agent, managed_agents)
         case AgentFramework.SMOLAGENTS:

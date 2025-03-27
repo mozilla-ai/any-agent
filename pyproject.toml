@@ -25,6 +25,7 @@ langchain = [
   "langchain",
   "langchain-openai>=0.3.10",
   "langgraph",
+  "langchain-mcp-adapters>=0.0.3",
   "openinference-instrumentation-langchain"
 ]
 smolagents = [

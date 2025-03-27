@@ -5,6 +5,9 @@ import os
 import asyncio
 from loguru import logger
 from textwrap import dedent
+
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
 from any_agent.schema import MCPTool
 
 # Global registry to keep manager instances alive
@@ -53,7 +56,6 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
         self.setup_tools()
 
     def setup_tools(self):
-        from mcp import StdioServerParameters
         from smolagents import ToolCollection
 
         self.server_parameters = StdioServerParameters(
@@ -137,3 +139,73 @@ class OpenAIMCPToolsManager(MCPToolsManagerBase):
     def __del__(self):
         self.cleanup()
         super().__del__()
+
+
+class LangchainMCPToolsManager(MCPToolsManagerBase):
+    """Implementation of MCP tools manager for LangChain agents."""
+
+    def __init__(self, mcp_tool: MCPTool):
+        super().__init__(mcp_tool)
+        self.client = None
+        self.session = None
+        self.tools = []
+        
+        # Using an existing event loop if available, or creating a new one
+        try:
+            self.loop = asyncio.get_event_loop()
+        except RuntimeError:
+            self.loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)
+        
+        self.loop.run_until_complete(self.setup_tools())
+
+    async def setup_tools(self):
+        """Set up the LangChain MCP server with the provided configuration."""
+        from langchain_mcp_adapters.tools import load_mcp_tools
+
+        server_params = StdioServerParameters(
+            command=self.mcp_tool.command,
+            args=self.mcp_tool.args,
+            env={**os.environ},
+        )
+        self.client = stdio_client(server_params)
+        self.read, self.write = await self.client.__aenter__()
+        self.session = ClientSession(self.read, self.write)
+        await self.session.__aenter__()
+        await self.session.initialize()
+        self.tools = await load_mcp_tools(self.session)
+
+    def cleanup(self):
+        """Clean up resources using the same event loop"""
+        if self.session and self.client:
+            try:
+                # Create a new event loop for cleanup if the original is closed
+                if self.loop.is_closed():
+                    cleanup_loop = asyncio.new_event_loop()
+                    cleanup_loop.run_until_complete(self._cleanup_async())
+                    cleanup_loop.close()
+                else:
+                    self.loop.run_until_complete(self._cleanup_async())
+            except Exception as e:
+                logger.error(f"Error closing LangChain MCP resources: {e}")
+
+    async def _cleanup_async(self):
+        """Async cleanup to be run in the same event loop as setup"""
+        if self.session:
+            await self.session.__aexit__(None, None, None)
+            self.session = None
+        
+        if self.client:
+            await self.client.__aexit__(None, None, None)
+            self.client = None
+
+    def __del__(self):
+        self.cleanup()
+        super().__del__()
+        
+    # Consider adding a context manager interface
+    async def __aenter__(self):
+        return self
+        
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self._cleanup_async()

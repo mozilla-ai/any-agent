@@ -14,7 +14,7 @@ except ImportError:
 
 
 @logger.catch(reraise=True)
-def load_lanchain_agent(
+def load_langchain_agent(
     main_agent: AgentSchema, managed_agents: list[AgentSchema] | None = None
 ):
     if not langchain_available:
@@ -31,9 +31,13 @@ def load_lanchain_agent(
     if managed_agents:
         raise NotImplementedError("langchain managed agents are not supported yet")
 
-    imported_tools, _ = import_and_wrap_tools(
+    imported_tools, mcp_managers = import_and_wrap_tools(
         main_agent.tools, agent_framework=AgentFramework.LANGCHAIN
     )
+
+    # Extract tools from MCP managers and add them to the imported_tools list
+    for manager in mcp_managers:
+        imported_tools.extend(manager.tools)
 
     model = init_chat_model(main_agent.model_id)
 
