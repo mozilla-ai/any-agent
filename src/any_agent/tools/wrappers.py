@@ -47,7 +47,7 @@ def wrap_tool_smolagents(tool):
 _mcp_managers = {}
 
 
-class MCP_ToolsManager:
+class MCPToolsManager:
     def __init__(self, mcp_tool: dict):
         from mcp import StdioServerParameters
         from smolagents import ToolCollection
