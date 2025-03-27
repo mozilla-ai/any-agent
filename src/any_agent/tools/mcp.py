@@ -149,14 +149,14 @@ class LangchainMCPToolsManager(MCPToolsManagerBase):
         self.client = None
         self.session = None
         self.tools = []
-        
+
         # Using an existing event loop if available, or creating a new one
         try:
             self.loop = asyncio.get_event_loop()
         except RuntimeError:
             self.loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self.loop)
-        
+
         self.loop.run_until_complete(self.setup_tools())
 
     async def setup_tools(self):
@@ -194,7 +194,7 @@ class LangchainMCPToolsManager(MCPToolsManagerBase):
         if self.session:
             await self.session.__aexit__(None, None, None)
             self.session = None
-        
+
         if self.client:
             await self.client.__aexit__(None, None, None)
             self.client = None
@@ -202,10 +202,10 @@ class LangchainMCPToolsManager(MCPToolsManagerBase):
     def __del__(self):
         self.cleanup()
         super().__del__()
-        
+
     # Consider adding a context manager interface
     async def __aenter__(self):
         return self
-        
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self._cleanup_async()
