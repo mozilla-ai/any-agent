@@ -71,7 +71,9 @@ def load_openai_agent(
             "any_agent.tools.search_web",
             "any_agent.tools.visit_webpage",
         ]
-    tools = import_and_wrap_tools(main_agent.tools, agent_framework=AgentFramework.OPENAI)
+    tools = import_and_wrap_tools(
+        main_agent.tools, agent_framework=AgentFramework.OPENAI
+    )
 
     handoffs = []
     if managed_agents:
@@ -80,7 +82,9 @@ def load_openai_agent(
                 name=managed_agent.name,
                 instructions=get_instructions(managed_agent.instructions),
                 model=_get_model(managed_agent),
-                tools=import_and_wrap_tools(managed_agent.tools, agent_framework=AgentFramework.OPENAI),
+                tools=import_and_wrap_tools(
+                    managed_agent.tools, agent_framework=AgentFramework.OPENAI
+                ),
             )
             if managed_agent.handoff:
                 handoffs.append(instance)

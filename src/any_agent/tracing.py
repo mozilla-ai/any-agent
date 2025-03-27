@@ -73,7 +73,9 @@ def get_tracer_provider(
     return tracer_provider, file_name
 
 
-def setup_tracing(tracer_provider: TracerProvider, agent_framework: AgentFramework) -> None:
+def setup_tracing(
+    tracer_provider: TracerProvider, agent_framework: AgentFramework
+) -> None:
     """Setup tracing for `agent_framework` by instrumenting `trace_provider`.
 
     Args:

@@ -17,7 +17,6 @@ def import_and_wrap_tools(
         AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
     }
 
-
     wrapper = wrapper_map[agent_framework]
 
     imported_tools = []

@@ -46,7 +46,9 @@ def load_smolagents_agent(
             "any_agent.tools.visit_webpage",
         ]
 
-    tools = import_and_wrap_tools(main_agent.tools, agent_framework=AgentFramework.SMOLAGENTS)
+    tools = import_and_wrap_tools(
+        main_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
+    )
 
     managed_agents_instanced = []
     if managed_agents:

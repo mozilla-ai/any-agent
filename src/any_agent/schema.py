@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Any, Dict
 from pydantic import BaseModel, Field, ConfigDict
 
 # make agent_framework enum str where options are "openai", "langchain", "smolagents"
@@ -10,10 +9,12 @@ class AgentFramework(str, Enum):
     LANGCHAIN = "langchain"
     SMOLAGENTS = "smolagents"
 
+
 class MCPTool(BaseModel):
     command: str
     args: list[str]
     tools: list[str]
+
 
 class AgentSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
