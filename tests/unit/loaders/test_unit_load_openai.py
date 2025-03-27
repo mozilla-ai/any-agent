@@ -29,6 +29,7 @@ def test_load_openai_agent_default():
             instructions=None,
             handoffs=[],
             tools=[mock_function_tool(search_web), mock_function_tool(visit_webpage)],
+            mcp_servers=[]
         )
 
 
@@ -83,7 +84,7 @@ def test_load_openai_multiagent():
                 AgentSchema(
                     model_id="gpt-4o-mini",
                     name="user-verification-agent",
-                    tools=["any_agent.tools.ask_user_verification"],
+                    tools=["any_agent.tools.ask_user_verification"]
                 ),
                 AgentSchema(
                     model_id="gpt-4o",
@@ -91,7 +92,7 @@ def test_load_openai_multiagent():
                     tools=[
                         "any_agent.tools.search_web",
                         "any_agent.tools.visit_webpage",
-                    ],
+                    ]
                 ),
                 AgentSchema(
                     model_id="gpt-4o-mini",
@@ -108,6 +109,7 @@ def test_load_openai_multiagent():
             tools=[
                 mock_function_tool(ask_user_verification),
             ],
+            mcp_servers=[]
         )
 
         mock_agent.assert_any_call(
@@ -115,6 +117,7 @@ def test_load_openai_multiagent():
             instructions=None,
             name="search-web-agent",
             tools=[mock_function_tool(search_web), mock_function_tool(visit_webpage)],
+            mcp_servers=[]
         )
 
         mock_agent.assert_any_call(
@@ -122,6 +125,7 @@ def test_load_openai_multiagent():
             instructions=None,
             name="communication-agent",
             tools=[mock_function_tool(show_final_answer)],
+            mcp_servers=[]
         )
 
         mock_agent.assert_any_call(
@@ -133,4 +137,40 @@ def test_load_openai_multiagent():
                 mock_agent.return_value.as_tool.return_value,
                 mock_agent.return_value.as_tool.return_value,
             ],
+            mcp_servers=[]
+        )
+
+
+def test_load_openai_agent_with_mcp_server():
+    mock_agent = MagicMock()
+    mock_function_tool = MagicMock()
+    mock_mcp_server = MagicMock()
+    mock_mcp_server.server = MagicMock()
+
+    with (
+        patch("any_agent.loaders.openai.Agent", mock_agent),
+        patch("agents.function_tool", mock_function_tool),
+        patch("any_agent.loaders.openai.import_and_wrap_tools") as mock_wrap_tools,
+    ):
+        # Setup the mock to return tools and MCP servers
+        mock_wrap_tools.return_value = (
+            [mock_function_tool(search_web)],  # tools
+            [mock_mcp_server]  # mcp_servers
+        )
+
+        load_openai_agent(
+            main_agent=AgentSchema(
+                model_id="gpt-4o",
+                tools=["some.mcp.server"]  # The actual import path doesn't matter for the test
+            )
+        )
+
+        # Verify Agent was called with the MCP server
+        mock_agent.assert_called_once_with(
+            name="default-name",
+            model="gpt-4o",
+            instructions=None,
+            handoffs=[],
+            tools=[mock_function_tool(search_web)],
+            mcp_servers=[mock_mcp_server.server]
         )
