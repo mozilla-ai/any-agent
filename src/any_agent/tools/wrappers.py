@@ -77,14 +77,15 @@ def wrap_mcp_server(mcp_tool: MCPTool, agent_framework: AgentFramework):
     tools = manager.tools
 
     # Only add the tools listed in mcp_tool['tools'] if specified
-    for tool in mcp_tool.tools:
-        tools = [tool for tool in tools if tool.name in mcp_tool.tools]
-        if len(tools) != len(mcp_tool.tools):
-            tool_names = [tool.name for tool in tools]
-            raise ValueError(
-                dedent(f"""Could not find all requested tools in the MCP server:
-                             Requested: {mcp_tool.tools}
-                             Set:   {tool_names}""")
-            )
+    requested_tools = mcp_tool.tools
+    filtered_tools = [tool for tool in tools if tool.name in requested_tools]
+    if len(filtered_tools) != len(requested_tools):
+        tool_names = [tool.name for tool in filtered_tools]
+        raise ValueError(
+            dedent(f"""Could not find all requested tools in the MCP server:
+                         Requested: {requested_tools}
+                         Set:   {tool_names}""")
+        )
 
+    return filtered_tools
     return tools
