@@ -1,19 +1,25 @@
 import inspect
 import importlib
 from collections.abc import Callable
-import os
 from textwrap import dedent
 
+from any_agent.tools.mcp import SmolagentsMCPToolsManager
 
-def import_and_wrap_tools(tools: list[str], wrapper: Callable) -> list[Callable]:
+
+def import_and_wrap_tools(tools: list[str | dict], wrapper: Callable) -> list[Callable]:
     imported_tools = []
     for tool in tools:
-        module, func = tool.rsplit(".", 1)
-        module = importlib.import_module(module)
-        imported_tool = getattr(module, func)
-        if inspect.isclass(imported_tool):
-            imported_tool = imported_tool()
-        imported_tools.append(wrapper(imported_tool))
+        if isinstance(tool, dict):  # Handle MCP tool configuration
+            # This is an MCP tool definition
+            mcp_tools = wrap_mcp_server(tool)
+            imported_tools.extend(mcp_tools)
+        else:  # Regular string tool reference
+            module, func = tool.rsplit(".", 1)
+            module = importlib.import_module(module)
+            imported_tool = getattr(module, func)
+            if inspect.isclass(imported_tool):
+                imported_tool = imported_tool()
+            imported_tools.append(wrapper(imported_tool))
     return imported_tools
 
 
@@ -43,57 +49,18 @@ def wrap_tool_smolagents(tool):
     return tool
 
 
-# Global registry to keep manager instances alive
-_mcp_managers = {}
-
-
-class MCPToolsManager:
-    def __init__(self, mcp_tool: dict):
-        from mcp import StdioServerParameters
-        from smolagents import ToolCollection
-
-        # Generate a unique identifier for this manager instance
-        self.id = id(self)
-
-        self.server_parameters = StdioServerParameters(
-            command=mcp_tool["command"],
-            args=mcp_tool["args"],
-            env={**os.environ},
-        )
-
-        # Store the context manager itself
-        self.context = ToolCollection.from_mcp(self.server_parameters)
-        # Enter the context
-        self.tool_collection = self.context.__enter__()
-        self.tools = self.tool_collection.tools
-
-        # Register self in the global registry to prevent garbage collection
-        _mcp_managers[self.id] = self
-
-    def __del__(self):
-        # Exit the context when the class is deleted/garbage collected
-        if hasattr(self, "context") and self.context:
-            try:
-                self.context.__exit__(None, None, None)
-            except Exception as e:
-                print(f"Error closing MCP context: {e}")
-
-        # Remove from registry
-        if hasattr(self, "id") and self.id in _mcp_managers:
-            del _mcp_managers[self.id]
-
-
-def wrap_mcp_server_smolagents(mcp_tool: dict):
+def wrap_mcp_server(mcp_tool: dict):
+    """
+    Generic MCP server wrapper that can work with different frameworks
+    by accepting a wrapper function
+    """
     # Create the manager instance which will manage the MCP tool context
-    # The manager will be kept alive in the _mcp_managers registry
-    manager = MCP_ToolsManager(mcp_tool)
+    manager = SmolagentsMCPToolsManager(mcp_tool)
 
-    # Return the tools along with a reference to the manager's ID
-    # The returned tools are now associated with their manager
-    # which will stay alive in the global registry
+    # Get all tools from the manager
     tools = manager.tools
 
-    # only add the tools listed in mcp_tool['tools']. Throw an error if a requested tool isn't found
+    # Only add the tools listed in mcp_tool['tools'] if specified
     if "tools" in mcp_tool:
         tools = [tool for tool in tools if tool.name in mcp_tool["tools"]]
         if len(tools) != len(mcp_tool["tools"]):
@@ -105,13 +72,3 @@ def wrap_mcp_server_smolagents(mcp_tool: dict):
             )
 
     return tools
-
-
-def cleanup_mcp_managers():
-    """Manually clean up all MCP managers"""
-    global _mcp_managers
-    managers = list(_mcp_managers.values())
-    for manager in managers:
-        del manager
-    _mcp_managers.clear()
-    print(f"Cleaned up all MCP managers, current count: {len(_mcp_managers)}")

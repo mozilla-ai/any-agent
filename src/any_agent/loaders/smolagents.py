@@ -6,7 +6,6 @@ from loguru import logger
 from any_agent.schema import AgentSchema
 from any_agent.tools.wrappers import (
     import_and_wrap_tools,
-    wrap_mcp_server_smolagents,
     wrap_tool_smolagents,
 )
 
@@ -49,13 +48,9 @@ def load_smolagents_agent(
             "any_agent.tools.search_web",
             "any_agent.tools.visit_webpage",
         ]
-    tools = import_and_wrap_tools(main_agent.tools, wrap_tool_smolagents)
 
-    for tool in main_agent.mcp_tools:
-        mcp_server_tools = wrap_mcp_server_smolagents(tool)
-        mcp_server_tool: smolagents.Tool
-        for mcp_server_tool in mcp_server_tools:
-            tools.append(mcp_server_tool)
+    # The import_and_wrap_tools function now handles both regular tools and MCP tools
+    tools = import_and_wrap_tools(main_agent.tools, wrap_tool_smolagents)
 
     managed_agents_instanced = []
     if managed_agents:
