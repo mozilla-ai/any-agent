@@ -2,7 +2,9 @@
 
 from abc import ABC, abstractmethod
 import os
+import asyncio
 from loguru import logger
+from textwrap import dedent
 from any_agent.schema import MCPTool
 
 # Global registry to keep manager instances alive
@@ -64,7 +66,19 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
         self.context = ToolCollection.from_mcp(self.server_parameters)
         # Enter the context
         self.tool_collection = self.context.__enter__()
-        self.tools = self.tool_collection.tools
+        tools = self.tool_collection.tools
+
+        # Only add the tools listed in mcp_tool['tools'] if specified
+        requested_tools = self.mcp_tool.tools
+        filtered_tools = [tool for tool in tools if tool.name in requested_tools]
+        if len(filtered_tools) != len(requested_tools):
+            tool_names = [tool.name for tool in filtered_tools]
+            raise ValueError(
+                dedent(f"""Could not find all requested tools in the MCP server:
+                            Requested: {requested_tools}
+                            Set:   {tool_names}""")
+            )
+        self.tools = filtered_tools
 
     def cleanup(self):
         # Exit the context when cleanup is called
@@ -74,6 +88,51 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
                 self.context = None
             except Exception as e:
                 logger.error(f"Error closing MCP context: {e}")
+
+    def __del__(self):
+        self.cleanup()
+        super().__del__()
+
+
+class OpenAIMCPToolsManager(MCPToolsManagerBase):
+    """Implementation of MCP tools manager for OpenAI agents."""
+
+    def __init__(self, mcp_tool: MCPTool):
+        super().__init__(mcp_tool)
+        self.server = None
+        self.loop = None
+        self.setup_tools()
+
+    def setup_tools(self):
+        """Set up the OpenAI MCP server with the provided configuration."""
+        from agents.mcp import MCPServerStdio
+
+        self.server = MCPServerStdio(
+            name="OpenAI MCP Server",
+            params={
+                "command": self.mcp_tool.command,
+                "args": self.mcp_tool.args,
+            },
+        )
+        # Create event loop if needed
+        try:
+            self.loop = asyncio.get_event_loop()
+        except RuntimeError:
+            self.loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)
+        # Start the server
+        self.loop.run_until_complete(self.server.__aenter__())
+        # Get tools from the server
+        self.tools = self.loop.run_until_complete(self.server.list_tools())
+
+    def cleanup(self):
+        """Clean up the MCP server resources."""
+        if self.server and self.loop:
+            try:
+                self.loop.run_until_complete(self.server.__aexit__(None, None, None))
+                self.server = None
+            except Exception as e:
+                logger.error(f"Error closing OpenAI MCP server: {e}")
 
     def __del__(self):
         self.cleanup()

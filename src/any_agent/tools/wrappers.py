@@ -4,12 +4,12 @@ from collections.abc import Callable
 from textwrap import dedent
 
 from any_agent.schema import AgentFramework, MCPTool
-from any_agent.tools.mcp import SmolagentsMCPToolsManager
+from any_agent.tools.mcp import SmolagentsMCPToolsManager, OpenAIMCPToolsManager, MCPToolsManagerBase
 
 
 def import_and_wrap_tools(
     tools: list[str | dict], agent_framework: AgentFramework
-) -> list[Callable]:
+) -> tuple[list[Callable], list[MCPToolsManagerBase]]:
     # Select the appropriate wrapper based on agent_framework
     wrapper_map = {
         AgentFramework.OPENAI: wrap_tool_openai,
@@ -20,11 +20,12 @@ def import_and_wrap_tools(
     wrapper = wrapper_map[agent_framework]
 
     imported_tools = []
+    mcp_servers = []
     for tool in tools:
         if isinstance(tool, MCPTool):  # Handle MCP tool configuration
             # This is an MCP tool definition
-            mcp_tools = wrap_mcp_server(tool, agent_framework)
-            imported_tools.extend(mcp_tools)
+            mcp_server = wrap_mcp_server(tool, agent_framework)
+            mcp_servers.append(mcp_server)
         else:  # Regular string tool reference
             module, func = tool.rsplit(".", 1)
             module = importlib.import_module(module)
@@ -32,7 +33,7 @@ def import_and_wrap_tools(
             if inspect.isclass(imported_tool):
                 imported_tool = imported_tool()
             imported_tools.append(wrapper(imported_tool))
-    return imported_tools
+    return imported_tools, mcp_servers
 
 
 def wrap_tool_openai(tool):
@@ -61,31 +62,24 @@ def wrap_tool_smolagents(tool):
     return tool
 
 
-def wrap_mcp_server(mcp_tool: MCPTool, agent_framework: AgentFramework):
+def wrap_mcp_server(mcp_tool: MCPTool, agent_framework: AgentFramework) -> MCPToolsManagerBase:
     """
     Generic MCP server wrapper that can work with different frameworks
     based on the specified agent_framework
     """
-    if agent_framework != AgentFramework.SMOLAGENTS:
+    # Select the appropriate manager based on agent_framework
+    manager_map = {
+        AgentFramework.OPENAI: OpenAIMCPToolsManager,
+        AgentFramework.SMOLAGENTS: SmolagentsMCPToolsManager,
+    }
+
+    if agent_framework not in manager_map:
         raise NotImplementedError(
-            f"Unsupported agent type: {agent_framework}. Currently only smolagents is supported for MCP server tools."
+            f"Unsupported agent type: {agent_framework}. Currently supported types are: {manager_map.keys()}"
         )
+
     # Create the manager instance which will manage the MCP tool context
-    manager = SmolagentsMCPToolsManager(mcp_tool)
+    manager_class = manager_map[agent_framework]
+    manager = manager_class(mcp_tool)
 
-    # Get all tools from the manager
-    tools = manager.tools
-
-    # Only add the tools listed in mcp_tool['tools'] if specified
-    requested_tools = mcp_tool.tools
-    filtered_tools = [tool for tool in tools if tool.name in requested_tools]
-    if len(filtered_tools) != len(requested_tools):
-        tool_names = [tool.name for tool in filtered_tools]
-        raise ValueError(
-            dedent(f"""Could not find all requested tools in the MCP server:
-                         Requested: {requested_tools}
-                         Set:   {tool_names}""")
-        )
-
-    return filtered_tools
-    return tools
+    return manager

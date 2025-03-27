@@ -33,7 +33,7 @@ smolagents = [
 ]
 
 openai = [
-  "openai-agents",
+  "openai-agents>=0.0.7",
   "openinference-instrumentation-openai-agents"
 ]
 

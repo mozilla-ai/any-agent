@@ -45,7 +45,7 @@ class JsonFileSpanExporter(SpanExporter):
 
 
 def get_tracer_provider(
-    project_name: str, output_dir: str = "output"
+    project_name: str, agent_framework: AgentFramework, output_dir: str = "output"
 ) -> tuple[TracerProvider, str | None]:
     """
     Create a tracer_provider based on the selected mode.
@@ -65,7 +65,7 @@ def get_tracer_provider(
     tracer_provider = TracerProvider()
     trace.set_tracer_provider(tracer_provider)
 
-    file_name = f"{output_dir}/{project_name}-{timestamp}.json"
+    file_name = f"{output_dir}/{agent_framework.value}-{project_name}-{timestamp}.json"
     json_file_exporter = JsonFileSpanExporter(file_name=file_name)
     span_processor = SimpleSpanProcessor(json_file_exporter)
     tracer_provider.add_span_processor(span_processor)

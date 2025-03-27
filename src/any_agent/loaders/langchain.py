@@ -31,7 +31,7 @@ def load_lanchain_agent(
     if managed_agents:
         raise NotImplementedError("langchain managed agents are not supported yet")
 
-    imported_tools = import_and_wrap_tools(
+    imported_tools, _ = import_and_wrap_tools(
         main_agent.tools, agent_framework=AgentFramework.LANGCHAIN
     )
 

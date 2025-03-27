@@ -32,6 +32,12 @@ def _get_model(agent_config: AgentSchema):
     return model_class(**kwargs)
 
 
+def merge_mcp_tools(mcp_servers):
+    tools = []
+    for mcp_server in mcp_servers:
+        tools.extend(mcp_server.tools)
+    return tools
+
 @logger.catch(reraise=True)
 def load_smolagents_agent(
     main_agent: AgentSchema,
@@ -46,9 +52,10 @@ def load_smolagents_agent(
             "any_agent.tools.visit_webpage",
         ]
 
-    tools = import_and_wrap_tools(
+    tools, mcp_servers = import_and_wrap_tools(
         main_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
     )
+    tools.extend(merge_mcp_tools(mcp_servers))
 
     managed_agents_instanced = []
     if managed_agents:
@@ -61,13 +68,15 @@ def load_smolagents_agent(
                 kwargs = {
                     "prompt_template": {"system_prompt": managed_agent.instructions}
                 }
+            managed_tools, managed_mcp_servers =import_and_wrap_tools(
+                    managed_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
+                )
+            tools.extend(merge_mcp_tools(managed_mcp_servers))
             managed_agents_instanced.append(
                 agent_type(
                     name=managed_agent.name,
                     model=_get_model(managed_agent),
-                    tools=import_and_wrap_tools(
-                        managed_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
-                    ),
+                    tools=managed_tools,
                     description=managed_agent.description
                     or f"Use the agent: {managed_agent.name}",
                     **kwargs,

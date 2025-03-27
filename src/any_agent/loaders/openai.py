@@ -71,20 +71,22 @@ def load_openai_agent(
             "any_agent.tools.search_web",
             "any_agent.tools.visit_webpage",
         ]
-    tools = import_and_wrap_tools(
+    tools, mcp_servers = import_and_wrap_tools(
         main_agent.tools, agent_framework=AgentFramework.OPENAI
     )
 
     handoffs = []
     if managed_agents:
         for managed_agent in managed_agents:
+            managed_tools, managed_mcp_servers = import_and_wrap_tools(
+                managed_agent.tools, agent_framework=AgentFramework.OPENAI
+            )
             instance = Agent(
                 name=managed_agent.name,
                 instructions=get_instructions(managed_agent.instructions),
                 model=_get_model(managed_agent),
-                tools=import_and_wrap_tools(
-                    managed_agent.tools, agent_framework=AgentFramework.OPENAI
-                ),
+                tools=managed_tools,
+                mcp_servers=[managed_mcp_server.server for managed_mcp_server in managed_mcp_servers],
             )
             if managed_agent.handoff:
                 handoffs.append(instance)
@@ -103,4 +105,5 @@ def load_openai_agent(
         model=_get_model(main_agent),
         handoffs=handoffs,
         tools=tools,
+        mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
     )
