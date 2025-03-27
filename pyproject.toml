@@ -60,3 +60,9 @@ where = ["src"]
 namespaces = false
 
 [tool.setuptools_scm]
+
+
+[tool.pylint.messages_control]
+disable = [
+    "import-outside-toplevel",
+]

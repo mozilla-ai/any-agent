@@ -3,11 +3,8 @@ from typing import Optional, TYPE_CHECKING
 
 from loguru import logger
 
-from any_agent.schema import AgentSchema
-from any_agent.tools.wrappers import (
-    import_and_wrap_tools,
-    wrap_tool_smolagents,
-)
+from any_agent.schema import AgentFramework, AgentSchema
+from any_agent.tools.wrappers import import_and_wrap_tools
 
 if TYPE_CHECKING:
     from smolagents.agents import MultiStepAgent
@@ -49,8 +46,7 @@ def load_smolagents_agent(
             "any_agent.tools.visit_webpage",
         ]
 
-    # The import_and_wrap_tools function now handles both regular tools and MCP tools
-    tools = import_and_wrap_tools(main_agent.tools, wrap_tool_smolagents)
+    tools = import_and_wrap_tools(main_agent.tools, agent_framework=AgentFramework.SMOLAGENTS)
 
     managed_agents_instanced = []
     if managed_agents:
@@ -68,7 +64,7 @@ def load_smolagents_agent(
                     name=managed_agent.name,
                     model=_get_model(managed_agent),
                     tools=import_and_wrap_tools(
-                        managed_agent.tools, wrap_tool_smolagents
+                        managed_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
                     ),
                     description=managed_agent.description
                     or f"Use the agent: {managed_agent.name}",

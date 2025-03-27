@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 import os
+from any_agent.schema import MCPTool
 
 # Global registry to keep manager instances alive
 _mcp_managers = {}
@@ -10,7 +11,7 @@ _mcp_managers = {}
 class MCPToolsManagerBase(ABC):
     """Base class for MCP tools managers across different frameworks."""
 
-    def __init__(self, mcp_tool: dict):
+    def __init__(self, mcp_tool: MCPTool):
         # Generate a unique identifier for this manager instance
         self.id = id(self)
 
@@ -42,7 +43,7 @@ class MCPToolsManagerBase(ABC):
 class SmolagentsMCPToolsManager(MCPToolsManagerBase):
     """Implementation of MCP tools manager for smolagents."""
 
-    def __init__(self, mcp_tool: dict):
+    def __init__(self, mcp_tool: MCPTool):
         super().__init__(mcp_tool)
         self.context = None
         self.tool_collection = None
@@ -53,8 +54,8 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
         from smolagents import ToolCollection
 
         self.server_parameters = StdioServerParameters(
-            command=self.mcp_tool["command"],
-            args=self.mcp_tool["args"],
+            command=self.mcp_tool.command,
+            args=self.mcp_tool.args,
             env={**os.environ},
         )
 

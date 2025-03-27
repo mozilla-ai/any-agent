@@ -3,15 +3,28 @@ import importlib
 from collections.abc import Callable
 from textwrap import dedent
 
+from any_agent.schema import AgentFramework, MCPTool
 from any_agent.tools.mcp import SmolagentsMCPToolsManager
 
 
-def import_and_wrap_tools(tools: list[str | dict], wrapper: Callable) -> list[Callable]:
+def import_and_wrap_tools(
+    tools: list[str | dict], agent_framework: AgentFramework
+) -> list[Callable]:
+    # Select the appropriate wrapper based on agent_framework
+    wrapper_map = {
+        AgentFramework.OPENAI: wrap_tool_openai,
+        AgentFramework.LANGCHAIN: wrap_tool_langchain,
+        AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
+    }
+
+
+    wrapper = wrapper_map[agent_framework]
+
     imported_tools = []
     for tool in tools:
-        if isinstance(tool, dict):  # Handle MCP tool configuration
+        if isinstance(tool, MCPTool):  # Handle MCP tool configuration
             # This is an MCP tool definition
-            mcp_tools = wrap_mcp_server(tool)
+            mcp_tools = wrap_mcp_server(tool, agent_framework)
             imported_tools.extend(mcp_tools)
         else:  # Regular string tool reference
             module, func = tool.rsplit(".", 1)
@@ -49,11 +62,15 @@ def wrap_tool_smolagents(tool):
     return tool
 
 
-def wrap_mcp_server(mcp_tool: dict):
+def wrap_mcp_server(mcp_tool: MCPTool, agent_framework: AgentFramework):
     """
     Generic MCP server wrapper that can work with different frameworks
-    by accepting a wrapper function
+    based on the specified agent_framework
     """
+    if agent_framework != AgentFramework.SMOLAGENTS:
+        raise NotImplementedError(
+            f"Unsupported agent type: {agent_framework}. Currently only smolagents is supported for MCP server tools."
+        )
     # Create the manager instance which will manage the MCP tool context
     manager = SmolagentsMCPToolsManager(mcp_tool)
 
@@ -61,13 +78,13 @@ def wrap_mcp_server(mcp_tool: dict):
     tools = manager.tools
 
     # Only add the tools listed in mcp_tool['tools'] if specified
-    if "tools" in mcp_tool:
-        tools = [tool for tool in tools if tool.name in mcp_tool["tools"]]
-        if len(tools) != len(mcp_tool["tools"]):
+    for tool in mcp_tool.tools:
+        tools = [tool for tool in tools if tool.name in mcp_tool.tools]
+        if len(tools) != len(mcp_tool.tools):
             tool_names = [tool.name for tool in tools]
             raise ValueError(
                 dedent(f"""Could not find all requested tools in the MCP server:
-                             Requested: {mcp_tool['tools']}
+                             Requested: {mcp_tool.tools}
                              Set:   {tool_names}""")
             )
 

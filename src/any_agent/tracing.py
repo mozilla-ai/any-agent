@@ -6,6 +6,7 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export import SpanExporter
+from any_agent import AgentFramework
 
 
 class JsonFileSpanExporter(SpanExporter):
@@ -72,24 +73,24 @@ def get_tracer_provider(
     return tracer_provider, file_name
 
 
-def setup_tracing(tracer_provider: TracerProvider, agent_framework: str) -> None:
+def setup_tracing(tracer_provider: TracerProvider, agent_framework: AgentFramework) -> None:
     """Setup tracing for `agent_framework` by instrumenting `trace_provider`.
 
     Args:
         tracer_provider (TracerProvider): The configured tracer provider from
             [get_tracer_provider][surf_spot_finder.tracing.get_tracer_provider].
-        agent_framework (str): The type of agent being used.
+        agent_framework (AgentFramework): The type of agent being used.
             Must be one of the supported types in [RUNNERS][surf_spot_finder.agents.RUNNERS].
     """
-    if "openai" in agent_framework:
+    if agent_framework == AgentFramework.OPENAI:
         from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 
         OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
-    elif agent_framework == "smolagents":
+    elif agent_framework == AgentFramework.SMOLAGENTS:
         from openinference.instrumentation.smolagents import SmolagentsInstrumentor
 
         SmolagentsInstrumentor().instrument(tracer_provider=tracer_provider)
-    elif agent_framework == "langchain":
+    elif agent_framework == AgentFramework.LANGCHAIN:
         from openinference.instrumentation.langchain import LangChainInstrumentor
 
         LangChainInstrumentor().instrument(tracer_provider=tracer_provider)

@@ -3,9 +3,9 @@ from typing import Optional, TYPE_CHECKING
 
 from loguru import logger
 
-from any_agent.schema import AgentSchema
+from any_agent.schema import AgentFramework, AgentSchema
 from any_agent.instructions import get_instructions
-from any_agent.tools.wrappers import import_and_wrap_tools, wrap_tool_openai
+from any_agent.tools.wrappers import import_and_wrap_tools
 
 if TYPE_CHECKING:
     from agents import Agent
@@ -71,7 +71,7 @@ def load_openai_agent(
             "any_agent.tools.search_web",
             "any_agent.tools.visit_webpage",
         ]
-    tools = import_and_wrap_tools(main_agent.tools, wrap_tool_openai)
+    tools = import_and_wrap_tools(main_agent.tools, agent_framework=AgentFramework.OPENAI)
 
     handoffs = []
     if managed_agents:
@@ -80,7 +80,7 @@ def load_openai_agent(
                 name=managed_agent.name,
                 instructions=get_instructions(managed_agent.instructions),
                 model=_get_model(managed_agent),
-                tools=import_and_wrap_tools(managed_agent.tools, wrap_tool_openai),
+                tools=import_and_wrap_tools(managed_agent.tools, agent_framework=AgentFramework.OPENAI),
             )
             if managed_agent.handoff:
                 handoffs.append(instance)

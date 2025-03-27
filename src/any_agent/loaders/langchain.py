@@ -1,7 +1,7 @@
 from loguru import logger
 
-from any_agent.schema import AgentSchema
-from any_agent.tools.wrappers import import_and_wrap_tools, wrap_tool_langchain
+from any_agent.schema import AgentFramework, AgentSchema
+from any_agent.tools.wrappers import import_and_wrap_tools
 
 
 try:
@@ -31,7 +31,7 @@ def load_lanchain_agent(
     if managed_agents:
         raise NotImplementedError("langchain managed agents are not supported yet")
 
-    imported_tools = import_and_wrap_tools(main_agent.tools, wrap_tool_langchain)
+    imported_tools = import_and_wrap_tools(main_agent.tools, agent_framework=AgentFramework.LANGCHAIN)
 
     model = init_chat_model(main_agent.model_id)
 
