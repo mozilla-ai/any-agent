@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 import os
+from loguru import logger
 from any_agent.schema import MCPTool
 
 # Global registry to keep manager instances alive
@@ -72,7 +73,7 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
                 self.context.__exit__(None, None, None)
                 self.context = None
             except Exception as e:
-                print(f"Error closing MCP context: {e}")
+                logger.error(f"Error closing MCP context: {e}")
 
     def __del__(self):
         self.cleanup()
