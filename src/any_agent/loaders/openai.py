@@ -86,7 +86,10 @@ def load_openai_agent(
                 instructions=get_instructions(managed_agent.instructions),
                 model=_get_model(managed_agent),
                 tools=managed_tools,
-                mcp_servers=[managed_mcp_server.server for managed_mcp_server in managed_mcp_servers],
+                mcp_servers=[
+                    managed_mcp_server.server
+                    for managed_mcp_server in managed_mcp_servers
+                ],
             )
             if managed_agent.handoff:
                 handoffs.append(instance)

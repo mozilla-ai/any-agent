@@ -17,7 +17,7 @@ def test_get_tracer_provider(tmp_path):
         get_tracer_provider(
             project_name="test_project",
             output_dir=tmp_path / "telemetry",
-            agent_framework=AgentFramework.OPENAI
+            agent_framework=AgentFramework.OPENAI,
         )
         assert (tmp_path / "telemetry").exists()
         mock_trace.set_tracer_provider.assert_called_once_with(

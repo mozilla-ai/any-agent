@@ -38,6 +38,7 @@ def merge_mcp_tools(mcp_servers):
         tools.extend(mcp_server.tools)
     return tools
 
+
 @logger.catch(reraise=True)
 def load_smolagents_agent(
     main_agent: AgentSchema,
@@ -68,9 +69,9 @@ def load_smolagents_agent(
                 kwargs = {
                     "prompt_template": {"system_prompt": managed_agent.instructions}
                 }
-            managed_tools, managed_mcp_servers =import_and_wrap_tools(
-                    managed_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
-                )
+            managed_tools, managed_mcp_servers = import_and_wrap_tools(
+                managed_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
+            )
             tools.extend(merge_mcp_tools(managed_mcp_servers))
             managed_agents_instanced.append(
                 agent_type(

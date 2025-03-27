@@ -1,10 +1,13 @@
 import inspect
 import importlib
 from collections.abc import Callable
-from textwrap import dedent
 
 from any_agent.schema import AgentFramework, MCPTool
-from any_agent.tools.mcp import SmolagentsMCPToolsManager, OpenAIMCPToolsManager, MCPToolsManagerBase
+from any_agent.tools.mcp import (
+    SmolagentsMCPToolsManager,
+    OpenAIMCPToolsManager,
+    MCPToolsManagerBase,
+)
 
 
 def import_and_wrap_tools(
@@ -62,7 +65,9 @@ def wrap_tool_smolagents(tool):
     return tool
 
 
-def wrap_mcp_server(mcp_tool: MCPTool, agent_framework: AgentFramework) -> MCPToolsManagerBase:
+def wrap_mcp_server(
+    mcp_tool: MCPTool, agent_framework: AgentFramework
+) -> MCPToolsManagerBase:
     """
     Generic MCP server wrapper that can work with different frameworks
     based on the specified agent_framework
