@@ -50,7 +50,11 @@ class LangchainAgent(AnyAgent):
         for manager in mcp_managers:
             imported_tools.extend(manager.tools)
 
-        model = init_chat_model(self.config.model_id)
+        if "/" in self.config.model_id:
+            model_provider, model_id = self.config.model_id.split("/")
+            model = init_chat_model(model=model_id, model_provider=model_provider)
+        else:
+            model = init_chat_model(self.config.model_id)
 
         self.agent = create_react_agent(
             model=model, tools=imported_tools, prompt=self.config.instructions

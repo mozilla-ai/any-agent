@@ -14,7 +14,7 @@ try:
 except ImportError:
     smolagents_available = None
 
-DEFAULT_AGENT_TYPE = "ToolCallingAgent"
+DEFAULT_AGENT_TYPE = "CodeAgent"
 DEFAULT_MODEL_CLASS = "LiteLLMModel"
 
 
