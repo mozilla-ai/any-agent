@@ -28,7 +28,7 @@ jobs:
           cache: "pip"
 
       - name: Install
-        run: pip install -e '.[mcp,langchain,smolagents,openai,tests]'
+        run: pip install -e '.[mcp,langchain,llama_index,smolagents,openai,tests]'
 
       - name: Run Unit tests
         run: pytest -v tests/unit
