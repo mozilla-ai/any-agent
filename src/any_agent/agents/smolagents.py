@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 from loguru import logger
 
@@ -9,6 +9,7 @@ from .any_agent import AnyAgent
 
 try:
     import smolagents
+    from smolagents import MultiStepAgent
 
     smolagents_available = True
 except ImportError:
@@ -26,6 +27,7 @@ class SmolagentsAgent(AnyAgent):
     ):
         self.managed_agents = managed_agents
         self.config = config
+        self._agent = None
         self._load_agent()
 
     def _get_model(self, agent_config: AgentConfig):
@@ -99,7 +101,7 @@ class SmolagentsAgent(AnyAgent):
         if self.config.instructions:
             kwargs = {"prompt_template": {"system_prompt": self.config.instructions}}
 
-        self.agent = main_agent_type(
+        self._agent: MultiStepAgent = main_agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
             tools=tools,
@@ -110,5 +112,13 @@ class SmolagentsAgent(AnyAgent):
     @logger.catch(reraise=True)
     def run(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
-        result = self.agent.run(prompt)
+        result = self._agent.run(prompt)
         return result
+
+    @property
+    def tools(self) -> List[str]:
+        """
+        Return the tools used by the agent.
+        This property is read-only and cannot be modified.
+        """
+        return self._agent.tools

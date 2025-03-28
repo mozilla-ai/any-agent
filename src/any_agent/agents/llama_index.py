@@ -1,5 +1,5 @@
 import importlib
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 from loguru import logger
 
@@ -26,6 +26,7 @@ class LlamaIndexAgent(AnyAgent):
     ):
         self.managed_agents: Optional[list[AgentConfig]] = managed_agents
         self.config: AgentConfig = config
+        self._agent = None
         self._load_agent()
 
     def _get_model(self, agent_config: AgentConfig):
@@ -64,14 +65,14 @@ class LlamaIndexAgent(AnyAgent):
         for manager in mcp_managers:
             imported_tools.extend(manager.tools)
 
-        self.agent = ReActAgent(
+        self._agent = ReActAgent(
             name=self.config.name,
             tools=imported_tools,
             llm=self._get_model(self.config),
         )
 
     async def _async_run(self, prompt):
-        result = await self.agent.run(prompt)
+        result = await self._agent.run(prompt)
         return result
 
     @logger.catch(reraise=True)
@@ -80,3 +81,11 @@ class LlamaIndexAgent(AnyAgent):
         import asyncio
 
         return asyncio.run(self._async_run(prompt))
+
+    @property
+    def tools(self) -> List[str]:
+        """
+        Return the tools used by the agent.
+        This property is read-only and cannot be modified.
+        """
+        return self._agent.tools

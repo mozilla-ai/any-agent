@@ -80,9 +80,8 @@ def setup_tracing(
 
     Args:
         tracer_provider (TracerProvider): The configured tracer provider from
-            [get_tracer_provider][surf_spot_finder.tracing.get_tracer_provider].
+            [get_tracer_provider][any_agent.tracing.get_tracer_provider].
         agent_framework (AgentFramework): The type of agent being used.
-            Must be one of the supported types in [RUNNERS][surf_spot_finder.agents.RUNNERS].
     """
     if agent_framework == AgentFramework.OPENAI:
         from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor

@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 from loguru import logger
 
@@ -26,6 +26,7 @@ class OpenAIAgent(AnyAgent):
     ):
         self.managed_agents = managed_agents
         self.config = config
+        self._agent = None
         self._load_agent()
 
     def _get_model(self, agent_config: AgentConfig):
@@ -85,7 +86,7 @@ class OpenAIAgent(AnyAgent):
                         )
                     )
 
-        self.agent = Agent(
+        self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
             model=self._get_model(self.config),
@@ -102,6 +103,17 @@ class OpenAIAgent(AnyAgent):
                 "You need to `pip install openai-agents` to use this agent"
             )
 
-        result = Runner.run_sync(self.agent, prompt, max_turns=OPENAI_MAX_TURNS)
+        result = Runner.run_sync(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
         logger.info(result.final_output)
         return result
+
+    @property
+    def tools(self) -> List[str]:
+        """
+        Return the tools used by the agent.
+        This property is read-only and cannot be modified.
+        """
+        if hasattr(self, "_agent") and hasattr(self._agent, "tools"):
+            # Extract tool names from the agent's tools
+            return [tool.name for tool in self._agent.tools if hasattr(tool, "name")]
+        return []

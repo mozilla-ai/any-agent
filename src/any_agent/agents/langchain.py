@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 from loguru import logger
 
@@ -9,6 +9,7 @@ from .any_agent import AnyAgent
 try:
     from langchain.chat_models import init_chat_model
     from langgraph.prebuilt import create_react_agent
+    from langgraph.graph.graph import CompiledGraph
 
     langchain_available = True
 except ImportError:
@@ -23,6 +24,8 @@ class LangchainAgent(AnyAgent):
     ):
         self.managed_agents = managed_agents
         self.config = config
+        self._agent = None
+        self._tools = []
         self._load_agent()
 
     @logger.catch(reraise=True)
@@ -56,19 +59,29 @@ class LangchainAgent(AnyAgent):
         else:
             model = init_chat_model(self.config.model_id)
 
-        self.agent = create_react_agent(
+        self._agent: CompiledGraph = create_react_agent(
             model=model, tools=imported_tools, prompt=self.config.instructions
         )
+        # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph, so we'll store a list of them in this class
+        self._tools = imported_tools
 
     @logger.catch(reraise=True)
     def run(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
         inputs = {"messages": [("user", prompt)]}
         message = None
-        for s in self.agent.stream(inputs, stream_mode="values"):
+        for s in self._agent.stream(inputs, stream_mode="values"):
             message = s["messages"][-1]
             if isinstance(message, tuple):
                 logger.debug(message)
             else:
                 message.pretty_print()
         return message
+
+    @property
+    def tools(self) -> List[str]:
+        """
+        Return the tools used by the agent.
+        This property is read-only and cannot be modified.
+        """
+        return self._tools

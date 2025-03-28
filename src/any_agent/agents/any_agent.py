@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, List
 from abc import ABC, abstractmethod
 
 from any_agent.config import AgentFramework, AgentConfig
@@ -46,3 +46,37 @@ class AnyAgent(ABC):
     def run(self, prompt: str) -> Any:
         """Run the agent with the given prompt."""
         pass
+
+    @property
+    @abstractmethod
+    def tools(self) -> List[str]:
+        """
+        Return the tools used by the agent.
+        This property is read-only and cannot be modified.
+        """
+        pass
+
+    def __init__(self):
+        raise NotImplementedError(
+            "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
+        )
+
+    @property
+    def agent(self):
+        """
+        The underlying agent implementation from the framework.
+
+        This property is intentionally restricted to maintain framework abstraction
+        and prevent direct dependency on specific agent implementations.
+
+        If you need functionality that relies on accessing the underlying agent:
+        1. Consider if the functionality can be added to the AnyAgent interface
+        2. Submit a GitHub issue describing your use case
+        3. Contribute a PR implementing the needed functionality
+
+        Raises:
+            NotImplementedError: Always raised when this property is accessed
+        """
+        raise NotImplementedError(
+            "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
+        )

@@ -59,6 +59,10 @@ tests = [
   "debugpy>=1.8.13",
 ]
 
+dev = [
+  "pre-commit",
+]
+
 [project.urls]
 Documentation = "https://mozilla-ai.github.io/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
