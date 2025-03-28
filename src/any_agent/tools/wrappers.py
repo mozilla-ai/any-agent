@@ -19,6 +19,7 @@ def import_and_wrap_tools(
         AgentFramework.OPENAI: wrap_tool_openai,
         AgentFramework.LANGCHAIN: wrap_tool_langchain,
         AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
+        AgentFramework.LLAMAINDEX: wrap_tool_lammaindex,
     }
 
     wrapper = wrapper_map[agent_framework]
@@ -62,7 +63,14 @@ def wrap_tool_smolagents(tool):
 
     if not isinstance(tool, Tool):
         return smolagents_tool(tool)
+    return tool
 
+
+def wrap_tool_lammaindex(tool):
+    from llama_index.core.tools import FunctionTool
+
+    if not isinstance(tool, FunctionTool):
+        return FunctionTool.from_defaults(tool)
     return tool
 
 

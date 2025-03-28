@@ -6,6 +6,7 @@ class AgentFramework(str, Enum):
     OPENAI = "openai"
     LANGCHAIN = "langchain"
     SMOLAGENTS = "smolagents"
+    LLAMAINDEX = "llama_index"
 
 
 class MCPTool(BaseModel):

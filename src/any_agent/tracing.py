@@ -96,5 +96,9 @@ def setup_tracing(
         from openinference.instrumentation.langchain import LangChainInstrumentor
 
         LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+    elif agent_framework == AgentFramework.LLAMAINDEX:
+        from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+
+        LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
     else:
         raise NotImplementedError(f"{agent_framework} tracing is not supported.")

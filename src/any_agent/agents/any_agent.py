@@ -18,17 +18,22 @@ class AnyAgent(ABC):
         agent_config: AgentConfig,
         managed_agents: Optional[list[AgentConfig]] = None,
     ) -> "AnyAgent":
-        # Import here to avoid circular imports
-        from any_agent.agents.langchain_agent import LangchainAgent
-        from any_agent.agents.openai_agent import OpenAIAgent
-        from any_agent.agents.smolagents_agent import SmolagentsAgent
-
         if agent_framework == AgentFramework.SMOLAGENTS:
+            from any_agent.agents.smolagents import SmolagentsAgent
+
             return SmolagentsAgent(agent_config, managed_agents=managed_agents)
         elif agent_framework == AgentFramework.LANGCHAIN:
+            from any_agent.agents.langchain import LangchainAgent
+
             return LangchainAgent(agent_config, managed_agents=managed_agents)
         elif agent_framework == AgentFramework.OPENAI:
+            from any_agent.agents.openai import OpenAIAgent
+
             return OpenAIAgent(agent_config, managed_agents=managed_agents)
+        elif agent_framework == AgentFramework.LLAMAINDEX:
+            from any_agent.agents.llama_index import LlamaIndexAgent
+
+            return LlamaIndexAgent(agent_config, managed_agents=managed_agents)
         else:
             raise ValueError(f"Unsupported agent framework: {agent_framework}")
 

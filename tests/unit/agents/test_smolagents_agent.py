@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from any_agent import AgentFramework, AgentConfig, AnyAgent
-from any_agent.agents.smolagents_agent import (
+from any_agent.agents.smolagents import (
     DEFAULT_AGENT_TYPE,
     DEFAULT_MODEL_CLASS,
 )

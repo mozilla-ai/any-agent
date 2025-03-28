@@ -27,6 +27,12 @@ langchain = [
   "langchain-mcp-adapters>=0.0.3",
   "openinference-instrumentation-langchain"
 ]
+
+llama_index = [
+  "llama-index",
+  "openinference-instrumentation-llama-index"
+]
+
 smolagents = [
   "smolagents[litellm,mcp]>=1.10.0",
   "openinference-instrumentation-smolagents>=0.1.4"
