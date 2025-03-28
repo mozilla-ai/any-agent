@@ -12,7 +12,7 @@ try:
 
     llama_index_available = True
 except ImportError:
-    langchain_available = False
+    llama_index_available = False
 
 
 DEFAULT_MODEL_CLASS = "openai.OpenAI"

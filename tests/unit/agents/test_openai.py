@@ -11,12 +11,12 @@ from any_agent.tools import (
 )
 
 
-def test_load_openai_agent_default():
+def test_load_openai_default():
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
 
     with (
-        patch("any_agent.agents.openai_agent.Agent", mock_agent),
+        patch("any_agent.agents.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
     ):
         AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
@@ -30,15 +30,15 @@ def test_load_openai_agent_default():
         )
 
 
-def test_openai_agent_with_api_base_and_api_key_var():
+def test_openai_with_api_base_and_api_key_var():
     mock_agent = MagicMock()
     async_openai_mock = MagicMock()
     openai_chat_completions_model = MagicMock()
     with (
-        patch("any_agent.agents.openai_agent.Agent", mock_agent),
-        patch("any_agent.agents.openai_agent.AsyncOpenAI", async_openai_mock),
+        patch("any_agent.agents.openai.Agent", mock_agent),
+        patch("any_agent.agents.openai.AsyncOpenAI", async_openai_mock),
         patch(
-            "any_agent.agents.openai_agent.OpenAIChatCompletionsModel",
+            "any_agent.agents.openai.OpenAIChatCompletionsModel",
             openai_chat_completions_model,
         ),
         patch.dict(os.environ, {"TEST_API_KEY": "test-key-12345"}),
@@ -65,16 +65,16 @@ def test_openai_environment_error():
             )
 
 
-def test_load_openai_agent_with_mcp_server():
+def test_load_openai_with_mcp_server():
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
     mock_mcp_server = MagicMock()
     mock_mcp_server.server = MagicMock()
 
     with (
-        patch("any_agent.agents.openai_agent.Agent", mock_agent),
+        patch("any_agent.agents.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
-        patch("any_agent.agents.openai_agent.import_and_wrap_tools") as mock_wrap_tools,
+        patch("any_agent.agents.openai.import_and_wrap_tools") as mock_wrap_tools,
     ):
         # Setup the mock to return tools and MCP servers
         mock_wrap_tools.return_value = (
@@ -108,7 +108,7 @@ def test_load_openai_multiagent():
     mock_function_tool = MagicMock()
 
     with (
-        patch("any_agent.agents.openai_agent.Agent", mock_agent),
+        patch("any_agent.agents.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
     ):
         main_agent = AgentConfig(
@@ -176,3 +176,11 @@ def test_load_openai_multiagent():
             ],
             mcp_servers=[],
         )
+
+
+def test_load_openai_agent_missing():
+    with patch("any_agent.agents.openai.agents_available", False):
+        with pytest.raises(
+            ImportError, match="You need to `pip install openai-agents`"
+        ):
+            AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))

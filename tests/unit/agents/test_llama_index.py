@@ -1,5 +1,7 @@
 from unittest.mock import patch, MagicMock
 
+import pytest
+
 from any_agent import AgentFramework, AgentConfig, AnyAgent
 from any_agent.tools import (
     search_web,
@@ -27,3 +29,9 @@ def test_load_llama_index_agent_default():
             llm=model_mock.return_value,
             tools=[tool_mock(search_web), tool_mock(visit_webpage)],
         )
+
+
+def test_load_llama_index_agent_missing():
+    with patch("any_agent.agents.llama_index.llama_index_available", False):
+        with pytest.raises(ImportError, match="You need to `pip install llama-index`"):
+            AnyAgent.create(AgentFramework.LLAMAINDEX, AgentConfig(model_id="gpt-4o"))
