@@ -2,14 +2,12 @@
 
 A single interface for different Agent frameworks
 
-
 ```py
 from random import choice
-from any_agent import AgentSchema, AgentFramework, load_agent, run_agent
+from any_agent import AgentFramework, AgentSchema, AnyAgent
 
-agent = load_agent(
-    framework=AgentFramework(choice(["langchain", "openai", "smolagents"]))
-    main_agent=AgentSchema(model_id="gpt-4o-mini"),
-)
-result = run_agent(agent, "What day is today?")
+framework = AgentFramework(choice([AgentFramework.LANGCHAIN, AgentFramework.OPENAI, AgentFramework.SMOLAGENTS]))
+agent_config = AgentSchema(model_id="gpt-4o-mini")
+agent = AnyAgent.create(framework, agent_config)
+agent.run("What day is today?")
 ```

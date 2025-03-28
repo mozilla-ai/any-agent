@@ -2,10 +2,8 @@ import os
 import pytest
 from unittest.mock import patch, MagicMock
 
-
-from any_agent.schema import AgentSchema
-from any_agent.loaders.smolagents import (
-    load_smolagents_agent,
+from any_agent import AgentFramework, AgentSchema, AnyAgent
+from any_agent.agents.smolagents_agent import (
     DEFAULT_AGENT_TYPE,
     DEFAULT_MODEL_CLASS,
 )
@@ -22,7 +20,8 @@ def test_load_smolagent_default():
         patch(f"smolagents.{DEFAULT_MODEL_CLASS}", mock_model),
         patch("smolagents.tool", mock_tool),
     ):
-        load_smolagents_agent(
+        AnyAgent.create(
+            AgentFramework.SMOLAGENTS,
             AgentSchema(
                 model_id="openai/o3-mini",
             ),
@@ -47,7 +46,8 @@ def test_load_smolagent_with_api_base_and_api_key_var():
         patch("smolagents.tool", mock_tool),
         patch.dict(os.environ, {"OPENAI_API_KEY": "BAR"}),
     ):
-        load_smolagents_agent(
+        AnyAgent.create(
+            AgentFramework.SMOLAGENTS,
             AgentSchema(
                 model_id="openai/o3-mini",
                 api_base="https://custom-api.example.com",
@@ -68,8 +68,18 @@ def test_load_smolagent_with_api_base_and_api_key_var():
 
 
 def test_load_smolagent_environment_error():
-    with patch.dict(os.environ, {}, clear=True):
+    mock_agent = MagicMock()
+    mock_model = MagicMock()
+    mock_tool = MagicMock()
+
+    with (
+        patch(f"smolagents.{DEFAULT_AGENT_TYPE}", mock_agent),
+        patch(f"smolagents.{DEFAULT_MODEL_CLASS}", mock_model),
+        patch("smolagents.tool", mock_tool),
+        patch.dict(os.environ, {}, clear=True),
+    ):
         with pytest.raises(KeyError, match="MISSING_KEY"):
-            load_smolagents_agent(
+            agent = AnyAgent.create(
+                AgentFramework.SMOLAGENTS,
                 AgentSchema(model_id="openai/o3-mini", api_key_var="MISSING_KEY"),
             )
