@@ -6,9 +6,16 @@ import asyncio
 from loguru import logger
 from textwrap import dedent
 
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
 from any_agent.config import MCPTool
+
+try:
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.stdio import stdio_client
+
+    mcp_available = True
+except ImportError:
+    mcp_available = False
+
 
 # Global registry to keep manager instances alive
 _mcp_managers = {}
@@ -18,6 +25,8 @@ class MCPToolsManagerBase(ABC):
     """Base class for MCP tools managers across different frameworks."""
 
     def __init__(self, mcp_tool: MCPTool):
+        if not mcp_available:
+            raise ImportError("You need to `pip install mcp` to use this tools.")
         # Generate a unique identifier for this manager instance
         self.id = id(self)
 
