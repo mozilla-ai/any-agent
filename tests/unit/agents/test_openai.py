@@ -45,7 +45,10 @@ def test_openai_with_api_base_and_api_key_var():
     ):
         AnyAgent.create(
             AgentFramework.OPENAI,
-            AgentConfig(model_id="gpt-4o", api_base="FOO", api_key_var="TEST_API_KEY"),
+            AgentConfig(
+                model_id="gpt-4o",
+                model_args=dict(base_url="FOO", api_key_var="TEST_API_KEY"),
+            ),
         )
         async_openai_mock.assert_called_once_with(
             api_key="test-key-12345",
@@ -60,7 +63,8 @@ def test_openai_environment_error():
             AnyAgent.create(
                 AgentFramework.OPENAI,
                 AgentConfig(
-                    model_id="gpt-4o", api_base="FOO", api_key_var="MISSING_KEY"
+                    model_id="gpt-4o",
+                    model_args=dict(base_url="FOO", api_key_var="MISSING_KEY"),
                 ),
             )
 

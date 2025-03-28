@@ -31,10 +31,13 @@ class OpenAIAgent(AnyAgent):
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for an OpenAI agent."""
-        if agent_config.api_key_var and agent_config.api_base:
+        model_args = agent_config.model_args or {}
+        api_key_var = model_args.pop("api_key_var", None)
+        base_url = model_args.pop("base_url", None)
+        if api_key_var and base_url:
             external_client = AsyncOpenAI(
-                api_key=os.environ[agent_config.api_key_var],
-                base_url=agent_config.api_base,
+                api_key=os.environ[api_key_var],
+                base_url=base_url,
             )
             return OpenAIChatCompletionsModel(
                 model=agent_config.model_id,
@@ -65,6 +68,9 @@ class OpenAIAgent(AnyAgent):
                 managed_tools, managed_mcp_servers = import_and_wrap_tools(
                     managed_agent.tools, agent_framework=AgentFramework.OPENAI
                 )
+                kwargs = {}
+                if managed_agent.model_args:
+                    kwargs["model_settings"] = managed_agent.model_args
                 instance = Agent(
                     name=managed_agent.name,
                     instructions=get_instructions(managed_agent.instructions),
@@ -74,6 +80,7 @@ class OpenAIAgent(AnyAgent):
                         managed_mcp_server.server
                         for managed_mcp_server in managed_mcp_servers
                     ],
+                    **kwargs,
                 )
                 if managed_agent.handoff:
                     handoffs.append(instance)
@@ -86,6 +93,9 @@ class OpenAIAgent(AnyAgent):
                         )
                     )
 
+        kwargs = self.config.agent_args or {}
+        if self.config.model_args:
+            kwargs["model_settings"] = self.config.model_args
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
@@ -93,6 +103,7 @@ class OpenAIAgent(AnyAgent):
             handoffs=handoffs,
             tools=tools,
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
+            **kwargs,
         )
 
     @logger.catch(reraise=True)

@@ -32,17 +32,14 @@ class SmolagentsAgent(AnyAgent):
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a smolagents agent."""
-        model_class = getattr(
-            smolagents, agent_config.model_class or DEFAULT_MODEL_CLASS
-        )
+        model_type = getattr(smolagents, agent_config.model_type or DEFAULT_MODEL_CLASS)
         kwargs = {
             "model_id": agent_config.model_id,
         }
-        if agent_config.api_base:
-            kwargs["api_base"] = agent_config.api_base
-        if agent_config.api_key_var:
-            kwargs["api_key"] = os.environ[agent_config.api_key_var]
-        return model_class(**kwargs)
+        model_args = agent_config.model_args or {}
+        if api_key_var := model_args.pop("api_key_var", None):
+            kwargs["api_key"] = os.environ[api_key_var]
+        return model_type(**kwargs, **model_args)
 
     def _merge_mcp_tools(self, mcp_servers):
         """Merge MCP tools from different servers."""
@@ -100,6 +97,7 @@ class SmolagentsAgent(AnyAgent):
             model=self._get_model(self.config),
             tools=tools,
             managed_agents=managed_agents_instanced,
+            **self.config.agent_args or {},
         )
 
         if self.config.instructions:

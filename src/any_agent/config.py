@@ -20,10 +20,10 @@ class AgentConfig(BaseModel):
     model_id: str
     name: str = "default-name"
     instructions: str | None = None
-    api_base: str | None = None
-    api_key_var: str | None = None
     tools: list[str | MCPTool] = Field(default_factory=list)
     handoff: bool = False
     agent_type: str | None = None
-    model_class: str | None = None
+    agent_args: dict | None = None
+    model_type: str | None = None
+    model_args: dict | None = None
     description: str | None = None

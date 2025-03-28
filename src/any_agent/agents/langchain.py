@@ -55,12 +55,21 @@ class LangchainAgent(AnyAgent):
 
         if "/" in self.config.model_id:
             model_provider, model_id = self.config.model_id.split("/")
-            model = init_chat_model(model=model_id, model_provider=model_provider)
+            model = init_chat_model(
+                model=model_id,
+                model_provider=model_provider,
+                **self.config.model_args or {},
+            )
         else:
-            model = init_chat_model(self.config.model_id)
+            model = init_chat_model(
+                self.config.model_id, **self.config.model_args or {}
+            )
 
         self._agent: CompiledGraph = create_react_agent(
-            model=model, tools=imported_tools, prompt=self.config.instructions
+            model=model,
+            tools=imported_tools,
+            prompt=self.config.instructions,
+            **self.config.agent_args or {},
         )
         # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph, so we'll store a list of them in this class
         self._tools = imported_tools

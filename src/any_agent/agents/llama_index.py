@@ -31,14 +31,14 @@ class LlamaIndexAgent(AnyAgent):
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a llama_index agent."""
-        if not agent_config.model_class:
-            agent_config.model_class = DEFAULT_MODEL_CLASS
-        module, class_name = agent_config.model_class.split(".")
-        model_class = getattr(
+        if not agent_config.model_type:
+            agent_config.model_type = DEFAULT_MODEL_CLASS
+        module, class_name = agent_config.model_type.split(".")
+        model_type = getattr(
             importlib.import_module(f"llama_index.llms.{module}"), class_name
         )
 
-        return model_class(model=agent_config.model_id)
+        return model_type(model=agent_config.model_id, **agent_config.model_args or {})
 
     @logger.catch(reraise=True)
     def _load_agent(self) -> None:
@@ -69,6 +69,7 @@ class LlamaIndexAgent(AnyAgent):
             name=self.config.name,
             tools=imported_tools,
             llm=self._get_model(self.config),
+            **self.config.agent_args or {},
         )
 
     async def _async_run(self, prompt):
