@@ -68,7 +68,7 @@ class LangchainAgent(AnyAgent):
         for s in self.agent.stream(inputs, stream_mode="values"):
             message = s["messages"][-1]
             if isinstance(message, tuple):
-                print(message)
+                logger.debug(message)
             else:
                 message.pretty_print()
         return message
