@@ -17,6 +17,7 @@ except ImportError:
 
 OPENAI_MAX_TURNS = 30
 
+
 class OpenAIAgent(AnyAgent):
     """OpenAI agent implementation that handles both loading and running."""
 
