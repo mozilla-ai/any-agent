@@ -15,6 +15,7 @@ try:
 except ImportError:
     agents_available = None
 
+OPENAI_MAX_TURNS = 30
 
 class OpenAIAgent(AnyAgent):
     """OpenAI agent implementation that handles both loading and running."""
@@ -100,6 +101,6 @@ class OpenAIAgent(AnyAgent):
                 "You need to `pip install openai-agents` to use this agent"
             )
 
-        result = Runner.run_sync(self.agent, prompt)
+        result = Runner.run_sync(self.agent, prompt, max_turns=OPENAI_MAX_TURNS)
         logger.info(result.final_output)
         return result
