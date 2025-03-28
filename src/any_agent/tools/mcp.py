@@ -125,25 +125,15 @@ class OpenAIMCPToolsManager(MCPToolsManagerBase):
                 "args": self.mcp_tool.args,
             },
         )
-        # Create event loop if needed
-        try:
-            self.loop = asyncio.get_event_loop()
-        except RuntimeError:
-            self.loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(self.loop)
-        # Start the server
+
+        self.loop = asyncio.get_event_loop()
+
         self.loop.run_until_complete(self.server.__aenter__())
         # Get tools from the server
         self.tools = self.loop.run_until_complete(self.server.list_tools())
 
     def cleanup(self):
-        """Clean up the MCP server resources."""
-        if self.server and self.loop:
-            try:
-                self.loop.run_until_complete(self.server.__aexit__(None, None, None))
-                self.server = None
-            except Exception as e:
-                logger.error(f"Error closing OpenAI MCP server: {e}")
+        self.server = None
 
     def __del__(self):
         self.cleanup()
