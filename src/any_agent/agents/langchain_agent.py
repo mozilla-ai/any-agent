@@ -1,4 +1,3 @@
-import os
 from typing import Any, Optional
 
 from loguru import logger
@@ -10,6 +9,7 @@ from .any_agent import AnyAgent
 try:
     from langchain.chat_models import init_chat_model
     from langgraph.prebuilt import create_react_agent
+
     langchain_available = True
 except ImportError:
     langchain_available = False
@@ -17,8 +17,10 @@ except ImportError:
 
 class LangchainAgent(AnyAgent):
     """LangChain agent implementation that handles both loading and running."""
-    
-    def __init__(self, config: AgentSchema, managed_agents: Optional[list[AgentSchema]] = None):
+
+    def __init__(
+        self, config: AgentSchema, managed_agents: Optional[list[AgentSchema]] = None
+    ):
         self.managed_agents = managed_agents
         self.config = config
         self._load_agent()

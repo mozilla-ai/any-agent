@@ -19,9 +19,7 @@ def test_load_langchain_agent_default():
         patch("any_agent.agents.langchain_agent.init_chat_model", model_mock),
         patch("langchain_core.tools.tool", tool_mock),
     ):
-        AnyAgent.create(
-            AgentFramework.LANGCHAIN, AgentSchema(model_id="gpt-4o")
-        )
+        AnyAgent.create(AgentFramework.LANGCHAIN, AgentSchema(model_id="gpt-4o"))
         model_mock.assert_called_once_with("gpt-4o")
         create_mock.assert_called_once_with(
             model=model_mock.return_value,

@@ -1,5 +1,5 @@
 import os
-from typing import Optional, TYPE_CHECKING, Any
+from typing import Optional, Any
 
 from loguru import logger
 
@@ -9,12 +9,8 @@ from any_agent.tools.wrappers import import_and_wrap_tools
 from .any_agent import AnyAgent
 
 try:
-    from agents import (
-        Agent,
-        AsyncOpenAI,
-        OpenAIChatCompletionsModel,
-        Runner
-    )
+    from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel, Runner
+
     agents_available = True
 except ImportError:
     agents_available = None
@@ -22,8 +18,10 @@ except ImportError:
 
 class OpenAIAgent(AnyAgent):
     """OpenAI agent implementation that handles both loading and running."""
-    
-    def __init__(self, config: AgentSchema, managed_agents: Optional[list[AgentSchema]] = None):
+
+    def __init__(
+        self, config: AgentSchema, managed_agents: Optional[list[AgentSchema]] = None
+    ):
         self.managed_agents = managed_agents
         self.config = config
         self._load_agent()
@@ -45,7 +43,9 @@ class OpenAIAgent(AnyAgent):
     def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
         if not agents_available:
-            raise ImportError("You need to `pip install openai-agents` to use this agent")
+            raise ImportError(
+                "You need to `pip install openai-agents` to use this agent"
+            )
 
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
@@ -96,7 +96,9 @@ class OpenAIAgent(AnyAgent):
     def run(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt."""
         if not agents_available:
-            raise ImportError("You need to `pip install openai-agents` to use this agent")
+            raise ImportError(
+                "You need to `pip install openai-agents` to use this agent"
+            )
 
         result = Runner.run_sync(self.agent, prompt)
         logger.info(result.final_output)

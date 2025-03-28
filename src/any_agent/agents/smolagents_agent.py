@@ -1,5 +1,5 @@
 import os
-from typing import Optional, TYPE_CHECKING, Any
+from typing import Optional, Any
 
 from loguru import logger
 
@@ -9,6 +9,7 @@ from .any_agent import AnyAgent
 
 try:
     import smolagents
+
     smolagents_available = True
 except ImportError:
     smolagents_available = None
@@ -19,15 +20,19 @@ DEFAULT_MODEL_CLASS = "LiteLLMModel"
 
 class SmolagentsAgent(AnyAgent):
     """Smolagents agent implementation that handles both loading and running."""
-    
-    def __init__(self, config: AgentSchema, managed_agents: Optional[list[AgentSchema]] = None):
+
+    def __init__(
+        self, config: AgentSchema, managed_agents: Optional[list[AgentSchema]] = None
+    ):
         self.managed_agents = managed_agents
         self.config = config
         self._load_agent()
 
     def _get_model(self, agent_config: AgentSchema):
         """Get the model configuration for a smolagents agent."""
-        model_class = getattr(smolagents, agent_config.model_class or DEFAULT_MODEL_CLASS)
+        model_class = getattr(
+            smolagents, agent_config.model_class or DEFAULT_MODEL_CLASS
+        )
         kwargs = {
             "model_id": agent_config.model_id,
         }
@@ -87,11 +92,13 @@ class SmolagentsAgent(AnyAgent):
                     )
                 )
 
-        main_agent_type = getattr(smolagents, self.config.agent_type or DEFAULT_AGENT_TYPE)
+        main_agent_type = getattr(
+            smolagents, self.config.agent_type or DEFAULT_AGENT_TYPE
+        )
         kwargs = {}
         if self.config.instructions:
             kwargs = {"prompt_template": {"system_prompt": self.config.instructions}}
-        
+
         self.agent = main_agent_type(
             name=self.config.name,
             model=self._get_model(self.config),

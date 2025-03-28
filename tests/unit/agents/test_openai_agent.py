@@ -3,7 +3,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from any_agent import AgentFramework, AgentSchema, AnyAgent
-from any_agent.agents.openai_agent import OpenAIAgent
 from any_agent.tools import (
     show_final_answer,
     ask_user_verification,
@@ -20,9 +19,7 @@ def test_load_openai_agent_default():
         patch("any_agent.agents.openai_agent.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
     ):
-        agent = AnyAgent.create(
-            AgentFramework.OPENAI, AgentSchema(model_id="gpt-4o")
-        )
+        AnyAgent.create(AgentFramework.OPENAI, AgentSchema(model_id="gpt-4o"))
         mock_agent.assert_called_once_with(
             name="default-name",
             model="gpt-4o",
@@ -31,6 +28,7 @@ def test_load_openai_agent_default():
             tools=[mock_function_tool(search_web), mock_function_tool(visit_webpage)],
             mcp_servers=[],
         )
+
 
 def test_openai_agent_with_api_base_and_api_key_var():
     mock_agent = MagicMock()
@@ -45,11 +43,9 @@ def test_openai_agent_with_api_base_and_api_key_var():
         ),
         patch.dict(os.environ, {"TEST_API_KEY": "test-key-12345"}),
     ):
-        agent = AnyAgent.create(
+        AnyAgent.create(
             AgentFramework.OPENAI,
-            AgentSchema(
-                model_id="gpt-4o", api_base="FOO", api_key_var="TEST_API_KEY"
-            ),
+            AgentSchema(model_id="gpt-4o", api_base="FOO", api_key_var="TEST_API_KEY"),
         )
         async_openai_mock.assert_called_once_with(
             api_key="test-key-12345",
@@ -61,7 +57,7 @@ def test_openai_agent_with_api_base_and_api_key_var():
 def test_openai_environment_error():
     with patch.dict(os.environ, {}, clear=True):
         with pytest.raises(KeyError, match="MISSING_KEY"):
-            agent = AnyAgent.create(
+            AnyAgent.create(
                 AgentFramework.OPENAI,
                 AgentSchema(
                     model_id="gpt-4o", api_base="FOO", api_key_var="MISSING_KEY"
@@ -93,7 +89,7 @@ def test_load_openai_agent_with_mcp_server():
                 tools=[
                     "some.mcp.server"
                 ],  # The actual import path doesn't matter for the test
-            )
+            ),
         )
 
         # Verify Agent was called with the MCP server
@@ -110,11 +106,10 @@ def test_load_openai_agent_with_mcp_server():
 def test_load_openai_multiagent():
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
-    mock_openai_agent = MagicMock()
 
     with (
         patch("any_agent.agents.openai_agent.Agent", mock_agent),
-        patch("agents.function_tool", mock_function_tool)
+        patch("agents.function_tool", mock_function_tool),
     ):
         main_agent = AgentSchema(
             model_id="o3-mini",
@@ -140,8 +135,10 @@ def test_load_openai_multiagent():
                 handoff=True,
             ),
         ]
-        
-        AnyAgent.create(AgentFramework.OPENAI, main_agent, managed_agents=managed_agents)
+
+        AnyAgent.create(
+            AgentFramework.OPENAI, main_agent, managed_agents=managed_agents
+        )
         mock_agent.assert_any_call(
             model="gpt-4o-mini",
             instructions=None,

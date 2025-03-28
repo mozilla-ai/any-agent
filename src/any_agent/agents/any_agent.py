@@ -1,4 +1,4 @@
-from typing import Union, Any, Optional
+from typing import Any, Optional
 from abc import ABC, abstractmethod
 
 from any_agent.schema import AgentFramework, AgentSchema

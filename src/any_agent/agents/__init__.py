@@ -4,9 +4,4 @@ from .openai_agent import OpenAIAgent
 from .smolagents_agent import SmolagentsAgent
 
 
-__all__ = [
-    "AnyAgent",
-    "LangchainAgent",
-    "OpenAIAgent",
-    "SmolagentsAgent"
-]
+__all__ = ["AnyAgent", "LangchainAgent", "OpenAIAgent", "SmolagentsAgent"]

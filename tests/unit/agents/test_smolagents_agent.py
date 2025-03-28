@@ -79,7 +79,7 @@ def test_load_smolagent_environment_error():
         patch.dict(os.environ, {}, clear=True),
     ):
         with pytest.raises(KeyError, match="MISSING_KEY"):
-            agent = AnyAgent.create(
+            AnyAgent.create(
                 AgentFramework.SMOLAGENTS,
                 AgentSchema(model_id="openai/o3-mini", api_key_var="MISSING_KEY"),
             )
