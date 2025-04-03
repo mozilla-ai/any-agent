@@ -11,40 +11,10 @@ from any_agent.tools.mcp import (
 )
 
 
-def import_and_wrap_tools(
-    tools: list[str | dict], agent_framework: AgentFramework
-) -> tuple[list[Callable], list[MCPToolsManagerBase]]:
-    # Select the appropriate wrapper based on agent_framework
-    wrapper_map = {
-        AgentFramework.OPENAI: wrap_tool_openai,
-        AgentFramework.LANGCHAIN: wrap_tool_langchain,
-        AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
-        AgentFramework.LLAMAINDEX: wrap_tool_llama_index,
-    }
-
-    wrapper = wrapper_map[agent_framework]
-
-    imported_tools = []
-    mcp_servers = []
-    for tool in tools:
-        if isinstance(tool, MCPTool):  # Handle MCP tool configuration
-            # This is an MCP tool definition
-            mcp_server = wrap_mcp_server(tool, agent_framework)
-            mcp_servers.append(mcp_server)
-        else:  # Regular string tool reference
-            module, func = tool.rsplit(".", 1)
-            module = importlib.import_module(module)
-            imported_tool = getattr(module, func)
-            if inspect.isclass(imported_tool):
-                imported_tool = imported_tool()
-            imported_tools.append(wrapper(imported_tool))
-    return imported_tools, mcp_servers
-
-
 def wrap_tool_openai(tool):
-    from agents import function_tool, FunctionTool
+    from agents import function_tool, Tool
 
-    if not isinstance(tool, FunctionTool):
+    if not isinstance(tool, Tool):
         return function_tool(tool)
     return tool
 
@@ -98,3 +68,40 @@ def wrap_mcp_server(
     manager = manager_class(mcp_tool)
 
     return manager
+
+
+WRAPPERS = {
+    AgentFramework.OPENAI: wrap_tool_openai,
+    AgentFramework.LANGCHAIN: wrap_tool_langchain,
+    AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
+    AgentFramework.LLAMAINDEX: wrap_tool_llama_index,
+}
+
+
+def import_and_wrap_tools(
+    tools: list[str | dict], agent_framework: AgentFramework
+) -> tuple[list[Callable], list[MCPToolsManagerBase]]:
+    wrapper = WRAPPERS[agent_framework]
+
+    wrapped_tools = []
+    mcp_servers = []
+    for tool in tools:
+        if isinstance(tool, MCPTool):
+            # MCP adapters are usually implemented as context managers.
+            # We wrap the server using `MCPToolsManagerBase` so the
+            # tools can be used as any other callable.
+            mcp_server = wrap_mcp_server(tool, agent_framework)
+            mcp_servers.append(mcp_server)
+        elif isinstance(tool, str):
+            module, func = tool.rsplit(".", 1)
+            module = importlib.import_module(module)
+            imported_tool = getattr(module, func)
+            if inspect.isclass(imported_tool):
+                imported_tool = imported_tool()
+            wrapped_tools.append(wrapper(imported_tool))
+        else:
+            raise ValueError(
+                f"Tool {tool} needs to be of type `str` or `MCPTool` but is {type(tool)}"
+            )
+
+    return wrapped_tools, mcp_servers
