@@ -6,4 +6,6 @@
 
 ::: any_agent.agents
 
+::: any_agent.instructions
+
 ::: any_agent.tools
