@@ -2,7 +2,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from any_agent.tracing import get_tracer_provider, setup_tracing
+from any_agent.tracing import _get_tracer_provider, setup_tracing
 from any_agent.config import AgentFramework
 
 
@@ -14,17 +14,16 @@ def test_get_tracer_provider(tmp_path):
         patch("any_agent.tracing.trace", mock_trace),
         patch("any_agent.tracing.TracerProvider", mock_tracer_provider),
     ):
-        get_tracer_provider(
-            project_name="test_project",
-            output_dir=tmp_path / "telemetry",
+        _get_tracer_provider(
+            output_dir=tmp_path / "traces",
             agent_framework=AgentFramework.OPENAI,
         )
-        assert (tmp_path / "telemetry").exists()
+        assert (tmp_path / "traces").exists()
         mock_trace.set_tracer_provider.assert_called_once_with(
             mock_tracer_provider.return_value
         )
 
 
-def test_invalid_agent_framework():
+def test_invalid_agent_framework(tmp_path):
     with pytest.raises(NotImplementedError, match="tracing is not supported"):
-        setup_tracing(MagicMock(), "invalid_agent_framework")
+        setup_tracing(MagicMock(), tmp_path / "traces")
