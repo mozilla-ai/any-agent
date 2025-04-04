@@ -63,7 +63,7 @@ tool so it becomes usable by the selected framework.
         tools=[
             MCPTool(
                 command="docker",
-                args=["run", "-i", "--rm", "mcp/fetch"].
+                args=["run", "-i", "--rm", "mcp/fetch"],
                 tools=["fetch"]
             ),
         ]

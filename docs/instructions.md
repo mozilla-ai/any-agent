@@ -34,7 +34,7 @@ In the first case, the import should point to a Python string.
 
     main_agent = AgentConfig(
         model_id="gpt-4o-mini",
-        instructions="You are a heplful assistant that can navigate the web",
+        instructions="You are a helpful assistant that can navigate the web",
         tools=[
             "any_agent.tools.search_web",
             "any_agent.tools.visit_webpage"

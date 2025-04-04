@@ -83,7 +83,7 @@ managed_agents = [
     AgentConfig(
         name="visit_webpage_agent",
         model_id="gpt-4o-mini",
-        description="Agent that visit webpages",
+        description="Agent that can visit webpages",
         tools=["any_agent.tools.visit_webpage"]
     )
 ]
