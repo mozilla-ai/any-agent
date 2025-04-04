@@ -21,7 +21,7 @@ def search_web(query: str) -> str:
     """Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.
 
     Args:
-        query: The search query to perform.
+        query (str): The search query to perform.
 
     Returns:
         The top search results.

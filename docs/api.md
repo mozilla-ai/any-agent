@@ -6,6 +6,10 @@
 
 ::: any_agent.tools
 
+::: any_agent.tracing
+
 ::: any_agent.config.AgentFramework
 
 ::: any_agent.config.AgentConfig
+
+::: any_agent.config.MCPTool

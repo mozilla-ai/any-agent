@@ -4,7 +4,11 @@ repo_url: https://github.com/mozilla-ai/any-agent
 repo_name: any-agent
 
 nav:
-  - Home: index.md
+  - Intro: index.md
+  - Frameworks: frameworks.md
+  - Tools: tools.md
+  - Instructions: instructions.md
+  - Tracing: tracing.md
   - API Reference: api.md
 
 theme:
@@ -29,6 +33,7 @@ theme:
     - content.tabs.link
 
 markdown_extensions:
+  - admonition
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
