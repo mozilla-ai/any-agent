@@ -12,7 +12,7 @@ class AgentFramework(str, Enum):
 class MCPTool(BaseModel):
     command: str
     args: list[str]
-    tools: list[str]
+    tools: list[str] | None = None
 
 
 class AgentConfig(BaseModel):

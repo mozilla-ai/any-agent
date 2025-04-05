@@ -83,15 +83,22 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
 
         # Only add the tools listed in mcp_tool['tools'] if specified
         requested_tools = self.mcp_tool.tools
-        filtered_tools = [tool for tool in tools if tool.name in requested_tools]
-        if len(filtered_tools) != len(requested_tools):
-            tool_names = [tool.name for tool in filtered_tools]
-            raise ValueError(
-                dedent(f"""Could not find all requested tools in the MCP server:
-                            Requested: {requested_tools}
-                            Set:   {tool_names}""")
+        if requested_tools:
+            filtered_tools = [tool for tool in tools if tool.name in requested_tools]
+            if len(filtered_tools) != len(requested_tools):
+                tool_names = [tool.name for tool in filtered_tools]
+                raise ValueError(
+                    dedent(f"""Could not find all requested tools in the MCP server:
+                                Requested: {requested_tools}
+                                Set:   {tool_names}""")
+                )
+            self.tools = filtered_tools
+        else:
+            logger.info(
+                "No specific tools requested for MCP server, using all available tools:"
             )
-        self.tools = filtered_tools
+            logger.info(f"Tools available: {tools}")
+            self.tools = tools
 
     def cleanup(self):
         # Exit the context when cleanup is called
@@ -127,8 +134,21 @@ class OpenAIMCPToolsManager(MCPToolsManagerBase):
                 "args": self.mcp_tool.args,
             },
         )
+        try:
+            # Try to get the existing event loop
+            self.loop = asyncio.get_event_loop()
+            # Check if it's running
+            is_running = self.loop.is_running()
+        except RuntimeError:
+            # No event loop exists in this thread
+            is_running = False
+            self.loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)
 
-        self.loop = asyncio.get_event_loop()
+        # If we got an existing event loop but it's not running, we might need a new one
+        if not is_running:
+            self.loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self.loop)
 
         self.loop.run_until_complete(self.server.__aenter__())
         # Get tools from the server
