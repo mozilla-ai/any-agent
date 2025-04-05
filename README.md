@@ -1,7 +1,5 @@
 # any-agent
 
-`any-agent` is a Python library providing a single interface to different agent frameworks.
-
 <div align="center">
 
 [![Docs](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/)
@@ -12,13 +10,27 @@
 
 </div>
 
+`any-agent` is a Python library designed to provide a single interface to access many different agent frameworks.
+
+Using `any-agent`, you can more easily switch to a new or different agent framework without needing to worry about the underlying API changes.
+
+## Supported Frameworks
+
+* [OpenAI Agents SDK](https://github.com/openai/openai-agents-python)
+* [Smolagents](https://smolagents.org/)
+* [Langchain / Langgraph](https://github.com/langchain-ai/langgraph)
+* [Llama Index](https://github.com/run-llama/llama_index)
+* [Coming Soon] [AWS Bedrock Agents](https://aws.amazon.com/bedrock/agents/)
+
+
+
 ## Quickstart
 
 ```py
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 ```
 
-Configure the agent:
+Create the agent configuration for things like the underlying LLM as well as any tools.
 
 ```py
 main_agent = AgentConfig(
@@ -46,3 +58,10 @@ agent = AnyAgent.create(framework, main_agent)
 
 agent.run("Which Agent Framework is the best??")
 ```
+
+`any-agent` supports the use of Model Context Protocol (MCP) servers, and if the agent framework allows,
+any LLM and provider using [LiteLLM](https://docs.litellm.ai/docs/) syntax.
+
+## Contributions
+
+The AI agent space is moving fast! If you see a new agentic framework that AnyAgent doesn't yet support, we would love for you to create a Github issue. We also welcome your support in development of additional features or functionality.
