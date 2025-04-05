@@ -21,7 +21,7 @@ def test_load_openai_default():
     ):
         AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
         mock_agent.assert_called_once_with(
-            name="default-name",
+            name="any_agent",
             model="gpt-4o",
             instructions=None,
             handoffs=[],
@@ -98,7 +98,7 @@ def test_load_openai_with_mcp_server():
 
         # Verify Agent was called with the MCP server
         mock_agent.assert_called_once_with(
-            name="default-name",
+            name="any_agent",
             model="gpt-4o",
             instructions=None,
             handoffs=[],
@@ -172,7 +172,7 @@ def test_load_openai_multiagent():
         mock_agent.assert_any_call(
             model="o3-mini",
             instructions=None,
-            name="default-name",
+            name="any_agent",
             handoffs=[mock_agent.return_value],
             tools=[
                 mock_agent.return_value.as_tool.return_value,

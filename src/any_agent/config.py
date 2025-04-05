@@ -18,7 +18,7 @@ class MCPTool(BaseModel):
 class AgentConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     model_id: str
-    name: str = "default-name"
+    name: str = "any_agent"
     instructions: str | None = None
     tools: list[str | MCPTool] = Field(default_factory=list)
     handoff: bool = False

@@ -27,7 +27,7 @@ def test_load_smolagent_default():
             ),
         )
         mock_agent.assert_called_once_with(
-            name="default-name",
+            name="any_agent",
             model=mock_model.return_value,
             managed_agents=[],
             tools=[mock_tool(search_web), mock_tool(visit_webpage)],
@@ -57,7 +57,7 @@ def test_load_smolagent_with_api_base_and_api_key_var():
             ),
         )
         mock_agent.assert_called_once_with(
-            name="default-name",
+            name="any_agent",
             model=mock_model.return_value,
             managed_agents=[],
             tools=[mock_tool(search_web), mock_tool(visit_webpage)],

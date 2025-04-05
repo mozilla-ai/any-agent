@@ -74,7 +74,9 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
         )
 
         # Store the context manager itself
-        self.context = ToolCollection.from_mcp(self.server_parameters)
+        self.context = ToolCollection.from_mcp(
+            self.server_parameters, trust_remote_code=True
+        )
         # Enter the context
         self.tool_collection = self.context.__enter__()
         tools = self.tool_collection.tools
@@ -131,6 +133,9 @@ class OpenAIMCPToolsManager(MCPToolsManagerBase):
         self.loop.run_until_complete(self.server.__aenter__())
         # Get tools from the server
         self.tools = self.loop.run_until_complete(self.server.list_tools())
+        logger.warning(
+            "OpenAI MCP currently does not support filtering MCP available tools"
+        )
 
     def cleanup(self):
         self.server = None

@@ -124,7 +124,20 @@ class OpenAIAgent(AnyAgent):
         Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
-        if hasattr(self, "_agent") and hasattr(self._agent, "tools"):
+        if hasattr(self, "_agent"):
             # Extract tool names from the agent's tools
-            return [tool.name for tool in self._agent.tools if hasattr(tool, "name")]
-        return []
+            tools = [tool.name for tool in self._agent.tools]
+            # Add MCP tools to the list
+            for mcp_server in self._agent.mcp_servers:
+                tools_in_mcp = mcp_server._tools_list
+                server_name = mcp_server.name.replace(" ", "_")
+                if tools_in_mcp:
+                    tools.extend(
+                        [f"{server_name}_{tool.name}" for tool in tools_in_mcp]
+                    )
+                else:
+                    raise ValueError(f"No tools found in MCP {server_name}")
+        else:
+            logger.warning("Agent not loaded or does not have tools.")
+            tools = []
+        return tools

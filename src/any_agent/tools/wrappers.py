@@ -6,7 +6,6 @@ from any_agent.config import AgentFramework, MCPTool
 from any_agent.tools.mcp import (
     SmolagentsMCPToolsManager,
     OpenAIMCPToolsManager,
-    LangchainMCPToolsManager,
     MCPToolsManagerBase,
 )
 
@@ -55,7 +54,6 @@ def wrap_mcp_server(
     manager_map = {
         AgentFramework.OPENAI: OpenAIMCPToolsManager,
         AgentFramework.SMOLAGENTS: SmolagentsMCPToolsManager,
-        AgentFramework.LANGCHAIN: LangchainMCPToolsManager,
     }
 
     if agent_framework not in manager_map:
@@ -64,7 +62,7 @@ def wrap_mcp_server(
         )
 
     # Create the manager instance which will manage the MCP tool context
-    manager_class = manager_map[agent_framework]
+    manager_class: MCPToolsManagerBase = manager_map[agent_framework]
     manager = manager_class(mcp_tool)
 
     return manager

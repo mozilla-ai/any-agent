@@ -25,7 +25,7 @@ def test_load_llama_index_agent_default():
         AnyAgent.create(AgentFramework.LLAMAINDEX, AgentConfig(model_id="gpt-4o"))
         model_mock.assert_called_once_with(model="gpt-4o")
         create_mock.assert_called_once_with(
-            name="default-name",
+            name="any_agent",
             llm=model_mock.return_value,
             tools=[tool_mock(search_web), tool_mock(visit_webpage)],
         )
