@@ -16,12 +16,9 @@ Using `any-agent`, you can more easily switch to a new or different agent framew
 
 ## Supported Frameworks
 
-* [OpenAI Agents SDK](https://github.com/openai/openai-agents-python)
-* [Smolagents](https://smolagents.org/)
-* [Langchain / Langgraph](https://github.com/langchain-ai/langgraph)
-* [Llama Index](https://github.com/run-llama/llama_index)
-* [Coming Soon] [AWS Bedrock Agents](https://aws.amazon.com/bedrock/agents/)
+[![LangChain](https://img.shields.io/badge/LangChain-1e4545?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph) [![LlamaIndex](https://img.shields.io/badge/🦙%20LlamaIndex-fbcfe2)](https://github.com/run-llama/llama_index) [![OpenAI Agents](https://img.shields.io/badge/OpenAI%20Agents-black?logo=openai)](https://github.com/openai/openai-agents-python) [![Smolagents](https://img.shields.io/badge/Smolagents-ffcb3a?logo=huggingface&logoColor=white)](https://smolagents.org/)
 
+[Coming Soon] [AWS Bedrock Agents](https://aws.amazon.com/bedrock/agents/)
 
 
 ## Quickstart

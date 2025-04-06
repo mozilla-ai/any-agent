@@ -4,11 +4,10 @@
 
 !!! warning
 
-    Compared to traditional code-defined workflows, agent frameworks introduce complexety and
-    demand much more computational power.
+    Compared to traditional code-defined workflows, agent frameworks introduce complexity and demand much more computational power.
 
     Before jumping to use one, carefully consider and evaluate how much value you
-    would get compared to manually defining a sequence of tools and LLMs calls.
+    would get compared to manually defining a sequence of tools and LLM calls.
 
 ## Quickstart
 
@@ -16,6 +15,12 @@ To define any agent system you will always use the same imports:
 
 ```py
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+```
+
+Before running any agents, you'll need to set up your environment variables:
+
+```bash
+export OPENAI_API_KEY=your_api_key_here
 ```
 
 ### Single Agent
@@ -29,7 +34,7 @@ main_agent = AgentConfig(
 )
 ```
 
-Chose one of the available frameworks:
+Choose one of the available frameworks:
 
 ```py
 from random import choice
@@ -94,5 +99,5 @@ You can then create and run the multi-agent:
 ```py
 multi_agent = AnyAgent.create(framework, main_agent, managed_agents)
 
-agent.run("Which Agent Framework is the best??")
+multi_agent.run("Which Agent Framework is the best??")
 ```
