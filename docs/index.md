@@ -4,7 +4,7 @@
 
 !!! warning
 
-    Compared to traditional code-defined workflows, agent frameworks introduce complexity and 
+    Compared to traditional code-defined workflows, agent frameworks introduce complexity and
     demand much more computational power.
 
     Before jumping to use one, carefully consider and evaluate how much value you
