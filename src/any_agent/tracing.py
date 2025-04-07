@@ -105,7 +105,6 @@ def _get_tracer_provider(
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     tracer_provider = TracerProvider()
-    trace.set_tracer_provider(tracer_provider)
 
     file_name = f"{output_dir}/{agent_framework.value}-{timestamp}.json"
     json_file_exporter = JsonFileSpanExporter(file_name=file_name)

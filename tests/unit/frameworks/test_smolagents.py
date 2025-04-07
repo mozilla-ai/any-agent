@@ -30,6 +30,7 @@ def test_load_smolagent_default():
             name="any_agent",
             model=mock_model.return_value,
             managed_agents=[],
+            verbosity_level=-1,
             tools=[mock_tool(search_web), mock_tool(visit_webpage)],
         )
         mock_model.assert_called_once_with(model_id="openai/o3-mini")
@@ -60,6 +61,7 @@ def test_load_smolagent_with_api_base_and_api_key_var():
             name="any_agent",
             model=mock_model.return_value,
             managed_agents=[],
+            verbosity_level=-1,
             tools=[mock_tool(search_web), mock_tool(visit_webpage)],
         )
         mock_model.assert_called_once_with(
