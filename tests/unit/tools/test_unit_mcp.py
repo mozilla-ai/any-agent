@@ -5,16 +5,16 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 from any_agent.tools.mcp import (
-    MCPToolsManagerBase,
-    SmolagentsMCPToolsManager,
+    MCPServerBase,
+    SmolagentsMCPServerStdio,
 )
 
 
-class TestMCPToolsManagerBase(unittest.TestCase):
-    """Tests for the MCPToolsManagerBase class."""
+class TestMCPServerBase(unittest.TestCase):
+    """Tests for the MCPServerBase class."""
 
     # Define the test class once at class level instead of in each test method
-    class ConcreteMCPManager(MCPToolsManagerBase):
+    class ConcreteMCPManager(MCPServerBase):
         def setup_tools(self):
             pass
 
@@ -55,8 +55,8 @@ def create_specific_mock_tools():
 
 @patch("smolagents.ToolCollection")
 @patch("mcp.StdioServerParameters")
-class TestSmolagentsMCPToolsManager(unittest.TestCase):
-    """Tests for the SmolagentsMCPToolsManager class."""
+class TestSmolagentsMCPServerStdio(unittest.TestCase):
+    """Tests for the SmolagentsMCPServerStdio class."""
 
     def setUp(self):
         """Set up test fixtures before each test."""
@@ -76,8 +76,8 @@ class TestSmolagentsMCPToolsManager(unittest.TestCase):
         mock_tool_collection.from_mcp.return_value = self.mock_context
 
         # Initialize the manager with setup_tools patched
-        with patch.object(SmolagentsMCPToolsManager, "setup_tools", return_value=None):
-            manager = SmolagentsMCPToolsManager(self.test_tool)
+        with patch.object(SmolagentsMCPServerStdio, "setup_tools", return_value=None):
+            manager = SmolagentsMCPServerStdio(self.test_tool)
 
         # Set the context attribute
         manager.context = self.mock_context
@@ -104,7 +104,7 @@ class TestSmolagentsMCPToolsManager(unittest.TestCase):
         self.test_tool.tools = None
 
         # Initialize the manager
-        manager = SmolagentsMCPToolsManager(self.test_tool)
+        manager = SmolagentsMCPServerStdio(self.test_tool)
 
         # Verify all tools are included
         self.assertEqual(manager.tools, mock_tools)
@@ -125,7 +125,7 @@ class TestSmolagentsMCPToolsManager(unittest.TestCase):
         self.test_tool.tools = ["read_thing", "write_thing"]
 
         # Initialize the manager
-        manager = SmolagentsMCPToolsManager(self.test_tool)
+        manager = SmolagentsMCPServerStdio(self.test_tool)
 
         # Verify only the requested tools are included
         self.assertEqual(len(manager.tools), 2)

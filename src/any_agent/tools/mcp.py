@@ -21,7 +21,7 @@ except ImportError:
 _smolagents_mcp_managers = {}
 
 
-class MCPToolsManagerBase(ABC):
+class MCPServerBase(ABC):
     """Base class for MCP tools managers across different frameworks."""
 
     def __init__(self, mcp_tool: MCPTool):
@@ -45,7 +45,7 @@ class MCPToolsManagerBase(ABC):
         pass
 
 
-class SmolagentsMCPToolsManager(MCPToolsManagerBase):
+class SmolagentsMCPServerStdio(MCPServerBase):
     """Implementation of MCP tools manager for smolagents."""
 
     def __init__(self, mcp_tool: MCPTool):
@@ -113,7 +113,7 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
             del _smolagents_mcp_managers[self.id]
 
 
-class OpenAIMCPToolsManager(MCPToolsManagerBase):
+class OpenAIMCPServerStdio(MCPServerBase):
     """Implementation of MCP tools manager for OpenAI agents."""
 
     def __init__(self, mcp_tool: MCPTool):
@@ -124,9 +124,9 @@ class OpenAIMCPToolsManager(MCPToolsManagerBase):
 
     def setup_tools(self):
         """Set up the OpenAI MCP server with the provided configuration."""
-        from agents.mcp import MCPServerStdio
+        from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
 
-        self.server = MCPServerStdio(
+        self.server = OpenAIInternalMCPServerStdio(
             name="OpenAI MCP Server",
             params={
                 "command": self.mcp_tool.command,
@@ -163,7 +163,7 @@ class OpenAIMCPToolsManager(MCPToolsManagerBase):
         self.cleanup()
 
 
-class LangchainMCPToolsManager(MCPToolsManagerBase):
+class LangchainMCPServerStdio(MCPServerBase):
     """Implementation of MCP tools manager for LangChain agents."""
 
     def __init__(self, mcp_tool: MCPTool):

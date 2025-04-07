@@ -4,9 +4,9 @@ from collections.abc import Callable
 
 from any_agent.config import AgentFramework, MCPTool
 from any_agent.tools.mcp import (
-    SmolagentsMCPToolsManager,
-    OpenAIMCPToolsManager,
-    MCPToolsManagerBase,
+    SmolagentsMCPServerStdio,
+    OpenAIMCPServerStdio,
+    MCPServerBase,
 )
 
 
@@ -45,15 +45,15 @@ def wrap_tool_llama_index(tool):
 
 def wrap_mcp_server(
     mcp_tool: MCPTool, agent_framework: AgentFramework
-) -> MCPToolsManagerBase:
+) -> MCPServerBase:
     """
     Generic MCP server wrapper that can work with different frameworks
     based on the specified agent_framework
     """
     # Select the appropriate manager based on agent_framework
     manager_map = {
-        AgentFramework.OPENAI: OpenAIMCPToolsManager,
-        AgentFramework.SMOLAGENTS: SmolagentsMCPToolsManager,
+        AgentFramework.OPENAI: OpenAIMCPServerStdio,
+        AgentFramework.SMOLAGENTS: SmolagentsMCPServerStdio,
     }
 
     if agent_framework not in manager_map:
@@ -62,7 +62,7 @@ def wrap_mcp_server(
         )
 
     # Create the manager instance which will manage the MCP tool context
-    manager_class: MCPToolsManagerBase = manager_map[agent_framework]
+    manager_class: MCPServerBase = manager_map[agent_framework]
     manager = manager_class(mcp_tool)
 
     return manager
@@ -78,7 +78,7 @@ WRAPPERS = {
 
 def import_and_wrap_tools(
     tools: list[str | dict], agent_framework: AgentFramework
-) -> tuple[list[Callable], list[MCPToolsManagerBase]]:
+) -> tuple[list[Callable], list[MCPServerBase]]:
     wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = []
@@ -86,7 +86,7 @@ def import_and_wrap_tools(
     for tool in tools:
         if isinstance(tool, MCPTool):
             # MCP adapters are usually implemented as context managers.
-            # We wrap the server using `MCPToolsManagerBase` so the
+            # We wrap the server using `MCPServerBase` so the
             # tools can be used as any other callable.
             mcp_server = wrap_mcp_server(tool, agent_framework)
             mcp_servers.append(mcp_server)
