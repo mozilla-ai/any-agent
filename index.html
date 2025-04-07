@@ -312,15 +312,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#single-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      Single Agent
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#multi-agent" class="md-nav__link">
     <span class="md-ellipsis">
       Multi-Agent
@@ -489,15 +480,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#single-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      Single Agent
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#multi-agent" class="md-nav__link">
     <span class="md-ellipsis">
       Multi-Agent
@@ -534,23 +516,29 @@
 <p><code>any-agent</code> is a Python library providing a single interface to different agent frameworks.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Compared to traditional code-defined workflows, agent frameworks introduce complexety and
+<p>Compared to traditional code-defined workflows, agent frameworks introduce complexity and
 demand much more computational power.</p>
 <p>Before jumping to use one, carefully consider and evaluate how much value you
-would get compared to manually defining a sequence of tools and LLMs calls.</p>
+would get compared to manually defining a sequence of tools and LLM calls.</p>
 </div>
 <h2 id="quickstart">Quickstart</h2>
 <p>To define any agent system you will always use the same imports:</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AgentFramework</span><span class="p">,</span> <span class="n">AnyAgent</span>
 </span></code></pre></div>
-<h3 id="single-agent">Single Agent</h3>
-<p>Configure the agent:</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">main_agent</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;any_agent.tools.search_web&quot;</span><span class="p">,</span> <span class="s2">&quot;any_agent.tools.visit_webpage&quot;</span><span class="p">]</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span>
+<p>If you plan on using an agent that requires access to an external service (e.g. OpenAI, Mistral, DeepSeek, etc), you'll need to set any relevant environment variables, e.g.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>your_api_key_here
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DEEPSEEK_API_KEY</span><span class="o">=</span>your_api_key_here
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">### Single Agent</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Configure<span class="w"> </span>the<span class="w"> </span>agent:
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="sb">```</span>py
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nv">main_agent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>AgentConfig<span class="o">(</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="nv">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span>,
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="nv">tools</span><span class="o">=[</span><span class="s2">&quot;any_agent.tools.search_web&quot;</span>,<span class="w"> </span><span class="s2">&quot;any_agent.tools.visit_webpage&quot;</span><span class="o">]</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="o">)</span>
 </span></code></pre></div>
-<p>Chose one of the available frameworks:</p>
+<p>Choose one of the available frameworks:</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">random</span><span class="w"> </span><span class="kn">import</span> <span class="n">choice</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">framework</span> <span class="o">=</span> <span class="n">AgentFramework</span><span class="p">(</span>
@@ -597,7 +585,7 @@ solve the task.</p>
 <p>You can then create and run the multi-agent:</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">multi_agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">framework</span><span class="p">,</span> <span class="n">main_agent</span><span class="p">,</span> <span class="n">managed_agents</span><span class="p">)</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which Agent Framework is the best??&quot;</span><span class="p">)</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">multi_agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which Agent Framework is the best??&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 
 
