@@ -79,6 +79,7 @@ class SmolagentsAgent(AnyAgent):
                     name=managed_agent.name,
                     model=self._get_model(managed_agent),
                     tools=managed_tools,
+                    verbosity_level=-1,  # OFF
                     description=managed_agent.description
                     or f"Use the agent: {managed_agent.name}",
                 )
@@ -96,6 +97,7 @@ class SmolagentsAgent(AnyAgent):
             name=self.config.name,
             model=self._get_model(self.config),
             tools=tools,
+            verbosity_level=-1,  # OFF
             managed_agents=managed_agents_instanced,
             **self.config.agent_args or {},
         )

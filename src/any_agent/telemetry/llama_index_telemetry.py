@@ -6,11 +6,11 @@ from loguru import logger
 from any_agent.telemetry import TelemetryProcessor
 
 
-class OpenAITelemetryProcessor(TelemetryProcessor):
-    """Processor for OpenAI agent telemetry data."""
+class LlamaIndexTelemetryProcessor(TelemetryProcessor):
+    """Processor for LlamaIndex agent telemetry data."""
 
     def _get_agent_framework(self) -> AgentFramework:
-        return AgentFramework.OPENAI
+        return AgentFramework.LLAMAINDEX
 
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         for span in reversed(trace):
@@ -83,8 +83,40 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
+    def _extract_chain_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract information from a CHAIN span."""
+        attributes = span.get("attributes", {})
+
+        span_info = {
+            "type": "chain",
+            "workflow": span.get("name", "Chain workflow"),
+            "start_time": span.get("start_time"),
+            "end_time": span.get("end_time"),
+        }
+
+        # Extract input and output values
+        input_value = attributes.get("input.value", "")
+        output_value = attributes.get("output.value", "")
+
+        # Try to parse JSON if available
+        try:
+            span_info["input"] = json.loads(input_value)
+        except (json.JSONDecodeError, TypeError):
+            span_info["input"] = input_value
+
+        try:
+            span_info["output"] = json.loads(output_value)
+        except (json.JSONDecodeError, TypeError):
+            span_info["output"] = output_value
+
+        # Add service name if available
+        if "service.name" in span.get("resource", {}).get("attributes", {}):
+            span_info["service"] = span["resource"]["attributes"]["service.name"]
+
+        return span_info
+
     def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> list:
-        """Extract LLM calls and tool calls from OpenAI telemetry."""
+        """Extract LLM calls and tool calls from LlamaIndex telemetry."""
         calls = []
 
         for span in telemetry:
@@ -103,7 +135,9 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
             return self._extract_tool_interaction(span)
         elif span_kind == "AGENT":
             return self._extract_agent_interaction(span)
+        elif span_kind == "CHAIN":
+            return self._extract_chain_interaction(span)
         else:
             raise ValueError(
-                f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', or 'AGENT'."
+                f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'AGENT', or 'CHAIN'."
             )

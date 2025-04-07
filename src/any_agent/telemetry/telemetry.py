@@ -32,6 +32,12 @@ class TelemetryProcessor(ABC):
             )
 
             return OpenAITelemetryProcessor()
+        elif agent_framework == AgentFramework.LLAMAINDEX:
+            from any_agent.telemetry.llama_index_telemetry import (
+                LlamaIndexTelemetryProcessor,
+            )
+
+            return LlamaIndexTelemetryProcessor()
         else:
             raise ValueError(f"Unsupported agent type {agent_framework}")
 
@@ -65,6 +71,11 @@ class TelemetryProcessor(ABC):
     @abstractmethod
     def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> List[Dict]:
         """Extract the agent-specific data from telemetry."""
+        pass
+
+    @abstractmethod
+    def extract_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract interaction details from a span."""
         pass
 
     def extract_evidence(self, telemetry: List[Dict[str, Any]]) -> str:
