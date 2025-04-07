@@ -71,7 +71,7 @@ class RichConsoleSpanExporter(SpanExporter):
                     if key == "output":
                         self.console.print(
                             Panel(
-                                Markdown(value),
+                                Markdown(str(value or "")),
                                 title="Output",
                             )
                         )
