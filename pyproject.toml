@@ -17,6 +17,7 @@ dependencies = [
   "opentelemetry-sdk",
   "pydantic",
   "requests",
+  "rich",
 ]
 
 [project.optional-dependencies]
