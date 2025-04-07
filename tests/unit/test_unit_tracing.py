@@ -25,5 +25,5 @@ def test_get_tracer_provider(tmp_path):
 
 
 def test_invalid_agent_framework(tmp_path):
-    with pytest.raises(NotImplementedError, match="tracing is not supported"):
+    with pytest.raises(ValueError, match="tracing is not supported"):
         setup_tracing(MagicMock(), tmp_path / "traces")
