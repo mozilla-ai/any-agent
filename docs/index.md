@@ -18,12 +18,11 @@ To define any agent system you will always use the same imports:
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 ```
 
-Before running any agents, you'll need to set up your environment variables:
+If you plan on using an agent that requires access to an external service (e.g. OpenAI, Mistral, DeepSeek, etc), you'll need to set any relevant environment variables, e.g.
 
 ```bash
 export OPENAI_API_KEY=your_api_key_here
-```
-
+export DEEPSEEK_API_KEY=your_api_key_here
 ### Single Agent
 
 Configure the agent:
