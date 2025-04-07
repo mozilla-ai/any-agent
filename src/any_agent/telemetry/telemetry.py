@@ -74,7 +74,7 @@ class TelemetryProcessor(ABC):
         pass
 
     @abstractmethod
-    def extract_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def extract_interaction(self, span: Dict[str, Any]) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         pass
 
@@ -97,7 +97,7 @@ class TelemetryProcessor(ABC):
                     if isinstance(v, str) and len(v) > self.MAX_EVIDENCE_LENGTH
                     else v
                 )
-                for k, v in call.items()
+                for k, v in call[0].items()
             }
 
             # Use ensure_ascii=False to prevent escaping Unicode characters

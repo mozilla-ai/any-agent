@@ -120,11 +120,11 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
         calls = []
 
         for span in telemetry:
-            calls.append(self.extract_interaction(span))
+            calls.append(self.extract_interaction(span)[1])
 
         return calls
 
-    def extract_interaction(self, span):
+    def extract_interaction(self, span: Dict[str, Any]) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")

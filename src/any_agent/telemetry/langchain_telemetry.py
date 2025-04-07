@@ -211,7 +211,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         calls = []
 
         for span in telemetry:
-            calls.append(self.extract_interaction(span))
+            calls.append(self.extract_interaction(span)[1])
 
         return calls
 
