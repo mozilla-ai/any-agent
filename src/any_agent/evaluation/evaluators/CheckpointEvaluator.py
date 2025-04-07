@@ -30,6 +30,7 @@ class CheckpointEvaluator(LLMEvaluator):
             List of evaluation results
         """
         evidence = processor.extract_evidence(telemetry)
+        evidence = evidence.replace("<", "\\<").replace(">", "\\>")
         logger.info(f"""<yellow>Evidence\n{evidence}</yellow>\n""")
         results = []
 

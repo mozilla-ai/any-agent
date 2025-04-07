@@ -47,7 +47,6 @@ def save_evaluation_results(
                 [
                     {
                         "config": test_case.model_dump(),
-                        "agent_config_path": test_case.agent_config_path,
                         "test_case_path": test_case.test_case_path,
                         "output_message": output_message,
                         "telemetry_path": telemetry_path,

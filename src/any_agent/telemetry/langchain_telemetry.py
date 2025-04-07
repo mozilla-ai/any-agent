@@ -6,6 +6,10 @@ from langchain_core.messages import BaseMessage
 
 from any_agent.telemetry import TelemetryProcessor
 
+from any_agent.evaluation.logging import get_logger
+
+logger = get_logger()
+
 
 class LangchainTelemetryProcessor(TelemetryProcessor):
     """Processor for Langchain agent telemetry data."""
@@ -229,6 +233,5 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         elif span_kind == "AGENT":
             return "AGENT", self._extract_agent_interaction(span)
         else:
-            raise ValueError(
-                f"Unsupported span kind: {span_kind}. Supported kinds are LLM, TOOL, CHAIN, and AGENT."
-            )
+            logger.warning(f"Unknown span kind: {span_kind}. Span: {span}")
+            return "UNKNOWN", {}

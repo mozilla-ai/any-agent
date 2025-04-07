@@ -22,7 +22,7 @@ class QuestionAnsweringSquadEvaluator:
                 "id": "1",
                 "answers": {
                     "answer_start": [0],
-                    "text": [ground_truth_answer[0]["value"]],
+                    "text": [str(ground_truth_answer[0]["value"])],
                 },
             }
         ]

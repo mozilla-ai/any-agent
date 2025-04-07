@@ -18,6 +18,7 @@ dependencies = [
   "pydantic",
   "requests",
   "rich",
+  "evaluate",
 ]
 
 [project.optional-dependencies]

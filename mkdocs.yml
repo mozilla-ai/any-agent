@@ -10,6 +10,7 @@ nav:
   - Instructions: instructions.md
   - Tracing: tracing.md
   - API Reference: api.md
+  - Agent Evaluation: evaluation.md
 
 theme:
   name: material

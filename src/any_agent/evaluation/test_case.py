@@ -2,6 +2,9 @@ from typing import Dict, List, Any
 from pydantic import BaseModel, Field, ConfigDict
 import yaml
 from litellm import validate_environment
+from any_agent.evaluation.logging import get_logger
+
+logger = get_logger()
 
 
 class CheckpointCriteria(BaseModel):
@@ -19,12 +22,10 @@ class TestCase(BaseModel):
     llm_judge: str
     final_answer_criteria: List[CheckpointCriteria] = Field(default_factory=list)
     test_case_path: str
-    agent_config_path: str
-    agent_config_dict: Dict[str, Any] = Field(default_factory=dict)
     output_path: str = "output/results.json"
 
     @classmethod
-    def from_yaml(cls, test_case_path: str, agent_config_path: str) -> "TestCase":
+    def from_yaml(cls, test_case_path: str) -> "TestCase":
         """Load a test case from a YAML file and process it"""
         with open(test_case_path, "r") as f:
             test_case_dict = yaml.safe_load(f)
@@ -55,18 +56,6 @@ class TestCase(BaseModel):
             ]
 
         test_case_dict["test_case_path"] = test_case_path
-        test_case_dict["agent_config_path"] = agent_config_path
-        with open(agent_config_path, "r") as f:
-            agent_config_dict = yaml.safe_load(f)
-
-        # Overwrite the agent_config_dict input values with the input values from the test case
-        for key, value in test_case_dict["input"].items():
-            if key in agent_config_dict:
-                agent_config_dict[key] = value
-        # remove the input from the test_case_dict
-        test_case_dict.pop("input", None)
-
-        test_case_dict["agent_config_dict"] = agent_config_dict
         # verify that the llm_judge is a valid litellm model
         validate_environment(test_case_dict["llm_judge"])
         return cls.model_validate(test_case_dict)
