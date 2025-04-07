@@ -1,87 +1,135 @@
+# Test MCP Tools Classes.
+# Disclaim
+
 import unittest
 from unittest.mock import patch, MagicMock
 
 from any_agent.tools.mcp import (
     MCPToolsManagerBase,
     SmolagentsMCPToolsManager,
-    _mcp_managers,
 )
 
 
 class TestMCPToolsManagerBase(unittest.TestCase):
     """Tests for the MCPToolsManagerBase class."""
 
-    def test_init_registers_in_global_registry(self):
-        """Test that initialization registers the instance in the global registry."""
+    # Define the test class once at class level instead of in each test method
+    class ConcreteMCPManager(MCPToolsManagerBase):
+        def setup_tools(self):
+            pass
 
-        # Create a concrete subclass for testing the abstract base class
-        class ConcreteMCPManager(MCPToolsManagerBase):
-            def setup_tools(self):
-                pass
+        def cleanup(self):
+            pass
 
-            def cleanup(self):
-                pass
+    def setUp(self):
+        """Set up test fixtures before each test."""
+        # Common test data
+        self.test_tool = MagicMock()
+        self.test_tool.name = "test_tool"
 
-        test_tool = {"name": "test_tool"}
-        manager = ConcreteMCPManager(test_tool)
-
-        # Check if manager is registered in global registry
-        self.assertIn(manager.id, _mcp_managers)
-        self.assertEqual(_mcp_managers[manager.id], manager)
-
-        # Check if attributes are set correctly
-        self.assertEqual(manager.mcp_tool, test_tool)
-        self.assertEqual(manager.tools, [])
-
-    def test_del_removes_from_registry(self):
-        """Test that deletion removes the instance from the global registry."""
-
-        class ConcreteMCPManager(MCPToolsManagerBase):
-            def setup_tools(self):
-                pass
-
-            def cleanup(self):
-                pass
-
-        manager = ConcreteMCPManager({"name": "test_tool"})
-        manager_id = manager.id
-
-        # Verify it's in the registry
-        self.assertIn(manager_id, _mcp_managers)
-
-        # Delete the manager
-        manager.__del__()
-
-        # Verify it's removed from the registry
-        self.assertNotIn(manager_id, _mcp_managers)
+    def tearDown(self):
+        """Clean up after each test."""
+        pass
 
 
+# Common helper functions for all test classes
+def create_mock_tools():
+    """Helper method to create mock tools."""
+    mock_tool1 = MagicMock()
+    mock_tool1.name = "tool1"
+    mock_tool2 = MagicMock()
+    mock_tool2.name = "tool2"
+    return [mock_tool1, mock_tool2]
+
+
+def create_specific_mock_tools():
+    """Helper method to create specific mock tools."""
+    mock_read_tool = MagicMock()
+    mock_read_tool.name = "read_thing"
+    mock_write_tool = MagicMock()
+    mock_write_tool.name = "write_thing"
+    mock_other_tool = MagicMock()
+    mock_other_tool.name = "other_thing"
+    return [mock_read_tool, mock_write_tool, mock_other_tool]
+
+
+@patch("smolagents.ToolCollection")
+@patch("mcp.StdioServerParameters")
 class TestSmolagentsMCPToolsManager(unittest.TestCase):
     """Tests for the SmolagentsMCPToolsManager class."""
 
-    @patch("smolagents.ToolCollection")
-    @patch("mcp.StdioServerParameters")
+    def setUp(self):
+        """Set up test fixtures before each test."""
+        # Common test data
+        self.test_tool = MagicMock()
+        self.test_tool.command = "test_command"
+        self.test_tool.args = ["arg1", "arg2"]
+
+        # Common mock configuration
+        self.mock_collection = MagicMock()
+        self.mock_context = MagicMock()
+        self.mock_context.__enter__.return_value = self.mock_collection
+
     def test_cleanup(self, mock_stdio_params, mock_tool_collection):
         """Test that cleanup exits the context manager."""
-        # Mock the context manager behavior
-        mock_context = MagicMock()
-        mock_tool_collection.from_mcp.return_value = mock_context
+        # Configure the mocks
+        mock_tool_collection.from_mcp.return_value = self.mock_context
 
-        # Create test tool configuration
-        test_tool = {"command": "test_command", "args": ["arg1", "arg2"]}
-
-        # Initialize the manager
+        # Initialize the manager with setup_tools patched
         with patch.object(SmolagentsMCPToolsManager, "setup_tools", return_value=None):
-            manager = SmolagentsMCPToolsManager(test_tool)
+            manager = SmolagentsMCPToolsManager(self.test_tool)
 
         # Set the context attribute
-        manager.context = mock_context
+        manager.context = self.mock_context
 
         # Call cleanup
         manager.cleanup()
 
         # Verify context.__exit__ was called
-        mock_context.__exit__.assert_called_once_with(None, None, None)
+        self.mock_context.__exit__.assert_called_once_with(None, None, None)
 
         # Verify context was set to None
         self.assertIsNone(manager.context)
+
+    def test_setup_tools_with_none_tools(self, mock_stdio_params, mock_tool_collection):
+        """Test that when mcp_tool.tools is None, all available tools are used."""
+        # Setup mock tools
+        mock_tools = create_mock_tools()
+
+        # Setup mock tool collection
+        self.mock_collection.tools = mock_tools
+        mock_tool_collection.from_mcp.return_value = self.mock_context
+
+        # Create test tool configuration with None tools
+        self.test_tool.tools = None
+
+        # Initialize the manager
+        manager = SmolagentsMCPToolsManager(self.test_tool)
+
+        # Verify all tools are included
+        self.assertEqual(manager.tools, mock_tools)
+        self.assertEqual(len(manager.tools), 2)
+
+    def test_setup_tools_with_specific_tools(
+        self, mock_stdio_params, mock_tool_collection
+    ):
+        """Test that when mcp_tool.tools has specific values, only those tools are used."""
+        # Setup mock tools
+        mock_tools = create_specific_mock_tools()
+
+        # Setup mock tool collection
+        self.mock_collection.tools = mock_tools
+        mock_tool_collection.from_mcp.return_value = self.mock_context
+
+        # Create test tool configuration with specific tools
+        self.test_tool.tools = ["read_thing", "write_thing"]
+
+        # Initialize the manager
+        manager = SmolagentsMCPToolsManager(self.test_tool)
+
+        # Verify only the requested tools are included
+        self.assertEqual(len(manager.tools), 2)
+        tool_names = [tool.name for tool in manager.tools]
+        self.assertIn("read_thing", tool_names)
+        self.assertIn("write_thing", tool_names)
+        self.assertNotIn("other_thing", tool_names)

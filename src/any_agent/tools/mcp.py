@@ -17,8 +17,8 @@ except ImportError:
     mcp_available = False
 
 
-# Global registry to keep manager instances alive
-_mcp_managers = {}
+# Global registry to keep Smolagents MCP manager instances alive
+_smolagents_mcp_managers = {}
 
 
 class MCPToolsManagerBase(ABC):
@@ -27,22 +27,12 @@ class MCPToolsManagerBase(ABC):
     def __init__(self, mcp_tool: MCPTool):
         if not mcp_available:
             raise ImportError("You need to `pip install mcp` to use this tools.")
-        # Generate a unique identifier for this manager instance
-        self.id = id(self)
 
         # Store the original tool configuration
         self.mcp_tool = mcp_tool
 
         # Initialize tools list (to be populated by subclasses)
         self.tools = []
-
-        # Register self in the global registry to prevent garbage collection
-        _mcp_managers[self.id] = self
-
-    def __del__(self):
-        # Remove from registry when deleted
-        if self.id in _mcp_managers:
-            del _mcp_managers[self.id]
 
     @abstractmethod
     def setup_tools(self):
@@ -60,8 +50,15 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
 
     def __init__(self, mcp_tool: MCPTool):
         super().__init__(mcp_tool)
+        # Generate a unique identifier for this manager instance
+        self.id = id(self)
         self.context = None
         self.tool_collection = None
+
+        # Register self in the global registry to prevent garbage collection
+        # (only needed for Smolagents implementation)
+        _smolagents_mcp_managers[self.id] = self
+
         self.setup_tools()
 
     def setup_tools(self):
@@ -111,7 +108,9 @@ class SmolagentsMCPToolsManager(MCPToolsManagerBase):
 
     def __del__(self):
         self.cleanup()
-        super().__del__()
+        # Remove from registry when deleted (Smolagents-specific)
+        if hasattr(self, "id") and self.id in _smolagents_mcp_managers:
+            del _smolagents_mcp_managers[self.id]
 
 
 class OpenAIMCPToolsManager(MCPToolsManagerBase):
@@ -162,7 +161,6 @@ class OpenAIMCPToolsManager(MCPToolsManagerBase):
 
     def __del__(self):
         self.cleanup()
-        super().__del__()
 
 
 class LangchainMCPToolsManager(MCPToolsManagerBase):
@@ -225,7 +223,6 @@ class LangchainMCPToolsManager(MCPToolsManagerBase):
 
     def __del__(self):
         self.cleanup()
-        super().__del__()
 
     # Consider adding a context manager interface
     async def __aenter__(self):
