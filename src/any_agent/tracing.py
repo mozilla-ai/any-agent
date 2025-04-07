@@ -3,13 +3,17 @@ import json
 from datetime import datetime
 
 from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider, ReadableSpan
+from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
     SimpleSpanProcessor,
     SpanExporter,
     BatchSpanProcessor,
-    ConsoleSpanExporter,
+    SpanExportResult,
 )
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.panel import Panel
+
 from any_agent import AgentFramework
 from any_agent.telemetry import TelemetryProcessor
 
@@ -47,43 +51,39 @@ class JsonFileSpanExporter(SpanExporter):
         pass
 
 
-def create_console_span_formatter(agent_framework: AgentFramework) -> callable:
-    """
-    This function creates the correct span formatter for each given framework,
-    Since even though we are using openinference there are still differences
-    in how to extract the correct info.
+class RichConsoleSpanExporter(SpanExporter):
+    def __init__(self, agent_framework):
+        self.processor = TelemetryProcessor.create(agent_framework=agent_framework)
+        self.console = Console()
+        self.styles = {"LLM": "yellow", "TOOL": "blue", "AGENT": "magenta"}
 
-    Args:
-        agent_framework (AgentFramework): The type of agent being used.
-    Returns:
-        callable: A function that formats spans for console output.
-    """
+    def export(self, spans):
+        for span in spans:
+            span_str = span.to_json()
+            span_dict = json.loads(span_str)
+            try:
+                span_kind, interaction = self.processor.extract_interaction(span_dict)
+                self.console.rule(
+                    span_kind,
+                    style=self.styles.get(span_kind, "rule.line"),
+                )
+                for key, value in interaction.items():
+                    if key == "output":
+                        self.console.print(
+                            Panel(
+                                Markdown(value),
+                                title="Output",
+                            )
+                        )
+                    else:
+                        self.console.print(f"{key}: {value}")
+            except Exception:
+                self.console.print_exception()
+            self.console.rule(style=self.styles.get(span_kind, "rule.line"))
+        return SpanExportResult.SUCCESS
 
-    def console_span_formatter(span: ReadableSpan) -> str:
-        """
-        Format a span for console output. The input and output signature is set by opentelemetry
-        Args:
-            span (ReadableSpan): The span to format.
-        Returns:
-            str: The formatted span string.
-        """
-        span_str = span.to_json()
-        span_dict = json.loads(span_str)
-
-        processor = TelemetryProcessor.create(agent_framework=agent_framework)
-        try:
-            interaction = processor.extract_interaction(span_dict)
-            output_str = "-" * 50 + "\n"
-            for key, value in interaction.items():
-                output_str += f"{key}: {value}\n"
-        except Exception as e:
-            output_str = f"Error processing span: {e}\n"
-            output_str += f"Span data: {span_str}\n"
-        output_str += "\n"
-        output_str += "-" * 50 + "\n"
-        return output_str
-
-    return console_span_formatter
+    def force_flush(self, timeout_millis: int = 30000) -> bool:
+        return True
 
 
 def _get_tracer_provider(
@@ -113,9 +113,7 @@ def _get_tracer_provider(
 
     # This is what will log all the span info to stdout: We turn off the agent sdk specific logging so that
     # the user sees a similar logging format for whichever agent they are using under the hood.
-    processor = BatchSpanProcessor(
-        ConsoleSpanExporter(formatter=create_console_span_formatter(agent_framework))
-    )
+    processor = BatchSpanProcessor(RichConsoleSpanExporter(agent_framework))
     tracer_provider.add_span_processor(processor)
     trace.set_tracer_provider(tracer_provider)
 

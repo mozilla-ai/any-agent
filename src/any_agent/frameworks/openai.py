@@ -115,7 +115,6 @@ class OpenAIAgent(AnyAgent):
             )
 
         result = Runner.run_sync(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
-        logger.info(result.final_output)
         return result
 
     @property

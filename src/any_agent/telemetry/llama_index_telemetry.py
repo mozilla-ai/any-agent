@@ -130,13 +130,13 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
         span_kind = attributes.get("openinference.span.kind", "")
 
         if span_kind == "LLM":
-            return self._extract_llm_interaction(span)
+            return "LLM", self._extract_llm_interaction(span)
         elif span_kind == "TOOL":
-            return self._extract_tool_interaction(span)
+            return "TOOL", self._extract_tool_interaction(span)
         elif span_kind == "AGENT":
-            return self._extract_agent_interaction(span)
+            return "AGENT", self._extract_agent_interaction(span)
         elif span_kind == "CHAIN":
-            return self._extract_chain_interaction(span)
+            return "CHAIN", self._extract_chain_interaction(span)
         else:
             raise ValueError(
                 f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'AGENT', or 'CHAIN'."

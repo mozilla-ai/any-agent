@@ -215,19 +215,19 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return calls
 
-    def extract_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def extract_interaction(self, span: Dict[str, Any]) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")
 
         if span_kind == "LLM" and "llm.output_messages.0.message.content" in attributes:
-            return self._extract_llm_interaction(span)
+            return "LLM", self._extract_llm_interaction(span)
         elif "tool.name" in attributes or span.get("name", "").endswith("Tool"):
-            return self._extract_tool_interaction(span)
+            return "TOOL", self._extract_tool_interaction(span)
         elif span_kind == "CHAIN":
-            return self._extract_chain_interaction(span)
+            return "CHAIN", self._extract_chain_interaction(span)
         elif span_kind == "AGENT":
-            return self._extract_agent_interaction(span)
+            return "AGENT", self._extract_agent_interaction(span)
         else:
             raise ValueError(
                 f"Unsupported span kind: {span_kind}. Supported kinds are LLM, TOOL, CHAIN, and AGENT."
