@@ -97,7 +97,7 @@ class TelemetryProcessor(ABC):
                     if isinstance(v, str) and len(v) > self.MAX_EVIDENCE_LENGTH
                     else v
                 )
-                for k, v in call[0].items()
+                for k, v in call.items()
             }
 
             # Use ensure_ascii=False to prevent escaping Unicode characters
