@@ -62,7 +62,7 @@ The AI agent space is moving fast! If you see a new agentic framework that AnyAg
 
 ## Running in Jupyter Notebook
 
-If running in Jupyter Notebook you will need to add the following two lines before running AnyAgent, otherwise you may see the error `RuntimeError: This event loop is already running`
+If running in Jupyter Notebook you will need to add the following two lines before running AnyAgent, otherwise you may see the error `RuntimeError: This event loop is already running`. This is a known limitation of Jupyter Notebooks, see [Github Issue](https://github.com/jupyter/notebook/issues/3397#issuecomment-376803076)
 
 ```py
 import nest_asyncio
