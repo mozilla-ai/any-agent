@@ -19,15 +19,15 @@ Using `any-agent`, you can more easily switch to a new or different agent framew
 [![LangChain](https://img.shields.io/badge/LangChain-1e4545?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph) [![LlamaIndex](https://img.shields.io/badge/🦙%20LlamaIndex-fbcfe2)](https://github.com/run-llama/llama_index) [![OpenAI Agents](https://img.shields.io/badge/OpenAI%20Agents-black?logo=openai)](https://github.com/openai/openai-agents-python) [![Smolagents](https://img.shields.io/badge/Smolagents-ffcb3a?logo=huggingface&logoColor=white)](https://smolagents.org/)
 
 ## Coming Soon (Contributions Welcome!)
-[AWS Bedrock Agents](https://aws.amazon.com/bedrock/agents/) [Github Issue](https://github.com/mozilla-ai/any-agent/issues/16)
+[AWS Bedrock Agents](https://aws.amazon.com/bedrock/agents/): [Github Issue](https://github.com/mozilla-ai/any-agent/issues/16)
 
-[Agno AI](https://docs.agno.com/introduction) [Github Issue](https://github.com/mozilla-ai/any-agent/issues/27)
+[Agno AI](https://docs.agno.com/introduction): [Github Issue](https://github.com/mozilla-ai/any-agent/issues/27)
 
-[Pydantic AI](https://ai.pydantic.dev/) [Github Issue](https://github.com/mozilla-ai/any-agent/issues/31)
+[Pydantic AI](https://ai.pydantic.dev/): [Github Issue](https://github.com/mozilla-ai/any-agent/issues/31)
 
-[Microsoft AutoGen](https://github.com/microsoft/autogen) [Github Issue](https://github.com/mozilla-ai/any-agent/issues/30)
+[Microsoft AutoGen](https://github.com/microsoft/autogen): [Github Issue](https://github.com/mozilla-ai/any-agent/issues/30)
 
-[Crew AI](https://github.com/mozilla-ai/any-agent/issues/17) [Github Issue](https://www.crewai.com/)
+[Crew AI](https://github.com/mozilla-ai/any-agent/issues/17): [Github Issue](https://www.crewai.com/)
 
 
 ## Quickstart
