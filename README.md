@@ -23,8 +23,9 @@ Using `any-agent`, you can more easily switch to a new or different agent framew
 
 ## Quickstart
 
+Refer to pyproject.toml for a list of the extras available. Update your pip install command to include all of the frameworks that you plan on using.
 ```bash
-pip install any-agent
+pip install 'any-agent[smolagents,langchain,llama_index,openai,mcp]'
 ```
 
 To define any agent system you will always use the same imports:
