@@ -32,34 +32,23 @@ To define any agent system you will always use the same imports:
 
 ```py
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-```
 
-Create the agent configuration for things like the underlying LLM as well as any tools.
-
-```py
+# Create the agent configuration for things like the underlying LLM as well as any tools.
 main_agent = AgentConfig(
     model_id="gpt-4o-mini",
     tools=["any_agent.tools.search_web", "any_agent.tools.visit_webpage"]
 )
-```
 
-Choose one of the available frameworks:
-
-```py
+# Choose one of the available frameworks:
 from random import choice
-
 framework = AgentFramework(
     choice(
         ["langchain", "llama_index", "openai", "smolagents"]
     )
 )
-```
 
-Create and run the agent:
-
-```py
+# Create and run the agent:
 agent = AnyAgent.create(framework, main_agent)
-
 agent.run("Which Agent Framework is the best??")
 ```
 
@@ -69,3 +58,13 @@ any LLM and provider using [LiteLLM](https://docs.litellm.ai/docs/) syntax.
 ## Contributions
 
 The AI agent space is moving fast! If you see a new agentic framework that AnyAgent doesn't yet support, we would love for you to create a Github issue. We also welcome your support in development of additional features or functionality.
+
+
+## Running in Jupyter Notebook
+
+If running in Jupyter Notebook you will need to add the following two lines before running AnyAgent, otherwise you may see the error `RuntimeError: This event loop is already running`
+
+```py
+import nest_asyncio
+nest_asyncio.apply()
+```
