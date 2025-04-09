@@ -32,6 +32,7 @@ langchain = [
 
 llama_index = [
   "llama-index",
+  "llama-index-llms-litellm",
   "platformdirs>=4.3.7",
   "openinference-instrumentation-llama-index"
 ]

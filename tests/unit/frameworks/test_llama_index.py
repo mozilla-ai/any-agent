@@ -19,11 +19,13 @@ def test_load_llama_index_agent_default():
 
     with (
         patch("any_agent.frameworks.llama_index.ReActAgent", create_mock),
-        patch("llama_index.llms.openai.OpenAI", model_mock),
+        patch("llama_index.llms.litellm.LiteLLM", model_mock),
         patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
-        AnyAgent.create(AgentFramework.LLAMAINDEX, AgentConfig(model_id="gpt-4o"))
-        model_mock.assert_called_once_with(model="gpt-4o")
+        AnyAgent.create(
+            AgentFramework.LLAMAINDEX, AgentConfig(model_id="gemini/gemini-2.0-flash")
+        )
+        model_mock.assert_called_once_with(model="gemini/gemini-2.0-flash")
         create_mock.assert_called_once_with(
             name="any_agent",
             llm=model_mock.return_value,

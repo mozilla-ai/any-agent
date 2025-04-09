@@ -15,7 +15,7 @@ except ImportError:
     llama_index_available = False
 
 
-DEFAULT_MODEL_CLASS = "openai.OpenAI"
+DEFAULT_MODEL_CLASS = "litellm.LiteLLM"
 
 
 class LlamaIndexAgent(AnyAgent):
