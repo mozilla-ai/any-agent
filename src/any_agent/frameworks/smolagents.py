@@ -108,7 +108,7 @@ class SmolagentsAgent(AnyAgent):
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
     @logger.catch(reraise=True)
-    def run(self, prompt: str) -> Any:
+    async def _async_run(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
         result = self._agent.run(prompt)
         return result

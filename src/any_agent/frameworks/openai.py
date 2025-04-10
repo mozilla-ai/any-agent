@@ -111,10 +111,9 @@ class OpenAIAgent(AnyAgent):
         )
 
     @logger.catch(reraise=True)
-    def run(self, prompt: str) -> Any:
-        """Run the OpenAI agent with the given prompt."""
-
-        result = Runner.run_sync(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
+    async def _async_run(self, prompt: str) -> Any:
+        """Run the OpenAI agent with the given prompt asynchronously."""
+        result = await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
         return result
 
     @property

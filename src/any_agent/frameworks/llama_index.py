@@ -1,5 +1,5 @@
 import importlib
-from typing import Any, Optional, List
+from typing import Optional, List
 
 from loguru import logger
 
@@ -74,16 +74,10 @@ class LlamaIndexAgent(AnyAgent):
             **self.config.agent_args or {},
         )
 
+    @logger.catch(reraise=True)
     async def _async_run(self, prompt):
         result = await self._agent.run(prompt)
         return result
-
-    @logger.catch(reraise=True)
-    def run(self, prompt: str) -> Any:
-        """Run the LlamaIndex agent with the given prompt."""
-        import asyncio
-
-        return asyncio.run(self._async_run(prompt))
 
     @property
     def tools(self) -> List[str]:

@@ -81,7 +81,7 @@ class GoogleAgent(AnyAgent):
         )
 
     @logger.catch(reraise=True)
-    def run(
+    async def _async_run(
         self, prompt: str, user_id: str | None = None, session_id: str | None = None
     ) -> Any:
         """Run the Google agent with the given prompt."""
