@@ -56,7 +56,7 @@ mcp = [
 ]
 
 all = [
-  "any-agent[langchain,llama_index,smolagents,openai,mcp]"
+  "any-agent[google,langchain,llama_index,smolagents,openai,mcp]"
 ]
 
 docs = [
