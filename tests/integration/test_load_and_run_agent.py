@@ -6,7 +6,7 @@ from any_agent import AgentFramework, AgentConfig, AnyAgent
 
 
 @pytest.mark.parametrize(
-    "framework", ("langchain", "openai", "smolagents", "llama_index")
+    "framework", ("google", "langchain", "openai", "smolagents", "llama_index")
 )
 @pytest.mark.skipif(
     "OPENAI_API_KEY" not in os.environ,

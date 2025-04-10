@@ -22,6 +22,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+google = [
+  "google-adk"
+]
+
 langchain = [
   "langchain",
   "langchain-openai>=0.3.10",

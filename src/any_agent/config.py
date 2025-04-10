@@ -3,10 +3,11 @@ from pydantic import BaseModel, Field, ConfigDict
 
 
 class AgentFramework(str, Enum):
-    OPENAI = "openai"
+    GOOGLE = "google"
     LANGCHAIN = "langchain"
-    SMOLAGENTS = "smolagents"
     LLAMAINDEX = "llama_index"
+    OPENAI = "openai"
+    SMOLAGENTS = "smolagents"
 
 
 class MCPTool(BaseModel):

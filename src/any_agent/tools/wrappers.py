@@ -43,6 +43,14 @@ def wrap_tool_llama_index(tool):
     return tool
 
 
+def wrap_tool_google(tool):
+    from google.adk.tools import BaseTool, FunctionTool
+
+    if not isinstance(tool, BaseTool):
+        return FunctionTool(tool)
+    return tool
+
+
 def wrap_mcp_server(
     mcp_tool: MCPTool, agent_framework: AgentFramework
 ) -> MCPServerBase:
@@ -69,6 +77,7 @@ def wrap_mcp_server(
 
 
 WRAPPERS = {
+    AgentFramework.GOOGLE: wrap_tool_google,
     AgentFramework.OPENAI: wrap_tool_openai,
     AgentFramework.LANGCHAIN: wrap_tool_langchain,
     AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
