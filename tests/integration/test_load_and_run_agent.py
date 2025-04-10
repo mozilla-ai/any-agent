@@ -4,7 +4,6 @@ import pytest
 
 from any_agent import AgentFramework, AgentConfig, AnyAgent
 
-# LLAMAINDEX is not yet supported in this test
 frameworks = [item for item in AgentFramework]
 
 
