@@ -11,7 +11,7 @@ from any_agent.tools import (
 )
 
 
-def test_load_openai_default():
+async def test_load_openai_default():
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
 
@@ -19,7 +19,8 @@ def test_load_openai_default():
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
     ):
-        AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
+        agent = AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
+        await agent.ensure_loaded()
         mock_agent.assert_called_once_with(
             name="any_agent",
             model="gpt-4o",
@@ -30,7 +31,7 @@ def test_load_openai_default():
         )
 
 
-def test_openai_with_api_base_and_api_key_var():
+async def test_openai_with_api_base_and_api_key_var():
     mock_agent = MagicMock()
     async_openai_mock = MagicMock()
     openai_chat_completions_model = MagicMock()
@@ -43,13 +44,14 @@ def test_openai_with_api_base_and_api_key_var():
         ),
         patch.dict(os.environ, {"TEST_API_KEY": "test-key-12345"}),
     ):
-        AnyAgent.create(
+        agent = AnyAgent.create(
             AgentFramework.OPENAI,
             AgentConfig(
                 model_id="gpt-4o",
                 model_args=dict(base_url="FOO", api_key_var="TEST_API_KEY"),
             ),
         )
+        await agent.ensure_loaded()
         async_openai_mock.assert_called_once_with(
             api_key="test-key-12345",
             base_url="FOO",
@@ -57,19 +59,20 @@ def test_openai_with_api_base_and_api_key_var():
         openai_chat_completions_model.assert_called_once()
 
 
-def test_openai_environment_error():
+async def test_openai_environment_error():
     with patch.dict(os.environ, {}, clear=True):
         with pytest.raises(KeyError, match="MISSING_KEY"):
-            AnyAgent.create(
+            agent = AnyAgent.create(
                 AgentFramework.OPENAI,
                 AgentConfig(
                     model_id="gpt-4o",
                     model_args=dict(base_url="FOO", api_key_var="MISSING_KEY"),
                 ),
             )
+            await agent.ensure_loaded()
 
 
-def test_load_openai_with_mcp_server():
+async def test_load_openai_with_mcp_server():
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
     mock_mcp_server = MagicMock()
@@ -86,7 +89,7 @@ def test_load_openai_with_mcp_server():
             [mock_mcp_server],  # mcp_servers
         )
 
-        AnyAgent.create(
+        agent = AnyAgent.create(
             AgentFramework.OPENAI,
             AgentConfig(
                 model_id="gpt-4o",
@@ -95,6 +98,7 @@ def test_load_openai_with_mcp_server():
                 ],  # The actual import path doesn't matter for the test
             ),
         )
+        await agent.ensure_loaded()
 
         # Verify Agent was called with the MCP server
         mock_agent.assert_called_once_with(
@@ -107,7 +111,7 @@ def test_load_openai_with_mcp_server():
         )
 
 
-def test_load_openai_multiagent():
+async def test_load_openai_multiagent():
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
 
@@ -140,9 +144,10 @@ def test_load_openai_multiagent():
             ),
         ]
 
-        AnyAgent.create(
+        agent = AnyAgent.create(
             AgentFramework.OPENAI, main_agent, managed_agents=managed_agents
         )
+        await agent.ensure_loaded()
         mock_agent.assert_any_call(
             model="gpt-4o-mini",
             instructions=None,

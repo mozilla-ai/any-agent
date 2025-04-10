@@ -1,4 +1,3 @@
-import asyncio
 import importlib
 from typing import Any, Optional, List
 
@@ -34,7 +33,6 @@ class LangchainAgent(AnyAgent):
         self.config = config
         self._agent = None
         self._tools = []
-        asyncio.get_event_loop().run_until_complete(self._load_agent())
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a LangChain agent."""
@@ -80,6 +78,7 @@ class LangchainAgent(AnyAgent):
     @logger.catch(reraise=True)
     async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
+        await self.ensure_loaded()
         inputs = {"messages": [("user", prompt)]}
         message = None
         async for s in self._agent.astream(inputs, stream_mode="values"):

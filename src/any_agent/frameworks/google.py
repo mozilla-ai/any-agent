@@ -1,4 +1,3 @@
-import asyncio
 from typing import Optional, Any, List
 from uuid import uuid4
 
@@ -34,7 +33,6 @@ class GoogleAgent(AnyAgent):
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
-        asyncio.get_event_loop().run_until_complete(self._load_agent())
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a Google agent."""
@@ -94,6 +92,7 @@ class GoogleAgent(AnyAgent):
         self, prompt: str, user_id: str | None = None, session_id: str | None = None
     ) -> Any:
         """Run the Google agent with the given prompt."""
+        await self.ensure_loaded()
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())

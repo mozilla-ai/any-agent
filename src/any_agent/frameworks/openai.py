@@ -1,4 +1,3 @@
-import asyncio
 import os
 from typing import Optional, Any, List
 
@@ -32,7 +31,6 @@ class OpenAIAgent(AnyAgent):
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
-        asyncio.get_event_loop().run_until_complete(self._load_agent())
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for an OpenAI agent."""
@@ -114,6 +112,7 @@ class OpenAIAgent(AnyAgent):
     @logger.catch(reraise=True)
     async def run_async(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt asynchronously."""
+        await self.ensure_loaded()
         result = await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
         return result
 

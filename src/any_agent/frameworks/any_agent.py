@@ -41,6 +41,11 @@ class AnyAgent(ABC):
         else:
             raise ValueError(f"Unsupported agent framework: {agent_framework}")
 
+    async def ensure_loaded(self):
+        if not self._agent_loaded:
+            await self._load_agent()
+            self._agent_loaded = True
+
     @abstractmethod
     def _load_agent(self) -> None:
         """Load the agent instance."""

@@ -1,4 +1,3 @@
-import asyncio
 import importlib
 from typing import Optional, List
 
@@ -32,7 +31,6 @@ class LlamaIndexAgent(AnyAgent):
         self.managed_agents: Optional[list[AgentConfig]] = managed_agents
         self.config: AgentConfig = config
         self._agent = None
-        asyncio.get_event_loop().run_until_complete(self._load_agent())
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a llama_index agent."""
@@ -77,6 +75,7 @@ class LlamaIndexAgent(AnyAgent):
 
     @logger.catch(reraise=True)
     async def run_async(self, prompt):
+        await self.ensure_loaded()
         result = await self._agent.run(prompt)
         return result
 

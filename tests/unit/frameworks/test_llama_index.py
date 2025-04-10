@@ -9,7 +9,7 @@ from any_agent.tools import (
 )
 
 
-def test_load_llama_index_agent_default():
+async def test_load_llama_index_agent_default():
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -22,9 +22,10 @@ def test_load_llama_index_agent_default():
         patch("llama_index.llms.litellm.LiteLLM", model_mock),
         patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
-        AnyAgent.create(
+        agent = AnyAgent.create(
             AgentFramework.LLAMAINDEX, AgentConfig(model_id="gemini/gemini-2.0-flash")
         )
+        await agent.ensure_loaded()
         model_mock.assert_called_once_with(model="gemini/gemini-2.0-flash")
         create_mock.assert_called_once_with(
             name="any_agent",

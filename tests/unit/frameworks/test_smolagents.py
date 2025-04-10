@@ -10,7 +10,7 @@ from any_agent.frameworks.smolagents import (
 from any_agent.tools import search_web, visit_webpage
 
 
-def test_load_smolagent_default():
+async def test_load_smolagent_default():
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_tool = MagicMock()
@@ -20,12 +20,13 @@ def test_load_smolagent_default():
         patch(f"smolagents.{DEFAULT_MODEL_CLASS}", mock_model),
         patch("smolagents.tool", mock_tool),
     ):
-        AnyAgent.create(
+        agent = AnyAgent.create(
             AgentFramework.SMOLAGENTS,
             AgentConfig(
                 model_id="openai/o3-mini",
             ),
         )
+        await agent.ensure_loaded()
         mock_agent.assert_called_once_with(
             name="any_agent",
             model=mock_model.return_value,
@@ -36,7 +37,7 @@ def test_load_smolagent_default():
         mock_model.assert_called_once_with(model_id="openai/o3-mini")
 
 
-def test_load_smolagent_with_api_base_and_api_key_var():
+async def test_load_smolagent_with_api_base_and_api_key_var():
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_tool = MagicMock()
@@ -47,7 +48,7 @@ def test_load_smolagent_with_api_base_and_api_key_var():
         patch("smolagents.tool", mock_tool),
         patch.dict(os.environ, {"OPENAI_API_KEY": "BAR"}),
     ):
-        AnyAgent.create(
+        agent = AnyAgent.create(
             AgentFramework.SMOLAGENTS,
             AgentConfig(
                 model_id="openai/o3-mini",
@@ -57,6 +58,7 @@ def test_load_smolagent_with_api_base_and_api_key_var():
                 ),
             ),
         )
+        await agent.ensure_loaded()
         mock_agent.assert_called_once_with(
             name="any_agent",
             model=mock_model.return_value,
@@ -71,7 +73,7 @@ def test_load_smolagent_with_api_base_and_api_key_var():
         )
 
 
-def test_load_smolagent_environment_error():
+async def test_load_smolagent_environment_error():
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_tool = MagicMock()
@@ -83,13 +85,14 @@ def test_load_smolagent_environment_error():
         patch.dict(os.environ, {}, clear=True),
     ):
         with pytest.raises(KeyError, match="MISSING_KEY"):
-            AnyAgent.create(
+            agent = AnyAgent.create(
                 AgentFramework.SMOLAGENTS,
                 AgentConfig(
                     model_id="openai/o3-mini",
                     model_args=dict(api_key_var="MISSING_KEY"),
                 ),
             )
+            await agent.ensure_loaded()
 
 
 def test_load_smolagents_agent_missing():
