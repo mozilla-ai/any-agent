@@ -106,5 +106,5 @@ for that framework and no `model_args`.
 
 !!! tip
 
-    For frameworks that have support for [`LiteLLM`](https://github.com/BerriAI/litellm) (`google`, `llama_index`, `smolagents`)
+    For frameworks that have support for [`LiteLLM`](https://github.com/BerriAI/litellm) (`google`, `langchain`, `llama_index`, `smolagents`)
     we use it as default `model_type`, allowing you to use the same `model_id` syntax across these frameworks.

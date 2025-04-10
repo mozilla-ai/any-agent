@@ -1,3 +1,4 @@
+import importlib
 from typing import Any, Optional, List
 
 from loguru import logger
@@ -7,13 +8,15 @@ from any_agent.tools.wrappers import import_and_wrap_tools
 from .any_agent import AnyAgent
 
 try:
-    from langchain.chat_models import init_chat_model
     from langgraph.prebuilt import create_react_agent
     from langgraph.graph.graph import CompiledGraph
 
     langchain_available = True
 except ImportError:
     langchain_available = False
+
+
+DEFAULT_MODEL_CLASS = "langchain_litellm.ChatLiteLLM"
 
 
 class LangchainAgent(AnyAgent):
@@ -27,6 +30,15 @@ class LangchainAgent(AnyAgent):
         self._agent = None
         self._tools = []
         self._load_agent()
+
+    def _get_model(self, agent_config: AgentConfig):
+        """Get the model configuration for a llama_index agent."""
+        if not agent_config.model_type:
+            agent_config.model_type = DEFAULT_MODEL_CLASS
+        module, class_name = agent_config.model_type.split(".")
+        model_type = getattr(importlib.import_module(module), class_name)
+
+        return model_type(model=agent_config.model_id, **agent_config.model_args or {})
 
     @logger.catch(reraise=True)
     def _load_agent(self) -> None:
@@ -53,17 +65,7 @@ class LangchainAgent(AnyAgent):
         for manager in mcp_managers:
             imported_tools.extend(manager.tools)
 
-        if "/" in self.config.model_id:
-            model_provider, model_id = self.config.model_id.split("/")
-            model = init_chat_model(
-                model=model_id,
-                model_provider=model_provider,
-                **self.config.model_args or {},
-            )
-        else:
-            model = init_chat_model(
-                self.config.model_id, **self.config.model_args or {}
-            )
+        model = self._get_model(self.config)
 
         self._agent: CompiledGraph = create_react_agent(
             model=model,
