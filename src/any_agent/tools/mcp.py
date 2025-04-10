@@ -26,7 +26,9 @@ class MCPServerBase(ABC):
 
     def __init__(self, mcp_tool: MCPTool):
         if not mcp_available:
-            raise ImportError("You need to `pip install mcp` to use this tools.")
+            raise ImportError(
+                "You need to `pip install 'any-agent[mcp]'` to use MCP tools."
+            )
 
         # Store the original tool configuration
         self.mcp_tool = mcp_tool

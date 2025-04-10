@@ -22,6 +22,10 @@ class LangchainAgent(AnyAgent):
     def __init__(
         self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
     ):
+        if not langchain_available:
+            raise ImportError(
+                "You need to `pip install 'any-agent[langchain]'` to use this agent"
+            )
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
@@ -31,10 +35,6 @@ class LangchainAgent(AnyAgent):
     @logger.catch(reraise=True)
     def _load_agent(self) -> None:
         """Load the LangChain agent with the given configuration."""
-        if not langchain_available:
-            raise ImportError(
-                "You need to `pip install langchain langgraph` to use this agent"
-            )
 
         if not self.config.tools:
             self.config.tools = [

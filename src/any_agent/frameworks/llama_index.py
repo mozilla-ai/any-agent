@@ -24,6 +24,10 @@ class LlamaIndexAgent(AnyAgent):
     def __init__(
         self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
     ):
+        if not llama_index_available:
+            raise ImportError(
+                "You need to `pip install 'any-agent[llama_index]'` to use this agent"
+            )
         self.managed_agents: Optional[list[AgentConfig]] = managed_agents
         self.config: AgentConfig = config
         self._agent = None
@@ -43,8 +47,6 @@ class LlamaIndexAgent(AnyAgent):
     @logger.catch(reraise=True)
     def _load_agent(self) -> None:
         """Load the LLamaIndex agent with the given configuration."""
-        if not llama_index_available:
-            raise ImportError("You need to `pip install llama-index` to use this agent")
 
         if not self.config.tools:
             self.config.tools = [

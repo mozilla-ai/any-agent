@@ -24,6 +24,10 @@ class OpenAIAgent(AnyAgent):
     def __init__(
         self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
     ):
+        if not agents_available:
+            raise ImportError(
+                "You need to `pip install 'any-agent[openai]'` to use this agent"
+            )
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
@@ -109,10 +113,6 @@ class OpenAIAgent(AnyAgent):
     @logger.catch(reraise=True)
     def run(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt."""
-        if not agents_available:
-            raise ImportError(
-                "You need to `pip install openai-agents` to use this agent"
-            )
 
         result = Runner.run_sync(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
         return result

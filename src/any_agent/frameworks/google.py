@@ -19,8 +19,6 @@ try:
 except ImportError:
     adk_available = None
 
-OPENAI_MAX_TURNS = 30
-
 
 class GoogleAgent(AnyAgent):
     """Google agent implementation that handles both loading and running."""
@@ -28,6 +26,10 @@ class GoogleAgent(AnyAgent):
     def __init__(
         self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
     ):
+        if not adk_available:
+            raise ImportError(
+                "You need to `pip install 'any-agent[google]'` to use this agent"
+            )
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
@@ -40,9 +42,6 @@ class GoogleAgent(AnyAgent):
     @logger.catch(reraise=True)
     def _load_agent(self) -> None:
         """Load the Google agent with the given configuration."""
-        if not adk_available:
-            raise ImportError("You need to `pip install google-adk` to use this agent")
-
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
                 "any_agent.tools.search_web",
@@ -86,8 +85,6 @@ class GoogleAgent(AnyAgent):
         self, prompt: str, user_id: str | None = None, session_id: str | None = None
     ) -> Any:
         """Run the Google agent with the given prompt."""
-        if not adk_available:
-            raise ImportError("You need to `pip install google-adk` to use this agent")
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
