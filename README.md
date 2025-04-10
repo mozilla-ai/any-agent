@@ -18,12 +18,13 @@ Using `any-agent`, you can more easily switch to a new or different agent framew
 
 [![LangChain](https://img.shields.io/badge/LangChain-1e4545?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph) [![LlamaIndex](https://img.shields.io/badge/🦙%20LlamaIndex-fbcfe2)](https://github.com/run-llama/llama_index) [![OpenAI Agents](https://img.shields.io/badge/OpenAI%20Agents-black?logo=openai)](https://github.com/openai/openai-agents-python) [![Smolagents](https://img.shields.io/badge/Smolagents-ffcb3a?logo=huggingface&logoColor=white)](https://smolagents.org/)
 
-## Coming Soon (Contributions Welcome!)
-[AWS Bedrock Agents](https://github.com/mozilla-ai/any-agent/issues/16), 
-[Agno AI](https://github.com/mozilla-ai/any-agent/issues/27), 
-[Pydantic AI](https://github.com/mozilla-ai/any-agent/issues/31), 
-[Microsoft AutoGen](https://github.com/mozilla-ai/any-agent/issues/30), 
-[Crew AI](https://www.crewai.com/)
+## Planned for Support (Contributions Welcome!)
+[AWS Bedrock Agents](https://github.com/mozilla-ai/any-agent/issues/16),
+[Agno AI](https://github.com/mozilla-ai/any-agent/issues/27),
+[Pydantic AI](https://github.com/mozilla-ai/any-agent/issues/31),
+[Microsoft AutoGen](https://github.com/mozilla-ai/any-agent/issues/30),
+[Crew AI](https://github.com/mozilla-ai/any-agent/issues/17)
+[Google ADK](https://github.com/mozilla-ai/any-agent/issues/51)
 
 
 ## Quickstart
