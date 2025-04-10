@@ -32,7 +32,7 @@ class LangchainAgent(AnyAgent):
         self._load_agent()
 
     def _get_model(self, agent_config: AgentConfig):
-        """Get the model configuration for a llama_index agent."""
+        """Get the model configuration for a LangChain agent."""
         if not agent_config.model_type:
             agent_config.model_type = DEFAULT_MODEL_CLASS
         module, class_name = agent_config.model_type.split(".")
