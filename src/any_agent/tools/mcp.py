@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 import os
-import asyncio
 from loguru import logger
 from textwrap import dedent
 
@@ -17,8 +16,8 @@ except ImportError:
     mcp_available = False
 
 
-# Global registry to keep Smolagents MCP manager instances alive
-_smolagents_mcp_managers = {}
+# Global registry to keep MCP manager instances alive
+_mcps = {}
 
 
 class MCPServerBase(ABC):
@@ -37,13 +36,8 @@ class MCPServerBase(ABC):
         self.tools = []
 
     @abstractmethod
-    def setup_tools(self):
+    async def setup_tools(self):
         """Set up tools. To be implemented by subclasses."""
-        pass
-
-    @abstractmethod
-    def cleanup(self):
-        """Clean up resources. To be implemented by subclasses."""
         pass
 
 
@@ -58,12 +52,9 @@ class SmolagentsMCPServerStdio(MCPServerBase):
         self.tool_collection = None
 
         # Register self in the global registry to prevent garbage collection
-        # (only needed for Smolagents implementation)
-        _smolagents_mcp_managers[self.id] = self
+        _mcps[self.id] = self
 
-        self.setup_tools()
-
-    def setup_tools(self):
+    async def setup_tools(self):
         from smolagents import ToolCollection
 
         self.server_parameters = StdioServerParameters(
@@ -99,7 +90,7 @@ class SmolagentsMCPServerStdio(MCPServerBase):
             logger.info(f"Tools available: {tools}")
             self.tools = tools
 
-    def cleanup(self):
+    def __del__(self):
         # Exit the context when cleanup is called
         if hasattr(self, "context") and self.context:
             try:
@@ -107,12 +98,9 @@ class SmolagentsMCPServerStdio(MCPServerBase):
                 self.context = None
             except Exception as e:
                 logger.error(f"Error closing MCP context: {e}")
-
-    def __del__(self):
-        self.cleanup()
         # Remove from registry when deleted (Smolagents-specific)
-        if hasattr(self, "id") and self.id in _smolagents_mcp_managers:
-            del _smolagents_mcp_managers[self.id]
+        if hasattr(self, "id") and self.id in _mcps:
+            del _mcps[self.id]
 
 
 class OpenAIMCPServerStdio(MCPServerBase):
@@ -122,9 +110,8 @@ class OpenAIMCPServerStdio(MCPServerBase):
         super().__init__(mcp_tool)
         self.server = None
         self.loop = None
-        self.setup_tools()
 
-    def setup_tools(self):
+    async def setup_tools(self):
         """Set up the OpenAI MCP server with the provided configuration."""
         from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
 
@@ -135,34 +122,13 @@ class OpenAIMCPServerStdio(MCPServerBase):
                 "args": self.mcp_tool.args,
             },
         )
-        try:
-            # Try to get the existing event loop
-            self.loop = asyncio.get_event_loop()
-            # Check if it's running
-            is_running = self.loop.is_running()
-        except RuntimeError:
-            # No event loop exists in this thread
-            is_running = False
-            self.loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(self.loop)
 
-        # If we got an existing event loop but it's not running, we might need a new one
-        if not is_running:
-            self.loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(self.loop)
-
-        self.loop.run_until_complete(self.server.__aenter__())
+        await self.server.__aenter__()
         # Get tools from the server
-        self.tools = self.loop.run_until_complete(self.server.list_tools())
+        self.tools = await self.server.list_tools()
         logger.warning(
             "OpenAI MCP currently does not support filtering MCP available tools"
         )
-
-    def cleanup(self):
-        self.server = None
-
-    def __del__(self):
-        self.cleanup()
 
 
 class LangchainMCPServerStdio(MCPServerBase):
@@ -173,15 +139,8 @@ class LangchainMCPServerStdio(MCPServerBase):
         self.client = None
         self.session = None
         self.tools = []
-
-        # Using an existing event loop if available, or creating a new one
-        try:
-            self.loop = asyncio.get_event_loop()
-        except RuntimeError:
-            self.loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(self.loop)
-
-        self.loop.run_until_complete(self.setup_tools())
+        self.id = id(self)
+        _mcps[self.id] = self
 
     async def setup_tools(self):
         """Set up the LangChain MCP server with the provided configuration."""
@@ -199,36 +158,39 @@ class LangchainMCPServerStdio(MCPServerBase):
         await self.session.initialize()
         self.tools = await load_mcp_tools(self.session)
 
-    def cleanup(self):
-        """Clean up resources using the same event loop"""
-        if self.session and self.client:
-            try:
-                # Create a new event loop for cleanup if the original is closed
-                if self.loop.is_closed():
-                    cleanup_loop = asyncio.new_event_loop()
-                    cleanup_loop.run_until_complete(self._cleanup_async())
-                    cleanup_loop.close()
-                else:
-                    self.loop.run_until_complete(self._cleanup_async())
-            except Exception as e:
-                logger.error(f"Error closing LangChain MCP resources: {e}")
+    def __del__(self):
+        if hasattr(self, "id") and self.id in _mcps:
+            del _mcps[self.id]
 
-    async def _cleanup_async(self):
-        """Async cleanup to be run in the same event loop as setup"""
-        if self.session:
-            await self.session.__aexit__(None, None, None)
-            self.session = None
 
-        if self.client:
-            await self.client.__aexit__(None, None, None)
-            self.client = None
+class GoogleMCPServerStdio(MCPServerBase):
+    """Implementation of MCP tools manager for Google agents."""
+
+    def __init__(self, mcp_tool: MCPTool):
+        super().__init__(mcp_tool)
+        self.server = None
+        self.id = id(self)
+        _mcps[self.id] = self
+
+    async def setup_tools(self):
+        """Set up the Google MCP server with the provided configuration."""
+        from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
+        from google.adk.tools.mcp_tool.mcp_toolset import (
+            StdioServerParameters as GoogleStdioServerParameters,
+        )
+
+        params = GoogleStdioServerParameters(
+            command=self.mcp_tool.command,
+            args=self.mcp_tool.args,
+            env={**os.environ},
+        )
+
+        toolset = GoogleMCPToolset(connection_params=params)
+        await toolset.__aenter__()
+        tools = await toolset.load_tools()
+        self.tools = tools
+        self.server = toolset
 
     def __del__(self):
-        self.cleanup()
-
-    # Consider adding a context manager interface
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self._cleanup_async()
+        if hasattr(self, "id") and self.id in _mcps:
+            del _mcps[self.id]

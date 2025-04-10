@@ -70,27 +70,6 @@ class TestSmolagentsMCPServerStdio(unittest.TestCase):
         self.mock_context = MagicMock()
         self.mock_context.__enter__.return_value = self.mock_collection
 
-    def test_cleanup(self, mock_stdio_params, mock_tool_collection):
-        """Test that cleanup exits the context manager."""
-        # Configure the mocks
-        mock_tool_collection.from_mcp.return_value = self.mock_context
-
-        # Initialize the manager with setup_tools patched
-        with patch.object(SmolagentsMCPServerStdio, "setup_tools", return_value=None):
-            manager = SmolagentsMCPServerStdio(self.test_tool)
-
-        # Set the context attribute
-        manager.context = self.mock_context
-
-        # Call cleanup
-        manager.cleanup()
-
-        # Verify context.__exit__ was called
-        self.mock_context.__exit__.assert_called_once_with(None, None, None)
-
-        # Verify context was set to None
-        self.assertIsNone(manager.context)
-
     def test_setup_tools_with_none_tools(self, mock_stdio_params, mock_tool_collection):
         """Test that when mcp_tool.tools is None, all available tools are used."""
         # Setup mock tools

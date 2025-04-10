@@ -4,10 +4,15 @@ import pytest
 
 from any_agent import AgentFramework, AgentConfig, AnyAgent
 
+# LLAMAINDEX is not yet supported in this test
+frameworks = [
+    item for item in AgentFramework if item not in [AgentFramework.LLAMAINDEX]
+]
+
 
 @pytest.mark.parametrize(
     "framework",
-    (AgentFramework.OPENAI, AgentFramework.SMOLAGENTS),
+    frameworks,
 )
 @pytest.mark.skipif(
     "OPENAI_API_KEY" not in os.environ,
@@ -33,7 +38,8 @@ def test_mcp(framework):
             "tools": [
                 "write_file",
             ],
-        }
+        },
+        {"command": "docker", "args": ["run", "-i", "--rm", "mcp/time"]},
     ]
     agent_config = AgentConfig(
         model_id="gpt-4o",

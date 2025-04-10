@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 from typing import Any, Optional, List
 
@@ -33,7 +34,7 @@ class LangchainAgent(AnyAgent):
         self.config = config
         self._agent = None
         self._tools = []
-        self._load_agent()
+        asyncio.get_event_loop().run_until_complete(self._load_agent())
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a LangChain agent."""
@@ -45,7 +46,7 @@ class LangchainAgent(AnyAgent):
         return model_type(model=agent_config.model_id, **agent_config.model_args or {})
 
     @logger.catch(reraise=True)
-    def _load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the LangChain agent with the given configuration."""
 
         if not self.config.tools:
@@ -57,7 +58,7 @@ class LangchainAgent(AnyAgent):
         if self.managed_agents:
             raise NotImplementedError("langchain managed agents are not supported yet")
 
-        imported_tools, mcp_managers = import_and_wrap_tools(
+        imported_tools, mcp_managers = await import_and_wrap_tools(
             self.config.tools, agent_framework=AgentFramework.LANGCHAIN
         )
 
@@ -81,7 +82,7 @@ class LangchainAgent(AnyAgent):
         """Run the LangChain agent with the given prompt."""
         inputs = {"messages": [("user", prompt)]}
         message = None
-        for s in self._agent.stream(inputs, stream_mode="values"):
+        async for s in self._agent.astream(inputs, stream_mode="values"):
             message = s["messages"][-1]
             if isinstance(message, tuple):
                 logger.debug(message)

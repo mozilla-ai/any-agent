@@ -4,8 +4,10 @@ from collections.abc import Callable
 
 from any_agent.config import AgentFramework, MCPTool
 from any_agent.tools.mcp import (
+    GoogleMCPServerStdio,
     SmolagentsMCPServerStdio,
     OpenAIMCPServerStdio,
+    LangchainMCPServerStdio,
     MCPServerBase,
 )
 
@@ -51,7 +53,7 @@ def wrap_tool_google(tool):
     return tool
 
 
-def wrap_mcp_server(
+async def wrap_mcp_server(
     mcp_tool: MCPTool, agent_framework: AgentFramework
 ) -> MCPServerBase:
     """
@@ -62,6 +64,8 @@ def wrap_mcp_server(
     manager_map = {
         AgentFramework.OPENAI: OpenAIMCPServerStdio,
         AgentFramework.SMOLAGENTS: SmolagentsMCPServerStdio,
+        AgentFramework.LANGCHAIN: LangchainMCPServerStdio,
+        AgentFramework.GOOGLE: GoogleMCPServerStdio,
     }
 
     if agent_framework not in manager_map:
@@ -70,8 +74,9 @@ def wrap_mcp_server(
         )
 
     # Create the manager instance which will manage the MCP tool context
-    manager_class: MCPServerBase = manager_map[agent_framework]
-    manager = manager_class(mcp_tool)
+    manager_class = manager_map[agent_framework]
+    manager: MCPServerBase = manager_class(mcp_tool)
+    await manager.setup_tools()
 
     return manager
 
@@ -85,7 +90,7 @@ WRAPPERS = {
 }
 
 
-def import_and_wrap_tools(
+async def import_and_wrap_tools(
     tools: list[str | dict], agent_framework: AgentFramework
 ) -> tuple[list[Callable], list[MCPServerBase]]:
     wrapper = WRAPPERS[agent_framework]
@@ -97,7 +102,7 @@ def import_and_wrap_tools(
             # MCP adapters are usually implemented as context managers.
             # We wrap the server using `MCPServerBase` so the
             # tools can be used as any other callable.
-            mcp_server = wrap_mcp_server(tool, agent_framework)
+            mcp_server = await wrap_mcp_server(tool, agent_framework)
             mcp_servers.append(mcp_server)
         elif isinstance(tool, str):
             module, func = tool.rsplit(".", 1)

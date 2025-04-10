@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 from typing import Optional, List
 
@@ -31,7 +32,7 @@ class LlamaIndexAgent(AnyAgent):
         self.managed_agents: Optional[list[AgentConfig]] = managed_agents
         self.config: AgentConfig = config
         self._agent = None
-        self._load_agent()
+        asyncio.get_event_loop().run_until_complete(self._load_agent())
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a llama_index agent."""
@@ -45,7 +46,7 @@ class LlamaIndexAgent(AnyAgent):
         return model_type(model=agent_config.model_id, **agent_config.model_args or {})
 
     @logger.catch(reraise=True)
-    def _load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the LLamaIndex agent with the given configuration."""
 
         if not self.config.tools:
@@ -59,7 +60,7 @@ class LlamaIndexAgent(AnyAgent):
                 "llama-index managed agents are not supported yet"
             )
 
-        imported_tools, mcp_managers = import_and_wrap_tools(
+        imported_tools, mcp_managers = await import_and_wrap_tools(
             self.config.tools, agent_framework=AgentFramework.LLAMAINDEX
         )
 

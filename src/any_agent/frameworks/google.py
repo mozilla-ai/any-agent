@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional, Any, List
 from uuid import uuid4
 
@@ -33,30 +34,38 @@ class GoogleAgent(AnyAgent):
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
-        self._load_agent()
+        asyncio.get_event_loop().run_until_complete(self._load_agent())
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a Google agent."""
         return LiteLlm(model=agent_config.model_id, **agent_config.model_args or {})
 
     @logger.catch(reraise=True)
-    def _load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the Google agent with the given configuration."""
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
                 "any_agent.tools.search_web",
                 "any_agent.tools.visit_webpage",
             ]
-        tools, mcp_servers = import_and_wrap_tools(
+        tools, mcp_servers = await import_and_wrap_tools(
             self.config.tools, agent_framework=AgentFramework.GOOGLE
         )
+        mcp_tools = [tool for mcp_server in mcp_servers for tool in mcp_server.tools]
+        tools.extend(mcp_tools)
 
         sub_agents_instanced = []
         if self.managed_agents:
             for managed_agent in self.managed_agents:
-                managed_tools, managed_mcp_servers = import_and_wrap_tools(
+                managed_tools, managed_mcp_servers = await import_and_wrap_tools(
                     managed_agent.tools, agent_framework=AgentFramework.GOOGLE
                 )
+                managed_mcp_tools = [
+                    tool
+                    for mcp_server in managed_mcp_servers
+                    for tool in mcp_server.tools
+                ]
+                managed_tools.extend(managed_mcp_tools)
                 instance = Agent(
                     name=managed_agent.name,
                     instruction=get_instructions(managed_agent.instructions) or "",
@@ -91,14 +100,17 @@ class GoogleAgent(AnyAgent):
         runner.session_service.create_session(
             app_name=runner.app_name, user_id=user_id, session_id=session_id
         )
-        for event in runner.run(
+        events = runner.run_async(
             user_id=user_id,
             session_id=session_id,
             new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
-        ):
+        )
+
+        async for event in events:
             logger.debug(event)
             if event.is_final_response():
                 break
+
         session = runner.session_service.get_session(
             app_name=runner.app_name, user_id=user_id, session_id=session_id
         )
