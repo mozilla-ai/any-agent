@@ -34,4 +34,7 @@ jobs:
         run: pytest -v tests/unit
 
       - name: Run Integration tests
+        env:
+          ANY_AGENT_INTEGRATION_TESTS: TRUE
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: pytest -v tests/integration
