@@ -9,6 +9,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     If there is no existing issue, don't hesitate to request and/or contribute it.
 
+## Examples
 
 === "Google ADK"
 
@@ -16,8 +17,8 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ``` py
     agent = AnyAgent.create(
-        framework=AgentFramework("google"),
-        main_agent=AgentConfig(
+        AgentFramework("google"),
+        AgentConfig(
             model_id="gpt-4o-mini"
         )
     )
@@ -30,8 +31,8 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ``` py
     agent = AnyAgent.create(
-        framework=AgentFramework("langchain"),
-        main_agent=AgentConfig(
+        AgentFramework("langchain"),
+        AgentConfig(
             model_id="gpt-4o-mini"
         )
     )
@@ -44,8 +45,8 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ``` py
     agent = AnyAgent.create(
-        framework=AgentFramework("llama_index"),
-        main_agent=AgentConfig(
+        AgentFramework("llama_index"),
+        AgentConfig(
             model_id="gpt-4o-mini"
         )
     )
@@ -58,8 +59,8 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ``` py
     agent = AnyAgent.create(
-        framework=AgentFramework("openai"),
-        main_agent=AgentConfig(
+        AgentFramework("openai"),
+        AgentConfig(
             model_id="gpt-4o-mini"
         )
     )
@@ -72,10 +73,23 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ``` py
     agent = AnyAgent.create(
-        framework=AgentFramework("smolagents"),
-        main_agent=AgentConfig(
+        AgentFramework("smolagents"),
+        AgentConfig(
             model_id="gpt-4o-mini"
         )
     )
     agent.run("Which Agent Framework is the best??")
     ```
+
+## Models
+
+The model used by an agent is defined by 3 arguments `model_id`, `model_type` and `model_args`.
+
+If you just specify `model_id` (as in the examples above), the agent will use the default `model_type` that we have selected
+for that framework and no `model_args`.
+
+
+!!! tip
+
+    For frameworks that have support for [`LiteLLM`](https://github.com/BerriAI/litellm) (`google`, `llama_index`, `smolagents`)
+    we use it as default `model_type`, allowing you to use the same `model_id` syntax across these frameworks.
