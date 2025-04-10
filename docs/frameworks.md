@@ -85,6 +85,21 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
 The model used by an agent is defined by 3 arguments `model_id`, `model_type` and `model_args`.
 
+A common usage of `model_args` is to specify a custom `api_base` and/or `api_key`:
+
+```py
+agent = AnyAgent.create(
+    AgentFramework("smolagents"),
+    AgentConfig(
+        model_id="llama3.2",
+        model_args={
+            "api_base": "http://localhost:11434/v1"
+        }
+    )
+)
+agent.run("Which Agent Framework is the best??")
+```
+
 If you just specify `model_id` (as in the examples above), the agent will use the default `model_type` that we have selected
 for that framework and no `model_args`.
 
