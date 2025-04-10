@@ -9,6 +9,21 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     If there is no existing issue, don't hesitate to request and/or contribute it.
 
+
+=== "Google ADK"
+
+    [Google ADK Repo](https://github.com/google/adk-python)
+
+    ``` py
+    agent = AnyAgent.create(
+        framework=AgentFramework("google"),
+        main_agent=AgentConfig(
+            model_id="gpt-4o-mini"
+        )
+    )
+    agent.run("Which Agent Framework is the best??")
+    ```
+
 === "🦜🔗 LangChain"
 
     [LangChain Repo](https://github.com/langchain-ai/langchain)
@@ -37,7 +52,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
     agent.run("Which Agent Framework is the best??")
     ```
 
-=== "OpenAI Agents"
+=== "OpenAI Agents SDK"
 
     [OpenAI Agents Repo](https://github.com/openai/openai-agents-python)
 
