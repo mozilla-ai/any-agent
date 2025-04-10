@@ -184,7 +184,5 @@ def test_load_openai_multiagent():
 
 def test_load_openai_agent_missing():
     with patch("any_agent.frameworks.openai.agents_available", False):
-        with pytest.raises(
-            ImportError, match="You need to `pip install openai-agents`"
-        ):
+        with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))

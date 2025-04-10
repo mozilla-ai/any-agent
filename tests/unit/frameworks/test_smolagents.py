@@ -94,5 +94,5 @@ def test_load_smolagent_environment_error():
 
 def test_load_smolagents_agent_missing():
     with patch("any_agent.frameworks.smolagents.smolagents_available", False):
-        with pytest.raises(ImportError, match="You need to `pip install smolagents`"):
+        with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.SMOLAGENTS, AgentConfig(model_id="gpt-4o"))

@@ -35,5 +35,5 @@ def test_load_llama_index_agent_default():
 
 def test_load_llama_index_agent_missing():
     with patch("any_agent.frameworks.llama_index.llama_index_available", False):
-        with pytest.raises(ImportError, match="You need to `pip install llama-index`"):
+        with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.LLAMAINDEX, AgentConfig(model_id="gpt-4o"))

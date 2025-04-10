@@ -1,5 +1,7 @@
 from unittest.mock import patch, MagicMock
 
+import pytest
+
 from any_agent import AgentFramework, AgentConfig, AnyAgent
 from any_agent.tools import (
     search_web,
@@ -93,3 +95,9 @@ def test_load_google_multiagent():
             sub_agents=[mock_agent.return_value],
             output_key="response",
         )
+
+
+def test_load_google_agent_missing():
+    with patch("any_agent.frameworks.google.adk_available", False):
+        with pytest.raises(ImportError):
+            AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))

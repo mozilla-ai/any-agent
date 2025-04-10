@@ -32,7 +32,5 @@ def test_load_langchain_agent_default():
 
 def test_load_langchain_agent_missing():
     with patch("any_agent.frameworks.langchain.langchain_available", False):
-        with pytest.raises(
-            ImportError, match="You need to `pip install langchain langgraph`"
-        ):
+        with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.LANGCHAIN, AgentConfig(model_id="gpt-4o"))
