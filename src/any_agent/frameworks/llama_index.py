@@ -75,7 +75,7 @@ class LlamaIndexAgent(AnyAgent):
         )
 
     @logger.catch(reraise=True)
-    async def _async_run(self, prompt):
+    async def run_async(self, prompt):
         result = await self._agent.run(prompt)
         return result
 

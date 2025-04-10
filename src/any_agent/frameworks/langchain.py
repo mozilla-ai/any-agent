@@ -77,7 +77,7 @@ class LangchainAgent(AnyAgent):
         self._tools = imported_tools
 
     @logger.catch(reraise=True)
-    async def _async_run(self, prompt: str) -> Any:
+    async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
         inputs = {"messages": [("user", prompt)]}
         message = None

@@ -48,10 +48,10 @@ class AnyAgent(ABC):
 
     def run(self, prompt: str) -> Any:
         """Run the agent with the given prompt."""
-        return asyncio.get_event_loop().run_until_complete(self._async_run(prompt))
+        return asyncio.get_event_loop().run_until_complete(self.run_async(prompt))
 
     @abstractmethod
-    async def _async_run(self, prompt: str) -> Any:
+    async def run_async(self, prompt: str) -> Any:
         """Run the agent asynchronously with the given prompt."""
         pass
 
