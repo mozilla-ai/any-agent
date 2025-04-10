@@ -27,7 +27,7 @@ def test_load_google_default():
         AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))
         mock_agent.assert_called_once_with(
             name="any_agent",
-            instruction=None,
+            instruction="",
             model=mock_model(model="gpt-4o"),
             tools=[MockedFunctionTool(search_web), MockedFunctionTool(visit_webpage)],
             sub_agents=[],
@@ -75,19 +75,19 @@ def test_load_google_multiagent():
         )
         mock_agent.assert_any_call(
             model=mock_model(model="gpt-4o-mini"),
-            instruction=None,
+            instruction="",
             name="search-web-agent",
             tools=[MockedFunctionTool(search_web), MockedFunctionTool(visit_webpage)],
         )
         mock_agent.assert_any_call(
             model=mock_model(model="gpt-4o-mini"),
-            instruction=None,
+            instruction="",
             name="communication-agent",
             tools=[MockedFunctionTool(show_final_answer)],
         )
         mock_agent.assert_any_call(
             name="any_agent",
-            instruction=None,
+            instruction="",
             model=mock_model(model="gpt-4o"),
             tools=[mock_agent_tool.return_value],
             sub_agents=[mock_agent.return_value],
