@@ -3,33 +3,46 @@ import os
 import pytest
 
 from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent.tracing import setup_tracing
 
 
 @pytest.mark.parametrize("framework", ("google", "openai", "smolagents"))
 @pytest.mark.skipif(
-    "OPENAI_API_KEY" not in os.environ,
-    reason="Integration tests require `OPENAI_API_KEY` env var",
+    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
+    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_multi_agent(framework):
+def test_load_and_run_multi_agent(framework, tmp_path):
     agent_framework = AgentFramework(framework)
     kwargs = {}
     if framework == "smolagents":
         kwargs["agent_type"] = "ToolCallingAgent"
+
+    if framework != "openai":
+        kwargs["model_id"] = "gemini/gemini-2.0-flash"
+        if "GEMINI_API_KEY" not in os.environ:
+            pytest.skip(f"GEMINI_API_KEY needed for {framework}")
+    else:
+        kwargs["model_id"] = "gpt-4o-mini"
+        if "OPENAI_API_KEY" not in os.environ:
+            pytest.skip(f"OPENAI_API_KEY needed for {framework}")
+
+    if framework != "google":
+        setup_tracing(agent_framework, str(tmp_path / "traces"))
+
     main_agent = AgentConfig(
-        model_id="gpt-4o",
         instructions="Use the available agents to complete the task.",
         **kwargs,
     )
     managed_agents = [
         AgentConfig(
             name="search_web_agent",
-            model_id="gpt-4o-mini",
+            model_id=kwargs["model_id"],
             description="Agent that can search the web",
             tools=["any_agent.tools.search_web"],
         ),
         AgentConfig(
             name="visit_webpage_agent",
-            model_id="gpt-4o-mini",
+            model_id=kwargs["model_id"],
             description="Agent that can visit webpages",
             tools=["any_agent.tools.visit_webpage"],
         ),
@@ -38,7 +51,7 @@ def test_load_and_run_multi_agent(framework):
         managed_agents.append(
             AgentConfig(
                 name="final_answer_agent",
-                model_id="gpt-4o-mini",
+                model_id=kwargs["model_id"],
                 description="Agent that can show the final answer",
                 tools=["any_agent.tools.show_final_answer"],
                 handoff=True,
