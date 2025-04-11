@@ -32,6 +32,7 @@ class LangchainAgent(AnyAgent):
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
+        self._agent_loaded = False
         self._tools = []
 
     def _get_model(self, agent_config: AgentConfig):

@@ -31,6 +31,7 @@ class LlamaIndexAgent(AnyAgent):
         self.managed_agents: Optional[list[AgentConfig]] = managed_agents
         self.config: AgentConfig = config
         self._agent = None
+        self._agent_loaded = False
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a llama_index agent."""

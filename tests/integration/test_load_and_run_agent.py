@@ -38,6 +38,6 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
         **kwargs,
     )
     agent = AnyAgent.create(agent_framework, agent_config)
-    assert len(agent.tools) > 0
     result = agent.run("Which agent framework is the best?")
+    assert len(agent.tools) > 0
     assert result
