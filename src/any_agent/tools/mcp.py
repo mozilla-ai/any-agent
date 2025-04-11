@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 import os
-from loguru import logger
+from any_agent.logging import logger
 from textwrap import dedent
 
 from any_agent.config import MCPTool
