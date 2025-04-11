@@ -15,8 +15,8 @@ frameworks = [
     frameworks,
 )
 @pytest.mark.skipif(
-    "OPENAI_API_KEY" not in os.environ,
-    reason="Integration tests require `OPENAI_API_KEY` env var",
+    os.environ.get("MCP_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
+    reason="Integration tests require `MCP_INTEGRATION_TESTS=TRUE` env var",
 )
 def test_mcp(framework):
     agent_framework = AgentFramework(framework)

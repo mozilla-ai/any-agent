@@ -11,7 +11,7 @@ from any_agent.tracing import setup_tracing
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_multi_agent(framework, tmp_path):
+def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
     agent_framework = AgentFramework(framework)
     kwargs = {}
     if framework == "smolagents":
