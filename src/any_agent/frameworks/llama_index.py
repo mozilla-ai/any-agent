@@ -72,7 +72,6 @@ class LlamaIndexAgent(AnyAgent):
         )
 
     async def run_async(self, prompt):
-        await self.ensure_loaded()
         result = await self._agent.run(prompt)
         return result
 

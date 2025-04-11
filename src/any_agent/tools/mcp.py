@@ -1,11 +1,11 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
-import os
-from textwrap import dedent
 from abc import ABC, abstractmethod
+import os
+from loguru import logger
+from textwrap import dedent
 
 from any_agent.config import MCPTool
-from any_agent.logging import logger
 
 try:
     from mcp import ClientSession, StdioServerParameters

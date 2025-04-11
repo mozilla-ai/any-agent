@@ -9,7 +9,7 @@ from any_agent.tools import (
 )
 
 
-async def test_load_langchain_agent_default():
+def test_load_langchain_agent_default():
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -21,10 +21,8 @@ async def test_load_langchain_agent_default():
         patch("langchain_litellm.ChatLiteLLM", model_mock),
         patch("langchain_core.tools.tool", tool_mock),
     ):
-        agent = AnyAgent.create(
-            AgentFramework.LANGCHAIN, AgentConfig(model_id="gpt-4o")
-        )
-        await agent.ensure_loaded()
+        AnyAgent.create(AgentFramework.LANGCHAIN, AgentConfig(model_id="gpt-4o"))
+
         model_mock.assert_called_once_with(model="gpt-4o")
         create_mock.assert_called_once_with(
             model=model_mock.return_value,

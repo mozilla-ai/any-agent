@@ -19,35 +19,24 @@ class AnyAgent(ABC):
         managed_agents: Optional[list[AgentConfig]] = None,
     ) -> "AnyAgent":
         if agent_framework == AgentFramework.SMOLAGENTS:
-            from any_agent.frameworks.smolagents import SmolagentsAgent
-
-            return SmolagentsAgent(agent_config, managed_agents=managed_agents)
+            from any_agent.frameworks.smolagents import SmolagentsAgent as Agent
         elif agent_framework == AgentFramework.LANGCHAIN:
-            from any_agent.frameworks.langchain import LangchainAgent
-
-            return LangchainAgent(agent_config, managed_agents=managed_agents)
+            from any_agent.frameworks.langchain import LangchainAgent as Agent
         elif agent_framework == AgentFramework.OPENAI:
-            from any_agent.frameworks.openai import OpenAIAgent
-
-            return OpenAIAgent(agent_config, managed_agents=managed_agents)
+            from any_agent.frameworks.openai import OpenAIAgent as Agent
         elif agent_framework == AgentFramework.LLAMAINDEX:
-            from any_agent.frameworks.llama_index import LlamaIndexAgent
-
-            return LlamaIndexAgent(agent_config, managed_agents=managed_agents)
+            from any_agent.frameworks.llama_index import LlamaIndexAgent as Agent
         elif agent_framework == AgentFramework.GOOGLE:
-            from any_agent.frameworks.google import GoogleAgent
+            from any_agent.frameworks.google import GoogleAgent as Agent
 
-            return GoogleAgent(agent_config, managed_agents=managed_agents)
         else:
             raise ValueError(f"Unsupported agent framework: {agent_framework}")
-
-    async def ensure_loaded(self):
-        if not self._agent_loaded:
-            await self._load_agent()
-            self._agent_loaded = True
+        agent = Agent(agent_config, managed_agents=managed_agents)
+        asyncio.get_event_loop().run_until_complete(agent._load_agent())
+        return agent
 
     @abstractmethod
-    def _load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the agent instance."""
         pass
 

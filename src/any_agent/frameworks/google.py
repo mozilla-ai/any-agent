@@ -90,7 +90,6 @@ class GoogleAgent(AnyAgent):
         self, prompt: str, user_id: str | None = None, session_id: str | None = None
     ) -> Any:
         """Run the Google agent with the given prompt."""
-        await self.ensure_loaded()
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())

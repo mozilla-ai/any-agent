@@ -2,10 +2,9 @@ import os
 import pandas as pd
 
 from any_agent.evaluation.test_case import TestCase
-from any_agent.evaluation.logging import get_logger
+from any_agent.logging import logger
 
 # Use the shared logger
-logger = get_logger()
 
 
 def save_evaluation_results(

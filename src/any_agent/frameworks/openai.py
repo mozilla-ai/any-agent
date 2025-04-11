@@ -110,7 +110,6 @@ class OpenAIAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt asynchronously."""
-        await self.ensure_loaded()
         result = await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
         return result
 

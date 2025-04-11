@@ -106,7 +106,6 @@ class SmolagentsAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
-        await self.ensure_loaded()
         result = self._agent.run(prompt)
         return result
 

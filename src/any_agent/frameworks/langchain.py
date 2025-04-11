@@ -76,7 +76,6 @@ class LangchainAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
-        await self.ensure_loaded()
         inputs = {"messages": [("user", prompt)]}
         message = None
         async for s in self._agent.astream(inputs, stream_mode="values"):

@@ -1,6 +1,7 @@
 # Test MCP Tools Classes.
 # Disclaim
 
+import asyncio
 import unittest
 from unittest.mock import patch, MagicMock
 
@@ -70,9 +71,7 @@ class TestSmolagentsMCPServerStdio(unittest.TestCase):
         self.mock_context = MagicMock()
         self.mock_context.__enter__.return_value = self.mock_collection
 
-    async def test_setup_tools_with_none_tools(
-        self, mock_stdio_params, mock_tool_collection
-    ):
+    def test_setup_tools_with_none_tools(self, mock_stdio_params, mock_tool_collection):
         """Test that when mcp_tool.tools is None, all available tools are used."""
         # Setup mock tools
         mock_tools = create_mock_tools()
@@ -85,13 +84,13 @@ class TestSmolagentsMCPServerStdio(unittest.TestCase):
         self.test_tool.tools = None
 
         mcp_server = SmolagentsMCPServerStdio(self.test_tool)
-        await mcp_server.setup_tools()
+        asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify all tools are included
         self.assertEqual(mcp_server.tools, mock_tools)
         self.assertEqual(len(mcp_server.tools), 2)
 
-    async def test_setup_tools_with_specific_tools(
+    def test_setup_tools_with_specific_tools(
         self, mock_stdio_params, mock_tool_collection
     ):
         """Test that when mcp_tool.tools has specific values, only those tools are used."""
@@ -106,7 +105,7 @@ class TestSmolagentsMCPServerStdio(unittest.TestCase):
         self.test_tool.tools = ["read_thing", "write_thing"]
 
         mcp_server = SmolagentsMCPServerStdio(self.test_tool)
-        await mcp_server.setup_tools()
+        asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify only the requested tools are included
         self.assertEqual(len(mcp_server.tools), 2)

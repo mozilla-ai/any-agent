@@ -4,9 +4,7 @@ from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.telemetry import TelemetryProcessor
 from any_agent.evaluation.test_case import CheckpointCriteria
-from any_agent.evaluation.logging import get_logger
-
-logger = get_logger()
+from any_agent.logging import logger
 
 
 class CheckpointEvaluator(LLMEvaluator):

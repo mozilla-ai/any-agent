@@ -2,9 +2,6 @@ from typing import Dict, List, Any
 from pydantic import BaseModel, Field, ConfigDict
 import yaml
 from litellm import validate_environment
-from any_agent.evaluation.logging import get_logger
-
-logger = get_logger()
 
 
 class CheckpointCriteria(BaseModel):
