@@ -1,11 +1,10 @@
 import importlib
 from typing import Any, Optional, List
 
-from loguru import logger
-
 from any_agent.config import AgentFramework, AgentConfig
+from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
-from .any_agent import AnyAgent
 
 try:
     from langgraph.prebuilt import create_react_agent
@@ -44,7 +43,6 @@ class LangchainAgent(AnyAgent):
 
         return model_type(model=agent_config.model_id, **agent_config.model_args or {})
 
-    @logger.catch(reraise=True)
     async def _load_agent(self) -> None:
         """Load the LangChain agent with the given configuration."""
 
@@ -76,7 +74,6 @@ class LangchainAgent(AnyAgent):
         # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph, so we'll store a list of them in this class
         self._tools = imported_tools
 
-    @logger.catch(reraise=True)
     async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
         await self.ensure_loaded()

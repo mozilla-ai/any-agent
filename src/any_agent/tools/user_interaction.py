@@ -1,4 +1,4 @@
-from loguru import logger
+from any_agent.logging import logger
 
 
 def show_plan(plan: str) -> None:

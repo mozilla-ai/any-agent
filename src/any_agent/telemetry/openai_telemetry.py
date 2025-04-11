@@ -2,7 +2,7 @@ from typing import Any, Dict, List
 import json
 
 from any_agent import AgentFramework
-from loguru import logger
+from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
 
 

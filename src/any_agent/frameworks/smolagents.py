@@ -1,11 +1,9 @@
 import os
 from typing import Optional, Any, List
 
-from loguru import logger
-
 from any_agent.config import AgentFramework, AgentConfig
+from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools.wrappers import import_and_wrap_tools
-from .any_agent import AnyAgent
 
 try:
     import smolagents
@@ -52,7 +50,6 @@ class SmolagentsAgent(AnyAgent):
             tools.extend(mcp_server.tools)
         return tools
 
-    @logger.catch(reraise=True)
     async def _load_agent(self) -> None:
         """Load the Smolagents agent with the given configuration."""
 
@@ -107,7 +104,6 @@ class SmolagentsAgent(AnyAgent):
         if self.config.instructions:
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
-    @logger.catch(reraise=True)
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
         await self.ensure_loaded()

@@ -1,11 +1,9 @@
 import importlib
 from typing import Optional, List
 
-from loguru import logger
-
 from any_agent.config import AgentFramework, AgentConfig
+from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools.wrappers import import_and_wrap_tools
-from .any_agent import AnyAgent
 
 try:
     from llama_index.core.agent.workflow import ReActAgent
@@ -44,7 +42,6 @@ class LlamaIndexAgent(AnyAgent):
 
         return model_type(model=agent_config.model_id, **agent_config.model_args or {})
 
-    @logger.catch(reraise=True)
     async def _load_agent(self) -> None:
         """Load the LLamaIndex agent with the given configuration."""
 
@@ -74,7 +71,6 @@ class LlamaIndexAgent(AnyAgent):
             **self.config.agent_args or {},
         )
 
-    @logger.catch(reraise=True)
     async def run_async(self, prompt):
         await self.ensure_loaded()
         result = await self._agent.run(prompt)

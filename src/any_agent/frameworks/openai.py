@@ -1,12 +1,11 @@
 import os
 from typing import Optional, Any, List
 
-from loguru import logger
-
 from any_agent.config import AgentFramework, AgentConfig
+from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.instructions import get_instructions
+from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
-from .any_agent import AnyAgent
 
 try:
     from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel, Runner
@@ -49,7 +48,6 @@ class OpenAIAgent(AnyAgent):
             )
         return agent_config.model_id
 
-    @logger.catch(reraise=True)
     async def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
         if not agents_available:
@@ -110,7 +108,6 @@ class OpenAIAgent(AnyAgent):
             **kwargs,
         )
 
-    @logger.catch(reraise=True)
     async def run_async(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt asynchronously."""
         await self.ensure_loaded()

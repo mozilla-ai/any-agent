@@ -1,12 +1,11 @@
 from typing import Optional, Any, List
 from uuid import uuid4
 
-from loguru import logger
-
 from any_agent.config import AgentFramework, AgentConfig
+from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.instructions import get_instructions
+from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
-from .any_agent import AnyAgent
 
 try:
     from google.adk.agents import Agent
@@ -39,7 +38,6 @@ class GoogleAgent(AnyAgent):
         """Get the model configuration for a Google agent."""
         return LiteLlm(model=agent_config.model_id, **agent_config.model_args or {})
 
-    @logger.catch(reraise=True)
     async def _load_agent(self) -> None:
         """Load the Google agent with the given configuration."""
         if not self.managed_agents and not self.config.tools:
@@ -88,7 +86,6 @@ class GoogleAgent(AnyAgent):
             output_key="response",
         )
 
-    @logger.catch(reraise=True)
     async def run_async(
         self, prompt: str, user_id: str | None = None, session_id: str | None = None
     ) -> Any:

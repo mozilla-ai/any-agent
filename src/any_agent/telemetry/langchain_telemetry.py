@@ -4,11 +4,8 @@ from any_agent import AgentFramework
 from langchain_core.messages import BaseMessage
 
 
+from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
-
-from any_agent.evaluation.logging import get_logger
-
-logger = get_logger()
 
 
 class LangchainTelemetryProcessor(TelemetryProcessor):
