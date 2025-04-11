@@ -33,6 +33,8 @@ class GoogleAgent(AnyAgent):
         self.config = config
         self._agent = None
         self._agent_loaded = False
+        self._mcp_servers = None
+        self._managed_mcp_servers = None
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a Google agent."""
@@ -48,6 +50,8 @@ class GoogleAgent(AnyAgent):
         tools, mcp_servers = await import_and_wrap_tools(
             self.config.tools, agent_framework=AgentFramework.GOOGLE
         )
+        # Add to agent so that it doesn't get garbage collected
+        self._mcp_servers = mcp_servers
         mcp_tools = [tool for mcp_server in mcp_servers for tool in mcp_server.tools]
         tools.extend(mcp_tools)
 
@@ -57,6 +61,8 @@ class GoogleAgent(AnyAgent):
                 managed_tools, managed_mcp_servers = await import_and_wrap_tools(
                     managed_agent.tools, agent_framework=AgentFramework.GOOGLE
                 )
+                # Add to agent so that it doesn't get garbage collected
+                self._managed_mcp_servers = managed_mcp_servers
                 managed_mcp_tools = [
                     tool
                     for mcp_server in managed_mcp_servers

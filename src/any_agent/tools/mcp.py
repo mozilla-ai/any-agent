@@ -16,10 +16,6 @@ except ImportError:
     mcp_available = False
 
 
-# Global registry to keep MCP manager instances alive
-_mcps = {}
-
-
 class MCPServerBase(ABC):
     """Base class for MCP tools managers across different frameworks."""
 
@@ -46,13 +42,8 @@ class SmolagentsMCPServerStdio(MCPServerBase):
 
     def __init__(self, mcp_tool: MCPTool):
         super().__init__(mcp_tool)
-        # Generate a unique identifier for this manager instance
-        self.id = id(self)
         self.context = None
         self.tool_collection = None
-
-        # Register self in the global registry to prevent garbage collection
-        _mcps[self.id] = self
 
     async def setup_tools(self):
         from smolagents import ToolCollection
@@ -89,18 +80,6 @@ class SmolagentsMCPServerStdio(MCPServerBase):
             )
             logger.info(f"Tools available: {tools}")
             self.tools = tools
-
-    def __del__(self):
-        # Exit the context when cleanup is called
-        if hasattr(self, "context") and self.context:
-            try:
-                self.context.__exit__(None, None, None)
-                self.context = None
-            except Exception as e:
-                logger.error(f"Error closing MCP context: {e}")
-        # Remove from registry when deleted (Smolagents-specific)
-        if hasattr(self, "id") and self.id in _mcps:
-            del _mcps[self.id]
 
 
 class OpenAIMCPServerStdio(MCPServerBase):
@@ -139,8 +118,6 @@ class LangchainMCPServerStdio(MCPServerBase):
         self.client = None
         self.session = None
         self.tools = []
-        self.id = id(self)
-        _mcps[self.id] = self
 
     async def setup_tools(self):
         """Set up the LangChain MCP server with the provided configuration."""
@@ -158,10 +135,6 @@ class LangchainMCPServerStdio(MCPServerBase):
         await self.session.initialize()
         self.tools = await load_mcp_tools(self.session)
 
-    def __del__(self):
-        if hasattr(self, "id") and self.id in _mcps:
-            del _mcps[self.id]
-
 
 class GoogleMCPServerStdio(MCPServerBase):
     """Implementation of MCP tools manager for Google agents."""
@@ -169,8 +142,6 @@ class GoogleMCPServerStdio(MCPServerBase):
     def __init__(self, mcp_tool: MCPTool):
         super().__init__(mcp_tool)
         self.server = None
-        self.id = id(self)
-        _mcps[self.id] = self
 
     async def setup_tools(self):
         """Set up the Google MCP server with the provided configuration."""
@@ -190,7 +161,3 @@ class GoogleMCPServerStdio(MCPServerBase):
         tools = await toolset.load_tools()
         self.tools = tools
         self.server = toolset
-
-    def __del__(self):
-        if hasattr(self, "id") and self.id in _mcps:
-            del _mcps[self.id]

@@ -33,6 +33,7 @@ class LangchainAgent(AnyAgent):
         self._agent = None
         self._agent_loaded = False
         self._tools = []
+        self._mcp_servers = None
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a LangChain agent."""
@@ -55,13 +56,14 @@ class LangchainAgent(AnyAgent):
         if self.managed_agents:
             raise NotImplementedError("langchain managed agents are not supported yet")
 
-        imported_tools, mcp_managers = await import_and_wrap_tools(
+        imported_tools, mcp_servers = await import_and_wrap_tools(
             self.config.tools, agent_framework=AgentFramework.LANGCHAIN
         )
+        self._mcp_servers = mcp_servers
 
         # Extract tools from MCP managers and add them to the imported_tools list
-        for manager in mcp_managers:
-            imported_tools.extend(manager.tools)
+        for mcp_server in mcp_servers:
+            imported_tools.extend(mcp_server.tools)
 
         model = self._get_model(self.config)
 

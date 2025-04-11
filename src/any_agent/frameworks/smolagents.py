@@ -31,6 +31,8 @@ class SmolagentsAgent(AnyAgent):
         self.config = config
         self._agent = None
         self._agent_loaded = False
+        self._mcp_servers = None
+        self._managed_mcp_servers = None
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a smolagents agent."""
@@ -62,6 +64,7 @@ class SmolagentsAgent(AnyAgent):
         tools, mcp_servers = await import_and_wrap_tools(
             self.config.tools, agent_framework=AgentFramework.SMOLAGENTS
         )
+        self._mcp_servers = mcp_servers
         tools.extend(self._merge_mcp_tools(mcp_servers))
 
         managed_agents_instanced = []
@@ -73,6 +76,7 @@ class SmolagentsAgent(AnyAgent):
                 managed_tools, managed_mcp_servers = await import_and_wrap_tools(
                     managed_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
                 )
+                self._managed_mcp_servers = managed_mcp_servers
                 tools.extend(self._merge_mcp_tools(managed_mcp_servers))
                 managed_agent_instance = agent_type(
                     name=managed_agent.name,

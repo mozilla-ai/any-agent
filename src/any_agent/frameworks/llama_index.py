@@ -30,6 +30,7 @@ class LlamaIndexAgent(AnyAgent):
         self.config: AgentConfig = config
         self._agent = None
         self._agent_loaded = False
+        self._mcp_servers = None
 
     def _get_model(self, agent_config: AgentConfig):
         """Get the model configuration for a llama_index agent."""
@@ -56,13 +57,15 @@ class LlamaIndexAgent(AnyAgent):
                 "llama-index managed agents are not supported yet"
             )
 
-        imported_tools, mcp_managers = await import_and_wrap_tools(
+        imported_tools, mcp_servers = await import_and_wrap_tools(
             self.config.tools, agent_framework=AgentFramework.LLAMAINDEX
         )
+        # Add to agent so that it doesn't get garbage collected
+        self._mcp_servers = mcp_servers
 
         # Extract tools from MCP managers and add them to the imported_tools list
-        for manager in mcp_managers:
-            imported_tools.extend(manager.tools)
+        for mcp_server in mcp_servers:
+            imported_tools.extend(mcp_server.tools)
 
         self._agent = ReActAgent(
             name=self.config.name,
