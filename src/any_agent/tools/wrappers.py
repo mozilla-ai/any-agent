@@ -5,6 +5,7 @@ from collections.abc import Callable
 from any_agent.config import AgentFramework, MCPTool
 from any_agent.tools.mcp import (
     GoogleMCPServerStdio,
+    LlamaIndexMCPServerStdio,
     SmolagentsMCPServerStdio,
     OpenAIMCPServerStdio,
     LangchainMCPServerStdio,
@@ -61,20 +62,21 @@ async def wrap_mcp_server(
     based on the specified agent_framework
     """
     # Select the appropriate manager based on agent_framework
-    manager_map = {
+    mcp_server_map = {
         AgentFramework.OPENAI: OpenAIMCPServerStdio,
         AgentFramework.SMOLAGENTS: SmolagentsMCPServerStdio,
         AgentFramework.LANGCHAIN: LangchainMCPServerStdio,
         AgentFramework.GOOGLE: GoogleMCPServerStdio,
+        AgentFramework.LLAMAINDEX: LlamaIndexMCPServerStdio,
     }
 
-    if agent_framework not in manager_map:
+    if agent_framework not in mcp_server_map:
         raise NotImplementedError(
-            f"Unsupported agent type: {agent_framework}. Currently supported types are: {manager_map.keys()}"
+            f"Unsupported agent type: {agent_framework}. Currently supported types are: {mcp_server_map.keys()}"
         )
 
     # Create the manager instance which will manage the MCP tool context
-    manager_class = manager_map[agent_framework]
+    manager_class = mcp_server_map[agent_framework]
     manager: MCPServerBase = manager_class(mcp_tool)
     await manager.setup_tools()
 
