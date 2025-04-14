@@ -21,7 +21,7 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
         kwargs["agent_type"] = "ToolCallingAgent"
 
     if framework != "openai":
-        kwargs["model_id"] = "gemini/gemini-2.0-flash"
+        kwargs["model_id"] = "gemini/gemini-2.0-pro-exp"
         if "GEMINI_API_KEY" not in os.environ:
             pytest.skip(f"GEMINI_API_KEY needed for {framework}")
     else:

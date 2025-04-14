@@ -1,3 +1,4 @@
+import json
 import os
 
 import pytest
@@ -6,7 +7,7 @@ from any_agent import AgentFramework, AgentConfig, AnyAgent
 from any_agent.tracing import setup_tracing
 
 
-@pytest.mark.parametrize("framework", ("google", "openai", "smolagents"))
+@pytest.mark.parametrize("framework", ("google", "langchain", "openai", "smolagents"))
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
@@ -18,7 +19,7 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
         kwargs["agent_type"] = "ToolCallingAgent"
 
     if framework != "openai":
-        kwargs["model_id"] = "gemini/gemini-2.0-flash"
+        kwargs["model_id"] = "gemini/gemini-2.0-pro-exp"
         if "GEMINI_API_KEY" not in os.environ:
             pytest.skip(f"GEMINI_API_KEY needed for {framework}")
     else:
@@ -27,7 +28,7 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
             pytest.skip(f"OPENAI_API_KEY needed for {framework}")
 
     if framework != "google":
-        setup_tracing(agent_framework, str(tmp_path / "traces"))
+        trace_path = setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     main_agent = AgentConfig(
         instructions="Use the available agents to complete the task.",
@@ -62,5 +63,7 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
         agent_config=main_agent,
         managed_agents=managed_agents,
     )
-    result = agent.run("Which agent framework is the best?")
-    assert result
+    agent.run("Which agent framework is the best?")
+
+    traces = json.load(open(trace_path))
+    assert len(traces)
