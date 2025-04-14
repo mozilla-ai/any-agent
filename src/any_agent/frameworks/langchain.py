@@ -3,7 +3,6 @@ from typing import Any, Optional, List
 
 from any_agent.config import AgentFramework, AgentConfig
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
 
 try:
@@ -78,14 +77,8 @@ class LangchainAgent(AnyAgent):
     async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
         inputs = {"messages": [("user", prompt)]}
-        message = None
-        async for s in self._agent.astream(inputs, stream_mode="values"):
-            message = s["messages"][-1]
-            if isinstance(message, tuple):
-                logger.debug(message)
-            else:
-                message.pretty_print()
-        return message
+        result = await self._agent.ainvoke(inputs)
+        return result
 
     @property
     def tools(self) -> List[str]:
