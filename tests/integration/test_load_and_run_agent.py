@@ -20,17 +20,13 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
     if framework == "smolagents":
         kwargs["agent_type"] = "ToolCallingAgent"
 
-    if framework != "openai":
-        kwargs["model_id"] = "gemini/gemini-2.0-pro-exp"
-        if "GEMINI_API_KEY" not in os.environ:
-            pytest.skip(f"GEMINI_API_KEY needed for {framework}")
-    else:
-        kwargs["model_id"] = "gpt-4o-mini"
-        if "OPENAI_API_KEY" not in os.environ:
-            pytest.skip(f"OPENAI_API_KEY needed for {framework}")
+    kwargs["model_id"] = "gpt-4o-mini"
+    if "OPENAI_API_KEY" not in os.environ:
+        pytest.skip(f"OPENAI_API_KEY needed for {framework}")
+
     # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
     # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-    if framework != "google" and framework != "agno":
+    if framework not in ("agno", "google"):
         setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     agent_config = AgentConfig(

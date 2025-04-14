@@ -18,15 +18,11 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
     if framework == "smolagents":
         kwargs["agent_type"] = "ToolCallingAgent"
 
-    if framework != "openai":
-        kwargs["model_id"] = "gemini/gemini-2.0-pro-exp"
-        if "GEMINI_API_KEY" not in os.environ:
-            pytest.skip(f"GEMINI_API_KEY needed for {framework}")
-    else:
-        kwargs["model_id"] = "gpt-4o-mini"
-        if "OPENAI_API_KEY" not in os.environ:
-            pytest.skip(f"OPENAI_API_KEY needed for {framework}")
+    kwargs["model_id"] = "gpt-4o-mini"
+    if "OPENAI_API_KEY" not in os.environ:
+        pytest.skip(f"OPENAI_API_KEY needed for {framework}")
 
+    trace_path = None
     if framework != "google":
         trace_path = setup_tracing(agent_framework, str(tmp_path / "traces"))
 
@@ -65,5 +61,6 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
     )
     agent.run("Which agent framework is the best?")
 
-    traces = json.load(open(trace_path))
-    assert len(traces)
+    if trace_path:
+        traces = json.load(open(trace_path))
+        assert len(traces)
