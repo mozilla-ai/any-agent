@@ -39,7 +39,7 @@ class AgnoAgent(AnyAgent):
         )
 
     async def _load_agent(self) -> None:
-        if not self.config.tools:
+        if not managed_agents and not self.config.tools:
             self.config.tools = [
                 "any_agent.tools.search_web",
                 "any_agent.tools.visit_webpage",
