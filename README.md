@@ -51,7 +51,7 @@ main_agent = AgentConfig(
 from random import choice
 framework = AgentFramework(
     choice(
-        ["langchain", "llama_index", "openai", "smolagents"]
+        ["langchain", "llama_index", "openai", "smolagents", "google", "agno"]
     )
 )
 
