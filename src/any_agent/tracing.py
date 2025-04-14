@@ -14,7 +14,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-from any_agent import AgentFramework
+from any_agent.config import AgentFramework, TracingConfig
 from any_agent.telemetry import TelemetryProcessor
 
 
@@ -52,20 +52,27 @@ class JsonFileSpanExporter(SpanExporter):
 
 
 class RichConsoleSpanExporter(SpanExporter):
-    def __init__(self, agent_framework):
+    def __init__(self, agent_framework: AgentFramework, tracing_config: TracingConfig):
         self.processor = TelemetryProcessor.create(agent_framework=agent_framework)
         self.console = Console()
-        self.styles = {"LLM": "yellow", "TOOL": "blue", "AGENT": "magenta"}
+        self.tracing_config = tracing_config
 
     def export(self, spans):
         for span in spans:
+            style = None
             span_str = span.to_json()
             span_dict = json.loads(span_str)
             try:
                 span_kind, interaction = self.processor.extract_interaction(span_dict)
+
+                style = getattr(self.tracing_config, span_kind.lower(), None)
+
+                if not style:
+                    continue
+
                 self.console.rule(
                     span_kind,
-                    style=self.styles.get(span_kind, "rule.line"),
+                    style=style,
                 )
                 for key, value in interaction.items():
                     if key == "output":
@@ -79,7 +86,8 @@ class RichConsoleSpanExporter(SpanExporter):
                         self.console.print(f"{key}: {value}")
             except Exception:
                 self.console.print_exception()
-            self.console.rule(style=self.styles.get(span_kind, "rule.line"))
+            if style:
+                self.console.rule(style=style)
         return SpanExportResult.SUCCESS
 
     def force_flush(self, timeout_millis: int = 30000) -> bool:
@@ -87,19 +95,8 @@ class RichConsoleSpanExporter(SpanExporter):
 
 
 def _get_tracer_provider(
-    agent_framework: AgentFramework, output_dir: str = "output"
+    agent_framework: AgentFramework, output_dir: str, tracing_config: TracingConfig
 ) -> tuple[TracerProvider, str | None]:
-    """
-    Create a tracer_provider that will write to `output_dir`.
-
-    Args:
-        output_dir: The directory where the traces will be stored.
-            Defaults to "output".
-
-    Returns:
-        tracer_provider: The configured tracer provider
-        file_name: The name of the JSON file where traces will be stored
-    """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -113,14 +110,20 @@ def _get_tracer_provider(
 
     # This is what will log all the span info to stdout: We turn off the agent sdk specific logging so that
     # the user sees a similar logging format for whichever agent they are using under the hood.
-    processor = BatchSpanProcessor(RichConsoleSpanExporter(agent_framework))
+    processor = BatchSpanProcessor(
+        RichConsoleSpanExporter(agent_framework, tracing_config)
+    )
     tracer_provider.add_span_processor(processor)
     trace.set_tracer_provider(tracer_provider)
 
     return tracer_provider, file_name
 
 
-def setup_tracing(agent_framework: AgentFramework, output_dir: str = "traces") -> str:
+def setup_tracing(
+    agent_framework: AgentFramework,
+    output_dir: str = "traces",
+    tracing_config: TracingConfig | None = None,
+) -> str:
     """Setup tracing for `agent_framework` using `openinference.instrumentation`.
 
     Args:
@@ -130,7 +133,11 @@ def setup_tracing(agent_framework: AgentFramework, output_dir: str = "traces") -
     Returns:
         str: The name of the JSON file where traces will be stored.
     """
-    tracer_provider, file_name = _get_tracer_provider(agent_framework, output_dir)
+    tracing_config = tracing_config or TracingConfig()
+
+    tracer_provider, file_name = _get_tracer_provider(
+        agent_framework, output_dir, tracing_config
+    )
     if agent_framework == AgentFramework.OPENAI:
         from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 

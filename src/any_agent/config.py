@@ -16,6 +16,13 @@ class MCPTool(BaseModel):
     tools: list[str] | None = None
 
 
+class TracingConfig(BaseModel):
+    llm: str | None = "yellow"
+    tool: str | None = "blue"
+    agent: str | None = None
+    chain: str | None = None
+
+
 class AgentConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     model_id: str
