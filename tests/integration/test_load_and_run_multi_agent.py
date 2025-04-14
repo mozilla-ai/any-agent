@@ -28,6 +28,7 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
 
     main_agent = AgentConfig(
         instructions="Use the available agents to complete the task.",
+        model_args={"parallel_tool_calls": False},
         **kwargs,
     )
     managed_agents = [

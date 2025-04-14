@@ -8,7 +8,13 @@ from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
 
 try:
-    from agents import Agent, AsyncOpenAI, OpenAIChatCompletionsModel, Runner
+    from agents import (
+        Agent,
+        AsyncOpenAI,
+        OpenAIChatCompletionsModel,
+        Runner,
+        ModelSettings,
+    )
 
     agents_available = True
 except ImportError:
@@ -96,7 +102,7 @@ class OpenAIAgent(AnyAgent):
 
         kwargs = self.config.agent_args or {}
         if self.config.model_args:
-            kwargs["model_settings"] = self.config.model_args
+            kwargs["model_settings"] = ModelSettings(**self.config.model_args)
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
