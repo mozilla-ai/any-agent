@@ -27,6 +27,7 @@ class AgnoAgent(AnyAgent):
             raise NotImplementedError(
                 "Managed agents are not yet supported in Agno agent."
             )
+        self.managed_agents = managed_agents  # Future proofing
         self.config = config
         self._agent = None
         self._mcp_servers = None
@@ -39,7 +40,7 @@ class AgnoAgent(AnyAgent):
         )
 
     async def _load_agent(self) -> None:
-        if not managed_agents and not self.config.tools:
+        if not self.managed_agents and not self.config.tools:
             self.config.tools = [
                 "any_agent.tools.search_web",
                 "any_agent.tools.visit_webpage",
