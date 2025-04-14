@@ -27,7 +27,7 @@ agent.run("Which agent framework is the best?")
 ### Outputs
 
 [`setup_tracing`][any_agent.tracing.setup_tracing] will produce standardized console output regardless of the
-framework used:
+framework used.
 
 ```console
 ──────────────────────────────────────────────────────────────────────────── LLM ─────────────────────────────────────────────────────────────────────────────
@@ -57,16 +57,22 @@ input: {'query': 'best agent framework 2023'}
 │ reduce complexity and streamline decision-making as we build our agents. To find the best agentic framework for our client projects, we tested eight of    │
 │ the most promising AI agent frameworks currently available, some relative newborns at less than six months from their first release: Autogen; CrewAI;      │
 │ Langflow; LangGraph; LlamaIndex; n8n ... Comparing Open-Source AI Agent Frameworks - Langfuse Blog This post offers an in-depth look at some of the        │
-│ leading open-source AI agent frameworks out there: LangGraph, the OpenAI Agents SDK, Smolagents, CrewAI, AutoGen, Semantic Kernel, and LlamaIndex agents.  │
-│ By the time you finish reading, you should have a clearer view of each framework's sweet spot, how they differ, and where they excel in real ... Choosing  │
-│ the Right AI Agent Framework: LangGraph vs CrewAI vs OpenAI Swarm We chose LangGraph, CrewAI, and OpenAI Swarm because they represent the latest schools   │
-│ of thought in agent development. Here's a quick overview: LangGraph: As its name suggests, LangGraph bets on graph architecture as the best way to define  │
-│ and orchestrate agentic workflows. Unlike early versions of LangChain, LangGraph is a well designed framework with many robust and customizable features   │
-│ ... Best AI Agent Frameworks Your business demands the best AI agent framework to accelerate your project. It should support LLM integration, advanced     │
-│ reasoning, long-term memory, flexible tool coordination, and smooth collaboration between multiple agents. Here we discuss some AI agent frameworks that   │
-│ empower you to achieve unmatched levels of automation and intelligence.                                                                                    │
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+```
+
+You can configure the behavior of the console output using [`TracingConfig`][any_agent.config.TracingConfig]:
+
+```py
+from any_agent.config import TracingConfig
+
+setup_tracing(
+  AgentFramework("langchain"),
+  TracingConfig(
+    llm=None,  # Setting to None disables this `openinference.span.kind`
+    tool="purple",  # Change the color used to display
+  )
+)
 ```
 
 In addition, an output JSON will be stored in the selected `output_dir`, which is `"traces"` by default:
