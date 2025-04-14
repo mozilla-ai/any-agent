@@ -7,6 +7,7 @@ class AgentFramework(str, Enum):
     LANGCHAIN = "langchain"
     LLAMAINDEX = "llama_index"
     OPENAI = "openai"
+    AGNO = "agno"
     SMOLAGENTS = "smolagents"
 
 

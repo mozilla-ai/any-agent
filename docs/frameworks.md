@@ -81,6 +81,19 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
     agent.run("Which Agent Framework is the best??")
     ```
 
+=== "Agno Agents"
+    [Agno Agents Repo](https://github.com/agno-agi/agno)
+
+    ``` py
+    agent = AnyAgent.create(
+        AgentFramework("agno"),
+        AgentConfig(
+            model_id="gpt-4o-mini"
+        )
+    )
+    agent.run("Which Agent Framework is the best??")
+    ```
+
 ## Models
 
 The model used by an agent is defined by 3 arguments `model_id`, `model_type` and `model_args`.

@@ -28,8 +28,9 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
         kwargs["model_id"] = "gpt-4o-mini"
         if "OPENAI_API_KEY" not in os.environ:
             pytest.skip(f"OPENAI_API_KEY needed for {framework}")
-
-    if framework != "google":
+    # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
+    # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
+    if framework != "google" and framework != "agno":
         setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     agent_config = AgentConfig(

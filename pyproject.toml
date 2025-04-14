@@ -51,12 +51,17 @@ openai = [
   "openinference-instrumentation-openai-agents>=0.1.5"
 ]
 
+agno = [
+  "agno",
+  "litellm"
+]
+
 mcp = [
   "mcp>=1.5.0"
 ]
 
 all = [
-  "any-agent[google,langchain,llama_index,smolagents,openai,mcp]"
+  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp]"
 ]
 
 docs = [

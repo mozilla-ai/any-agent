@@ -30,7 +30,6 @@ class SmolagentsAgent(AnyAgent):
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
-        self._agent_loaded = False
         self._mcp_servers = None
         self._managed_mcp_servers = None
 

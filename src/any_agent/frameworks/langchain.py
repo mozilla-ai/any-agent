@@ -31,7 +31,6 @@ class LangchainAgent(AnyAgent):
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
-        self._agent_loaded = False
         self._tools = []
         self._mcp_servers = None
 

@@ -4,6 +4,7 @@ from collections.abc import Callable
 
 from any_agent.config import AgentFramework, MCPTool
 from any_agent.tools.mcp import (
+    AgnoMCPServerStdio,
     GoogleMCPServerStdio,
     LlamaIndexMCPServerStdio,
     SmolagentsMCPServerStdio,
@@ -54,6 +55,11 @@ def wrap_tool_google(tool):
     return tool
 
 
+def wrap_tool_agno(tool):
+    # Agno lets you pass callables directly in as tools ❤️
+    return tool
+
+
 async def wrap_mcp_server(
     mcp_tool: MCPTool, agent_framework: AgentFramework
 ) -> MCPServerBase:
@@ -68,6 +74,7 @@ async def wrap_mcp_server(
         AgentFramework.LANGCHAIN: LangchainMCPServerStdio,
         AgentFramework.GOOGLE: GoogleMCPServerStdio,
         AgentFramework.LLAMAINDEX: LlamaIndexMCPServerStdio,
+        AgentFramework.AGNO: AgnoMCPServerStdio,
     }
 
     if agent_framework not in mcp_server_map:
@@ -89,6 +96,7 @@ WRAPPERS = {
     AgentFramework.LANGCHAIN: wrap_tool_langchain,
     AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
     AgentFramework.LLAMAINDEX: wrap_tool_llama_index,
+    AgentFramework.AGNO: wrap_tool_agno,
 }
 
 
