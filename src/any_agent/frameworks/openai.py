@@ -37,11 +37,10 @@ class OpenAIAgent(AnyAgent):
         self.config = config
         self._agent = None
 
-    def _get_model(self, agent_config: AgentConfig):
+    def _get_model(
+        self, agent_config: AgentConfig, api_key_var: str = None, base_url: str = None
+    ):
         """Get the model configuration for an OpenAI agent."""
-        model_args = agent_config.model_args or {}
-        api_key_var = model_args.pop("api_key_var", None)
-        base_url = model_args.pop("base_url", None)
         if api_key_var and base_url:
             external_client = AsyncOpenAI(
                 api_key=os.environ[api_key_var],
@@ -76,12 +75,16 @@ class OpenAIAgent(AnyAgent):
                     managed_agent.tools, agent_framework=AgentFramework.OPENAI
                 )
                 kwargs = {}
+                api_key_var = None
+                base_url = None
                 if managed_agent.model_args:
+                    api_key_var = managed_agent.model_args.pop("api_key_var", None)
+                    base_url = managed_agent.model_args.pop("base_url", None)
                     kwargs["model_settings"] = managed_agent.model_args
                 instance = Agent(
                     name=managed_agent.name,
                     instructions=get_instructions(managed_agent.instructions),
-                    model=self._get_model(managed_agent),
+                    model=self._get_model(managed_agent, api_key_var, base_url),
                     tools=managed_tools,
                     mcp_servers=[
                         managed_mcp_server.server
@@ -101,12 +104,16 @@ class OpenAIAgent(AnyAgent):
                     )
 
         kwargs = self.config.agent_args or {}
+        api_key_var = None
+        base_url = None
         if self.config.model_args:
+            api_key_var = self.config.model_args.pop("api_key_var", None)
+            base_url = self.config.model_args.pop("base_url", None)
             kwargs["model_settings"] = ModelSettings(**self.config.model_args)
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
-            model=self._get_model(self.config),
+            model=self._get_model(self.config, api_key_var, base_url),
             handoffs=handoffs,
             tools=tools,
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
