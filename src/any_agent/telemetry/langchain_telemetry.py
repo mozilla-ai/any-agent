@@ -221,7 +221,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")
 
-        if span_kind == "LLM" and "llm.output_messages.0.message.content" in attributes:
+        if span_kind == "LLM":
             return "LLM", self._extract_llm_interaction(span)
         elif "tool.name" in attributes or span.get("name", "").endswith("Tool"):
             return "TOOL", self._extract_tool_interaction(span)
