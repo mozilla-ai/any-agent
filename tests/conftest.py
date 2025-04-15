@@ -23,11 +23,12 @@ def refresh_tools():
 
 
 @pytest.fixture(autouse=True)
-def disable_rich_console(monkeypatch):
+def disable_rich_console(monkeypatch, pytestconfig):
     original_init = rich.console.Console.__init__
 
     def quiet_init(self, *args, **kwargs):
-        kwargs["quiet"] = True
+        if pytestconfig.option.capture != "no":
+            kwargs["quiet"] = True
         original_init(self, *args, **kwargs)
 
     monkeypatch.setattr(rich.console.Console, "__init__", quiet_init)
