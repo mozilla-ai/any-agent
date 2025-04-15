@@ -4,6 +4,7 @@ import pytest
 
 from any_agent import AgentFramework, AgentConfig, AnyAgent
 from any_agent.tracing import setup_tracing
+from any_agent.tools import search_web
 
 frameworks = [item for item in AgentFramework]
 
@@ -30,7 +31,7 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
         setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     agent_config = AgentConfig(
-        tools=["any_agent.tools.search_web"],
+        tools=[search_web],
         instructions="Search the web to answer",
         model_args={"parallel_tool_calls": False} if framework != "agno" else None,
         **kwargs,

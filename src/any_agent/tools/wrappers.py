@@ -1,6 +1,5 @@
-import inspect
-import importlib
 from collections.abc import Callable
+
 
 from any_agent.config import AgentFramework, MCPTool
 from any_agent.tools.mcp import (
@@ -100,8 +99,8 @@ WRAPPERS = {
 }
 
 
-async def import_and_wrap_tools(
-    tools: list[str | dict], agent_framework: AgentFramework
+async def wrap_tools(
+    tools: list[Callable, MCPTool], agent_framework: AgentFramework
 ) -> tuple[list[Callable], list[MCPServerBase]]:
     wrapper = WRAPPERS[agent_framework]
 
@@ -114,18 +113,11 @@ async def import_and_wrap_tools(
             # tools can be used as any other callable.
             mcp_server = await wrap_mcp_server(tool, agent_framework)
             mcp_servers.append(mcp_server)
-        elif isinstance(tool, str):
-            module, func = tool.rsplit(".", 1)
-            module = importlib.import_module(module)
-            imported_tool = getattr(module, func)
-            if inspect.isclass(imported_tool):
-                imported_tool = imported_tool()
-            wrapped_tools.append(wrapper(imported_tool))
         elif callable(tool):
             wrapped_tools.append(wrapper(tool))
         else:
             raise ValueError(
-                f"Tool {tool} needs to be of type `MCPTool`, `str` or `callable` but is {type(tool)}"
+                f"Tool {tool} needs to be of type `MCPTool` or `callable` but is {type(tool)}"
             )
 
     return wrapped_tools, mcp_servers
