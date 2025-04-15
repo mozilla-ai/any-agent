@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 import pytest
 
@@ -14,22 +15,27 @@ from smolagents.tools import Tool as SmolagentsClass
 
 
 def import_and_wrap_sync(tools, framework):
-    wrapped_tools, _ = asyncio.run(import_and_wrap_tools(tools, framework))
+    wrapped_tools, _ = asyncio.get_event_loop().run_until_complete(
+        import_and_wrap_tools(tools, framework)
+    )
     return wrapped_tools
 
 
-@pytest.mark.parametrize(
-    "framework,expected_class",
+@pytest.mark.parametrize("framework,expected_class",
     [
         ("google", GoogleClass),
         ("langchain", LangchainClass),
         ("llama_index", LlamaindexClass),
         ("openai", OpenaiClass),
-        ("smolagents", SmolagentsClass),
-    ],
+        ("smolagents", SmolagentsClass)
+    ]
 )
 def test_import_and_wrap_tools(framework, expected_class):
     wrapped_tools = import_and_wrap_sync(
-        ["any_agent.tools.search_web", visit_webpage], AgentFramework(framework)
+        ["any_agent.tools.search_web", visit_webpage],
+        AgentFramework(framework)
     )
-    assert all(isinstance(tool, expected_class) for tool in wrapped_tools)
+    assert all(
+        isinstance(tool, expected_class)
+        for tool in wrapped_tools
+    )
