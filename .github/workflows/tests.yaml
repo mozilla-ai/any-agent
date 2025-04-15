@@ -30,6 +30,9 @@ jobs:
       - name: Install
         run: pip install -e '.[all,tests]'
 
+      - name: Run Documentation tests
+        run: pytest -v tests/docs
+
       - name: Run Unit tests
         run: pytest -v tests/unit
 
@@ -38,6 +41,3 @@ jobs:
           ANY_AGENT_INTEGRATION_TESTS: TRUE
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: pytest -v tests/integration
-
-      - name: Run Documentation tests
-        run: pytest -v tests/docs
