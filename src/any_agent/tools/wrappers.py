@@ -121,9 +121,11 @@ async def import_and_wrap_tools(
             if inspect.isclass(imported_tool):
                 imported_tool = imported_tool()
             wrapped_tools.append(wrapper(imported_tool))
+        elif callable(tool):
+            wrapped_tools.append(wrapper(tool))
         else:
             raise ValueError(
-                f"Tool {tool} needs to be of type `str` or `MCPTool` but is {type(tool)}"
+                f"Tool {tool} needs to be of type `MCPTool`, `str` or `callable` but is {type(tool)}"
             )
 
     return wrapped_tools, mcp_servers

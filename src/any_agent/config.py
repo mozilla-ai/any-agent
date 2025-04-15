@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import Callable
+
 from pydantic import BaseModel, Field, ConfigDict
 
 
@@ -29,7 +31,7 @@ class AgentConfig(BaseModel):
     model_id: str
     name: str = "any_agent"
     instructions: str | None = None
-    tools: list[str | MCPTool] = Field(default_factory=list)
+    tools: list[str | MCPTool | Callable] = Field(default_factory=list)
     handoff: bool = False
     agent_type: str | None = None
     agent_args: dict | None = None
