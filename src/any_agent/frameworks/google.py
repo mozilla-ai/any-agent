@@ -3,7 +3,6 @@ from uuid import uuid4
 
 from any_agent.config import AgentFramework, AgentConfig
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.instructions import get_instructions
 from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
 
@@ -70,7 +69,7 @@ class GoogleAgent(AnyAgent):
                 managed_tools.extend(managed_mcp_tools)
                 instance = Agent(
                     name=managed_agent.name,
-                    instruction=get_instructions(managed_agent.instructions) or "",
+                    instruction=managed_agent.instructions or "",
                     model=self._get_model(managed_agent),
                     tools=managed_tools,
                     **managed_agent.agent_args or {},

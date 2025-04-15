@@ -3,7 +3,6 @@ from typing import Optional, Any, List
 
 from any_agent.config import AgentFramework, AgentConfig
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.instructions import get_instructions
 from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
 
@@ -83,7 +82,7 @@ class OpenAIAgent(AnyAgent):
                     kwargs["model_settings"] = managed_agent.model_args
                 instance = Agent(
                     name=managed_agent.name,
-                    instructions=get_instructions(managed_agent.instructions),
+                    instructions=managed_agent.instructions,
                     model=self._get_model(managed_agent, api_key_var, base_url),
                     tools=managed_tools,
                     mcp_servers=[

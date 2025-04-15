@@ -2,7 +2,6 @@ import importlib
 from typing import Optional, List
 
 from any_agent import AgentFramework, AgentConfig, AnyAgent
-from any_agent.instructions import get_instructions
 from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
 
@@ -79,7 +78,7 @@ class LlamaIndexAgent(AnyAgent):
                 managed_instance = ReActAgent(
                     name=name,
                     description=managed_agent.description,
-                    system_prompt=get_instructions(managed_agent.instructions),
+                    system_prompt=managed_agent.instructions,
                     tools=managed_tools,
                     llm=self._get_model(managed_agent),
                     can_handoff_to=[self.config.name],
@@ -93,7 +92,7 @@ class LlamaIndexAgent(AnyAgent):
                 description=self.config.description,
                 tools=main_tools,
                 llm=self._get_model(self.config),
-                system_prompt=get_instructions(self.config.instructions),
+                system_prompt=self.config.instructions,
                 can_handoff_to=managed_names,
                 **self.config.agent_args or {},
             )
@@ -108,7 +107,7 @@ class LlamaIndexAgent(AnyAgent):
                 name=self.config.name,
                 tools=imported_tools,
                 llm=self._get_model(self.config),
-                system_prompt=get_instructions(self.config.instructions),
+                system_prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )
 

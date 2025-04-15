@@ -1,8 +1,6 @@
-# Agent Instructions
+# Agent Instructions (aka System Prompt)
 
-`any-agent` provides 2 options to specify the instructions for your agent: `Import` and `String`.
-
-In the first case, the import should point to a Python string.
+`any-agent` allows you to specify the instruction for the agent (often also referred to as a "system_prompt").
 
 !!! warning
 
@@ -13,40 +11,17 @@ In the first case, the import should point to a Python string.
     instructions.
     For example, check the [`CodeAgent` default instructions](https://github.com/huggingface/smolagents/blob/main/src/smolagents/prompts/code_agent.yaml) in `smolagents`.
 
-=== "Import"
 
-    For a variable that you would import like:
+```python
+from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 
-    ```python
-    from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-    ```
+instruction = RECOMMENDED_PROMPT_PREFIX + "\nYou are a helpful assistant that can navigate the web."
 
-    The expected syntax is `agents.extensions.handoff_prompt.RECOMMENDED_PROMPT_PREFIX`
+framework = AgentFramework("openai")
 
-    ```python
-    from any_agent import AgentConfig, AgentFramework, AnyAgent
-
-    framework = AgentFramework("openai")
-
-    main_agent = AgentConfig(
-        model_id="gpt-4o-mini",
-        instructions="agents.extensions.handoff_prompt.RECOMMENDED_PROMPT_PREFIX",
-    )
-    ```
-
-=== "String"
-
-    ```python
-    from any_agent import AgentConfig, AgentFramework, AnyAgent
-
-    framework = AgentFramework("openai")
-
-    main_agent = AgentConfig(
-        model_id="gpt-4o-mini",
-        instructions="You are a helpful assistant that can navigate the web",
-        tools=[
-            "any_agent.tools.search_web",
-            "any_agent.tools.visit_webpage"
-        ]
-    )
-    ```
+main_agent = AgentConfig(
+    model_id="gpt-4o-mini",
+    instructions=instruction,
+)
+```

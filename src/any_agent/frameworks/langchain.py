@@ -4,7 +4,6 @@ from typing import Any, Optional, List
 from any_agent.config import AgentFramework, AgentConfig
 from any_agent.logging import logger
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.instructions import get_instructions
 from any_agent.tools.wrappers import import_and_wrap_tools
 
 try:
@@ -92,7 +91,7 @@ class LangchainAgent(AnyAgent):
                     model=self._get_model(managed_agent),
                     tools=managed_tools
                     + [create_handoff_tool(agent_name=self.config.name)],
-                    prompt=get_instructions(managed_agent.instructions),
+                    prompt=managed_agent.instructions,
                     **managed_agent.agent_args or {},
                 )
                 swarm.append(managed_agent)
@@ -106,7 +105,7 @@ class LangchainAgent(AnyAgent):
                 name=self.config.name,
                 model=self._get_model(self.config),
                 tools=imported_tools,
-                prompt=get_instructions(self.config.instructions),
+                prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )
             swarm.append(main_agent)
@@ -118,7 +117,7 @@ class LangchainAgent(AnyAgent):
                 name=self.config.name,
                 model=self._get_model(self.config),
                 tools=imported_tools,
-                prompt=get_instructions(self.config.instructions),
+                prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )
             self._tools = imported_tools

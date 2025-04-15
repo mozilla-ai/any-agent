@@ -10,8 +10,6 @@
 
 ::: any_agent.config.TracingConfig
 
-::: any_agent.instructions
-
 ::: any_agent.tools
 
 ::: any_agent.tracing
