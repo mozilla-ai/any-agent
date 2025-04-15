@@ -1,4 +1,3 @@
-import json
 import os
 
 import pytest
@@ -22,9 +21,8 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {framework}")
 
-    trace_path = None
     if framework != "google":
-        trace_path = setup_tracing(agent_framework, str(tmp_path / "traces"))
+        setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     main_agent = AgentConfig(
         instructions="Use the available agents to complete the task.",
