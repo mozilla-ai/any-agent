@@ -17,7 +17,7 @@ setup_tracing(framework)
 
 agent = AnyAgent.create(
         framework,
-        main_agent=AgentConfig(
+        AgentConfig(
                 model_id="gpt-4o",
                 tools=["any_agent.tools.search_web"]
             )
