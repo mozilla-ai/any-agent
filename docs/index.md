@@ -18,7 +18,7 @@ pip install any-agent
 
 To define any agent system you will always use the same imports:
 
-```py
+```python
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 ```
 
@@ -35,7 +35,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 
 Configure the agent:
 
-```py
+```python
 main_agent = AgentConfig(
     model_id="gpt-4o",
     tools=["any_agent.tools.search_web", "any_agent.tools.visit_webpage"]
@@ -44,7 +44,7 @@ main_agent = AgentConfig(
 
 Choose one of the available frameworks:
 
-```py
+```python
 from random import choice
 
 framework = AgentFramework(
@@ -56,7 +56,7 @@ framework = AgentFramework(
 
 Create and run the agent:
 
-```py
+```python
 agent = AnyAgent.create(framework, main_agent)
 
 agent.run("Which Agent Framework is the best??")
@@ -75,9 +75,10 @@ Building on top of the previous example, we can easily extend it to a multi-agen
 
 First, configure the `main_agent`, similar to before:
 
-```py
+```python
 main_agent = AgentConfig(
-    model_id="gpt-4o"
+    model_id="gpt-4o",
+    description="Main Agent"
 )
 ```
 
@@ -85,7 +86,7 @@ This agent will act as the "orchestrator".
 
 Then, configure the list of `managed_agents`:
 
-```py
+```python
 managed_agents = [
     AgentConfig(
         name="search_web_agent",
@@ -104,7 +105,7 @@ managed_agents = [
 
 You can then create and run the multi-agent:
 
-```py
+```python
 multi_agent = AnyAgent.create(framework, main_agent, managed_agents)
 
 multi_agent.run("Which Agent Framework is the best??")

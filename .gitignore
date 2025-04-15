@@ -1,5 +1,6 @@
 uv.lock
-
+output/
+traces/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

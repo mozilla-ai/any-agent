@@ -7,9 +7,10 @@ standardized [OpenTelemetry](https://opentelemetry.io/) traces for any of the su
 
 To enable tracing, call [`setup_tracing`][any_agent.tracing.setup_tracing] passing the selected framework.
 
-```py
+```python
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tracing import setup_tracing
+from any_agent.tools import search_web
 
 framework = AgentFramework("openai")
 
@@ -19,7 +20,7 @@ agent = AnyAgent.create(
         framework,
         AgentConfig(
                 model_id="gpt-4o",
-                tools=["any_agent.tools.search_web"]
+                tools=[search_web]
             )
         )
 agent.run("Which agent framework is the best?")
@@ -64,12 +65,12 @@ input: {'query': 'best agent framework 2023'}
 
 You can configure the behavior of the console output using [`TracingConfig`][any_agent.config.TracingConfig]:
 
-```py
+```python
 from any_agent.config import TracingConfig
 
 setup_tracing(
-  AgentFramework("langchain"),
-  TracingConfig(
+  agent_framework=AgentFramework("langchain"),
+  tracing_config=TracingConfig(
     llm=None,  # Setting to None disables this `openinference.span.kind`
     tool="purple",  # Change the color used to display
   )

@@ -36,32 +36,16 @@ agent.run("How many seconds would it take for a leopard at full speed to run thr
 ```
 1. Define a test case in a yaml file, e.g.
 
-```yaml
-# The criteria will be passed to an llm-as-a-judge along with the trace to have as context
-# The points specify the weight given to each criteria when producing the final score
-llm_judge: openai/gpt-4o
-checkpoints:
-  - points: 1
-    criteria: Ensure that the agent called the search_web tool in order to retrieve the length of Pont des Arts
-  - points: 1
-    criteria: Ensure that the agent called the search_web tool in order to access the top speed of a leopard
-  - points: 1
-    criteria: |
-        Ensure that the agent ran a python snippet to combine the information
-        from the info retrieved from the web searches
 
-# Optionally, you can check whether the final answer is what was expected. Checking this value does not use an LLM
-ground_truth:
-  - name: Time
-    points: 5
-    value: 9.63
-```
+~~~yaml
+{% include "./examples/test_case.yaml" %}
+~~~
 
 1. Run the evaluation using the test case and trace.
 ```python
 from any_agent.evaluation.test_case import TestCase
 from any_agent.evaluation.evaluate import evaluate_telemetry
-test_case = TestCase.from_yaml("/path/to/test/case/yaml")
+test_case = TestCase.from_yaml("/Users/nbrake/scm/any-agent/docs/examples/test_case.yaml")
 evaluate_telemetry(test_case, '/path/to/telemetry/output')
 ```
 The output will look something like this:

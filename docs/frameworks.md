@@ -15,7 +15,8 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     [Google ADK Repo](https://github.com/google/adk-python)
 
-    ``` py
+    ```python
+    from any_agent import AnyAgent, AgentConfig
     agent = AnyAgent.create(
         AgentFramework("google"),
         AgentConfig(
@@ -29,7 +30,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     [LangChain Repo](https://github.com/langchain-ai/langchain)
 
-    ``` py
+    ```python
     agent = AnyAgent.create(
         AgentFramework("langchain"),
         AgentConfig(
@@ -43,7 +44,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     [LLamaIndex Repo](https://github.com/run-llama/llama_index)
 
-    ``` py
+    ```python
     agent = AnyAgent.create(
         AgentFramework("llama_index"),
         AgentConfig(
@@ -57,7 +58,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     [OpenAI Agents Repo](https://github.com/openai/openai-agents-python)
 
-    ``` py
+    ```python
     agent = AnyAgent.create(
         AgentFramework("openai"),
         AgentConfig(
@@ -71,7 +72,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     [smolagents Repo](https://github.com/huggingface/smolagents)
 
-    ``` py
+    ```python
     agent = AnyAgent.create(
         AgentFramework("smolagents"),
         AgentConfig(
@@ -84,7 +85,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 === "Agno Agents"
     [Agno Agents Repo](https://github.com/agno-agi/agno)
 
-    ``` py
+    ```python
     agent = AnyAgent.create(
         AgentFramework("agno"),
         AgentConfig(
@@ -100,7 +101,8 @@ The model used by an agent is defined by 3 arguments `model_id`, `model_type` an
 
 A common usage of `model_args` is to specify a custom `api_base` and/or `api_key`:
 
-```py
+```python
+from any_agent import AnyAgent, AgentFramework, AgentConfig
 agent = AnyAgent.create(
     AgentFramework("smolagents"),
     AgentConfig(

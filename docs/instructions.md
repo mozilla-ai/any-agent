@@ -17,13 +17,13 @@ In the first case, the import should point to a Python string.
 
     For a variable that you would import like:
 
-    ```py
+    ```python
     from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
     ```
 
     The expected syntax is `agents.extensions.handoff_prompt.RECOMMENDED_PROMPT_PREFIX`
 
-    ```py
+    ```python
     from any_agent import AgentConfig, AgentFramework, AnyAgent
 
     framework = AgentFramework("openai")
@@ -36,7 +36,7 @@ In the first case, the import should point to a Python string.
 
 === "String"
 
-    ```py
+    ```python
     from any_agent import AgentConfig, AgentFramework, AnyAgent
 
     framework = AgentFramework("openai")

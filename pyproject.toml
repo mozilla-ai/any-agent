@@ -69,12 +69,14 @@ docs = [
   "mkdocs",
   "mkdocs-material",
   "mkdocstrings-python",
+  "mkdocs-include-markdown-plugin>=7.1.5",
 ]
 
 tests = [
   "pytest>=8,<9",
   "pytest-sugar>=0.9.6",
   "debugpy>=1.8.13",
+  "mktestdocs>=0.2.4",
 ]
 
 dev = [
