@@ -2,6 +2,7 @@ import importlib
 from typing import Optional, List
 
 from any_agent.config import AgentFramework, AgentConfig
+from any_agent.instructions import get_instructions
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools.wrappers import import_and_wrap_tools
 
@@ -70,6 +71,7 @@ class LlamaIndexAgent(AnyAgent):
             name=self.config.name,
             tools=imported_tools,
             llm=self._get_model(self.config),
+            system_prompt=get_instructions(self.config.instructions),
             **self.config.agent_args or {},
         )
 
