@@ -45,7 +45,7 @@ agent.run("How many seconds would it take for a leopard at full speed to run thr
 ```python
 from any_agent.evaluation.test_case import TestCase
 from any_agent.evaluation.evaluate import evaluate_telemetry
-test_case = TestCase.from_yaml("/Users/nbrake/scm/any-agent/docs/examples/test_case.yaml")
+test_case = TestCase.from_yaml("./docs/examples/test_case.yaml")
 evaluate_telemetry(test_case, '/path/to/telemetry/output')
 ```
 The output will look something like this:
