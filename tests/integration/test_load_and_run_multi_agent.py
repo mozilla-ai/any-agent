@@ -18,7 +18,7 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
     if framework == "smolagents":
         kwargs["agent_type"] = "ToolCallingAgent"
 
-    kwargs["model_id"] = "gpt-4o-mini"
+    kwargs["model_id"] = "gpt-4o"
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {framework}")
 
@@ -34,13 +34,13 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
     managed_agents = [
         AgentConfig(
             name="search_web_agent",
-            model_id=kwargs["model_id"],
+            model_id="gpt-4o-mini",
             description="Agent that can search the web",
             tools=["any_agent.tools.search_web"],
         ),
         AgentConfig(
             name="visit_webpage_agent",
-            model_id=kwargs["model_id"],
+            model_id="gpt-4o-mini",
             description="Agent that can visit webpages",
             tools=["any_agent.tools.visit_webpage"],
         ),
@@ -60,8 +60,6 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
         agent_config=main_agent,
         managed_agents=managed_agents,
     )
-    agent.run("Which agent framework is the best?")
+    result = agent.run("Which agent framework is the best?")
 
-    if trace_path:
-        traces = json.load(open(trace_path))
-        assert len(traces)
+    assert result
