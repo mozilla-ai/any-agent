@@ -12,6 +12,8 @@ from any_agent.tools.mcp import (
     MCPServerBase,
 )
 
+from functools import wraps
+
 
 def wrap_tool_openai(tool):
     from agents import function_tool, Tool
@@ -34,7 +36,12 @@ def wrap_tool_smolagents(tool):
     from smolagents import Tool, tool as smolagents_tool
 
     if not isinstance(tool, Tool):
-        return smolagents_tool(tool)
+        # this wrapping needed until https://github.com/huggingface/smolagents/pull/1203 is merged and released
+        @wraps(tool)
+        def wrapped_function(*args, **kwargs):
+            return tool(*args, **kwargs)
+
+        return smolagents_tool(wrapped_function)
     return tool
 
 
