@@ -5,11 +5,13 @@ from typing import TYPE_CHECKING, Any, cast
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import Tool
 from any_agent.logging import logger
-from any_agent.tools.mcp import MCPServerBase
-from any_agent.tools.wrappers import import_and_wrap_tools
+from any_agent.tools import search_web, visit_webpage
+from any_agent.tools.wrappers import wrap_tools
 
 if TYPE_CHECKING:
     from llama_index.core.llms import LLM
+
+    from any_agent.tools.mcp import MCPServerBase
 
 try:
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
@@ -32,9 +34,8 @@ class LlamaIndexAgent(AnyAgent):
         managed_agents: list[AgentConfig] | None = None,
     ):
         if not llama_index_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[llama_index]'` to use this agent",
-            )
+            msg = "You need to `pip install 'any-agent[llama_index]'` to use this agent"
+            raise ImportError(msg)
         self.managed_agents: list[AgentConfig] | None = managed_agents
         self.config: AgentConfig = config
         self._agent: AgentWorkflow | ReActAgent | None = None
@@ -56,7 +57,7 @@ class LlamaIndexAgent(AnyAgent):
         )
 
     async def _load_tools(self, tools: Sequence[Tool]) -> list[Tool]:
-        imported_tools, mcp_servers = await import_and_wrap_tools(tools, self.framework)
+        imported_tools, mcp_servers = await wrap_tools(tools, self.framework)
 
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
@@ -70,8 +71,8 @@ class LlamaIndexAgent(AnyAgent):
         """Load the LLamaIndex agent with the given configuration."""
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
-                "any_agent.tools.search_web",
-                "any_agent.tools.visit_webpage",
+                search_web,
+                visit_webpage,
             ]
 
         if self.managed_agents:
@@ -123,12 +124,12 @@ class LlamaIndexAgent(AnyAgent):
             )
 
     async def run_async(self, prompt: str) -> Any:
-        result = await self._agent.run(prompt)  # type: ignore[union-attr]
-        return result
+        return await self._agent.run(prompt)  # type: ignore[union-attr]
 
     @property
     def tools(self) -> list[Tool]:
-        """Return the tools used by the agent.
+        """
+        Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
         if not self._agent:

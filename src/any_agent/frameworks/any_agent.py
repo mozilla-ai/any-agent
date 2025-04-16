@@ -44,7 +44,8 @@ class AnyAgent(ABC):
                 AgnoAgent as Agent,
             )
         else:
-            raise ValueError(f"Unsupported agent framework: {agent_framework}")
+            msg = f"Unsupported agent framework: {agent_framework}"
+            raise ValueError(msg)
         agent = Agent(agent_config, managed_agents=managed_agents)
         asyncio.get_event_loop().run_until_complete(agent._load_agent())
         return agent
@@ -73,9 +74,8 @@ class AnyAgent(ABC):
         config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
     ) -> None:
-        raise NotImplementedError(
-            "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'",
-        )
+        msg = "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
+        raise NotImplementedError(msg)
 
     @property
     def agent(self) -> Any:
@@ -93,6 +93,5 @@ class AnyAgent(ABC):
             NotImplementedError: Always raised when this property is accessed
 
         """
-        raise NotImplementedError(
-            "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class",
-        )
+        msg = "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
+        raise NotImplementedError(msg)

@@ -6,7 +6,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 
-frameworks = [item for item in AgentFramework]
+frameworks = list(AgentFramework)
 
 
 @pytest.mark.parametrize(

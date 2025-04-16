@@ -1,3 +1,4 @@
+import contextlib
 import json
 from collections.abc import Mapping, Sequence
 from typing import Any
@@ -61,10 +62,8 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
             "output": tool_output,
         }
 
-        try:
+        with contextlib.suppress(json.JSONDecodeError):
             span_info["input"] = json.loads(span_info["input"])
-        except json.JSONDecodeError:
-            pass
 
         return span_info
 
@@ -143,6 +142,5 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
             return "AGENT", self._extract_agent_interaction(span)
         if span_kind == "CHAIN":
             return "CHAIN", self._extract_chain_interaction(span)
-        raise ValueError(
-            f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'AGENT', or 'CHAIN'.",
-        )
+        msg = f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'AGENT', or 'CHAIN'."
+        raise ValueError(msg)

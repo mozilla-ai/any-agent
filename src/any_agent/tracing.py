@@ -170,5 +170,6 @@ def setup_tracing(
 
         LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
     else:
-        raise NotImplementedError(f"{agent_framework} tracing is not supported.")
+        msg = f"{agent_framework} tracing is not supported."
+        raise NotImplementedError(msg)
     return file_name

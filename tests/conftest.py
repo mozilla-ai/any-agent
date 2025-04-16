@@ -4,7 +4,7 @@ import pytest
 import rich.console
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def refresh_tools() -> None:
     """Smolagents tool wrapping hacks the original function signature
     of the tool that you pass.

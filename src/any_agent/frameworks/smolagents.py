@@ -4,8 +4,9 @@ from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.mcp import MCPServerBase
-from any_agent.tools.wrappers import import_and_wrap_tools
+from any_agent.tools.wrappers import wrap_tools
 
 try:
     import smolagents
@@ -28,9 +29,8 @@ class SmolagentsAgent(AnyAgent):
         managed_agents: list[AgentConfig] | None = None,
     ):
         if not smolagents_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[smolagents]'` to use this agent",
-            )
+            msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
+            raise ImportError(msg)
         self.managed_agents = managed_agents
         self.config = config
         self._agent: MultiStepAgent | None = None
@@ -59,13 +59,12 @@ class SmolagentsAgent(AnyAgent):
         """Load the Smolagents agent with the given configuration."""
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
-                "any_agent.tools.search_web",
-                "any_agent.tools.visit_webpage",
+                search_web,
+                visit_webpage,
             ]
 
-        tools, mcp_servers = await import_and_wrap_tools(
-            self.config.tools,
-            agent_framework=AgentFramework.SMOLAGENTS,
+        tools, mcp_servers = await wrap_tools(
+            self.config.tools, agent_framework=AgentFramework.SMOLAGENTS
         )
         self._mcp_servers = mcp_servers
         tools.extend(self._merge_mcp_tools(mcp_servers))
@@ -77,9 +76,8 @@ class SmolagentsAgent(AnyAgent):
                     smolagents,
                     managed_agent.agent_type or DEFAULT_AGENT_TYPE,
                 )
-                managed_tools, managed_mcp_servers = await import_and_wrap_tools(
-                    managed_agent.tools,
-                    agent_framework=AgentFramework.SMOLAGENTS,
+                managed_tools, managed_mcp_servers = await wrap_tools(
+                    managed_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
                 )
                 self._managed_mcp_servers = managed_mcp_servers
                 tools.extend(self._merge_mcp_tools(managed_mcp_servers))
@@ -116,12 +114,12 @@ class SmolagentsAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
-        result = self._agent.run(prompt)  # type: ignore[union-attr]
-        return result
+        return self._agent.run(prompt)  # type: ignore[union-attr]
 
     @property
     def tools(self) -> list[Tool]:
-        """Return the tools used by the agent.
+        """
+        Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
         return self._agent.tools  # type: ignore[no-any-return, union-attr]

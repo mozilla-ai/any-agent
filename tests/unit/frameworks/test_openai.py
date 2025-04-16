@@ -49,7 +49,7 @@ def test_openai_with_api_base_and_api_key_var() -> None:
             AgentFramework.OPENAI,
             AgentConfig(
                 model_id="gpt-4o",
-                model_args=dict(base_url="FOO", api_key_var="TEST_API_KEY"),
+                model_args={"base_url": "FOO", "api_key_var": "TEST_API_KEY"},
             ),
         )
 
@@ -67,7 +67,7 @@ def test_openai_environment_error() -> None:
                 AgentFramework.OPENAI,
                 AgentConfig(
                     model_id="gpt-4o",
-                    model_args=dict(base_url="FOO", api_key_var="MISSING_KEY"),
+                    model_args={"base_url": "FOO", "api_key_var": "MISSING_KEY"},
                 ),
             )
 
@@ -81,7 +81,7 @@ def test_load_openai_with_mcp_server() -> None:
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
-        patch("any_agent.frameworks.openai.import_and_wrap_tools") as mock_wrap_tools,
+        patch("any_agent.frameworks.openai.wrap_tools") as mock_wrap_tools,
     ):
         # Setup the mock to return tools and MCP servers
         mock_wrap_tools.return_value = (
@@ -121,24 +121,25 @@ def test_load_openai_multiagent() -> None:
         main_agent = AgentConfig(
             model_id="o3-mini",
         )
+
         managed_agents = [
             AgentConfig(
                 model_id="gpt-4o-mini",
                 name="user-verification-agent",
-                tools=["any_agent.tools.ask_user_verification"],
+                tools=[ask_user_verification],
             ),
             AgentConfig(
                 model_id="gpt-4o",
                 name="search-web-agent",
                 tools=[
-                    "any_agent.tools.search_web",
-                    "any_agent.tools.visit_webpage",
+                    search_web,
+                    visit_webpage,
                 ],
             ),
             AgentConfig(
                 model_id="gpt-4o-mini",
                 name="communication-agent",
-                tools=["any_agent.tools.show_final_answer"],
+                tools=[show_final_answer],
                 handoff=True,
             ),
         ]

@@ -15,10 +15,10 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
     def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
-                content = span["attributes"]["output.value"]
-                return str(content)
+                return str(span["attributes"]["output.value"])
 
-        raise ValueError("No agent final answer found in trace")
+        msg = "No agent final answer found in trace"
+        raise ValueError(msg)
 
     def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
@@ -34,10 +34,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
         elif "input.value" in attributes:
             try:
                 input_value = json.loads(attributes["input.value"])
-                if "content" in input_value:
-                    span_info["input"] = input_value["content"]
-                else:
-                    span_info["input"] = input_value
+                span_info["input"] = input_value.get("content", input_value)
             except (json.JSONDecodeError, TypeError):
                 span_info["input"] = attributes["input.value"]
 
@@ -48,10 +45,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
         elif "output.value" in attributes:
             try:
                 output_value = json.loads(attributes["output.value"])
-                if "content" in output_value:
-                    output_content = output_value["content"]
-                else:
-                    output_content = output_value
+                output_content = output_value.get("content", output_value)
             except (json.JSONDecodeError, TypeError):
                 output_content = attributes["output.value"]
 
@@ -209,6 +203,5 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
             return "AGENT", self._extract_agent_interaction(span)
         if "tool.name" in attributes or span.get("name", "").startswith("SimpleTool"):
             return "TOOL", self._extract_tool_interaction(span)
-        raise ValueError(
-            f"Unknown span kind: {span_kind} or unsupported span name: {span.get('name', '')}",
-        )
+        msg = f"Unknown span kind: {span_kind} or unsupported span name: {span.get('name', '')}"
+        raise ValueError(msg)

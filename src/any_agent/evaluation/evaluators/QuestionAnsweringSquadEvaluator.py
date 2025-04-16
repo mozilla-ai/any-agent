@@ -48,8 +48,8 @@ class QuestionAnsweringSquadEvaluator:
         )
 
         match = EvaluationResult(
-            passed=True if int(result["exact_match"]) == 1 else False,
-            reason=f"Partial Match (F1) score is {round(result.get('f1', 0), 2)}",
+            passed=int(result["exact_match"]) == 1,
+            reason=f"Partial Match (F1) score is {round(result['f1'], 2)}",
             criteria="Is the answer a direct match?",
             points=1,
         )

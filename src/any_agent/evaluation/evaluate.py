@@ -88,7 +88,8 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
     logger.info(output_message)
 
     if won_points + missed_points == 0:
-        raise ValueError("No points were defined in the test case")
+        msg = "No points were defined in the test case"
+        raise ValueError(msg)
     score = won_points / (won_points + missed_points) * 100
 
     # Save the evaluation results

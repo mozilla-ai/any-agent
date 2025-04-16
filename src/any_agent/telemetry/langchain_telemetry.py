@@ -33,7 +33,8 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                     pass
                 return final_text
 
-        raise ValueError("No agent final answer found in trace")
+        msg = "No agent final answer found in trace"
+        raise ValueError(msg)
 
     def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
@@ -76,10 +77,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                     parsed_output = self.parse_generic_key_value_string(
                         output_value["output"],
                     )
-                    if "content" in parsed_output:
-                        tool_info["output"] = parsed_output["content"]
-                    else:
-                        tool_info["output"] = parsed_output
+                    tool_info["output"] = parsed_output.get("content", parsed_output)
                 else:
                     tool_info["output"] = output_value
             except Exception:

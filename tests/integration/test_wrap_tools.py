@@ -11,22 +11,22 @@ from smolagents.tools import Tool as SmolagentsClass
 
 from any_agent import AgentFramework
 from any_agent.config import Tool
-from any_agent.tools import visit_webpage
-from any_agent.tools.wrappers import import_and_wrap_tools
+from any_agent.tools import search_web, visit_webpage
+from any_agent.tools.wrappers import wrap_tools
 
 
-def import_and_wrap_sync(
+def wrap_sync(
     tools: Sequence[Tool],
     framework: AgentFramework,
 ) -> list[Tool]:
     wrapped_tools, _ = asyncio.get_event_loop().run_until_complete(
-        import_and_wrap_tools(tools, framework),
+        wrap_tools(tools, framework)
     )
     return wrapped_tools
 
 
 @pytest.mark.parametrize(
-    "framework,expected_class",
+    ("framework", "expected_class"),
     [
         ("google", GoogleClass),
         ("langchain", LangchainClass),
@@ -35,9 +35,6 @@ def import_and_wrap_sync(
         ("smolagents", SmolagentsClass),
     ],
 )
-def test_import_and_wrap_tools(framework: str, expected_class: Any) -> None:
-    wrapped_tools = import_and_wrap_sync(
-        ["any_agent.tools.search_web", visit_webpage],
-        AgentFramework(framework),
-    )
+def test_wrap_tools(framework: str, expected_class: Any) -> None:
+    wrapped_tools = wrap_sync([search_web, visit_webpage], AgentFramework(framework))
     assert all(isinstance(tool, expected_class) for tool in wrapped_tools)

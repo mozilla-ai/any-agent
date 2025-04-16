@@ -17,7 +17,8 @@ class CheckpointEvaluator(LLMEvaluator):
         checkpoints: Sequence[CheckpointCriteria],
         processor: TelemetryProcessor,
     ) -> list[EvaluationResult]:
-        """Verify each checkpoint against the telemetry data using LLM
+        """
+        Verify each checkpoint against the telemetry data using LLM
 
         Args:
             telemetry: The telemetry data to evaluate

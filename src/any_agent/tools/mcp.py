@@ -2,7 +2,6 @@
 
 import os
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 from textwrap import dedent
 from typing import TYPE_CHECKING
 
@@ -18,9 +17,10 @@ except ImportError:
     mcp_available = False
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
     from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
-    from mcp import ClientSession, StdioServerParameters
     from smolagents import ToolCollection
 
 
@@ -29,9 +29,8 @@ class MCPServerBase(ABC):
 
     def __init__(self, mcp_tool: MCPTool):
         if not mcp_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[mcp]'` to use MCP tools.",
-            )
+            msg = "You need to `pip install 'any-agent[mcp]'` to use MCP tools."
+            raise ImportError(msg)
 
         # Store the original tool configuration
         self.mcp_tool = mcp_tool

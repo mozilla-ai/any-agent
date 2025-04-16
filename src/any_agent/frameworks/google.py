@@ -1,12 +1,16 @@
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
-from any_agent.tools.mcp import MCPServerBase
-from any_agent.tools.wrappers import import_and_wrap_tools
+from any_agent.tools import search_web, visit_webpage
+from any_agent.tools.wrappers import wrap_tools
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from any_agent.tools.mcp import MCPServerBase
 
 try:
     from google.adk.agents import Agent
@@ -29,9 +33,8 @@ class GoogleAgent(AnyAgent):
         managed_agents: list[AgentConfig] | None = None,
     ):
         if not adk_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[google]'` to use this agent",
-            )
+            msg = "You need to `pip install 'any-agent[google]'` to use this agent"
+            raise ImportError(msg)
         self.managed_agents = managed_agents
         self.config = config
         self._agent: Agent | None = None
@@ -46,12 +49,11 @@ class GoogleAgent(AnyAgent):
         """Load the Google agent with the given configuration."""
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
-                "any_agent.tools.search_web",
-                "any_agent.tools.visit_webpage",
+                search_web,
+                visit_webpage,
             ]
-        tools, mcp_servers = await import_and_wrap_tools(
-            self.config.tools,
-            agent_framework=AgentFramework.GOOGLE,
+        tools, mcp_servers = await wrap_tools(
+            self.config.tools, agent_framework=AgentFramework.GOOGLE
         )
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers = mcp_servers
@@ -61,9 +63,8 @@ class GoogleAgent(AnyAgent):
         sub_agents_instanced = []
         if self.managed_agents:
             for managed_agent in self.managed_agents:
-                managed_tools, managed_mcp_servers = await import_and_wrap_tools(
-                    managed_agent.tools,
-                    agent_framework=AgentFramework.GOOGLE,
+                managed_tools, managed_mcp_servers = await wrap_tools(
+                    managed_agent.tools, agent_framework=AgentFramework.GOOGLE
                 )
                 # Add to agent so that it doesn't get garbage collected
                 self._managed_mcp_servers = managed_mcp_servers
@@ -131,7 +132,8 @@ class GoogleAgent(AnyAgent):
 
     @property
     def tools(self) -> list[Tool]:
-        """Return the tools used by the agent.
+        """
+        Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
         if not self._agent:

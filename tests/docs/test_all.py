@@ -15,10 +15,7 @@ def test_files_all(fpath: pathlib.Path) -> None:
     # Patch the evaluate_telemetry function.
     # Eventually we may want to better validate that the docs use evaluate_telemetry correctly
     with (
-        patch(
-            "any_agent.evaluation.evaluate.evaluate_telemetry",
-            mock_evaluate,
-        ),
+        patch("any_agent.evaluation.evaluate.evaluate_telemetry", mock_evaluate),
         patch("any_agent.AnyAgent.create", mock_create),
     ):
         check_md_file(fpath=fpath, memory=True)

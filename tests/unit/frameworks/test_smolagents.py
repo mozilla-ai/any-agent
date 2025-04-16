@@ -53,10 +53,10 @@ def test_load_smolagent_with_api_base_and_api_key_var() -> None:
             AgentFramework.SMOLAGENTS,
             AgentConfig(
                 model_id="openai/o3-mini",
-                model_args=dict(
-                    api_base="https://custom-api.example.com",
-                    api_key_var="OPENAI_API_KEY",
-                ),
+                model_args={
+                    "api_base": "https://custom-api.example.com",
+                    "api_key_var": "OPENAI_API_KEY",
+                },
             ),
         )
 
@@ -90,7 +90,7 @@ def test_load_smolagent_environment_error() -> None:
                 AgentFramework.SMOLAGENTS,
                 AgentConfig(
                     model_id="openai/o3-mini",
-                    model_args=dict(api_key_var="MISSING_KEY"),
+                    model_args={"api_key_var": "MISSING_KEY"},
                 ),
             )
 

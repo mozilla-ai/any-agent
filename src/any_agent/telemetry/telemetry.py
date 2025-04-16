@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 import re
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from any_agent import AgentFramework
 from any_agent.logging import logger
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
 
 
 class TelemetryProcessor(ABC):
@@ -42,7 +44,8 @@ class TelemetryProcessor(ABC):
             )
 
             return LlamaIndexTelemetryProcessor()
-        raise ValueError(f"Unsupported agent type {agent_framework}")
+        msg = f"Unsupported agent type {agent_framework}"
+        raise ValueError(msg)
 
     @staticmethod
     def determine_agent_framework(trace: Sequence[Mapping[str, Any]]) -> AgentFramework:
@@ -62,9 +65,8 @@ class TelemetryProcessor(ABC):
             if span.get("name") == "response":
                 logger.info("Agent type is OPENAI")
                 return AgentFramework.OPENAI
-        raise ValueError(
-            "Could not determine agent type from trace, or agent type not supported",
-        )
+        msg = "Could not determine agent type from trace, or agent type not supported"
+        raise ValueError(msg)
 
     @abstractmethod
     def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
@@ -117,7 +119,8 @@ class TelemetryProcessor(ABC):
 
     @staticmethod
     def parse_generic_key_value_string(text: str) -> dict[str, str]:
-        """Parse a string that has items of a dict with key-value pairs separated by '='.
+        """
+        Parse a string that has items of a dict with key-value pairs separated by '='.
         Only splits on '=' signs, handling quoted strings properly.
         """
         pattern = r"(\w+)=('.*?'|\".*?\"|[^'\"=]*?)(?=\s+\w+=|\s*$)"
