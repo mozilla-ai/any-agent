@@ -1,3 +1,3 @@
-from .telemetry import TelemetryProcessor
+from .base import TelemetryProcessor
 
 __all__ = ["TelemetryProcessor"]
