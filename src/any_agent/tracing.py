@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 from types import NoneType
-from typing import Protocol
+from typing import Protocol, assert_never
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
@@ -18,8 +18,6 @@ from rich.panel import Panel
 
 from any_agent.config import AgentFramework, TracingConfig
 from any_agent.telemetry import TelemetryProcessor
-
-from typing_extensions import assert_never
 
 
 class JsonFileSpanExporter(SpanExporter):
@@ -175,7 +173,7 @@ def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
         return LlamaIndexInstrumentor()
 
     if framework is AgentFramework.GOOGLE or framework is AgentFramework.AGNO:
-        msg = f"{agent_framework} tracing is not supported."
+        msg = f"{framework} tracing is not supported."
         raise NotImplementedError(msg)
 
     assert_never(framework)
