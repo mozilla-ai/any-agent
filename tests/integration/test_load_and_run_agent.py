@@ -2,10 +2,10 @@ import os
 
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tracing import setup_tracing
 
-frameworks = [item for item in AgentFramework]
+frameworks = list(AgentFramework)
 
 
 @pytest.mark.parametrize("framework", frameworks)
@@ -20,7 +20,7 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
     if framework == "smolagents":
         kwargs["agent_type"] = "ToolCallingAgent"
 
-    kwargs["model_id"] = "gpt-4o-mini"
+    kwargs["model_id"] = "gpt-4.1-nano"
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {framework}")
 

@@ -3,7 +3,7 @@
 
 import asyncio
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from any_agent.tools.mcp import (
     MCPServerBase,
@@ -30,7 +30,6 @@ class TestMCPServerBase(unittest.TestCase):
 
     def tearDown(self):
         """Clean up after each test."""
-        pass
 
 
 # Common helper functions for all test classes
@@ -87,8 +86,8 @@ class TestSmolagentsMCPServerStdio(unittest.TestCase):
         asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify all tools are included
-        self.assertEqual(mcp_server.tools, mock_tools)
-        self.assertEqual(len(mcp_server.tools), 2)
+        assert mcp_server.tools == mock_tools
+        assert len(mcp_server.tools) == 2
 
     def test_setup_tools_with_specific_tools(
         self, mock_stdio_params, mock_tool_collection
@@ -108,8 +107,8 @@ class TestSmolagentsMCPServerStdio(unittest.TestCase):
         asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify only the requested tools are included
-        self.assertEqual(len(mcp_server.tools), 2)
+        assert len(mcp_server.tools) == 2
         tool_names = [tool.name for tool in mcp_server.tools]
-        self.assertIn("read_thing", tool_names)
-        self.assertIn("write_thing", tool_names)
-        self.assertNotIn("other_thing", tool_names)
+        assert "read_thing" in tool_names
+        assert "write_thing" in tool_names
+        assert "other_thing" not in tool_names

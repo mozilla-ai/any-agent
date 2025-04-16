@@ -4,7 +4,7 @@ import pytest
 import rich.console
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def refresh_tools():
     """
     smolagents tool wrapping hacks the original function signature
@@ -15,7 +15,7 @@ def refresh_tools():
     signature.
     """
     tool_modules = []
-    for k in sys.modules.keys():
+    for k in sys.modules:
         if "any_agent.tools" in k:
             tool_modules.append(k)
     for module in tool_modules:

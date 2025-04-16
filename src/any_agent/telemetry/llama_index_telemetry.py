@@ -1,5 +1,6 @@
-from typing import Any, Dict, List
+import contextlib
 import json
+from typing import Any
 
 from any_agent import AgentFramework
 from any_agent.logging import logger
@@ -12,7 +13,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LLAMAINDEX
 
-    def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
+    def extract_hypothesis_answer(self, trace: list[dict[str, Any]]) -> str:
         for span in reversed(trace):
             # Looking for the final response that has the summary answer
             if (
@@ -27,7 +28,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
         logger.warning("No agent final answer found in trace")
         return "NO FINAL ANSWER FOUND"
 
-    def _extract_llm_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_llm_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
         attributes = span.get("attributes", {})
         span_info = {}
 
@@ -49,7 +50,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_tool_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
         attributes = span.get("attributes", {})
         tool_name = attributes.get("tool.name", "Unknown tool")
         tool_output = attributes.get("output.value", "")
@@ -60,14 +61,12 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
             "output": tool_output,
         }
 
-        try:
+        with contextlib.suppress(json.JSONDecodeError):
             span_info["input"] = json.loads(span_info["input"])
-        except json.JSONDecodeError:
-            pass
 
         return span_info
 
-    def _extract_agent_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_agent_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
         """Extract information from an AGENT span."""
 
         span_info = {
@@ -83,7 +82,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_chain_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_chain_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
         """Extract information from a CHAIN span."""
         attributes = span.get("attributes", {})
 
@@ -115,7 +114,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> list:
+    def _extract_telemetry_data(self, telemetry: list[dict[str, Any]]) -> list:
         """Extract LLM calls and tool calls from LlamaIndex telemetry."""
         calls = []
 
@@ -124,20 +123,18 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         return calls
 
-    def extract_interaction(self, span: Dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    def extract_interaction(self, span: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")
 
         if span_kind == "LLM":
             return "LLM", self._extract_llm_interaction(span)
-        elif span_kind == "TOOL":
+        if span_kind == "TOOL":
             return "TOOL", self._extract_tool_interaction(span)
-        elif span_kind == "AGENT":
+        if span_kind == "AGENT":
             return "AGENT", self._extract_agent_interaction(span)
-        elif span_kind == "CHAIN":
+        if span_kind == "CHAIN":
             return "CHAIN", self._extract_chain_interaction(span)
-        else:
-            raise ValueError(
-                f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'AGENT', or 'CHAIN'."
-            )
+        msg = f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'AGENT', or 'CHAIN'."
+        raise ValueError(msg)

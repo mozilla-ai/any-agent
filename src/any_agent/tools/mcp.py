@@ -1,11 +1,11 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
-from abc import ABC, abstractmethod
 import os
-from any_agent.logging import logger
+from abc import ABC, abstractmethod
 from textwrap import dedent
 
 from any_agent.config import MCPTool
+from any_agent.logging import logger
 
 try:
     from mcp import ClientSession, StdioServerParameters
@@ -21,9 +21,8 @@ class MCPServerBase(ABC):
 
     def __init__(self, mcp_tool: MCPTool):
         if not mcp_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[mcp]'` to use MCP tools."
-            )
+            msg = "You need to `pip install 'any-agent[mcp]'` to use MCP tools."
+            raise ImportError(msg)
 
         # Store the original tool configuration
         self.mcp_tool = mcp_tool
@@ -34,7 +33,6 @@ class MCPServerBase(ABC):
     @abstractmethod
     async def setup_tools(self):
         """Set up tools. To be implemented by subclasses."""
-        pass
 
 
 class SmolagentsMCPServerStdio(MCPServerBase):

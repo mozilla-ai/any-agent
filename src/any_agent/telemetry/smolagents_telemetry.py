@@ -1,8 +1,7 @@
-from typing import Any, Dict, List
 import json
+from typing import Any
 
 from any_agent import AgentFramework
-
 from any_agent.telemetry import TelemetryProcessor
 
 
@@ -12,15 +11,15 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS
 
-    def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
+    def extract_hypothesis_answer(self, trace: list[dict[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
-                content = span["attributes"]["output.value"]
-                return content
+                return span["attributes"]["output.value"]
 
-        raise ValueError("No agent final answer found in trace")
+        msg = "No agent final answer found in trace"
+        raise ValueError(msg)
 
-    def _extract_llm_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_llm_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
         attributes = span.get("attributes", {})
         span_info = {
@@ -34,10 +33,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
         elif "input.value" in attributes:
             try:
                 input_value = json.loads(attributes["input.value"])
-                if "content" in input_value:
-                    span_info["input"] = input_value["content"]
-                else:
-                    span_info["input"] = input_value
+                span_info["input"] = input_value.get("content", input_value)
             except (json.JSONDecodeError, TypeError):
                 span_info["input"] = attributes["input.value"]
 
@@ -48,10 +44,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
         elif "output.value" in attributes:
             try:
                 output_value = json.loads(attributes["output.value"])
-                if "content" in output_value:
-                    output_content = output_value["content"]
-                else:
-                    output_content = output_value
+                output_content = output_value.get("content", output_value)
             except (json.JSONDecodeError, TypeError):
                 output_content = attributes["output.value"]
 
@@ -60,7 +53,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_tool_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
         """Extract tool interaction details from a span."""
         attributes = span.get("attributes", {})
         tool_info = {
@@ -100,7 +93,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return tool_info
 
-    def _extract_chain_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_chain_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
         """Extract chain interaction details from a CHAIN span."""
         attributes = span.get("attributes", {})
         status = span.get("status", {})
@@ -136,7 +129,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return chain_info
 
-    def _extract_agent_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_agent_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
         """Extract agent interaction details from an AGENT span."""
         attributes = span.get("attributes", {})
         status = span.get("status", {})
@@ -182,7 +175,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return agent_info
 
-    def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> List[Dict]:
+    def _extract_telemetry_data(self, telemetry: list[dict[str, Any]]) -> list[dict]:
         """Extract LLM calls and tool calls from SmoL Agents telemetry."""
         calls = []
 
@@ -190,20 +183,18 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
             calls.append(self.extract_interaction(span)[1])
         return calls
 
-    def extract_interaction(self, span: Dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    def extract_interaction(self, span: dict[str, Any]) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")
 
         if span_kind == "LLM" or "LiteLLMModel.__call__" in span.get("name", ""):
             return "LLM", self._extract_llm_interaction(span)
-        elif span_kind == "CHAIN":
+        if span_kind == "CHAIN":
             return "CHAIN", self._extract_chain_interaction(span)
-        elif span_kind == "AGENT":
+        if span_kind == "AGENT":
             return "AGENT", self._extract_agent_interaction(span)
-        elif "tool.name" in attributes or span.get("name", "").startswith("SimpleTool"):
+        if "tool.name" in attributes or span.get("name", "").startswith("SimpleTool"):
             return "TOOL", self._extract_tool_interaction(span)
-        else:
-            raise ValueError(
-                f"Unknown span kind: {span_kind} or unsupported span name: {span.get('name', '')}"
-            )
+        msg = f"Unknown span kind: {span_kind} or unsupported span name: {span.get('name', '')}"
+        raise ValueError(msg)

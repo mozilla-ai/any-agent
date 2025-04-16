@@ -1,4 +1,5 @@
-from typing import Any, List, Optional
+from typing import Any
+
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
@@ -17,16 +18,14 @@ class AgnoAgent(AnyAgent):
     """Agno agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
+        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
     ):
         if not agno_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[agno]'` to use this agent"
-            )
+            msg = "You need to `pip install 'any-agent[agno]'` to use this agent"
+            raise ImportError(msg)
         if managed_agents:
-            raise NotImplementedError(
-                "Managed agents are not yet supported in Agno agent."
-            )
+            msg = "Managed agents are not yet supported in Agno agent."
+            raise NotImplementedError(msg)
         self.managed_agents = managed_agents  # Future proofing
         self.config = config
         self._agent = None
@@ -62,11 +61,10 @@ class AgnoAgent(AnyAgent):
         )
 
     async def run_async(self, prompt: str) -> Any:
-        result = await self._agent.arun(prompt)
-        return result
+        return await self._agent.arun(prompt)
 
     @property
-    def tools(self) -> List[str]:
+    def tools(self) -> list[str]:
         if hasattr(self, "_agent"):
             tools = self._agent.tools
         else:

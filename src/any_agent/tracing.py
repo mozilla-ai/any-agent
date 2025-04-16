@@ -1,5 +1,5 @@
-import os
 import json
+import os
 from datetime import datetime
 from types import NoneType
 from typing import Protocol
@@ -7,9 +7,9 @@ from typing import Protocol
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor,
     SimpleSpanProcessor,
     SpanExporter,
-    BatchSpanProcessor,
     SpanExportResult,
 )
 from rich.console import Console
@@ -31,7 +31,7 @@ class JsonFileSpanExporter(SpanExporter):
 
     def export(self, spans) -> None:
         try:
-            with open(self.file_name, "r") as f:
+            with open(self.file_name) as f:
                 all_spans = json.load(f)
         except (json.JSONDecodeError, FileNotFoundError):
             all_spans = []
@@ -175,6 +175,7 @@ def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
         return LlamaIndexInstrumentor()
 
     if framework is AgentFramework.GOOGLE or framework is AgentFramework.AGNO:
-        raise NotImplementedError(f"{framework} tracing is not supported.")
+        msg = f"{agent_framework} tracing is not supported."
+        raise NotImplementedError(msg)
 
     assert_never(framework)

@@ -1,7 +1,7 @@
 import os
-from typing import Optional, Any, List
+from typing import Any
 
-from any_agent.config import AgentFramework, AgentConfig
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
@@ -10,9 +10,9 @@ try:
     from agents import (
         Agent,
         AsyncOpenAI,
+        ModelSettings,
         OpenAIChatCompletionsModel,
         Runner,
-        ModelSettings,
     )
 
     agents_available = True
@@ -26,18 +26,20 @@ class OpenAIAgent(AnyAgent):
     """OpenAI agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
+        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
     ):
         if not agents_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[openai]'` to use this agent"
-            )
+            msg = "You need to `pip install 'any-agent[openai]'` to use this agent"
+            raise ImportError(msg)
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
 
     def _get_model(
-        self, agent_config: AgentConfig, api_key_var: str = None, base_url: str = None
+        self,
+        agent_config: AgentConfig,
+        api_key_var: str | None = None,
+        base_url: str | None = None,
     ):
         """Get the model configuration for an OpenAI agent."""
         if api_key_var and base_url:
@@ -54,9 +56,8 @@ class OpenAIAgent(AnyAgent):
     async def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
         if not agents_available:
-            raise ImportError(
-                "You need to `pip install openai-agents` to use this agent"
-            )
+            msg = "You need to `pip install openai-agents` to use this agent"
+            raise ImportError(msg)
 
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
@@ -121,11 +122,10 @@ class OpenAIAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt asynchronously."""
-        result = await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
-        return result
+        return await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
 
     @property
-    def tools(self) -> List[str]:
+    def tools(self) -> list[str]:
         """
         Return the tools used by the agent.
         This property is read-only and cannot be modified.
@@ -142,7 +142,8 @@ class OpenAIAgent(AnyAgent):
                         [f"{server_name}_{tool.name}" for tool in tools_in_mcp]
                     )
                 else:
-                    raise ValueError(f"No tools found in MCP {server_name}")
+                    msg = f"No tools found in MCP {server_name}"
+                    raise ValueError(msg)
         else:
             logger.warning("Agent not loaded or does not have tools.")
             tools = []

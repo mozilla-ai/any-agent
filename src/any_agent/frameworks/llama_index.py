@@ -1,13 +1,11 @@
 import importlib
-from typing import Optional, List
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
 
 try:
-    from llama_index.core.agent.workflow import ReActAgent
-    from llama_index.core.agent.workflow import AgentWorkflow
+    from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
 
     llama_index_available = True
 except ImportError:
@@ -21,13 +19,12 @@ class LlamaIndexAgent(AnyAgent):
     """LLamaIndex agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
+        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
     ):
         if not llama_index_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[llama_index]'` to use this agent"
-            )
-        self.managed_agents: Optional[list[AgentConfig]] = managed_agents
+            msg = "You need to `pip install 'any-agent[llama_index]'` to use this agent"
+            raise ImportError(msg)
+        self.managed_agents: list[AgentConfig] | None = managed_agents
         self.config: AgentConfig = config
         self._agent = None
         self._mcp_servers = []
@@ -112,11 +109,10 @@ class LlamaIndexAgent(AnyAgent):
             )
 
     async def run_async(self, prompt):
-        result = await self._agent.run(prompt)
-        return result
+        return await self._agent.run(prompt)
 
     @property
-    def tools(self) -> List[str]:
+    def tools(self) -> list[str]:
         """
         Return the tools used by the agent.
         This property is read-only and cannot be modified.

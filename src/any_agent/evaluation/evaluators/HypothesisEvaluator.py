@@ -1,4 +1,5 @@
-from typing import Dict, List, Any
+from typing import Any
+
 from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.test_case import CheckpointCriteria
@@ -10,9 +11,9 @@ class HypothesisEvaluator(LLMEvaluator):
     def evaluate(
         self,
         hypothesis_final_answer: str,
-        ground_truth_answer_dict: Dict[str, Any],
-        ground_truth_checkpoints: List[CheckpointCriteria],
-    ) -> List[EvaluationResult]:
+        ground_truth_answer_dict: dict[str, Any],
+        ground_truth_checkpoints: list[CheckpointCriteria],
+    ) -> list[EvaluationResult]:
         """Verify if the final answer meets all specified criteria"""
         results = []
 

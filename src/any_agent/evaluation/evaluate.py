@@ -1,6 +1,7 @@
 import json
 from textwrap import dedent
-from typing import Any, Dict, List
+from typing import Any
+
 from any_agent.evaluation.evaluators import (
     CheckpointEvaluator,
     HypothesisEvaluator,
@@ -13,8 +14,8 @@ from any_agent.telemetry.telemetry import TelemetryProcessor
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
-    with open(telemetry_path, "r") as f:
-        telemetry: List[Dict[str, Any]] = json.loads(f.read())
+    with open(telemetry_path) as f:
+        telemetry: list[dict[str, Any]] = json.loads(f.read())
     logger.info(f"Telemetry loaded from {telemetry_path}")
 
     agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)
@@ -87,7 +88,8 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     logger.info(output_message)
 
     if won_points + missed_points == 0:
-        raise ValueError("No points were defined in the test case")
+        msg = "No points were defined in the test case"
+        raise ValueError(msg)
     score = won_points / (won_points + missed_points) * 100
 
     # Save the evaluation results

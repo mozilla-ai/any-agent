@@ -1,5 +1,5 @@
-from typing import List
 import evaluate
+
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 
 
@@ -11,7 +11,7 @@ class QuestionAnsweringSquadEvaluator:
 
     def evaluate(
         self, hypothesis_answer: str, ground_truth_answer: list
-    ) -> List[EvaluationResult]:
+    ) -> list[EvaluationResult]:
         """Directly compare answers using simple matching"""
 
         # format the answers so that they're dicts with 'id' and 'prediction' keys for hypo
@@ -32,7 +32,7 @@ class QuestionAnsweringSquadEvaluator:
         )
 
         match = EvaluationResult(
-            passed=True if int(result["exact_match"]) == 1 else False,
+            passed=int(result["exact_match"]) == 1,
             reason=f"Partial Match (F1) score is {round(result['f1'], 2)}",
             criteria="Is the answer a direct match?",
             points=1,

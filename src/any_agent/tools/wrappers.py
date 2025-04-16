@@ -1,21 +1,21 @@
-import inspect
 import importlib
+import inspect
 from collections.abc import Callable
 
 from any_agent.config import AgentFramework, MCPTool
 from any_agent.tools.mcp import (
     AgnoMCPServerStdio,
     GoogleMCPServerStdio,
-    LlamaIndexMCPServerStdio,
-    SmolagentsMCPServerStdio,
-    OpenAIMCPServerStdio,
     LangchainMCPServerStdio,
+    LlamaIndexMCPServerStdio,
     MCPServerBase,
+    OpenAIMCPServerStdio,
+    SmolagentsMCPServerStdio,
 )
 
 
 def wrap_tool_openai(tool):
-    from agents import function_tool, Tool
+    from agents import Tool, function_tool
 
     if not isinstance(tool, Tool):
         return function_tool(tool)
@@ -32,7 +32,8 @@ def wrap_tool_langchain(tool):
 
 
 def wrap_tool_smolagents(tool):
-    from smolagents import Tool, tool as smolagents_tool
+    from smolagents import Tool
+    from smolagents import tool as smolagents_tool
 
     if not isinstance(tool, Tool):
         return smolagents_tool(tool)
@@ -78,9 +79,8 @@ async def wrap_mcp_server(
     }
 
     if agent_framework not in mcp_server_map:
-        raise NotImplementedError(
-            f"Unsupported agent type: {agent_framework}. Currently supported types are: {mcp_server_map.keys()}"
-        )
+        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {mcp_server_map.keys()}"
+        raise NotImplementedError(msg)
 
     # Create the manager instance which will manage the MCP tool context
     manager_class = mcp_server_map[agent_framework]
@@ -124,8 +124,7 @@ async def import_and_wrap_tools(
         elif callable(tool):
             wrapped_tools.append(wrapper(tool))
         else:
-            raise ValueError(
-                f"Tool {tool} needs to be of type `MCPTool`, `str` or `callable` but is {type(tool)}"
-            )
+            msg = f"Tool {tool} needs to be of type `MCPTool`, `str` or `callable` but is {type(tool)}"
+            raise ValueError(msg)
 
     return wrapped_tools, mcp_servers
