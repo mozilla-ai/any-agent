@@ -1,7 +1,10 @@
+from __future__ import annotations
 from typing import Any, Optional, List
 from abc import ABC, abstractmethod
 import asyncio
 from any_agent.config import AgentFramework, AgentConfig
+
+from typing_extensions import assert_never
 
 
 class AnyAgent(ABC):
@@ -10,7 +13,40 @@ class AnyAgent(ABC):
     This provides a unified interface for different agent frameworks.
     """
 
-    # factory method
+    @staticmethod
+    def _get_agent_type_by_framework(framework: AgentFramework) -> type[AnyAgent]:
+        if framework is AgentFramework.SMOLAGENTS:
+            from any_agent.frameworks.smolagents import SmolagentsAgent
+
+            return SmolagentsAgent
+
+        if framework is AgentFramework.LANGCHAIN:
+            from any_agent.frameworks.langchain import LangchainAgent
+
+            return LangchainAgent
+
+        if framework is AgentFramework.OPENAI:
+            from any_agent.frameworks.openai import OpenAIAgent
+
+            return OpenAIAgent
+
+        if framework is AgentFramework.LLAMAINDEX:
+            from any_agent.frameworks.llama_index import LlamaIndexAgent
+
+            return LlamaIndexAgent
+
+        if framework is AgentFramework.GOOGLE:
+            from any_agent.frameworks.google import GoogleAgent
+
+            return GoogleAgent
+
+        if framework is AgentFramework.AGNO:
+            from any_agent.frameworks.agno import AgnoAgent
+
+            return AgnoAgent
+
+        assert_never(framework)
+
     @classmethod
     def create(
         cls,
@@ -18,20 +54,7 @@ class AnyAgent(ABC):
         agent_config: AgentConfig,
         managed_agents: Optional[list[AgentConfig]] = None,
     ) -> "AnyAgent":
-        if agent_framework == AgentFramework.SMOLAGENTS:
-            from any_agent.frameworks.smolagents import SmolagentsAgent as Agent
-        elif agent_framework == AgentFramework.LANGCHAIN:
-            from any_agent.frameworks.langchain import LangchainAgent as Agent
-        elif agent_framework == AgentFramework.OPENAI:
-            from any_agent.frameworks.openai import OpenAIAgent as Agent
-        elif agent_framework == AgentFramework.LLAMAINDEX:
-            from any_agent.frameworks.llama_index import LlamaIndexAgent as Agent
-        elif agent_framework == AgentFramework.GOOGLE:
-            from any_agent.frameworks.google import GoogleAgent as Agent
-        elif agent_framework == AgentFramework.AGNO:
-            from any_agent.frameworks.agno import AgnoAgent as Agent
-        else:
-            raise ValueError(f"Unsupported agent framework: {agent_framework}")
+        Agent = cls._get_agent_type_by_framework(agent_framework)
         agent = Agent(agent_config, managed_agents=managed_agents)
         asyncio.get_event_loop().run_until_complete(agent._load_agent())
         return agent
@@ -59,7 +82,9 @@ class AnyAgent(ABC):
         """
         pass
 
-    def __init__(self):
+    def __init__(
+        self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
+    ):
         raise NotImplementedError(
             "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
         )
