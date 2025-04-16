@@ -11,6 +11,10 @@ import pytest
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools.mcp import (
+    AgnoMCPServer,
+    GoogleMCPServer,
+    LangchainMCPServer,
+    LlamaIndexMCPServer,
     MCPServerBase,
     MCPTypes,
     SmolagentsMCPServer,
@@ -183,3 +187,200 @@ async def test_smolagents_mcp_sse():
             # Check that the right params were passed
             assert isinstance(args[0], dict)
             assert args[0]["url"] == "http://localhost:8000/sse"
+
+
+@pytest.mark.asyncio
+async def test_langchain_mcp_sse():
+    """Test LangchainMCPServer with SSE configuration."""
+    # Mock the necessary components
+    mock_tools = [MagicMock(), MagicMock()]
+
+    # Create an MCP tool config for SSE
+    mcp_tool = MCPSseParams(
+        url="http://localhost:8000/sse",
+        type=MCPTypes.SSE,
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+    # Mock required components
+    with (
+        patch("langchain_mcp_adapters.tools.load_mcp_tools") as mock_load_tools,
+        patch("mcp.ClientSession") as mock_client_session,
+    ):
+        # Create the server instance
+        server = LangchainMCPServer(mcp_tool)
+
+        # Set up mocks
+        mock_transport = (AsyncMock(), AsyncMock())
+
+        mock_session = AsyncMock()
+        mock_client_session.return_value.__aenter__.return_value = mock_session
+
+        mock_load_tools.return_value = mock_tools
+
+        # Mock AsyncExitStack to avoid actually setting up exit handlers
+        with patch.object(AsyncExitStack, "enter_async_context") as mock_enter_context:
+            mock_enter_context.side_effect = [
+                mock_transport,
+                mock_session,
+            ]
+
+            # Test the setup_tools method
+            await server.setup_tools()
+            # Verify session was initialized
+            mock_session.initialize.assert_called_once()
+            # Verify tools were loaded
+            mock_load_tools.assert_called_once_with(mock_session)
+            # Check that tools were stored
+            assert server.tools == mock_tools
+
+
+@pytest.mark.asyncio
+async def test_google_mcp_sse():
+    """Test GoogleMCPServer with SSE configuration."""
+    # Mock the necessary components
+    mock_tools = [MagicMock(), MagicMock()]
+
+    # Create an MCP tool config for SSE
+    mcp_tool = MCPSseParams(
+        url="http://localhost:8000/sse",
+        type=MCPTypes.SSE,
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+    # Create the server instance
+    server = GoogleMCPServer(mcp_tool)
+
+    # Mock Google MCP classes
+    with (
+        patch("google.adk.tools.mcp_tool.mcp_toolset.MCPToolset") as mock_toolset_class,
+        patch(
+            "google.adk.tools.mcp_tool.mcp_toolset.SseServerParams"
+        ) as mock_sse_params,
+    ):
+        # Set up mock toolset
+        mock_toolset = AsyncMock()
+        mock_toolset.load_tools.return_value = mock_tools
+        mock_toolset_class.return_value = mock_toolset
+
+        # Mock AsyncExitStack to avoid actually setting up exit handlers
+        with patch.object(AsyncExitStack, "enter_async_context") as mock_enter_context:
+            mock_enter_context.return_value = mock_toolset
+
+            # Test the setup_tools method
+            await server.setup_tools()
+
+            # Verify the SseServerParams was created correctly
+            mock_sse_params.assert_called_once_with(
+                url="http://localhost:8000/sse",
+                headers={"Authorization": "Bearer test-token"},
+            )
+
+            # Verify toolset was created with correct params
+            mock_toolset_class.assert_called_once_with(
+                connection_params=mock_sse_params.return_value
+            )
+
+            # Verify tools were loaded
+            mock_toolset.load_tools.assert_called_once()
+
+            # Check that tools were stored
+            assert server.tools == mock_tools
+            assert server.server == mock_toolset
+
+
+@pytest.mark.asyncio
+async def test_llamaindex_mcp_sse():
+    """Test LlamaIndexMCPServer with SSE configuration."""
+    # Mock the necessary components
+    mock_tools = [MagicMock(), MagicMock()]
+
+    # Create an MCP tool config for SSE
+    mcp_tool = MCPSseParams(
+        url="http://localhost:8000/sse", type=MCPTypes.SSE, tools=["tool1", "tool2"]
+    )
+
+    # Create the server instance
+    server = LlamaIndexMCPServer(mcp_tool)
+
+    # Mock LlamaIndex MCP classes
+    with (
+        patch("llama_index.tools.mcp.BasicMCPClient") as mock_client_class,
+        patch("llama_index.tools.mcp.McpToolSpec") as mock_tool_spec_class,
+    ):
+        # Set up mock client and tool spec
+        mock_client = MagicMock()
+        mock_client_class.return_value = mock_client
+
+        mock_tool_spec = MagicMock()
+        mock_tool_spec.to_tool_list_async = AsyncMock(return_value=mock_tools)
+        mock_tool_spec_class.return_value = mock_tool_spec
+
+        # Test the setup_tools method
+        await server.setup_tools()
+
+        # Verify the client was created correctly
+        mock_client_class.assert_called_once_with(
+            command_or_url="http://localhost:8000/sse"
+        )
+
+        # Verify tool spec was created with correct params
+        mock_tool_spec_class.assert_called_once_with(
+            client=mock_client, allowed_tools=["tool1", "tool2"]
+        )
+
+        # Verify to_tool_list_async was called
+        mock_tool_spec.to_tool_list_async.assert_called_once()
+
+        # Check that tools were stored
+        assert server.tools == mock_tools
+
+
+@pytest.mark.asyncio
+async def test_agno_mcp_sse():
+    """Test AgnoMCPServer with SSE configuration."""
+    # Mock the necessary components
+    mock_tools = [MagicMock(), MagicMock()]
+
+    # Create an MCP tool config for SSE
+    mcp_tool = MCPSseParams(
+        url="http://localhost:8000/sse",
+        type=MCPTypes.SSE,
+        headers={"Authorization": "Bearer test-token"},
+        tools=["tool1", "tool2"],
+    )
+
+    # Create the server instance
+    server = AgnoMCPServer(mcp_tool)
+
+    # Mock required components
+    with (
+        patch("mcp.ClientSession") as mock_client_session,
+        patch("agno.tools.mcp.MCPTools") as mock_mcp_tools,
+    ):
+        # Set up mocks
+        mock_transport = (AsyncMock(), AsyncMock())
+
+        mock_session = AsyncMock()
+        mock_client_session.return_value.__aenter__.return_value = mock_session
+
+        mock_tools_instance = MagicMock()
+        mock_mcp_tools.return_value = mock_tools_instance
+
+        # Mock AsyncExitStack to avoid actually setting up exit handlers
+        with patch.object(AsyncExitStack, "enter_async_context") as mock_enter_context:
+            mock_enter_context.side_effect = [mock_transport, mock_session, mock_tools]
+
+            # Test the setup_tools method
+            await server.setup_tools()
+
+            # Verify session was initialized
+            mock_session.initialize.assert_called_once()
+
+            # Verify MCPTools was created with correct params
+            mock_mcp_tools.assert_called_once_with(
+                session=mock_session, include_tools=["tool1", "tool2"]
+            )
+
+            # Check that tools instance was set as server
+            assert server.server == mock_tools_instance

@@ -11,6 +11,7 @@ from any_agent.logging import logger
 
 try:
     from mcp import ClientSession, StdioServerParameters
+    from mcp.client.sse import sse_client
     from mcp.client.stdio import stdio_client
 
     mcp_available = True
@@ -166,26 +167,29 @@ class LangchainMCPServer(MCPServerBase):
         """
         from langchain_mcp_adapters.tools import load_mcp_tools
 
-        if self.mcp_type == MCPTypes.SSE:
-            msg = "LangChain does not support SSE MCP server yet"
-            raise NotImplementedError(msg)
+        if self.mcp_type == MCPTypes.STDIO:
+            server_params = StdioServerParameters(
+                command=self.mcp_tool.command,
+                args=self.mcp_tool.args,
+                env={**os.environ},
+            )
 
-        server_params = StdioServerParameters(
-            command=self.mcp_tool.command,
-            args=self.mcp_tool.args,
-            env={**os.environ},
-        )
-
-        stdio_transport = await self.exit_stack.enter_async_context(
-            stdio_client(server_params)
-        )
-        stdio, write = stdio_transport
+            stdio_transport = await self.exit_stack.enter_async_context(
+                stdio_client(server_params)
+            )
+            stdio, write = stdio_transport
+        else:
+            sse_transport = await self.exit_stack.enter_async_context(
+                sse_client(
+                    url=self.mcp_tool.url,
+                    headers=self.mcp_tool.headers,
+                )
+            )
+            stdio, write = sse_transport
         self.session = await self.exit_stack.enter_async_context(
             ClientSession(stdio, write)
         )
-
         await self.session.initialize()
-
         # List available tools
         self.tools = await load_mcp_tools(self.session)
 
@@ -202,18 +206,23 @@ class GoogleMCPServer(MCPServerBase):
         """Set up the Google MCP server with the provided configuration."""
         from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
         from google.adk.tools.mcp_tool.mcp_toolset import (
+            SseServerParams as GoogleSseServerParameters,
+        )
+        from google.adk.tools.mcp_tool.mcp_toolset import (
             StdioServerParameters as GoogleStdioServerParameters,
         )
 
-        if self.mcp_type == MCPTypes.SSE:
-            msg = "Google ADK does not support SSE MCP server yet"
-            raise NotImplementedError(msg)
-
-        params = GoogleStdioServerParameters(
-            command=self.mcp_tool.command,
-            args=self.mcp_tool.args,
-            env={**os.environ},
-        )
+        if self.mcp_type == MCPTypes.STDIO:
+            params = GoogleStdioServerParameters(
+                command=self.mcp_tool.command,
+                args=self.mcp_tool.args,
+                env={**os.environ},
+            )
+        else:
+            params = GoogleSseServerParameters(
+                url=self.mcp_tool.url,
+                headers=self.mcp_tool.headers,
+            )
 
         toolset = GoogleMCPToolset(connection_params=params)
         await self.exit_stack.enter_async_context(toolset)
@@ -233,15 +242,15 @@ class LlamaIndexMCPServer(MCPServerBase):
         from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
         from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
-        if self.mcp_type == MCPTypes.SSE:
-            msg = "SSE MCP server is not yet supported in LlamaIndex"
-            raise NotImplementedError(msg)
+        if self.mcp_type == MCPTypes.STDIO:
+            mcp_client = LlamaIndexMCPClient(
+                command_or_url=self.mcp_tool.command,
+                args=self.mcp_tool.args,
+                env={**os.environ},
+            )
+        else:
+            mcp_client = LlamaIndexMCPClient(command_or_url=self.mcp_tool.url)
 
-        mcp_client = LlamaIndexMCPClient(
-            command_or_url=self.mcp_tool.command,
-            args=self.mcp_tool.args,
-            env={**os.environ},
-        )
         mcp_tool_spec = LlamaIndexMcpToolSpec(
             client=mcp_client,
             allowed_tools=self.mcp_tool.tools,
@@ -262,14 +271,27 @@ class AgnoMCPServer(MCPServerBase):
         """Set up the Agno MCP server with the provided configuration."""
         from agno.tools.mcp import MCPTools
 
-        if self.mcp_type == MCPTypes.SSE:
-            msg = "SSE MCP server is not yet supported in Agno"
-            raise NotImplementedError(msg)
-
-        server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
-        self.server = MCPTools(
-            command=server_params,
-            include_tools=self.mcp_tool.tools,
-            env={**os.environ},
-        )
+        if self.mcp_type == MCPTypes.STDIO:
+            server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
+            self.server = MCPTools(
+                command=server_params,
+                include_tools=self.mcp_tool.tools,
+                env={**os.environ},
+            )
+        else:
+            sse_transport = await self.exit_stack.enter_async_context(
+                sse_client(
+                    url=self.mcp_tool.url,
+                    headers=self.mcp_tool.headers,
+                )
+            )
+            stdio, write = sse_transport
+            session = await self.exit_stack.enter_async_context(
+                ClientSession(stdio, write)
+            )
+            await session.initialize()
+            self.server = MCPTools(
+                session=session,
+                include_tools=self.mcp_tool.tools,
+            )
         self.tools = await self.exit_stack.enter_async_context(self.server)
