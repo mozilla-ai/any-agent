@@ -5,7 +5,6 @@ from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.wrappers import wrap_tools
 
 try:
     from agents import (
@@ -29,12 +28,11 @@ class OpenAIAgent(AnyAgent):
     def __init__(
         self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
     ):
-        if not agents_available:
-            msg = "You need to `pip install 'any-agent[openai]'` to use this agent"
-            raise ImportError(msg)
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
+        self._mcp_servers = []
+        self.framework = AgentFramework.OPENAI
 
     def _get_model(
         self,
@@ -57,6 +55,9 @@ class OpenAIAgent(AnyAgent):
     async def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
         if not agents_available:
+            msg = "You need to `pip install 'any-agent[openai]'` to use this agent"
+            raise ImportError(msg)
+        if not agents_available:
             msg = "You need to `pip install openai-agents` to use this agent"
             raise ImportError(msg)
 
@@ -65,15 +66,13 @@ class OpenAIAgent(AnyAgent):
                 search_web,
                 visit_webpage,
             ]
-        tools, mcp_servers = await wrap_tools(
-            self.config.tools, agent_framework=AgentFramework.OPENAI
-        )
+        tools, mcp_servers = await self._load_tools(self.config.tools)
 
         handoffs = []
         if self.managed_agents:
             for managed_agent in self.managed_agents:
-                managed_tools, managed_mcp_servers = await wrap_tools(
-                    managed_agent.tools, agent_framework=AgentFramework.OPENAI
+                managed_tools, managed_mcp_servers = await self._load_tools(
+                    managed_agent.tools
                 )
                 kwargs = {}
                 api_key_var = None

@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework
+from any_agent.tools.wrappers import wrap_tools
 
 
 class AnyAgent(ABC):
@@ -11,7 +12,18 @@ class AnyAgent(ABC):
     This provides a unified interface for different agent frameworks.
     """
 
-    # factory method
+    def __init__(self):
+        msg = "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
+        raise NotImplementedError(msg)
+
+    async def _load_tools(self, tools):
+        tools, mcp_servers = await wrap_tools(tools, self.framework)
+        # Add to agent so that it doesn't get garbage collected
+        self._mcp_servers.extend(mcp_servers)
+        for mcp_server in mcp_servers:
+            tools.extend(mcp_server.tools)
+        return tools, mcp_servers
+
     @classmethod
     def create(
         cls,
@@ -34,7 +46,7 @@ class AnyAgent(ABC):
         else:
             msg = f"Unsupported agent framework: {agent_framework}"
             raise ValueError(msg)
-        agent = Agent(agent_config, managed_agents=managed_agents)
+        agent = Agent(agent_config, managed_agents)
         asyncio.get_event_loop().run_until_complete(agent._load_agent())
         return agent
 
@@ -57,10 +69,6 @@ class AnyAgent(ABC):
         Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
-
-    def __init__(self):
-        msg = "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
-        raise NotImplementedError(msg)
 
     @property
     def agent(self):
