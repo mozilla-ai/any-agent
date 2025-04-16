@@ -79,7 +79,14 @@ def test_wrap_tool_smolagents():
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
         wrap_tool_smolagents(foo)
-        wrapper.assert_called_with(foo)
+        # Check that wrapper was called once with any argument
+        wrapper.assert_called_once()
+        # The first argument to wrapper should be a function (the wrapped version of foo)
+        args, _ = wrapper.call_args
+        wrapped_func = args[0]
+        # Verify the wrapped function has the same metadata as foo
+        assert wrapped_func.__name__ == foo.__name__
+        assert wrapped_func.__doc__ == foo.__doc__
 
 
 def test_wrap_tool_smolagents_already_wrapped():
