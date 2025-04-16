@@ -1,6 +1,7 @@
 import json
 from textwrap import dedent
-from typing import Any, Dict, List
+from typing import Any
+
 from any_agent.evaluation.evaluators import (
     CheckpointEvaluator,
     HypothesisEvaluator,
@@ -12,9 +13,9 @@ from any_agent.logging import logger
 from any_agent.telemetry.telemetry import TelemetryProcessor
 
 
-def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
-    with open(telemetry_path, "r") as f:
-        telemetry: List[Dict[str, Any]] = json.loads(f.read())
+def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
+    with open(telemetry_path) as f:
+        telemetry: list[dict[str, Any]] = json.loads(f.read())
     logger.info(f"Telemetry loaded from {telemetry_path}")
 
     agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)
@@ -63,7 +64,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
                 f"""
                 <green>Passed:
                 - {check.criteria}
-                - {check.reason}</green>"""
+                - {check.reason}</green>""",
             )
             output_message += message + "\n"
     if failed_checks:
@@ -72,7 +73,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
                 f"""
                 <red>Failed:
                 - {check.criteria}
-                - {check.reason}</red>"""
+                - {check.reason}</red>""",
             )
             output_message += message + "\n"
     else:

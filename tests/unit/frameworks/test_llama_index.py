@@ -1,15 +1,15 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import (
     search_web,
     visit_webpage,
 )
 
 
-def test_load_llama_index_agent_default():
+def test_load_llama_index_agent_default() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -39,13 +39,13 @@ def test_load_llama_index_agent_default():
         )
 
 
-def test_load_llama_index_agent_missing():
+def test_load_llama_index_agent_missing() -> None:
     with patch("any_agent.frameworks.llama_index.llama_index_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.LLAMAINDEX, AgentConfig(model_id="gpt-4o"))
 
 
-def test_load_langchain_multiagent():
+def test_load_langchain_multiagent() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -72,7 +72,9 @@ def test_load_langchain_multiagent():
         ]
 
         AnyAgent.create(
-            AgentFramework.LLAMAINDEX, main_agent, managed_agents=managed_agents
+            AgentFramework.LLAMAINDEX,
+            main_agent,
+            managed_agents=managed_agents,
         )
 
         create_mock.assert_any_call(

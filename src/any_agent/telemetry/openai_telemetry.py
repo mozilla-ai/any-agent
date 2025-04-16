@@ -1,5 +1,6 @@
-from typing import Any, Dict, List
 import json
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 from any_agent import AgentFramework
 from any_agent.logging import logger
@@ -12,7 +13,7 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.OPENAI
 
-    def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
+    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             # Looking for the final response that has the summary answer
             if (
@@ -23,11 +24,11 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
                     "llm.output_messages.0.message.contents.0.message_content.text"
                 )
                 if output_key in span["attributes"]:
-                    return span["attributes"][output_key]
+                    return str(span["attributes"][output_key])
         logger.warning("No agent final answer found in trace")
         return "NO FINAL ANSWER FOUND"
 
-    def _extract_llm_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         attributes = span.get("attributes", {})
         span_info = {}
 
@@ -49,7 +50,7 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         attributes = span.get("attributes", {})
         tool_name = attributes.get("tool.name", "Unknown tool")
         tool_output = attributes.get("output.value", "")
@@ -67,9 +68,8 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_agent_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract information from an AGENT span."""
-
         span_info = {
             "type": "agent",
             "workflow": span.get("name", "Agent workflow"),
@@ -83,7 +83,7 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_chain_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract information from a CHAIN span."""
         attributes = span.get("attributes", {})
 
@@ -115,29 +115,34 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> list:
+    def _extract_telemetry_data(
+        self,
+        telemetry: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
         """Extract LLM calls and tool calls from OpenAI telemetry."""
-        calls = []
+        calls = list[dict[str, Any]]()
 
         for span in telemetry:
             calls.append(self.extract_interaction(span)[1])
 
         return calls
 
-    def extract_interaction(self, span: Dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    def extract_interaction(
+        self,
+        span: Mapping[str, Any],
+    ) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")
 
         if span_kind == "LLM":
             return "LLM", self._extract_llm_interaction(span)
-        elif span_kind == "TOOL":
+        if span_kind == "TOOL":
             return "TOOL", self._extract_tool_interaction(span)
-        elif span_kind == "AGENT":
+        if span_kind == "AGENT":
             return "AGENT", self._extract_agent_interaction(span)
-        elif span_kind == "CHAIN":
+        if span_kind == "CHAIN":
             return "CHAIN", self._extract_chain_interaction(span)
-        else:
-            raise ValueError(
-                f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'CHAIN', or 'AGENT'."
-            )
+        raise ValueError(
+            f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'CHAIN', or 'AGENT'.",
+        )

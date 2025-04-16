@@ -1,9 +1,10 @@
-from typing import Any, Dict, List
 import json
-from any_agent import AgentFramework
+from collections.abc import Mapping, Sequence
+from typing import Any
+
 from langchain_core.messages import BaseMessage
 
-
+from any_agent import AgentFramework
 from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
 
@@ -14,7 +15,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
 
-    def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
+    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
                 content = span["attributes"]["output.value"]
@@ -34,7 +35,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         raise ValueError("No agent final answer found in trace")
 
-    def _extract_llm_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
         attributes = span.get("attributes", {})
         span_info = {
@@ -50,7 +51,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract tool interaction details from a span."""
         attributes = span.get("attributes", {})
         tool_info = {
@@ -73,7 +74,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                 output_value = json.loads(attributes["output.value"])
                 if "output" in output_value:
                     parsed_output = self.parse_generic_key_value_string(
-                        output_value["output"]
+                        output_value["output"],
                     )
                     if "content" in parsed_output:
                         tool_info["output"] = parsed_output["content"]
@@ -86,7 +87,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return tool_info
 
-    def _extract_chain_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract chain interaction details from a span."""
         attributes = span.get("attributes", {})
         chain_info = {
@@ -99,7 +100,8 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
             try:
                 input_data = json.loads(attributes["input.value"])
                 if "messages" in input_data and isinstance(
-                    input_data["messages"], list
+                    input_data["messages"],
+                    list,
                 ):
                     # Extract message content if available
                     messages = []
@@ -139,7 +141,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return chain_info
 
-    def _extract_agent_interaction(self, span: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract agent interaction details from a span."""
         attributes = span.get("attributes", {})
         agent_info = {
@@ -152,12 +154,13 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
             try:
                 input_data = json.loads(attributes["input.value"])
                 if "messages" in input_data and isinstance(
-                    input_data["messages"], list
+                    input_data["messages"],
+                    list,
                 ):
                     if len(input_data["messages"]) > 0:
                         # For Langchain agents, messages might be serialized as strings
                         message = self.parse_generic_key_value_string(
-                            input_data["messages"][0]
+                            input_data["messages"][0],
                         )
                         if message and "content" in message:
                             agent_info["input"] = message["content"]
@@ -179,12 +182,13 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
             try:
                 output_data = json.loads(attributes["output.value"])
                 if "messages" in output_data and isinstance(
-                    output_data["messages"], list
+                    output_data["messages"],
+                    list,
                 ):
                     if len(output_data["messages"]) > 0:
                         # For Langchain agents, messages might be serialized as strings
                         message = self.parse_generic_key_value_string(
-                            output_data["messages"][0]
+                            output_data["messages"][0],
                         )
                         if message and "content" in message:
                             agent_info["output"] = message["content"]
@@ -207,7 +211,10 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return agent_info
 
-    def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> List[Dict]:
+    def _extract_telemetry_data(
+        self,
+        telemetry: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
         """Extract LLM calls and tool calls from LangChain telemetry."""
         calls = []
 
@@ -216,19 +223,21 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return calls
 
-    def extract_interaction(self, span: Dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    def extract_interaction(
+        self,
+        span: Mapping[str, Any],
+    ) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")
 
         if span_kind == "LLM":
             return "LLM", self._extract_llm_interaction(span)
-        elif "tool.name" in attributes or span.get("name", "").endswith("Tool"):
+        if "tool.name" in attributes or span.get("name", "").endswith("Tool"):
             return "TOOL", self._extract_tool_interaction(span)
-        elif span_kind == "CHAIN":
+        if span_kind == "CHAIN":
             return "CHAIN", self._extract_chain_interaction(span)
-        elif span_kind == "AGENT":
+        if span_kind == "AGENT":
             return "AGENT", self._extract_agent_interaction(span)
-        else:
-            logger.warning(f"Unknown span kind: {span_kind}. Span: {span}")
-            return "UNKNOWN", {}
+        logger.warning(f"Unknown span kind: {span_kind}. Span: {span}")
+        return "UNKNOWN", {}

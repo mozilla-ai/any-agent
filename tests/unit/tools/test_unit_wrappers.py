@@ -14,14 +14,14 @@ def foo() -> None:
     print("bar")
 
 
-def test_wrap_tool_langchain():
+def test_wrap_tool_langchain() -> None:
     wrapper = MagicMock()
     with patch("langchain_core.tools.tool", wrapper):
         wrap_tool_langchain(foo)
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_langchain_already_wrapped():
+def test_wrap_tool_langchain_already_wrapped() -> None:
     from langchain_core.tools import tool
 
     wrapped = tool(foo)
@@ -31,7 +31,7 @@ def test_wrap_tool_langchain_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_llama_index():
+def test_wrap_tool_llama_index() -> None:
     from llama_index.core.tools import FunctionTool
 
     wrapper = MagicMock()
@@ -40,7 +40,7 @@ def test_wrap_tool_llama_index():
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_llama_index_already_wrapped():
+def test_wrap_tool_llama_index_already_wrapped() -> None:
     from llama_index.core.tools import FunctionTool
 
     wrapped = FunctionTool.from_defaults(foo)
@@ -50,14 +50,14 @@ def test_wrap_tool_llama_index_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_openai():
+def test_wrap_tool_openai() -> None:
     wrapper = MagicMock()
     with patch("agents.function_tool", wrapper):
         wrap_tool_openai(foo)
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_openai_already_wrapped():
+def test_wrap_tool_openai_already_wrapped() -> None:
     from agents import function_tool
 
     wrapped = function_tool(foo)
@@ -67,7 +67,7 @@ def test_wrap_tool_openai_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_openai_builtin_tools():
+def test_wrap_tool_openai_builtin_tools() -> None:
     from agents.tool import WebSearchTool
 
     wrapper = MagicMock()
@@ -76,14 +76,14 @@ def test_wrap_tool_openai_builtin_tools():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_smolagents():
+def test_wrap_tool_smolagents() -> None:
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
         wrap_tool_smolagents(foo)
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_smolagents_already_wrapped():
+def test_wrap_tool_smolagents_already_wrapped() -> None:
     from smolagents import tool
 
     wrapped = tool(foo)
@@ -93,7 +93,7 @@ def test_wrap_tool_smolagents_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_smolagents_builtin_tools():
+def test_wrap_tool_smolagents_builtin_tools() -> None:
     from smolagents import DuckDuckGoSearchTool
 
     wrapper = MagicMock()
@@ -102,7 +102,7 @@ def test_wrap_tool_smolagents_builtin_tools():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_google():
+def test_wrap_tool_google() -> None:
     from google.adk.tools import FunctionTool
 
     wrapper = MagicMock()
@@ -113,7 +113,7 @@ def test_wrap_tool_google():
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_google_already_wrapped():
+def test_wrap_tool_google_already_wrapped() -> None:
     from google.adk.tools import FunctionTool
 
     wrapper = MagicMock()
@@ -125,7 +125,7 @@ def test_wrap_tool_google_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_google_builtin_tools():
+def test_wrap_tool_google_builtin_tools() -> None:
     from google.adk.tools import FunctionTool, google_search
 
     wrapper = MagicMock()

@@ -1,14 +1,20 @@
 import importlib
-from typing import Any, Optional, List
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any, cast
 
-from any_agent.config import AgentFramework, AgentConfig
-from any_agent.logging import logger
+from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.logging import logger
+from any_agent.tools.mcp import MCPServerBase
 from any_agent.tools.wrappers import import_and_wrap_tools
 
+if TYPE_CHECKING:
+    from langchain_core.language_models import LanguageModelLike
+
 try:
-    from langgraph.prebuilt import create_react_agent
+    from langchain_core.language_models import LanguageModelLike
     from langgraph.graph.graph import CompiledGraph
+    from langgraph.prebuilt import create_react_agent
     from langgraph_swarm import create_handoff_tool, create_swarm
 
     langchain_available = True
@@ -23,32 +29,36 @@ class LangchainAgent(AnyAgent):
     """LangChain agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
     ):
         if not langchain_available:
             raise ImportError(
-                "You need to `pip install 'any-agent[langchain]'` to use this agent"
+                "You need to `pip install 'any-agent[langchain]'` to use this agent",
             )
         self.managed_agents = managed_agents
         self.config = config
-        self._agent = None
+        self._agent: CompiledGraph | None = None
         # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph,
         # so we'll store a list of them in this class
-        self._tools = []
-        self._mcp_servers = None
+        self._tools: Sequence[Tool] = []
+        self._mcp_servers: Sequence[MCPServerBase] | None = None
 
-    def _get_model(self, agent_config: AgentConfig):
+    def _get_model(self, agent_config: AgentConfig) -> str | LanguageModelLike:
         """Get the model configuration for a LangChain agent."""
         if not agent_config.model_type:
             agent_config.model_type = DEFAULT_MODEL_CLASS
         module, class_name = agent_config.model_type.split(".")
         model_type = getattr(importlib.import_module(module), class_name)
 
-        return model_type(model=agent_config.model_id, **agent_config.model_args or {})
+        return cast(
+            str | LanguageModelLike,
+            model_type(model=agent_config.model_id, **agent_config.model_args or {}),
+        )
 
     async def _load_agent(self) -> None:
         """Load the LangChain agent with the given configuration."""
-
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
                 "any_agent.tools.search_web",
@@ -56,7 +66,8 @@ class LangchainAgent(AnyAgent):
             ]
 
         imported_tools, mcp_servers = await import_and_wrap_tools(
-            self.config.tools, agent_framework=AgentFramework.LANGCHAIN
+            self.config.tools,
+            agent_framework=AgentFramework.LANGCHAIN,
         )
         self._mcp_servers = mcp_servers
 
@@ -69,19 +80,20 @@ class LangchainAgent(AnyAgent):
             managed_names = []
             for n, managed_agent in enumerate(self.managed_agents):
                 managed_tools, managed_mcp_servers = await import_and_wrap_tools(
-                    managed_agent.tools, agent_framework=AgentFramework.LANGCHAIN
+                    managed_agent.tools,
+                    agent_framework=AgentFramework.LANGCHAIN,
                 )
                 managed_tools.extend(
                     [
                         tool
                         for mcp_server in managed_mcp_servers
                         for tool in mcp_server.tools
-                    ]
+                    ],
                 )
                 name = managed_agent.name
                 if not name or name == "any_agent":
                     logger.warning(
-                        "Overriding name for managed_agent. Can't use the default."
+                        "Overriding name for managed_agent. Can't use the default.",
                     )
                     name = f"managed_agent_{n}"
                 managed_names.append(name)
@@ -110,10 +122,10 @@ class LangchainAgent(AnyAgent):
             )
             swarm.append(main_agent)
             workflow = create_swarm(swarm, default_active_agent=self.config.name)
-            self._agent: CompiledGraph = workflow.compile()
+            self._agent = workflow.compile()
             self._tools = imported_tools
         else:
-            self._agent: CompiledGraph = create_react_agent(
+            self._agent = create_react_agent(
                 name=self.config.name,
                 model=self._get_model(self.config),
                 tools=imported_tools,
@@ -125,13 +137,12 @@ class LangchainAgent(AnyAgent):
     async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
         inputs = {"messages": [("user", prompt)]}
-        result = await self._agent.ainvoke(inputs)
+        result = await self._agent.ainvoke(inputs)  # type: ignore[union-attr]
         return result
 
     @property
-    def tools(self) -> List[str]:
-        """
-        Return the tools used by the agent.
+    def tools(self) -> list[Tool]:
+        """Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
-        return self._tools
+        return list(self._tools)

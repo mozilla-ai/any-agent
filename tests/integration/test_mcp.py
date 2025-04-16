@@ -1,8 +1,10 @@
 import os
 import tempfile as tmpfile
+from typing import Any
+
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 
 frameworks = [item for item in AgentFramework]
 
@@ -15,9 +17,9 @@ frameworks = [item for item in AgentFramework]
     os.environ.get("MCP_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `MCP_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_mcp(framework):
+def test_mcp(framework: AgentFramework) -> None:
     agent_framework = AgentFramework(framework)
-    kwargs = {}
+    kwargs: dict[str, Any] = {}
 
     tmp_dir = tmpfile.mkdtemp()
     tools = [
@@ -40,7 +42,7 @@ def test_mcp(framework):
     ]
     agent_config = AgentConfig(
         model_id="gpt-4o",
-        tools=tools,
+        tools=tools,  # type: ignore[arg-type]
         **kwargs,
     )
     agent = AnyAgent.create(agent_framework, agent_config)
@@ -49,7 +51,7 @@ def test_mcp(framework):
     # Check if the file was created
     assert os.path.exists(os.path.join(tmp_dir, "tmp.txt"))
     # Check if the content is correct
-    with open(os.path.join(tmp_dir, "tmp.txt"), "r") as f:
+    with open(os.path.join(tmp_dir, "tmp.txt")) as f:
         content = f.read()
     assert content == "hi"
     assert result

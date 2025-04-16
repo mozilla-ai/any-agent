@@ -5,9 +5,8 @@ import rich.console
 
 
 @pytest.fixture(scope="function")
-def refresh_tools():
-    """
-    smolagents tool wrapping hacks the original function signature
+def refresh_tools() -> None:
+    """Smolagents tool wrapping hacks the original function signature
     of the tool that you pass.
     That causes that a tool already wrapped in the same python
     process will fail the second time you try to wrap it.
@@ -23,10 +22,13 @@ def refresh_tools():
 
 
 @pytest.fixture(autouse=True)
-def disable_rich_console(monkeypatch, pytestconfig):
+def disable_rich_console(
+    monkeypatch: pytest.MonkeyPatch,
+    pytestconfig: pytest.Config,
+) -> None:
     original_init = rich.console.Console.__init__
 
-    def quiet_init(self, *args, **kwargs):
+    def quiet_init(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
         if pytestconfig.option.capture != "no":
             kwargs["quiet"] = True
         original_init(self, *args, **kwargs)

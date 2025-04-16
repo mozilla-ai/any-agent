@@ -1,8 +1,9 @@
 import os
+from pathlib import Path
 
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tracing import setup_tracing
 
 frameworks = [item for item in AgentFramework]
@@ -13,7 +14,8 @@ frameworks = [item for item in AgentFramework]
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_agent(framework, tmp_path, refresh_tools):
+@pytest.mark.usefixtures("refresh_tools")
+def test_load_and_run_agent(framework: AgentFramework, tmp_path: Path) -> None:
     agent_framework = AgentFramework(framework)
     kwargs = {}
 
@@ -33,7 +35,7 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
         tools=["any_agent.tools.search_web"],
         instructions="Search the web to answer",
         model_args={"parallel_tool_calls": False} if framework != "agno" else None,
-        **kwargs,
+        **kwargs,  # type: ignore[arg-type]
     )
     agent = AnyAgent.create(agent_framework, agent_config)
     result = agent.run("Which agent framework is the best?")

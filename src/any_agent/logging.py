@@ -1,4 +1,5 @@
 import logging
+
 from rich.logging import RichHandler
 
 logger = logging.getLogger("any_agent")

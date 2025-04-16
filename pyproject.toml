@@ -101,3 +101,8 @@ namespaces = false
 disable = [
     "import-outside-toplevel",
 ]
+
+[tool.mypy]
+strict = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true

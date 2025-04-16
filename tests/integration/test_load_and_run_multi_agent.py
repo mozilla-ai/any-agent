@@ -1,19 +1,22 @@
 import os
+from pathlib import Path
 
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tracing import setup_tracing
 
 
 @pytest.mark.parametrize(
-    "framework", ("google", "openai", "langchain", "smolagents", "llama_index")
+    "framework",
+    ("google", "openai", "langchain", "smolagents", "llama_index"),
 )
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
+@pytest.mark.usefixtures("refresh_tools")
+def test_load_and_run_multi_agent(framework: str, tmp_path: Path) -> None:
     agent_framework = AgentFramework(framework)
     kwargs = {}
     if framework == "smolagents":
@@ -30,7 +33,7 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
         instructions="Use the available agents to complete the task.",
         description="The orchestrator that can use other agents.",
         model_args={"parallel_tool_calls": False},
-        **kwargs,
+        **kwargs,  # type: ignore[arg-type]
     )
     managed_agents = [
         AgentConfig(

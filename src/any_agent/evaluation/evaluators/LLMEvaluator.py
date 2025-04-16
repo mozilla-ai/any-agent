@@ -1,12 +1,13 @@
-from abc import ABC
 import json
 import re
-from typing import Dict, List, Any, Optional, Union
+from abc import ABC
+from collections.abc import Sequence
 from textwrap import dedent
 
 from litellm import completion
+
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
-from any_agent.evaluation.test_case import CheckpointCriteria
+from any_agent.evaluation.test_case import CheckpointCriteria, GroundTruthAnswer
 
 
 class LLMEvaluator(ABC):
@@ -19,14 +20,13 @@ class LLMEvaluator(ABC):
         self,
         criteria: str,
         points: int,
-        ground_truth_output: Optional[
-            Union[List[CheckpointCriteria], Dict[str, Any]]
-        ] = None,
-        hypothesis_final_answer: Optional[str] = None,
-        evidence: Optional[str] = None,
+        ground_truth_output: Sequence[CheckpointCriteria]
+        | Sequence[GroundTruthAnswer]
+        | None = None,
+        hypothesis_final_answer: str | None = None,
+        evidence: str | None = None,
     ) -> EvaluationResult:
         """Evaluate a single criterion using LLM"""
-
         prompt = dedent(f"""
         Evaluate if the following criterion was met {"based on the provided evidence" if evidence else "in the agent's answer"}.
 
@@ -66,14 +66,17 @@ class LLMEvaluator(ABC):
         """
 
         response = completion(
-            model=self.model, messages=[{"role": "user", "content": prompt}]
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
         )
         content = response.choices[0].message.content
 
         try:
             # Extract JSON from the response - looks for patterns like ```json {...} ``` or just {...}
             json_match = re.search(
-                r"```(?:json)?\s*(\{.*?\})\s*```|(\{.*?\})", content, re.DOTALL
+                r"```(?:json)?\s*(\{.*?\})\s*```|(\{.*?\})",
+                content,
+                re.DOTALL,
             )
 
             if json_match:
@@ -88,7 +91,7 @@ class LLMEvaluator(ABC):
         except (json.JSONDecodeError, AttributeError, StopIteration) as e:
             evaluation = {
                 "passed": False,
-                "reason": f"Failed to evaluate due to parsing: {str(e)} \n Response: {content}",
+                "reason": f"Failed to evaluate due to parsing: {e!s} \n Response: {content}",
                 "criteria": criteria,
             }
         evaluation["points"] = points
