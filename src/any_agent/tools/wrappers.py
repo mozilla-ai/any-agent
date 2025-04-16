@@ -1,6 +1,6 @@
-import importlib
 import inspect
 from collections.abc import Callable
+from functools import wraps
 
 from any_agent.config import AgentFramework, MCPTool
 from any_agent.tools.mcp import (
@@ -36,7 +36,12 @@ def wrap_tool_smolagents(tool):
     from smolagents import tool as smolagents_tool
 
     if not isinstance(tool, Tool):
-        return smolagents_tool(tool)
+        # this wrapping needed until https://github.com/huggingface/smolagents/pull/1203 is merged and released
+        @wraps(tool)
+        def wrapped_function(*args, **kwargs):
+            return tool(*args, **kwargs)
+
+        return smolagents_tool(wrapped_function)
     return tool
 
 
@@ -100,8 +105,33 @@ WRAPPERS = {
 }
 
 
-async def import_and_wrap_tools(
-    tools: list[str | dict], agent_framework: AgentFramework
+def verify_callable(tool: Callable) -> None:
+    """
+    Verify a few things about the callable:
+    - It needs to have some sort of docstring that describes what it does
+    - It needs to have typed argument
+    - It needs to have a typed return
+
+    We need these things because this info gets provided to the agent so that they know how and when to call the tool.
+    """
+    signature = inspect.signature(tool)
+    if not tool.__doc__:
+        msg = f"Tool {tool} needs to have a docstring but does not"
+        raise ValueError(msg)
+
+    # Check if the function has a return type
+    if signature.return_annotation is inspect.Signature.empty:
+        msg = f"Tool {tool} needs to have a return type but does not"
+        raise ValueError(msg)
+    # Check if all parameters have type annotations
+    for param in signature.parameters.values():
+        if param.annotation is inspect.Signature.empty:
+            msg = f"Tool {tool} needs to have typed arguments but does not"
+            raise ValueError(msg)
+
+
+async def wrap_tools(
+    tools: list[Callable, MCPTool], agent_framework: AgentFramework
 ) -> tuple[list[Callable], list[MCPServerBase]]:
     wrapper = WRAPPERS[agent_framework]
 
@@ -114,14 +144,8 @@ async def import_and_wrap_tools(
             # tools can be used as any other callable.
             mcp_server = await wrap_mcp_server(tool, agent_framework)
             mcp_servers.append(mcp_server)
-        elif isinstance(tool, str):
-            module, func = tool.rsplit(".", 1)
-            module = importlib.import_module(module)
-            imported_tool = getattr(module, func)
-            if inspect.isclass(imported_tool):
-                imported_tool = imported_tool()
-            wrapped_tools.append(wrapper(imported_tool))
         elif callable(tool):
+            verify_callable(tool)
             wrapped_tools.append(wrapper(tool))
         else:
             msg = f"Tool {tool} needs to be of type `MCPTool`, `str` or `callable` but is {type(tool)}"

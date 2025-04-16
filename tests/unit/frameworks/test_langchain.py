@@ -60,12 +60,13 @@ def test_load_langchain_multiagent():
         main_agent = AgentConfig(
             model_id="o3-mini",
         )
+
         managed_agents = [
             AgentConfig(
                 model_id="gpt-4o",
                 tools=[
-                    "any_agent.tools.search_web",
-                    "any_agent.tools.visit_webpage",
+                    search_web,
+                    visit_webpage,
                 ],
             ),
         ]

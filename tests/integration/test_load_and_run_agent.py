@@ -3,6 +3,7 @@ import os
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.tools import search_web
 from any_agent.tracing import setup_tracing
 
 frameworks = list(AgentFramework)
@@ -13,7 +14,7 @@ frameworks = list(AgentFramework)
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_agent(framework, tmp_path, refresh_tools):
+def test_load_and_run_agent(framework, tmp_path):
     agent_framework = AgentFramework(framework)
     kwargs = {}
 
@@ -30,7 +31,7 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
         setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     agent_config = AgentConfig(
-        tools=["any_agent.tools.search_web"],
+        tools=[search_web],
         instructions="Search the web to answer",
         model_args={"parallel_tool_calls": False} if framework != "agno" else None,
         **kwargs,

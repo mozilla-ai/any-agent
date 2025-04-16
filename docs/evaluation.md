@@ -23,10 +23,10 @@ with user defined criteria. The steps for evaluating an agent are as follows:
 ```python
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tracing import setup_tracing
-
+from any_agent.tools import search_web
 main_agent = AgentConfig(
 	model_id="gpt-4o-mini",
-    tools=["any_agent.tools.search_web"]
+    tools=[search_web]
 )
 framework=AgentFramework("langchain")
 tracing_path = setup_tracing(framework, "output")

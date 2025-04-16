@@ -3,6 +3,7 @@ import os
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.tools import search_web, show_final_answer, visit_webpage
 from any_agent.tracing import setup_tracing
 
 
@@ -13,7 +14,7 @@ from any_agent.tracing import setup_tracing
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
+def test_load_and_run_multi_agent(framework, tmp_path):
     agent_framework = AgentFramework(framework)
     kwargs = {}
     if framework == "smolagents":
@@ -32,18 +33,19 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
         model_args={"parallel_tool_calls": False},
         **kwargs,
     )
+
     managed_agents = [
         AgentConfig(
             name="search_web_agent",
             model_id="gpt-4.1-nano",
             description="Agent that can search the web",
-            tools=["any_agent.tools.search_web"],
+            tools=[search_web],
         ),
         AgentConfig(
             name="visit_webpage_agent",
             model_id="gpt-4.1-nano",
             description="Agent that can visit webpages",
-            tools=["any_agent.tools.visit_webpage"],
+            tools=[visit_webpage],
         ),
     ]
     if framework != "smolagents":
@@ -52,7 +54,7 @@ def test_load_and_run_multi_agent(framework, tmp_path, refresh_tools):
                 name="final_answer_agent",
                 model_id="gpt-4.1-nano",
                 description="Agent that can show the final answer",
-                tools=["any_agent.tools.show_final_answer"],
+                tools=[show_final_answer],
                 handoff=True,
             ),
         )

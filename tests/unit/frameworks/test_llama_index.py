@@ -60,12 +60,13 @@ def test_load_langchain_multiagent():
         patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
         main_agent = AgentConfig(model_id="gpt-4.1-mini", description="Main agent")
+
         managed_agents = [
             AgentConfig(
                 model_id="gpt-4.1-nano",
                 tools=[
-                    "any_agent.tools.search_web",
-                    "any_agent.tools.visit_webpage",
+                    search_web,
+                    visit_webpage,
                 ],
                 description="Managed agent",
             ),

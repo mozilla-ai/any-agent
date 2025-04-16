@@ -4,7 +4,8 @@ from typing import Any
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
-from any_agent.tools.wrappers import import_and_wrap_tools
+from any_agent.tools import search_web, visit_webpage
+from any_agent.tools.wrappers import wrap_tools
 
 try:
     from agents import (
@@ -61,17 +62,17 @@ class OpenAIAgent(AnyAgent):
 
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
-                "any_agent.tools.search_web",
-                "any_agent.tools.visit_webpage",
+                search_web,
+                visit_webpage,
             ]
-        tools, mcp_servers = await import_and_wrap_tools(
+        tools, mcp_servers = await wrap_tools(
             self.config.tools, agent_framework=AgentFramework.OPENAI
         )
 
         handoffs = []
         if self.managed_agents:
             for managed_agent in self.managed_agents:
-                managed_tools, managed_mcp_servers = await import_and_wrap_tools(
+                managed_tools, managed_mcp_servers = await wrap_tools(
                     managed_agent.tools, agent_framework=AgentFramework.OPENAI
                 )
                 kwargs = {}
