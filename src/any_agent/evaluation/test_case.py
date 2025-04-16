@@ -24,7 +24,7 @@ class TestCase(BaseModel):
     @classmethod
     def from_yaml(cls, test_case_path: str) -> "TestCase":
         """Load a test case from a YAML file and process it"""
-        with open(test_case_path, "r") as f:
+        with open(test_case_path, "r", encoding="utf-8") as f:
             test_case_dict = yaml.safe_load(f)
         final_answer_criteria = []
 

@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent.config import AgentFramework, AgentConfig, AnyAgent
 from any_agent.tracing import setup_tracing
 
 frameworks = [item for item in AgentFramework]

@@ -2,7 +2,7 @@ import os
 import tempfile as tmpfile
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent.config import AgentFramework, AgentConfig, AnyAgent
 
 frameworks = [item for item in AgentFramework]
 
@@ -49,7 +49,7 @@ def test_mcp(framework):
     # Check if the file was created
     assert os.path.exists(os.path.join(tmp_dir, "tmp.txt"))
     # Check if the content is correct
-    with open(os.path.join(tmp_dir, "tmp.txt"), "r") as f:
+    with open(os.path.join(tmp_dir, "tmp.txt"), "r", encoding="utf-8") as f:
         content = f.read()
     assert content == "hi"
     assert result

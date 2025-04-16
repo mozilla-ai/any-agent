@@ -2,7 +2,7 @@ import os
 import pytest
 from unittest.mock import patch, MagicMock
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent.config import AgentFramework, AgentConfig, AnyAgent
 from any_agent.frameworks.smolagents import (
     DEFAULT_AGENT_TYPE,
     DEFAULT_MODEL_CLASS,
@@ -52,10 +52,10 @@ def test_load_smolagent_with_api_base_and_api_key_var():
             AgentFramework.SMOLAGENTS,
             AgentConfig(
                 model_id="openai/o3-mini",
-                model_args=dict(
-                    api_base="https://custom-api.example.com",
-                    api_key_var="OPENAI_API_KEY",
-                ),
+                model_args={
+                    "api_base": "https://custom-api.example.com",
+                    "api_key_var": "OPENAI_API_KEY",
+                },
             ),
         )
 

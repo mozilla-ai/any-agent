@@ -1,7 +1,8 @@
 import importlib
 from typing import Optional, List
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent.config import AgentFramework, AgentConfig
+from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
 

@@ -2,7 +2,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent.config import AgentFramework, AgentConfig, AnyAgent
 from any_agent.tools import (
     search_web,
     show_final_answer,

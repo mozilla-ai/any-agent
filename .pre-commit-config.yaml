@@ -20,6 +20,17 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
+
+  - repo: https://github.com/pycqa/pylint
+    # Cannot be replaced by ruff until https://github.com/astral-sh/ruff/issues/970 is closed
+    rev: "v3.3.4"
+    hooks:
+      - id: pylint
+        additional_dependencies:
+          - pylint-pydantic
+          - any-agent[dev, all]
+          - mktestdocs
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:

@@ -9,12 +9,11 @@ from requests.exceptions import RequestException
 def _truncate_content(content: str, max_length: int) -> str:
     if len(content) <= max_length:
         return content
-    else:
-        return (
-            content[: max_length // 2]
-            + f"\n..._This content has been truncated to stay below {max_length} characters_...\n"
-            + content[-max_length // 2 :]
-        )
+    return (
+        content[: max_length // 2]
+        + f"\n..._This content has been truncated to stay below {max_length} characters_...\n"
+        + content[-max_length // 2 :]
+    )
 
 
 def search_web(query: str) -> str:
@@ -40,7 +39,7 @@ def visit_webpage(url: str) -> str:
         url: The url of the webpage to visit.
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         response.raise_for_status()
 
         markdown_content = markdownify(response.text).strip()

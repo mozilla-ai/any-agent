@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 import json
-from any_agent import AgentFramework
+from any_agent.config import AgentFramework
 from langchain_core.messages import BaseMessage
 
 
@@ -65,7 +65,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
             try:
                 input_value = json.loads(attributes["input.value"])
                 tool_info["input"] = input_value
-            except Exception:
+            except json.JSONDecodeError:
                 tool_info["input"] = attributes["input.value"]
 
         if "output.value" in attributes:
@@ -81,7 +81,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                         tool_info["output"] = parsed_output
                 else:
                     tool_info["output"] = output_value
-            except Exception:
+            except json.JSONDecodeError:
                 tool_info["output"] = attributes["output.value"]
 
         return tool_info
@@ -113,7 +113,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                         chain_info["input"] = input_data
                 else:
                     chain_info["input"] = input_data
-            except Exception:
+            except json.JSONDecodeError:
                 chain_info["input"] = attributes["input.value"]
 
         # Extract output from the chain
@@ -134,7 +134,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                         chain_info["output"] = output_data["messages"]
                 else:
                     chain_info["output"] = output_data
-            except Exception:
+            except json.JSONDecodeError:
                 chain_info["output"] = attributes["output.value"]
 
         return chain_info
@@ -167,7 +167,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                         agent_info["input"] = input_data
                 else:
                     agent_info["input"] = input_data
-            except Exception:
+            except json.JSONDecodeError:
                 agent_info["input"] = attributes["input.value"]
 
         # Extract direct LLM input if available
@@ -194,7 +194,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                         agent_info["output"] = output_data
                 else:
                     agent_info["output"] = output_data
-            except Exception:
+            except json.JSONDecodeError:
                 agent_info["output"] = attributes["output.value"]
 
         # Extract metadata if available
@@ -202,7 +202,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
             try:
                 metadata = json.loads(attributes["metadata"])
                 agent_info["metadata"] = metadata
-            except Exception:
+            except json.JSONDecodeError:
                 agent_info["metadata"] = attributes["metadata"]
 
         return agent_info

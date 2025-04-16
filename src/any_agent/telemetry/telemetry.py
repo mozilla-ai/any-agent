@@ -3,7 +3,7 @@ import re
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, ClassVar
 
-from any_agent import AgentFramework
+from any_agent.config import AgentFramework
 from any_agent.logging import logger
 
 
@@ -67,17 +67,14 @@ class TelemetryProcessor(ABC):
     @abstractmethod
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         """Extract the hypothesis agent final answer from the trace."""
-        pass
 
     @abstractmethod
     def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> List[Dict]:
         """Extract the agent-specific data from telemetry."""
-        pass
 
     @abstractmethod
     def extract_interaction(self, span: Dict[str, Any]) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
-        pass
 
     def extract_evidence(self, telemetry: List[Dict[str, Any]]) -> str:
         """Extract relevant telemetry evidence."""
@@ -109,7 +106,6 @@ class TelemetryProcessor(ABC):
     @abstractmethod
     def _get_agent_framework(self) -> AgentFramework:
         """Get the agent type associated with this processor."""
-        pass
 
     @staticmethod
     def parse_generic_key_value_string(text: str) -> Dict[str, str]:

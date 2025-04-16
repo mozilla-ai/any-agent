@@ -99,5 +99,30 @@ namespaces = false
 
 [tool.pylint.messages_control]
 disable = [
-    "import-outside-toplevel",
+  "missing-module-docstring",
+  "missing-function-docstring",
+  "missing-class-docstring",
+  "import-outside-toplevel",
+  "line-too-long",
+  "duplicate-code",
+  "ungrouped-imports",
 ]
+
+[tool.pylint.main]
+fail-on = ["I"]
+fail-under = 10
+load-plugins = [
+  "pylint.extensions.mccabe",
+]
+
+[tool.pylint.design]
+max-args = 7
+max-attributes = 7
+max-bool-expr = 5
+max-branches = 12
+max-complexity = 10
+max-locals = 15
+max-parents = 7
+max-public-methods = 20
+max-returns = 6
+max-statements = 50

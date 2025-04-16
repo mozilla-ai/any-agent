@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 
-from any_agent import AgentFramework
+from any_agent.config import AgentFramework
 from any_agent.tools import visit_webpage
 from any_agent.tools.wrappers import import_and_wrap_tools
 
