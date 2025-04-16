@@ -101,3 +101,33 @@ namespaces = false
 disable = [
     "import-outside-toplevel",
 ]
+
+[tool.ruff.lint]
+ignore = [
+  "D",
+  "FBT",
+  "COM",
+  "ANN",
+  "ARG",
+  "S101",
+  "E501",
+  "INP001",
+  "PERF",
+  "PLR",
+  "SIM",
+  "PTH",
+  "DTZ005",
+  "BLE001",
+  "TRY004",
+  "S113",
+  "PLW2901",
+  "C901",
+  "ERA001",
+  "SLF001",
+  "PD901",
+  "PLR0912",
+  "PLR0913",
+  "N999",
+  "B024",
+]
+extend-select = ["ALL"]

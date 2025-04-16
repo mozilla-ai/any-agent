@@ -2,13 +2,13 @@ import os
 
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
-from any_agent.tools import search_web, visit_webpage, show_final_answer
+from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.tools import search_web, show_final_answer, visit_webpage
 from any_agent.tracing import setup_tracing
 
 
 @pytest.mark.parametrize(
-    "framework", ("google", "openai", "langchain", "smolagents", "llama_index")
+    "framework", ["google", "openai", "langchain", "smolagents", "llama_index"]
 )
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",

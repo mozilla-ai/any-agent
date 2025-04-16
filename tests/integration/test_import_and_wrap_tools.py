@@ -1,16 +1,15 @@
 import asyncio
 
 import pytest
-
-from any_agent import AgentFramework
-from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.wrappers import wrap_tools
-
 from agents.tool import Tool as OpenaiClass
 from google.adk.tools import FunctionTool as GoogleClass
 from langchain.tools import BaseTool as LangchainClass
 from llama_index.core.tools import FunctionTool as LlamaindexClass
 from smolagents.tools import Tool as SmolagentsClass
+
+from any_agent import AgentFramework
+from any_agent.tools import search_web, visit_webpage
+from any_agent.tools.wrappers import wrap_tools
 
 
 def wrap_sync(tools, framework):
@@ -21,7 +20,7 @@ def wrap_sync(tools, framework):
 
 
 @pytest.mark.parametrize(
-    "framework,expected_class",
+    ("framework", "expected_class"),
     [
         ("google", GoogleClass),
         ("langchain", LangchainClass),

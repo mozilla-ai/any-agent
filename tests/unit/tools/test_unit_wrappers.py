@@ -11,7 +11,6 @@ from any_agent.tools.wrappers import (
 
 def foo() -> None:
     """Print bar."""
-    print("bar")
 
 
 def test_wrap_tool_langchain():

@@ -1,9 +1,9 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from any_agent.tracing import _get_tracer_provider, setup_tracing
 from any_agent.config import AgentFramework, TracingConfig
+from any_agent.tracing import _get_tracer_provider, setup_tracing
 
 
 def test_get_tracer_provider(tmp_path):

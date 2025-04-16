@@ -1,8 +1,7 @@
 import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-
 
 from any_agent.config import AgentFramework, TracingConfig
 from any_agent.tracing import RichConsoleSpanExporter

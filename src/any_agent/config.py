@@ -1,7 +1,7 @@
+from collections.abc import Callable
 from enum import Enum
-from typing import Callable
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AgentFramework(str, Enum):

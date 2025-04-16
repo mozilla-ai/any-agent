@@ -1,11 +1,11 @@
-from typing import Optional, Any, List
+from typing import Any
 from uuid import uuid4
 
-from any_agent.config import AgentFramework, AgentConfig
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
-from any_agent.tools.wrappers import wrap_tools
 from any_agent.tools import search_web, visit_webpage
+from any_agent.tools.wrappers import wrap_tools
 
 try:
     from google.adk.agents import Agent
@@ -23,12 +23,11 @@ class GoogleAgent(AnyAgent):
     """Google agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
+        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
     ):
         if not adk_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[google]'` to use this agent"
-            )
+            msg = "You need to `pip install 'any-agent[google]'` to use this agent"
+            raise ImportError(msg)
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
@@ -118,7 +117,7 @@ class GoogleAgent(AnyAgent):
         return session.state.get("response", None)
 
     @property
-    def tools(self) -> List[str]:
+    def tools(self) -> list[str]:
         """
         Return the tools used by the agent.
         This property is read-only and cannot be modified.
