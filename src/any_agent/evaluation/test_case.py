@@ -15,8 +15,9 @@ class CheckpointCriteria(BaseModel):
 
 
 class GroundTruthAnswer(TypedDict):
-    value: str
     name: str
+    value: float
+    points: float
 
 
 class TestCase(BaseModel):

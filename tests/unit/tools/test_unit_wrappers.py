@@ -158,7 +158,7 @@ def test_bad_functions(framework: AgentFramework) -> None:
     """Test the verify_callable function with various bad functions."""
 
     # Test missing return type
-    def missing_return_type(foo: str) -> str:
+    def missing_return_type(foo: str):  # type: ignore[no-untyped-def]
         """Docstring for foo."""
         return foo
 
@@ -173,9 +173,9 @@ def test_bad_functions(framework: AgentFramework) -> None:
         asyncio.run(wrap_tools([missing_docstring], framework))
 
     # Test missing parameter type
-    def missing_param_type(foo: str) -> str:
+    def missing_param_type(foo) -> str:  # type: ignore[no-untyped-def]
         """Docstring for foo."""
-        return foo
+        return foo  # type: ignore[no-any-return]
 
     with pytest.raises(ValueError, match="typed arguments"):
         asyncio.run(wrap_tools([missing_param_type], framework))
