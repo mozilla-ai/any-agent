@@ -1,3 +1,4 @@
+import inspect
 from collections.abc import Callable
 from functools import wraps
 
@@ -104,6 +105,31 @@ WRAPPERS = {
 }
 
 
+def verify_callable(tool: Callable) -> None:
+    """
+    Verify a few things about the callable:
+    - It needs to have some sort of docstring that describes what it does
+    - It needs to have typed argument
+    - It needs to have a typed return
+
+    We need these things because this info gets provided to the agent so that they know how and when to call the tool.
+    """
+    signature = inspect.signature(tool)
+    if not tool.__doc__:
+        msg = f"Tool {tool} needs to have a docstring but does not"
+        raise ValueError(msg)
+
+    # Check if the function has a return type
+    if signature.return_annotation is inspect.Signature.empty:
+        msg = f"Tool {tool} needs to have a return type but does not"
+        raise ValueError(msg)
+    # Check if all parameters have type annotations
+    for param in signature.parameters.values():
+        if param.annotation is inspect.Signature.empty:
+            msg = f"Tool {tool} needs to have typed arguments but does not"
+            raise ValueError(msg)
+
+
 async def wrap_tools(
     tools: list[Callable, MCPTool], agent_framework: AgentFramework
 ) -> tuple[list[Callable], list[MCPServerBase]]:
@@ -119,6 +145,7 @@ async def wrap_tools(
             mcp_server = await wrap_mcp_server(tool, agent_framework)
             mcp_servers.append(mcp_server)
         elif callable(tool):
+            verify_callable(tool)
             wrapped_tools.append(wrapper(tool))
         else:
             msg = f"Tool {tool} needs to be of type `MCPTool`, `str` or `callable` but is {type(tool)}"
