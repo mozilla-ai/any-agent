@@ -1,7 +1,7 @@
 import os
-from typing import Optional, Any, List
+from typing import Any
 
-from any_agent.config import AgentFramework, AgentConfig
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools.wrappers import import_and_wrap_tools
 
@@ -21,12 +21,11 @@ class SmolagentsAgent(AnyAgent):
     """Smolagents agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
+        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
     ):
         if not smolagents_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[smolagents]'` to use this agent"
-            )
+            msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
+            raise ImportError(msg)
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
@@ -109,11 +108,10 @@ class SmolagentsAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
-        result = self._agent.run(prompt)
-        return result
+        return self._agent.run(prompt)
 
     @property
-    def tools(self) -> List[str]:
+    def tools(self) -> list[str]:
         """
         Return the tools used by the agent.
         This property is read-only and cannot be modified.

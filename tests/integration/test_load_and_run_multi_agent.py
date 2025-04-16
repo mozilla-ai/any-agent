@@ -2,12 +2,12 @@ import os
 
 import pytest
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tracing import setup_tracing
 
 
 @pytest.mark.parametrize(
-    "framework", ("google", "openai", "langchain", "smolagents", "llama_index")
+    "framework", ["google", "openai", "langchain", "smolagents", "llama_index"]
 )
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",

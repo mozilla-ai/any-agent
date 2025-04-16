@@ -1,14 +1,16 @@
 import importlib
-from typing import Any, Optional, List
+from typing import TYPE_CHECKING, Any
 
-from any_agent.config import AgentFramework, AgentConfig
-from any_agent.logging import logger
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.logging import logger
 from any_agent.tools.wrappers import import_and_wrap_tools
+
+if TYPE_CHECKING:
+    from langgraph.graph.graph import CompiledGraph
 
 try:
     from langgraph.prebuilt import create_react_agent
-    from langgraph.graph.graph import CompiledGraph
     from langgraph_swarm import create_handoff_tool, create_swarm
 
     langchain_available = True
@@ -23,12 +25,11 @@ class LangchainAgent(AnyAgent):
     """LangChain agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: Optional[list[AgentConfig]] = None
+        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
     ):
         if not langchain_available:
-            raise ImportError(
-                "You need to `pip install 'any-agent[langchain]'` to use this agent"
-            )
+            msg = "You need to `pip install 'any-agent[langchain]'` to use this agent"
+            raise ImportError(msg)
         self.managed_agents = managed_agents
         self.config = config
         self._agent = None
@@ -89,8 +90,10 @@ class LangchainAgent(AnyAgent):
                 managed_agent = create_react_agent(
                     name=name,
                     model=self._get_model(managed_agent),
-                    tools=managed_tools
-                    + [create_handoff_tool(agent_name=self.config.name)],
+                    tools=[
+                        *managed_tools,
+                        create_handoff_tool(agent_name=self.config.name),
+                    ],
                     prompt=managed_agent.instructions,
                     **managed_agent.agent_args or {},
                 )
@@ -125,11 +128,10 @@ class LangchainAgent(AnyAgent):
     async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
         inputs = {"messages": [("user", prompt)]}
-        result = await self._agent.ainvoke(inputs)
-        return result
+        return await self._agent.ainvoke(inputs)
 
     @property
-    def tools(self) -> List[str]:
+    def tools(self) -> list[str]:
         """
         Return the tools used by the agent.
         This property is read-only and cannot be modified.

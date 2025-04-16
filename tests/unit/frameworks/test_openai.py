@@ -1,12 +1,13 @@
 import os
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from any_agent import AgentFramework, AgentConfig, AnyAgent
+import pytest
+
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import (
-    show_final_answer,
     ask_user_verification,
     search_web,
+    show_final_answer,
     visit_webpage,
 )
 
@@ -48,7 +49,7 @@ def test_openai_with_api_base_and_api_key_var():
             AgentFramework.OPENAI,
             AgentConfig(
                 model_id="gpt-4o",
-                model_args=dict(base_url="FOO", api_key_var="TEST_API_KEY"),
+                model_args={"base_url": "FOO", "api_key_var": "TEST_API_KEY"},
             ),
         )
 
@@ -66,7 +67,7 @@ def test_openai_environment_error():
                 AgentFramework.OPENAI,
                 AgentConfig(
                     model_id="gpt-4o",
-                    model_args=dict(base_url="FOO", api_key_var="MISSING_KEY"),
+                    model_args={"base_url": "FOO", "api_key_var": "MISSING_KEY"},
                 ),
             )
 

@@ -1,6 +1,6 @@
 from .CheckpointEvaluator import CheckpointEvaluator
-from .QuestionAnsweringSquadEvaluator import QuestionAnsweringSquadEvaluator
 from .HypothesisEvaluator import HypothesisEvaluator
+from .QuestionAnsweringSquadEvaluator import QuestionAnsweringSquadEvaluator
 
 __all__ = [
     "CheckpointEvaluator",
