@@ -129,7 +129,9 @@ def verify_callable(tool: Callable) -> None:
 
 
 async def wrap_tools(
-    tools: list[Callable | MCPStdioParams | MCPSseParams], agent_framework: AgentFramework
+    tools: list[Callable | MCPStdioParams | MCPSseParams],
+    agent_framework: AgentFramework,
+) -> tuple[list[Callable], list[MCPServerBase]]:
     wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = []
