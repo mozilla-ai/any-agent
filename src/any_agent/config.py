@@ -13,9 +13,15 @@ class AgentFramework(str, Enum):
     SMOLAGENTS = "smolagents"
 
 
-class MCPTool(BaseModel):
+class MCPStdioParams(BaseModel):
     command: str
     args: list[str]
+    tools: list[str] | None = None
+
+
+class MCPSseParams(BaseModel):
+    url: str
+    headers: dict[str, str] | None = None
     tools: list[str] | None = None
 
 
@@ -31,7 +37,9 @@ class AgentConfig(BaseModel):
     model_id: str
     name: str = "any_agent"
     instructions: str | None = None
-    tools: list[str | MCPTool | Callable] = Field(default_factory=list)
+    tools: list[str | MCPStdioParams | MCPSseParams | Callable] = Field(
+        default_factory=list
+    )
     handoff: bool = False
     agent_type: str | None = None
     agent_args: dict | None = None

@@ -2,15 +2,15 @@ import inspect
 from collections.abc import Callable
 from functools import wraps
 
-from any_agent.config import AgentFramework, MCPTool
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp import (
-    AgnoMCPServerStdio,
-    GoogleMCPServerStdio,
-    LangchainMCPServerStdio,
-    LlamaIndexMCPServerStdio,
+    AgnoMCPServer,
+    GoogleMCPServer,
+    LangchainMCPServer,
+    LlamaIndexMCPServer,
     MCPServerBase,
-    OpenAIMCPServerStdio,
-    SmolagentsMCPServerStdio,
+    OpenAIMCPServer,
+    SmolagentsMCPServer,
 )
 
 
@@ -67,22 +67,20 @@ def wrap_tool_agno(tool):
 
 
 async def wrap_mcp_server(
-    mcp_tool: MCPTool, agent_framework: AgentFramework
+    mcp_tool: MCPStdioParams | MCPSseParams, agent_framework: AgentFramework
 ) -> MCPServerBase:
     """
     Generic MCP server wrapper that can work with different frameworks
     based on the specified agent_framework
     """
-    # Select the appropriate manager based on agent_framework
     mcp_server_map = {
-        AgentFramework.OPENAI: OpenAIMCPServerStdio,
-        AgentFramework.SMOLAGENTS: SmolagentsMCPServerStdio,
-        AgentFramework.LANGCHAIN: LangchainMCPServerStdio,
-        AgentFramework.GOOGLE: GoogleMCPServerStdio,
-        AgentFramework.LLAMAINDEX: LlamaIndexMCPServerStdio,
-        AgentFramework.AGNO: AgnoMCPServerStdio,
+        AgentFramework.OPENAI: OpenAIMCPServer,
+        AgentFramework.SMOLAGENTS: SmolagentsMCPServer,
+        AgentFramework.LANGCHAIN: LangchainMCPServer,
+        AgentFramework.GOOGLE: GoogleMCPServer,
+        AgentFramework.LLAMAINDEX: LlamaIndexMCPServer,
+        AgentFramework.AGNO: AgnoMCPServer,
     }
-
     if agent_framework not in mcp_server_map:
         msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {mcp_server_map.keys()}"
         raise NotImplementedError(msg)
@@ -131,14 +129,15 @@ def verify_callable(tool: Callable) -> None:
 
 
 async def wrap_tools(
-    tools: list[Callable, MCPTool], agent_framework: AgentFramework
+    tools: list[Callable, MCPStdioParams, MCPSseParams], agent_framework: AgentFramework
 ) -> tuple[list[Callable], list[MCPServerBase]]:
     wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = []
     mcp_servers = []
     for tool in tools:
-        if isinstance(tool, MCPTool):
+        # if it's MCPStdioParams or MCPSseParams, we need to wrap it in a server
+        if isinstance(tool, MCPStdioParams) or isinstance(tool, MCPSseParams):
             # MCP adapters are usually implemented as context managers.
             # We wrap the server using `MCPServerBase` so the
             # tools can be used as any other callable.
@@ -148,7 +147,7 @@ async def wrap_tools(
             verify_callable(tool)
             wrapped_tools.append(wrapper(tool))
         else:
-            msg = f"Tool {tool} needs to be of type `MCPTool`, `str` or `callable` but is {type(tool)}"
+            msg = f"Tool {tool} needs to be of type `MCPStdioParams`, `str` or `callable` but is {type(tool)}"
             raise ValueError(msg)
 
     return wrapped_tools, mcp_servers
