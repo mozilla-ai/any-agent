@@ -1,9 +1,9 @@
 from collections.abc import Sequence
-from typing import TypedDict
 
 import yaml
 from litellm import validate_environment
 from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import TypedDict
 
 
 class CheckpointCriteria(BaseModel):
