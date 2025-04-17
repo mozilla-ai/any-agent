@@ -1,8 +1,9 @@
 import json
 from typing import Any
 
-from any_agent import AgentFramework
-from any_agent.telemetry import TelemetryProcessor
+from any_agent.config import AgentFramework
+
+from .telemetry import TelemetryProcessor
 
 
 class SmolagentsTelemetryProcessor(TelemetryProcessor):

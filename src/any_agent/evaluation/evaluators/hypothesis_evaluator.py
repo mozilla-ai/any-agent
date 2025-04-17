@@ -1,6 +1,6 @@
 from typing import Any
 
-from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
+from any_agent.evaluation.evaluators.llm_evaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.test_case import CheckpointCriteria
 

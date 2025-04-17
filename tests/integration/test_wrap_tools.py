@@ -7,7 +7,7 @@ from langchain.tools import BaseTool as LangchainClass
 from llama_index.core.tools import FunctionTool as LlamaindexClass
 from smolagents.tools import Tool as SmolagentsClass
 
-from any_agent import AgentFramework
+from any_agent.config import AgentFramework
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.wrappers import wrap_tools
 
