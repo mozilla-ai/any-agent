@@ -150,11 +150,7 @@ def test_wrap_tool_google_builtin_tools() -> None:
 frameworks = list(AgentFramework)
 
 
-@pytest.mark.parametrize(
-    "framework",
-    frameworks,
-)
-def test_bad_functions(framework: AgentFramework) -> None:
+def test_bad_functions(agent_framework: AgentFramework) -> None:
     """Test the verify_callable function with various bad functions."""
 
     # Test missing return type
@@ -163,14 +159,14 @@ def test_bad_functions(framework: AgentFramework) -> None:
         return foo
 
     with pytest.raises(ValueError, match="return type"):
-        asyncio.run(wrap_tools([missing_return_type], framework))
+        asyncio.run(wrap_tools([missing_return_type], agent_framework))
 
     # Test missing docstring
     def missing_docstring(foo: str) -> str:
         return foo
 
     with pytest.raises(ValueError, match="docstring"):
-        asyncio.run(wrap_tools([missing_docstring], framework))
+        asyncio.run(wrap_tools([missing_docstring], agent_framework))
 
     # Test missing parameter type
     def missing_param_type(foo) -> str:  # type: ignore[no-untyped-def]
@@ -178,7 +174,7 @@ def test_bad_functions(framework: AgentFramework) -> None:
         return foo  # type: ignore[no-any-return]
 
     with pytest.raises(ValueError, match="typed arguments"):
-        asyncio.run(wrap_tools([missing_param_type], framework))
+        asyncio.run(wrap_tools([missing_param_type], agent_framework))
 
     # Good function should not raise an error
     def good_function(foo: str) -> str:
@@ -190,4 +186,4 @@ def test_bad_functions(framework: AgentFramework) -> None:
         """
         return foo
 
-    asyncio.run(wrap_tools([good_function], framework))
+    asyncio.run(wrap_tools([good_function], agent_framework))

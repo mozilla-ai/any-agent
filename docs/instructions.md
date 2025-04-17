@@ -18,7 +18,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 
 instruction = RECOMMENDED_PROMPT_PREFIX + "\nYou are a helpful assistant that can navigate the web."
 
-framework = AgentFramework("openai")
+framework = "openai"
 
 main_agent = AgentConfig(
     model_id="gpt-4o-mini",

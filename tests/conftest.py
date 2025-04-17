@@ -19,6 +19,6 @@ def disable_rich_console(
     monkeypatch.setattr(rich.console.Console, "__init__", quiet_init)
 
 
-@pytest.fixture(params=AgentFramework)
+@pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
 def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
     return request.param  # type: ignore[no-any-return]

@@ -8,24 +8,22 @@ from any_agent.tools import search_web, show_final_answer, visit_webpage
 from any_agent.tracing import setup_tracing
 
 
-@pytest.mark.parametrize(
-    "framework", ["google", "openai", "langchain", "smolagents", "llama_index"]
-)
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_multi_agent(framework: str, tmp_path: Path) -> None:
-    agent_framework = AgentFramework(framework)
+def test_load_and_run_multi_agent(
+    agent_framework: AgentFramework, tmp_path: Path
+) -> None:
     kwargs = {}
-    if framework == "smolagents":
+    if agent_framework is AgentFramework.SMOLAGENTS:
         kwargs["agent_type"] = "ToolCallingAgent"
 
     kwargs["model_id"] = "gpt-4.1-nano"
     if "OPENAI_API_KEY" not in os.environ:
-        pytest.skip(f"OPENAI_API_KEY needed for {framework}")
+        pytest.skip(f"OPENAI_API_KEY needed for {agent_framework.name}")
 
-    if framework != "google":
+    if agent_framework is not AgentFramework.GOOGLE:
         setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     main_agent = AgentConfig(
@@ -49,7 +47,7 @@ def test_load_and_run_multi_agent(framework: str, tmp_path: Path) -> None:
             tools=[visit_webpage],
         ),
     ]
-    if framework != "smolagents":
+    if agent_framework is not AgentFramework.SMOLAGENTS:
         managed_agents.append(
             AgentConfig(
                 name="final_answer_agent",

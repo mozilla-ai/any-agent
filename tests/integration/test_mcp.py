@@ -6,19 +6,12 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 
-frameworks = list(AgentFramework)
 
-
-@pytest.mark.parametrize(
-    "framework",
-    frameworks,
-)
 @pytest.mark.skipif(
     os.environ.get("MCP_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `MCP_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_mcp(framework: AgentFramework) -> None:
-    agent_framework = AgentFramework(framework)
+def test_mcp(agent_framework: AgentFramework) -> None:
     kwargs: dict[str, Any] = {}
 
     tmp_dir = tmpfile.mkdtemp()

@@ -62,7 +62,7 @@ class JsonFileSpanExporter(SpanExporter):
 
 class RichConsoleSpanExporter(SpanExporter):
     def __init__(self, agent_framework: AgentFramework, tracing_config: TracingConfig):
-        self.processor = TelemetryProcessor.create(agent_framework=agent_framework)
+        self.processor = TelemetryProcessor.create(agent_framework)
         self.console = Console()
         self.tracing_config = tracing_config
 
@@ -131,7 +131,7 @@ def _get_tracer_provider(
 
 
 def setup_tracing(
-    agent_framework: AgentFramework,
+    agent_framework: AgentFramework | str,
     output_dir: str | Path = "traces",
     tracing_config: TracingConfig | None = None,
 ) -> str:
@@ -146,15 +146,16 @@ def setup_tracing(
         str: The name of the JSON file where traces will be stored.
 
     """
+    agent_framework_ = AgentFramework.from_string(agent_framework)
     tracing_config = tracing_config or TracingConfig()
 
     tracer_provider, file_name = _get_tracer_provider(
-        agent_framework,
+        agent_framework_,
         output_dir,
         tracing_config,
     )
 
-    instrumenter = get_instrumenter_by_framework(agent_framework)
+    instrumenter = get_instrumenter_by_framework(agent_framework_)
     instrumenter.instrument(tracer_provider=tracer_provider)
 
     return file_name

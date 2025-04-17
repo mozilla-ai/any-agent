@@ -18,7 +18,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
     ```python
     from any_agent import AnyAgent, AgentConfig
     agent = AnyAgent.create(
-        AgentFramework("google"),
+        "google",
         AgentConfig(
             model_id="gpt-4o-mini"
         )
@@ -32,7 +32,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ```python
     agent = AnyAgent.create(
-        AgentFramework("langchain"),
+        "langchain",
         AgentConfig(
             model_id="gpt-4o-mini"
         )
@@ -46,7 +46,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ```python
     agent = AnyAgent.create(
-        AgentFramework("llama_index"),
+        "llama_index",
         AgentConfig(
             model_id="gpt-4o-mini"
         )
@@ -60,7 +60,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ```python
     agent = AnyAgent.create(
-        AgentFramework("openai"),
+        "openai",
         AgentConfig(
             model_id="gpt-4o-mini"
         )
@@ -74,7 +74,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ```python
     agent = AnyAgent.create(
-        AgentFramework("smolagents"),
+        "smolagents",
         AgentConfig(
             model_id="gpt-4o-mini"
         )
@@ -87,7 +87,7 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
     ```python
     agent = AnyAgent.create(
-        AgentFramework("agno"),
+        "agno",
         AgentConfig(
             model_id="gpt-4o-mini"
         )
@@ -104,7 +104,7 @@ A common usage of `model_args` is to specify a custom `api_base` and/or `api_key
 ```python
 from any_agent import AnyAgent, AgentFramework, AgentConfig
 agent = AnyAgent.create(
-    AgentFramework("smolagents"),
+    "smolagents",
     AgentConfig(
         model_id="llama3.2",
         model_args={

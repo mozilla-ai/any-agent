@@ -48,10 +48,8 @@ Choose one of the available frameworks:
 ```python
 from random import choice
 
-framework = AgentFramework(
-    choice(
-        ["langchain", "llama_index", "openai", "smolagents"]
-    )
+framework = choice(
+    ["langchain", "llama_index", "openai", "smolagents"]
 )
 ```
 

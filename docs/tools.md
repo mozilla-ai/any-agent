@@ -16,7 +16,7 @@ See [SuperGateway](https://github.com/supercorp-ai/supergateway) for an easy way
     from any_agent import AgentConfig, AgentFramework, AnyAgent
     from any_agent.tools import search_web
 
-    framework = AgentFramework("openai")
+    framework = "openai"
 
     main_agent = AgentConfig(
         model_id="gpt-4o-mini",
@@ -30,7 +30,7 @@ See [SuperGateway](https://github.com/supercorp-ai/supergateway) for an easy way
     from any_agent import AgentConfig, AgentFramework, AnyAgent
     from any_agent.config import MCPStdioParams
 
-    framework = AgentFramework("openai")
+    framework = "openai"
 
     main_agent = AgentConfig(
         model_id="gpt-4o-mini",
@@ -50,7 +50,7 @@ See [SuperGateway](https://github.com/supercorp-ai/supergateway) for an easy way
     from any_agent import AgentConfig, AgentFramework, AnyAgent
     from any_agent.config import MCPSseParams
 
-    framework = AgentFramework("openai")
+    framework = "openai"
 
     main_agent = AgentConfig(
         model_id="gpt-4o-mini",

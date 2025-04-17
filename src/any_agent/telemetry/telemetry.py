@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, assert_never
 
 from any_agent import AgentFramework
 from any_agent.logging import logger
@@ -18,34 +18,42 @@ class TelemetryProcessor(ABC):
     MAX_EVIDENCE_LENGTH: ClassVar[int] = 400
 
     @classmethod
-    def create(cls, agent_framework: AgentFramework) -> TelemetryProcessor:
+    def create(cls, agent_framework_raw: AgentFramework | str) -> TelemetryProcessor:
         """Factory method to create the appropriate telemetry processor."""
-        if agent_framework == AgentFramework.LANGCHAIN:
+        agent_framework = AgentFramework.from_string(agent_framework_raw)
+
+        if agent_framework is AgentFramework.LANGCHAIN:
             from any_agent.telemetry.langchain_telemetry import (
                 LangchainTelemetryProcessor,
             )
 
             return LangchainTelemetryProcessor()
-        if agent_framework == AgentFramework.SMOLAGENTS:
+        if agent_framework is AgentFramework.SMOLAGENTS:
             from any_agent.telemetry.smolagents_telemetry import (
                 SmolagentsTelemetryProcessor,
             )
 
             return SmolagentsTelemetryProcessor()
-        if agent_framework == AgentFramework.OPENAI:
+        if agent_framework is AgentFramework.OPENAI:
             from any_agent.telemetry.openai_telemetry import (
                 OpenAITelemetryProcessor,
             )
 
             return OpenAITelemetryProcessor()
-        if agent_framework == AgentFramework.LLAMA_INDEX:
+        if agent_framework is AgentFramework.LLAMA_INDEX:
             from any_agent.telemetry.llama_index_telemetry import (
                 LlamaIndexTelemetryProcessor,
             )
 
             return LlamaIndexTelemetryProcessor()
-        msg = f"Unsupported agent type {agent_framework}"
-        raise ValueError(msg)
+
+        if (
+            agent_framework is AgentFramework.GOOGLE
+            or agent_framework is AgentFramework.AGNO
+        ):
+            raise NotImplementedError
+
+        assert_never(agent_framework)
 
     @staticmethod
     def determine_agent_framework(trace: Sequence[Mapping[str, Any]]) -> AgentFramework:

@@ -28,13 +28,13 @@ def wrap_sync(
 @pytest.mark.parametrize(
     ("framework", "expected_class"),
     [
-        ("google", GoogleClass),
-        ("langchain", LangchainClass),
-        ("llama_index", LlamaindexClass),
-        ("openai", OpenaiClass),
-        ("smolagents", SmolagentsClass),
+        (AgentFramework.GOOGLE, GoogleClass),
+        (AgentFramework.LANGCHAIN, LangchainClass),
+        (AgentFramework.LLAMA_INDEX, LlamaindexClass),
+        (AgentFramework.OPENAI, OpenaiClass),
+        (AgentFramework.SMOLAGENTS, SmolagentsClass),
     ],
 )
-def test_wrap_tools(framework: str, expected_class: Any) -> None:
-    wrapped_tools = wrap_sync([search_web, visit_webpage], AgentFramework(framework))
+def test_wrap_tools(framework: AgentFramework, expected_class: Any) -> None:
+    wrapped_tools = wrap_sync([search_web, visit_webpage], framework)
     assert all(isinstance(tool, expected_class) for tool in wrapped_tools)

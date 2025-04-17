@@ -27,5 +27,5 @@ def test_get_tracer_provider(tmp_path: Path) -> None:
 
 
 def test_invalid_agent_framework(tmp_path: Path) -> None:
-    with pytest.raises(ValueError, match="Unsupported agent type"):
+    with pytest.raises(ValueError, match="Unsupported agent framework"):
         setup_tracing(MagicMock(), tmp_path / "traces")

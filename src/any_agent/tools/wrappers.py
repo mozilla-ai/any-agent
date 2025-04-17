@@ -85,7 +85,7 @@ async def wrap_mcp_server(
         AgentFramework.AGNO: AgnoMCPServer,
     }
     if agent_framework not in mcp_server_map:
-        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {mcp_server_map.keys()}"
+        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {list(mcp_server_map.keys())}"
         raise NotImplementedError(msg)
 
     # Create the manager instance which will manage the MCP tool context
