@@ -14,8 +14,8 @@ from .results_saver import save_evaluation_results
 from .test_case import TestCase
 
 
-def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
-    with open(telemetry_path, encoding="utf-8") as f:
+def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
+    with open(telemetry_path) as f:
         telemetry: list[dict[str, Any]] = json.loads(f.read())
     logger.info("Telemetry loaded from %s", telemetry_path)
 
@@ -65,7 +65,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
                 f"""
                 <green>Passed:
                 - {check.criteria}
-                - {check.reason}</green>"""
+                - {check.reason}</green>""",
             )
             output_message += message + "\n"
     if failed_checks:
@@ -74,7 +74,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
                 f"""
                 <red>Failed:
                 - {check.criteria}
-                - {check.reason}</red>"""
+                - {check.reason}</red>""",
             )
             output_message += message + "\n"
     else:

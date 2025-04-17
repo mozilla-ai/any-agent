@@ -1,6 +1,9 @@
 import json
 import os
+from collections.abc import Sequence
 from datetime import datetime
+from pathlib import Path
+from typing import Protocol, assert_never
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
@@ -18,6 +21,10 @@ from any_agent.config import AgentFramework, TracingConfig
 from any_agent.telemetry import TelemetryProcessor
 
 
+class Span(Protocol):
+    def to_json(self) -> str: ...
+
+
 class JsonFileSpanExporter(SpanExporter):
     def __init__(self, file_name: str):
         self.file_name = file_name
@@ -25,7 +32,7 @@ class JsonFileSpanExporter(SpanExporter):
             with open(self.file_name, "w", encoding="utf-8") as f:
                 json.dump([], f)
 
-    def export(self, spans) -> None:
+    def export(self, spans: Sequence[Span]) -> SpanExportResult:
         try:
             with open(self.file_name, encoding="utf-8") as f:
                 all_spans = json.load(f)
@@ -47,17 +54,19 @@ class JsonFileSpanExporter(SpanExporter):
         with open(self.file_name, "w", encoding="utf-8") as f:
             json.dump(all_spans, f, indent=2)
 
-    def shutdown(self):
+        return SpanExportResult.SUCCESS
+
+    def shutdown(self) -> None:
         pass
 
 
 class RichConsoleSpanExporter(SpanExporter):
     def __init__(self, agent_framework: AgentFramework, tracing_config: TracingConfig):
-        self.processor = TelemetryProcessor.create(agent_framework=agent_framework)
+        self.processor = TelemetryProcessor.create(agent_framework)
         self.console = Console()
         self.tracing_config = tracing_config
 
-    def export(self, spans):
+    def export(self, spans: Sequence[Span]) -> SpanExportResult:
         for span in spans:
             style = None
             span_str = span.to_json()
@@ -80,7 +89,7 @@ class RichConsoleSpanExporter(SpanExporter):
                             Panel(
                                 Markdown(str(value or "")),
                                 title="Output",
-                            )
+                            ),
                         )
                     else:
                         self.console.print(f"{key}: {value}")
@@ -95,8 +104,10 @@ class RichConsoleSpanExporter(SpanExporter):
 
 
 def _get_tracer_provider(
-    agent_framework: AgentFramework, output_dir: str, tracing_config: TracingConfig
-) -> tuple[TracerProvider, str | None]:
+    agent_framework: AgentFramework,
+    output_dir: str | Path,
+    tracing_config: TracingConfig,
+) -> tuple[TracerProvider, str]:
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -111,7 +122,7 @@ def _get_tracer_provider(
     # This is what will log all the span info to stdout: We turn off the agent sdk specific logging so that
     # the user sees a similar logging format for whichever agent they are using under the hood.
     processor = BatchSpanProcessor(
-        RichConsoleSpanExporter(agent_framework, tracing_config)
+        RichConsoleSpanExporter(agent_framework, tracing_config),
     )
     tracer_provider.add_span_processor(processor)
     trace.set_tracer_provider(tracer_provider)
@@ -120,8 +131,8 @@ def _get_tracer_provider(
 
 
 def setup_tracing(
-    agent_framework: AgentFramework,
-    output_dir: str = "traces",
+    agent_framework: AgentFramework | str,
+    output_dir: str | Path = "traces",
     tracing_config: TracingConfig | None = None,
 ) -> str:
     """Setup tracing for `agent_framework` using `openinference.instrumentation`.
@@ -130,31 +141,53 @@ def setup_tracing(
         agent_framework (AgentFramework): The type of agent being used.
         output_dir (str): The directory where the traces will be stored.
             Defaults to "traces".
+
     Returns:
         str: The name of the JSON file where traces will be stored.
+
     """
+    agent_framework_ = AgentFramework.from_string(agent_framework)
     tracing_config = tracing_config or TracingConfig()
 
     tracer_provider, file_name = _get_tracer_provider(
-        agent_framework, output_dir, tracing_config
+        agent_framework_,
+        output_dir,
+        tracing_config,
     )
-    if agent_framework == AgentFramework.OPENAI:
+
+    instrumenter = get_instrumenter_by_framework(agent_framework_)
+    instrumenter.instrument(tracer_provider=tracer_provider)
+
+    return file_name
+
+
+class Instrumenter(Protocol):
+    def instrument(self, *, tracer_provider: TracerProvider) -> None: ...
+
+
+def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
+    if framework is AgentFramework.OPENAI:
         from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 
-        OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
-    elif agent_framework == AgentFramework.SMOLAGENTS:
+        return OpenAIAgentsInstrumentor()
+
+    if framework is AgentFramework.SMOLAGENTS:
         from openinference.instrumentation.smolagents import SmolagentsInstrumentor
 
-        SmolagentsInstrumentor().instrument(tracer_provider=tracer_provider)
-    elif agent_framework == AgentFramework.LANGCHAIN:
+        return SmolagentsInstrumentor()
+
+    if framework is AgentFramework.LANGCHAIN:
         from openinference.instrumentation.langchain import LangChainInstrumentor
 
-        LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
-    elif agent_framework == AgentFramework.LLAMAINDEX:
+        return LangChainInstrumentor()
+
+    if framework is AgentFramework.LLAMA_INDEX:
         from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
 
-        LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
-    else:
-        msg = f"{agent_framework} tracing is not supported."
+        return LlamaIndexInstrumentor()
+
+    if framework is AgentFramework.GOOGLE or framework is AgentFramework.AGNO:
+        msg = f"{framework} tracing is not supported."
         raise NotImplementedError(msg)
-    return file_name
+
+    assert_never(framework)

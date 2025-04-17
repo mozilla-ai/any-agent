@@ -9,7 +9,7 @@ from any_agent.tools import (
 )
 
 
-def test_load_agno_default():
+def test_load_agno_default() -> None:
     mock_agent = MagicMock()
     mock_model = MagicMock()
 
@@ -26,7 +26,7 @@ def test_load_agno_default():
         )
 
 
-def test_load_agno_agent_missing():
+def test_load_agno_agent_missing() -> None:
     with patch("any_agent.frameworks.agno.agno_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))

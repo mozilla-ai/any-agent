@@ -34,6 +34,20 @@ repos:
           - .[dev, all]
           - mktestdocs
 
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-requests
+          - types-pyyaml
+          - pytest
+          - pydantic
+          - openinference-instrumentation-langchain
+          - openinference-instrumentation-llama-index
+          - openinference-instrumentation-smolagents
+          - openinference-instrumentation-openai-agents>=0.1.5
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:

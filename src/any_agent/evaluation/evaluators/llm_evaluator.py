@@ -1,13 +1,13 @@
 import json
 import re
 from abc import ABC
+from collections.abc import Sequence
 from textwrap import dedent
-from typing import Any
 
 from litellm import completion
 
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
-from any_agent.evaluation.test_case import CheckpointCriteria
+from any_agent.evaluation.test_case import CheckpointCriteria, GroundTruthAnswer
 
 
 class LLMEvaluator(ABC):
@@ -20,12 +20,13 @@ class LLMEvaluator(ABC):
         self,
         criteria: str,
         points: int,
-        ground_truth_output: list[CheckpointCriteria] | dict[str, Any] | None = None,
+        ground_truth_output: Sequence[CheckpointCriteria]
+        | Sequence[GroundTruthAnswer]
+        | None = None,
         hypothesis_final_answer: str | None = None,
         evidence: str | None = None,
     ) -> EvaluationResult:
         """Evaluate a single criterion using LLM"""
-
         prompt = dedent(f"""
         Evaluate if the following criterion was met {"based on the provided evidence" if evidence else "in the agent's answer"}.
 
@@ -65,14 +66,17 @@ class LLMEvaluator(ABC):
         """
 
         response = completion(
-            model=self.model, messages=[{"role": "user", "content": prompt}]
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
         )
         content = response.choices[0].message.content
 
         try:
             # Extract JSON from the response - looks for patterns like ```json {...} ``` or just {...}
             json_match = re.search(
-                r"```(?:json)?\s*(\{.*?\})\s*```|(\{.*?\})", content, re.DOTALL
+                r"```(?:json)?\s*(\{.*?\})\s*```|(\{.*?\})",
+                content,
+                re.DOTALL,
             )
 
             if json_match:

@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import json
 import re
 from abc import ABC, abstractmethod
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, assert_never
 
 from any_agent.config import AgentFramework
 from any_agent.logging import logger
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
 
 
 class TelemetryProcessor(ABC):
@@ -13,37 +18,45 @@ class TelemetryProcessor(ABC):
     MAX_EVIDENCE_LENGTH: ClassVar[int] = 400
 
     @classmethod
-    def create(cls, agent_framework: AgentFramework) -> "TelemetryProcessor":
+    def create(cls, agent_framework_raw: AgentFramework | str) -> TelemetryProcessor:
         """Factory method to create the appropriate telemetry processor."""
-        if agent_framework == AgentFramework.LANGCHAIN:
+        agent_framework = AgentFramework.from_string(agent_framework_raw)
+
+        if agent_framework is AgentFramework.LANGCHAIN:
             from any_agent.telemetry.langchain_telemetry import (
                 LangchainTelemetryProcessor,
             )
 
             return LangchainTelemetryProcessor()
-        if agent_framework == AgentFramework.SMOLAGENTS:
+        if agent_framework is AgentFramework.SMOLAGENTS:
             from any_agent.telemetry.smolagents_telemetry import (
                 SmolagentsTelemetryProcessor,
             )
 
             return SmolagentsTelemetryProcessor()
-        if agent_framework == AgentFramework.OPENAI:
+        if agent_framework is AgentFramework.OPENAI:
             from any_agent.telemetry.openai_telemetry import (
                 OpenAITelemetryProcessor,
             )
 
             return OpenAITelemetryProcessor()
-        if agent_framework == AgentFramework.LLAMAINDEX:
+        if agent_framework is AgentFramework.LLAMA_INDEX:
             from any_agent.telemetry.llama_index_telemetry import (
                 LlamaIndexTelemetryProcessor,
             )
 
             return LlamaIndexTelemetryProcessor()
-        msg = f"Unsupported agent type {agent_framework}"
-        raise ValueError(msg)
+
+        if (
+            agent_framework is AgentFramework.GOOGLE
+            or agent_framework is AgentFramework.AGNO
+        ):
+            raise NotImplementedError
+
+        assert_never(agent_framework)
 
     @staticmethod
-    def determine_agent_framework(trace: list[dict[str, Any]]) -> AgentFramework:
+    def determine_agent_framework(trace: Sequence[Mapping[str, Any]]) -> AgentFramework:
         """Determine the agent type based on the trace.
         These are not really stable ways to find it, because we're waiting on some
         reliable method for determining the agent type. This is a temporary solution.
@@ -64,23 +77,29 @@ class TelemetryProcessor(ABC):
         raise ValueError(msg)
 
     @abstractmethod
-    def extract_hypothesis_answer(self, trace: list[dict[str, Any]]) -> str:
+    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         """Extract the hypothesis agent final answer from the trace."""
 
     @abstractmethod
-    def _extract_telemetry_data(self, telemetry: list[dict[str, Any]]) -> list[dict]:
+    def _extract_telemetry_data(
+        self,
+        telemetry: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
         """Extract the agent-specific data from telemetry."""
 
     @abstractmethod
-    def extract_interaction(self, span: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    def extract_interaction(
+        self,
+        span: Mapping[str, Any],
+    ) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
 
-    def extract_evidence(self, telemetry: list[dict[str, Any]]) -> str:
+    def extract_evidence(self, telemetry: Sequence[Mapping[str, Any]]) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
         return self._format_evidence(calls)
 
-    def _format_evidence(self, calls: list[dict]) -> str:
+    def _format_evidence(self, calls: Sequence[Mapping[str, Any]]) -> str:
         """Format extracted data into a standardized output format."""
         evidence = f"## {self._get_agent_framework().name} Agent Execution\n\n"
 
