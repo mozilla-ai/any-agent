@@ -79,7 +79,7 @@ async def wrap_mcp_server(
         AgentFramework.SMOLAGENTS: SmolagentsMCPServerStdio,
         AgentFramework.LANGCHAIN: LangchainMCPServerStdio,
         AgentFramework.GOOGLE: GoogleMCPServerStdio,
-        AgentFramework.LLAMAINDEX: LlamaIndexMCPServerStdio,
+        AgentFramework.LLAMA_INDEX: LlamaIndexMCPServerStdio,
         AgentFramework.AGNO: AgnoMCPServerStdio,
     }
 
@@ -100,7 +100,7 @@ WRAPPERS = {
     AgentFramework.OPENAI: wrap_tool_openai,
     AgentFramework.LANGCHAIN: wrap_tool_langchain,
     AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
-    AgentFramework.LLAMAINDEX: wrap_tool_llama_index,
+    AgentFramework.LLAMA_INDEX: wrap_tool_llama_index,
     AgentFramework.AGNO: wrap_tool_agno,
 }
 

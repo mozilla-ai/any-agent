@@ -33,7 +33,7 @@ class TelemetryProcessor(ABC):
             )
 
             return OpenAITelemetryProcessor()
-        if agent_framework == AgentFramework.LLAMAINDEX:
+        if agent_framework == AgentFramework.LLAMA_INDEX:
             from any_agent.telemetry.llama_index_telemetry import (
                 LlamaIndexTelemetryProcessor,
             )

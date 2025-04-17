@@ -11,7 +11,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
     """Processor for LlamaIndex agent telemetry data."""
 
     def _get_agent_framework(self) -> AgentFramework:
-        return AgentFramework.LLAMAINDEX
+        return AgentFramework.LLAMA_INDEX
 
     def extract_hypothesis_answer(self, trace: list[dict[str, Any]]) -> str:
         for span in reversed(trace):

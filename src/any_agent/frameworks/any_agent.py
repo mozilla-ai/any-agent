@@ -14,7 +14,11 @@ class AnyAgent(ABC):
     """
 
     @staticmethod
-    def _get_agent_type_by_framework(framework: AgentFramework) -> type[AnyAgent]:
+    def _get_agent_type_by_framework(
+        framework_raw: AgentFramework | str,
+    ) -> type[AnyAgent]:
+        framework = AgentFramework.from_string(framework_raw)
+
         if framework is AgentFramework.SMOLAGENTS:
             from any_agent.frameworks.smolagents import SmolagentsAgent
 
@@ -30,7 +34,7 @@ class AnyAgent(ABC):
 
             return OpenAIAgent
 
-        if framework is AgentFramework.LLAMAINDEX:
+        if framework is AgentFramework.LLAMA_INDEX:
             from any_agent.frameworks.llama_index import LlamaIndexAgent
 
             return LlamaIndexAgent
@@ -50,7 +54,7 @@ class AnyAgent(ABC):
     @classmethod
     def create(
         cls,
-        agent_framework: AgentFramework,
+        agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
     ) -> AnyAgent:

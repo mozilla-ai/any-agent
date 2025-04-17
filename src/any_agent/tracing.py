@@ -167,7 +167,7 @@ def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
 
         return LangChainInstrumentor()
 
-    if framework is AgentFramework.LLAMAINDEX:
+    if framework is AgentFramework.LLAMA_INDEX:
         from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
 
         return LlamaIndexInstrumentor()
