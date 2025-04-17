@@ -118,8 +118,16 @@ agent.run("Which Agent Framework is the best??")
 If you just specify `model_id` (as in the examples above), the agent will use the default `model_type` that we have selected
 for that framework and no `model_args`.
 
+### Model Type
 
-!!! tip
+The `model_type` parameter controls the type of model class that is used by the agent framework, and is unique to the agent framework being used. For frameworks that have support for [`LiteLLM`](https://github.com/BerriAI/litellm) (`google`, `langchain`, `llama_index`, `smolagents`, `agno`) we use it as default `model_type`, allowing you to use the same `model_id` syntax across these frameworks.
 
-    For frameworks that have support for [`LiteLLM`](https://github.com/BerriAI/litellm) (`google`, `langchain`, `llama_index`, `smolagents`)
-    we use it as default `model_type`, allowing you to use the same `model_id` syntax across these frameworks.
+### Model ID
+
+If you are using the default `model_type` (LiteLLM), you can refer to [LiteLLM Provider Docs](https://docs.litellm.ai/docs/providers) for the list
+of providers and how to access them. For extra args like `api_base` or `api_key` that you may need to access custom/on-prem resources, they can be added to the `model_args` key.
+
+### Model Args
+
+The `model_args` provides the ability to set parameters like `temperature`, `top_k`, as well as any other provider-specific parameters.
+Refer to [LiteLLM Completion API Docs](https://docs.litellm.ai/docs/text_completion) as well
