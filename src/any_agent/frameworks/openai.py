@@ -58,7 +58,7 @@ class OpenAIAgent(AnyAgent):
             openai_client=external_client,
         )
 
-    async def _load_agent(self) -> None:
+    async def load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
         if not agents_available:
             msg = "You need to `pip install openai-agents` to use this agent"

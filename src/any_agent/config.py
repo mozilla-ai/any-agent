@@ -27,6 +27,7 @@ class MCPSseParams(BaseModel):
 
 
 class TracingConfig(BaseModel):
+    output_dir: str = "traces"
     llm: str | None = "yellow"
     tool: str | None = "blue"
     agent: str | None = None

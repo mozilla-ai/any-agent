@@ -5,7 +5,6 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import search_web, show_final_answer, visit_webpage
-from any_agent.tracing import setup_tracing
 
 
 @pytest.mark.parametrize(
@@ -24,9 +23,6 @@ def test_load_and_run_multi_agent(framework: str, tmp_path: Path) -> None:
     kwargs["model_id"] = "gpt-4.1-nano"
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {framework}")
-
-    if framework != "google":
-        setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     main_agent = AgentConfig(
         instructions="Use the available agents to complete the task.",

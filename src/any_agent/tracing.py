@@ -2,7 +2,6 @@ import json
 import os
 from collections.abc import Sequence
 from datetime import datetime
-from pathlib import Path
 from typing import Protocol
 
 from opentelemetry import trace
@@ -105,16 +104,15 @@ class RichConsoleSpanExporter(SpanExporter):  # type: ignore[misc]
 
 def _get_tracer_provider(
     agent_framework: AgentFramework,
-    output_dir: str | Path,
     tracing_config: TracingConfig,
 ) -> tuple[TracerProvider, str]:
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    if not os.path.exists(tracing_config.output_dir):
+        os.makedirs(tracing_config.output_dir)
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     tracer_provider = TracerProvider()
 
-    file_name = f"{output_dir}/{agent_framework.value}-{timestamp}.json"
+    file_name = f"{tracing_config.output_dir}/{agent_framework.value}-{timestamp}.json"
     json_file_exporter = JsonFileSpanExporter(file_name=file_name)
     span_processor = SimpleSpanProcessor(json_file_exporter)
     tracer_provider.add_span_processor(span_processor)
@@ -132,8 +130,7 @@ def _get_tracer_provider(
 
 def setup_tracing(
     agent_framework: AgentFramework,
-    output_dir: str | Path = "traces",
-    tracing_config: TracingConfig | None = None,
+    tracing_config: TracingConfig,
 ) -> str:
     """Setup tracing for `agent_framework` using `openinference.instrumentation`.
 
@@ -146,11 +143,9 @@ def setup_tracing(
         str: The name of the JSON file where traces will be stored.
 
     """
-    tracing_config = tracing_config or TracingConfig()
 
     tracer_provider, file_name = _get_tracer_provider(
         agent_framework,
-        output_dir,
         tracing_config,
     )
     if agent_framework == AgentFramework.OPENAI:
