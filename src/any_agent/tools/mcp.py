@@ -4,9 +4,9 @@ import os
 from abc import ABC, abstractmethod
 from contextlib import AsyncExitStack
 from textwrap import dedent
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from any_agent.config import MCPParams, MCPStdioParams, Tool
+from any_agent.config import MCPParams, MCPStdioParams
 from any_agent.logging import logger
 
 try:
@@ -38,7 +38,7 @@ class MCPServerBase(ABC):
         self.mcp_tool = mcp_tool
 
         # Initialize tools list (to be populated by subclasses)
-        self.tools: Sequence[Tool] = []
+        self.tools: Sequence[Any] = []
 
     @abstractmethod
     async def setup_tools(self) -> None:
@@ -279,4 +279,4 @@ class AgnoMCPServer(MCPServerBase):
                 session=session,
                 include_tools=self.mcp_tool.tools,
             )
-        self.tools = await self.exit_stack.enter_async_context(self.server)
+        self.tools = [await self.exit_stack.enter_async_context(self.server)]

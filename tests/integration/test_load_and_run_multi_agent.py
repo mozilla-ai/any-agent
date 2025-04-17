@@ -15,7 +15,6 @@ from any_agent.tracing import setup_tracing
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-@pytest.mark.usefixtures("refresh_tools")
 def test_load_and_run_multi_agent(framework: str, tmp_path: Path) -> None:
     agent_framework = AgentFramework(framework)
     kwargs = {}

@@ -124,7 +124,7 @@ class TestSmolagentsMCPServer(unittest.TestCase):
 
         # Verify only the requested tools are included
         assert len(mcp_server.tools) == 2
-        tool_names = [tool.name for tool in mcp_server.tools]  # type: ignore[union-attr]
+        tool_names = [tool.name for tool in mcp_server.tools]
         assert "read_thing" in tool_names
         assert "write_thing" in tool_names
         assert "other_thing" not in tool_names
