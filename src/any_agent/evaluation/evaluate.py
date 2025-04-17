@@ -14,9 +14,9 @@ from any_agent.telemetry.telemetry import TelemetryProcessor
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
-    with open(telemetry_path, "r", encoding="utf-8") as f:
+    with open(telemetry_path, encoding="utf-8") as f:
         telemetry: list[dict[str, Any]] = json.loads(f.read())
-    logger.info(f"Telemetry loaded from {telemetry_path}")
+    logger.info("Telemetry loaded from %s", telemetry_path)
 
     agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)
 

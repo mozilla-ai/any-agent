@@ -1,7 +1,6 @@
 import os
 from unittest.mock import MagicMock, patch
 
-from any_agent.config import AgentFramework, AgentConfig, AnyAgent
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent

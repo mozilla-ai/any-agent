@@ -27,7 +27,7 @@ class JsonFileSpanExporter(SpanExporter):
 
     def export(self, spans) -> None:
         try:
-            with open(self.file_name, "r", encoding="utf-8") as f:
+            with open(self.file_name, encoding="utf-8") as f:
                 all_spans = json.load(f)
         except (json.JSONDecodeError, FileNotFoundError):
             all_spans = []

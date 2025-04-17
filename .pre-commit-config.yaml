@@ -27,8 +27,11 @@ repos:
     hooks:
       - id: pylint
         additional_dependencies:
+          - pydantic
           - pylint-pydantic
-          - any-agent[dev, all]
+          - langchain_core
+          - pandas
+          - .[dev, all]
           - mktestdocs
 
   - repo: https://github.com/codespell-project/codespell
