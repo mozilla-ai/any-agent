@@ -63,7 +63,7 @@ def llm_span() -> LLMSpan:
 def test_rich_console_span_exporter_default(llm_span: LLMSpan) -> None:
     console_mock = MagicMock()
     with patch("any_agent.tracing.Console", console_mock):
-        exporter = RichConsoleSpanExporter(AgentFramework("langchain"), TracingConfig())
+        exporter = RichConsoleSpanExporter(AgentFramework.LANGCHAIN, TracingConfig())
         exporter.export([llm_span])
         console_mock.return_value.rule.assert_called()
 
@@ -72,7 +72,7 @@ def test_rich_console_span_exporter_disable(llm_span: LLMSpan) -> None:
     console_mock = MagicMock()
     with patch("any_agent.tracing.Console", console_mock):
         exporter = RichConsoleSpanExporter(
-            AgentFramework("langchain"),
+            AgentFramework.LANGCHAIN,
             TracingConfig(llm=None),
         )
         exporter.export([llm_span])
