@@ -55,7 +55,7 @@ class SmolagentsAgent(AnyAgent):
             tools.extend(mcp_server.tools)
         return tools
 
-    async def _load_agent(self) -> None:
+    async def load_agent(self) -> None:
         """Load the Smolagents agent with the given configuration."""
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [

@@ -5,7 +5,6 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import search_web
-from any_agent.tracing import setup_tracing
 
 frameworks = list(AgentFramework)
 
@@ -25,11 +24,6 @@ def test_load_and_run_agent(framework: AgentFramework, tmp_path: Path) -> None:
     kwargs["model_id"] = "gpt-4.1-nano"
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {framework}")
-
-    # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
-    # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-    if framework not in ("agno", "google"):
-        setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     agent_config = AgentConfig(
         tools=[search_web],

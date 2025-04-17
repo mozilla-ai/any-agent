@@ -67,7 +67,7 @@ class LlamaIndexAgent(AnyAgent):
 
         return imported_tools
 
-    async def _load_agent(self) -> None:
+    async def load_agent(self) -> None:
         """Load the LLamaIndex agent with the given configuration."""
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [

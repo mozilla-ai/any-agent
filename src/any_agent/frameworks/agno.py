@@ -46,7 +46,7 @@ class AgnoAgent(AnyAgent):
             **agent_config.model_args or {},
         )
 
-    async def _load_agent(self) -> None:
+    async def load_agent(self) -> None:
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
                 search_web,

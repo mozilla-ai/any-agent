@@ -61,7 +61,7 @@ class LangchainAgent(AnyAgent):
             model_type(model=agent_config.model_id, **agent_config.model_args or {}),
         )
 
-    async def _load_agent(self) -> None:
+    async def load_agent(self) -> None:
         """Load the LangChain agent with the given configuration."""
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
