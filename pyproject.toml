@@ -90,7 +90,7 @@ Issues = "https://github.com/mozilla-ai/any-agent/issues"
 Source = "https://github.com/mozilla-ai/any-agent"
 
 [tool.setuptools.package-data]
-any-agent = ["py.typed"]
+"*" = ["py.typed"]
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]
