@@ -18,14 +18,14 @@ def foo() -> None:
     """Print bar."""
 
 
-def test_wrap_tool_langchain():
+def test_wrap_tool_langchain() -> None:
     wrapper = MagicMock()
     with patch("langchain_core.tools.tool", wrapper):
         wrap_tool_langchain(foo)
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_langchain_already_wrapped():
+def test_wrap_tool_langchain_already_wrapped() -> None:
     from langchain_core.tools import tool
 
     wrapped = tool(foo)
@@ -35,7 +35,7 @@ def test_wrap_tool_langchain_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_llama_index():
+def test_wrap_tool_llama_index() -> None:
     from llama_index.core.tools import FunctionTool
 
     wrapper = MagicMock()
@@ -44,7 +44,7 @@ def test_wrap_tool_llama_index():
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_llama_index_already_wrapped():
+def test_wrap_tool_llama_index_already_wrapped() -> None:
     from llama_index.core.tools import FunctionTool
 
     wrapped = FunctionTool.from_defaults(foo)
@@ -54,14 +54,14 @@ def test_wrap_tool_llama_index_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_openai():
+def test_wrap_tool_openai() -> None:
     wrapper = MagicMock()
     with patch("agents.function_tool", wrapper):
         wrap_tool_openai(foo)
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_openai_already_wrapped():
+def test_wrap_tool_openai_already_wrapped() -> None:
     from agents import function_tool
 
     wrapped = function_tool(foo)
@@ -71,7 +71,7 @@ def test_wrap_tool_openai_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_openai_builtin_tools():
+def test_wrap_tool_openai_builtin_tools() -> None:
     from agents.tool import WebSearchTool
 
     wrapper = MagicMock()
@@ -80,7 +80,7 @@ def test_wrap_tool_openai_builtin_tools():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_smolagents():
+def test_wrap_tool_smolagents() -> None:
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
         wrap_tool_smolagents(foo)
@@ -94,7 +94,7 @@ def test_wrap_tool_smolagents():
         assert wrapped_func.__doc__ == foo.__doc__
 
 
-def test_wrap_tool_smolagents_already_wrapped():
+def test_wrap_tool_smolagents_already_wrapped() -> None:
     from smolagents import tool
 
     wrapped = tool(foo)
@@ -104,7 +104,7 @@ def test_wrap_tool_smolagents_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_smolagents_builtin_tools():
+def test_wrap_tool_smolagents_builtin_tools() -> None:
     from smolagents import DuckDuckGoSearchTool
 
     wrapper = MagicMock()
@@ -113,7 +113,7 @@ def test_wrap_tool_smolagents_builtin_tools():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_google():
+def test_wrap_tool_google() -> None:
     from google.adk.tools import FunctionTool
 
     wrapper = MagicMock()
@@ -124,7 +124,7 @@ def test_wrap_tool_google():
         wrapper.assert_called_with(foo)
 
 
-def test_wrap_tool_google_already_wrapped():
+def test_wrap_tool_google_already_wrapped() -> None:
     from google.adk.tools import FunctionTool
 
     wrapper = MagicMock()
@@ -136,7 +136,7 @@ def test_wrap_tool_google_already_wrapped():
         wrapper.assert_not_called()
 
 
-def test_wrap_tool_google_builtin_tools():
+def test_wrap_tool_google_builtin_tools() -> None:
     from google.adk.tools import FunctionTool, google_search
 
     wrapper = MagicMock()
@@ -154,11 +154,11 @@ frameworks = list(AgentFramework)
     "framework",
     frameworks,
 )
-def test_bad_functions(framework):
+def test_bad_functions(framework: AgentFramework) -> None:
     """Test the verify_callable function with various bad functions."""
 
     # Test missing return type
-    def missing_return_type(foo: str):
+    def missing_return_type(foo: str):  # type: ignore[no-untyped-def]
         """Docstring for foo."""
         return foo
 
@@ -173,9 +173,9 @@ def test_bad_functions(framework):
         asyncio.run(wrap_tools([missing_docstring], framework))
 
     # Test missing parameter type
-    def missing_param_type(foo) -> str:
+    def missing_param_type(foo) -> str:  # type: ignore[no-untyped-def]
         """Docstring for foo."""
-        return foo
+        return foo  # type: ignore[no-any-return]
 
     with pytest.raises(ValueError, match="typed arguments"):
         asyncio.run(wrap_tools([missing_param_type], framework))

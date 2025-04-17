@@ -2,7 +2,7 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import Any
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, Tool
 
 
 class AnyAgent(ABC):
@@ -20,17 +20,29 @@ class AnyAgent(ABC):
         managed_agents: list[AgentConfig] | None = None,
     ) -> "AnyAgent":
         if agent_framework == AgentFramework.SMOLAGENTS:
-            from any_agent.frameworks.smolagents import SmolagentsAgent as Agent
+            from any_agent.frameworks.smolagents import (
+                SmolagentsAgent as Agent,
+            )
         elif agent_framework == AgentFramework.LANGCHAIN:
-            from any_agent.frameworks.langchain import LangchainAgent as Agent
+            from any_agent.frameworks.langchain import (  # type: ignore[assignment]
+                LangchainAgent as Agent,
+            )
         elif agent_framework == AgentFramework.OPENAI:
-            from any_agent.frameworks.openai import OpenAIAgent as Agent
+            from any_agent.frameworks.openai import (  # type: ignore[assignment]
+                OpenAIAgent as Agent,
+            )
         elif agent_framework == AgentFramework.LLAMAINDEX:
-            from any_agent.frameworks.llama_index import LlamaIndexAgent as Agent
+            from any_agent.frameworks.llama_index import (  # type: ignore[assignment]
+                LlamaIndexAgent as Agent,
+            )
         elif agent_framework == AgentFramework.GOOGLE:
-            from any_agent.frameworks.google import GoogleAgent as Agent
+            from any_agent.frameworks.google import (  # type: ignore[assignment]
+                GoogleAgent as Agent,
+            )
         elif agent_framework == AgentFramework.AGNO:
-            from any_agent.frameworks.agno import AgnoAgent as Agent
+            from any_agent.frameworks.agno import (  # type: ignore[assignment]
+                AgnoAgent as Agent,
+            )
         else:
             msg = f"Unsupported agent framework: {agent_framework}"
             raise ValueError(msg)
@@ -52,20 +64,22 @@ class AnyAgent(ABC):
 
     @property
     @abstractmethod
-    def tools(self) -> list[str]:
-        """
-        Return the tools used by the agent.
+    def tools(self) -> list[Tool]:
+        """Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
 
-    def __init__(self):
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
+    ) -> None:
         msg = "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
         raise NotImplementedError(msg)
 
     @property
-    def agent(self):
-        """
-        The underlying agent implementation from the framework.
+    def agent(self) -> Any:
+        """The underlying agent implementation from the framework.
 
         This property is intentionally restricted to maintain framework abstraction
         and prevent direct dependency on specific agent implementations.
@@ -77,6 +91,7 @@ class AnyAgent(ABC):
 
         Raises:
             NotImplementedError: Always raised when this property is accessed
+
         """
         msg = "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
         raise NotImplementedError(msg)

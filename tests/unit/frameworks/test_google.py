@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -10,15 +11,15 @@ from any_agent.tools import (
 )
 
 
-def test_load_google_default():
+def test_load_google_default() -> None:
     from google.adk.tools import FunctionTool
 
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_function_tool = MagicMock()
 
-    class MockedFunctionTool(FunctionTool):
-        def __new__(cls, *args, **kwargs):
+    class MockedFunctionTool(FunctionTool):  # type: ignore[misc]
+        def __new__(cls, *args: Any, **kwargs: Any) -> MagicMock:
             return mock_function_tool
 
     with (
@@ -37,7 +38,7 @@ def test_load_google_default():
         )
 
 
-def test_load_google_multiagent():
+def test_load_google_multiagent() -> None:
     from google.adk.tools import FunctionTool
 
     mock_agent = MagicMock()
@@ -45,8 +46,8 @@ def test_load_google_multiagent():
     mock_agent_tool = MagicMock()
     mock_function_tool = MagicMock()
 
-    class MockedFunctionTool(FunctionTool):
-        def __new__(cls, *args, **kwargs):
+    class MockedFunctionTool(FunctionTool):  # type: ignore[misc]
+        def __new__(cls, *args: Any, **kwargs: Any) -> "MockedFunctionTool":
             return mock_function_tool
 
     with (
@@ -98,7 +99,7 @@ def test_load_google_multiagent():
         )
 
 
-def test_load_google_agent_missing():
+def test_load_google_agent_missing() -> None:
     with patch("any_agent.frameworks.google.adk_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))

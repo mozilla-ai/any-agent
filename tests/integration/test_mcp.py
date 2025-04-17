@@ -1,5 +1,6 @@
 import os
 import tempfile as tmpfile
+from typing import Any
 
 import pytest
 
@@ -16,9 +17,9 @@ frameworks = list(AgentFramework)
     os.environ.get("MCP_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `MCP_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_mcp(framework):
+def test_mcp(framework: AgentFramework) -> None:
     agent_framework = AgentFramework(framework)
-    kwargs = {}
+    kwargs: dict[str, Any] = {}
 
     tmp_dir = tmpfile.mkdtemp()
     tools = [
@@ -41,7 +42,7 @@ def test_mcp(framework):
     ]
     agent_config = AgentConfig(
         model_id="gpt-4o",
-        tools=tools,
+        tools=tools,  # type: ignore[arg-type]
         **kwargs,
     )
     agent = AnyAgent.create(agent_framework, agent_config)

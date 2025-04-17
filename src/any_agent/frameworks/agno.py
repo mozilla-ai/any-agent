@@ -1,10 +1,15 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.wrappers import wrap_tools
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from any_agent.tools.mcp import MCPServerBase
 
 try:
     from agno.agent import Agent
@@ -12,14 +17,16 @@ try:
 
     agno_available = True
 except ImportError:
-    agno_available = None
+    agno_available = False
 
 
 class AgnoAgent(AnyAgent):
     """Agno agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
     ):
         if not agno_available:
             msg = "You need to `pip install 'any-agent[agno]'` to use this agent"
@@ -29,10 +36,10 @@ class AgnoAgent(AnyAgent):
             raise NotImplementedError(msg)
         self.managed_agents = managed_agents  # Future proofing
         self.config = config
-        self._agent = None
-        self._mcp_servers = None
+        self._agent: Agent | None = None
+        self._mcp_servers: Sequence[MCPServerBase] | None = None
 
-    def _get_model(self, agent_config: AgentConfig):
+    def _get_model(self, agent_config: AgentConfig) -> LiteLLM:
         """Get the model configuration for an Agno agent."""
         return LiteLLM(
             id=agent_config.model_id,
@@ -50,8 +57,8 @@ class AgnoAgent(AnyAgent):
         )
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers = mcp_servers
-        mcp_tools = [mcp_server.tools for mcp_server in mcp_servers]
-        tools.extend(mcp_tools)
+        for mcp_server in mcp_servers:
+            tools.extend(mcp_server.tools)
 
         self._agent = Agent(
             name=self.config.name,
@@ -62,13 +69,14 @@ class AgnoAgent(AnyAgent):
         )
 
     async def run_async(self, prompt: str) -> Any:
-        return await self._agent.arun(prompt)
+        return await self._agent.arun(prompt)  # type: ignore[union-attr]
 
     @property
-    def tools(self) -> list[str]:
+    def tools(self) -> list[Tool]:
         if hasattr(self, "_agent"):
-            tools = self._agent.tools
+            pass
         else:
             logger.warning("Agent not loaded or does not have tools.")
-            tools = []
-        return tools
+            return []
+
+        return self._agent.tools  # type: ignore[no-any-return, union-attr]

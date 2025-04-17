@@ -1,4 +1,5 @@
 import json
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from any_agent import AgentFramework
@@ -11,15 +12,15 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS
 
-    def extract_hypothesis_answer(self, trace: list[dict[str, Any]]) -> str:
+    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
-                return span["attributes"]["output.value"]
+                return str(span["attributes"]["output.value"])
 
         msg = "No agent final answer found in trace"
         raise ValueError(msg)
 
-    def _extract_llm_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
         attributes = span.get("attributes", {})
         span_info = {
@@ -53,7 +54,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract tool interaction details from a span."""
         attributes = span.get("attributes", {})
         tool_info = {
@@ -93,7 +94,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return tool_info
 
-    def _extract_chain_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract chain interaction details from a CHAIN span."""
         attributes = span.get("attributes", {})
         status = span.get("status", {})
@@ -129,7 +130,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return chain_info
 
-    def _extract_agent_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract agent interaction details from an AGENT span."""
         attributes = span.get("attributes", {})
         status = span.get("status", {})
@@ -175,7 +176,10 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return agent_info
 
-    def _extract_telemetry_data(self, telemetry: list[dict[str, Any]]) -> list[dict]:
+    def _extract_telemetry_data(
+        self,
+        telemetry: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
         """Extract LLM calls and tool calls from SmoL Agents telemetry."""
         calls = []
 
@@ -183,7 +187,10 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
             calls.append(self.extract_interaction(span)[1])
         return calls
 
-    def extract_interaction(self, span: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    def extract_interaction(
+        self,
+        span: Mapping[str, Any],
+    ) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")

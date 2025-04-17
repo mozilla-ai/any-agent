@@ -1,5 +1,6 @@
 import contextlib
 import json
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from any_agent import AgentFramework
@@ -13,7 +14,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LLAMAINDEX
 
-    def extract_hypothesis_answer(self, trace: list[dict[str, Any]]) -> str:
+    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             # Looking for the final response that has the summary answer
             if (
@@ -24,11 +25,11 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
                     "llm.output_messages.0.message.contents.0.message_content.text"
                 )
                 if output_key in span["attributes"]:
-                    return span["attributes"][output_key]
+                    return str(span["attributes"][output_key])
         logger.warning("No agent final answer found in trace")
         return "NO FINAL ANSWER FOUND"
 
-    def _extract_llm_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         attributes = span.get("attributes", {})
         span_info = {}
 
@@ -50,7 +51,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         attributes = span.get("attributes", {})
         tool_name = attributes.get("tool.name", "Unknown tool")
         tool_output = attributes.get("output.value", "")
@@ -66,9 +67,8 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_agent_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract information from an AGENT span."""
-
         span_info = {
             "type": "agent",
             "workflow": span.get("name", "Agent workflow"),
@@ -82,7 +82,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_chain_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract information from a CHAIN span."""
         attributes = span.get("attributes", {})
 
@@ -114,16 +114,22 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_telemetry_data(self, telemetry: list[dict[str, Any]]) -> list:
+    def _extract_telemetry_data(
+        self,
+        telemetry: Sequence[Mapping[str, Any]],
+    ) -> list[dict[str, Any]]:
         """Extract LLM calls and tool calls from LlamaIndex telemetry."""
-        calls = []
+        calls = list[dict[str, Any]]()
 
         for span in telemetry:
             calls.append(self.extract_interaction(span)[1])
 
         return calls
 
-    def extract_interaction(self, span: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    def extract_interaction(
+        self,
+        span: Mapping[str, Any],
+    ) -> tuple[str, dict[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")

@@ -3,10 +3,10 @@
 import os
 from abc import ABC, abstractmethod
 from contextlib import AsyncExitStack
-from enum import Enum
 from textwrap import dedent
+from typing import TYPE_CHECKING
 
-from any_agent.config import MCPSseParams, MCPStdioParams
+from any_agent.config import MCPParams, MCPStdioParams, Tool
 from any_agent.logging import logger
 
 try:
@@ -18,16 +18,18 @@ try:
 except ImportError:
     mcp_available = False
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
-class MCPTypes(str, Enum):
-    SSE = "sse"
-    STDIO = "stdio"
+    from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
+    from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
+    from smolagents import ToolCollection
 
 
 class MCPServerBase(ABC):
     """Base class for MCP tools managers across different frameworks."""
 
-    def __init__(self, mcp_tool: MCPStdioParams | MCPSseParams):
+    def __init__(self, mcp_tool: MCPParams):
         if not mcp_available:
             msg = "You need to `pip install 'any-agent[mcp]'` to use MCP tools."
             raise ImportError(msg)
@@ -35,37 +37,26 @@ class MCPServerBase(ABC):
         # Store the original tool configuration
         self.mcp_tool = mcp_tool
 
-        if isinstance(mcp_tool, MCPSseParams):
-            self.mcp_type = MCPTypes.SSE
-        elif isinstance(mcp_tool, MCPStdioParams):
-            self.mcp_type = MCPTypes.STDIO
-        else:
-            msg = f"Unsupported MCP tool type: {type(mcp_tool)}"
-            raise NotImplementedError(msg)
-
         # Initialize tools list (to be populated by subclasses)
-        self.tools = []
+        self.tools: Sequence[Tool] = []
 
     @abstractmethod
-    async def setup_tools(self):
+    async def setup_tools(self) -> None:
         """Set up tools. To be implemented by subclasses."""
 
 
 class SmolagentsMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for smolagents."""
 
-    def __init__(self, mcp_tool: MCPStdioParams):
+    def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
-        self.tool_collection = (
-            None  # hold the reference so the MCP doesn't get garbage collected
-        )
-        self.tools = []
         self.exit_stack = AsyncExitStack()
+        self.tool_collection: ToolCollection | None = None
 
-    async def setup_tools(self):
+    async def setup_tools(self) -> None:
         from smolagents import ToolCollection
 
-        if self.mcp_type == MCPTypes.STDIO:
+        if isinstance(self.mcp_tool, MCPStdioParams):
             server_parameters = StdioServerParameters(
                 command=self.mcp_tool.command,
                 args=self.mcp_tool.args,
@@ -91,12 +82,12 @@ class SmolagentsMCPServer(MCPServerBase):
                 raise ValueError(
                     dedent(f"""Could not find all requested tools in the MCP server:
                                 Requested: {requested_tools}
-                                Set:   {tool_names}""")
+                                Set:   {tool_names}"""),
                 )
             self.tools = filtered_tools
         else:
             logger.info(
-                "No specific tools requested for MCP server, using all available tools:"
+                "No specific tools requested for MCP server, using all available tools:",
             )
             logger.info(f"Tools available: {tools}")
             self.tools = tools
@@ -105,12 +96,12 @@ class SmolagentsMCPServer(MCPServerBase):
 class OpenAIMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for OpenAI agents."""
 
-    def __init__(self, mcp_tool: MCPStdioParams):
+    def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
-        self.server = None
+        self.server: OpenAIInternalMCPServerStdio | None = None
         self.exit_stack = AsyncExitStack()
 
-    async def setup_tools(self):
+    async def setup_tools(self) -> None:
         """Set up the OpenAI MCP server with the provided configuration."""
         from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
         from agents.mcp import (
@@ -121,7 +112,7 @@ class OpenAIMCPServer(MCPServerBase):
             MCPServerStdioParams as OpenAIInternalMCPServerStdioParams,
         )
 
-        if self.mcp_type == MCPTypes.STDIO:
+        if isinstance(self.mcp_tool, MCPStdioParams):
             params = OpenAIInternalMCPServerStdioParams(
                 command=self.mcp_tool.command,
                 args=self.mcp_tool.args,
@@ -144,30 +135,25 @@ class OpenAIMCPServer(MCPServerBase):
         # Get tools from the server
         self.tools = await self.server.list_tools()
         logger.warning(
-            "OpenAI MCP currently does not support filtering MCP available tools"
+            "OpenAI MCP currently does not support filtering MCP available tools",
         )
 
 
 class LangchainMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for LangChain agents."""
 
-    def __init__(self, mcp_tool: MCPStdioParams):
+    def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
         self.client = None
-        self.session = None
         self.tools = []
-        self.session: ClientSession | None = None
+        self.session: ClientSession = None
         self.exit_stack = AsyncExitStack()
 
-    async def setup_tools(self):
-        """Connect to an MCP server
-
-        Args:
-            server_script_path: Path to the server script (.py or .js)
-        """
+    async def setup_tools(self) -> None:
+        """Set up the LangChain MCP server with the provided configuration."""
         from langchain_mcp_adapters.tools import load_mcp_tools
 
-        if self.mcp_type == MCPTypes.STDIO:
+        if isinstance(self.mcp_tool, MCPStdioParams):
             server_params = StdioServerParameters(
                 command=self.mcp_tool.command,
                 args=self.mcp_tool.args,
@@ -197,12 +183,12 @@ class LangchainMCPServer(MCPServerBase):
 class GoogleMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Google agents."""
 
-    def __init__(self, mcp_tool: MCPStdioParams):
+    def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
-        self.server = None
+        self.server: GoogleMCPToolset | None = None
         self.exit_stack = AsyncExitStack()
 
-    async def setup_tools(self):
+    async def setup_tools(self) -> None:
         """Set up the Google MCP server with the provided configuration."""
         from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
         from google.adk.tools.mcp_tool.mcp_toolset import (
@@ -212,7 +198,7 @@ class GoogleMCPServer(MCPServerBase):
             StdioServerParameters as GoogleStdioServerParameters,
         )
 
-        if self.mcp_type == MCPTypes.STDIO:
+        if isinstance(self.mcp_tool, MCPStdioParams):
             params = GoogleStdioServerParameters(
                 command=self.mcp_tool.command,
                 args=self.mcp_tool.args,
@@ -234,15 +220,15 @@ class GoogleMCPServer(MCPServerBase):
 class LlamaIndexMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Google agents."""
 
-    def __init__(self, mcp_tool: MCPStdioParams):
+    def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
 
-    async def setup_tools(self):
+    async def setup_tools(self) -> None:
         """Set up the Google MCP server with the provided configuration."""
         from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
         from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
-        if self.mcp_type == MCPTypes.STDIO:
+        if isinstance(self.mcp_tool, MCPStdioParams):
             mcp_client = LlamaIndexMCPClient(
                 command_or_url=self.mcp_tool.command,
                 args=self.mcp_tool.args,
@@ -262,18 +248,17 @@ class LlamaIndexMCPServer(MCPServerBase):
 class AgnoMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Agno agents."""
 
-    def __init__(self, mcp_tool: MCPStdioParams):
+    def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
-        self.server = None
         self.exit_stack = AsyncExitStack()
 
-    async def setup_tools(self):
+    async def setup_tools(self) -> None:
         """Set up the Agno MCP server with the provided configuration."""
-        from agno.tools.mcp import MCPTools
+        from agno.tools.mcp import MCPTools as AgnoMCPTools
 
-        if self.mcp_type == MCPTypes.STDIO:
+        if isinstance(self.mcp_tool, MCPStdioParams):
             server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
-            self.server = MCPTools(
+            self.server = AgnoMCPTools(
                 command=server_params,
                 include_tools=self.mcp_tool.tools,
                 env={**os.environ},
@@ -290,7 +275,7 @@ class AgnoMCPServer(MCPServerBase):
                 ClientSession(stdio, write)
             )
             await session.initialize()
-            self.server = MCPTools(
+            self.server = AgnoMCPTools(
                 session=session,
                 include_tools=self.mcp_tool.tools,
             )

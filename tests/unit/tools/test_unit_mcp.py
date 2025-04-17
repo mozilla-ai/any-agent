@@ -4,6 +4,7 @@
 import asyncio
 import unittest
 from contextlib import AsyncExitStack
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -16,7 +17,6 @@ from any_agent.tools.mcp import (
     LangchainMCPServer,
     LlamaIndexMCPServer,
     MCPServerBase,
-    MCPTypes,
     SmolagentsMCPServer,
 )
 
@@ -26,24 +26,24 @@ class TestMCPServerBase(unittest.TestCase):
 
     # Define the test class once at class level instead of in each test method
     class ConcreteMCPManager(MCPServerBase):
-        def setup_tools(self):
+        async def setup_tools(self) -> None:
             pass
 
-        def cleanup(self):
+        def cleanup(self) -> None:
             pass
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test fixtures before each test."""
         # Common test data
         self.test_tool = MagicMock()
         self.test_tool.name = "test_tool"
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Clean up after each test."""
 
 
 # Common helper functions for all test classes
-def create_mock_tools():
+def create_mock_tools() -> list[MagicMock]:
     """Helper method to create mock tools."""
     mock_tool1 = MagicMock()
     mock_tool1.name = "tool1"
@@ -52,7 +52,7 @@ def create_mock_tools():
     return [mock_tool1, mock_tool2]
 
 
-def create_specific_mock_tools():
+def create_specific_mock_tools() -> list[MagicMock]:
     """Helper method to create specific mock tools."""
     mock_read_tool = MagicMock()
     mock_read_tool.name = "read_thing"
@@ -68,7 +68,7 @@ def create_specific_mock_tools():
 class TestSmolagentsMCPServer(unittest.TestCase):
     """Tests for the SmolagentsMCPServer class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test fixtures before each test."""
         # Common test data
         self.test_tool = MagicMock(spec=MCPStdioParams)
@@ -80,7 +80,11 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         self.mock_context = MagicMock()
         self.mock_context.__enter__.return_value = self.mock_collection
 
-    def test_setup_tools_with_none_tools(self, mock_stdio_params, mock_tool_collection):
+    def test_setup_tools_with_none_tools(
+        self,
+        mock_stdio_params: Any,
+        mock_tool_collection: Any,
+    ) -> None:
         """Test that when mcp_tool.tools is None, all available tools are used."""
         # Setup mock tools
         mock_tools = create_mock_tools()
@@ -100,8 +104,10 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         assert len(mcp_server.tools) == 2
 
     def test_setup_tools_with_specific_tools(
-        self, mock_stdio_params, mock_tool_collection
-    ):
+        self,
+        mock_stdio_params: Any,
+        mock_tool_collection: Any,
+    ) -> None:
         """Test that when mcp_tool.tools has specific values, only those tools are used."""
         # Setup mock tools
         mock_tools = create_specific_mock_tools()
@@ -118,13 +124,13 @@ class TestSmolagentsMCPServer(unittest.TestCase):
 
         # Verify only the requested tools are included
         assert len(mcp_server.tools) == 2
-        tool_names = [tool.name for tool in mcp_server.tools]
+        tool_names = [tool.name for tool in mcp_server.tools]  # type: ignore[union-attr]
         assert "read_thing" in tool_names
         assert "write_thing" in tool_names
         assert "other_thing" not in tool_names
 
 
-def test_openai_mcpsse():
+def test_openai_mcpsse() -> None:
     agent_framework = AgentFramework.OPENAI
     # Set up our mocks
     mock_server = AsyncMock()
@@ -137,9 +143,7 @@ def test_openai_mcpsse():
     # Path the imports and class
     with patch("agents.mcp.MCPServerSse", return_value=mock_server):
         # Set up tools config for agent
-        tools = [
-            {"url": "http://localhost:8000/sse"},  # dummy url since it's mocked
-        ]
+        tools = [MCPSseParams(url="http://localhost:8000/sse")]
 
         # Create and run the agent
         agent_config = AgentConfig(model_id="gpt-4o", tools=tools)
@@ -149,7 +153,7 @@ def test_openai_mcpsse():
 
 
 @pytest.mark.asyncio
-async def test_smolagents_mcp_sse():
+async def test_smolagents_mcp_sse() -> None:
     # Mock the necessary components
     mock_tool_collection = MagicMock()
     mock_tool1 = MagicMock()
@@ -161,7 +165,7 @@ async def test_smolagents_mcp_sse():
     mock_tool_collection.tools = [mock_tool1, mock_tool2]
 
     # Create an MCP tool config for SSE
-    mcp_tool = MCPSseParams(url="http://localhost:8000/sse", type=MCPTypes.SSE)
+    mcp_tool = MCPSseParams(url="http://localhost:8000/sse")
 
     # Create the server instance
     server = SmolagentsMCPServer(mcp_tool)
@@ -190,7 +194,7 @@ async def test_smolagents_mcp_sse():
 
 
 @pytest.mark.asyncio
-async def test_langchain_mcp_sse():
+async def test_langchain_mcp_sse() -> None:
     """Test LangchainMCPServer with SSE configuration."""
     # Mock the necessary components
     mock_tools = [MagicMock(), MagicMock()]
@@ -198,7 +202,6 @@ async def test_langchain_mcp_sse():
     # Create an MCP tool config for SSE
     mcp_tool = MCPSseParams(
         url="http://localhost:8000/sse",
-        type=MCPTypes.SSE,
         headers={"Authorization": "Bearer test-token"},
     )
 
@@ -236,7 +239,7 @@ async def test_langchain_mcp_sse():
 
 
 @pytest.mark.asyncio
-async def test_google_mcp_sse():
+async def test_google_mcp_sse() -> None:
     """Test GoogleMCPServer with SSE configuration."""
     # Mock the necessary components
     mock_tools = [MagicMock(), MagicMock()]
@@ -244,7 +247,6 @@ async def test_google_mcp_sse():
     # Create an MCP tool config for SSE
     mcp_tool = MCPSseParams(
         url="http://localhost:8000/sse",
-        type=MCPTypes.SSE,
         headers={"Authorization": "Bearer test-token"},
     )
 
@@ -290,15 +292,13 @@ async def test_google_mcp_sse():
 
 
 @pytest.mark.asyncio
-async def test_llamaindex_mcp_sse():
+async def test_llamaindex_mcp_sse() -> None:
     """Test LlamaIndexMCPServer with SSE configuration."""
     # Mock the necessary components
     mock_tools = [MagicMock(), MagicMock()]
 
     # Create an MCP tool config for SSE
-    mcp_tool = MCPSseParams(
-        url="http://localhost:8000/sse", type=MCPTypes.SSE, tools=["tool1", "tool2"]
-    )
+    mcp_tool = MCPSseParams(url="http://localhost:8000/sse", tools=["tool1", "tool2"])
 
     # Create the server instance
     server = LlamaIndexMCPServer(mcp_tool)
@@ -337,7 +337,7 @@ async def test_llamaindex_mcp_sse():
 
 
 @pytest.mark.asyncio
-async def test_agno_mcp_sse():
+async def test_agno_mcp_sse() -> None:
     """Test AgnoMCPServer with SSE configuration."""
     # Mock the necessary components
     mock_tools = [MagicMock(), MagicMock()]
@@ -345,7 +345,6 @@ async def test_agno_mcp_sse():
     # Create an MCP tool config for SSE
     mcp_tool = MCPSseParams(
         url="http://localhost:8000/sse",
-        type=MCPTypes.SSE,
         headers={"Authorization": "Bearer test-token"},
         tools=["tool1", "tool2"],
     )

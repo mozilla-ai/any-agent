@@ -90,6 +90,9 @@ Documentation = "https://mozilla-ai.github.io/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
 Source = "https://github.com/mozilla-ai/any-agent"
 
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]
 where = ["src"]
@@ -132,3 +135,9 @@ ignore = [
   "B024",
 ]
 extend-select = ["ALL"]
+
+[tool.mypy]
+strict = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+follow_untyped_imports = true

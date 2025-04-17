@@ -20,6 +20,18 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-requests
+          - types-pyyaml
+          - pytest
+          - pydantic
+          - .[dev, all]
+
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:
