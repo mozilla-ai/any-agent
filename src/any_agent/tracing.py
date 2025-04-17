@@ -136,8 +136,7 @@ def setup_tracing(
 
     Args:
         agent_framework (AgentFramework): The type of agent being used.
-        output_dir (str): The directory where the traces will be stored.
-            Defaults to "traces".
+        tracing_config (TracingConfig): Configuration for tracing, including output directory and styles.
 
     Returns:
         str: The name of the JSON file where traces will be stored.
