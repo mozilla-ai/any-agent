@@ -52,12 +52,13 @@ setup_tracing(framework)
 ### Single agent
 
 ```py
+from any_agent.tools import search_web, visit_webpage
 agent = AnyAgent.create(
     framework,
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
-        tools=["any_agent.tools.search_web", "any_agent.tools.visit_webpage"]
+        tools=[search_web, visit_webpage]
     )
 )
 
@@ -67,6 +68,7 @@ agent.run("Which Agent Framework is the best??")
 ### Multi-agent
 
 ```py
+from any_agent.tools import search_web, visit_webpage
 agent = AnyAgent.create(
     framework,
     AgentConfig(
@@ -78,13 +80,13 @@ agent = AnyAgent.create(
             name="search_web_agent",
             description="An agent that can search the web",
             model_id="gpt-4.1-nano",
-            tools=["any_agent.tools.search_web"]
+            tools=[search_web]
         ),
         AgentConfig(
             name="visit_webpage_agent",
             description="An agent that can visit webpages",
             model_id="gpt-4.1-nano",
-            tools=["any_agent.tools.visit_webpage"]
+            tools=[visit_webpage]
         )
     ]
 )

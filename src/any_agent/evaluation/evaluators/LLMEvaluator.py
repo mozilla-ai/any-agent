@@ -1,10 +1,11 @@
-from abc import ABC
 import json
 import re
-from typing import Dict, List, Any, Optional, Union
+from abc import ABC
 from textwrap import dedent
+from typing import Any
 
 from litellm import completion
+
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.test_case import CheckpointCriteria
 
@@ -19,11 +20,9 @@ class LLMEvaluator(ABC):
         self,
         criteria: str,
         points: int,
-        ground_truth_output: Optional[
-            Union[List[CheckpointCriteria], Dict[str, Any]]
-        ] = None,
-        hypothesis_final_answer: Optional[str] = None,
-        evidence: Optional[str] = None,
+        ground_truth_output: list[CheckpointCriteria] | dict[str, Any] | None = None,
+        hypothesis_final_answer: str | None = None,
+        evidence: str | None = None,
     ) -> EvaluationResult:
         """Evaluate a single criterion using LLM"""
 
@@ -88,7 +87,7 @@ class LLMEvaluator(ABC):
         except (json.JSONDecodeError, AttributeError, StopIteration) as e:
             evaluation = {
                 "passed": False,
-                "reason": f"Failed to evaluate due to parsing: {str(e)} \n Response: {content}",
+                "reason": f"Failed to evaluate due to parsing: {e!s} \n Response: {content}",
                 "criteria": criteria,
             }
         evaluation["points"] = points

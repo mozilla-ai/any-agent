@@ -37,6 +37,7 @@ jobs:
         run: pytest -v tests/unit
 
       - name: Run Integration tests
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         env:
           ANY_AGENT_INTEGRATION_TESTS: TRUE
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

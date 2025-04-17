@@ -1,7 +1,8 @@
-from typing import Dict, List, Any
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any
+
 import yaml
 from litellm import validate_environment
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class CheckpointCriteria(BaseModel):
@@ -14,10 +15,10 @@ class CheckpointCriteria(BaseModel):
 
 class TestCase(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    ground_truth: List[Dict[str, Any]] = Field(default_factory=list)
-    checkpoints: List[CheckpointCriteria] = Field(default_factory=list)
+    ground_truth: list[dict[str, Any]] = Field(default_factory=list)
+    checkpoints: list[CheckpointCriteria] = Field(default_factory=list)
     llm_judge: str
-    final_answer_criteria: List[CheckpointCriteria] = Field(default_factory=list)
+    final_answer_criteria: list[CheckpointCriteria] = Field(default_factory=list)
     test_case_path: str
     output_path: str = "output/results.json"
 

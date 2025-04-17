@@ -3,9 +3,11 @@ import os
 import pytest
 
 from any_agent.config import AgentFramework, AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.tools import search_web
 from any_agent.tracing import setup_tracing
 
-frameworks = [item for item in AgentFramework]
+frameworks = list(AgentFramework)
 
 
 @pytest.mark.parametrize("framework", frameworks)
@@ -13,14 +15,14 @@ frameworks = [item for item in AgentFramework]
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_agent(framework, tmp_path, refresh_tools):
+def test_load_and_run_agent(framework, tmp_path):
     agent_framework = AgentFramework(framework)
     kwargs = {}
 
     if framework == "smolagents":
         kwargs["agent_type"] = "ToolCallingAgent"
 
-    kwargs["model_id"] = "gpt-4o-mini"
+    kwargs["model_id"] = "gpt-4.1-nano"
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {framework}")
 
@@ -30,7 +32,7 @@ def test_load_and_run_agent(framework, tmp_path, refresh_tools):
         setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     agent_config = AgentConfig(
-        tools=["any_agent.tools.search_web"],
+        tools=[search_web],
         instructions="Search the web to answer",
         model_args={"parallel_tool_calls": False} if framework != "agno" else None,
         **kwargs,

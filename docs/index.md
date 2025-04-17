@@ -36,9 +36,10 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 Configure the agent:
 
 ```python
+from any_agent.tools import search_web, visit_webpage
 main_agent = AgentConfig(
     model_id="gpt-4o",
-    tools=["any_agent.tools.search_web", "any_agent.tools.visit_webpage"]
+    tools=[search_web, visit_webpage]
 )
 ```
 
@@ -87,18 +88,19 @@ This agent will act as the "orchestrator".
 Then, configure the list of `managed_agents`:
 
 ```python
+from any_agent.tools import search_web, visit_webpage
 managed_agents = [
     AgentConfig(
         name="search_web_agent",
         model_id="gpt-4o-mini",
         description="Agent that can search the web",
-        tools=["any_agent.tools.search_web"]
+        tools=[search_web]
     ),
     AgentConfig(
         name="visit_webpage_agent",
         model_id="gpt-4o-mini",
         description="Agent that can visit webpages",
-        tools=["any_agent.tools.visit_webpage"]
+        tools=[visit_webpage]
     )
 ]
 ```

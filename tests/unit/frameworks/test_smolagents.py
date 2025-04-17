@@ -1,8 +1,10 @@
 import os
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from any_agent.config import AgentFramework, AgentConfig, AnyAgent
+import pytest
+
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.frameworks.smolagents import (
     DEFAULT_AGENT_TYPE,
     DEFAULT_MODEL_CLASS,
@@ -89,7 +91,7 @@ def test_load_smolagent_environment_error():
                 AgentFramework.SMOLAGENTS,
                 AgentConfig(
                     model_id="openai/o3-mini",
-                    model_args=dict(api_key_var="MISSING_KEY"),
+                    model_args={"api_key_var": "MISSING_KEY"},
                 ),
             )
 

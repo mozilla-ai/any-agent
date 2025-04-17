@@ -1,13 +1,13 @@
-import os
 import json
+import os
 from datetime import datetime
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
+    BatchSpanProcessor,
     SimpleSpanProcessor,
     SpanExporter,
-    BatchSpanProcessor,
     SpanExportResult,
 )
 from rich.console import Console
@@ -155,5 +155,6 @@ def setup_tracing(
 
         LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
     else:
-        raise NotImplementedError(f"{agent_framework} tracing is not supported.")
+        msg = f"{agent_framework} tracing is not supported."
+        raise NotImplementedError(msg)
     return file_name
