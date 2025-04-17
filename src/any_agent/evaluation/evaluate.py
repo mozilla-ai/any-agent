@@ -2,15 +2,16 @@ import json
 from textwrap import dedent
 from typing import Any
 
-from any_agent.evaluation.evaluators import (
+from any_agent.logging import logger
+from any_agent.telemetry import TelemetryProcessor
+
+from .evaluators import (
     CheckpointEvaluator,
     HypothesisEvaluator,
     QuestionAnsweringSquadEvaluator,
 )
-from any_agent.evaluation.results_saver import save_evaluation_results
-from any_agent.evaluation.test_case import TestCase
-from any_agent.logging import logger
-from any_agent.telemetry.telemetry import TelemetryProcessor
+from .results_saver import save_evaluation_results
+from .test_case import TestCase
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:

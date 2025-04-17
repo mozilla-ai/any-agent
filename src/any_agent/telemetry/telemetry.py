@@ -3,7 +3,7 @@ import re
 from abc import ABC, abstractmethod
 from typing import Any, ClassVar
 
-from any_agent import AgentFramework
+from any_agent.config import AgentFramework
 from any_agent.logging import logger
 
 
