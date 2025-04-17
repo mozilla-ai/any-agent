@@ -1,9 +1,10 @@
 import importlib
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.wrappers import wrap_tools
+from any_agent.tools import search_web, visit_webpage, wrap_tools
+
+from .any_agent import AnyAgent
 
 try:
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent

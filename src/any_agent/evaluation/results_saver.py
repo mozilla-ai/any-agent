@@ -2,8 +2,9 @@ import os
 
 import pandas as pd
 
-from any_agent.evaluation.test_case import TestCase
 from any_agent.logging import logger
+
+from .test_case import TestCase
 
 # Use the shared logger
 

@@ -1,9 +1,13 @@
-from .CheckpointEvaluator import CheckpointEvaluator
-from .HypothesisEvaluator import HypothesisEvaluator
-from .QuestionAnsweringSquadEvaluator import QuestionAnsweringSquadEvaluator
+from .checkpoint_evaluator import CheckpointEvaluator
+from .hypothesis_evaluator import HypothesisEvaluator
+from .llm_evaluator import LLMEvaluator
+from .question_answering_squad_evaluator import QuestionAnsweringSquadEvaluator
+from .schemas import EvaluationResult
 
 __all__ = [
     "CheckpointEvaluator",
-    "QuestionAnsweringSquadEvaluator",
+    "EvaluationResult",
     "HypothesisEvaluator",
+    "LLMEvaluator",
+    "QuestionAnsweringSquadEvaluator",
 ]

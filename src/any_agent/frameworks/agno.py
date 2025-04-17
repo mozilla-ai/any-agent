@@ -1,10 +1,11 @@
 from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.wrappers import wrap_tools
+
+from .any_agent import AnyAgent
 
 try:
     from agno.agent import Agent
