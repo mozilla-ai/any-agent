@@ -1,8 +1,9 @@
-from typing import Any
+from collections.abc import Sequence
 
 import yaml
 from litellm import validate_environment
 from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import TypedDict
 
 
 class CheckpointCriteria(BaseModel):
@@ -13,12 +14,24 @@ class CheckpointCriteria(BaseModel):
     points: int
 
 
+class GroundTruthAnswer(TypedDict):
+    name: str
+    value: float
+    points: float
+
+
 class TestCase(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    ground_truth: list[dict[str, Any]] = Field(default_factory=list)
-    checkpoints: list[CheckpointCriteria] = Field(default_factory=list)
+    ground_truth: Sequence[GroundTruthAnswer] = Field(
+        default_factory=list[GroundTruthAnswer],
+    )
+    checkpoints: Sequence[CheckpointCriteria] = Field(
+        default_factory=list[CheckpointCriteria],
+    )
     llm_judge: str
-    final_answer_criteria: list[CheckpointCriteria] = Field(default_factory=list)
+    final_answer_criteria: Sequence[CheckpointCriteria] = Field(
+        default_factory=list[CheckpointCriteria],
+    )
     test_case_path: str
     output_path: str = "output/results.json"
 
@@ -29,18 +42,21 @@ class TestCase(BaseModel):
             test_case_dict = yaml.safe_load(f)
         final_answer_criteria = []
 
-        def add_gt_final_answer_criteria(ground_truth_list):
+        def add_gt_final_answer_criteria(
+            ground_truth_list: Sequence[GroundTruthAnswer],
+        ) -> None:
             """Add checkpoints for each item in the ground_truth list"""
             for item in ground_truth_list:
-                if isinstance(item, dict) and "name" in item and "value" in item:
+                if "name" in item and "value" in item:
                     points = item.get(
-                        "points", 1
+                        "points",
+                        1,
                     )  # Default to 1 if points not specified
                     final_answer_criteria.append(
                         {
                             "points": points,
                             "criteria": f"Check if {item['name']} is approximately '{item['value']}'.",
-                        }
+                        },
                     )
 
         if "ground_truth" in test_case_dict:

@@ -9,7 +9,7 @@ from any_agent.tools import (
 )
 
 
-def test_load_llama_index_agent_default():
+def test_load_llama_index_agent_default() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -39,13 +39,13 @@ def test_load_llama_index_agent_default():
         )
 
 
-def test_load_llama_index_agent_missing():
+def test_load_llama_index_agent_missing() -> None:
     with patch("any_agent.frameworks.llama_index.llama_index_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.LLAMA_INDEX, AgentConfig(model_id="gpt-4o"))
 
 
-def test_load_langchain_multiagent():
+def test_load_langchain_multiagent() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()

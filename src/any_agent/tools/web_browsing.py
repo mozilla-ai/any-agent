@@ -24,6 +24,7 @@ def search_web(query: str) -> str:
 
     Returns:
         The top search results.
+
     """
     ddgs = DDGS()
     results = ddgs.text(query, max_results=10)
@@ -37,6 +38,7 @@ def visit_webpage(url: str) -> str:
 
     Args:
         url: The url of the webpage to visit.
+
     """
     try:
         response = requests.get(url)

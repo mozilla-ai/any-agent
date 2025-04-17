@@ -1,3 +1,4 @@
+from collections.abc import MutableMapping, Sequence
 from typing import Any
 
 from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
@@ -12,8 +13,8 @@ class CheckpointEvaluator(LLMEvaluator):
 
     def evaluate(
         self,
-        telemetry: list[dict[str, Any]],
-        checkpoints: list[CheckpointCriteria],
+        telemetry: Sequence[MutableMapping[str, Any]],
+        checkpoints: Sequence[CheckpointCriteria],
         processor: TelemetryProcessor,
     ) -> list[EvaluationResult]:
         """
@@ -26,6 +27,7 @@ class CheckpointEvaluator(LLMEvaluator):
 
         Returns:
             List of evaluation results
+
         """
         evidence = processor.extract_evidence(telemetry)
         evidence = evidence.replace("<", "\\<").replace(">", "\\>")

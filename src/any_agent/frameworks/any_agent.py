@@ -4,7 +4,7 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import Any, assert_never
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, Tool
 
 
 class AnyAgent(ABC):
@@ -77,22 +77,22 @@ class AnyAgent(ABC):
 
     @property
     @abstractmethod
-    def tools(self) -> list[str]:
-        """
-        Return the tools used by the agent.
+    def tools(self) -> list[Tool]:
+        """Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
 
     def __init__(
-        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
-    ):
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
+    ) -> None:
         msg = "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
         raise NotImplementedError(msg)
 
     @property
-    def agent(self):
-        """
-        The underlying agent implementation from the framework.
+    def agent(self) -> Any:
+        """The underlying agent implementation from the framework.
 
         This property is intentionally restricted to maintain framework abstraction
         and prevent direct dependency on specific agent implementations.
@@ -104,6 +104,7 @@ class AnyAgent(ABC):
 
         Raises:
             NotImplementedError: Always raised when this property is accessed
+
         """
         msg = "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
         raise NotImplementedError(msg)

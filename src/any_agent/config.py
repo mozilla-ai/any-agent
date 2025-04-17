@@ -1,6 +1,6 @@
-from collections.abc import Callable
+from collections.abc import Callable, MutableMapping, Sequence
 from enum import Enum, auto
-from typing import Self
+from typing import Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -29,9 +29,15 @@ class AgentFramework(str, Enum):
         return cls[formatted_value]
 
 
-class MCPTool(BaseModel):
+class MCPStdioParams(BaseModel):
     command: str
-    args: list[str]
+    args: Sequence[str]
+    tools: Sequence[str] | None = None
+
+
+class MCPSseParams(BaseModel):
+    url: str
+    headers: dict[str, str] | None = None
     tools: list[str] | None = None
 
 
@@ -42,15 +48,20 @@ class TracingConfig(BaseModel):
     chain: str | None = None
 
 
+MCPParams = MCPStdioParams | MCPSseParams
+
+Tool = str | MCPParams | Callable[..., Any]
+
+
 class AgentConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     model_id: str
+    description: str = ""
     name: str = "any_agent"
     instructions: str | None = None
-    tools: list[str | MCPTool | Callable] = Field(default_factory=list)
+    tools: Sequence[Tool] = Field(default_factory=list)
     handoff: bool = False
     agent_type: str | None = None
-    agent_args: dict | None = None
+    agent_args: MutableMapping[str, Any] | None = None
     model_type: str | None = None
-    model_args: dict | None = None
-    description: str | None = None
+    model_args: MutableMapping[str, Any] | None = None

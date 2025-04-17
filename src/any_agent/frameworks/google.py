@@ -1,11 +1,16 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.wrappers import wrap_tools
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from any_agent.tools.mcp import MCPServerBase
 
 try:
     from google.adk.agents import Agent
@@ -16,25 +21,27 @@ try:
 
     adk_available = True
 except ImportError:
-    adk_available = None
+    adk_available = False
 
 
 class GoogleAgent(AnyAgent):
     """Google agent implementation that handles both loading and running."""
 
     def __init__(
-        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
     ):
         if not adk_available:
             msg = "You need to `pip install 'any-agent[google]'` to use this agent"
             raise ImportError(msg)
         self.managed_agents = managed_agents
         self.config = config
-        self._agent = None
-        self._mcp_servers = None
-        self._managed_mcp_servers = None
+        self._agent: Agent | None = None
+        self._mcp_servers: Sequence[MCPServerBase] | None = None
+        self._managed_mcp_servers: Sequence[MCPServerBase] | None = None
 
-    def _get_model(self, agent_config: AgentConfig):
+    def _get_model(self, agent_config: AgentConfig) -> LiteLlm:
         """Get the model configuration for a Google agent."""
         return LiteLlm(model=agent_config.model_id, **agent_config.model_args or {})
 
@@ -91,14 +98,19 @@ class GoogleAgent(AnyAgent):
         )
 
     async def run_async(
-        self, prompt: str, user_id: str | None = None, session_id: str | None = None
+        self,
+        prompt: str,
+        user_id: str | None = None,
+        session_id: str | None = None,
     ) -> Any:
         """Run the Google agent with the given prompt."""
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
         runner.session_service.create_session(
-            app_name=runner.app_name, user_id=user_id, session_id=session_id
+            app_name=runner.app_name,
+            user_id=user_id,
+            session_id=session_id,
         )
         events = runner.run_async(
             user_id=user_id,
@@ -112,19 +124,20 @@ class GoogleAgent(AnyAgent):
                 break
 
         session = runner.session_service.get_session(
-            app_name=runner.app_name, user_id=user_id, session_id=session_id
+            app_name=runner.app_name,
+            user_id=user_id,
+            session_id=session_id,
         )
         return session.state.get("response", None)
 
     @property
-    def tools(self) -> list[str]:
+    def tools(self) -> list[Tool]:
         """
         Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
-        if hasattr(self, "_agent"):
-            tools = [tool.name for tool in self._agent.tools]
-        else:
+        if not self._agent:
             logger.warning("Agent not loaded or does not have tools.")
-            tools = []
-        return tools
+            return []
+
+        return [tool.name for tool in self._agent.tools]

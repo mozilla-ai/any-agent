@@ -75,6 +75,7 @@ docs = [
 tests = [
   "pytest>=8,<9",
   "pytest-sugar>=0.9.6",
+  "pytest-asyncio>=0.26.0",
   "debugpy>=1.8.13",
   "mktestdocs>=0.2.4",
 ]
@@ -88,6 +89,9 @@ dev = [
 Documentation = "https://mozilla-ai.github.io/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
 Source = "https://github.com/mozilla-ai/any-agent"
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]
@@ -131,3 +135,9 @@ ignore = [
   "B024",
 ]
 extend-select = ["ALL"]
+
+[tool.mypy]
+strict = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+follow_untyped_imports = true

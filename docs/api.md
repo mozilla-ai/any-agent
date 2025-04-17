@@ -6,7 +6,9 @@
 
 ::: any_agent.AgentConfig
 
-::: any_agent.config.MCPTool
+::: any_agent.config.MCPStdioParams
+
+::: any_agent.config.MCPSseParams
 
 ::: any_agent.config.TracingConfig
 

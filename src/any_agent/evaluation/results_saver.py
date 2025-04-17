@@ -18,8 +18,7 @@ def save_evaluation_results(
     failed_checks: int,
     score: float,
 ) -> None:
-    """
-    Save evaluation results to the specified output path.
+    """Save evaluation results to the specified output path.
 
     Args:
         test_case: Path to the test case file
@@ -31,6 +30,7 @@ def save_evaluation_results(
         passed_checks: Number of passed checkpoints
         failed_checks: Number of failed checkpoints
         score: Evaluation score as a percentage
+
     """
     # See if the output_path file exists
     if os.path.exists(output_path):
@@ -54,10 +54,10 @@ def save_evaluation_results(
                         "passed_checks": passed_checks,
                         "failed_checks": failed_checks,
                         "score": round(score, 2),
-                    }
-                ]
+                    },
+                ],
             ),
-        ]
+        ],
     )
     logger.info(f"Writing output to {output_path}")
     df.to_json(output_path, orient="records", lines=True)
