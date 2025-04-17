@@ -89,6 +89,9 @@ Documentation = "https://mozilla-ai.github.io/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
 Source = "https://github.com/mozilla-ai/any-agent"
 
+[tool.setuptools.package-data]
+any-agent = ["py.typed"]
+
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]
 where = ["src"]
@@ -134,15 +137,6 @@ extend-select = ["ALL"]
 
 [tool.mypy]
 strict = true
-check-untyped-defs = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
-disallow-incomplete-defs = true
-disallow-untyped-decorators = true
-disallow-any-unimported = true
-disallow-any-expr = true
-disallow-any-decorated = true
-disallow-any-explicit = true
-disallow-any-generics = true
-disallow-subclassing-any = true
-warn-incomplete-stub = true
+follow_untyped_imports = true

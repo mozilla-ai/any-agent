@@ -29,7 +29,7 @@ def wrap_tool_langchain(tool: Tool) -> Any:
     from langchain_core.tools import tool as langchain_tool
 
     if not isinstance(tool, BaseTool):
-        return langchain_tool(tool)  # type: ignore[arg-type]
+        return langchain_tool(tool)
     return tool
 
 
@@ -51,7 +51,7 @@ def wrap_tool_llama_index(tool: Tool) -> Any:
     from llama_index.core.tools import FunctionTool
 
     if not isinstance(tool, FunctionTool):
-        return FunctionTool.from_defaults(tool)  # type: ignore[arg-type]
+        return FunctionTool.from_defaults(tool)
     return tool
 
 

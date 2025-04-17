@@ -28,11 +28,9 @@ repos:
         additional_dependencies:
           - types-requests
           - types-pyyaml
-          - openai
-          - langchain
-          - llama-index
-          - smolagents
           - pytest
+          - pydantic
+          - .[dev, all]
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
