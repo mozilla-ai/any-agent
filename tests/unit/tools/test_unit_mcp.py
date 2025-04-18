@@ -139,7 +139,7 @@ def test_openai_mcpsse() -> None:
 
     mock_tool = MagicMock(spec=MCPTool)
     mock_tool.name = "test_tool"
-    mock_server._tools_list = [mock_tool]
+    mock_server._tools_list = [mock_tool]  # pylint: disable=protected-access
 
     # Path the imports and class
     with patch("agents.mcp.MCPServerSse", return_value=mock_server):
