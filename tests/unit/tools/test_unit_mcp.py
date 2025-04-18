@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument, unused-variable
 # Test MCP Tools Classes.
 # Disclaim
 
@@ -124,7 +125,7 @@ class TestSmolagentsMCPServer(unittest.TestCase):
 
         # Verify only the requested tools are included
         assert len(mcp_server.tools) == 2
-        tool_names = [tool.name for tool in mcp_server.tools]
+        tool_names = [tool.name for tool in mcp_server.tools]  # type: ignore[union-attr]
         assert "read_thing" in tool_names
         assert "write_thing" in tool_names
         assert "other_thing" not in tool_names
@@ -138,7 +139,7 @@ def test_openai_mcpsse() -> None:
 
     mock_tool = MagicMock(spec=MCPTool)
     mock_tool.name = "test_tool"
-    mock_server._tools_list = [mock_tool]
+    mock_server._tools_list = [mock_tool]  # pylint: disable=protected-access
 
     # Path the imports and class
     with patch("agents.mcp.MCPServerSse", return_value=mock_server):
