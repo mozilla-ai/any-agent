@@ -35,10 +35,10 @@ def save_evaluation_results(
     """
     # See if the output_path file exists
     if os.path.exists(output_path):
-        logger.info(f"Reading existing output from {output_path}")
+        logger.info("Reading existing output from %s", output_path)
         df = pd.read_json(output_path, orient="records", lines=True)
     else:
-        logger.info(f"Creating new output file at {output_path}")
+        logger.info("Creating new output file at %s", output_path)
         df = pd.DataFrame()
 
     df = pd.concat(
@@ -60,5 +60,5 @@ def save_evaluation_results(
             ),
         ],
     )
-    logger.info(f"Writing output to {output_path}")
+    logger.info("Writing output to %s", output_path)
     df.to_json(output_path, orient="records", lines=True)

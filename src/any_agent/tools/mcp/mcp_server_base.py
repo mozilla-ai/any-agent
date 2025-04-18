@@ -1,10 +1,14 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 from importlib.util import find_spec
+from typing import TYPE_CHECKING
 
 from any_agent.config import MCPParams, Tool
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 client_session_available = find_spec("mcp") is not None
 stdio_client_available = find_spec("mcp.client.stdio") is not None

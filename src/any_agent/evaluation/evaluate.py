@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from textwrap import dedent
 from typing import Any
 
@@ -15,8 +16,8 @@ from .test_case import TestCase
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
-    with open(telemetry_path) as f:
-        telemetry: list[dict[str, Any]] = json.loads(f.read())
+    file_text = Path(telemetry_path).read_text(encoding="utf-8")
+    telemetry: list[dict[str, Any]] = json.loads(file_text)
     logger.info("Telemetry loaded from %s", telemetry_path)
 
     agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)
@@ -57,8 +58,8 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
     )
     failed_checks = [r for r in verification_results if not r.passed]
     passed_checks = [r for r in verification_results if r.passed]
-    missed_points = sum([r.points for r in failed_checks])
-    won_points = sum([r.points for r in passed_checks])
+    missed_points = sum(r.points for r in failed_checks)
+    won_points = sum(r.points for r in passed_checks)
     if passed_checks:
         for check in passed_checks:
             message = dedent(

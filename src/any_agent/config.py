@@ -40,6 +40,7 @@ class MCPSseParams(BaseModel):
     headers: Mapping[str, str] = Field(default_factory=dict)
     tools: Sequence[str] = Field(default_factory=list)
 
+
 MCPParams = MCPStdioParams | MCPSseParams
 
 Tool = str | MCPParams | Callable[..., Any]
