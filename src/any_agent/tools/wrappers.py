@@ -4,7 +4,7 @@ from functools import wraps
 from typing import Any
 
 from any_agent.config import AgentFramework, MCPParams, Tool
-from any_agent.tools.mcp import (
+from .mcp import (
     AgnoMCPServerStdio,
     GoogleMCPServerStdio,
     LangchainMCPServerStdio,
