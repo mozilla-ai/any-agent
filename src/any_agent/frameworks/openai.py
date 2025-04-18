@@ -3,7 +3,6 @@ from collections.abc import Sequence
 from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
-from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage, wrap_tools
 
@@ -93,7 +92,7 @@ class OpenAIAgent(AnyAgent):
                     model=self._get_model(managed_agent, api_key_var, base_url),
                     tools=managed_tools,
                     mcp_servers=[
-                        managed_mcp_server.server  # type: ignore[attr-defined]
+                        managed_mcp_server.server
                         for managed_mcp_server in managed_mcp_servers
                     ],
                     **kwargs,
@@ -122,7 +121,7 @@ class OpenAIAgent(AnyAgent):
             model=self._get_model(self.config, api_key_var, base_url),
             handoffs=handoffs,
             tools=tools,
-            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],  # type: ignore[attr-defined]
+            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,
         )
 

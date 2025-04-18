@@ -2,8 +2,7 @@ import importlib
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import Tool
+from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage, wrap_tools
 
@@ -53,7 +52,7 @@ class LlamaIndexAgent(AnyAgent):
             class_name,
         )
         return cast(
-            LLM,
+            "LLM",
             model_type(model=agent_config.model_id, **agent_config.model_args or {}),
         )
 

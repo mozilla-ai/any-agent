@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
-from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage, wrap_tools
 

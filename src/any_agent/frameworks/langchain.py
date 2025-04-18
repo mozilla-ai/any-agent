@@ -2,7 +2,6 @@ import importlib
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
-from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage, wrap_tools
 
@@ -58,7 +57,7 @@ class LangchainAgent(AnyAgent):
         model_type = getattr(importlib.import_module(module), class_name)
 
         return cast(
-            str | LanguageModelLike,
+            "str | LanguageModelLike",
             model_type(model=agent_config.model_id, **agent_config.model_args or {}),
         )
 
