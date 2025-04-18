@@ -1,28 +1,38 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: "v5.0.0"
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
       - id: check-json
       - id: check-merge-conflict
-        args: ['--assume-in-merge']
+        args:
+          - '--assume-in-merge'
       - id: check-toml
       - id: check-yaml
       - id: end-of-file-fixer
       - id: mixed-line-ending
-        args: ['--fix=lf']
+        args:
+          - '--fix=lf'
       - id: sort-simple-yaml
       - id: trailing-whitespace
+
+  - repo: https://gitlab.com/vojko.pribudic.foss/pre-commit-update
+    rev: "v0.6.1"
+    hooks:
+      - id: pre-commit-update
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.7.3'
+    rev: "v0.11.6"
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args:
+          - "--fix"
+          - "--exit-non-zero-on-fix"
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.15.0
+    rev: "v1.15.0"
     hooks:
       - id: mypy
         additional_dependencies:
@@ -36,7 +46,7 @@ repos:
           - openinference-instrumentation-openai-agents>=0.1.5
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: "v2.4.1"
     hooks:
       - id: codespell
         exclude: CODE_OF_CONDUCT.md

@@ -52,7 +52,7 @@ class LlamaIndexAgent(AnyAgent):
             class_name,
         )
         return cast(
-            LLM,
+            "LLM",
             model_type(model=agent_config.model_id, **agent_config.model_args or {}),
         )
 
