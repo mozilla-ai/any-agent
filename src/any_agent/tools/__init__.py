@@ -7,10 +7,10 @@ from .user_interaction import (
 from .web_browsing import search_web, visit_webpage
 
 __all__ = [
+    "ask_user_verification",
     "search_web",
+    "send_console_message",
     "show_final_answer",
     "show_plan",
-    "ask_user_verification",
     "visit_webpage",
-    "send_console_message",
 ]
