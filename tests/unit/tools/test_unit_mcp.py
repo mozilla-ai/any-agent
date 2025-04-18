@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument, unused-variable
 # Test MCP Tools Classes.
 # Disclaim
 

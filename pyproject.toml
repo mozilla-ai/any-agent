@@ -113,7 +113,7 @@ disable = [
   "super-init-not-called",           # AnyAgent uses create as Factory Method
   "unnecessary-dunder-call",         # There are several calls to __aenter__ and similar
   "too-few-public-methods",          # Some of the classes are straightforward
-  "redefined-outer-name)",           # This is incompatible with pytest fixtures
+  "redefined-outer-name",            # This is incompatible with pytest fixtures
   "attribute-defined-outside-init",  # TODO: MUST FIX
   "too-many-branches",               # TODO: MUST FIX
   "too-many-positional-arguments",   # TODO: MUST FIX
@@ -121,6 +121,7 @@ disable = [
   "too-many-arguments",              # TODO: MUST FIX
   "too-complex",                     # TODO: MUST FIX
   "broad-exception-caught",          # TODO: MUST FIX
+  "too-many-statements",             # TODO: MUST FIX
 ]
 
 [tool.pylint.main]

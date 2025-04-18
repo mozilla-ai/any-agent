@@ -63,7 +63,7 @@ class AnyAgent(ABC):
     ) -> AnyAgent:
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config, managed_agents=managed_agents)
-        asyncio.get_event_loop().run_until_complete(agent._load_agent())
+        asyncio.get_event_loop().run_until_complete(agent._load_agent())  # pylint: disable=protected-access
         return agent
 
     @abstractmethod
