@@ -1,3 +1,4 @@
+from contextlib import suppress
 import os
 from collections.abc import Sequence
 from typing import Any
@@ -8,13 +9,12 @@ from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.mcp import MCPServerBase
 from any_agent.tools.wrappers import wrap_tools
 
-try:
+smolagents_available = False
+with suppress(ImportError):
     import smolagents
     from smolagents import MultiStepAgent
 
     smolagents_available = True
-except ImportError:
-    smolagents_available = False
 
 DEFAULT_AGENT_TYPE = "CodeAgent"
 DEFAULT_MODEL_CLASS = "LiteLLMModel"

@@ -238,5 +238,5 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
             return "CHAIN", self._extract_chain_interaction(span)
         if span_kind == "AGENT":
             return "AGENT", self._extract_agent_interaction(span)
-        logger.warning(f"Unknown span kind: {span_kind}. Span: {span}")
+        logger.warning("Unknown span kind: %s. Span: %s", span_kind, span)
         return "UNKNOWN", {}

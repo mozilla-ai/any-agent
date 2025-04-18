@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
@@ -12,7 +13,9 @@ if TYPE_CHECKING:
 
     from any_agent.tools.mcp import MCPServerBase
 
-try:
+
+adk_available = False
+with suppress(ImportError):
     from google.adk.agents import Agent
     from google.adk.models.lite_llm import LiteLlm
     from google.adk.runners import InMemoryRunner
@@ -20,8 +23,6 @@ try:
     from google.genai import types
 
     adk_available = True
-except ImportError:
-    adk_available = False
 
 
 class GoogleAgent(AnyAgent):

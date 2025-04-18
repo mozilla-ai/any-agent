@@ -169,7 +169,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
             "llm.token_count.total",
         ]:
             if key in attributes:
-                token_name = key.split(".")[-1]
+                token_name = key.rsplit(".", maxsplit=1)[-1]
                 token_counts[token_name] = attributes[key]
 
         if token_counts:

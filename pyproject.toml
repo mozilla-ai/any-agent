@@ -110,6 +110,8 @@ disable = [
   "line-too-long",
   "duplicate-code",
   "ungrouped-imports",
+  "super-init-not-called",  # AnyAgent uses create as Factory Method
+  "unnecessary-dunder-call", # There are several calls to __aenter__ and similar
 ]
 
 [tool.pylint.main]

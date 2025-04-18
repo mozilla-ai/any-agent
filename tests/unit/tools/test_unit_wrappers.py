@@ -1,3 +1,5 @@
+# pylint: disable=disallowed-name, redefined-outer-name
+
 import asyncio
 from unittest.mock import MagicMock, patch
 

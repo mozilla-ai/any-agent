@@ -1,3 +1,4 @@
+from contextlib import suppress
 import os
 from collections.abc import Sequence
 from typing import Any
@@ -8,7 +9,8 @@ from any_agent.tools import search_web, visit_webpage, wrap_tools
 
 from .any_agent import AnyAgent
 
-try:
+agents_available = False
+with suppress(ImportError):
     from agents import (
         Agent,
         AsyncOpenAI,
@@ -18,8 +20,6 @@ try:
     )
 
     agents_available = True
-except ImportError:
-    agents_available = False
 
 OPENAI_MAX_TURNS = 30
 

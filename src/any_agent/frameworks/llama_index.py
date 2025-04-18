@@ -1,3 +1,4 @@
+from contextlib import suppress
 import importlib
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
@@ -13,14 +14,12 @@ if TYPE_CHECKING:
 
     from any_agent.tools.mcp import MCPServerBase
 
-try:
+llama_index_available = False
+with suppress(ImportError):
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
     from llama_index.core.llms import LLM
 
     llama_index_available = True
-except ImportError:
-    llama_index_available = False
-
 
 DEFAULT_MODEL_CLASS = "litellm.LiteLLM"
 

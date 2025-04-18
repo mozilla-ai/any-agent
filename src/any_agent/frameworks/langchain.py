@@ -1,5 +1,6 @@
 import importlib
 from typing import TYPE_CHECKING, Any, cast
+from contextlib import suppress
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.logging import logger
@@ -14,17 +15,17 @@ if TYPE_CHECKING:
 
     from any_agent.tools.mcp import MCPServerBase
 
-if TYPE_CHECKING:
     from langchain_core.language_models import LanguageModelLike
 
-try:
+
+langchain_available = False
+
+with suppress(ImportError):
     from langchain_core.language_models import LanguageModelLike
     from langgraph.prebuilt import create_react_agent
     from langgraph_swarm import create_handoff_tool, create_swarm
 
     langchain_available = True
-except ImportError:
-    langchain_available = False
 
 
 DEFAULT_MODEL_CLASS = "langchain_litellm.ChatLiteLLM"

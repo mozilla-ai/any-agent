@@ -57,5 +57,5 @@ class SmolagentsMCPServerStdio(MCPServerBase):
             logger.info(
                 "No specific tools requested for MCP server, using all available tools:"
             )
-            logger.info(f"Tools available: {tools}")
+            logger.info("Tools available: %s", tools")
             self.tools = tools
