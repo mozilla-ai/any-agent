@@ -18,13 +18,14 @@ with suppress(ImportError):
     )
 
 
-
 class OpenAIMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for OpenAI agents."""
 
     def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
-        self.server: OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None = None
+        self.server: (
+            OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None
+        ) = None
         self.exit_stack = AsyncExitStack()
 
     async def setup_stdio_tools(self) -> None:

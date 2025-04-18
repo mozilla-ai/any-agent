@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 mcp_available = False
 with suppress(ImportError):
-
     mcp_available = True
 
 

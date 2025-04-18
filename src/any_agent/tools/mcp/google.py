@@ -24,7 +24,9 @@ class GoogleMCPServer(MCPServerBase):
         super().__init__(mcp_tool)
         self.server: GoogleMCPToolset | None = None
         self.exit_stack = AsyncExitStack()
-        self.params: GoogleStdioServerParameters | GoogleSseServerParameters | None = None
+        self.params: GoogleStdioServerParameters | GoogleSseServerParameters | None = (
+            None
+        )
 
     async def setup_stdio_tools(self) -> None:
         assert isinstance(self.mcp_tool, MCPStdioParams)

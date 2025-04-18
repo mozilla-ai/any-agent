@@ -13,7 +13,6 @@ with suppress(ImportError):
     from mcp.client.sse import sse_client
 
 
-
 class AgnoMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Agno agents."""
 

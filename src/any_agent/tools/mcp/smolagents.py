@@ -72,4 +72,3 @@ class SmolagentsMCPServer(MCPServerBase):
             )
 
         self.tools = filtered_tools
-
