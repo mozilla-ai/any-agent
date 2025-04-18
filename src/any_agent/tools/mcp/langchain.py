@@ -3,7 +3,7 @@
 import os
 from contextlib import suppress
 
-from any_agent.config import MCPTool
+from any_agent.config import MCPParams, MCPStdioParams
 
 from .mcp_server_base import MCPServerBase
 
@@ -15,24 +15,27 @@ with suppress(ImportError):
 class LangchainMCPServerStdio(MCPServerBase):
     """Implementation of MCP tools manager for LangChain agents."""
 
-    def __init__(self, mcp_tool: MCPTool):
+    def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
         self.client = None
         self.session = None
         self.tools = []
 
-    async def setup_tools(self):
+    async def setup_tools(self) -> None:
         """Set up the LangChain MCP server with the provided configuration."""
         from langchain_mcp_adapters.tools import load_mcp_tools
 
+        if not isinstance(self.mcp_tool, MCPStdioParams):
+            raise NotImplementedError
+
         server_params = StdioServerParameters(
             command=self.mcp_tool.command,
-            args=self.mcp_tool.args,
+            args=list(self.mcp_tool.args),
             env={**os.environ},
         )
         self.client = stdio_client(server_params)
-        self.read, self.write = await self.client.__aenter__()
+        self.read, self.write = await self.client.__aenter__()  # type: ignore[attr-defined]
         self.session = ClientSession(self.read, self.write)
-        await self.session.__aenter__()
-        await self.session.initialize()
+        await self.session.__aenter__()  # type: ignore[attr-defined]
+        await self.session.initialize()  # type: ignore[attr-defined]
         self.tools = await load_mcp_tools(self.session)

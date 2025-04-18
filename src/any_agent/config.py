@@ -1,4 +1,4 @@
-from collections.abc import Callable, MutableMapping, Sequence
+from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import Enum, auto
 from typing import Any, Self
 
@@ -32,21 +32,13 @@ class AgentFramework(str, Enum):
 class MCPStdioParams(BaseModel):
     command: str
     args: Sequence[str]
-    tools: Sequence[str] | None = None
+    tools: Sequence[str] = Field(default_factory=list)
 
 
 class MCPSseParams(BaseModel):
     url: str
-    headers: dict[str, str] | None = None
-    tools: list[str] | None = None
-
-
-class TracingConfig(BaseModel):
-    llm: str | None = "yellow"
-    tool: str | None = "blue"
-    agent: str | None = None
-    chain: str | None = None
-
+    headers: Mapping[str, str] = Field(default_factory=dict)
+    tools: Sequence[str] = Field(default_factory=list)
 
 MCPParams = MCPStdioParams | MCPSseParams
 
@@ -62,6 +54,13 @@ class AgentConfig(BaseModel):
     tools: Sequence[Tool] = Field(default_factory=list)
     handoff: bool = False
     agent_type: str | None = None
-    agent_args: MutableMapping[str, Any] | None = None
+    agent_args: MutableMapping[str, Any] = Field(default_factory=dict)
     model_type: str | None = None
-    model_args: MutableMapping[str, Any] | None = None
+    model_args: MutableMapping[str, Any] = Field(default_factory=dict)
+
+
+class TracingConfig(BaseModel):
+    llm: str | None = "yellow"
+    tool: str | None = "blue"
+    agent: str | None = None
+    chain: str | None = None

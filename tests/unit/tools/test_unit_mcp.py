@@ -12,12 +12,12 @@ import pytest
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools.mcp import (
-    AgnoMCPServer,
-    GoogleMCPServer,
-    LangchainMCPServer,
-    LlamaIndexMCPServer,
+    AgnoMCPServerStdio,
+    GoogleMCPServerStdio,
+    LangchainMCPServerStdio,
+    LlamaIndexMCPServerStdio,
     MCPServerBase,
-    SmolagentsMCPServer,
+    SmolagentsMCPServerStdio,
 )
 
 
@@ -96,7 +96,7 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         # Create test tool configuration with None tools
         self.test_tool.tools = None
 
-        mcp_server = SmolagentsMCPServer(self.test_tool)
+        mcp_server = SmolagentsMCPServerStdio(self.test_tool)
         asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify all tools are included
@@ -119,12 +119,12 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         # Create test tool configuration with specific tools
         self.test_tool.tools = ["read_thing", "write_thing"]
 
-        mcp_server = SmolagentsMCPServer(self.test_tool)
+        mcp_server = SmolagentsMCPServerStdio(self.test_tool)
         asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify only the requested tools are included
         assert len(mcp_server.tools) == 2
-        tool_names = [tool.name for tool in mcp_server.tools]
+        tool_names = [tool.name for tool in mcp_server.tools]  # type: ignore[union-attr]
         assert "read_thing" in tool_names
         assert "write_thing" in tool_names
         assert "other_thing" not in tool_names
@@ -168,7 +168,7 @@ async def test_smolagents_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse")
 
     # Create the server instance
-    server = SmolagentsMCPServer(mcp_tool)
+    server = SmolagentsMCPServerStdio(mcp_tool)
 
     # Patch the ToolCollection.from_mcp method to return our mock
     with patch("smolagents.ToolCollection") as mock_tool_collection:
@@ -211,7 +211,7 @@ async def test_langchain_mcp_sse() -> None:
         patch("mcp.ClientSession") as mock_client_session,
     ):
         # Create the server instance
-        server = LangchainMCPServer(mcp_tool)
+        server = LangchainMCPServerStdio(mcp_tool)
 
         # Set up mocks
         mock_transport = (AsyncMock(), AsyncMock())
@@ -251,7 +251,7 @@ async def test_google_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = GoogleMCPServer(mcp_tool)
+    server = GoogleMCPServerStdio(mcp_tool)
 
     # Mock Google MCP classes
     with (
@@ -301,7 +301,7 @@ async def test_llamaindex_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse", tools=["tool1", "tool2"])
 
     # Create the server instance
-    server = LlamaIndexMCPServer(mcp_tool)
+    server = LlamaIndexMCPServerStdio(mcp_tool)
 
     # Mock LlamaIndex MCP classes
     with (
@@ -350,7 +350,7 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = AgnoMCPServer(mcp_tool)
+    server = AgnoMCPServerStdio(mcp_tool)
 
     # Mock required components
     with (

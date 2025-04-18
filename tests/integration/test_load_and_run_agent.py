@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -27,11 +28,9 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     if agent_framework not in (AgentFramework.AGNO, AgentFramework.GOOGLE):
         setup_tracing(agent_framework, str(tmp_path / "traces"))
 
-    model_args = (
-        {"parallel_tool_calls": False}
-        if agent_framework is not AgentFramework.AGNO
-        else None
-    )
+    model_args = dict[str, Any]()
+    if agent_framework is not AgentFramework.AGNO:
+        model_args["parallel_tool_calls"] = False
 
     agent_config = AgentConfig(
         tools=[search_web],

@@ -68,12 +68,12 @@ def _wrap_tool_agno(tool: Tool) -> Any:
     return tool
 
 
-FRAMEWORK_TO_MCP_SERVER: dict[AgentFramework, Any] = {
+FRAMEWORK_TO_MCP_SERVER: dict[AgentFramework, type[MCPServerBase]] = {
     AgentFramework.OPENAI: OpenAIMCPServerStdio,
     AgentFramework.SMOLAGENTS: SmolagentsMCPServerStdio,
     AgentFramework.LANGCHAIN: LangchainMCPServerStdio,
     AgentFramework.GOOGLE: GoogleMCPServerStdio,
-    AgentFramework.LLAMAINDEX: LlamaIndexMCPServerStdio,
+    AgentFramework.LLAMA_INDEX: LlamaIndexMCPServerStdio,
     AgentFramework.AGNO: AgnoMCPServerStdio,
 }
 

@@ -4,7 +4,7 @@ import os
 from contextlib import suppress
 from textwrap import dedent
 
-from any_agent.config import MCPTool
+from any_agent.config import MCPParams, MCPStdioParams
 from any_agent.logging import logger
 
 from .mcp_server_base import MCPServerBase
@@ -16,17 +16,20 @@ with suppress(ImportError):
 class SmolagentsMCPServerStdio(MCPServerBase):
     """Implementation of MCP tools manager for smolagents."""
 
-    def __init__(self, mcp_tool: MCPTool):
+    def __init__(self, mcp_tool: MCPParams):
         super().__init__(mcp_tool)
         self.context = None
         self.tool_collection = None
 
-    async def setup_tools(self):
+    async def setup_tools(self) -> None:
         from smolagents import ToolCollection
+
+        if not isinstance(self.mcp_tool, MCPStdioParams):
+            raise NotImplementedError
 
         self.server_parameters = StdioServerParameters(
             command=self.mcp_tool.command,
-            args=self.mcp_tool.args,
+            args=list(self.mcp_tool.args),
             env={**os.environ},
         )
 
@@ -35,8 +38,8 @@ class SmolagentsMCPServerStdio(MCPServerBase):
             self.server_parameters, trust_remote_code=True
         )
         # Enter the context
-        self.tool_collection = self.context.__enter__()
-        tools = self.tool_collection.tools
+        self.tool_collection = self.context.__enter__()  # type: ignore[attr-defined]
+        tools = self.tool_collection.tools  # type: ignore[attr-defined]
 
         # Only add the tools listed in mcp_tool['tools'] if specified
         requested_tools = self.mcp_tool.tools

@@ -1,4 +1,4 @@
-from .config import AgentConfig, AgentFramework, MCPTool, TracingConfig
+from .config import AgentConfig, AgentFramework, Tool, TracingConfig
 from .evaluation import (
     CheckpointCriteria,
     CheckpointEvaluator,
@@ -67,7 +67,7 @@ __all__ = [
     "LlamaIndexMCPServerStdio",
     "LlamaIndexTelemetryProcessor",
     "MCPServerBase",
-    "MCPTool",
+    "Tool",
     "OpenAIAgent",
     "OpenAIMCPServerStdio",
     "OpenAITelemetryProcessor",
