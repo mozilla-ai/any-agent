@@ -19,7 +19,7 @@ with suppress(ImportError):
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
     from llama_index.core.llms import LLM
 
-    llama_index_available = True
+    llama_index_available = True  # pylint: disable=invalid-name
 
 DEFAULT_MODEL_CLASS = "litellm.LiteLLM"
 

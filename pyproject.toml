@@ -110,13 +110,17 @@ disable = [
   "line-too-long",
   "duplicate-code",
   "ungrouped-imports",
-  "super-init-not-called",          # AnyAgent uses create as Factory Method
-  "unnecessary-dunder-call",        # There are several calls to __aenter__ and similar
-  "too-few-public-methods",         # Some of the classes are straightforward
-  "attribute-defined-outside-init", # TODO: MUST FIX
-  "too-many-branches",              # TODO: MUST FIX
-  "too-many-positional-arguments",  # TODO: MUST FIX
-  "too-many-locals",                # TODO: MUST FIX
+  "super-init-not-called",           # AnyAgent uses create as Factory Method
+  "unnecessary-dunder-call",         # There are several calls to __aenter__ and similar
+  "too-few-public-methods",          # Some of the classes are straightforward
+  "redefined-outer-name)",           # This is incompatible with pytest fixtures
+  "attribute-defined-outside-init",  # TODO: MUST FIX
+  "too-many-branches",               # TODO: MUST FIX
+  "too-many-positional-arguments",   # TODO: MUST FIX
+  "too-many-locals",                 # TODO: MUST FIX
+  "too-many-arguments",              # TODO: MUST FIX
+  "too-complex",                     # TODO: MUST FIX
+  "broad-exception-caught",          # TODO: MUST FIX
 ]
 
 [tool.pylint.main]
@@ -125,16 +129,16 @@ fail-under = 10
 load-plugins = ["pylint.extensions.mccabe"]
 
 [tool.pylint.design]
-max-args = 7
-max-attributes = 7
+max-args = 5
+max-attributes = 5
 max-bool-expr = 5
 max-branches = 12
-max-complexity = 10
-max-locals = 15
+max-complexity = 8
+max-locals = 10
 max-parents = 7
-max-public-methods = 20
-max-returns = 6
-max-statements = 50
+max-public-methods = 10
+max-returns = 10
+max-statements = 30
 
 
 [tool.ruff.lint]

@@ -17,7 +17,7 @@ with suppress(ImportError):
     from agno.agent import Agent
     from agno.models.litellm import LiteLLM
 
-    agno_available = True
+    agno_available = True  # pylint: disable=invalid-name
 
 
 class AgnoAgent(AnyAgent):

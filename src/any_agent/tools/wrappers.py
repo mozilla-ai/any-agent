@@ -34,10 +34,10 @@ def _wrap_tool_langchain(tool: Tool) -> Any:
 
 
 def _wrap_tool_smolagents(tool: Tool) -> Any:
-    from smolagents import Tool
+    from smolagents import Tool as SmolAgentsTool
     from smolagents import tool as smolagents_tool
 
-    if not isinstance(tool, Tool):
+    if not isinstance(tool, SmolAgentsTool):
         # this wrapping needed until https://github.com/huggingface/smolagents/pull/1203 is merged and released
         @wraps(tool)  # type: ignore[arg-type]
         def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]

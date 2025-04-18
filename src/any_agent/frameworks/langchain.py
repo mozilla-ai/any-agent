@@ -23,7 +23,7 @@ with suppress(ImportError):
     from langgraph.prebuilt import create_react_agent
     from langgraph_swarm import create_handoff_tool, create_swarm
 
-    langchain_available = True
+    langchain_available = True  # pylint: disable=invalid-name
 
 
 DEFAULT_MODEL_CLASS = "langchain_litellm.ChatLiteLLM"

@@ -41,7 +41,7 @@ class LangchainMCPServerStdio(MCPServerBase):
             env={**os.environ},
         )
         self.client = stdio_client(server_params)
-        self.read, self.write = await self.client.__aenter__()  # type: ignore[attr-defined]
+        self.read, self.write = await self.client.__aenter__()  # type: ignore[attr-defined] # pylint: disable=no-member
         self.session = ClientSession(self.read, self.write)
         await self.session.__aenter__()  # type: ignore[attr-defined]
         await self.session.initialize()  # type: ignore[attr-defined]

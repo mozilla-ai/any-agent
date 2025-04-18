@@ -22,7 +22,7 @@ with suppress(ImportError):
     from google.adk.tools.agent_tool import AgentTool
     from google.genai import types
 
-    adk_available = True
+    adk_available = True  # pylint: disable=invalid-name
 
 
 class GoogleAgent(AnyAgent):

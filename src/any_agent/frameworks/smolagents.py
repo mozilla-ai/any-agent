@@ -14,7 +14,7 @@ with suppress(ImportError):
     import smolagents
     from smolagents import MultiStepAgent
 
-    smolagents_available = True
+    smolagents_available = True  # pylint: disable=invalid-name
 
 DEFAULT_AGENT_TYPE = "CodeAgent"
 DEFAULT_MODEL_CLASS = "LiteLLMModel"

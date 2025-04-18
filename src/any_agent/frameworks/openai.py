@@ -19,7 +19,7 @@ with suppress(ImportError):
         Runner,
     )
 
-    agents_available = True
+    agents_available = True  # pylint: disable=invalid-name
 
 OPENAI_MAX_TURNS = 30
 
