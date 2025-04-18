@@ -2,7 +2,7 @@
 
 import os
 
-from any_agent.config import MCPParams, MCPStdioParams
+from any_agent.config import MCPStdioParams
 
 from .mcp_server_base import MCPServerBase
 

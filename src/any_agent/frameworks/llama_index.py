@@ -1,6 +1,6 @@
-from contextlib import suppress
 import importlib
 from collections.abc import Sequence
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework, Tool

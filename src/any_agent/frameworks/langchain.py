@@ -1,6 +1,6 @@
 import importlib
-from typing import TYPE_CHECKING, Any, cast
 from contextlib import suppress
+from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.logging import logger
@@ -11,11 +11,10 @@ from .any_agent import AnyAgent
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from langchain_core.language_models import LanguageModelLike
     from langgraph.graph.graph import CompiledGraph
 
     from any_agent.tools.mcp import MCPServerBase
-
-    from langchain_core.language_models import LanguageModelLike
 
 
 langchain_available = False
