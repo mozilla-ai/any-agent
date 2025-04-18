@@ -82,7 +82,8 @@ tests = [
 
 dev = [
   "any-agent[docs,tests]",
-  "pre-commit",
+  "pre-commit~=4.2",
+  "pre-commit-uv~=4.1"
 ]
 
 [project.urls]
