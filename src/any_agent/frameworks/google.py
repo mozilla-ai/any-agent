@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from any_agent.tools.mcp import MCPServerBase
 
 
-adk_available = False
+adk_available = False  # pylint: disable=invalid-name
 with suppress(ImportError):
     from google.adk.agents import Agent
     from google.adk.models.lite_llm import LiteLlm

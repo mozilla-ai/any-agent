@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
     from any_agent.tools.mcp import MCPServerBase
 
-agno_available = False
+agno_available = False  # pylint: disable=invalid-name
 with suppress(ImportError):
     from agno.agent import Agent
     from agno.models.litellm import LiteLLM

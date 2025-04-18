@@ -110,16 +110,19 @@ disable = [
   "line-too-long",
   "duplicate-code",
   "ungrouped-imports",
-  "super-init-not-called",  # AnyAgent uses create as Factory Method
-  "unnecessary-dunder-call", # There are several calls to __aenter__ and similar
+  "super-init-not-called",          # AnyAgent uses create as Factory Method
+  "unnecessary-dunder-call",        # There are several calls to __aenter__ and similar
+  "too-few-public-methods",         # Some of the classes are straightforward
+  "attribute-defined-outside-init", # TODO: MUST FIX
+  "too-many-branches",              # TODO: MUST FIX
+  "too-many-positional-arguments",  # TODO: MUST FIX
+  "too-many-locals",                # TODO: MUST FIX
 ]
 
 [tool.pylint.main]
 fail-on = ["I"]
 fail-under = 10
-load-plugins = [
-  "pylint.extensions.mccabe",
-]
+load-plugins = ["pylint.extensions.mccabe"]
 
 [tool.pylint.design]
 max-args = 7

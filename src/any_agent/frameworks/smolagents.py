@@ -9,7 +9,7 @@ from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.mcp import MCPServerBase
 from any_agent.tools.wrappers import wrap_tools
 
-smolagents_available = False
+smolagents_available = False  # pylint: disable=invalid-name
 with suppress(ImportError):
     import smolagents
     from smolagents import MultiStepAgent

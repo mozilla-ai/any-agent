@@ -2,10 +2,15 @@
 
 import os
 from contextlib import suppress
+from typing import TYPE_CHECKING, Any
 
 from any_agent.config import MCPParams, MCPStdioParams
 
 from .mcp_server_base import MCPServerBase
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 with suppress(ImportError):
     from mcp import ClientSession, StdioServerParameters
@@ -20,6 +25,8 @@ class LangchainMCPServerStdio(MCPServerBase):
         self.client = None
         self.session = None
         self.tools = []
+        self.read: Callable[..., Any] | None = None
+        self.write: Callable[..., Any] | None = None
 
     async def setup_tools(self) -> None:
         """Set up the LangChain MCP server with the provided configuration."""

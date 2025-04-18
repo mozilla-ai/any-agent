@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from any_agent.tools.mcp import MCPServerBase
 
-llama_index_available = False
+llama_index_available = False  # pylint: disable=invalid-name
 with suppress(ImportError):
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
     from llama_index.core.llms import LLM

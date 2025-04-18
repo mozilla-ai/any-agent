@@ -17,8 +17,7 @@ if TYPE_CHECKING:
     from any_agent.tools.mcp import MCPServerBase
 
 
-langchain_available = False
-
+langchain_available = False  # pylint: disable=invalid-name
 with suppress(ImportError):
     from langchain_core.language_models import LanguageModelLike
     from langgraph.prebuilt import create_react_agent

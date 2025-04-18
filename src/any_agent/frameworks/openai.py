@@ -9,7 +9,7 @@ from any_agent.tools import search_web, visit_webpage, wrap_tools
 
 from .any_agent import AnyAgent
 
-agents_available = False
+agents_available = False  # pylint: disable=invalid-name
 with suppress(ImportError):
     from agents import (
         Agent,
@@ -140,7 +140,7 @@ class OpenAIAgent(AnyAgent):
             tools = [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]
             # Add MCP tools to the list
             for mcp_server in self._agent.mcp_servers:  # type: ignore[union-attr]
-                tools_in_mcp = mcp_server._tools_list
+                tools_in_mcp = mcp_server._tools_list  # pylint: disable=protected-access
                 server_name = mcp_server.name.replace(" ", "_")
                 if tools_in_mcp:
                     tools.extend(
@@ -157,7 +157,7 @@ class OpenAIAgent(AnyAgent):
         tools = [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]
         # Add MCP tools to the list
         for mcp_server in self._agent.mcp_servers:  # type: ignore[union-attr]
-            tools_in_mcp = mcp_server._tools_list
+            tools_in_mcp = mcp_server._tools_list  # pylint: disable=protected-access
             server_name = mcp_server.name.replace(" ", "_")
             if tools_in_mcp:
                 tools.extend(
