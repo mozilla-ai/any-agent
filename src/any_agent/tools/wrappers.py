@@ -4,18 +4,19 @@ from functools import wraps
 from typing import Any
 
 from any_agent.config import AgentFramework, MCPParams, Tool
-from any_agent.tools.mcp import (
-    AgnoMCPServer,
-    GoogleMCPServer,
-    LangchainMCPServer,
-    LlamaIndexMCPServer,
+
+from .mcp import (
+    AgnoMCPServerStdio,
+    GoogleMCPServerStdio,
+    LangchainMCPServerStdio,
+    LlamaIndexMCPServerStdio,
     MCPServerBase,
-    OpenAIMCPServer,
-    SmolagentsMCPServer,
+    OpenAIMCPServerStdio,
+    SmolagentsMCPServerStdio,
 )
 
 
-def wrap_tool_openai(tool: Tool) -> Any:
+def _wrap_tool_openai(tool: Tool) -> Any:
     from agents import Tool as AgentTool
     from agents import function_tool
 
@@ -24,7 +25,7 @@ def wrap_tool_openai(tool: Tool) -> Any:
     return tool
 
 
-def wrap_tool_langchain(tool: Tool) -> Any:
+def _wrap_tool_langchain(tool: Tool) -> Any:
     from langchain_core.tools import BaseTool
     from langchain_core.tools import tool as langchain_tool
 
@@ -33,11 +34,11 @@ def wrap_tool_langchain(tool: Tool) -> Any:
     return tool
 
 
-def wrap_tool_smolagents(tool: Tool) -> Any:
-    from smolagents import Tool
+def _wrap_tool_smolagents(tool: Tool) -> Any:
+    from smolagents import Tool as SmolAgentsTool
     from smolagents import tool as smolagents_tool
 
-    if not isinstance(tool, Tool):
+    if not isinstance(tool, SmolAgentsTool):
         # this wrapping needed until https://github.com/huggingface/smolagents/pull/1203 is merged and released
         @wraps(tool)  # type: ignore[arg-type]
         def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
@@ -47,7 +48,7 @@ def wrap_tool_smolagents(tool: Tool) -> Any:
     return tool
 
 
-def wrap_tool_llama_index(tool: Tool) -> Any:
+def _wrap_tool_llama_index(tool: Tool) -> Any:
     from llama_index.core.tools import FunctionTool
 
     if not isinstance(tool, FunctionTool):
@@ -55,7 +56,7 @@ def wrap_tool_llama_index(tool: Tool) -> Any:
     return tool
 
 
-def wrap_tool_google(tool: Tool) -> Any:
+def _wrap_tool_google(tool: Tool) -> Any:
     from google.adk.tools import BaseTool, FunctionTool
 
     if not isinstance(tool, BaseTool):
@@ -63,9 +64,19 @@ def wrap_tool_google(tool: Tool) -> Any:
     return tool
 
 
-def wrap_tool_agno(tool: Tool) -> Any:
+def _wrap_tool_agno(tool: Tool) -> Any:
     # Agno lets you pass callables directly in as tools ❤️
     return tool
+
+
+FRAMEWORK_TO_MCP_SERVER: dict[AgentFramework, type[MCPServerBase]] = {
+    AgentFramework.OPENAI: OpenAIMCPServerStdio,
+    AgentFramework.SMOLAGENTS: SmolagentsMCPServerStdio,
+    AgentFramework.LANGCHAIN: LangchainMCPServerStdio,
+    AgentFramework.GOOGLE: GoogleMCPServerStdio,
+    AgentFramework.LLAMA_INDEX: LlamaIndexMCPServerStdio,
+    AgentFramework.AGNO: AgnoMCPServerStdio,
+}
 
 
 async def wrap_mcp_server(
@@ -76,20 +87,12 @@ async def wrap_mcp_server(
     based on the specified agent_framework
     """
     # Select the appropriate manager based on agent_framework
-    mcp_server_map: dict[AgentFramework, type[MCPServerBase]] = {
-        AgentFramework.OPENAI: OpenAIMCPServer,
-        AgentFramework.SMOLAGENTS: SmolagentsMCPServer,
-        AgentFramework.LANGCHAIN: LangchainMCPServer,
-        AgentFramework.GOOGLE: GoogleMCPServer,
-        AgentFramework.LLAMA_INDEX: LlamaIndexMCPServer,
-        AgentFramework.AGNO: AgnoMCPServer,
-    }
-    if agent_framework not in mcp_server_map:
-        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {list(mcp_server_map.keys())}"
+    if agent_framework not in FRAMEWORK_TO_MCP_SERVER:
+        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {list(FRAMEWORK_TO_MCP_SERVER.keys())}"
         raise NotImplementedError(msg)
 
     # Create the manager instance which will manage the MCP tool context
-    manager_class = mcp_server_map[agent_framework]
+    manager_class = FRAMEWORK_TO_MCP_SERVER[agent_framework]
     manager = manager_class(mcp_tool)
     await manager.setup_tools()
 
@@ -97,16 +100,16 @@ async def wrap_mcp_server(
 
 
 WRAPPERS: dict[AgentFramework, Callable[..., Any]] = {
-    AgentFramework.GOOGLE: wrap_tool_google,
-    AgentFramework.OPENAI: wrap_tool_openai,
-    AgentFramework.LANGCHAIN: wrap_tool_langchain,
-    AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
-    AgentFramework.LLAMA_INDEX: wrap_tool_llama_index,
-    AgentFramework.AGNO: wrap_tool_agno,
+    AgentFramework.GOOGLE: _wrap_tool_google,
+    AgentFramework.OPENAI: _wrap_tool_openai,
+    AgentFramework.LANGCHAIN: _wrap_tool_langchain,
+    AgentFramework.SMOLAGENTS: _wrap_tool_smolagents,
+    AgentFramework.LLAMA_INDEX: _wrap_tool_llama_index,
+    AgentFramework.AGNO: _wrap_tool_agno,
 }
 
 
-def verify_callable(tool: Callable[..., Any]) -> None:
+def _verify_callable(tool: Callable[..., Any]) -> None:
     """
     Verify a few things about the callable:
     - It needs to have some sort of docstring that describes what it does
@@ -148,7 +151,7 @@ async def wrap_tools(
             mcp_server = await wrap_mcp_server(tool, agent_framework)
             mcp_servers.append(mcp_server)
         elif callable(tool):
-            verify_callable(tool)
+            _verify_callable(tool)
             wrapped_tools.append(wrapper(tool))
         else:
             msg = f"Tool {tool} needs to be of type `MCPStdioParams`, `str` or `callable` but is {type(tool)}"

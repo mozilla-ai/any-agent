@@ -103,8 +103,44 @@ namespaces = false
 
 [tool.pylint.messages_control]
 disable = [
-    "import-outside-toplevel",
+  "missing-module-docstring",
+  "missing-function-docstring",
+  "missing-class-docstring",
+  "import-outside-toplevel",
+  "line-too-long",
+  "duplicate-code",
+  "ungrouped-imports",
+  "super-init-not-called",           # AnyAgent uses create as Factory Method
+  "unnecessary-dunder-call",         # There are several calls to __aenter__ and similar
+  "too-few-public-methods",          # Some of the classes are straightforward
+  "redefined-outer-name",            # This is incompatible with pytest fixtures
+  "attribute-defined-outside-init",  # TODO: MUST FIX
+  "too-many-branches",               # TODO: MUST FIX
+  "too-many-positional-arguments",   # TODO: MUST FIX
+  "too-many-locals",                 # TODO: MUST FIX
+  "too-many-arguments",              # TODO: MUST FIX
+  "too-complex",                     # TODO: MUST FIX
+  "broad-exception-caught",          # TODO: MUST FIX
+  "too-many-statements",             # TODO: MUST FIX
 ]
+
+[tool.pylint.main]
+fail-on = ["I"]
+fail-under = 10
+load-plugins = ["pylint.extensions.mccabe"]
+
+[tool.pylint.design]
+max-args = 5
+max-attributes = 5
+max-bool-expr = 5
+max-branches = 12
+max-complexity = 8
+max-locals = 10
+max-parents = 7
+max-public-methods = 10
+max-returns = 10
+max-statements = 30
+
 
 [tool.ruff.lint]
 ignore = [

@@ -15,11 +15,24 @@ repos:
       - id: sort-simple-yaml
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.7.3'
+    rev: 'v0.11.5'
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
       - id: ruff-format
+
+  - repo: https://github.com/pycqa/pylint
+    # Cannot be replaced by ruff until https://github.com/astral-sh/ruff/issues/970 is closed
+    rev: "v3.3.4"
+    hooks:
+      - id: pylint
+        additional_dependencies:
+          - pydantic
+          - pylint-pydantic
+          - langchain_core
+          - pandas
+          - any-agent[dev, all]
+          - mktestdocs
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.15.0
@@ -36,7 +49,7 @@ repos:
           - openinference-instrumentation-openai-agents>=0.1.5
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.1
     hooks:
       - id: codespell
         exclude: CODE_OF_CONDUCT.md

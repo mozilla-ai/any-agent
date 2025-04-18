@@ -44,7 +44,7 @@ def test_mcp(agent_framework: AgentFramework) -> None:
     # Check if the file was created
     assert os.path.exists(os.path.join(tmp_dir, "tmp.txt"))
     # Check if the content is correct
-    with open(os.path.join(tmp_dir, "tmp.txt")) as f:
+    with open(os.path.join(tmp_dir, "tmp.txt"), encoding="utf-8") as f:
         content = f.read()
     assert content == "hi"
     assert result

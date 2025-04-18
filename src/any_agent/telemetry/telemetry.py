@@ -5,7 +5,7 @@ import re
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, ClassVar, assert_never
 
-from any_agent import AgentFramework
+from any_agent.config import AgentFramework
 from any_agent.logging import logger
 
 if TYPE_CHECKING:

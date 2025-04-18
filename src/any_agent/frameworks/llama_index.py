@@ -1,26 +1,25 @@
 import importlib
 from collections.abc import Sequence
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any, cast
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import Tool
+from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.wrappers import wrap_tools
+from any_agent.tools import search_web, visit_webpage, wrap_tools
+
+from .any_agent import AnyAgent
 
 if TYPE_CHECKING:
     from llama_index.core.llms import LLM
 
     from any_agent.tools.mcp import MCPServerBase
 
-try:
+llama_index_available = False  # pylint: disable=invalid-name
+with suppress(ImportError):
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
     from llama_index.core.llms import LLM
 
-    llama_index_available = True
-except ImportError:
-    llama_index_available = False
-
+    llama_index_available = True  # pylint: disable=invalid-name
 
 DEFAULT_MODEL_CLASS = "litellm.LiteLLM"
 
@@ -52,7 +51,7 @@ class LlamaIndexAgent(AnyAgent):
             class_name,
         )
         return cast(
-            LLM,
+            "LLM",
             model_type(model=agent_config.model_id, **agent_config.model_args or {}),
         )
 

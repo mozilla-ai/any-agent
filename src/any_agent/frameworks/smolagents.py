@@ -1,5 +1,6 @@
 import os
 from collections.abc import Sequence
+from contextlib import suppress
 from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
@@ -8,13 +9,12 @@ from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.mcp import MCPServerBase
 from any_agent.tools.wrappers import wrap_tools
 
-try:
+smolagents_available = False  # pylint: disable=invalid-name
+with suppress(ImportError):
     import smolagents
     from smolagents import MultiStepAgent
 
-    smolagents_available = True
-except ImportError:
-    smolagents_available = False
+    smolagents_available = True  # pylint: disable=invalid-name
 
 DEFAULT_AGENT_TYPE = "CodeAgent"
 DEFAULT_MODEL_CLASS = "LiteLLMModel"

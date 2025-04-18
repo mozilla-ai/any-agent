@@ -29,12 +29,12 @@ class JsonFileSpanExporter(SpanExporter):
     def __init__(self, file_name: str):
         self.file_name = file_name
         if not os.path.exists(self.file_name):
-            with open(self.file_name, "w") as f:
+            with open(self.file_name, "w", encoding="utf-8") as f:
                 json.dump([], f)
 
     def export(self, spans: Sequence[Span]) -> SpanExportResult:
         try:
-            with open(self.file_name) as f:
+            with open(self.file_name, encoding="utf-8") as f:
                 all_spans = json.load(f)
         except (json.JSONDecodeError, FileNotFoundError):
             all_spans = []
@@ -51,7 +51,7 @@ class JsonFileSpanExporter(SpanExporter):
             all_spans.append(span_data)
 
         # Write all spans back to the file as a proper JSON array
-        with open(self.file_name, "w") as f:
+        with open(self.file_name, "w", encoding="utf-8") as f:
             json.dump(all_spans, f, indent=2)
 
         return SpanExportResult.SUCCESS

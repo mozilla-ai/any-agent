@@ -1,27 +1,28 @@
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
-from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.wrappers import wrap_tools
+from any_agent.tools import search_web, visit_webpage, wrap_tools
+
+from .any_agent import AnyAgent
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from any_agent.tools.mcp import MCPServerBase
 
-try:
+
+adk_available = False  # pylint: disable=invalid-name
+with suppress(ImportError):
     from google.adk.agents import Agent
     from google.adk.models.lite_llm import LiteLlm
     from google.adk.runners import InMemoryRunner
     from google.adk.tools.agent_tool import AgentTool
     from google.genai import types
 
-    adk_available = True
-except ImportError:
-    adk_available = False
+    adk_available = True  # pylint: disable=invalid-name
 
 
 class GoogleAgent(AnyAgent):

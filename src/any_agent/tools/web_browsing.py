@@ -41,7 +41,7 @@ def visit_webpage(url: str) -> str:
 
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         response.raise_for_status()
 
         markdown_content = markdownify(response.text).strip()

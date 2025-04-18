@@ -8,7 +8,7 @@ def show_plan(plan: str) -> str:
         plan: The current plan.
 
     """
-    logger.info(f"Current plan: {plan}")
+    logger.info("Current plan: %s", plan)
     return plan
 
 
@@ -19,7 +19,7 @@ def show_final_answer(answer: str) -> str:
         answer: The final answer.
 
     """
-    logger.info(f"Final answer: {answer}")
+    logger.info("Final answer: %s", answer)
     return answer
 
 

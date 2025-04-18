@@ -1,7 +1,7 @@
 from collections.abc import MutableMapping, Sequence
 from typing import Any
 
-from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
+from any_agent.evaluation.evaluators.llm_evaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.test_case import CheckpointCriteria
 from any_agent.logging import logger
@@ -31,7 +31,7 @@ class CheckpointEvaluator(LLMEvaluator):
         """
         evidence = processor.extract_evidence(telemetry)
         evidence = evidence.replace("<", "\\<").replace(">", "\\>")
-        logger.info(f"""<yellow>Evidence\n{evidence}</yellow>\n""")
+        logger.info("""<yellow>Evidence\n%s</yellow>\n""", evidence)
         results = []
 
         for checkpoint in checkpoints:

@@ -1,3 +1,5 @@
+# pylint: disable=disallowed-name, redefined-outer-name
+
 import asyncio
 from unittest.mock import MagicMock, patch
 
@@ -5,11 +7,11 @@ import pytest
 
 from any_agent.config import AgentFramework
 from any_agent.tools.wrappers import (
-    wrap_tool_google,
-    wrap_tool_langchain,
-    wrap_tool_llama_index,
-    wrap_tool_openai,
-    wrap_tool_smolagents,
+    _wrap_tool_google,
+    _wrap_tool_langchain,
+    _wrap_tool_llama_index,
+    _wrap_tool_openai,
+    _wrap_tool_smolagents,
     wrap_tools,
 )
 
@@ -21,7 +23,7 @@ def foo() -> None:
 def test_wrap_tool_langchain() -> None:
     wrapper = MagicMock()
     with patch("langchain_core.tools.tool", wrapper):
-        wrap_tool_langchain(foo)
+        _wrap_tool_langchain(foo)
         wrapper.assert_called_with(foo)
 
 
@@ -31,7 +33,7 @@ def test_wrap_tool_langchain_already_wrapped() -> None:
     wrapped = tool(foo)
     wrapper = MagicMock()
     with patch("langchain_core.tools.tool", wrapper):
-        wrap_tool_langchain(wrapped)
+        _wrap_tool_langchain(wrapped)
         wrapper.assert_not_called()
 
 
@@ -40,7 +42,7 @@ def test_wrap_tool_llama_index() -> None:
 
     wrapper = MagicMock()
     with patch.object(FunctionTool, "from_defaults", wrapper):
-        wrap_tool_llama_index(foo)
+        _wrap_tool_llama_index(foo)
         wrapper.assert_called_with(foo)
 
 
@@ -50,14 +52,14 @@ def test_wrap_tool_llama_index_already_wrapped() -> None:
     wrapped = FunctionTool.from_defaults(foo)
     wrapper = MagicMock()
     with patch.object(FunctionTool, "from_defaults", wrapper):
-        wrap_tool_llama_index(wrapped)
+        _wrap_tool_llama_index(wrapped)
         wrapper.assert_not_called()
 
 
 def test_wrap_tool_openai() -> None:
     wrapper = MagicMock()
     with patch("agents.function_tool", wrapper):
-        wrap_tool_openai(foo)
+        _wrap_tool_openai(foo)
         wrapper.assert_called_with(foo)
 
 
@@ -67,7 +69,7 @@ def test_wrap_tool_openai_already_wrapped() -> None:
     wrapped = function_tool(foo)
     wrapper = MagicMock()
     with patch("agents.function_tool", wrapper):
-        wrap_tool_openai(wrapped)
+        _wrap_tool_openai(wrapped)
         wrapper.assert_not_called()
 
 
@@ -76,14 +78,14 @@ def test_wrap_tool_openai_builtin_tools() -> None:
 
     wrapper = MagicMock()
     with patch("agents.function_tool", wrapper):
-        wrap_tool_openai(WebSearchTool())
+        _wrap_tool_openai(WebSearchTool())
         wrapper.assert_not_called()
 
 
 def test_wrap_tool_smolagents() -> None:
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
-        wrap_tool_smolagents(foo)
+        _wrap_tool_smolagents(foo)
         # Check that wrapper was called once with any argument
         wrapper.assert_called_once()
         # The first argument to wrapper should be a function (the wrapped version of foo)
@@ -100,7 +102,7 @@ def test_wrap_tool_smolagents_already_wrapped() -> None:
     wrapped = tool(foo)
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
-        wrap_tool_smolagents(wrapped)
+        _wrap_tool_smolagents(wrapped)
         wrapper.assert_not_called()
 
 
@@ -109,7 +111,7 @@ def test_wrap_tool_smolagents_builtin_tools() -> None:
 
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
-        wrap_tool_smolagents(DuckDuckGoSearchTool())
+        _wrap_tool_smolagents(DuckDuckGoSearchTool())
         wrapper.assert_not_called()
 
 
@@ -120,7 +122,7 @@ def test_wrap_tool_google() -> None:
     wrapper.return_value = None
 
     with patch.object(FunctionTool, "__init__", wrapper):
-        wrap_tool_google(foo)
+        _wrap_tool_google(foo)
         wrapper.assert_called_with(foo)
 
 
@@ -132,7 +134,7 @@ def test_wrap_tool_google_already_wrapped() -> None:
     wrapped = FunctionTool(foo)
 
     with patch.object(FunctionTool, "__init__", wrapper):
-        wrap_tool_google(wrapped)
+        _wrap_tool_google(wrapped)
         wrapper.assert_not_called()
 
 
@@ -143,7 +145,7 @@ def test_wrap_tool_google_builtin_tools() -> None:
     wrapper.return_value = None
 
     with patch.object(FunctionTool, "__init__", wrapper):
-        wrap_tool_google(google_search)
+        _wrap_tool_google(google_search)
         wrapper.assert_not_called()
 
 

@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
@@ -11,13 +12,12 @@ if TYPE_CHECKING:
 
     from any_agent.tools.mcp import MCPServerBase
 
-try:
+agno_available = False  # pylint: disable=invalid-name
+with suppress(ImportError):
     from agno.agent import Agent
     from agno.models.litellm import LiteLLM
 
-    agno_available = True
-except ImportError:
-    agno_available = False
+    agno_available = True  # pylint: disable=invalid-name
 
 
 class AgnoAgent(AnyAgent):

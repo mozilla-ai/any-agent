@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Any, assert_never
+from typing import TYPE_CHECKING, Any, assert_never
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class AnyAgent(ABC):
@@ -60,7 +63,7 @@ class AnyAgent(ABC):
     ) -> AnyAgent:
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config, managed_agents=managed_agents)
-        asyncio.get_event_loop().run_until_complete(agent._load_agent())
+        asyncio.get_event_loop().run_until_complete(agent._load_agent())  # pylint: disable=protected-access
         return agent
 
     @abstractmethod
@@ -84,8 +87,8 @@ class AnyAgent(ABC):
 
     def __init__(
         self,
-        config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
+        config: AgentConfig,  # pylint: disable=unused-argument
+        managed_agents: Sequence[AgentConfig] | None = None,  # pylint: disable=unused-argument
     ) -> None:
         msg = "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
         raise NotImplementedError(msg)

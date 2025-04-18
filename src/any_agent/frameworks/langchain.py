@@ -1,30 +1,29 @@
 import importlib
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
-from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.wrappers import wrap_tools
+from any_agent.tools import search_web, visit_webpage, wrap_tools
+
+from .any_agent import AnyAgent
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from langchain_core.language_models import LanguageModelLike
     from langgraph.graph.graph import CompiledGraph
 
     from any_agent.tools.mcp import MCPServerBase
 
-if TYPE_CHECKING:
-    from langchain_core.language_models import LanguageModelLike
 
-try:
+langchain_available = False  # pylint: disable=invalid-name
+with suppress(ImportError):
     from langchain_core.language_models import LanguageModelLike
     from langgraph.prebuilt import create_react_agent
     from langgraph_swarm import create_handoff_tool, create_swarm
 
-    langchain_available = True
-except ImportError:
-    langchain_available = False
+    langchain_available = True  # pylint: disable=invalid-name
 
 
 DEFAULT_MODEL_CLASS = "langchain_litellm.ChatLiteLLM"
@@ -57,7 +56,7 @@ class LangchainAgent(AnyAgent):
         model_type = getattr(importlib.import_module(module), class_name)
 
         return cast(
-            str | LanguageModelLike,
+            "str | LanguageModelLike",
             model_type(model=agent_config.model_id, **agent_config.model_args or {}),
         )
 

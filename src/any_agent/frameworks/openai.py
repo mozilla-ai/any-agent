@@ -1,14 +1,16 @@
 import os
 from collections.abc import Sequence
+from contextlib import suppress
 from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework, Tool
-from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.wrappers import wrap_tools
+from any_agent.tools import search_web, visit_webpage, wrap_tools
 
-try:
+from .any_agent import AnyAgent
+
+agents_available = False  # pylint: disable=invalid-name
+with suppress(ImportError):
     from agents import (
         Agent,
         AsyncOpenAI,
@@ -17,9 +19,7 @@ try:
         Runner,
     )
 
-    agents_available = True
-except ImportError:
-    agents_available = False
+    agents_available = True  # pylint: disable=invalid-name
 
 OPENAI_MAX_TURNS = 30
 
@@ -140,7 +140,7 @@ class OpenAIAgent(AnyAgent):
             tools = [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]
             # Add MCP tools to the list
             for mcp_server in self._agent.mcp_servers:  # type: ignore[union-attr]
-                tools_in_mcp = mcp_server._tools_list
+                tools_in_mcp = mcp_server._tools_list  # pylint: disable=protected-access
                 server_name = mcp_server.name.replace(" ", "_")
                 if tools_in_mcp:
                     tools.extend(
@@ -157,7 +157,7 @@ class OpenAIAgent(AnyAgent):
         tools = [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]
         # Add MCP tools to the list
         for mcp_server in self._agent.mcp_servers:  # type: ignore[union-attr]
-            tools_in_mcp = mcp_server._tools_list
+            tools_in_mcp = mcp_server._tools_list  # pylint: disable=protected-access
             server_name = mcp_server.name.replace(" ", "_")
             if tools_in_mcp:
                 tools.extend(
