@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from llama_index.core.tools import FunctionTool as LlamaIndexTool
 
 
-def wrap_tool_openai(tool: Tool | AgentTool) -> AgentTool:
+def wrap_tool_openai(tool: Tool | "AgentTool") -> "AgentTool":
     from agents import Tool as AgentTool
     from agents import function_tool
 
@@ -32,7 +32,7 @@ def wrap_tool_openai(tool: Tool | AgentTool) -> AgentTool:
     return function_tool(tool)  # type: ignore[arg-type, return-value]
 
 
-def wrap_tool_langchain(tool: Tool | LangchainTool) -> LangchainTool:
+def wrap_tool_langchain(tool: Tool | "LangchainTool") -> "LangchainTool":
     from langchain_core.tools import BaseTool
     from langchain_core.tools import tool as langchain_tool
 
@@ -42,7 +42,7 @@ def wrap_tool_langchain(tool: Tool | LangchainTool) -> LangchainTool:
     return langchain_tool(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_smolagents(tool: Tool | SmolagentsTool) -> SmolagentsTool:
+def wrap_tool_smolagents(tool: Tool | "SmolagentsTool") -> "SmolagentsTool":
     from smolagents import Tool as SmolagentsTool
     from smolagents import tool as smolagents_tool
 
@@ -57,7 +57,7 @@ def wrap_tool_smolagents(tool: Tool | SmolagentsTool) -> SmolagentsTool:
     return smolagents_tool(wrapped_function)
 
 
-def wrap_tool_llama_index(tool: Tool | LlamaIndexTool) -> LlamaIndexTool:
+def wrap_tool_llama_index(tool: Tool | "LlamaIndexTool") -> "LlamaIndexTool":
     from llama_index.core.tools import FunctionTool
 
     if isinstance(tool, FunctionTool):
@@ -66,7 +66,7 @@ def wrap_tool_llama_index(tool: Tool | LlamaIndexTool) -> LlamaIndexTool:
     return FunctionTool.from_defaults(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_google(tool: Tool | GoogleTool) -> GoogleTool:
+def wrap_tool_google(tool: Tool | "GoogleTool") -> "GoogleTool":
     from google.adk.tools import BaseTool, FunctionTool
 
     if isinstance(tool, BaseTool):
