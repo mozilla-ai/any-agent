@@ -1,7 +1,7 @@
 import inspect
 from collections.abc import Callable, Sequence
 from functools import wraps
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 from any_agent.tools.mcp import (
@@ -14,56 +14,68 @@ from any_agent.tools.mcp import (
     SmolagentsMCPServer,
 )
 
+if TYPE_CHECKING:
+    from agents import Tool as AgentTool
+    from langchain_core.tools import BaseTool as LangchainTool
+    from google.adk.tools import BaseTool as GoogleTool
+    from smolagents import Tool as SmolagentsTool
+    from llama_index.core.tools import FunctionTool as LlamaIndexTool
 
-def wrap_tool_openai(tool: Tool) -> Any:
+
+def wrap_tool_openai(tool: Tool | AgentTool) -> AgentTool:
     from agents import Tool as AgentTool
     from agents import function_tool
 
-    if not isinstance(tool, AgentTool):
-        return function_tool(tool)
-    return tool
+    if isinstance(tool, AgentTool):  # type: ignore[arg-type]
+        return tool
+    
+    return function_tool(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_langchain(tool: Tool) -> Any:
+def wrap_tool_langchain(tool: Tool | LangchainTool) -> LangchainTool:
     from langchain_core.tools import BaseTool
     from langchain_core.tools import tool as langchain_tool
 
-    if not isinstance(tool, BaseTool):
-        return langchain_tool(tool)
-    return tool
+    if isinstance(tool, BaseTool):
+        return tool
+    
+    return langchain_tool(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_smolagents(tool: Tool) -> Any:
-    from smolagents import Tool
+def wrap_tool_smolagents(tool: Tool | SmolagentsTool) -> SmolagentsTool:
+    from smolagents import Tool as SmolagentsTool
     from smolagents import tool as smolagents_tool
 
-    if not isinstance(tool, Tool):
-        # this wrapping needed until https://github.com/huggingface/smolagents/pull/1203 is merged and released
-        @wraps(tool)  # type: ignore[arg-type]
-        def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
-            return tool(*args, **kwargs)  # type: ignore[operator]
+    if isinstance(tool, SmolagentsTool):
+        return tool
+    
+    # this wrapping needed until https://github.com/huggingface/smolagents/pull/1203 is merged and released
+    @wraps(tool)  # type: ignore[arg-type]
+    def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+        return tool(*args, **kwargs)  # type: ignore[operator]
 
-        return smolagents_tool(wrapped_function)
-    return tool
+    return smolagents_tool(wrapped_function)
 
 
-def wrap_tool_llama_index(tool: Tool) -> Any:
+def wrap_tool_llama_index(tool: Tool | LlamaIndexTool) -> LlamaIndexTool:
     from llama_index.core.tools import FunctionTool
 
-    if not isinstance(tool, FunctionTool):
-        return FunctionTool.from_defaults(tool)
-    return tool
+    if isinstance(tool, FunctionTool):
+        return tool
+    
+    return FunctionTool.from_defaults(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_google(tool: Tool) -> Any:
+def wrap_tool_google(tool: Tool | GoogleTool) -> GoogleTool:
     from google.adk.tools import BaseTool, FunctionTool
 
-    if not isinstance(tool, BaseTool):
-        return FunctionTool(tool)
-    return tool
+    if isinstance(tool, BaseTool):
+        return tool
+    
+    return FunctionTool(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_agno(tool: Tool) -> Any:
+def wrap_tool_agno(tool: Tool) -> Tool:
     # Agno lets you pass callables directly in as tools ❤️
     return tool
 

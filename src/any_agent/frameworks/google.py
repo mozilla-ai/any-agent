@@ -128,6 +128,7 @@ class GoogleAgent(AnyAgent):
             user_id=user_id,
             session_id=session_id,
         )
+        assert session, "Session should not be None"
         return session.state.get("response", None)
 
     @property

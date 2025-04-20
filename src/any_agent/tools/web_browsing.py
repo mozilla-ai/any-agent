@@ -44,7 +44,7 @@ def visit_webpage(url: str) -> str:
         response = requests.get(url)
         response.raise_for_status()
 
-        markdown_content = markdownify(response.text).strip()
+        markdown_content = markdownify(response.text).strip()  # type: ignore[no-untyped-call]
 
         markdown_content = re.sub(r"\n{2,}", "\n", markdown_content)
 

@@ -110,7 +110,7 @@ class LlamaIndexAgent(AnyAgent):
             )
             agents.append(main_agent)
 
-            self._agent = AgentWorkflow(agents=agents, root_agent=main_agent.name)
+            self._agent = AgentWorkflow(agents=agents, root_agent=main_agent.name)  # type: ignore[arg-type]
 
         else:
             imported_tools = await self._load_tools(self.config.tools)

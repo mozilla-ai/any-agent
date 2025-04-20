@@ -18,7 +18,7 @@ def test_load_google_default() -> None:
     mock_model = MagicMock()
     mock_function_tool = MagicMock()
 
-    class MockedFunctionTool(FunctionTool):  # type: ignore[misc]
+    class MockedFunctionTool(FunctionTool):
         def __new__(cls, *args: Any, **kwargs: Any) -> MagicMock:
             return mock_function_tool
 
@@ -46,7 +46,7 @@ def test_load_google_multiagent() -> None:
     mock_agent_tool = MagicMock()
     mock_function_tool = MagicMock()
 
-    class MockedFunctionTool(FunctionTool):  # type: ignore[misc]
+    class MockedFunctionTool(FunctionTool):
         def __new__(cls, *args: Any, **kwargs: Any) -> "MockedFunctionTool":
             return mock_function_tool
 

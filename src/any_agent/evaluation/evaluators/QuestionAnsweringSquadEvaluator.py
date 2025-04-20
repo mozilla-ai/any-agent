@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-import evaluate
+import evaluate.loading
 from typing_extensions import TypedDict
 
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
@@ -21,7 +21,7 @@ class QuestionAnsweringSquadEvaluator:
     """Directly compares answers without using LLM-as-judge"""
 
     def __init__(self) -> None:
-        self.metric = evaluate.load("squad")
+        self.metric = evaluate.loading.load("squad")
 
     def evaluate(
         self,
@@ -46,6 +46,8 @@ class QuestionAnsweringSquadEvaluator:
             predictions=hypothesis_answers,
             references=ground_truth_answers,
         )
+
+        assert result, "The result of the evaluation is empty"
 
         match = EvaluationResult(
             passed=int(result["exact_match"]) == 1,

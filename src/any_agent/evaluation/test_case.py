@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
 import yaml
-from litellm import validate_environment
+from litellm.utils import validate_environment
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import TypedDict
 

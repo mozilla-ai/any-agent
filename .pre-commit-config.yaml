@@ -30,6 +30,8 @@ repos:
           - types-pyyaml
           - pytest
           - any-agent[dev, all]
+          - markdownify
+          - litellm
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0

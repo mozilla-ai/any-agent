@@ -122,4 +122,4 @@ class SmolagentsAgent(AnyAgent):
         Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
-        return self._agent.tools  # type: ignore[no-any-return, union-attr]
+        return self._agent.tools  # type: ignore[return-value, union-attr]

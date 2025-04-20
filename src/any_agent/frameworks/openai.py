@@ -11,11 +11,11 @@ from any_agent.tools.wrappers import wrap_tools
 try:
     from agents import (
         Agent,
-        AsyncOpenAI,
         ModelSettings,
         OpenAIChatCompletionsModel,
         Runner,
     )
+    from openai import AsyncOpenAI
 
     agents_available = True
 except ImportError:
@@ -44,7 +44,7 @@ class OpenAIAgent(AnyAgent):
         agent_config: AgentConfig,
         api_key_var: str | None = None,
         base_url: str | None = None,
-    ) -> "OpenAIChatCompletionsModel":
+    ) -> "OpenAIChatCompletionsModel | str":
         """Get the model configuration for an OpenAI agent."""
         if not api_key_var or not base_url:
             return agent_config.model_id
@@ -90,12 +90,12 @@ class OpenAIAgent(AnyAgent):
                     name=managed_agent.name,
                     instructions=managed_agent.instructions,
                     model=self._get_model(managed_agent, api_key_var, base_url),
-                    tools=managed_tools,
+                    tools=managed_tools,  # type: ignore[arg-type]
                     mcp_servers=[
                         managed_mcp_server.server  # type: ignore[attr-defined]
                         for managed_mcp_server in managed_mcp_servers
                     ],
-                    **kwargs,
+                    **kwargs,  # type: ignore[arg-type]
                 )
                 if managed_agent.handoff:
                     handoffs.append(instance)

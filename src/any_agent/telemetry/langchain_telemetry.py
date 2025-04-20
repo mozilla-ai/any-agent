@@ -31,7 +31,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                 except UnicodeDecodeError:
                     # If that fails, the escape sequences might already be interpreted
                     pass
-                return final_text  # type: ignore[no-any-return]
+                return final_text
 
         msg = "No agent final answer found in trace"
         raise ValueError(msg)
