@@ -41,7 +41,7 @@ class GoogleAgent(AnyAgent):
         self._mcp_servers: Sequence[MCPServerBase] | None = None
         self._managed_mcp_servers: Sequence[MCPServerBase] | None = None
 
-    def _get_model(self, agent_config: AgentConfig) -> LiteLlm:
+    def _get_model(self, agent_config: AgentConfig) -> "LiteLlm":
         """Get the model configuration for a Google agent."""
         return LiteLlm(model=agent_config.model_id, **agent_config.model_args or {})
 
@@ -78,7 +78,7 @@ class GoogleAgent(AnyAgent):
                     name=managed_agent.name,
                     instruction=managed_agent.instructions or "",
                     model=self._get_model(managed_agent),
-                    tools=managed_tools,
+                    tools=managed_tools,  # type: ignore[arg-type]
                     **managed_agent.agent_args or {},
                 )
 
@@ -91,8 +91,8 @@ class GoogleAgent(AnyAgent):
             name=self.config.name,
             instruction=self.config.instructions or "",
             model=self._get_model(self.config),
-            tools=tools,
-            sub_agents=sub_agents_instanced,
+            tools=tools,  # type: ignore[arg-type]
+            sub_agents=sub_agents_instanced,  # type: ignore[arg-type]
             **self.config.agent_args or {},
             output_key="response",
         )
@@ -104,6 +104,7 @@ class GoogleAgent(AnyAgent):
         session_id: str | None = None,
     ) -> Any:
         """Run the Google agent with the given prompt."""
+        assert self._agent, "Agent not loaded. Call _load_agent() first."
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
@@ -141,4 +142,4 @@ class GoogleAgent(AnyAgent):
             logger.warning("Agent not loaded or does not have tools.")
             return []
 
-        return [tool.name for tool in self._agent.tools]
+        return [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]

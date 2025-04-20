@@ -103,7 +103,7 @@ class LangchainAgent(AnyAgent):
                 managed_agent = create_react_agent(
                     name=name,
                     model=self._get_model(managed_agent),
-                    tools=[
+                    tools=[  # type: ignore[arg-type]
                         *managed_tools,
                         create_handoff_tool(agent_name=self.config.name),
                     ],
@@ -120,7 +120,7 @@ class LangchainAgent(AnyAgent):
             main_agent = create_react_agent(
                 name=self.config.name,
                 model=self._get_model(self.config),
-                tools=imported_tools,
+                tools=imported_tools,  # type: ignore[arg-type]
                 prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )
@@ -132,7 +132,7 @@ class LangchainAgent(AnyAgent):
             self._agent = create_react_agent(
                 name=self.config.name,
                 model=self._get_model(self.config),
-                tools=imported_tools,
+                tools=imported_tools,  # type: ignore[arg-type]
                 prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )

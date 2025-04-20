@@ -100,7 +100,7 @@ class OpenAIAgent(AnyAgent):
                 if managed_agent.handoff:
                     handoffs.append(instance)
                 else:
-                    tools.append(
+                    tools.append(  # type: ignore[arg-type]
                         instance.as_tool(
                             tool_name=instance.name,
                             tool_description=managed_agent.description
@@ -127,6 +127,7 @@ class OpenAIAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt asynchronously."""
+        assert self._agent
         return await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
 
     @property
@@ -140,7 +141,7 @@ class OpenAIAgent(AnyAgent):
             tools = [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]
             # Add MCP tools to the list
             for mcp_server in self._agent.mcp_servers:  # type: ignore[union-attr]
-                tools_in_mcp = mcp_server._tools_list
+                tools_in_mcp = mcp_server._tools_list  # type: ignore[union-attr]
                 server_name = mcp_server.name.replace(" ", "_")
                 if tools_in_mcp:
                     tools.extend(
@@ -157,7 +158,7 @@ class OpenAIAgent(AnyAgent):
         tools = [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]
         # Add MCP tools to the list
         for mcp_server in self._agent.mcp_servers:  # type: ignore[union-attr]
-            tools_in_mcp = mcp_server._tools_list
+            tools_in_mcp = mcp_server._tools_list  # type: ignore[union-attr]
             server_name = mcp_server.name.replace(" ", "_")
             if tools_in_mcp:
                 tools.extend(

@@ -117,7 +117,7 @@ class SmolagentsAgent(AnyAgent):
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
         assert self._agent
-        return self._agent.run(prompt)  # type: ignore[union-attr]
+        return self._agent.run(prompt)
 
     @property
     def tools(self) -> list[Tool]:
@@ -126,4 +126,4 @@ class SmolagentsAgent(AnyAgent):
         This property is read-only and cannot be modified.
         """
         assert self._agent
-        return self._agent.tools  # type: ignore[return-value, union-attr]
+        return self._agent.tools  # type: ignore[return-value]
