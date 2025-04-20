@@ -27,9 +27,9 @@ def wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
     from agents import function_tool
 
     if isinstance(tool, AgentTool):  # type: ignore[arg-type, misc]
-        return tool
+        return tool  # type: ignore[return-value]
 
-    return function_tool(tool)  # type: ignore[arg-type, return-value]
+    return function_tool(tool)
 
 
 def wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":

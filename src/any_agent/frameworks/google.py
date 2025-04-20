@@ -41,7 +41,7 @@ class GoogleAgent(AnyAgent):
         self._mcp_servers: Sequence[MCPServerBase] | None = None
         self._managed_mcp_servers: Sequence[MCPServerBase] | None = None
 
-    def _get_model(self, agent_config: AgentConfig) -> "LiteLlm":
+    def _get_model(self, agent_config: AgentConfig) -> LiteLlm:
         """Get the model configuration for a Google agent."""
         return LiteLlm(model=agent_config.model_id, **agent_config.model_args or {})
 
@@ -85,7 +85,7 @@ class GoogleAgent(AnyAgent):
                 if managed_agent.handoff:
                     sub_agents_instanced.append(instance)
                 else:
-                    tools.append(AgentTool(instance))
+                    tools.append(AgentTool(instance))  # type: ignore[arg-type]
 
         self._agent = Agent(
             name=self.config.name,

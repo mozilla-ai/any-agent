@@ -135,4 +135,4 @@ class LlamaIndexAgent(AnyAgent):
         if not self._agent:
             return []
 
-        return self._agent.tools  # type: ignore[union-attr, return-type]
+        return self._agent.tools  # type: ignore[union-attr, return-value]

@@ -100,11 +100,11 @@ class LangchainAgent(AnyAgent):
                     name = f"managed_agent_{n}"
                 managed_names.append(name)
 
-                managed_agent = create_react_agent(
+                managed_agent = create_react_agent(  # type: ignore[assignment]
                     name=name,
                     model=self._get_model(managed_agent),
-                    tools=[  # type: ignore[arg-type]
-                        *managed_tools,
+                    tools=[
+                        *managed_tools,  # type: ignore[list-item]
                         create_handoff_tool(agent_name=self.config.name),
                     ],
                     prompt=managed_agent.instructions,
@@ -124,8 +124,8 @@ class LangchainAgent(AnyAgent):
                 prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )
-            swarm.append(main_agent)
-            workflow = create_swarm(swarm, default_active_agent=self.config.name)
+            swarm.append(main_agent)  # type: ignore[arg-type]
+            workflow = create_swarm(swarm, default_active_agent=self.config.name)  # type: ignore[arg-type]
             self._agent = workflow.compile()
             self._tools = imported_tools
         else:

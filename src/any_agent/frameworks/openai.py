@@ -100,8 +100,8 @@ class OpenAIAgent(AnyAgent):
                 if managed_agent.handoff:
                     handoffs.append(instance)
                 else:
-                    tools.append(  # type: ignore[arg-type]
-                        instance.as_tool(
+                    tools.append(
+                        instance.as_tool(  # type: ignore[arg-type]
                             tool_name=instance.name,
                             tool_description=managed_agent.description
                             or f"Use the agent: {managed_agent.name}",
