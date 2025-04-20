@@ -64,8 +64,8 @@ def create_specific_mock_tools() -> list[MagicMock]:
     return [mock_read_tool, mock_write_tool, mock_other_tool]
 
 
-@patch("smolagents.ToolCollection")
-@patch("mcp.StdioServerParameters")
+@patch("any_agent.tools.mcp.smolagents.ToolCollection")
+@patch("any_agent.tools.mcp.smolagents.StdioServerParameters")
 class TestSmolagentsMCPServer(unittest.TestCase):
     """Tests for the SmolagentsMCPServer class."""
 
@@ -142,7 +142,7 @@ def test_openai_mcpsse() -> None:
     mock_server._tools_list = [mock_tool]  # pylint: disable=protected-access
 
     # Path the imports and class
-    with patch("agents.mcp.MCPServerSse", return_value=mock_server):
+    with patch("any_agent.tools.mcp.openai.OpenAIInternalMCPServerSse", return_value=mock_server):
         # Set up tools config for agent
         tools = [MCPSseParams(url="http://localhost:8000/sse")]
 
@@ -172,7 +172,7 @@ async def test_smolagents_mcp_sse() -> None:
     server = SmolagentsMCPServer(mcp_tool)
 
     # Patch the ToolCollection.from_mcp method to return our mock
-    with patch("smolagents.ToolCollection") as mock_tool_collection:
+    with patch("any_agent.tools.mcp.smolagents.ToolCollection") as mock_tool_collection:
         # Mock the context manager behavior
         mock_tool_collection.from_mcp.return_value.__enter__.return_value = (
             mock_tool_collection
@@ -208,7 +208,7 @@ async def test_langchain_mcp_sse() -> None:
 
     # Mock required components
     with (
-        patch("langchain_mcp_adapters.tools.load_mcp_tools") as mock_load_tools,
+        patch("any_agent.tools.mcp.langchain.load_mcp_tools") as mock_load_tools,
         patch("mcp.ClientSession") as mock_client_session,
     ):
         # Create the server instance
@@ -256,9 +256,9 @@ async def test_google_mcp_sse() -> None:
 
     # Mock Google MCP classes
     with (
-        patch("google.adk.tools.mcp_tool.mcp_toolset.MCPToolset") as mock_toolset_class,
+        patch("any_agent.tools.mcp.google.GoogleMCPToolset") as mock_toolset_class,
         patch(
-            "google.adk.tools.mcp_tool.mcp_toolset.SseServerParams"
+            "any_agent.tools.mcp.google.GoogleSseServerParameters"
         ) as mock_sse_params,
     ):
         # Set up mock toolset
@@ -306,8 +306,8 @@ async def test_llamaindex_mcp_sse() -> None:
 
     # Mock LlamaIndex MCP classes
     with (
-        patch("llama_index.tools.mcp.BasicMCPClient") as mock_client_class,
-        patch("llama_index.tools.mcp.McpToolSpec") as mock_tool_spec_class,
+        patch("any_agent.tools.mcp.llama_index.LlamaIndexMCPClient") as mock_client_class,
+        patch("any_agent.tools.mcp.llama_index.LlamaIndexMcpToolSpec") as mock_tool_spec_class,
     ):
         # Set up mock client and tool spec
         mock_client = MagicMock()
@@ -356,7 +356,7 @@ async def test_agno_mcp_sse() -> None:
     # Mock required components
     with (
         patch("mcp.ClientSession") as mock_client_session,
-        patch("agno.tools.mcp.MCPTools") as mock_mcp_tools,
+        patch("any_agent.tools.mcp.agno.AgnoMCPTools") as mock_mcp_tools,
     ):
         # Set up mocks
         mock_transport = (AsyncMock(), AsyncMock())
