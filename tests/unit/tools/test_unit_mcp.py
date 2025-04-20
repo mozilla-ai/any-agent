@@ -142,7 +142,10 @@ def test_openai_mcpsse() -> None:
     mock_server._tools_list = [mock_tool]  # pylint: disable=protected-access
 
     # Path the imports and class
-    with patch("any_agent.tools.mcp.openai.OpenAIInternalMCPServerSse", return_value=mock_server):
+    with patch(
+        "any_agent.tools.mcp.openai.OpenAIInternalMCPServerSse",
+        return_value=mock_server,
+    ):
         # Set up tools config for agent
         tools = [MCPSseParams(url="http://localhost:8000/sse")]
 
@@ -306,8 +309,12 @@ async def test_llamaindex_mcp_sse() -> None:
 
     # Mock LlamaIndex MCP classes
     with (
-        patch("any_agent.tools.mcp.llama_index.LlamaIndexMCPClient") as mock_client_class,
-        patch("any_agent.tools.mcp.llama_index.LlamaIndexMcpToolSpec") as mock_tool_spec_class,
+        patch(
+            "any_agent.tools.mcp.llama_index.LlamaIndexMCPClient"
+        ) as mock_client_class,
+        patch(
+            "any_agent.tools.mcp.llama_index.LlamaIndexMcpToolSpec"
+        ) as mock_tool_spec_class,
     ):
         # Set up mock client and tool spec
         mock_client = MagicMock()
