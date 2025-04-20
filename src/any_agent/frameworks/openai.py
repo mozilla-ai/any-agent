@@ -119,8 +119,8 @@ class OpenAIAgent(AnyAgent):
             name=self.config.name,
             instructions=self.config.instructions,
             model=self._get_model(self.config, api_key_var, base_url),
-            handoffs=handoffs,
-            tools=tools,
+            handoffs=handoffs,  # type: ignore[arg-type]
+            tools=tools,  # type: ignore[arg-type]
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],  # type: ignore[attr-defined]
             **kwargs_,
         )

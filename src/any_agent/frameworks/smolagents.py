@@ -109,11 +109,14 @@ class SmolagentsAgent(AnyAgent):
             **self.config.agent_args or {},
         )
 
+        assert self._agent
+
         if self.config.instructions:
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
+        assert self._agent
         return self._agent.run(prompt)  # type: ignore[union-attr]
 
     @property
@@ -122,4 +125,5 @@ class SmolagentsAgent(AnyAgent):
         Return the tools used by the agent.
         This property is read-only and cannot be modified.
         """
+        assert self._agent
         return self._agent.tools  # type: ignore[return-value, union-attr]

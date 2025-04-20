@@ -26,10 +26,10 @@ def wrap_tool_openai(tool: Tool | AgentTool) -> AgentTool:
     from agents import Tool as AgentTool
     from agents import function_tool
 
-    if isinstance(tool, AgentTool):  # type: ignore[arg-type]
+    if isinstance(tool, AgentTool):  # type: ignore[arg-type, misc]
         return tool
     
-    return function_tool(tool)  # type: ignore[arg-type]
+    return function_tool(tool)  # type: ignore[arg-type, return-value]
 
 
 def wrap_tool_langchain(tool: Tool | LangchainTool) -> LangchainTool:

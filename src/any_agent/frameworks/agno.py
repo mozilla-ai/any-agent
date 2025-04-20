@@ -64,7 +64,7 @@ class AgnoAgent(AnyAgent):
             name=self.config.name,
             instructions=self.config.instructions or "",
             model=self._get_model(self.config),
-            tools=tools,
+            tools=tools,  # type: ignore[arg-type]
             **self.config.agent_args or {},
         )
 
@@ -79,4 +79,4 @@ class AgnoAgent(AnyAgent):
             logger.warning("Agent not loaded or does not have tools.")
             return []
 
-        return self._agent.tools  # type: ignore[no-any-return, union-attr]
+        return self._agent.tools  # type: ignore[return-value, union-attr]

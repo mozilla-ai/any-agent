@@ -109,7 +109,7 @@ def test_wrap_tool_smolagents_builtin_tools() -> None:
 
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
-        wrap_tool_smolagents(DuckDuckGoSearchTool())
+        wrap_tool_smolagents(DuckDuckGoSearchTool())  # type: ignore[no-untyped-call]
         wrapper.assert_not_called()
 
 
