@@ -43,6 +43,8 @@ class AgnoAgent(AnyAgent):
         """Get the model configuration for an Agno agent."""
         return LiteLLM(
             id=agent_config.model_id,
+            api_base=agent_config.api_base,
+            api_key=agent_config.api_key,
             **agent_config.model_args or {},
         )
 
