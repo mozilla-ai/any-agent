@@ -44,7 +44,7 @@ def test_mcp(agent_framework: AgentFramework) -> None:
     agent = AnyAgent.create(agent_framework, agent_config)
     assert len(agent._mcp_servers) > 0
     result = agent.run(
-        "Search the web to find 'what year is today' and write the value to /projects/tmp.txt"
+        "Search the web to find 'what year is today' and write the value (single number) to /projects/tmp.txt"
     )
     # Check if the file was created
     assert os.path.exists(os.path.join(tmp_dir, "tmp.txt"))
