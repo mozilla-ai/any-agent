@@ -1,36 +1,22 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
-from abc import ABC, abstractmethod
-from enum import Enum, auto
 from contextlib import suppress
 from typing import Any
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 
 from pydantic import BaseModel, Field
 
-from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams, Tool
-
+from any_agent.config import Tool
+from .frameworks import MCPFrameworkConnection
 
 mcp_available = False
 with suppress(ImportError):
     mcp_available = True
 
-class MCPToolType(str, Enum):
-    STDIO = auto()
-    SSE = auto()
 
-
-class MCPToolConnection(BaseModel, ABC):
-    mcp_tool: MCPParams
-    type_: MCPToolType = Field(alias="type")
-
-    @abstractmethod
-    def setup(self) -> None:
-        ...
-
-class MCPServerBase(BaseModel):
+class MCPServer(BaseModel):
     """Base class for MCP tools managers across different frameworks."""
-    mcp_tool: MCPToolConnection
+    mcp_connection: MCPFrameworkConnection
     tools: Sequence[Tool] = Field(default_factory=list)
 
     def model_post_init(self, context: Any) -> None:
@@ -40,4 +26,4 @@ class MCPServerBase(BaseModel):
 
     async def setup_tools(self) -> None:
         """Set up tools. To be implemented by subclasses."""
-        self.tools = await self.mcp_tool.setup()
+        self.tools = await self.mcp_connection.setup()

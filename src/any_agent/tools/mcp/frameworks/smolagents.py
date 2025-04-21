@@ -7,14 +7,14 @@ from textwrap import dedent
 from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 from any_agent.logging import logger
 
-from .mcp_server_base import MCPServerBase
+# from any_agent.tools.mcp.mcp_server import MCPServer
 
 with suppress(ImportError):
     from mcp import StdioServerParameters
     from smolagents import ToolCollection
 
 
-class SmolagentsMCPServer(MCPServerBase):
+class SmolagentsMCPServer(object):
     """Implementation of MCP tools manager for smolagents."""
 
     def __init__(self, mcp_tool: MCPParams):

@@ -11,7 +11,7 @@ from any_agent.tools.wrappers import wrap_tools
 if TYPE_CHECKING:
     from llama_index.core.llms import LLM
 
-    from any_agent.tools.mcp import MCPServerBase
+    from any_agent.tools.mcp import MCPServer
 
 try:
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
@@ -39,7 +39,7 @@ class LlamaIndexAgent(AnyAgent):
         self.managed_agents: list[AgentConfig] | None = managed_agents
         self.config: AgentConfig = config
         self._agent: AgentWorkflow | ReActAgent | None = None
-        self._mcp_servers: list[MCPServerBase] = []
+        self._mcp_servers: list[MCPServer] = []
         self.framework = AgentFramework.LLAMA_INDEX
 
     def _get_model(self, agent_config: AgentConfig) -> LLM:

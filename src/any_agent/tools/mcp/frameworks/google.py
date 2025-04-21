@@ -5,7 +5,7 @@ from contextlib import AsyncExitStack, suppress
 
 from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 
-from .mcp_server_base import MCPServerBase
+# from any_agent.tools.mcp.mcp_server import MCPServer
 
 with suppress(ImportError):
     from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
@@ -17,7 +17,7 @@ with suppress(ImportError):
     )
 
 
-class GoogleMCPServer(MCPServerBase):
+class GoogleMCPServer(object):
     """Implementation of MCP tools manager for Google agents."""
 
     def __init__(self, mcp_tool: MCPParams):

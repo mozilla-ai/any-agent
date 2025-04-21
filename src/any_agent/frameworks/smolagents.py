@@ -5,7 +5,7 @@ from typing import Any
 from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.mcp import MCPServerBase
+from any_agent.tools.mcp import MCPServer
 from any_agent.tools.wrappers import wrap_tools
 
 try:
@@ -34,8 +34,8 @@ class SmolagentsAgent(AnyAgent):
         self.managed_agents = managed_agents
         self.config = config
         self._agent: MultiStepAgent | None = None
-        self._mcp_servers: Sequence[MCPServerBase] | None = None
-        self._managed_mcp_servers: Sequence[MCPServerBase] | None = None
+        self._mcp_servers: Sequence[MCPServer] | None = None
+        self._managed_mcp_servers: Sequence[MCPServer] | None = None
 
     def _get_model(self, agent_config: AgentConfig) -> Any:
         """Get the model configuration for a smolagents agent."""
@@ -48,7 +48,7 @@ class SmolagentsAgent(AnyAgent):
             kwargs["api_key"] = os.environ[api_key_var]
         return model_type(**kwargs, **model_args)
 
-    def _merge_mcp_tools(self, mcp_servers: Sequence[MCPServerBase]) -> list[Tool]:
+    def _merge_mcp_tools(self, mcp_servers: Sequence[MCPServer]) -> list[Tool]:
         """Merge MCP tools from different servers."""
         tools = list[Tool]()
         for mcp_server in mcp_servers:

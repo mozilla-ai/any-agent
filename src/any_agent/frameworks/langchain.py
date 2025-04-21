@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
     from langgraph.graph.graph import CompiledGraph
 
-    from any_agent.tools.mcp import MCPServerBase
+    from any_agent.tools.mcp import MCPServer
 
 if TYPE_CHECKING:
     from langchain_core.language_models import LanguageModelLike
@@ -47,7 +47,7 @@ class LangchainAgent(AnyAgent):
         # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph,
         # so we'll store a list of them in this class
         self._tools: Sequence[Tool] = []
-        self._mcp_servers: Sequence[MCPServerBase] | None = None
+        self._mcp_servers: Sequence[MCPServer] | None = None
 
     def _get_model(self, agent_config: AgentConfig) -> str | LanguageModelLike:
         """Get the model configuration for a LangChain agent."""

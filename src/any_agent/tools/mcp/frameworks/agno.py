@@ -2,13 +2,14 @@
 
 import os
 from contextlib import AsyncExitStack, suppress
-from typing import Annotated, Literal, Union
+from typing import Literal
 
-from pydantic import ConfigDict, Discriminator, Tag, TypeAdapter
+from pydantic import ConfigDict
 
 from any_agent.config import MCPSseParams, MCPStdioParams, Tool
 
-from .mcp_server_base import MCPToolConnection, MCPToolType
+from any_agent.tools.mcp.mcp_connection import MCPConnection, MCPToolType
+
 
 with suppress(ImportError):
     from agno.tools.mcp import MCPTools as AgnoMCPTools
@@ -16,7 +17,7 @@ with suppress(ImportError):
     from mcp.client.sse import sse_client
 
 
-class AgnoMCPToolConnectionBase(MCPToolConnection):
+class AgnoMCPToolConnectionBase(MCPConnection):
     server: AgnoMCPTools | None = None
     exit_stack: AsyncExitStack = AsyncExitStack()
 
@@ -65,4 +66,3 @@ class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
 
 
 AgnoMCPToolConnection = AgnoMCPToolConnectionStdio | AgnoMCPToolConnectionSse
-AgnoMCPToolConnectionValidator = TypeAdapter(AgnoMCPToolConnection)

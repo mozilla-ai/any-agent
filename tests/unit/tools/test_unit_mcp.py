@@ -18,16 +18,17 @@ from any_agent.tools.mcp import (
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
-    MCPServerBase,
+    MCPServer,
     SmolagentsMCPServer,
 )
+from any_agent.tools.mcp.frameworks import MCPFrameworkConnection
 
 
 class TestMCPServerBase(unittest.TestCase):
     """Tests for the MCPServerBase class."""
 
     # Define the test class once at class level instead of in each test method
-    class ConcreteMCPManager(MCPServerBase):
+    class ConcreteMCPManager(object):
         async def setup_tools(self) -> None:
             pass
 
@@ -359,14 +360,13 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = MCPServerBase(
-        mcp_tool=TypeAdapter(AgnoMCPToolConnection).validate_python({"mcp_tool": mcp_tool})
-    )
+    mcp_connection = TypeAdapter(MCPFrameworkConnection).validate_python({"mcp_tool": mcp_tool})
+    server = MCPServer(mcp_connection=mcp_connection)
 
     # Mock required components
     with (
-        patch("any_agent.tools.mcp.agno.ClientSession") as mock_client_session,
-        patch("any_agent.tools.mcp.agno.AgnoMCPTools") as mock_mcp_tools,
+        patch("any_agent.tools.mcp.frameworks.agno.ClientSession") as mock_client_session,
+        patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools,
     ):
         # Set up mocks
         mock_transport = (AsyncMock(), AsyncMock())
@@ -393,4 +393,4 @@ async def test_agno_mcp_sse() -> None:
             )
 
             # Check that tools instance was set as server
-            assert server.mcp_tool.server == mock_tools_instance
+            assert server.mcp_connection.server == mock_tools_instance

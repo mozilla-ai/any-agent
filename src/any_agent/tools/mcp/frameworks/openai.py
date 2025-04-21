@@ -5,7 +5,7 @@ from contextlib import AsyncExitStack, suppress
 from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 from any_agent.logging import logger
 
-from .mcp_server_base import MCPServerBase
+# from any_agent.tools.mcp.mcp_server import MCPServer
 
 with suppress(ImportError):
     from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
@@ -18,7 +18,7 @@ with suppress(ImportError):
     )
 
 
-class OpenAIMCPServer(MCPServerBase):
+class OpenAIMCPServer(object):
     """Implementation of MCP tools manager for OpenAI agents."""
 
     def __init__(self, mcp_tool: MCPParams):

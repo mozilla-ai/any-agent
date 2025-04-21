@@ -10,7 +10,7 @@ from any_agent.tools.wrappers import wrap_tools
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from any_agent.tools.mcp import MCPServerBase
+    from any_agent.tools.mcp import MCPServer
 
 try:
     from google.adk.agents import Agent
@@ -38,8 +38,8 @@ class GoogleAgent(AnyAgent):
         self.managed_agents = managed_agents
         self.config = config
         self._agent: Agent | None = None
-        self._mcp_servers: Sequence[MCPServerBase] | None = None
-        self._managed_mcp_servers: Sequence[MCPServerBase] | None = None
+        self._mcp_servers: Sequence[MCPServer] | None = None
+        self._managed_mcp_servers: Sequence[MCPServer] | None = None
 
     def _get_model(self, agent_config: AgentConfig) -> LiteLlm:
         """Get the model configuration for a Google agent."""

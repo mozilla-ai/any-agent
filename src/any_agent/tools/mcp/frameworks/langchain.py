@@ -6,7 +6,7 @@ from typing import Any
 
 from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 
-from .mcp_server_base import MCPServerBase
+# from any_agent.tools.mcp.mcp_server import MCPServer
 
 with suppress(ImportError):
     from langchain_mcp_adapters.tools import load_mcp_tools
@@ -15,7 +15,7 @@ with suppress(ImportError):
     from mcp.client.stdio import stdio_client
 
 
-class LangchainMCPServer(MCPServerBase):
+class LangchainMCPServer(object):
     """Implementation of MCP tools manager for LangChain agents."""
 
     def __init__(self, mcp_tool: MCPParams):

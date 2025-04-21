@@ -1,17 +1,19 @@
-from .agno import AgnoMCPToolConnection
-from .google import GoogleMCPServer
-from .langchain import LangchainMCPServer
-from .llama_index import LlamaIndexMCPServer
-from .mcp_server_base import MCPServerBase
-from .openai import OpenAIMCPServer
-from .smolagents import SmolagentsMCPServer
+from .frameworks import (
+    AgnoMCPToolConnection,
+    GoogleMCPServer,
+    LangchainMCPServer,
+    LlamaIndexMCPServer,
+    OpenAIMCPServer,
+    SmolagentsMCPServer,
+)
+from .mcp_server import MCPServer
 
 __all__ = [
     "AgnoMCPToolConnection",
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
-    "MCPServerBase",
+    "MCPServer",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
 ]

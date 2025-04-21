@@ -3,7 +3,7 @@ from .mcp import (
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
-    MCPServerBase,
+    MCPServer,
     OpenAIMCPServer,
     SmolagentsMCPServer,
 )
@@ -21,7 +21,7 @@ __all__ = [
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
-    "MCPServerBase",
+    "MCPServer",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
     "ask_user_verification",

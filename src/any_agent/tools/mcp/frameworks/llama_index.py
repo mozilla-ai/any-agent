@@ -5,14 +5,14 @@ from contextlib import suppress
 
 from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 
-from .mcp_server_base import MCPServerBase
+# from any_agent.tools.mcp.mcp_server import MCPServer
 
 with suppress(ImportError):
     from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
     from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
 
-class LlamaIndexMCPServer(MCPServerBase):
+class LlamaIndexMCPServer(object):
     """Implementation of MCP tools manager for Google agents."""
 
     def __init__(self, mcp_tool: MCPParams):

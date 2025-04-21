@@ -9,7 +9,7 @@ from any_agent.tools.mcp import (
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
-    MCPServerBase,
+    MCPServer,
     OpenAIMCPServer,
     SmolagentsMCPServer,
 )
@@ -71,12 +71,12 @@ def wrap_tool_agno(tool: Tool) -> Any:
 async def wrap_mcp_server(
     mcp_tool: MCPParams,
     agent_framework: AgentFramework,
-) -> MCPServerBase:
+) -> MCPServer:
     """Generic MCP server wrapper that can work with different frameworks
     based on the specified agent_framework
     """
     # Select the appropriate manager based on agent_framework
-    mcp_server_map: dict[AgentFramework, type[MCPServerBase]] = {
+    mcp_server_map: dict[AgentFramework, type[MCPServer]] = {
         AgentFramework.OPENAI: OpenAIMCPServer,
         AgentFramework.SMOLAGENTS: SmolagentsMCPServer,
         AgentFramework.LANGCHAIN: LangchainMCPServer,
@@ -134,11 +134,11 @@ def verify_callable(tool: Callable[..., Any]) -> None:
 async def wrap_tools(
     tools: Sequence[Tool],
     agent_framework: AgentFramework,
-) -> tuple[list[Tool], list[MCPServerBase]]:
+) -> tuple[list[Tool], list[MCPServer]]:
     wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = list[Tool]()
-    mcp_servers = list[MCPServerBase]()
+    mcp_servers = list[MCPServer]()
     for tool in tools:
         # if it's MCPStdioParams or MCPSseParams, we need to wrap it in a server
         if isinstance(tool, MCPParams):
