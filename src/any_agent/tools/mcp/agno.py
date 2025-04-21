@@ -2,10 +2,13 @@
 
 import os
 from contextlib import AsyncExitStack, suppress
+from functools import cache
 
-from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
+from pydantic import ConfigDict, TypeAdapter
 
-from .mcp_server_base import MCPServerBase
+from any_agent.config import MCPSseParams, MCPStdioParams, Tool
+
+from .mcp_server_base import MCPServerBase, MCPToolConnection
 
 with suppress(ImportError):
     from agno.tools.mcp import MCPTools as AgnoMCPTools
@@ -13,17 +16,21 @@ with suppress(ImportError):
     from mcp.client.sse import sse_client
 
 
-class AgnoMCPServer(MCPServerBase):
-    """Implementation of MCP tools manager for Agno agents."""
+class AgnoMCPToolConnectionBase(MCPToolConnection):
+    server: AgnoMCPTools | None = None
+    exit_stack: AsyncExitStack = AsyncExitStack()
 
-    def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
-        self.exit_stack = AsyncExitStack()
-        self.server: AgnoMCPTools | None = None
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    async def setup_stdio_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPStdioParams)
+    async def setup(self) -> list[Tool]:
+        """Set up the Agno MCP server with the provided configuration."""
+        assert self.server
+        return [await self.exit_stack.enter_async_context(self.server)]
 
+class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
+    mcp_tool: MCPStdioParams
+    
+    async def setup(self) -> list[Tool]:
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
         self.server = AgnoMCPTools(
             command=server_params,
@@ -31,8 +38,12 @@ class AgnoMCPServer(MCPServerBase):
             env={**os.environ},
         )
 
-    async def setup_sse_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPSseParams)
+        return await super().setup()
+
+class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
+    mcp_tool: MCPSseParams
+    
+    async def setup(self) -> list[Tool]:
         client = sse_client(
             url=self.mcp_tool.url,
             headers=self.mcp_tool.headers,
@@ -47,9 +58,15 @@ class AgnoMCPServer(MCPServerBase):
             include_tools=self.mcp_tool.tools,
         )
 
-    async def setup_tools(self) -> None:
-        """Set up the Agno MCP server with the provided configuration."""
-        await super().setup_tools()
+        return await super().setup()
 
-        assert self.server
-        self.tools = [await self.exit_stack.enter_async_context(self.server)]
+AgnoMCPToolConnection = AgnoMCPToolConnectionStdio | AgnoMCPToolConnectionSse
+AgnoMCPToolConnectionValidator = TypeAdapter(AgnoMCPToolConnection)
+
+class AgnoMCPServer(MCPServerBase):
+
+    @property
+    @cache
+    def mcp_tool_connection(self) -> MCPToolConnection:
+        return AgnoMCPToolConnectionValidator.validate_python({"mcp_tool": self.mcp_tool})
+

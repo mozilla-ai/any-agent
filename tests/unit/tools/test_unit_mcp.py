@@ -362,7 +362,7 @@ async def test_agno_mcp_sse() -> None:
 
     # Mock required components
     with (
-        patch("mcp.ClientSession") as mock_client_session,
+        patch("any_agent.tools.mcp.agno.ClientSession") as mock_client_session,
         patch("any_agent.tools.mcp.agno.AgnoMCPTools") as mock_mcp_tools,
     ):
         # Set up mocks
@@ -390,4 +390,4 @@ async def test_agno_mcp_sse() -> None:
             )
 
             # Check that tools instance was set as server
-            assert server.server == mock_tools_instance
+            assert server.mcp_tool_connection.server == mock_tools_instance

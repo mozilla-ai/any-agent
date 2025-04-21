@@ -4,7 +4,9 @@ from abc import ABC, abstractmethod
 from contextlib import suppress
 from typing import TYPE_CHECKING
 
-from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams, Tool
+from pydantic import BaseModel
+
+from any_agent.config import MCPParams, Tool
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -13,6 +15,13 @@ if TYPE_CHECKING:
 mcp_available = False
 with suppress(ImportError):
     mcp_available = True
+
+class MCPToolConnection(BaseModel, ABC):
+    mcp_tool: MCPParams
+
+    @abstractmethod
+    def setup(self) -> None:
+        ...
 
 
 class MCPServerBase(ABC):
@@ -29,19 +38,11 @@ class MCPServerBase(ABC):
         # Initialize tools list (to be populated by subclasses)
         self.tools: Sequence[Tool] = []
 
+    @property
     @abstractmethod
+    def mcp_tool_connection(self) -> MCPToolConnection:
+        ...
+
     async def setup_tools(self) -> None:
         """Set up tools. To be implemented by subclasses."""
-        match self.mcp_tool:
-            case MCPStdioParams():
-                await self.setup_stdio_tools()
-            case MCPSseParams():
-                await self.setup_sse_tools()
-
-    @abstractmethod
-    async def setup_sse_tools(self) -> None:
-        """Set up tools. To be implemented by subclasses."""
-
-    @abstractmethod
-    async def setup_stdio_tools(self) -> None:
-        """Set up tools. To be implemented by subclasses."""
+        self.tools = await self.mcp_tool_connection.setup()
