@@ -53,8 +53,8 @@ agent = AnyAgent.create(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
-    )
-    TracingConfig(output_dir="traces") # Optional, but recommended for saving and viewing traces
+    ),
+    tracing=TracingConfig(output_dir="traces") # Optional, but recommended for saving and viewing traces
 )
 
 agent.run("Which Agent Framework is the best??")
