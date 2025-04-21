@@ -19,7 +19,7 @@ pip install any-agent
 To define any agent system you will always use the same imports:
 
 ```python
-from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
 
 !!! note
@@ -33,37 +33,23 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 
 ### Single Agent
 
-Configure the agent:
-
-```python
+```py
 from any_agent.tools import search_web, visit_webpage
-main_agent = AgentConfig(
-    model_id="gpt-4o",
-    tools=[search_web, visit_webpage]
+
+agent = AnyAgent.create(
+    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    AgentConfig(
+        model_id="gpt-4.1-nano",
+        instructions="Use the tools to find an answer",
+        tools=[search_web, visit_webpage]
+    )
+    TracingConfig(output_dir="traces") # Optional, but recommended for saving and viewing traces
 )
-```
-
-Choose one of the available frameworks:
-
-```python
-from random import choice
-
-framework = choice(
-    ["langchain", "llama_index", "openai", "smolagents"]
-)
-```
-
-Create and run the agent:
-
-```python
-agent = AnyAgent.create(framework, main_agent)
 
 agent.run("Which Agent Framework is the best??")
 ```
 
 ### Multi-Agent
-
-Building on top of the previous example, we can easily extend it to a multi-agent system.
 
 !!! warning
 
@@ -72,41 +58,30 @@ Building on top of the previous example, we can easily extend it to a multi-agen
     As stated before, carefully consider whether you need to adopt this pattern to
     solve the task.
 
-First, configure the `main_agent`, similar to before:
-
-```python
-main_agent = AgentConfig(
-    model_id="gpt-4o",
-    description="Main Agent"
-)
-```
-
-This agent will act as the "orchestrator".
-
-Then, configure the list of `managed_agents`:
-
-```python
+```py
 from any_agent.tools import search_web, visit_webpage
-managed_agents = [
+
+agent = AnyAgent.create(
+    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
-        name="search_web_agent",
-        model_id="gpt-4o-mini",
-        description="Agent that can search the web",
-        tools=[search_web]
+        model_id="gpt-4.1-mini",
+        instructions="You are the main agent. Use the other available agents to find an answer",
     ),
-    AgentConfig(
-        name="visit_webpage_agent",
-        model_id="gpt-4o-mini",
-        description="Agent that can visit webpages",
-        tools=[visit_webpage]
-    )
-]
-```
+    managed_agents=[
+        AgentConfig(
+            name="search_web_agent",
+            description="An agent that can search the web",
+            model_id="gpt-4.1-nano",
+            tools=[search_web]
+        ),
+        AgentConfig(
+            name="visit_webpage_agent",
+            description="An agent that can visit webpages",
+            model_id="gpt-4.1-nano",
+            tools=[visit_webpage]
+        )
+    ]
+)
 
-You can then create and run the multi-agent:
-
-```python
-multi_agent = AnyAgent.create(framework, main_agent, managed_agents)
-
-multi_agent.run("Which Agent Framework is the best??")
+agent.run("Which Agent Framework is the best??")
 ```

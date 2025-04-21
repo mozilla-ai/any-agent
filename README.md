@@ -40,18 +40,16 @@ pip install 'any-agent[all]'
 To define any agent system you will always use the same imports:
 
 ```py
-from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
-
-# See all options in https://mozilla-ai.github.io/any-agent/frameworks/
-framework = AgentFramework("smolagents")
+from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
 
 ### Single agent
 
 ```py
 from any_agent.tools import search_web, visit_webpage
+
 agent = AnyAgent.create(
-    framework,
+    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
@@ -67,8 +65,9 @@ agent.run("Which Agent Framework is the best??")
 
 ```py
 from any_agent.tools import search_web, visit_webpage
+
 agent = AnyAgent.create(
-    framework,
+    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="You are the main agent. Use the other available agents to find an answer",
