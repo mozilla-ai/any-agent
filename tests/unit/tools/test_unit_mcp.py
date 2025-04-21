@@ -360,7 +360,7 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    mcp_connection = TypeAdapter(MCPFrameworkConnection).validate_python({"mcp_tool": mcp_tool})
+    mcp_connection = TypeAdapter(MCPFrameworkConnection).validate_python({"mcp_tool": mcp_tool, "framework": AgentFramework.AGNO})
     server = MCPServer(mcp_connection=mcp_connection)
 
     # Mock required components
