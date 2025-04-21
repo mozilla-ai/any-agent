@@ -149,7 +149,7 @@ def test_openai_mcpsse() -> None:
         agent_config = AgentConfig(model_id="gpt-4o", tools=tools)
 
         agent = AnyAgent.create(agent_framework, agent_config)
-        assert len(agent.tools) > 0
+        assert len(agent._mcp_servers) > 0
 
 
 @pytest.mark.asyncio

@@ -1,19 +1,19 @@
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from any_agent.config import AgentConfig, AgentFramework, Tool
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.mcp import MCPServerBase
-from any_agent.tools.wrappers import wrap_tools
 
 try:
     import smolagents
-    from smolagents import MultiStepAgent
 
     smolagents_available = True
 except ImportError:
     smolagents_available = False
+
+if TYPE_CHECKING:
+    from smolagents import MultiStepAgent
+
 
 DEFAULT_AGENT_TYPE = "CodeAgent"
 DEFAULT_MODEL_CLASS = "LiteLLMModel"
@@ -22,19 +22,9 @@ DEFAULT_MODEL_CLASS = "LiteLLMModel"
 class SmolagentsAgent(AnyAgent):
     """Smolagents agent implementation that handles both loading and running."""
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
-    ):
-        if not smolagents_available:
-            msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
-            raise ImportError(msg)
-        self.managed_agents = managed_agents
-        self.config = config
-        self._agent: MultiStepAgent | None = None
-        self._mcp_servers: Sequence[MCPServerBase] | None = None
-        self._managed_mcp_servers: Sequence[MCPServerBase] | None = None
+    @property
+    def framework(self) -> AgentFramework:
+        return AgentFramework.SMOLAGENTS
 
     def _get_model(self, agent_config: AgentConfig) -> Any:
         """Get the model configuration for a smolagents agent."""
@@ -47,26 +37,18 @@ class SmolagentsAgent(AnyAgent):
         model_args = agent_config.model_args or {}
         return model_type(**kwargs, **model_args)
 
-    def _merge_mcp_tools(self, mcp_servers: Sequence[MCPServerBase]) -> list[Tool]:
-        """Merge MCP tools from different servers."""
-        tools = list[Tool]()
-        for mcp_server in mcp_servers:
-            tools.extend(mcp_server.tools)
-        return tools
-
     async def load_agent(self) -> None:
         """Load the Smolagents agent with the given configuration."""
+        if not smolagents_available:
+            msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
+            raise ImportError(msg)
         if not self.managed_agents and not self.config.tools:
             self.config.tools = [
                 search_web,
                 visit_webpage,
             ]
 
-        tools, mcp_servers = await wrap_tools(
-            self.config.tools, agent_framework=AgentFramework.SMOLAGENTS
-        )
-        self._mcp_servers = mcp_servers
-        tools.extend(self._merge_mcp_tools(mcp_servers))
+        tools, _ = await self._load_tools(self.config.tools)
 
         managed_agents_instanced = []
         if self.managed_agents:
@@ -75,11 +57,7 @@ class SmolagentsAgent(AnyAgent):
                     smolagents,
                     managed_agent.agent_type or DEFAULT_AGENT_TYPE,
                 )
-                managed_tools, managed_mcp_servers = await wrap_tools(
-                    managed_agent.tools, agent_framework=AgentFramework.SMOLAGENTS
-                )
-                self._managed_mcp_servers = managed_mcp_servers
-                tools.extend(self._merge_mcp_tools(managed_mcp_servers))
+                managed_tools, _ = await self._load_tools(managed_agent.tools)
                 managed_agent_instance = agent_type(
                     name=managed_agent.name,
                     model=self._get_model(managed_agent),
@@ -99,7 +77,7 @@ class SmolagentsAgent(AnyAgent):
             self.config.agent_type or DEFAULT_AGENT_TYPE,
         )
 
-        self._agent = main_agent_type(
+        self._agent: MultiStepAgent = main_agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
             tools=tools,
@@ -113,12 +91,4 @@ class SmolagentsAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
-        return self._agent.run(prompt)  # type: ignore[union-attr]
-
-    @property
-    def tools(self) -> list[Tool]:
-        """
-        Return the tools used by the agent.
-        This property is read-only and cannot be modified.
-        """
-        return self._agent.tools  # type: ignore[no-any-return, union-attr]
+        return self._agent.run(prompt)

@@ -35,5 +35,4 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     )
     agent = AnyAgent.create(agent_framework, agent_config)
     result = agent.run("Which agent framework is the best?")
-    assert len(agent.tools) > 0
     assert result

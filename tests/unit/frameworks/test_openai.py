@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.config import MCPStdioParams
 from any_agent.tools import (
     ask_user_verification,
     search_web,
@@ -86,26 +87,34 @@ def test_load_openai_with_mcp_server() -> None:
     mock_mcp_server = MagicMock()
     mock_mcp_server.server = MagicMock()
     mock_litellm_model = MagicMock()
+    mock_wrap_tools = MagicMock()
 
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
-        patch("any_agent.frameworks.openai.wrap_tools") as mock_wrap_tools,
         patch("any_agent.frameworks.openai.LitellmModel", mock_litellm_model),
+        patch.object(AnyAgent, "_load_tools", mock_wrap_tools),
     ):
-        # Setup the mock to return tools and MCP servers
-        mock_wrap_tools.return_value = (
-            [mock_function_tool(search_web)],  # tools
-            [mock_mcp_server],  # mcp_servers
-        )
+
+        async def side_effect(self):  # type: ignore[no-untyped-def]
+            return (
+                [mock_function_tool(search_web)],  # tools
+                [mock_mcp_server],  # mcp_servers
+            )
+
+        mock_wrap_tools.side_effect = side_effect
 
         AnyAgent.create(
             AgentFramework.OPENAI,
             AgentConfig(
                 model_id="gpt-4o",
                 tools=[
-                    "some.mcp.server",
-                ],  # The actual import path doesn't matter for the test
+                    MCPStdioParams(
+                        command="docker",
+                        args=["run", "-i", "--rm", "mcp/fetch"],
+                        tools=["fetch"],
+                    ),
+                ],
             ),
         )
 

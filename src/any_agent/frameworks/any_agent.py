@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Any, assert_never
+from typing import TYPE_CHECKING, Any, assert_never
 
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
+from any_agent.tools.wrappers import wrap_tools
 from any_agent.tracing import setup_tracing
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from any_agent.tools.mcp import MCPServerBase
 
 
 class AnyAgent(ABC):
@@ -15,9 +21,27 @@ class AnyAgent(ABC):
     This provides a unified interface for different agent frameworks.
     """
 
-    trace_filepath: str | None = None
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
+    ):
+        self.config = config
+        self.managed_agents = managed_agents
+        self._agent = None
+        self.trace_filepath: str | None = None
+        self._mcp_servers: list[MCPServerBase] = []
 
-    # factory method
+    async def _load_tools(
+        self, tools: Sequence[Tool]
+    ) -> tuple[list[Any], list[MCPServerBase]]:
+        tools, mcp_servers = await wrap_tools(tools, self.framework)
+        # Add to agent so that it doesn't get garbage collected
+        self._mcp_servers.extend(mcp_servers)
+        for mcp_server in mcp_servers:
+            tools.extend(mcp_server.tools)
+        return tools, mcp_servers
+
     @staticmethod
     def _get_agent_type_by_framework(
         framework_raw: AgentFramework | str,
@@ -79,13 +103,13 @@ class AnyAgent(ABC):
         asyncio.get_event_loop().run_until_complete(agent.load_agent())
         return agent
 
-    @abstractmethod
-    async def load_agent(self) -> None:
-        """Load the agent instance."""
-
     def run(self, prompt: str) -> Any:
         """Run the agent with the given prompt."""
         return asyncio.get_event_loop().run_until_complete(self.run_async(prompt))
+
+    @abstractmethod
+    async def load_agent(self) -> None:
+        """Load the agent instance."""
 
     @abstractmethod
     async def run_async(self, prompt: str) -> Any:
@@ -93,18 +117,8 @@ class AnyAgent(ABC):
 
     @property
     @abstractmethod
-    def tools(self) -> list[Tool]:
-        """Return the tools used by the agent.
-        This property is read-only and cannot be modified.
-        """
-
-    def __init__(
-        self,
-        config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
-    ) -> None:
-        msg = "Cannot instantiate the base class AnyAgent, please use the factory method 'AnyAgent.create'"
-        raise NotImplementedError(msg)
+    def framework(self) -> AgentFramework:
+        """The Agent Framework used"""
 
     @property
     def agent(self) -> Any:
