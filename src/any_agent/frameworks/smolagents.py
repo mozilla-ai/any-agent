@@ -38,7 +38,7 @@ class SmolagentsAgent(AnyAgent):
             kwargs["api_key"] = os.environ[api_key_var]
         return model_type(**kwargs, **model_args)
 
-    async def _load_agent(self) -> None:
+    async def load_agent(self) -> None:
         """Load the Smolagents agent with the given configuration."""
         if not smolagents_available:
             msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"

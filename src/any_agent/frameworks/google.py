@@ -29,7 +29,7 @@ class GoogleAgent(AnyAgent):
         """Get the model configuration for a Google agent."""
         return LiteLlm(model=agent_config.model_id, **agent_config.model_args or {})
 
-    async def _load_agent(self) -> None:
+    async def load_agent(self) -> None:
         """Load the Google agent with the given configuration."""
         if not adk_available:
             msg = "You need to `pip install 'any-agent[google]'` to use this agent"

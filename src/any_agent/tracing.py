@@ -2,7 +2,6 @@ import json
 import os
 from collections.abc import Sequence
 from datetime import datetime
-from pathlib import Path
 from typing import Protocol, assert_never
 
 from opentelemetry import trace
@@ -105,19 +104,19 @@ class RichConsoleSpanExporter(SpanExporter):
 
 def _get_tracer_provider(
     agent_framework: AgentFramework,
-    output_dir: str | Path,
     tracing_config: TracingConfig,
 ) -> tuple[TracerProvider, str]:
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-
     tracer_provider = TracerProvider()
-
-    file_name = f"{output_dir}/{agent_framework.value}-{timestamp}.json"
-    json_file_exporter = JsonFileSpanExporter(file_name=file_name)
-    span_processor = SimpleSpanProcessor(json_file_exporter)
-    tracer_provider.add_span_processor(span_processor)
+    if tracing_config.output_dir is not None:
+        if not os.path.exists(tracing_config.output_dir):
+            os.makedirs(tracing_config.output_dir)
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        file_name = (
+            f"{tracing_config.output_dir}/{agent_framework.value}-{timestamp}.json"
+        )
+        json_file_exporter = JsonFileSpanExporter(file_name=file_name)
+        span_processor = SimpleSpanProcessor(json_file_exporter)
+        tracer_provider.add_span_processor(span_processor)
 
     # This is what will log all the span info to stdout: We turn off the agent sdk specific logging so that
     # the user sees a similar logging format for whichever agent they are using under the hood.
@@ -131,27 +130,24 @@ def _get_tracer_provider(
 
 
 def setup_tracing(
-    agent_framework: AgentFramework | str,
-    output_dir: str | Path = "traces",
-    tracing_config: TracingConfig | None = None,
+    agent_framework: AgentFramework,
+    tracing_config: TracingConfig,
 ) -> str:
     """Setup tracing for `agent_framework` using `openinference.instrumentation`.
 
     Args:
         agent_framework (AgentFramework): The type of agent being used.
-        output_dir (str): The directory where the traces will be stored.
-            Defaults to "traces".
+        tracing_config (TracingConfig): Configuration for tracing, including output directory and styles.
 
     Returns:
         str: The name of the JSON file where traces will be stored.
 
     """
+
     agent_framework_ = AgentFramework.from_string(agent_framework)
-    tracing_config = tracing_config or TracingConfig()
 
     tracer_provider, file_name = _get_tracer_provider(
-        agent_framework_,
-        output_dir,
+        agent_framework,
         tracing_config,
     )
 

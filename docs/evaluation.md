@@ -21,16 +21,13 @@ with user defined criteria. The steps for evaluating an agent are as follows:
 1. Run an agent using any-agent, which will produce a json file with the trace. For example
 
 ```python
-from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tracing import setup_tracing
+from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.tools import search_web
 main_agent = AgentConfig(
 	model_id="gpt-4o-mini",
     tools=[search_web]
 )
-framework = "langchain"
-tracing_path = setup_tracing(framework, "output")
-agent = AnyAgent.create(framework, main_agent)
+agent = AnyAgent.create("langchain", main_agent, TracingConfig(output_dir="traces"))
 
 agent.run("How many seconds would it take for a leopard at full speed to run through Pont des Arts?")
 ```

@@ -4,8 +4,10 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
 
-from any_agent.config import AgentConfig, AgentFramework, Tool
+from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
+from any_agent.logging import logger
 from any_agent.tools.wrappers import wrap_tools
+from any_agent.tracing import setup_tracing
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -27,6 +29,7 @@ class AnyAgent(ABC):
         self.config = config
         self.managed_agents = managed_agents
         self._agent = None
+        self.trace_filepath: str | None = None
         self._mcp_servers: list[MCPServerBase] = []
 
     async def _load_tools(
@@ -83,10 +86,21 @@ class AnyAgent(ABC):
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ) -> AnyAgent:
+        framework = AgentFramework.from_string(agent_framework)
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config, managed_agents=managed_agents)
-        asyncio.get_event_loop().run_until_complete(agent._load_agent())
+        if tracing is not None:
+            # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
+            # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
+            if framework in (AgentFramework.AGNO, AgentFramework.GOOGLE):
+                logger.warning(
+                    "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
+                )
+            else:
+                agent.trace_filepath = setup_tracing(framework, tracing)
+        asyncio.get_event_loop().run_until_complete(agent.load_agent())
         return agent
 
     def run(self, prompt: str) -> Any:
@@ -94,7 +108,7 @@ class AnyAgent(ABC):
         return asyncio.get_event_loop().run_until_complete(self.run_async(prompt))
 
     @abstractmethod
-    async def _load_agent(self) -> None:
+    async def load_agent(self) -> None:
         """Load the agent instance."""
 
     @abstractmethod

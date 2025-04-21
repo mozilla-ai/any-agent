@@ -40,13 +40,10 @@ pip install 'any-agent[all]'
 To define any agent system you will always use the same imports:
 
 ```py
-from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tracing import setup_tracing  # Optional, but recommended
+from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 
 # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
-framework = "smolagents"
-
-setup_tracing(framework)
+framework = AgentFramework("smolagents")
 ```
 
 ### Single agent
@@ -60,6 +57,7 @@ agent = AnyAgent.create(
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
     )
+    TracingConfig(output_dir="traces") # Optional, but recommended for saving and viewing traces
 )
 
 agent.run("Which Agent Framework is the best??")
