@@ -7,7 +7,7 @@ from mktestdocs import check_md_file
 
 # Note the use of `str`, makes for pretty output
 @pytest.mark.parametrize("fpath", pathlib.Path("docs").glob("**/*.md"), ids=str)
-def test_files_all(fpath):
+def test_files_all(fpath: pathlib.Path) -> None:
     # Create a mock for evaluate_telemetry
     mock_evaluate = MagicMock()
     mock_agent = MagicMock()

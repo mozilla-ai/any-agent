@@ -12,7 +12,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tracing import setup_tracing
 from any_agent.tools import search_web
 
-framework = AgentFramework("openai")
+framework = "openai"
 
 setup_tracing(framework)
 
@@ -69,7 +69,7 @@ You can configure the behavior of the console output using [`TracingConfig`][any
 from any_agent.config import TracingConfig
 
 setup_tracing(
-  agent_framework=AgentFramework("langchain"),
+  agent_framework="langchain",
   tracing_config=TracingConfig(
     llm=None,  # Setting to None disables this `openinference.span.kind`
     tool="purple",  # Change the color used to display

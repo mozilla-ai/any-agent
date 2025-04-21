@@ -9,7 +9,7 @@ from any_agent.tools import (
 )
 
 
-def test_load_langchain_agent_default():
+def test_load_langchain_agent_default() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -32,18 +32,18 @@ def test_load_langchain_agent_default():
         )
 
 
-def test_load_langchain_agent_missing():
+def test_load_langchain_agent_missing() -> None:
     with patch("any_agent.frameworks.langchain.langchain_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.LANGCHAIN, AgentConfig(model_id="gpt-4o"))
 
 
-def test_load_langchain_multiagent():
+def test_load_langchain_multiagent() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     handoff_mock = MagicMock()
 
-    def _create_effect(**kwargs):
+    def _create_effect(**kwargs: str) -> MagicMock:
         agent_mock = MagicMock()
         agent_mock.name = kwargs["name"]
         return agent_mock
@@ -72,7 +72,9 @@ def test_load_langchain_multiagent():
         ]
 
         AnyAgent.create(
-            AgentFramework.LANGCHAIN, main_agent, managed_agents=managed_agents
+            AgentFramework.LANGCHAIN,
+            main_agent,
+            managed_agents=managed_agents,
         )
 
         create_mock.assert_any_call(

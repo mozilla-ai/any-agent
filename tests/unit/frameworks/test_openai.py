@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import MCPTool
+from any_agent.config import MCPStdioParams
 from any_agent.tools import (
     ask_user_verification,
     search_web,
@@ -13,7 +13,7 @@ from any_agent.tools import (
 )
 
 
-def test_load_openai_default():
+def test_load_openai_default() -> None:
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
 
@@ -33,7 +33,7 @@ def test_load_openai_default():
         )
 
 
-def test_openai_with_api_base_and_api_key_var():
+def test_openai_with_api_base_and_api_key_var() -> None:
     mock_agent = MagicMock()
     async_openai_mock = MagicMock()
     openai_chat_completions_model = MagicMock()
@@ -61,7 +61,7 @@ def test_openai_with_api_base_and_api_key_var():
         openai_chat_completions_model.assert_called_once()
 
 
-def test_openai_environment_error():
+def test_openai_environment_error() -> None:
     with patch.dict(os.environ, {}, clear=True):
         with pytest.raises(KeyError, match="MISSING_KEY"):
             AnyAgent.create(
@@ -73,7 +73,7 @@ def test_openai_environment_error():
             )
 
 
-def test_load_openai_with_mcp_server():
+def test_load_openai_with_mcp_server() -> None:
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
     mock_mcp_server = MagicMock()
@@ -99,7 +99,7 @@ def test_load_openai_with_mcp_server():
             AgentConfig(
                 model_id="gpt-4o",
                 tools=[
-                    MCPTool(
+                    MCPStdioParams(
                         command="docker",
                         args=["run", "-i", "--rm", "mcp/fetch"],
                         tools=["fetch"],
@@ -119,7 +119,7 @@ def test_load_openai_with_mcp_server():
         )
 
 
-def test_load_openai_multiagent():
+def test_load_openai_multiagent() -> None:
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
 
@@ -154,7 +154,9 @@ def test_load_openai_multiagent():
         ]
 
         AnyAgent.create(
-            AgentFramework.OPENAI, main_agent, managed_agents=managed_agents
+            AgentFramework.OPENAI,
+            main_agent,
+            managed_agents=managed_agents,
         )
 
         mock_agent.assert_any_call(
@@ -196,7 +198,7 @@ def test_load_openai_multiagent():
         )
 
 
-def test_load_openai_agent_missing():
+def test_load_openai_agent_missing() -> None:
     with patch("any_agent.frameworks.openai.agents_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
