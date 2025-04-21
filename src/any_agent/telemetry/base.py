@@ -100,13 +100,6 @@ class TelemetryProcessor(ABC):
         msg = "Could not determine agent type from trace, or agent type not supported"
         raise ValueError(msg)
 
-    @abstractmethod
-    def _extract_telemetry_data(
-        self,
-        telemetry: Sequence[Mapping[str, Any]],
-    ) -> list[dict[str, Any]]:
-        """Extract the agent-specific data from telemetry."""
-
     def extract_evidence(self, telemetry: Sequence[Mapping[str, Any]]) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
@@ -159,8 +152,11 @@ class TelemetryProcessor(ABC):
 
         return result
 
-    def _extract_telemetry_data(self, telemetry: list[dict[str, Any]]) -> list[dict]:
-        """Extract LLM calls and tool calls from LangChain telemetry."""
+    def _extract_telemetry_data(
+        self,
+        telemetry: Sequence[Mapping[str, Any]],
+    ) -> list[Mapping[str, Any]]:
+        """Extract the agent-specific data from telemetry."""
         calls = []
 
         for span in telemetry:
@@ -171,7 +167,7 @@ class TelemetryProcessor(ABC):
     def extract_interaction(
         self,
         span: Mapping[str, Any],
-    ) -> tuple[str, dict[str, Any]]:
+    ) -> tuple[str, Mapping[str, Any]]:
         """Extract interaction details from a span."""
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")

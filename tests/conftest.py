@@ -22,9 +22,9 @@ def disable_rich_console(
 
 
 @pytest.fixture
-def llm_span():
+def llm_span():  # type: ignore[no-untyped-def]
     class LLMSpan:
-        def to_json(self):
+        def to_json(self) -> str:
             return json.dumps(
                 {
                     "name": "ChatLiteLLM",
@@ -71,6 +71,7 @@ def llm_span():
             )
 
     return LLMSpan()
+
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
 def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
