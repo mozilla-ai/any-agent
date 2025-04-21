@@ -2,7 +2,7 @@ import json
 import os
 from collections.abc import Sequence
 from datetime import datetime
-from typing import Protocol
+from typing import Protocol, assert_never
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
@@ -24,7 +24,7 @@ class Span(Protocol):
     def to_json(self) -> str: ...
 
 
-class JsonFileSpanExporter(SpanExporter):  # type: ignore[misc]
+class JsonFileSpanExporter(SpanExporter):
     def __init__(self, file_name: str):
         self.file_name = file_name
         if not os.path.exists(self.file_name):
@@ -59,9 +59,9 @@ class JsonFileSpanExporter(SpanExporter):  # type: ignore[misc]
         pass
 
 
-class RichConsoleSpanExporter(SpanExporter):  # type: ignore[misc]
+class RichConsoleSpanExporter(SpanExporter):
     def __init__(self, agent_framework: AgentFramework, tracing_config: TracingConfig):
-        self.processor = TelemetryProcessor.create(agent_framework=agent_framework)
+        self.processor = TelemetryProcessor.create(agent_framework)
         self.console = Console()
         self.tracing_config = tracing_config
 
@@ -143,27 +143,46 @@ def setup_tracing(
 
     """
 
+    agent_framework_ = AgentFramework.from_string(agent_framework)
+
     tracer_provider, file_name = _get_tracer_provider(
         agent_framework,
         tracing_config,
     )
-    if agent_framework == AgentFramework.OPENAI:
+
+    instrumenter = get_instrumenter_by_framework(agent_framework_)
+    instrumenter.instrument(tracer_provider=tracer_provider)
+
+    return file_name
+
+
+class Instrumenter(Protocol):
+    def instrument(self, *, tracer_provider: TracerProvider) -> None: ...
+
+
+def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
+    if framework is AgentFramework.OPENAI:
         from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 
-        OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
-    elif agent_framework == AgentFramework.SMOLAGENTS:
+        return OpenAIAgentsInstrumentor()
+
+    if framework is AgentFramework.SMOLAGENTS:
         from openinference.instrumentation.smolagents import SmolagentsInstrumentor
 
-        SmolagentsInstrumentor().instrument(tracer_provider=tracer_provider)
-    elif agent_framework == AgentFramework.LANGCHAIN:
+        return SmolagentsInstrumentor()
+
+    if framework is AgentFramework.LANGCHAIN:
         from openinference.instrumentation.langchain import LangChainInstrumentor
 
-        LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
-    elif agent_framework == AgentFramework.LLAMAINDEX:
+        return LangChainInstrumentor()
+
+    if framework is AgentFramework.LLAMA_INDEX:
         from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
 
-        LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
-    else:
-        msg = f"{agent_framework} tracing is not supported."
+        return LlamaIndexInstrumentor()
+
+    if framework is AgentFramework.GOOGLE or framework is AgentFramework.AGNO:
+        msg = f"{framework} tracing is not supported."
         raise NotImplementedError(msg)
-    return file_name
+
+    assert_never(framework)

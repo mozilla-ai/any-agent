@@ -57,7 +57,7 @@ class LangchainAgent(AnyAgent):
         model_type = getattr(importlib.import_module(module), class_name)
 
         return cast(
-            str | LanguageModelLike,
+            "str | LanguageModelLike",
             model_type(model=agent_config.model_id, **agent_config.model_args or {}),
         )
 

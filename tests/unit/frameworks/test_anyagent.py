@@ -59,7 +59,7 @@ def _get_agent_class_path(framework: AgentFramework) -> str:
         AgentFramework.SMOLAGENTS: "any_agent.frameworks.smolagents.SmolagentsAgent",
         AgentFramework.LANGCHAIN: "any_agent.frameworks.langchain.LangchainAgent",
         AgentFramework.OPENAI: "any_agent.frameworks.openai.OpenAIAgent",
-        AgentFramework.LLAMAINDEX: "any_agent.frameworks.llama_index.LlamaIndexAgent",
+        AgentFramework.LLAMA_INDEX: "any_agent.frameworks.llama_index.LlamaIndexAgent",
         AgentFramework.GOOGLE: "any_agent.frameworks.google.GoogleAgent",
         AgentFramework.AGNO: "any_agent.frameworks.agno.AgnoAgent",
     }

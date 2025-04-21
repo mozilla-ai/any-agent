@@ -11,7 +11,7 @@ To enable tracing, add a TracingConfig object [`TracingConfig`][any_agent.config
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.tools import search_web
 
-framework = AgentFramework("openai")
+framework = "openai"
 
 agent = AnyAgent.create(
         agent_framework=framework,

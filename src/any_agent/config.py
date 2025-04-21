@@ -1,17 +1,32 @@
 from collections.abc import Callable, MutableMapping, Sequence
-from enum import Enum
-from typing import Any
+from enum import Enum, auto
+from typing import Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class AgentFramework(str, Enum):
-    GOOGLE = "google"
-    LANGCHAIN = "langchain"
-    LLAMAINDEX = "llama_index"
-    OPENAI = "openai"
-    AGNO = "agno"
-    SMOLAGENTS = "smolagents"
+    GOOGLE = auto()
+    LANGCHAIN = auto()
+    LLAMA_INDEX = auto()
+    OPENAI = auto()
+    AGNO = auto()
+    SMOLAGENTS = auto()
+
+    @classmethod
+    def from_string(cls, value: str | Self) -> Self:
+        if isinstance(value, cls):
+            return value
+
+        formatted_value = value.strip().upper()
+        if formatted_value not in cls.__members__:
+            error_message = (
+                f"Unsupported agent framework: '{value}'. "
+                f"Valid frameworks are: {list(cls.__members__.keys())}"
+            )
+            raise ValueError(error_message)
+
+        return cls[formatted_value]
 
 
 class MCPStdioParams(BaseModel):

@@ -81,11 +81,11 @@ async def wrap_mcp_server(
         AgentFramework.SMOLAGENTS: SmolagentsMCPServer,
         AgentFramework.LANGCHAIN: LangchainMCPServer,
         AgentFramework.GOOGLE: GoogleMCPServer,
-        AgentFramework.LLAMAINDEX: LlamaIndexMCPServer,
+        AgentFramework.LLAMA_INDEX: LlamaIndexMCPServer,
         AgentFramework.AGNO: AgnoMCPServer,
     }
     if agent_framework not in mcp_server_map:
-        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {mcp_server_map.keys()}"
+        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {list(mcp_server_map.keys())}"
         raise NotImplementedError(msg)
 
     # Create the manager instance which will manage the MCP tool context
@@ -101,7 +101,7 @@ WRAPPERS: dict[AgentFramework, Callable[..., Any]] = {
     AgentFramework.OPENAI: wrap_tool_openai,
     AgentFramework.LANGCHAIN: wrap_tool_langchain,
     AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
-    AgentFramework.LLAMAINDEX: wrap_tool_llama_index,
+    AgentFramework.LLAMA_INDEX: wrap_tool_llama_index,
     AgentFramework.AGNO: wrap_tool_agno,
 }
 

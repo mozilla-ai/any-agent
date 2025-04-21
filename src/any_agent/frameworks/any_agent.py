@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, assert_never
 
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
@@ -16,52 +18,64 @@ class AnyAgent(ABC):
     trace_filepath: str | None = None
 
     # factory method
+    @staticmethod
+    def _get_agent_type_by_framework(
+        framework_raw: AgentFramework | str,
+    ) -> type[AnyAgent]:
+        framework = AgentFramework.from_string(framework_raw)
+
+        if framework is AgentFramework.SMOLAGENTS:
+            from any_agent.frameworks.smolagents import SmolagentsAgent
+
+            return SmolagentsAgent
+
+        if framework is AgentFramework.LANGCHAIN:
+            from any_agent.frameworks.langchain import LangchainAgent
+
+            return LangchainAgent
+
+        if framework is AgentFramework.OPENAI:
+            from any_agent.frameworks.openai import OpenAIAgent
+
+            return OpenAIAgent
+
+        if framework is AgentFramework.LLAMA_INDEX:
+            from any_agent.frameworks.llama_index import LlamaIndexAgent
+
+            return LlamaIndexAgent
+
+        if framework is AgentFramework.GOOGLE:
+            from any_agent.frameworks.google import GoogleAgent
+
+            return GoogleAgent
+
+        if framework is AgentFramework.AGNO:
+            from any_agent.frameworks.agno import AgnoAgent
+
+            return AgnoAgent
+
+        assert_never(framework)
+
     @classmethod
     def create(
         cls,
-        agent_framework: AgentFramework,
+        agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
-    ) -> "AnyAgent":
-        if agent_framework == AgentFramework.SMOLAGENTS:
-            from any_agent.frameworks.smolagents import (
-                SmolagentsAgent as Agent,
-            )
-        elif agent_framework == AgentFramework.LANGCHAIN:
-            from any_agent.frameworks.langchain import (  # type: ignore[assignment]
-                LangchainAgent as Agent,
-            )
-        elif agent_framework == AgentFramework.OPENAI:
-            from any_agent.frameworks.openai import (  # type: ignore[assignment]
-                OpenAIAgent as Agent,
-            )
-        elif agent_framework == AgentFramework.LLAMAINDEX:
-            from any_agent.frameworks.llama_index import (  # type: ignore[assignment]
-                LlamaIndexAgent as Agent,
-            )
-        elif agent_framework == AgentFramework.GOOGLE:
-            from any_agent.frameworks.google import (  # type: ignore[assignment]
-                GoogleAgent as Agent,
-            )
-        elif agent_framework == AgentFramework.AGNO:
-            from any_agent.frameworks.agno import (  # type: ignore[assignment]
-                AgnoAgent as Agent,
-            )
-        else:
-            msg = f"Unsupported agent framework: {agent_framework}"
-            raise ValueError(msg)
-        agent = Agent(agent_config, managed_agents=managed_agents)
-
-        if tracing:
+    ) -> AnyAgent:
+        framework = AgentFramework.from_string(agent_framework)
+        agent_cls = cls._get_agent_type_by_framework(agent_framework)
+        agent = agent_cls(agent_config, managed_agents=managed_agents)
+        if tracing is not None:
             # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
             # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-            if agent_framework in (AgentFramework.AGNO, AgentFramework.GOOGLE):
+            if framework in (AgentFramework.AGNO, AgentFramework.GOOGLE):
                 logger.warning(
                     "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
                 )
             else:
-                agent.trace_filepath = setup_tracing(agent_framework, tracing)
+                agent.trace_filepath = setup_tracing(framework, tracing)
         asyncio.get_event_loop().run_until_complete(agent.load_agent())
         return agent
 

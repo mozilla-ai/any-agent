@@ -40,7 +40,7 @@ class LlamaIndexAgent(AnyAgent):
         self.config: AgentConfig = config
         self._agent: AgentWorkflow | ReActAgent | None = None
         self._mcp_servers: list[MCPServerBase] = []
-        self.framework = AgentFramework.LLAMAINDEX
+        self.framework = AgentFramework.LLAMA_INDEX
 
     def _get_model(self, agent_config: AgentConfig) -> LLM:
         """Get the model configuration for a llama_index agent."""
@@ -52,7 +52,7 @@ class LlamaIndexAgent(AnyAgent):
             class_name,
         )
         return cast(
-            LLM,
+            "LLM",
             model_type(model=agent_config.model_id, **agent_config.model_args or {}),
         )
 
