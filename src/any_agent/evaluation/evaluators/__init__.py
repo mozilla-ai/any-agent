@@ -4,6 +4,6 @@ from .QuestionAnsweringSquadEvaluator import QuestionAnsweringSquadEvaluator
 
 __all__ = [
     "CheckpointEvaluator",
-    "QuestionAnsweringSquadEvaluator",
     "HypothesisEvaluator",
+    "QuestionAnsweringSquadEvaluator",
 ]
