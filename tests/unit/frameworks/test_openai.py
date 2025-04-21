@@ -86,7 +86,7 @@ def test_load_openai_with_mcp_server() -> None:
         patch.object(AnyAgent, "_load_tools", mock_wrap_tools),
     ):
 
-        async def side_effect(self):
+        async def side_effect(self):  # type: ignore[no-untyped-def]
             return (
                 [mock_function_tool(search_web)],  # tools
                 [mock_mcp_server],  # mcp_servers
