@@ -27,8 +27,7 @@ main_agent = AgentConfig(
 	model_id="gpt-4o-mini",
     tools=[search_web]
 )
-framework=AgentFramework("langchain")
-agent = AnyAgent.create(framework, main_agent, TracingConfig(output_dir="traces"))
+agent = AnyAgent.create("langchain", main_agent, TracingConfig(output_dir="traces"))
 
 agent.run("How many seconds would it take for a leopard at full speed to run through Pont des Arts?")
 ```

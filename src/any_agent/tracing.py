@@ -106,16 +106,17 @@ def _get_tracer_provider(
     agent_framework: AgentFramework,
     tracing_config: TracingConfig,
 ) -> tuple[TracerProvider, str]:
-    if not os.path.exists(tracing_config.output_dir):
-        os.makedirs(tracing_config.output_dir)
-    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-
     tracer_provider = TracerProvider()
-
-    file_name = f"{tracing_config.output_dir}/{agent_framework.value}-{timestamp}.json"
-    json_file_exporter = JsonFileSpanExporter(file_name=file_name)
-    span_processor = SimpleSpanProcessor(json_file_exporter)
-    tracer_provider.add_span_processor(span_processor)
+    if tracing_config.output_dir is not None:
+        if not os.path.exists(tracing_config.output_dir):
+            os.makedirs(tracing_config.output_dir)
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        file_name = (
+            f"{tracing_config.output_dir}/{agent_framework.value}-{timestamp}.json"
+        )
+        json_file_exporter = JsonFileSpanExporter(file_name=file_name)
+        span_processor = SimpleSpanProcessor(json_file_exporter)
+        tracer_provider.add_span_processor(span_processor)
 
     # This is what will log all the span info to stdout: We turn off the agent sdk specific logging so that
     # the user sees a similar logging format for whichever agent they are using under the hood.

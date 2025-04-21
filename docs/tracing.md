@@ -19,7 +19,7 @@ agent = AnyAgent.create(
                 model_id="gpt-4o",
                 tools=[search_web],
         ),
-        tracing=TracingConfig(enabled=True)
+        tracing=TracingConfig()
       )
 agent.run("Which agent framework is the best?")
 ```
