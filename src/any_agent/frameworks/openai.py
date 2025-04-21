@@ -18,7 +18,6 @@ try:
 except ImportError:
     agents_available = False
 
-
 OPENAI_MAX_TURNS = 30
 
 
@@ -63,6 +62,7 @@ class OpenAIAgent(AnyAgent):
                 visit_webpage,
             ]
         tools, mcp_servers = await self._load_tools(self.config.tools)
+        tools = self._filter_mcp_tools(tools, mcp_servers)
 
         handoffs = []
         if self.managed_agents:
@@ -70,6 +70,7 @@ class OpenAIAgent(AnyAgent):
                 managed_tools, managed_mcp_servers = await self._load_tools(
                     managed_agent.tools
                 )
+                managed_tools = self._filter_mcp_tools(tools, mcp_servers)
                 kwargs = {}
                 api_key_var = None
                 base_url = None
@@ -115,6 +116,15 @@ class OpenAIAgent(AnyAgent):
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],  # type: ignore[attr-defined]
             **kwargs_,
         )
+
+    def _filter_mcp_tools(self, tools: list[Any], mcp_servers: list[Any]) -> list[Any]:
+        """OpenAI frameowrk doesn't expect the mcp tool to be included in `tools`."""
+        non_mcp_tools = []
+        for tool in tools:
+            if any(tool in mcp_server.tools for mcp_server in mcp_servers):
+                continue
+            non_mcp_tools.append(tool)
+        return non_mcp_tools
 
     async def run_async(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt asynchronously."""
