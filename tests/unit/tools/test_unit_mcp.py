@@ -358,7 +358,7 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = AgnoMCPServer(mcp_tool)
+    server = AgnoMCPServer.model_validate({"mcp_tool": {"mcp_tool": mcp_tool}})
 
     # Mock required components
     with (
@@ -390,4 +390,4 @@ async def test_agno_mcp_sse() -> None:
             )
 
             # Check that tools instance was set as server
-            assert server.mcp_tool_connection.server == mock_tools_instance
+            assert server.mcp_tool.server == mock_tools_instance
