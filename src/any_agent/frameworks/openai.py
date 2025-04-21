@@ -70,7 +70,7 @@ class OpenAIAgent(AnyAgent):
                 managed_tools, managed_mcp_servers = await self._load_tools(
                     managed_agent.tools
                 )
-                managed_tools = self._filter_mcp_tools(tools, mcp_servers)
+                managed_tools = self._filter_mcp_tools(managed_tools, mcp_servers)
                 kwargs = {}
                 api_key_var = None
                 base_url = None
