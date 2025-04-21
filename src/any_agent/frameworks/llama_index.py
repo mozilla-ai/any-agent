@@ -92,7 +92,7 @@ class LlamaIndexAgent(AnyAgent):
             self._agent = AgentWorkflow(agents=agents, root_agent=main_agent.name)
 
         else:
-            imported_tools = await self._load_tools(self.config.tools)
+            imported_tools, _ = await self._load_tools(self.config.tools)
 
             self._agent = ReActAgent(
                 name=self.config.name,
