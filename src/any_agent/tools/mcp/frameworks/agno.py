@@ -2,13 +2,13 @@
 
 import os
 from contextlib import AsyncExitStack, suppress
-from typing import Literal
+
 
 from pydantic import ConfigDict
 
 from any_agent.config import MCPSseParams, MCPStdioParams, Tool
 
-from any_agent.tools.mcp.mcp_connection import MCPConnection, MCPToolType
+from any_agent.tools.mcp.mcp_connection import MCPConnection
 
 
 with suppress(ImportError):
@@ -30,7 +30,6 @@ class AgnoMCPToolConnectionBase(MCPConnection):
 
 class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
     mcp_tool: MCPStdioParams
-    type_: Literal[MCPToolType.STDIO] = MCPToolType.STDIO
     
     async def setup(self) -> list[Tool]:
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
@@ -45,8 +44,6 @@ class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
 class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
     mcp_tool: MCPSseParams
 
-    type_: Literal[MCPToolType.SSE] = MCPToolType.SSE
-    
     async def setup(self) -> list[Tool]:
         client = sse_client(
             url=self.mcp_tool.url,
