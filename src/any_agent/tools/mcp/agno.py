@@ -2,13 +2,13 @@
 
 import os
 from contextlib import AsyncExitStack, suppress
-from typing import Annotated, Union
+from typing import Annotated, Literal, Union
 
-from pydantic import ConfigDict, Discriminator, Tag
+from pydantic import ConfigDict, Discriminator, Tag, TypeAdapter
 
 from any_agent.config import MCPSseParams, MCPStdioParams, Tool
 
-from .mcp_server_base import MCPServerBase, MCPToolConnection, MCPToolType, mcp_params_to_mcp_tool_type
+from .mcp_server_base import MCPToolConnection, MCPToolType
 
 with suppress(ImportError):
     from agno.tools.mcp import MCPTools as AgnoMCPTools
@@ -29,6 +29,7 @@ class AgnoMCPToolConnectionBase(MCPToolConnection):
 
 class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
     mcp_tool: MCPStdioParams
+    type_: Literal[MCPToolType.STDIO] = MCPToolType.STDIO
     
     async def setup(self) -> list[Tool]:
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
@@ -42,6 +43,8 @@ class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
 
 class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
     mcp_tool: MCPSseParams
+
+    type_: Literal[MCPToolType.SSE] = MCPToolType.SSE
     
     async def setup(self) -> list[Tool]:
         client = sse_client(
@@ -61,14 +64,5 @@ class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
         return await super().setup()
 
 
-AgnoMCPToolConnection = Annotated[
-    Union[
-        Annotated[AgnoMCPToolConnectionStdio, Tag(MCPToolType.STDIO.name)] | 
-        Annotated[AgnoMCPToolConnectionSse, Tag(MCPToolType.SSE.name)]
-    ], 
-    Discriminator(mcp_params_to_mcp_tool_type)
-]
-
-class AgnoMCPServer(MCPServerBase):
-    mcp_tool: AgnoMCPToolConnection
-
+AgnoMCPToolConnection = AgnoMCPToolConnectionStdio | AgnoMCPToolConnectionSse
+AgnoMCPToolConnectionValidator = TypeAdapter(AgnoMCPToolConnection)

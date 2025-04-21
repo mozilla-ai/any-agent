@@ -22,20 +22,13 @@ class MCPToolType(str, Enum):
 
 class MCPToolConnection(BaseModel, ABC):
     mcp_tool: MCPParams
+    type_: MCPToolType = Field(alias="type")
 
     @abstractmethod
     def setup(self) -> None:
         ...
 
-def mcp_params_to_mcp_tool_type(mcp_params: Mapping[str, MCPParams]) -> str:
-    """Convert MCP parameters to a tool type."""
-    match mcp_params["mcp_tool"]:
-        case MCPStdioParams():
-            return MCPToolType.STDIO.name
-        case MCPSseParams():
-            return MCPToolType.SSE.name
-
-class MCPServerBase(BaseModel, ABC):
+class MCPServerBase(BaseModel):
     """Base class for MCP tools managers across different frameworks."""
     mcp_tool: MCPToolConnection
     tools: Sequence[Tool] = Field(default_factory=list)

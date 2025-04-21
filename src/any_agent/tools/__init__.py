@@ -1,5 +1,5 @@
 from .mcp import (
-    AgnoMCPServer,
+    AgnoMCPToolConnection,
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
@@ -17,7 +17,7 @@ from .web_browsing import search_web, visit_webpage
 from .wrappers import wrap_mcp_server, wrap_tools
 
 __all__ = [
-    "AgnoMCPServer",
+    "AgnoMCPToolConnection",
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
