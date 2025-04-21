@@ -108,7 +108,7 @@ agent = AnyAgent.create(
     "smolagents",
     AgentConfig(
         model_id="llama3.2",
-        model_args={},
+        model_args={"temperature": 1},
         api_base="http://localhost:11434/v1", # optional
         api_key=os.getenv('MY_CUSTOM_KEY_ENV'), # optional, litellm will automatically search for OPENAI_API_KEY etc
     )
