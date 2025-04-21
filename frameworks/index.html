@@ -671,27 +671,27 @@ to see if it has been already requested and comment/upvote on that issue.</p>
 </div>
 </div>
 <h2 id="models">Models</h2>
-<p>The model used by an agent is defined by 3 arguments <code>model_id</code>, <code>model_type</code> and <code>model_args</code>.</p>
-<p>A common usage of <code>model_args</code> is to specify a custom <code>api_base</code> and/or <code>api_key</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnyAgent</span><span class="p">,</span> <span class="n">AgentFramework</span><span class="p">,</span> <span class="n">AgentConfig</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">&quot;smolagents&quot;</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">AgentConfig</span><span class="p">(</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;llama3.2&quot;</span><span class="p">,</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="n">model_args</span><span class="o">=</span><span class="p">{</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>            <span class="s2">&quot;api_base&quot;</span><span class="p">:</span> <span class="s2">&quot;http://localhost:11434/v1&quot;</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>        <span class="p">}</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="p">)</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">)</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which Agent Framework is the best??&quot;</span><span class="p">)</span>
+<p>The model used by an agent is defined by a few arguments: <code>model_id</code>, <code>model_type</code>, <code>model_args</code>, <code>api_base</code>, and <code>api_key</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnyAgent</span><span class="p">,</span> <span class="n">AgentFramework</span><span class="p">,</span> <span class="n">AgentConfig</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s2">&quot;smolagents&quot;</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">AgentConfig</span><span class="p">(</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;llama3.2&quot;</span><span class="p">,</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>        <span class="n">model_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>        <span class="n">api_base</span><span class="o">=</span><span class="s2">&quot;http://localhost:11434/v1&quot;</span><span class="p">,</span> <span class="c1"># optional</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>        <span class="n">api_key</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;MY_CUSTOM_KEY_ENV&#39;</span><span class="p">),</span> <span class="c1"># optional, litellm will automatically search for OPENAI_API_KEY etc</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="p">)</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="p">)</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which Agent Framework is the best??&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <p>If you just specify <code>model_id</code> (as in the examples above), the agent will use the default <code>model_type</code> that we have selected
 for that framework and no <code>model_args</code>.</p>
 <h3 id="model-type">Model Type</h3>
-<p>The <code>model_type</code> parameter controls the type of model class that is used by the agent framework, and is unique to the agent framework being used. For frameworks that have support for <a href="https://github.com/BerriAI/litellm"><code>LiteLLM</code></a> (<code>google</code>, <code>langchain</code>, <code>llama_index</code>, <code>smolagents</code>, <code>agno</code>) we use it as default <code>model_type</code>, allowing you to use the same <code>model_id</code> syntax across these frameworks.</p>
+<p>The <code>model_type</code> parameter controls the type of model class that is used by the agent framework, and is unique to the agent framework being used. For each framework, we leverage their support for <a href="https://github.com/BerriAI/litellm"><code>LiteLLM</code></a> and when relevant use it as default <code>model_type</code>, allowing you to use the same <code>model_id</code> syntax across these frameworks.</p>
 <h3 id="model-id">Model ID</h3>
 <p>If you are using the default <code>model_type</code> (LiteLLM), you can refer to <a href="https://docs.litellm.ai/docs/providers">LiteLLM Provider Docs</a> for the list
-of providers and how to access them. For extra args like <code>api_base</code> or <code>api_key</code> that you may need to access custom/on-prem resources, they can be added to the <code>model_args</code> key.</p>
+of providers and how to access them.</p>
 <h3 id="model-args">Model Args</h3>
 <p>The <code>model_args</code> provides the ability to set parameters like <code>temperature</code>, <code>top_k</code>, as well as any other provider-specific parameters.
 Refer to <a href="https://docs.litellm.ai/docs/text_completion">LiteLLM Completion API Docs</a> as well</p>
