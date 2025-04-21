@@ -44,7 +44,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tracing import setup_tracing  # Optional, but recommended
 
 # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
-framework = AgentFramework("smolagents")
+framework = "smolagents"
 
 setup_tracing(framework)
 ```

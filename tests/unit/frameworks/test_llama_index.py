@@ -9,7 +9,7 @@ from any_agent.tools import (
 )
 
 
-def test_load_llama_index_agent_default():
+def test_load_llama_index_agent_default() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -23,7 +23,7 @@ def test_load_llama_index_agent_default():
         patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
         AnyAgent.create(
-            AgentFramework.LLAMAINDEX,
+            AgentFramework.LLAMA_INDEX,
             AgentConfig(
                 model_id="gemini/gemini-2.0-flash",
                 instructions="You are a helpful assistant",
@@ -39,13 +39,13 @@ def test_load_llama_index_agent_default():
         )
 
 
-def test_load_llama_index_agent_missing():
+def test_load_llama_index_agent_missing() -> None:
     with patch("any_agent.frameworks.llama_index.llama_index_available", False):
         with pytest.raises(ImportError):
-            AnyAgent.create(AgentFramework.LLAMAINDEX, AgentConfig(model_id="gpt-4o"))
+            AnyAgent.create(AgentFramework.LLAMA_INDEX, AgentConfig(model_id="gpt-4o"))
 
 
-def test_load_langchain_multiagent():
+def test_load_langchain_multiagent() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -73,7 +73,7 @@ def test_load_langchain_multiagent():
         ]
 
         AnyAgent.create(
-            AgentFramework.LLAMAINDEX, main_agent, managed_agents=managed_agents
+            AgentFramework.LLAMA_INDEX, main_agent, managed_agents=managed_agents
         )
 
         create_mock.assert_any_call(

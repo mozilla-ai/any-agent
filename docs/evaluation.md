@@ -28,7 +28,7 @@ main_agent = AgentConfig(
 	model_id="gpt-4o-mini",
     tools=[search_web]
 )
-framework=AgentFramework("langchain")
+framework = "langchain"
 tracing_path = setup_tracing(framework, "output")
 agent = AnyAgent.create(framework, main_agent)
 

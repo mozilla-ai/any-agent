@@ -1,5 +1,6 @@
 import contextlib
 import json
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from any_agent import AgentFramework
@@ -13,7 +14,7 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.OPENAI
 
-    def extract_hypothesis_answer(self, trace: list[dict[str, Any]]) -> str:
+    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             # Looking for the final response that has the summary answer
             if (
@@ -24,11 +25,11 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
                     "llm.output_messages.0.message.contents.0.message_content.text"
                 )
                 if output_key in span["attributes"]:
-                    return span["attributes"][output_key]
+                    return str(span["attributes"][output_key])
         logger.warning("No agent final answer found in trace")
         return "NO FINAL ANSWER FOUND"
 
-    def _extract_llm_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         attributes = span.get("attributes", {})
         span_info = {}
 
@@ -50,7 +51,7 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         attributes = span.get("attributes", {})
         tool_name = attributes.get("tool.name", "Unknown tool")
         tool_output = attributes.get("output.value", "")
@@ -66,9 +67,8 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_agent_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract information from an AGENT span."""
-
         span_info = {
             "type": "agent",
             "workflow": span.get("name", "Agent workflow"),
@@ -82,7 +82,7 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_chain_interaction(self, span: dict[str, Any]) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
         """Extract information from a CHAIN span."""
         attributes = span.get("attributes", {})
 

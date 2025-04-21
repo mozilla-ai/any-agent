@@ -11,7 +11,7 @@ from any_agent.frameworks.smolagents import (
 from any_agent.tools import search_web, visit_webpage
 
 
-def test_load_smolagent_default():
+def test_load_smolagent_default() -> None:
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_tool = MagicMock()
@@ -38,7 +38,7 @@ def test_load_smolagent_default():
         mock_model.assert_called_once_with(model_id="openai/o3-mini")
 
 
-def test_load_smolagent_with_api_base_and_api_key_var():
+def test_load_smolagent_with_api_base_and_api_key_var() -> None:
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_tool = MagicMock()
@@ -74,7 +74,7 @@ def test_load_smolagent_with_api_base_and_api_key_var():
         )
 
 
-def test_load_smolagent_environment_error():
+def test_load_smolagent_environment_error() -> None:
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_tool = MagicMock()
@@ -95,7 +95,7 @@ def test_load_smolagent_environment_error():
             )
 
 
-def test_load_smolagents_agent_missing():
+def test_load_smolagents_agent_missing() -> None:
     with patch("any_agent.frameworks.smolagents.smolagents_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.SMOLAGENTS, AgentConfig(model_id="gpt-4o"))
