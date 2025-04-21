@@ -4,11 +4,11 @@ import os
 from contextlib import AsyncExitStack, suppress
 from functools import cache
 
-from pydantic import ConfigDict, TypeAdapter
+from pydantic import ConfigDict
 
 from any_agent.config import MCPSseParams, MCPStdioParams, Tool
 
-from .mcp_server_base import MCPServerBase, MCPToolConnection
+from .mcp_server_base import MCPServerBase, MCPToolConnection, MCPToolType, mcp_params_to_mcp_tool_type
 
 with suppress(ImportError):
     from agno.tools.mcp import MCPTools as AgnoMCPTools
@@ -60,13 +60,18 @@ class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
 
         return await super().setup()
 
-AgnoMCPToolConnection = AgnoMCPToolConnectionStdio | AgnoMCPToolConnectionSse
-AgnoMCPToolConnectionValidator = TypeAdapter(AgnoMCPToolConnection)
+
+MCP_CONNECTION_TYPE_TO_SERVER_AGNO: dict[MCPToolType, type[MCPToolConnection]] = {
+    MCPToolType.STDIO: AgnoMCPToolConnectionStdio,
+    MCPToolType.SSE: AgnoMCPToolConnectionSse,
+}
+
 
 class AgnoMCPServer(MCPServerBase):
 
     @property
     @cache
     def mcp_tool_connection(self) -> MCPToolConnection:
-        return AgnoMCPToolConnectionValidator.validate_python({"mcp_tool": self.mcp_tool})
+        mcp_tool_connection_type = mcp_params_to_mcp_tool_type(self.mcp_tool)
+        return MCP_CONNECTION_TYPE_TO_SERVER_AGNO[mcp_tool_connection_type](mcp_tool=self.mcp_tool)
 
