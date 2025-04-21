@@ -1,16 +1,12 @@
 import importlib
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import Tool
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
 if TYPE_CHECKING:
     from llama_index.core.llms import LLM
-
-    from any_agent.tools.mcp import MCPServerBase
 
 try:
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
@@ -27,19 +23,9 @@ DEFAULT_MODEL_CLASS = "litellm.LiteLLM"
 class LlamaIndexAgent(AnyAgent):
     """LLamaIndex agent implementation that handles both loading and running."""
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
-    ):
-        if not llama_index_available:
-            msg = "You need to `pip install 'any-agent[llama_index]'` to use this agent"
-            raise ImportError(msg)
-        self.managed_agents: list[AgentConfig] | None = managed_agents
-        self.config: AgentConfig = config
-        self._agent: AgentWorkflow | ReActAgent | None = None
-        self._mcp_servers: list[MCPServerBase] = []
-        self.framework = AgentFramework.LLAMA_INDEX
+    @property
+    def framework(self) -> AgentFramework:
+        return AgentFramework.LLAMA_INDEX
 
     def _get_model(self, agent_config: AgentConfig) -> LLM:
         """Get the model configuration for a llama_index agent."""
@@ -67,6 +53,7 @@ class LlamaIndexAgent(AnyAgent):
                 visit_webpage,
             ]
 
+        self._agent: AgentWorkflow | ReActAgent
         if self.managed_agents:
             agents = []
             managed_names = []
@@ -105,7 +92,7 @@ class LlamaIndexAgent(AnyAgent):
             self._agent = AgentWorkflow(agents=agents, root_agent=main_agent.name)
 
         else:
-            imported_tools, _ = await self._load_tools(self.config.tools)
+            imported_tools = await self._load_tools(self.config.tools)
 
             self._agent = ReActAgent(
                 name=self.config.name,
@@ -116,15 +103,4 @@ class LlamaIndexAgent(AnyAgent):
             )
 
     async def run_async(self, prompt: str) -> Any:
-        return await self._agent.run(prompt)  # type: ignore[union-attr]
-
-    @property
-    def tools(self) -> list[Tool]:
-        """
-        Return the tools used by the agent.
-        This property is read-only and cannot be modified.
-        """
-        if not self._agent:
-            return []
-
-        return self._agent.tools  # type: ignore[no-any-return]
+        return await self._agent.run(prompt)

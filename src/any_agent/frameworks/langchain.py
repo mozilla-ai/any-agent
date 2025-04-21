@@ -1,17 +1,14 @@
 import importlib
 from typing import TYPE_CHECKING, Any, cast
 
-from any_agent.config import AgentConfig, AgentFramework, Tool
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     from langgraph.graph.graph import CompiledGraph
 
-    from any_agent.tools.mcp import MCPServerBase
 
 if TYPE_CHECKING:
     from langchain_core.language_models import LanguageModelLike
@@ -32,19 +29,9 @@ DEFAULT_MODEL_CLASS = "langchain_litellm.ChatLiteLLM"
 class LangchainAgent(AnyAgent):
     """LangChain agent implementation that handles both loading and running."""
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
-    ):
-        self.managed_agents = managed_agents
-        self.config = config
-        self._agent: CompiledGraph | None = None
-        # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph,
-        # so we'll store a list of them in this class
-        self._tools: Sequence[Tool] = []
-        self._mcp_servers: Sequence[MCPServerBase] | None = None
-        self.framework = AgentFramework.LANGCHAIN
+    @property
+    def framework(self) -> AgentFramework:
+        return AgentFramework.LANGCHAIN
 
     def _get_model(self, agent_config: AgentConfig) -> str | LanguageModelLike:
         """Get the model configuration for a LangChain agent."""
@@ -72,6 +59,7 @@ class LangchainAgent(AnyAgent):
 
         imported_tools, _ = await self._load_tools(self.config.tools)
 
+        self._agent: CompiledGraph
         if self.managed_agents:
             swarm = []
             managed_names = []
@@ -97,7 +85,7 @@ class LangchainAgent(AnyAgent):
                 )
                 swarm.append(managed_agent)
 
-            imported_tools += [
+            imported_tools = [
                 create_handoff_tool(agent_name=managed_name)
                 for managed_name in managed_names
             ]
@@ -111,7 +99,7 @@ class LangchainAgent(AnyAgent):
             )
             swarm.append(main_agent)
             workflow = create_swarm(swarm, default_active_agent=self.config.name)
-            self._agent: CompiledGraph = workflow.compile()
+            self._agent = workflow.compile()
         else:
             self._agent = create_react_agent(
                 name=self.config.name,
@@ -127,12 +115,4 @@ class LangchainAgent(AnyAgent):
     async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
         inputs = {"messages": [("user", prompt)]}
-        return await self._agent.ainvoke(inputs)  # type: ignore[union-attr]
-
-    @property
-    def tools(self) -> list[Tool]:
-        """
-        Return the tools used by the agent.
-        This property is read-only and cannot be modified.
-        """
-        return list(self._tools)
+        return await self._agent.ainvoke(inputs)

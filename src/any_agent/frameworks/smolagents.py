@@ -1,19 +1,20 @@
 import os
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from any_agent.config import AgentConfig, AgentFramework, Tool
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.mcp import MCPServerBase
 
 try:
     import smolagents
-    from smolagents import MultiStepAgent
 
     smolagents_available = True
 except ImportError:
     smolagents_available = False
+
+if TYPE_CHECKING:
+    from smolagents import MultiStepAgent
+
 
 DEFAULT_AGENT_TYPE = "CodeAgent"
 DEFAULT_MODEL_CLASS = "LiteLLMModel"
@@ -22,17 +23,9 @@ DEFAULT_MODEL_CLASS = "LiteLLMModel"
 class SmolagentsAgent(AnyAgent):
     """Smolagents agent implementation that handles both loading and running."""
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
-    ):
-        self.managed_agents = managed_agents
-        self.config = config
-        self._agent: MultiStepAgent | None = None
-        self._mcp_servers: Sequence[MCPServerBase] | None = None
-        self._managed_mcp_servers: Sequence[MCPServerBase] | None = None
-        self.framework = AgentFramework.SMOLAGENTS
+    @property
+    def framework(self) -> AgentFramework:
+        return AgentFramework.SMOLAGENTS
 
     def _get_model(self, agent_config: AgentConfig) -> Any:
         """Get the model configuration for a smolagents agent."""
@@ -85,7 +78,7 @@ class SmolagentsAgent(AnyAgent):
             self.config.agent_type or DEFAULT_AGENT_TYPE,
         )
 
-        self._agent = main_agent_type(
+        self._agent: MultiStepAgent = main_agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
             tools=tools,
@@ -99,12 +92,4 @@ class SmolagentsAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
-        return self._agent.run(prompt)  # type: ignore[union-attr]
-
-    @property
-    def tools(self) -> list[Tool]:
-        """
-        Return the tools used by the agent.
-        This property is read-only and cannot be modified.
-        """
-        return self._agent.tools  # type: ignore[no-any-return, union-attr]
+        return self._agent.run(prompt)

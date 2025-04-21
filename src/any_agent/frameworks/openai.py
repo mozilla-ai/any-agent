@@ -1,10 +1,8 @@
 import os
-from collections.abc import Sequence
 from typing import Any
 
-from any_agent.config import AgentConfig, AgentFramework, Tool
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
 try:
@@ -20,22 +18,16 @@ try:
 except ImportError:
     agents_available = False
 
+
 OPENAI_MAX_TURNS = 30
 
 
 class OpenAIAgent(AnyAgent):
     """OpenAI agent implementation that handles both loading and running."""
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        managed_agents: Sequence[AgentConfig] | None = None,
-    ):
-        self.managed_agents = managed_agents
-        self.config = config
-        self._agent = None
-        self._mcp_servers = []
-        self.framework = AgentFramework.OPENAI
+    @property
+    def framework(self) -> AgentFramework:
+        return AgentFramework.OPENAI
 
     def _get_model(
         self,
@@ -114,7 +106,7 @@ class OpenAIAgent(AnyAgent):
             api_key_var = self.config.model_args.pop("api_key_var", None)
             base_url = self.config.model_args.pop("base_url", None)
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
-        self._agent = Agent(
+        self._agent: Agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
             model=self._get_model(self.config, api_key_var, base_url),
@@ -127,42 +119,3 @@ class OpenAIAgent(AnyAgent):
     async def run_async(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt asynchronously."""
         return await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
-
-    @property
-    def tools(self) -> list[Tool]:
-        """
-        Return the tools used by the agent.
-        This property is read-only and cannot be modified.
-        """
-        if hasattr(self, "_agent"):
-            # Extract tool names from the agent's tools
-            tools = [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]
-            # Add MCP tools to the list
-            for mcp_server in self._agent.mcp_servers:  # type: ignore[union-attr]
-                tools_in_mcp = mcp_server._tools_list
-                server_name = mcp_server.name.replace(" ", "_")
-                if tools_in_mcp:
-                    tools.extend(
-                        [f"{server_name}_{tool.name}" for tool in tools_in_mcp]
-                    )
-                else:
-                    msg = f"No tools found in MCP {server_name}"
-                    raise ValueError(msg)
-        else:
-            logger.warning("Agent not loaded or does not have tools.")
-            return []
-
-        # Extract tool names from the agent's tools
-        tools = [tool.name for tool in self._agent.tools]  # type: ignore[union-attr]
-        # Add MCP tools to the list
-        for mcp_server in self._agent.mcp_servers:  # type: ignore[union-attr]
-            tools_in_mcp = mcp_server._tools_list
-            server_name = mcp_server.name.replace(" ", "_")
-            if tools_in_mcp:
-                tools.extend(
-                    [f"{server_name}_{tool.name}" for tool in tools_in_mcp],
-                )
-            else:
-                msg = f"No tools found in MCP {server_name}"
-                raise ValueError(msg)
-        return tools

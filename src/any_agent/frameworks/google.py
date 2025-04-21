@@ -1,15 +1,10 @@
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from uuid import uuid4
 
-from any_agent.config import AgentConfig, AgentFramework, Tool
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from any_agent.tools.mcp import MCPServerBase
 
 try:
     from google.adk.agents import Agent
@@ -26,16 +21,9 @@ except ImportError:
 class GoogleAgent(AnyAgent):
     """Google ADK agent implementation that handles both loading and running."""
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
-    ):
-        self.managed_agents = managed_agents
-        self.config = config
-        self._agent: Agent | None = None
-        self._mcp_servers: Sequence[MCPServerBase] | None = None
-        self.framework = AgentFramework.GOOGLE
+    @property
+    def framework(self) -> AgentFramework:
+        return AgentFramework.GOOGLE
 
     def _get_model(self, agent_config: AgentConfig) -> LiteLlm:
         """Get the model configuration for a Google agent."""
@@ -114,15 +102,3 @@ class GoogleAgent(AnyAgent):
             session_id=session_id,
         )
         return session.state.get("response", None)
-
-    @property
-    def tools(self) -> list[Tool]:
-        """
-        Return the tools used by the agent.
-        This property is read-only and cannot be modified.
-        """
-        if not self._agent:
-            logger.warning("Agent not loaded or does not have tools.")
-            return []
-
-        return [tool.name for tool in self._agent.tools]
