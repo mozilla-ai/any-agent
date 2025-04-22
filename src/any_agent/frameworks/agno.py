@@ -45,9 +45,7 @@ class AgnoAgent(AnyAgent):
         self._agent: Agent | Team
 
         if self.managed_agents:
-            if self.config.tools:
-                msg = "The main agent can't use tools in agno."
-                raise ValueError(msg)
+            tools, _ = await self._load_tools(self.config.tools)
 
             members = []
             for n, managed_agent in enumerate(self.managed_agents):
@@ -76,6 +74,7 @@ class AgnoAgent(AnyAgent):
                 model=self._get_model(self.config),
                 members=members,
                 instructions=self.config.instructions,
+                tools=tools,
                 **self.config.agent_args or {},
             )
         else:
