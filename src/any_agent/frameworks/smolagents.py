@@ -1,4 +1,3 @@
-import os
 from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -32,10 +31,10 @@ class SmolagentsAgent(AnyAgent):
         model_type = getattr(smolagents, agent_config.model_type or DEFAULT_MODEL_CLASS)
         kwargs = {
             "model_id": agent_config.model_id,
+            "api_key": agent_config.api_key,
+            "api_base": agent_config.api_base,
         }
         model_args = agent_config.model_args or {}
-        if api_key_var := model_args.pop("api_key_var", None):
-            kwargs["api_key"] = os.environ[api_key_var]
         return model_type(**kwargs, **model_args)
 
     async def load_agent(self) -> None:

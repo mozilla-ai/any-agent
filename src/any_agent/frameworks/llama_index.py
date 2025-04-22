@@ -38,7 +38,12 @@ class LlamaIndexAgent(AnyAgent):
         )
         return cast(
             "LLM",
-            model_type(model=agent_config.model_id, **agent_config.model_args or {}),
+            model_type(
+                model=agent_config.model_id,
+                api_key=agent_config.api_key,
+                api_base=agent_config.api_base,
+                **agent_config.model_args or {},
+            ),
         )
 
     async def load_agent(self) -> None:

@@ -1,4 +1,3 @@
-import os
 from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -8,11 +7,10 @@ from any_agent.tools import search_web, visit_webpage
 try:
     from agents import (
         Agent,
-        AsyncOpenAI,
         ModelSettings,
-        OpenAIChatCompletionsModel,
         Runner,
     )
+    from agents.extensions.models.litellm_model import LitellmModel
 
     agents_available = True
 except ImportError:
@@ -31,20 +29,12 @@ class OpenAIAgent(AnyAgent):
     def _get_model(
         self,
         agent_config: AgentConfig,
-        api_key_var: str | None = None,
-        base_url: str | None = None,
-    ) -> "OpenAIChatCompletionsModel":
+    ) -> "LitellmModel":
         """Get the model configuration for an OpenAI agent."""
-        if not api_key_var or not base_url:
-            return agent_config.model_id
-
-        external_client = AsyncOpenAI(
-            api_key=os.environ[api_key_var],
-            base_url=base_url,
-        )
-        return OpenAIChatCompletionsModel(
+        return LitellmModel(
             model=agent_config.model_id,
-            openai_client=external_client,
+            base_url=agent_config.api_base,
+            api_key=agent_config.api_key,
         )
 
     async def load_agent(self) -> None:
@@ -72,16 +62,12 @@ class OpenAIAgent(AnyAgent):
                 )
                 managed_tools = self._filter_mcp_tools(managed_tools, mcp_servers)
                 kwargs = {}
-                api_key_var = None
-                base_url = None
                 if managed_agent.model_args:
-                    api_key_var = managed_agent.model_args.pop("api_key_var", None)
-                    base_url = managed_agent.model_args.pop("base_url", None)
                     kwargs["model_settings"] = managed_agent.model_args
                 instance = Agent(
                     name=managed_agent.name,
                     instructions=managed_agent.instructions,
-                    model=self._get_model(managed_agent, api_key_var, base_url),
+                    model=self._get_model(managed_agent),
                     tools=managed_tools,
                     mcp_servers=[
                         managed_mcp_server.server  # type: ignore[attr-defined]
@@ -101,16 +87,12 @@ class OpenAIAgent(AnyAgent):
                     )
 
         kwargs_ = self.config.agent_args or {}
-        api_key_var = None
-        base_url = None
         if self.config.model_args:
-            api_key_var = self.config.model_args.pop("api_key_var", None)
-            base_url = self.config.model_args.pop("base_url", None)
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
         self._agent: Agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
-            model=self._get_model(self.config, api_key_var, base_url),
+            model=self._get_model(self.config),
             handoffs=handoffs,
             tools=tools,
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],  # type: ignore[attr-defined]

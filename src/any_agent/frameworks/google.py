@@ -27,7 +27,12 @@ class GoogleAgent(AnyAgent):
 
     def _get_model(self, agent_config: AgentConfig) -> LiteLlm:
         """Get the model configuration for a Google agent."""
-        return LiteLlm(model=agent_config.model_id, **agent_config.model_args or {})
+        return LiteLlm(
+            model=agent_config.model_id,
+            api_key=agent_config.api_key,
+            api_base=agent_config.api_base,
+            **agent_config.model_args or {},
+        )
 
     async def load_agent(self) -> None:
         """Load the Google agent with the given configuration."""
