@@ -10,10 +10,6 @@ from any_agent.config import Tool
 
 from .frameworks import MCPFrameworkConnection
 
-mcp_available = False
-with suppress(ImportError):
-    mcp_available = True
-
 
 class MCPServer(BaseModel):
     """Base class for MCP tools managers across different frameworks."""
@@ -22,9 +18,7 @@ class MCPServer(BaseModel):
     tools: Sequence[Tool] = Field(default_factory=list)
 
     def model_post_init(self, context: Any) -> None:
-        if not mcp_available:
-            msg = "You need to `pip install 'any-agent[mcp]'` to use MCP tools."
-            raise ImportError(msg)
+        self.mcp_connection.check_dependencies()
 
     async def setup_tools(self) -> None:
         """Set up tools. To be implemented by subclasses."""

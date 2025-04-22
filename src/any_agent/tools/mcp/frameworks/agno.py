@@ -25,13 +25,19 @@ class AgnoMCPServerBase(MCPConnection):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    def check_dependencies(self) -> None:
+        """Check if the required dependencies for the MCP server are available."""
+        self.libraries = "any-agent[mcp,agno]"
+        self.mcp_available = mcp_available
+        super().check_dependencies()
+
     async def setup(self) -> list[Tool]:
         """Set up the Agno MCP server with the provided configuration."""
         if not self.server:
             msg = "MCP server is not set up. Please call setup_stdio_tools or setup_sse_tools first."
             raise ValueError(msg)
 
-        self.tools = [await self.exit_stack.enter_async_context(self.server)]
+        return [await self.exit_stack.enter_async_context(self.server)]
 
 
 class AgnoMCPServerStdio(AgnoMCPServerBase):
