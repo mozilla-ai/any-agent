@@ -31,7 +31,7 @@ any-agent also provides a 'trace-first' [llm-as-a-judge powered evaluation tool]
 
 ## Requirements
 
-- Python 3.12 or newer
+- Python 3.11 or newer
 
 ## Quickstart
 
