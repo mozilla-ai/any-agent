@@ -17,8 +17,6 @@ def test_load_and_run_multi_agent(
     kwargs = {}
     if agent_framework is AgentFramework.SMOLAGENTS:
         kwargs["agent_type"] = "ToolCallingAgent"
-    # if agent_framework is not AgentFramework.AGNO:
-    #    kwargs["model_args"] = {"parallel_tool_calls": False}
 
     kwargs["model_id"] = "gpt-4.1-nano"
     if "OPENAI_API_KEY" not in os.environ:
