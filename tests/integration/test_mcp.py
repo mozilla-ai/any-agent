@@ -1,5 +1,4 @@
 import os
-import tempfile as tmpfile
 from datetime import datetime
 from typing import Any
 
@@ -7,19 +6,23 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import MCPStdioParams
-from any_agent.tools import search_web
+
+
+def get_current_year() -> str:
+    """Get the current year"""
+    return str(datetime.now().year)
 
 
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_mcp(agent_framework: AgentFramework) -> None:
+def test_mcp(agent_framework: AgentFramework, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """Get the current year"""
     kwargs: dict[str, Any] = {}
 
-    tmp_dir = tmpfile.mkdtemp()
     tools = [
-        search_web,
+        get_current_year,
         MCPStdioParams(
             command="docker",
             args=[
@@ -27,7 +30,7 @@ def test_mcp(agent_framework: AgentFramework) -> None:
                 "-i",
                 "--rm",
                 "--mount",
-                f"type=bind,src={tmp_dir},dst=/projects",
+                f"type=bind,src={tmp_path},dst=/projects",
                 "mcp/filesystem",
                 "/projects",
             ],
@@ -44,14 +47,10 @@ def test_mcp(agent_framework: AgentFramework) -> None:
     agent = AnyAgent.create(agent_framework, agent_config)
     assert len(agent._mcp_servers) > 0
     result = agent.run(
-        "Search the web to find 'what year is today' and write the value (single number) to /projects/tmp.txt"
+        "Use the tools to find what year is it and write the value (single number) to /projects/tmp.txt"
     )
-    # Check if the file was created
-    assert os.path.exists(os.path.join(tmp_dir, "tmp.txt"))
-    # Check if the content is correct
-    with open(os.path.join(tmp_dir, "tmp.txt")) as f:
+    assert os.path.exists(os.path.join(tmp_path, "tmp.txt"))
+    with open(os.path.join(tmp_path, "tmp.txt")) as f:
         content = f.read()
     assert content == str(datetime.now().year)
     assert result
-    # remove the temporary directory
-    os.remove(os.path.join(tmp_dir, "tmp.txt"))
