@@ -40,7 +40,7 @@ def test_mcp(agent_framework: AgentFramework, tmp_path) -> None:  # type: ignore
     ]
     agent_config = AgentConfig(
         model_id="gpt-4.1-mini",
-        tools=tools,
+        tools=tools,  # type: ignore[arg-type]
         **kwargs,
     )
     agent = AnyAgent.create(agent_framework, agent_config)
