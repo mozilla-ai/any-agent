@@ -27,6 +27,7 @@ class AgnoMCPServerBase(MCPConnection):
         assert self.server
         return [await self.exit_stack.enter_async_context(self.server)]
 
+
 class AgnoMCPServerStdio(AgnoMCPServerBase):
     mcp_tool: MCPStdioParams
 
@@ -39,6 +40,7 @@ class AgnoMCPServerStdio(AgnoMCPServerBase):
         )
 
         return await super().setup()
+
 
 class AgnoMCPServerSse(AgnoMCPServerBase):
     mcp_tool: MCPSseParams
