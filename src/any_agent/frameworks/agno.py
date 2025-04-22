@@ -47,7 +47,7 @@ class AgnoAgent(AnyAgent):
         if self.managed_agents:
             if self.config.tools:
                 msg = "The main agent can't use tools in agno."
-                raise NotImplementedError(msg)
+                raise ValueError(msg)
 
             members = []
             for n, managed_agent in enumerate(self.managed_agents):
