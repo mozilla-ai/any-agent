@@ -9,7 +9,6 @@ from any_agent.config import MCPStdioParams
 
 
 def get_current_year() -> str:
-    """Get the current year"""
     return str(datetime.now().year)
 
 
@@ -17,7 +16,8 @@ def get_current_year() -> str:
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_mcp(agent_framework: AgentFramework, tmp_path) -> None:
+def test_mcp(agent_framework: AgentFramework, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """Get the current year"""
     kwargs: dict[str, Any] = {}
 
     tools = [
@@ -40,7 +40,7 @@ def test_mcp(agent_framework: AgentFramework, tmp_path) -> None:
     ]
     agent_config = AgentConfig(
         model_id="gpt-4.1-mini",
-        tools=tools,  # type: ignore[arg-type]
+        tools=tools,
         **kwargs,
     )
     agent = AnyAgent.create(agent_framework, agent_config)
