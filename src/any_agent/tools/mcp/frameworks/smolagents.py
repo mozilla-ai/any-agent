@@ -7,50 +7,56 @@ from textwrap import dedent
 from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 from any_agent.logging import logger
 
-# from any_agent.tools.mcp.mcp_server import MCPServer
+from .mcp_server_base import MCPServerBase
 
+mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
-    from smolagents import ToolCollection
+    from smolagents.mcp_client import MCPClient, Tool
+
+    mcp_available = True
 
 
-class SmolagentsMCPServer:
+class SmolagentsMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for smolagents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
+        super().__init__(mcp_tool, "any-agent[mcp,smolagents]", mcp_available)
         self.exit_stack = AsyncExitStack()
-        self.tool_collection: ToolCollection | None = None
+        self.smolagent_tools: list[Tool] | None = None
 
     async def setup_stdio_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPStdioParams)
+        if not isinstance(self.mcp_tool, MCPStdioParams):
+            msg = "MCP tool parameters must be of type MCPStdioParams for stdio server."
+            raise ValueError(msg)
 
         server_parameters = StdioServerParameters(
             command=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
             env={**os.environ},
         )
-        self.tool_collection = self.exit_stack.enter_context(
-            ToolCollection.from_mcp(server_parameters, trust_remote_code=True)
+        self.smolagent_tools = self.exit_stack.enter_context(
+            MCPClient(server_parameters)
         )
 
     async def setup_sse_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPSseParams)
+        if not isinstance(self.mcp_tool, MCPSseParams):
+            msg = "MCP tool parameters must be of type MCPSseParams for SSE server."
+            raise ValueError(msg)
 
         server_parameters = {
             "url": self.mcp_tool.url,
         }
-        self.tool_collection = self.exit_stack.enter_context(
-            ToolCollection.from_mcp(server_parameters, trust_remote_code=True)
+        self.smolagent_tools = self.exit_stack.enter_context(
+            MCPClient(server_parameters)
         )
 
     async def setup_tools(self) -> None:
         await super().setup_tools()
 
-        assert self.tool_collection
-        # Store the context manager itself
-
-        tools = self.tool_collection.tools
+        if not self.smolagent_tools:
+            msg = "Tool collection is not set up. Please call setup_stdio_tools or setup_sse_tools first."
+            raise ValueError(msg)
 
         # Only add the tools listed in mcp_tool['tools'] if specified
         requested_tools = self.mcp_tool.tools
@@ -58,11 +64,13 @@ class SmolagentsMCPServer:
             logger.info(
                 "No specific tools requested for MCP server, using all available tools:",
             )
-            logger.info(f"Tools available: {tools}")
-            self.tools = tools
+            logger.info("Tools available: %s", self.smolagent_tools)
+            self.tools = self.smolagent_tools
             return
 
-        filtered_tools = [tool for tool in tools if tool.name in requested_tools]
+        filtered_tools = [
+            tool for tool in self.smolagent_tools if tool.name in requested_tools
+        ]
         if len(filtered_tools) != len(requested_tools):
             tool_names = [tool.name for tool in filtered_tools]
             raise ValueError(

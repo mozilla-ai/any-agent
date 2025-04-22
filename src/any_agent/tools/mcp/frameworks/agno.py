@@ -9,10 +9,13 @@ from pydantic import ConfigDict
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
 from any_agent.tools.mcp.mcp_connection import MCPConnection
 
+mcp_available = False
 with suppress(ImportError):
     from agno.tools.mcp import MCPTools as AgnoMCPTools
     from mcp import ClientSession
     from mcp.client.sse import sse_client
+
+    mcp_available = True
 
 
 class AgnoMCPServerBase(MCPConnection):
@@ -24,8 +27,11 @@ class AgnoMCPServerBase(MCPConnection):
 
     async def setup(self) -> list[Tool]:
         """Set up the Agno MCP server with the provided configuration."""
-        assert self.server
-        return [await self.exit_stack.enter_async_context(self.server)]
+        if not self.server:
+            msg = "MCP server is not set up. Please call setup_stdio_tools or setup_sse_tools first."
+            raise ValueError(msg)
+
+        self.tools = [await self.exit_stack.enter_async_context(self.server)]
 
 
 class AgnoMCPServerStdio(AgnoMCPServerBase):

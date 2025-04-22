@@ -6,27 +6,32 @@ from typing import Any
 
 from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 
-# from any_agent.tools.mcp.mcp_server import MCPServer
+from .mcp_server_base import MCPServerBase
 
+mcp_available = False
 with suppress(ImportError):
     from langchain_mcp_adapters.tools import load_mcp_tools
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.sse import sse_client
     from mcp.client.stdio import stdio_client
 
+    mcp_available = True
 
-class LangchainMCPServer:
+
+class LangchainMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for LangChain agents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
+        super().__init__(mcp_tool, "any-agent[mcp,langchain]", mcp_available)
         self.client: Any | None = None
         self.tools = []
         self.session: ClientSession = None
         self.exit_stack = AsyncExitStack()
 
     async def setup_stdio_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPStdioParams)
+        if not isinstance(self.mcp_tool, MCPStdioParams):
+            msg = "MCP tool parameters must be of type MCPStdioParams for stdio server."
+            raise ValueError(msg)
 
         server_params = StdioServerParameters(
             command=self.mcp_tool.command,
@@ -37,7 +42,9 @@ class LangchainMCPServer:
         self.client = stdio_client(server_params)
 
     async def setup_sse_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPSseParams)
+        if not isinstance(self.mcp_tool, MCPSseParams):
+            msg = "MCP tool parameters must be of type MCPSseParams for SSE server."
+            raise ValueError(msg)
 
         self.client = sse_client(
             url=self.mcp_tool.url,
@@ -48,7 +55,9 @@ class LangchainMCPServer:
         """Set up the LangChain MCP server with the provided configuration."""
         await super().setup_tools()
 
-        assert self.client
+        if not self.client:
+            msg = "MCP client is not set up. Please call setup_stdio_tools or setup_sse_tools first."
+            raise ValueError(msg)
         stdio, write = await self.exit_stack.enter_async_context(self.client)
 
         client_session = ClientSession(stdio, write)
