@@ -5,7 +5,6 @@ from typing import Any
 from langchain_core.messages import BaseMessage
 
 from any_agent import AgentFramework
-from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
 
 
@@ -208,34 +207,3 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                 agent_info["metadata"] = attributes["metadata"]
 
         return agent_info
-
-    def _extract_telemetry_data(
-        self,
-        telemetry: Sequence[Mapping[str, Any]],
-    ) -> list[dict[str, Any]]:
-        """Extract LLM calls and tool calls from LangChain telemetry."""
-        calls = []
-
-        for span in telemetry:
-            calls.append(self.extract_interaction(span)[1])
-
-        return calls
-
-    def extract_interaction(
-        self,
-        span: Mapping[str, Any],
-    ) -> tuple[str, dict[str, Any]]:
-        """Extract interaction details from a span."""
-        attributes = span.get("attributes", {})
-        span_kind = attributes.get("openinference.span.kind", "")
-
-        if span_kind == "LLM":
-            return "LLM", self._extract_llm_interaction(span)
-        if "tool.name" in attributes or span.get("name", "").endswith("Tool"):
-            return "TOOL", self._extract_tool_interaction(span)
-        if span_kind == "CHAIN":
-            return "CHAIN", self._extract_chain_interaction(span)
-        if span_kind == "AGENT":
-            return "AGENT", self._extract_agent_interaction(span)
-        logger.warning(f"Unknown span kind: {span_kind}. Span: {span}")
-        return "UNKNOWN", {}

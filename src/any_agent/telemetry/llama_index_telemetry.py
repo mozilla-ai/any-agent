@@ -113,34 +113,3 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
             span_info["service"] = span["resource"]["attributes"]["service.name"]
 
         return span_info
-
-    def _extract_telemetry_data(
-        self,
-        telemetry: Sequence[Mapping[str, Any]],
-    ) -> list[dict[str, Any]]:
-        """Extract LLM calls and tool calls from LlamaIndex telemetry."""
-        calls = list[dict[str, Any]]()
-
-        for span in telemetry:
-            calls.append(self.extract_interaction(span)[1])
-
-        return calls
-
-    def extract_interaction(
-        self,
-        span: Mapping[str, Any],
-    ) -> tuple[str, dict[str, Any]]:
-        """Extract interaction details from a span."""
-        attributes = span.get("attributes", {})
-        span_kind = attributes.get("openinference.span.kind", "")
-
-        if span_kind == "LLM":
-            return "LLM", self._extract_llm_interaction(span)
-        if span_kind == "TOOL":
-            return "TOOL", self._extract_tool_interaction(span)
-        if span_kind == "AGENT":
-            return "AGENT", self._extract_agent_interaction(span)
-        if span_kind == "CHAIN":
-            return "CHAIN", self._extract_chain_interaction(span)
-        msg = f"Unknown span kind: {span_kind}. Expected 'LLM', 'TOOL', 'AGENT', or 'CHAIN'."
-        raise ValueError(msg)
