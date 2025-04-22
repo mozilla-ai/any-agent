@@ -10,6 +10,10 @@
     Before jumping to use one, carefully consider and evaluate how much value you
     would get compared to manually defining a sequence of tools and LLM calls.
 
+## Requirements
+
+- Python 3.11 or newer
+
 ## Quickstart
 
 ```bash

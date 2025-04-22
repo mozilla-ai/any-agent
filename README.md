@@ -4,8 +4,10 @@
 
 [![Docs](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/)
 [![Tests](https://github.com/mozilla-ai/any-agent/actions/workflows/tests.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/tests.yaml/)
+![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
 [Documentation](https://mozilla-ai.github.io/any-agent/)
+
 
 [Blog Post Introduction and Motivation](https://blog.mozilla.ai/introducing-any-agent-an-abstraction-layer-between-your-code-and-the-many-agentic-frameworks/)
 
@@ -27,7 +29,12 @@ any-agent also provides a 'trace-first' [llm-as-a-judge powered evaluation tool]
 [Microsoft AutoGen](https://github.com/mozilla-ai/any-agent/issues/30),
 [Crew AI](https://github.com/mozilla-ai/any-agent/issues/17)
 
+## Requirements
+
+- Python 3.11 or newer
+
 ## Quickstart
+
 
 Refer to [pyproject.toml](./pyproject.toml) for a list of the options available.
 Update your pip install command to include the frameworks that you plan on using (or use `all` to install all the currently supported):
