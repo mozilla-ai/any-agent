@@ -33,6 +33,9 @@ repos:
         additional_dependencies:
           - types-requests
           - types-pyyaml
+
+      - id: mypy
+        additional_dependencies:
           - any-agent[docs]
   
       - id: mypy
