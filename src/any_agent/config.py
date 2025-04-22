@@ -57,7 +57,7 @@ Tool = str | MCPParams | Callable[..., Any]
 class AgentConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     model_id: str
-    description: str = ""
+    description: str | None = None
     name: str = "any_agent"
     instructions: str | None = None
     tools: Sequence[Tool] = Field(default_factory=list)
