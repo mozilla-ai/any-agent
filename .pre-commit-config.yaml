@@ -33,11 +33,32 @@ repos:
         additional_dependencies:
           - types-requests
           - types-pyyaml
-          - pytest
-          - any-agent[dev, all]
-          - markdownify
-          - litellm
-
+          - any-agent[docs]
+  
+      - id: mypy
+        additional_dependencies:
+          - any-agent[mcp, google]
+      
+      - id: mypy
+        additional_dependencies:
+          - any-agent[mcp, langchain]
+      
+      - id: mypy
+        additional_dependencies:
+          - any-agent[mcp, llama_index]
+      
+      - id: mypy
+        additional_dependencies:
+          - any-agent[mcp, smolagents]
+      
+      - id: mypy
+        additional_dependencies:
+          - any-agent[mcp, openai]
+      
+      - id: mypy
+        additional_dependencies:
+          - any-agent[mcp, agno]
+      
 
   - repo: https://github.com/codespell-project/codespell
     rev: "v2.4.1"
