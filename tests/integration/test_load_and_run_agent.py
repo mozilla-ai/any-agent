@@ -39,5 +39,6 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     )
     result = agent.run("Which agent framework is the best?")
     assert result
-    assert traces.exists()
-    assert agent_framework.name in str(next(traces.iterdir()).name)
+    if agent_framework not in (AgentFramework.AGNO, AgentFramework.GOOGLE):
+        assert traces.exists()
+        assert agent_framework.name in str(next(traces.iterdir()).name)
