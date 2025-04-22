@@ -48,7 +48,7 @@ smolagents = [
 ]
 
 openai = [
-    "openai-agents[litellm] @ git+https://github.com/openai/openai-agents-python.git", # Can replace with version once package with litellm is released
+  "openai-agents[litellm]<=0.0.12",
   "openinference-instrumentation-openai-agents>=0.1.5"
 ]
 
