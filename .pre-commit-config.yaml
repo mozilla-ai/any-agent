@@ -36,10 +36,6 @@ repos:
 
       - id: mypy
         additional_dependencies:
-          - any-agent[docs]
-  
-      - id: mypy
-        additional_dependencies:
           - any-agent[mcp, google]
       
       - id: mypy
