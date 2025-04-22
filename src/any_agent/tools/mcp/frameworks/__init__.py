@@ -1,14 +1,14 @@
-from .agno import AgnoMCPToolConnection
+from .agno import AgnoMCPServer
 from .google import GoogleMCPServer
 from .langchain import LangchainMCPServer
 from .llama_index import LlamaIndexMCPServer
 from .openai import OpenAIMCPServer
 from .smolagents import SmolagentsMCPServer
 
-MCPFrameworkConnection = AgnoMCPToolConnection
+MCPFrameworkConnection = AgnoMCPServer
 
 __all__ = [
-    "AgnoMCPToolConnection",
+    "AgnoMCPServer",
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",

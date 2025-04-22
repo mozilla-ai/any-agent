@@ -15,7 +15,7 @@ with suppress(ImportError):
     from mcp.client.sse import sse_client
 
 
-class AgnoMCPToolConnectionBase(MCPConnection):
+class AgnoMCPServerBase(MCPConnection):
     server: AgnoMCPTools | None = None
     exit_stack: AsyncExitStack = AsyncExitStack()
     framework: Literal[AgentFramework.AGNO] = AgentFramework.AGNO
@@ -27,8 +27,7 @@ class AgnoMCPToolConnectionBase(MCPConnection):
         assert self.server
         return [await self.exit_stack.enter_async_context(self.server)]
 
-
-class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
+class AgnoMCPServerStdio(AgnoMCPServerBase):
     mcp_tool: MCPStdioParams
 
     async def setup(self) -> list[Tool]:
@@ -41,8 +40,7 @@ class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
 
         return await super().setup()
 
-
-class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
+class AgnoMCPServerSse(AgnoMCPServerBase):
     mcp_tool: MCPSseParams
 
     async def setup(self) -> list[Tool]:
@@ -63,4 +61,4 @@ class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
         return await super().setup()
 
 
-AgnoMCPToolConnection = AgnoMCPToolConnectionStdio | AgnoMCPToolConnectionSse
+AgnoMCPServer = AgnoMCPServerStdio | AgnoMCPServerSse

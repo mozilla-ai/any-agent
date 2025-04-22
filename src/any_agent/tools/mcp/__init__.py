@@ -1,5 +1,5 @@
 from .frameworks import (
-    AgnoMCPToolConnection,
+    AgnoMCPServer,
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
@@ -9,7 +9,7 @@ from .frameworks import (
 from .mcp_server import MCPServer
 
 __all__ = [
-    "AgnoMCPToolConnection",
+    "AgnoMCPServer",
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",

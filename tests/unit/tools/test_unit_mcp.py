@@ -20,6 +20,7 @@ from any_agent.tools.mcp import (
     SmolagentsMCPServer,
 )
 from any_agent.tools.mcp.frameworks import MCPFrameworkConnection
+from any_agent.tools.mcp.mcp_server import MCPServer
 
 
 # Common helper functions for all test classes

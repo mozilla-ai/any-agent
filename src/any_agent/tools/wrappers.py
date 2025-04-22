@@ -5,7 +5,7 @@ from typing import Any
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 from any_agent.tools.mcp import (
-    AgnoMCPToolConnection,
+    AgnoMCPServer,
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
@@ -82,7 +82,7 @@ async def wrap_mcp_server(
         AgentFramework.LANGCHAIN: LangchainMCPServer,
         AgentFramework.GOOGLE: GoogleMCPServer,
         AgentFramework.LLAMA_INDEX: LlamaIndexMCPServer,
-        AgentFramework.AGNO: AgnoMCPToolConnection,
+        AgentFramework.AGNO: AgnoMCPServer,
     }
     if agent_framework not in mcp_server_map:
         msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {list(mcp_server_map.keys())}"
