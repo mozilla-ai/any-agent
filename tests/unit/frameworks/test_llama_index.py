@@ -30,7 +30,9 @@ def test_load_llama_index_agent_default() -> None:
             ),
         )
 
-        model_mock.assert_called_once_with(model="gemini/gemini-2.0-flash")
+        model_mock.assert_called_once_with(
+            model="gemini/gemini-2.0-flash", api_key=None, api_base=None
+        )
         create_mock.assert_called_once_with(
             name="any_agent",
             llm=model_mock.return_value,

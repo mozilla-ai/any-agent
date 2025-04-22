@@ -16,9 +16,10 @@ def test_get_tracer_provider(tmp_path: Path) -> None:
         patch("any_agent.tracing.TracerProvider", mock_tracer_provider),
     ):
         _get_tracer_provider(
-            output_dir=tmp_path / "traces",
             agent_framework=AgentFramework.OPENAI,
-            tracing_config=TracingConfig(),
+            tracing_config=TracingConfig(
+                output_dir=str(tmp_path / "traces"),
+            ),
         )
         assert (tmp_path / "traces").exists()
         mock_trace.set_tracer_provider.assert_called_once_with(
@@ -28,4 +29,7 @@ def test_get_tracer_provider(tmp_path: Path) -> None:
 
 def test_invalid_agent_framework(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="Unsupported agent framework"):
-        setup_tracing(MagicMock(), tmp_path / "traces")
+        setup_tracing(
+            MagicMock(),
+            tracing_config=TracingConfig(output_dir=str(tmp_path / "traces")),
+        )

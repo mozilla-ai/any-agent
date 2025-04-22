@@ -97,19 +97,20 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
 
 ## Models
 
-The model used by an agent is defined by 3 arguments `model_id`, `model_type` and `model_args`.
+The model used by an agent is defined by a few arguments: `model_id`, `model_type`, `model_args`, `api_base`, and `api_key`.
 
-A common usage of `model_args` is to specify a custom `api_base` and/or `api_key`:
+
 
 ```python
+import os
 from any_agent import AnyAgent, AgentFramework, AgentConfig
 agent = AnyAgent.create(
     "smolagents",
     AgentConfig(
         model_id="llama3.2",
-        model_args={
-            "api_base": "http://localhost:11434/v1"
-        }
+        model_args={"temperature": 1},
+        api_base="http://localhost:11434/v1", # optional
+        api_key=os.getenv('MY_CUSTOM_KEY_ENV'), # optional, litellm will automatically search for OPENAI_API_KEY etc
     )
 )
 agent.run("Which Agent Framework is the best??")
@@ -118,8 +119,16 @@ agent.run("Which Agent Framework is the best??")
 If you just specify `model_id` (as in the examples above), the agent will use the default `model_type` that we have selected
 for that framework and no `model_args`.
 
+### Model Type
 
-!!! tip
+The `model_type` parameter controls the type of model class that is used by the agent framework, and is unique to the agent framework being used. For each framework, we leverage their support for [`LiteLLM`](https://github.com/BerriAI/litellm) and when relevant use it as default `model_type`, allowing you to use the same `model_id` syntax across these frameworks.
 
-    For frameworks that have support for [`LiteLLM`](https://github.com/BerriAI/litellm) (`google`, `langchain`, `llama_index`, `smolagents`)
-    we use it as default `model_type`, allowing you to use the same `model_id` syntax across these frameworks.
+### Model ID
+
+If you are using the default `model_type` (LiteLLM), you can refer to [LiteLLM Provider Docs](https://docs.litellm.ai/docs/providers) for the list
+of providers and how to access them.
+
+### Model Args
+
+The `model_args` provides the ability to set parameters like `temperature`, `top_k`, as well as any other provider-specific parameters.
+Refer to [LiteLLM Completion API Docs](https://docs.litellm.ai/docs/text_completion) as well

@@ -4,9 +4,10 @@
 
 [![Docs](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/)
 [![Tests](https://github.com/mozilla-ai/any-agent/actions/workflows/tests.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/tests.yaml/)
-[![Lint](https://github.com/mozilla-ai/any-agent/actions/workflows/lint.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/lint.yaml/)
+![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
 [Documentation](https://mozilla-ai.github.io/any-agent/)
+
 
 [Blog Post Introduction and Motivation](https://blog.mozilla.ai/introducing-any-agent-an-abstraction-layer-between-your-code-and-the-many-agentic-frameworks/)
 
@@ -28,7 +29,12 @@ any-agent also provides a 'trace-first' [llm-as-a-judge powered evaluation tool]
 [Microsoft AutoGen](https://github.com/mozilla-ai/any-agent/issues/30),
 [Crew AI](https://github.com/mozilla-ai/any-agent/issues/17)
 
+## Requirements
+
+- Python 3.11 or newer
+
 ## Quickstart
+
 
 Refer to [pyproject.toml](./pyproject.toml) for a list of the options available.
 Update your pip install command to include the frameworks that you plan on using (or use `all` to install all the currently supported):
@@ -40,26 +46,22 @@ pip install 'any-agent[all]'
 To define any agent system you will always use the same imports:
 
 ```py
-from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tracing import setup_tracing  # Optional, but recommended
-
-# See all options in https://mozilla-ai.github.io/any-agent/frameworks/
-framework = "smolagents"
-
-setup_tracing(framework)
+from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
 
 ### Single agent
 
 ```py
 from any_agent.tools import search_web, visit_webpage
+
 agent = AnyAgent.create(
-    framework,
+    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
-    )
+    ),
+    tracing=TracingConfig(output_dir="traces") # Optional, but recommended for saving and viewing traces
 )
 
 agent.run("Which Agent Framework is the best??")
@@ -69,8 +71,9 @@ agent.run("Which Agent Framework is the best??")
 
 ```py
 from any_agent.tools import search_web, visit_webpage
+
 agent = AnyAgent.create(
-    framework,
+    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="You are the main agent. Use the other available agents to find an answer",
