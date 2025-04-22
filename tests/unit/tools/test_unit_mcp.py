@@ -17,30 +17,8 @@ from any_agent.tools.mcp import (
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
-    MCPServerBase,
     SmolagentsMCPServer,
 )
-
-
-class TestMCPServerBase(unittest.TestCase):
-    """Tests for the MCPServerBase class."""
-
-    # Define the test class once at class level instead of in each test method
-    class ConcreteMCPManager(MCPServerBase):
-        async def setup_tools(self) -> None:
-            pass
-
-        def cleanup(self) -> None:
-            pass
-
-    def setUp(self) -> None:
-        """Set up test fixtures before each test."""
-        # Common test data
-        self.test_tool = MagicMock()
-        self.test_tool.name = "test_tool"
-
-    def tearDown(self) -> None:
-        """Clean up after each test."""
 
 
 # Common helper functions for all test classes
@@ -64,8 +42,7 @@ def create_specific_mock_tools() -> list[MagicMock]:
     return [mock_read_tool, mock_write_tool, mock_other_tool]
 
 
-@patch("any_agent.tools.mcp.smolagents.ToolCollection")
-@patch("any_agent.tools.mcp.smolagents.StdioServerParameters")
+@patch("any_agent.tools.mcp.smolagents.MCPClient")
 class TestSmolagentsMCPServer(unittest.TestCase):
     """Tests for the SmolagentsMCPServer class."""
 
@@ -76,23 +53,16 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         self.test_tool.command = "test_command"
         self.test_tool.args = ["arg1", "arg2"]
 
-        # Common mock configuration
-        self.mock_collection = MagicMock()
-        self.mock_context = MagicMock()
-        self.mock_context.__enter__.return_value = self.mock_collection
-
     def test_setup_tools_with_none_tools(
         self,
-        mock_stdio_params: Any,
-        mock_tool_collection: Any,
+        mock_client_class: Any,
     ) -> None:
         """Test that when mcp_tool.tools is None, all available tools are used."""
         # Setup mock tools
         mock_tools = create_mock_tools()
 
-        # Setup mock tool collection
-        self.mock_collection.tools = mock_tools
-        mock_tool_collection.from_mcp.return_value = self.mock_context
+        # Setup mock MCPClient context manager behavior
+        mock_client_class.return_value.__enter__.return_value = mock_tools
 
         # Create test tool configuration with None tools
         self.test_tool.tools = None
@@ -106,16 +76,14 @@ class TestSmolagentsMCPServer(unittest.TestCase):
 
     def test_setup_tools_with_specific_tools(
         self,
-        mock_stdio_params: Any,
-        mock_tool_collection: Any,
+        mock_client_class: Any,
     ) -> None:
         """Test that when mcp_tool.tools has specific values, only those tools are used."""
         # Setup mock tools
         mock_tools = create_specific_mock_tools()
 
-        # Setup mock tool collection
-        self.mock_collection.tools = mock_tools
-        mock_tool_collection.from_mcp.return_value = self.mock_context
+        # Setup mock MCPClient context manager behavior
+        mock_client_class.return_value.__enter__.return_value = mock_tools
 
         # Create test tool configuration with specific tools
         self.test_tool.tools = ["read_thing", "write_thing"]
@@ -158,15 +126,12 @@ def test_openai_mcpsse() -> None:
 
 @pytest.mark.asyncio
 async def test_smolagents_mcp_sse() -> None:
-    # Mock the necessary components
-    mock_tool_collection = MagicMock()
+    # Create mock tools
     mock_tool1 = MagicMock()
     mock_tool1.name = "tool1"
     mock_tool2 = MagicMock()
     mock_tool2.name = "tool2"
-
-    # Set up the mock tools list that will be returned by the ToolCollection
-    mock_tool_collection.tools = [mock_tool1, mock_tool2]
+    mock_tools = [mock_tool1, mock_tool2]
 
     # Create an MCP tool config for SSE
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse")
@@ -174,27 +139,19 @@ async def test_smolagents_mcp_sse() -> None:
     # Create the server instance
     server = SmolagentsMCPServer(mcp_tool)
 
-    # Patch the ToolCollection.from_mcp method to return our mock
-    with patch("any_agent.tools.mcp.smolagents.ToolCollection") as mock_tool_collection:
-        # Mock the context manager behavior
-        mock_tool_collection.from_mcp.return_value.__enter__.return_value = (
-            mock_tool_collection
-        )
+    # Patch the MCPClient class to return our mock tools
+    with patch("any_agent.tools.mcp.smolagents.MCPClient") as mock_client_class:
+        # Setup the mock to return our tools when used as a context manager
+        mock_client_class.return_value.__enter__.return_value = mock_tools
 
-        # Mock AsyncExitStack to avoid actually setting up exit handlers
-        with patch.object(AsyncExitStack, "enter_context") as mock_enter_context:
-            mock_enter_context.return_value = mock_tool_collection
+        # Test the setup_tools method
+        await server.setup_tools()
 
-            # Test the setup_tools method
-            await server.setup_tools()
+        # Verify the client was created with correct parameters
+        mock_client_class.assert_called_once_with({"url": "http://localhost:8000/sse"})
 
-            # Verify the SSE server parameters were created correctly
-            mock_tool_collection.from_mcp.assert_called_once()
-            args, kwargs = mock_tool_collection.from_mcp.call_args
-
-            # Check that the right params were passed
-            assert isinstance(args[0], dict)
-            assert args[0]["url"] == "http://localhost:8000/sse"
+        # Verify tools were correctly assigned
+        assert server.tools == mock_tools
 
 
 @pytest.mark.asyncio
