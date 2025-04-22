@@ -7,16 +7,17 @@ from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 
 from .mcp_server_base import MCPServerBase
 
+mcp_available = False
 with suppress(ImportError):
     from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
     from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
-
+    mcp_available = True
 
 class LlamaIndexMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Google agents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
+        super().__init__(mcp_tool, mcp_available, "llama_index llama-index-tools-mcp")
         self.client: LlamaIndexMCPClient | None = None
 
     async def setup_stdio_tools(self) -> None:

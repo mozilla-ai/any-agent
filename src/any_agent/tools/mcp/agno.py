@@ -7,17 +7,19 @@ from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 
 from .mcp_server_base import MCPServerBase
 
+mcp_available = False
 with suppress(ImportError):
     from agno.tools.mcp import MCPTools as AgnoMCPTools
     from mcp import ClientSession
     from mcp.client.sse import sse_client
+    mcp_available = True
 
 
 class AgnoMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Agno agents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
+        super().__init__(mcp_tool, mcp_available, "mcp agno")
         self.exit_stack = AsyncExitStack()
         self.server: AgnoMCPTools | None = None
 

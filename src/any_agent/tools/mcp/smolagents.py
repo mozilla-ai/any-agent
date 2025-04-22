@@ -9,16 +9,17 @@ from any_agent.logging import logger
 
 from .mcp_server_base import MCPServerBase
 
+mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
     from smolagents import ToolCollection
-
+    mcp_available = True
 
 class SmolagentsMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for smolagents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
+        super().__init__(mcp_tool, mcp_available, "mcpsmolagents[mcp]")
         self.exit_stack = AsyncExitStack()
         self.tool_collection: ToolCollection | None = None
 

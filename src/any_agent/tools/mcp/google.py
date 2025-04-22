@@ -7,6 +7,7 @@ from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 
 from .mcp_server_base import MCPServerBase
 
+mcp_available = False
 with suppress(ImportError):
     from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
     from google.adk.tools.mcp_tool.mcp_toolset import (
@@ -15,13 +16,14 @@ with suppress(ImportError):
     from google.adk.tools.mcp_tool.mcp_toolset import (
         StdioServerParameters as GoogleStdioServerParameters,
     )
+    mcp_available = True
 
 
 class GoogleMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Google agents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
+        super().__init__(mcp_tool, mcp_available, "google-adk")
         self.server: GoogleMCPToolset | None = None
         self.exit_stack = AsyncExitStack()
         self.params: GoogleStdioServerParameters | GoogleSseServerParameters | None = (

@@ -8,18 +8,19 @@ from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 
 from .mcp_server_base import MCPServerBase
 
+mcp_available = False
 with suppress(ImportError):
     from langchain_mcp_adapters.tools import load_mcp_tools
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.sse import sse_client
     from mcp.client.stdio import stdio_client
-
+    mcp_available = True
 
 class LangchainMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for LangChain agents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
+        super().__init__(mcp_tool, mcp_available, "mcp langchain-mcp-adapters")
         self.client: Any | None = None
         self.tools = []
         self.session: ClientSession = None

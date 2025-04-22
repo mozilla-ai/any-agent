@@ -7,6 +7,7 @@ from any_agent.logging import logger
 
 from .mcp_server_base import MCPServerBase
 
+mcp_available = False
 with suppress(ImportError):
     from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
     from agents.mcp import (
@@ -16,13 +17,14 @@ with suppress(ImportError):
     from agents.mcp import (
         MCPServerStdioParams as OpenAIInternalMCPServerStdioParams,
     )
+    mcp_available = True
 
 
 class OpenAIMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for OpenAI agents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool)
+        super().__init__(mcp_tool, mcp_available, "agents[mcp]")
         self.server: (
             OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None
         ) = None
