@@ -15,11 +15,18 @@ class MCPServerBase(ABC):
     def __init__(
         self,
         mcp_tool: MCPParams,
+        libraries: str = "any-agent[mcp]",
         mcp_available: bool = False,
-        libraries: str = "agents[mcp]",
     ) -> None:
+        """
+        Log the appropriate error if the libraries aren't installed, and set up the shared MCP variables.
+        Args:
+            mcp_tool (MCPParams): The MCP tool parameters.
+            libraries (str): The libraries required for MCP. Used to inform error messages.
+            mcp_available (bool): Flag indicating if MCP is available.
+        """
         if not mcp_available:
-            msg = f"You need to `pip install {libraries}` to use MCP tools."
+            msg = f"You need to `pip install '{libraries}'` to use MCP."
             raise ImportError(msg)
 
         # Store the original tool configuration
@@ -28,7 +35,6 @@ class MCPServerBase(ABC):
         # Initialize tools list (to be populated by subclasses)
         self.tools: Sequence[Tool] = []
 
-    @abstractmethod
     async def setup_tools(self) -> None:
         """Set up tools. To be implemented by subclasses."""
         match self.mcp_tool:

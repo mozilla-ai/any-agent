@@ -20,12 +20,14 @@ class AgnoMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Agno agents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool, mcp_available, "mcp agno")
+        super().__init__(mcp_tool, "any-agent[mcp,agno]", mcp_available)
         self.exit_stack = AsyncExitStack()
         self.server: AgnoMCPTools | None = None
 
     async def setup_stdio_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPStdioParams)
+        if not isinstance(self.mcp_tool, MCPStdioParams):
+            msg = "MCP tool parameters must be of type MCPStdioParams for stdio server."
+            raise ValueError(msg)
 
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
         self.server = AgnoMCPTools(
@@ -35,7 +37,9 @@ class AgnoMCPServer(MCPServerBase):
         )
 
     async def setup_sse_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPSseParams)
+        if not isinstance(self.mcp_tool, MCPSseParams):
+            msg = "MCP tool parameters must be of type MCPSseParams for SSE server."
+            raise ValueError(msg)
         client = sse_client(
             url=self.mcp_tool.url,
             headers=self.mcp_tool.headers,
@@ -54,5 +58,8 @@ class AgnoMCPServer(MCPServerBase):
         """Set up the Agno MCP server with the provided configuration."""
         await super().setup_tools()
 
-        assert self.server
+        if not self.server:
+            msg = "MCP server is not set up. Please call setup_stdio_tools or setup_sse_tools first."
+            raise ValueError(msg)
+
         self.tools = [await self.exit_stack.enter_async_context(self.server)]

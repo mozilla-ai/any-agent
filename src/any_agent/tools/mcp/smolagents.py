@@ -21,12 +21,14 @@ class SmolagentsMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for smolagents."""
 
     def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool, mcp_available, "mcpsmolagents[mcp]")
+        super().__init__(mcp_tool, "any-agent[mcp,smolagents]", mcp_available)
         self.exit_stack = AsyncExitStack()
         self.tool_collection: ToolCollection | None = None
 
     async def setup_stdio_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPStdioParams)
+        if not isinstance(self.mcp_tool, MCPStdioParams):
+            msg = "MCP tool parameters must be of type MCPStdioParams for stdio server."
+            raise ValueError(msg)
 
         server_parameters = StdioServerParameters(
             command=self.mcp_tool.command,
@@ -38,7 +40,9 @@ class SmolagentsMCPServer(MCPServerBase):
         )
 
     async def setup_sse_tools(self) -> None:
-        assert isinstance(self.mcp_tool, MCPSseParams)
+        if not isinstance(self.mcp_tool, MCPSseParams):
+            msg = "MCP tool parameters must be of type MCPSseParams for SSE server."
+            raise ValueError(msg)
 
         server_parameters = {
             "url": self.mcp_tool.url,
@@ -50,8 +54,9 @@ class SmolagentsMCPServer(MCPServerBase):
     async def setup_tools(self) -> None:
         await super().setup_tools()
 
-        assert self.tool_collection
-        # Store the context manager itself
+        if not self.tool_collection:
+            msg = "Tool collection is not set up. Please call setup_stdio_tools or setup_sse_tools first."
+            raise ValueError(msg)
 
         tools = self.tool_collection.tools
 
@@ -61,7 +66,7 @@ class SmolagentsMCPServer(MCPServerBase):
             logger.info(
                 "No specific tools requested for MCP server, using all available tools:",
             )
-            logger.info(f"Tools available: {tools}")
+            logger.info("Tools available: %s", tools)
             self.tools = tools
             return
 
