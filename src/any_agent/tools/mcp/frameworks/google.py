@@ -17,7 +17,7 @@ with suppress(ImportError):
     )
 
 
-class GoogleMCPServer(object):
+class GoogleMCPServer:
     """Implementation of MCP tools manager for Google agents."""
 
     def __init__(self, mcp_tool: MCPParams):

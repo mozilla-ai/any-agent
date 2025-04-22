@@ -18,7 +18,7 @@ with suppress(ImportError):
     )
 
 
-class OpenAIMCPServer(object):
+class OpenAIMCPServer:
     """Implementation of MCP tools manager for OpenAI agents."""
 
     def __init__(self, mcp_tool: MCPParams):

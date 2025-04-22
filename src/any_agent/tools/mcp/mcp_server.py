@@ -1,12 +1,13 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
+from collections.abc import Sequence
 from contextlib import suppress
 from typing import Any
-from collections.abc import Sequence
 
 from pydantic import BaseModel, Field
 
 from any_agent.config import Tool
+
 from .frameworks import MCPFrameworkConnection
 
 mcp_available = False
@@ -16,6 +17,7 @@ with suppress(ImportError):
 
 class MCPServer(BaseModel):
     """Base class for MCP tools managers across different frameworks."""
+
     mcp_connection: MCPFrameworkConnection
     tools: Sequence[Tool] = Field(default_factory=list)
 

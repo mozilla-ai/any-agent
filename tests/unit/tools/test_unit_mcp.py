@@ -8,13 +8,12 @@ from contextlib import AsyncExitStack
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from pydantic import TypeAdapter
 import pytest
+from pydantic import TypeAdapter
 
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools.mcp import (
-    AgnoMCPToolConnection,
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
@@ -312,12 +311,16 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    mcp_connection = TypeAdapter(MCPFrameworkConnection).validate_python({"mcp_tool": mcp_tool, "framework": AgentFramework.AGNO})
+    mcp_connection = TypeAdapter(MCPFrameworkConnection).validate_python(
+        {"mcp_tool": mcp_tool, "framework": AgentFramework.AGNO}
+    )
     server = MCPServer(mcp_connection=mcp_connection)
 
     # Mock required components
     with (
-        patch("any_agent.tools.mcp.frameworks.agno.ClientSession") as mock_client_session,
+        patch(
+            "any_agent.tools.mcp.frameworks.agno.ClientSession"
+        ) as mock_client_session,
         patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools,
     ):
         # Set up mocks

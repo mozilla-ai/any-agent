@@ -15,7 +15,7 @@ with suppress(ImportError):
     from mcp.client.stdio import stdio_client
 
 
-class LangchainMCPServer(object):
+class LangchainMCPServer:
     """Implementation of MCP tools manager for LangChain agents."""
 
     def __init__(self, mcp_tool: MCPParams):

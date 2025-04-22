@@ -35,14 +35,13 @@ class MCPStdioParams(BaseModel):
     tools: Sequence[str] | None = None
 
     model_config = ConfigDict(frozen=True)
-    
 
 
 class MCPSseParams(BaseModel):
     url: str
     headers: dict[str, str] | None = None
     tools: list[str] | None = None
-    
+
     model_config = ConfigDict(frozen=True)
 
 

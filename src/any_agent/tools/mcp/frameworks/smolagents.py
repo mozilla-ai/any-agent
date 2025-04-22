@@ -14,7 +14,7 @@ with suppress(ImportError):
     from smolagents import ToolCollection
 
 
-class SmolagentsMCPServer(object):
+class SmolagentsMCPServer:
     """Implementation of MCP tools manager for smolagents."""
 
     def __init__(self, mcp_tool: MCPParams):

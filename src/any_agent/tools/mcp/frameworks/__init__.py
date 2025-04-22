@@ -12,7 +12,7 @@ __all__ = [
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
+    "MCPFrameworkConnection",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
-    "MCPFrameworkConnection"
 ]

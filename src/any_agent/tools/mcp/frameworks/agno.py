@@ -4,13 +4,10 @@ import os
 from contextlib import AsyncExitStack, suppress
 from typing import Literal
 
-
 from pydantic import ConfigDict
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
-
 from any_agent.tools.mcp.mcp_connection import MCPConnection
-
 
 with suppress(ImportError):
     from agno.tools.mcp import MCPTools as AgnoMCPTools
@@ -22,7 +19,6 @@ class AgnoMCPToolConnectionBase(MCPConnection):
     server: AgnoMCPTools | None = None
     exit_stack: AsyncExitStack = AsyncExitStack()
     framework: Literal[AgentFramework.AGNO] = AgentFramework.AGNO
-    
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -31,9 +27,10 @@ class AgnoMCPToolConnectionBase(MCPConnection):
         assert self.server
         return [await self.exit_stack.enter_async_context(self.server)]
 
+
 class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
     mcp_tool: MCPStdioParams
-    
+
     async def setup(self) -> list[Tool]:
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
         self.server = AgnoMCPTools(
@@ -43,6 +40,7 @@ class AgnoMCPToolConnectionStdio(AgnoMCPToolConnectionBase):
         )
 
         return await super().setup()
+
 
 class AgnoMCPToolConnectionSse(AgnoMCPToolConnectionBase):
     mcp_tool: MCPSseParams

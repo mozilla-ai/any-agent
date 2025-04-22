@@ -12,7 +12,7 @@ with suppress(ImportError):
     from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
 
-class LlamaIndexMCPServer(object):
+class LlamaIndexMCPServer:
     """Implementation of MCP tools manager for Google agents."""
 
     def __init__(self, mcp_tool: MCPParams):
