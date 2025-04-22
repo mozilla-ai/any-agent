@@ -14,7 +14,9 @@ with suppress(ImportError):
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.sse import sse_client
     from mcp.client.stdio import stdio_client
+
     mcp_available = True
+
 
 class LangchainMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for LangChain agents."""

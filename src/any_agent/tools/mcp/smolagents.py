@@ -13,7 +13,9 @@ mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
     from smolagents import ToolCollection
+
     mcp_available = True
+
 
 class SmolagentsMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for smolagents."""

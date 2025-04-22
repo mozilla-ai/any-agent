@@ -11,7 +11,9 @@ mcp_available = False
 with suppress(ImportError):
     from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
     from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
+
     mcp_available = True
+
 
 class LlamaIndexMCPServer(MCPServerBase):
     """Implementation of MCP tools manager for Google agents."""

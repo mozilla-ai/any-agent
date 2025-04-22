@@ -17,6 +17,7 @@ with suppress(ImportError):
     from agents.mcp import (
         MCPServerStdioParams as OpenAIInternalMCPServerStdioParams,
     )
+
     mcp_available = True
 
 

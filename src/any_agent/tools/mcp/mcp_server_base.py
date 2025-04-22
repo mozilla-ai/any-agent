@@ -12,8 +12,12 @@ if TYPE_CHECKING:
 class MCPServerBase(ABC):
     """Base class for MCP tools managers across different frameworks."""
 
-    def __init__(self, mcp_tool: MCPParams, mcp_available: bool = False, libraries: str = "agents[mcp]") -> None:
-        
+    def __init__(
+        self,
+        mcp_tool: MCPParams,
+        mcp_available: bool = False,
+        libraries: str = "agents[mcp]",
+    ) -> None:
         if not mcp_available:
             msg = f"You need to `pip install {libraries}` to use MCP tools."
             raise ImportError(msg)
