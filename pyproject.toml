@@ -43,7 +43,7 @@ llama_index = [
 ]
 
 smolagents = [
-  "smolagents[litellm,mcp]>=1.10.0",
+  "smolagents[litellm,mcp]>=1.14.0",
   "openinference-instrumentation-smolagents"
 ]
 
