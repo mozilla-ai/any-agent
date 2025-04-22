@@ -5,7 +5,6 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import search_web, show_final_answer, visit_webpage
-from any_agent.tracing import setup_tracing
 
 
 @pytest.mark.skipif(
@@ -28,9 +27,6 @@ def test_load_and_run_multi_agent(
             "AGNO agent is not supported for multi-agent test yet. "
             "See https://github.com/mozilla-ai/any-agent/issues/78"
         )
-
-    if agent_framework not in [AgentFramework.GOOGLE, AgentFramework.AGNO]:
-        setup_tracing(agent_framework, str(tmp_path / "traces"))
 
     main_agent = AgentConfig(
         instructions="Use the available agents to complete the task.",

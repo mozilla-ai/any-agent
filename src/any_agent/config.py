@@ -42,6 +42,7 @@ class MCPSseParams(BaseModel):
 
 
 class TracingConfig(BaseModel):
+    output_dir: str | None = "traces"  # None for no json saved trace
     llm: str | None = "yellow"
     tool: str | None = "blue"
     agent: str | None = None
@@ -56,6 +57,8 @@ Tool = str | MCPParams | Callable[..., Any]
 class AgentConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
     model_id: str
+    api_base: str | None = None
+    api_key: str | None = None
     description: str = ""
     name: str = "any_agent"
     instructions: str | None = None

@@ -14,11 +14,9 @@
 
 ```python
 from agents.extensions.handoff_prompt import RECOMMENDED_PROMPT_PREFIX
-from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent import AgentConfig
 
 instruction = RECOMMENDED_PROMPT_PREFIX + "\nYou are a helpful assistant that can navigate the web."
-
-framework = "openai"
 
 main_agent = AgentConfig(
     model_id="gpt-4o-mini",

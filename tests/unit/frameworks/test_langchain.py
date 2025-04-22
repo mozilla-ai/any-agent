@@ -23,7 +23,7 @@ def test_load_langchain_agent_default() -> None:
     ):
         AnyAgent.create(AgentFramework.LANGCHAIN, AgentConfig(model_id="gpt-4o"))
 
-        model_mock.assert_called_once_with(model="gpt-4o")
+        model_mock.assert_called_once_with(model="gpt-4o", api_base=None, api_key=None)
         create_mock.assert_called_once_with(
             name="any_agent",
             model=model_mock.return_value,
