@@ -1,4 +1,4 @@
-from collections.abc import Callable, MutableMapping, Sequence
+from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import Enum, auto
 from typing import Any, Self
 
@@ -34,11 +34,15 @@ class MCPStdioParams(BaseModel):
     args: Sequence[str]
     tools: Sequence[str] | None = None
 
+    model_config = ConfigDict(frozen=True)
+
 
 class MCPSseParams(BaseModel):
     url: str
-    headers: dict[str, str] | None = None
-    tools: list[str] | None = None
+    headers: Mapping[str, str] | None = None
+    tools: Sequence[str] | None = None
+
+    model_config = ConfigDict(frozen=True)
 
 
 class TracingConfig(BaseModel):

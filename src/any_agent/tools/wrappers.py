@@ -4,14 +4,9 @@ from functools import wraps
 from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentFramework, MCPParams, Tool
-from any_agent.tools.mcp import (
-    AgnoMCPServer,
-    GoogleMCPServer,
-    LangchainMCPServer,
-    LlamaIndexMCPServer,
+from any_agent.tools import (
     MCPServerBase,
-    OpenAIMCPServer,
-    SmolagentsMCPServer,
+    get_mcp_server,
 )
 
 if TYPE_CHECKING:
@@ -87,22 +82,7 @@ async def wrap_mcp_server(
     """Generic MCP server wrapper that can work with different frameworks
     based on the specified agent_framework
     """
-    # Select the appropriate manager based on agent_framework
-    mcp_server_map: dict[AgentFramework, type[MCPServerBase]] = {
-        AgentFramework.OPENAI: OpenAIMCPServer,
-        AgentFramework.SMOLAGENTS: SmolagentsMCPServer,
-        AgentFramework.LANGCHAIN: LangchainMCPServer,
-        AgentFramework.GOOGLE: GoogleMCPServer,
-        AgentFramework.LLAMA_INDEX: LlamaIndexMCPServer,
-        AgentFramework.AGNO: AgnoMCPServer,
-    }
-    if agent_framework not in mcp_server_map:
-        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {list(mcp_server_map.keys())}"
-        raise NotImplementedError(msg)
-
-    # Create the manager instance which will manage the MCP tool context
-    manager_class = mcp_server_map[agent_framework]
-    manager = manager_class(mcp_tool)
+    manager = get_mcp_server(mcp_tool, agent_framework)
     await manager.setup_tools()
 
     return manager

@@ -12,7 +12,7 @@ from any_agent.tracing import setup_tracing
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from any_agent.tools.mcp import MCPServerBase
+    from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 
 class AnyAgent(ABC):
