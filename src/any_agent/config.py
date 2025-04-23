@@ -42,6 +42,7 @@ class MCPSseParams(BaseModel):
 
 
 class TracingConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     output_dir: str | None = "traces"  # None for no json saved trace
     llm: str | None = "yellow"
     tool: str | None = "blue"
