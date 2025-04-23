@@ -75,7 +75,7 @@ class RichConsoleSpanExporter(SpanExporter):
 
                 style = getattr(self.tracing_config, span_kind.lower(), None)
 
-                if not style:
+                if not style or interaction == {}:
                     continue
 
                 self.console.rule(
