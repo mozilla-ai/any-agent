@@ -1,7 +1,6 @@
-"""Tools for managing MCP (Model Context Protocol) connections and resources."""
-
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from contextlib import AsyncExitStack
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -18,6 +17,10 @@ class MCPServerBase(BaseModel, ABC):
     tools: Sequence[Tool] = Field(default_factory=list)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.exit_stack = AsyncExitStack()
 
     def model_post_init(self, context: Any) -> None:
         self.check_dependencies()

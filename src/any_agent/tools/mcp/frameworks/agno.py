@@ -1,8 +1,6 @@
-"""Tools for managing MCP (Model Context Protocol) connections and resources."""
-
 import os
 from abc import ABC, abstractmethod
-from contextlib import AsyncExitStack, suppress
+from contextlib import suppress
 from typing import Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
@@ -19,7 +17,6 @@ with suppress(ImportError):
 
 class AgnoMCPServerBase(MCPServerBase, ABC):
     server: AgnoMCPTools | None = None
-    exit_stack: AsyncExitStack = AsyncExitStack()
     framework: Literal[AgentFramework.AGNO] = AgentFramework.AGNO
 
     def check_dependencies(self) -> None:

@@ -1,7 +1,5 @@
-"""Tools for managing MCP (Model Context Protocol) connections and resources."""
-
 from abc import ABC, abstractmethod
-from contextlib import AsyncExitStack, suppress
+from contextlib import suppress
 from typing import Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
@@ -24,7 +22,6 @@ with suppress(ImportError):
 
 class OpenAIMCPServerBase(MCPServerBase, ABC):
     server: OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None = None
-    exit_stack: AsyncExitStack = AsyncExitStack()
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
     def check_dependencies(self) -> None:

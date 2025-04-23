@@ -1,9 +1,7 @@
-"""Tools for managing MCP (Model Context Protocol) connections and resources."""
-
 import os
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from contextlib import AsyncExitStack, suppress
+from contextlib import suppress
 from textwrap import dedent
 from typing import Literal
 
@@ -22,7 +20,6 @@ with suppress(ImportError):
 
 class SmolagentsMCPServerBase(MCPServerBase, ABC):
     smolagent_tools: Sequence["SmolagentsTool"] | None = None
-    exit_stack: AsyncExitStack = AsyncExitStack()
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
 
     def check_dependencies(self) -> None:
