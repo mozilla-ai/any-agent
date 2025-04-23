@@ -73,7 +73,7 @@ class LlamaIndexAgent(AnyAgent):
                 managed_names.append(name)
                 managed_instance = ReActAgent(
                     name=name,
-                    description=managed_agent.description,
+                    description=managed_agent.description or "A managed agent",
                     system_prompt=managed_agent.instructions,
                     tools=managed_tools,  # type: ignore[arg-type]
                     llm=self._get_model(managed_agent),
@@ -85,8 +85,8 @@ class LlamaIndexAgent(AnyAgent):
             main_tools, _ = await self._load_tools(self.config.tools)
             main_agent = ReActAgent(
                 name=self.config.name,
-                description=self.config.description,
-                tools=main_tools,  # type: ignore[arg-type]
+                description=self.config.description or "The main agent",
+                tools=main_tools,
                 llm=self._get_model(self.config),
                 system_prompt=self.config.instructions,
                 can_handoff_to=managed_names,
@@ -101,7 +101,8 @@ class LlamaIndexAgent(AnyAgent):
 
             self._agent = ReActAgent(
                 name=self.config.name,
-                tools=imported_tools,  # type: ignore[arg-type]
+                tools=imported_tools,
+                description=self.config.description or "The main agent",
                 llm=self._get_model(self.config),
                 system_prompt=self.config.instructions,
                 **self.config.agent_args or {},

@@ -37,6 +37,7 @@ def test_load_llama_index_agent_default() -> None:
             name="any_agent",
             llm=model_mock.return_value,
             system_prompt="You are a helpful assistant",
+            description="The main agent",
             tools=[tool_mock(search_web), tool_mock(visit_webpage)],
         )
 
@@ -61,7 +62,7 @@ def test_load_langchain_multiagent() -> None:
         patch("llama_index.llms.litellm.LiteLLM", model_mock),
         patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
-        main_agent = AgentConfig(model_id="gpt-4.1-mini", description="Main agent")
+        main_agent = AgentConfig(model_id="gpt-4.1-mini")
 
         managed_agents = [
             AgentConfig(
@@ -70,7 +71,6 @@ def test_load_langchain_multiagent() -> None:
                     search_web,
                     visit_webpage,
                 ],
-                description="Managed agent",
             ),
         ]
 
@@ -80,7 +80,7 @@ def test_load_langchain_multiagent() -> None:
 
         create_mock.assert_any_call(
             name="managed_agent_0",
-            description="Managed agent",
+            description="A managed agent",
             llm=model_mock.return_value,
             tools=[
                 tool_mock(search_web),
@@ -92,7 +92,7 @@ def test_load_langchain_multiagent() -> None:
 
         create_mock.assert_called_with(
             name="any_agent",
-            description="Main agent",
+            description="The main agent",
             llm=model_mock.return_value,
             system_prompt=None,
             can_handoff_to=["managed_agent_0"],
