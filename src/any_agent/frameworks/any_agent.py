@@ -6,12 +6,13 @@ from typing import TYPE_CHECKING, Any, assert_never
 
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools.mcp.mcp_server import MCPServerBase
 from any_agent.tools.wrappers import wrap_tools
 from any_agent.tracing import setup_tracing
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 
 class AnyAgent(ABC):
