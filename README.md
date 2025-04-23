@@ -46,7 +46,7 @@ To define any agent system you will always use the same imports:
 ```py
 from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
-For this example we use a model hosted by openai, but you will need to set the API key for whichever model provider being used. See [Our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
+For this example we use a model hosted by openai, but you may need to set the API key for whichever provider being used. See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
 
 ```bash
 export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
