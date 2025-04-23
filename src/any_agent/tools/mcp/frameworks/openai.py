@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
-from contextlib import suppress
+from contextlib import AsyncExitStack, suppress
 from typing import Literal
+
+from pydantic import Field
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.logging import logger
@@ -22,6 +24,7 @@ with suppress(ImportError):
 
 class OpenAIMCPServerBase(MCPServerBase, ABC):
     server: OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None = None
+    exit_stack: AsyncExitStack = Field(default_factory=AsyncExitStack)
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
     def check_dependencies(self) -> None:

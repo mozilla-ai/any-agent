@@ -70,7 +70,6 @@ async def wrap_mcp_server(
     """Generic MCP server wrapper that can work with different frameworks
     based on the specified agent_framework
     """
-    # Select the appropriate manager based on agent_framework
     manager = get_mcp_server(mcp_tool, agent_framework)
     await manager.setup_tools()
 

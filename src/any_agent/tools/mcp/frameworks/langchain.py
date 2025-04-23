@@ -1,7 +1,9 @@
 import os
 from abc import ABC, abstractmethod
-from contextlib import suppress
+from contextlib import AsyncExitStack, suppress
 from typing import Any, Literal
+
+from pydantic import Field
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -18,6 +20,7 @@ with suppress(ImportError):
 
 class LangchainMCPServerBase(MCPServerBase, ABC):
     client: Any | None = None
+    exit_stack: AsyncExitStack = Field(default_factory=AsyncExitStack)
     framework: Literal[AgentFramework.LANGCHAIN] = AgentFramework.LANGCHAIN
 
     def check_dependencies(self) -> None:

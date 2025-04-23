@@ -1,7 +1,9 @@
 import os
 from abc import ABC, abstractmethod
-from contextlib import suppress
+from contextlib import AsyncExitStack, suppress
 from typing import Literal
+
+from pydantic import Field
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -21,6 +23,7 @@ with suppress(ImportError):
 
 class GoogleMCPServerBase(MCPServerBase, ABC):
     server: GoogleMCPToolset | None = None
+    exit_stack: AsyncExitStack = Field(default_factory=AsyncExitStack)
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
 
     def check_dependencies(self) -> None:
