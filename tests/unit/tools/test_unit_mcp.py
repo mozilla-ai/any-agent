@@ -9,11 +9,10 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from pydantic import TypeAdapter
 
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.tools.mcp import MCPServer
+from any_agent.tools import get_mcp_server
 
 
 # Common helper functions for all test classes
@@ -60,9 +59,7 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         mock_client_class.return_value.__enter__.return_value = mock_tools
 
         self.test_tool.tools = None
-        mcp_server = TypeAdapter[MCPServer](MCPServer).validate_python(
-            {"mcp_tool": self.test_tool, "framework": AgentFramework.SMOLAGENTS}
-        )
+        mcp_server = get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
         asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify all tools are included
@@ -83,9 +80,7 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         # Create test tool configuration with specific tools
         self.test_tool.tools = ["read_thing", "write_thing"]
 
-        mcp_server = TypeAdapter[MCPServer](MCPServer).validate_python(
-            {"mcp_tool": self.test_tool, "framework": AgentFramework.SMOLAGENTS}
-        )
+        mcp_server = get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
         asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify only the requested tools are included
@@ -134,9 +129,7 @@ async def test_smolagents_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse")
 
     # Create the server instance
-    server = TypeAdapter[MCPServer](MCPServer).validate_python(
-        {"mcp_tool": mcp_tool, "framework": AgentFramework.SMOLAGENTS}
-    )
+    server = get_mcp_server(mcp_tool, AgentFramework.SMOLAGENTS)
 
     # Patch the MCPClient class to return our mock tools
     with patch(
@@ -175,9 +168,7 @@ async def test_langchain_mcp_sse() -> None:
         patch("mcp.ClientSession") as mock_client_session,
     ):
         # Create the server instance
-        server = TypeAdapter[MCPServer](MCPServer).validate_python(
-            {"mcp_tool": mcp_tool, "framework": AgentFramework.LANGCHAIN}
-        )
+        server = get_mcp_server(mcp_tool, AgentFramework.LANGCHAIN)
 
         # Set up mocks
         mock_transport = (AsyncMock(), AsyncMock())
@@ -217,9 +208,7 @@ async def test_google_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = TypeAdapter[MCPServer](MCPServer).validate_python(
-        {"mcp_tool": mcp_tool, "framework": AgentFramework.GOOGLE}
-    )
+    server = get_mcp_server(mcp_tool, AgentFramework.GOOGLE)
 
     # Mock Google MCP classes
     with (
@@ -271,9 +260,7 @@ async def test_llamaindex_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse", tools=["tool1", "tool2"])
 
     # Create the server instance
-    server = TypeAdapter[MCPServer](MCPServer).validate_python(
-        {"mcp_tool": mcp_tool, "framework": AgentFramework.LLAMA_INDEX}
-    )
+    server = get_mcp_server(mcp_tool, AgentFramework.LLAMA_INDEX)
 
     # Mock LlamaIndex MCP classes
     with (
@@ -326,9 +313,7 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = TypeAdapter[MCPServer](MCPServer).validate_python(
-        {"mcp_tool": mcp_tool, "framework": AgentFramework.AGNO}
-    )
+    server = get_mcp_server(mcp_tool, AgentFramework.AGNO)
 
     # Mock required components
     with (

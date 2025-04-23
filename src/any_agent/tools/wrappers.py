@@ -3,11 +3,9 @@ from collections.abc import Callable, Sequence
 from functools import wraps
 from typing import Any
 
-from pydantic import TypeAdapter
-
 from any_agent.config import AgentFramework, MCPParams, Tool
-from any_agent.tools.mcp import (
-    MCPServer,
+from any_agent.tools import (
+    get_mcp_server,
     MCPServerBase,
 )
 
@@ -73,9 +71,7 @@ async def wrap_mcp_server(
     based on the specified agent_framework
     """
     # Select the appropriate manager based on agent_framework
-    manager = TypeAdapter[MCPServer](MCPServer).validate_python(
-        {"mcp_tool": mcp_tool, "framework": agent_framework}
-    )
+    manager = get_mcp_server(mcp_tool, agent_framework)
     await manager.setup_tools()
 
     return manager

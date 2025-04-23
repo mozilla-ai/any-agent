@@ -7,6 +7,7 @@ from .mcp import (
     MCPServerBase,
     OpenAIMCPServer,
     SmolagentsMCPServer,
+    get_mcp_server,
 )
 from .user_interaction import (
     ask_user_verification,
@@ -34,4 +35,5 @@ __all__ = [
     "visit_webpage",
     "wrap_mcp_server",
     "wrap_tools",
+    "get_mcp_server",
 ]

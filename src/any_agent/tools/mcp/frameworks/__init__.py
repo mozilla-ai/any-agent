@@ -1,3 +1,6 @@
+from pydantic import TypeAdapter
+from any_agent.config import MCPParams, AgentFramework
+
 from .agno import AgnoMCPServer
 from .google import GoogleMCPServer
 from .langchain import LangchainMCPServer
@@ -14,6 +17,12 @@ MCPServer = (
     | SmolagentsMCPServer
 )
 
+def get_mcp_server(mcp_tool: MCPParams, agent_framework: AgentFramework) -> MCPServer:
+    return TypeAdapter[MCPServer](MCPServer).validate_python(
+        {"mcp_tool": mcp_tool, "framework": agent_framework}
+    )
+
+
 __all__ = [
     "AgnoMCPServer",
     "GoogleMCPServer",
@@ -22,4 +31,5 @@ __all__ = [
     "MCPServer",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
+    "get_mcp_server",
 ]
