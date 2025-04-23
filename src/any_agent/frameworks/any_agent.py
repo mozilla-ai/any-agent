@@ -13,8 +13,6 @@ from any_agent.tracing import setup_tracing
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from any_agent.tools.mcp import MCPServer
-
 
 class AnyAgent(ABC):
     """Base abstract class for all agent implementations.
