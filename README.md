@@ -53,7 +53,7 @@ from any_agent import AgentConfig, AnyAgent, TracingConfig
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "llama_index",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
@@ -71,7 +71,7 @@ agent.run("Which Agent Framework is the best??")
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "llama_index",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="You are the main agent. Use the other available agents to find an answer",

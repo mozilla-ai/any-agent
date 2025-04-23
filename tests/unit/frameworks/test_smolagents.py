@@ -76,3 +76,34 @@ def test_load_smolagents_agent_missing() -> None:
     with patch("any_agent.frameworks.smolagents.smolagents_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.SMOLAGENTS, AgentConfig(model_id="gpt-4o"))
+
+
+def test_multi_agent_wrong_agent_type() -> None:
+    """Test that creating a multi-agent system with wrong agent type raises ValueError."""
+    mock_agent = MagicMock()
+    mock_model = MagicMock()
+    mock_tool = MagicMock()
+
+    with (
+        patch(f"smolagents.{DEFAULT_AGENT_TYPE}", mock_agent),
+        patch(f"smolagents.{DEFAULT_MODEL_CLASS}", mock_model),
+        patch("smolagents.tool", mock_tool),
+    ):
+        # Attempt to create a multi-agent system with incorrect agent_type (not ToolCallingAgent)
+        with pytest.raises(
+            ValueError,
+            match="Currently, the main agent in a multiagent system must be of type ToolCallingAgent",
+        ):
+            AnyAgent.create(
+                AgentFramework.SMOLAGENTS,
+                AgentConfig(
+                    model_id="openai/o3-mini",
+                    agent_type="CodeAgent",  # Wrong agent type for multi-agent system
+                ),
+                managed_agents=[
+                    AgentConfig(
+                        name="helper_agent",
+                        model_id="openai/o3-mini",
+                    )
+                ],
+            )

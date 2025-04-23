@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 
 DEFAULT_AGENT_TYPE = "CodeAgent"
+DEFAULT_MULTI_AGENT_TYPE = "ToolCallingAgent"
 DEFAULT_MODEL_CLASS = "LiteLLMModel"
 
 
@@ -50,12 +51,25 @@ class SmolagentsAgent(AnyAgent):
 
         tools, _ = await self._load_tools(self.config.tools)
 
+        main_agent_type = getattr(
+            smolagents,
+            self.config.agent_type or DEFAULT_AGENT_TYPE,
+        )
         managed_agents_instanced = []
         if self.managed_agents:
+            if self.config.agent_type != "ToolCallingAgent":
+                msg = "Currently, the main agent in a multiagent system must be of type ToolCallingAgent"
+                raise ValueError(msg)
             for managed_agent in self.managed_agents:
+                if managed_agent.agent_type:
+                    if managed_agent.agent_type != "ToolCallingAgent":
+                        msg = (
+                            "Currently, managed agents must be of type ToolCallingAgent"
+                        )
+                        raise ValueError(msg)
                 agent_type = getattr(
                     smolagents,
-                    managed_agent.agent_type or DEFAULT_AGENT_TYPE,
+                    managed_agent.agent_type or DEFAULT_MULTI_AGENT_TYPE,
                 )
                 managed_tools, _ = await self._load_tools(managed_agent.tools)
                 managed_agent_instance = agent_type(
@@ -71,11 +85,6 @@ class SmolagentsAgent(AnyAgent):
                         managed_agent.instructions
                     )
                 managed_agents_instanced.append(managed_agent_instance)
-
-        main_agent_type = getattr(
-            smolagents,
-            self.config.agent_type or DEFAULT_AGENT_TYPE,
-        )
 
         self._agent: MultiStepAgent = main_agent_type(
             name=self.config.name,
