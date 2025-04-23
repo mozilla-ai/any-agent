@@ -46,6 +46,11 @@ To define any agent system you will always use the same imports:
 ```py
 from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
+For this example we use OPENAI but you will need to set the API key for whichever model provider being used.
+
+```bash
+export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
+```
 
 ### Single agent
 
