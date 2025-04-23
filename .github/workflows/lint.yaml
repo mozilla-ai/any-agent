@@ -29,4 +29,4 @@ jobs:
           key: pre-commit-4|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: pre-commit
-        run: pre-commit autoupdate
+        run: pre-commit run --all-files

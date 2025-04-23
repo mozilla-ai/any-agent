@@ -20,14 +20,9 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install pre-commit
-        run: pip install pre-commit
+      - run: pip install pre-commit
 
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit/
-          key: pre-commit-4|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
-
+      - run: pre-commit autoupdate
 
       - uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         if: always()
