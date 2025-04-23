@@ -1,25 +1,34 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
+from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from contextlib import suppress
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-from any_agent.config import Tool
-
-from .frameworks import MCPFrameworkConnection
+from any_agent.config import AgentFramework, MCPParams, Tool
 
 
-class MCPServer(BaseModel):
-    """Base class for MCP tools managers across different frameworks."""
+class MCPServerBase(BaseModel, ABC):
+    mcp_tool: MCPParams
+    framework: AgentFramework
+    mcp_available: bool = False
+    libraries: str = ""
 
-    mcp_connection: MCPFrameworkConnection
     tools: Sequence[Tool] = Field(default_factory=list)
 
-    def model_post_init(self, context: Any) -> None:
-        self.mcp_connection.check_dependencies()
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    async def setup_tools(self) -> None:
-        """Set up tools. To be implemented by subclasses."""
-        self.tools = await self.mcp_connection.setup()
+    def model_post_init(self, context: Any) -> None:
+        self.check_dependencies()
+
+    @abstractmethod
+    def setup_tools(self) -> None: ...
+
+    @abstractmethod
+    def check_dependencies(self) -> None:
+        if self.mcp_available:
+            return
+
+        msg = f"You need to `pip install '{self.libraries}'` to use MCP."
+        raise ImportError(msg)

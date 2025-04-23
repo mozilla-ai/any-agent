@@ -1,11 +1,12 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
 import os
-from contextlib import suppress
+from abc import ABC, abstractmethod
+from contextlib import AsyncExitStack, suppress
+from typing import Literal
 
-from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
-
-from .mcp_server_base import MCPServerBase
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
+from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
 with suppress(ImportError):
@@ -15,39 +16,52 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class LlamaIndexMCPServer(MCPServerBase):
-    """Implementation of MCP tools manager for Google agents."""
+class LlamaIndexMCPServerBase(MCPServerBase, ABC):
+    client: LlamaIndexMCPClient | None = None
+    exit_stack: AsyncExitStack = AsyncExitStack()
+    framework: Literal[AgentFramework.LLAMA_INDEX] = AgentFramework.LLAMA_INDEX
 
-    def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool, "any-agent[mcp,llama_index]", mcp_available)
-        self.client: LlamaIndexMCPClient | None = None
+    def check_dependencies(self) -> None:
+        """Check if the required dependencies for the MCP server are available."""
+        self.libraries = "any-agent[mcp,llama_index]"
+        self.mcp_available = mcp_available
+        super().check_dependencies()
 
-    async def setup_stdio_tools(self) -> None:
-        if not isinstance(self.mcp_tool, MCPStdioParams):
-            msg = "MCP tool parameters must be of type MCPStdioParams for stdio server."
-            raise ValueError(msg)
-        self.client = LlamaIndexMCPClient(
-            command_or_url=self.mcp_tool.command,
-            args=self.mcp_tool.args,
-            env={**os.environ},
-        )
-
-    async def setup_sse_tools(self) -> None:
-        if not isinstance(self.mcp_tool, MCPSseParams):
-            msg = "MCP tool parameters must be of type MCPSseParams for SSE server."
-            raise ValueError(msg)
-        self.client = LlamaIndexMCPClient(command_or_url=self.mcp_tool.url)
-
+    @abstractmethod
     async def setup_tools(self) -> None:
-        """Set up the Google MCP server with the provided configuration."""
-        await super().setup_tools()
-
+        """Set up the LlamaIndex MCP server with the provided configuration."""
         if not self.client:
-            msg = "MCP client is not set up. Please call setup_stdio_tools or setup_sse_tools first."
+            msg = "MCP client is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
+
         mcp_tool_spec = LlamaIndexMcpToolSpec(
             client=self.client,
-            allowed_tools=self.mcp_tool.tools,
+            allowed_tools=list(self.mcp_tool.tools or []),
         )
 
         self.tools = await mcp_tool_spec.to_tool_list_async()
+
+
+class LlamaIndexMCPServerStdio(LlamaIndexMCPServerBase):
+    mcp_tool: MCPStdioParams
+
+    async def setup_tools(self) -> None:
+        self.client = LlamaIndexMCPClient(
+            command_or_url=self.mcp_tool.command,
+            args=list(self.mcp_tool.args),
+            env={**os.environ},
+        )
+
+        await super().setup_tools()
+
+
+class LlamaIndexMCPServerSse(LlamaIndexMCPServerBase):
+    mcp_tool: MCPSseParams
+
+    async def setup_tools(self) -> None:
+        self.client = LlamaIndexMCPClient(command_or_url=self.mcp_tool.url)
+
+        await super().setup_tools()
+
+
+LlamaIndexMCPServer = LlamaIndexMCPServerStdio | LlamaIndexMCPServerSse

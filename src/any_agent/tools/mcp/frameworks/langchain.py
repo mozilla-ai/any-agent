@@ -1,12 +1,12 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
 import os
+from abc import ABC, abstractmethod
 from contextlib import AsyncExitStack, suppress
-from typing import Any
+from typing import Any, Literal
 
-from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
-
-from .mcp_server_base import MCPServerBase
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
+from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
 with suppress(ImportError):
@@ -18,21 +18,38 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class LangchainMCPServer(MCPServerBase):
-    """Implementation of MCP tools manager for LangChain agents."""
+class LangchainMCPServerBase(MCPServerBase, ABC):
+    client: Any | None = None
+    exit_stack: AsyncExitStack = AsyncExitStack()
+    framework: Literal[AgentFramework.LANGCHAIN] = AgentFramework.LANGCHAIN
 
-    def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool, "any-agent[mcp,langchain]", mcp_available)
-        self.client: Any | None = None
-        self.tools = []
-        self.session: ClientSession = None
-        self.exit_stack = AsyncExitStack()
+    def check_dependencies(self) -> None:
+        """Check if the required dependencies for the MCP server are available."""
+        self.libraries = "any-agent[mcp,langchain]"
+        self.mcp_available = mcp_available
+        super().check_dependencies()
 
-    async def setup_stdio_tools(self) -> None:
-        if not isinstance(self.mcp_tool, MCPStdioParams):
-            msg = "MCP tool parameters must be of type MCPStdioParams for stdio server."
+    @abstractmethod
+    async def setup_tools(self) -> None:
+        """Set up the LangChain MCP server with the provided configuration."""
+        if not self.client:
+            msg = "MCP client is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
+        
+        stdio, write = await self.exit_stack.enter_async_context(self.client)
 
+        client_session = ClientSession(stdio, write)
+        session = await self.exit_stack.enter_async_context(client_session)
+
+        await session.initialize()
+        # List available tools
+        self.tools = await load_mcp_tools(session)
+
+
+class LangchainMCPServerStdio(LangchainMCPServerBase):
+    mcp_tool: MCPStdioParams
+
+    async def setup_tools(self) -> None:
         server_params = StdioServerParameters(
             command=self.mcp_tool.command,
             args=self.mcp_tool.args,
@@ -41,28 +58,19 @@ class LangchainMCPServer(MCPServerBase):
 
         self.client = stdio_client(server_params)
 
-    async def setup_sse_tools(self) -> None:
-        if not isinstance(self.mcp_tool, MCPSseParams):
-            msg = "MCP tool parameters must be of type MCPSseParams for SSE server."
-            raise ValueError(msg)
-
-        self.client = sse_client(
-            url=self.mcp_tool.url,
-            headers=self.mcp_tool.headers,
-        )
-
-    async def setup_tools(self) -> None:
-        """Set up the LangChain MCP server with the provided configuration."""
         await super().setup_tools()
 
-        if not self.client:
-            msg = "MCP client is not set up. Please call setup_stdio_tools or setup_sse_tools first."
-            raise ValueError(msg)
-        stdio, write = await self.exit_stack.enter_async_context(self.client)
 
-        client_session = ClientSession(stdio, write)
-        self.session = await self.exit_stack.enter_async_context(client_session)
+class LangchainMCPServerSse(LangchainMCPServerBase):
+    mcp_tool: MCPSseParams
 
-        await self.session.initialize()
-        # List available tools
-        self.tools = await load_mcp_tools(self.session)
+    async def setup_tools(self) -> None:
+        self.client = sse_client(
+            url=self.mcp_tool.url,
+            headers=dict(self.mcp_tool.headers or {}),
+        )
+
+        await super().setup_tools()
+
+
+LangchainMCPServer = LangchainMCPServerStdio | LangchainMCPServerSse

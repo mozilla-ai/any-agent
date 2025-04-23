@@ -5,14 +5,16 @@ from .llama_index import LlamaIndexMCPServer
 from .openai import OpenAIMCPServer
 from .smolagents import SmolagentsMCPServer
 
-MCPFrameworkConnection = AgnoMCPServer
+MCPServer = (
+    AgnoMCPServer | GoogleMCPServer | LangchainMCPServer | LlamaIndexMCPServer | OpenAIMCPServer | SmolagentsMCPServer
+)
 
 __all__ = [
     "AgnoMCPServer",
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
-    "MCPFrameworkConnection",
+    "MCPServer",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
 ]

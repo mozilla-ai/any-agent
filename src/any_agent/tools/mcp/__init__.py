@@ -5,15 +5,16 @@ from .frameworks import (
     LlamaIndexMCPServer,
     OpenAIMCPServer,
     SmolagentsMCPServer,
+    MCPServer,
 )
-from .mcp_server import MCPServer
+from .mcp_server import MCPServerBase
 
 __all__ = [
     "AgnoMCPServer",
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
-    "MCPServer",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
+    "MCPServer",
 ]

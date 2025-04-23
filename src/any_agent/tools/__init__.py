@@ -3,9 +3,10 @@ from .mcp import (
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
-    MCPServerBase,
     OpenAIMCPServer,
     SmolagentsMCPServer,
+    MCPServerBase,
+    MCPServer,
 )
 from .user_interaction import (
     ask_user_verification,
@@ -21,7 +22,6 @@ __all__ = [
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
-    "MCPServerBase",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
     "ask_user_verification",
@@ -32,4 +32,6 @@ __all__ = [
     "visit_webpage",
     "wrap_mcp_server",
     "wrap_tools",
+    "MCPServerBase",
+    "MCPServer",
 ]

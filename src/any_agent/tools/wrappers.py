@@ -3,15 +3,12 @@ from collections.abc import Callable, Sequence
 from functools import wraps
 from typing import Any
 
+from pydantic import TypeAdapter
+
 from any_agent.config import AgentFramework, MCPParams, Tool
 from any_agent.tools.mcp import (
-    AgnoMCPServer,
-    GoogleMCPServer,
-    LangchainMCPServer,
-    LlamaIndexMCPServer,
+    MCPServerBase,
     MCPServer,
-    OpenAIMCPServer,
-    SmolagentsMCPServer,
 )
 
 
@@ -71,26 +68,14 @@ def wrap_tool_agno(tool: Tool) -> Any:
 async def wrap_mcp_server(
     mcp_tool: MCPParams,
     agent_framework: AgentFramework,
-) -> MCPServer:
+) -> MCPServerBase:
     """Generic MCP server wrapper that can work with different frameworks
     based on the specified agent_framework
     """
     # Select the appropriate manager based on agent_framework
-    mcp_server_map: dict[AgentFramework, type[MCPServer]] = {
-        AgentFramework.OPENAI: OpenAIMCPServer,
-        AgentFramework.SMOLAGENTS: SmolagentsMCPServer,
-        AgentFramework.LANGCHAIN: LangchainMCPServer,
-        AgentFramework.GOOGLE: GoogleMCPServer,
-        AgentFramework.LLAMA_INDEX: LlamaIndexMCPServer,
-        AgentFramework.AGNO: AgnoMCPServer,
-    }
-    if agent_framework not in mcp_server_map:
-        msg = f"Unsupported agent type: {agent_framework}. Currently supported types are: {list(mcp_server_map.keys())}"
-        raise NotImplementedError(msg)
-
-    # Create the manager instance which will manage the MCP tool context
-    manager_class = mcp_server_map[agent_framework]
-    manager = manager_class(mcp_tool)
+    manager = TypeAdapter[MCPServer](MCPServer).validate_python(
+        {"mcp_tool": mcp_tool, "framework": agent_framework}
+    )
     await manager.setup_tools()
 
     return manager
@@ -134,11 +119,11 @@ def verify_callable(tool: Callable[..., Any]) -> None:
 async def wrap_tools(
     tools: Sequence[Tool],
     agent_framework: AgentFramework,
-) -> tuple[list[Tool], list[MCPServer]]:
+) -> tuple[list[Tool], list[MCPServerBase]]:
     wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = list[Tool]()
-    mcp_servers = list[MCPServer]()
+    mcp_servers = list[MCPServerBase]()
     for tool in tools:
         # if it's MCPStdioParams or MCPSseParams, we need to wrap it in a server
         if isinstance(tool, MCPParams):

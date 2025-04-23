@@ -1,11 +1,12 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
+from abc import ABC, abstractmethod
 from contextlib import AsyncExitStack, suppress
+from typing import Literal
 
-from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams
 from any_agent.logging import logger
-
-from .mcp_server_base import MCPServerBase
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
+from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
 with suppress(ImportError):
@@ -21,21 +22,36 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class OpenAIMCPServer(MCPServerBase):
-    """Implementation of MCP tools manager for OpenAI agents."""
+class OpenAIMCPServerBase(MCPServerBase, ABC):
+    server: OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None = None
+    exit_stack: AsyncExitStack = AsyncExitStack()
+    framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
-    def __init__(self, mcp_tool: MCPParams):
-        super().__init__(mcp_tool, "any-agent[mcp,openai]", mcp_available)
-        self.server: (
-            OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None
-        ) = None
-        self.exit_stack = AsyncExitStack()
+    def check_dependencies(self) -> None:
+        """Check if the required dependencies for the MCP server are available."""
+        self.libraries = "any-agent[mcp,openai]"
+        self.mcp_available = mcp_available
+        super().check_dependencies()
 
-    async def setup_stdio_tools(self) -> None:
-        if not isinstance(self.mcp_tool, MCPStdioParams):
-            msg = "MCP tool parameters must be of type MCPStdioParams for stdio server."
+    @abstractmethod
+    async def setup_tools(self) -> None:
+        """Set up the OpenAI MCP server with the provided configuration."""
+        if not self.server:
+            msg = "MCP server is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
+        await self.exit_stack.enter_async_context(self.server)
+        # Get tools from the server
+        logger.warning(
+            "OpenAI MCP currently does not support filtering MCP available tools",
+        )
+        self.tools = await self.server.list_tools()
+
+
+class OpenAIMCPServerStdio(OpenAIMCPServerBase):
+    mcp_tool: MCPStdioParams
+
+    async def setup_tools(self) -> None:
         params = OpenAIInternalMCPServerStdioParams(
             command=self.mcp_tool.command,
             args=self.mcp_tool.args,
@@ -46,28 +62,20 @@ class OpenAIMCPServer(MCPServerBase):
             params=params,
         )
 
-    async def setup_sse_tools(self) -> None:
-        if not isinstance(self.mcp_tool, MCPSseParams):
-            msg = "MCP tool parameters must be of type MCPSseParams for SSE server."
-            raise ValueError(msg)
+        await super().setup_tools()
 
+
+class OpenAIMCPServerSse(OpenAIMCPServerBase):
+    mcp_tool: MCPSseParams
+
+    async def setup_tools(self) -> None:
         params = OpenAIInternalMCPServerSseParams(url=self.mcp_tool.url)
 
         self.server = OpenAIInternalMCPServerSse(
             name="OpenAI MCP Server", params=params
         )
 
-    async def setup_tools(self) -> None:
-        """Set up the OpenAI MCP server with the provided configuration."""
         await super().setup_tools()
 
-        if not self.server:
-            msg = "MCP server is not set up. Please call setup_stdio_tools or setup_sse_tools first."
-            raise ValueError(msg)
 
-        await self.exit_stack.enter_async_context(self.server)
-        # Get tools from the server
-        self.tools = await self.server.list_tools()
-        logger.warning(
-            "OpenAI MCP currently does not support filtering MCP available tools",
-        )
+OpenAIMCPServer = OpenAIMCPServerStdio | OpenAIMCPServerSse

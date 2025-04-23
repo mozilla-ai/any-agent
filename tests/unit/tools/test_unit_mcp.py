@@ -13,14 +13,8 @@ from pydantic import TypeAdapter
 
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.tools.mcp import (
-    GoogleMCPServer,
-    LangchainMCPServer,
-    LlamaIndexMCPServer,
-    SmolagentsMCPServer,
-)
-from any_agent.tools.mcp.frameworks import MCPFrameworkConnection
-from any_agent.tools.mcp.mcp_server import MCPServer
+
+from any_agent.tools.mcp import MCPServer
 
 
 # Common helper functions for all test classes
@@ -44,7 +38,7 @@ def create_specific_mock_tools() -> list[MagicMock]:
     return [mock_read_tool, mock_write_tool, mock_other_tool]
 
 
-@patch("any_agent.tools.mcp.smolagents.MCPClient")
+@patch("any_agent.tools.mcp.frameworks.smolagents.MCPClient")
 class TestSmolagentsMCPServer(unittest.TestCase):
     """Tests for the SmolagentsMCPServer class."""
 
@@ -63,8 +57,13 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         # Setup mock tools
         mock_tools = create_mock_tools()
 
+        # Setup mock MCPClient context manager behavior
+        mock_client_class.return_value.__enter__.return_value = mock_tools
+
         self.test_tool.tools = None
-        mcp_server = SmolagentsMCPServer(self.test_tool)
+        mcp_server = TypeAdapter[MCPServer](MCPServer).validate_python(
+            {"mcp_tool": self.test_tool, "framework": AgentFramework.SMOLAGENTS}
+        )
         asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify all tools are included
@@ -85,7 +84,9 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         # Create test tool configuration with specific tools
         self.test_tool.tools = ["read_thing", "write_thing"]
 
-        mcp_server = SmolagentsMCPServer(self.test_tool)
+        mcp_server = TypeAdapter[MCPServer](MCPServer).validate_python(
+            {"mcp_tool": self.test_tool, "framework": AgentFramework.SMOLAGENTS}
+        )
         asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
 
         # Verify only the requested tools are included
@@ -108,7 +109,7 @@ def test_openai_mcpsse() -> None:
 
     # Path the imports and class
     with patch(
-        "any_agent.tools.mcp.openai.OpenAIInternalMCPServerSse",
+        "any_agent.tools.mcp.frameworks.openai.OpenAIInternalMCPServerSse",
         return_value=mock_server,
     ):
         # Set up tools config for agent
@@ -134,10 +135,12 @@ async def test_smolagents_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse")
 
     # Create the server instance
-    server = SmolagentsMCPServer(mcp_tool)
+    server = TypeAdapter[MCPServer](MCPServer).validate_python(
+        {"mcp_tool": mcp_tool, "framework": AgentFramework.SMOLAGENTS}
+    )
 
     # Patch the MCPClient class to return our mock tools
-    with patch("any_agent.tools.mcp.smolagents.MCPClient") as mock_client_class:
+    with patch("any_agent.tools.mcp.frameworks.smolagents.MCPClient") as mock_client_class:
         # Setup the mock to return our tools when used as a context manager
         mock_client_class.return_value.__enter__.return_value = mock_tools
 
@@ -165,11 +168,13 @@ async def test_langchain_mcp_sse() -> None:
 
     # Mock required components
     with (
-        patch("any_agent.tools.mcp.langchain.load_mcp_tools") as mock_load_tools,
+        patch("any_agent.tools.mcp.frameworks.langchain.load_mcp_tools") as mock_load_tools,
         patch("mcp.ClientSession") as mock_client_session,
     ):
         # Create the server instance
-        server = LangchainMCPServer(mcp_tool)
+        server = TypeAdapter[MCPServer](MCPServer).validate_python(
+            {"mcp_tool": mcp_tool, "framework": AgentFramework.LANGCHAIN}
+        )
 
         # Set up mocks
         mock_transport = (AsyncMock(), AsyncMock())
@@ -209,13 +214,15 @@ async def test_google_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = GoogleMCPServer(mcp_tool)
+    server = TypeAdapter[MCPServer](MCPServer).validate_python(
+        {"mcp_tool": mcp_tool, "framework": AgentFramework.GOOGLE}
+    )
 
     # Mock Google MCP classes
     with (
-        patch("any_agent.tools.mcp.google.GoogleMCPToolset") as mock_toolset_class,
+        patch("any_agent.tools.mcp.frameworks.google.GoogleMCPToolset") as mock_toolset_class,
         patch(
-            "any_agent.tools.mcp.google.GoogleSseServerParameters"
+            "any_agent.tools.mcp.frameworks.google.GoogleSseServerParameters"
         ) as mock_sse_params,
     ):
         # Set up mock toolset
@@ -259,15 +266,17 @@ async def test_llamaindex_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse", tools=["tool1", "tool2"])
 
     # Create the server instance
-    server = LlamaIndexMCPServer(mcp_tool)
+    server = TypeAdapter[MCPServer](MCPServer).validate_python(
+        {"mcp_tool": mcp_tool, "framework": AgentFramework.LLAMA_INDEX}
+    )
 
     # Mock LlamaIndex MCP classes
     with (
         patch(
-            "any_agent.tools.mcp.llama_index.LlamaIndexMCPClient"
+            "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMCPClient"
         ) as mock_client_class,
         patch(
-            "any_agent.tools.mcp.llama_index.LlamaIndexMcpToolSpec"
+            "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMcpToolSpec"
         ) as mock_tool_spec_class,
     ):
         # Set up mock client and tool spec
@@ -312,10 +321,9 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    mcp_connection = TypeAdapter(MCPFrameworkConnection).validate_python(
+    server = TypeAdapter(MCPServer).validate_python(
         {"mcp_tool": mcp_tool, "framework": AgentFramework.AGNO}
     )
-    server = MCPServer(mcp_connection=mcp_connection)
 
     # Mock required components
     with (
@@ -349,4 +357,4 @@ async def test_agno_mcp_sse() -> None:
             )
 
             # Check that tools instance was set as server
-            assert server.mcp_connection.server == mock_tools_instance
+            assert server.server == mock_tools_instance
