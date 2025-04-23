@@ -7,8 +7,8 @@ from pydantic import TypeAdapter
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 from any_agent.tools.mcp import (
-    MCPServerBase,
     MCPServer,
+    MCPServerBase,
 )
 
 

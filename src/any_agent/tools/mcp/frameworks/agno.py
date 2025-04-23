@@ -1,13 +1,11 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
-from abc import ABC, abstractmethod
 import os
+from abc import ABC, abstractmethod
 from contextlib import AsyncExitStack, suppress
 from typing import Literal
 
-from pydantic import ConfigDict
-
-from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False

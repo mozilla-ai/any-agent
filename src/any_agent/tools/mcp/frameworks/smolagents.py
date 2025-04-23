@@ -1,20 +1,21 @@
 """Tools for managing MCP (Model Context Protocol) connections and resources."""
 
-from collections.abc import Sequence
-from abc import ABC, abstractmethod
 import os
+from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from contextlib import AsyncExitStack, suppress
 from textwrap import dedent
 from typing import Literal
 
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.logging import logger
-from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
-    from smolagents.mcp_client import MCPClient, Tool as SmolagentsTool
+    from smolagents.mcp_client import MCPClient
+    from smolagents.mcp_client import Tool as SmolagentsTool
 
     mcp_available = True
 
@@ -45,7 +46,7 @@ class SmolagentsMCPServerBase(MCPServerBase, ABC):
             )
             logger.info("Tools available: %s", self.smolagent_tools)
             self.tools = self.smolagent_tools
-            return 
+            return
 
         filtered_tools = [
             tool for tool in self.smolagent_tools if tool.name in requested_tools

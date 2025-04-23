@@ -6,7 +6,12 @@ from .openai import OpenAIMCPServer
 from .smolagents import SmolagentsMCPServer
 
 MCPServer = (
-    AgnoMCPServer | GoogleMCPServer | LangchainMCPServer | LlamaIndexMCPServer | OpenAIMCPServer | SmolagentsMCPServer
+    AgnoMCPServer
+    | GoogleMCPServer
+    | LangchainMCPServer
+    | LlamaIndexMCPServer
+    | OpenAIMCPServer
+    | SmolagentsMCPServer
 )
 
 __all__ = [

@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from contextlib import AsyncExitStack, suppress
 from typing import Any, Literal
 
-from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
@@ -35,7 +35,7 @@ class LangchainMCPServerBase(MCPServerBase, ABC):
         if not self.client:
             msg = "MCP client is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
-        
+
         stdio, write = await self.exit_stack.enter_async_context(self.client)
 
         client_session = ClientSession(stdio, write)

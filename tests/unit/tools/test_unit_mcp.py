@@ -13,7 +13,6 @@ from pydantic import TypeAdapter
 
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
-
 from any_agent.tools.mcp import MCPServer
 
 
@@ -140,7 +139,9 @@ async def test_smolagents_mcp_sse() -> None:
     )
 
     # Patch the MCPClient class to return our mock tools
-    with patch("any_agent.tools.mcp.frameworks.smolagents.MCPClient") as mock_client_class:
+    with patch(
+        "any_agent.tools.mcp.frameworks.smolagents.MCPClient"
+    ) as mock_client_class:
         # Setup the mock to return our tools when used as a context manager
         mock_client_class.return_value.__enter__.return_value = mock_tools
 
@@ -168,7 +169,9 @@ async def test_langchain_mcp_sse() -> None:
 
     # Mock required components
     with (
-        patch("any_agent.tools.mcp.frameworks.langchain.load_mcp_tools") as mock_load_tools,
+        patch(
+            "any_agent.tools.mcp.frameworks.langchain.load_mcp_tools"
+        ) as mock_load_tools,
         patch("mcp.ClientSession") as mock_client_session,
     ):
         # Create the server instance
@@ -220,7 +223,9 @@ async def test_google_mcp_sse() -> None:
 
     # Mock Google MCP classes
     with (
-        patch("any_agent.tools.mcp.frameworks.google.GoogleMCPToolset") as mock_toolset_class,
+        patch(
+            "any_agent.tools.mcp.frameworks.google.GoogleMCPToolset"
+        ) as mock_toolset_class,
         patch(
             "any_agent.tools.mcp.frameworks.google.GoogleSseServerParameters"
         ) as mock_sse_params,

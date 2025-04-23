@@ -3,9 +3,9 @@ from .frameworks import (
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
+    MCPServer,
     OpenAIMCPServer,
     SmolagentsMCPServer,
-    MCPServer,
 )
 from .mcp_server import MCPServerBase
 
@@ -14,7 +14,7 @@ __all__ = [
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
+    "MCPServer",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
-    "MCPServer",
 ]
