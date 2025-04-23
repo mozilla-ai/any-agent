@@ -12,7 +12,7 @@ from any_agent.tracing import setup_tracing
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from any_agent.tools.mcp.mcp_server import MCPServerBase
+    from any_agent.tools.mcp import MCPServer
 
 
 class AnyAgent(ABC):
@@ -30,11 +30,11 @@ class AnyAgent(ABC):
         self.managed_agents = managed_agents
         self._agent = None
         self.trace_filepath: str | None = None
-        self._mcp_servers: list[MCPServerBase] = []
+        self._mcp_servers: list[MCPServer] = []
 
     async def _load_tools(
         self, tools: Sequence[Tool]
-    ) -> tuple[list[Any], list[MCPServerBase]]:
+    ) -> tuple[list[Any], list[MCPServer]]:
         tools, mcp_servers = await wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
