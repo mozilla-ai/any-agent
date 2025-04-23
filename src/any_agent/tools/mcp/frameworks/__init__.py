@@ -1,5 +1,6 @@
 from pydantic import TypeAdapter
-from any_agent.config import MCPParams, AgentFramework
+
+from any_agent.config import AgentFramework, MCPParams
 
 from .agno import AgnoMCPServer
 from .google import GoogleMCPServer
@@ -16,6 +17,7 @@ MCPServer = (
     | OpenAIMCPServer
     | SmolagentsMCPServer
 )
+
 
 def get_mcp_server(mcp_tool: MCPParams, agent_framework: AgentFramework) -> MCPServer:
     return TypeAdapter[MCPServer](MCPServer).validate_python(

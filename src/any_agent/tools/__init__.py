@@ -28,6 +28,7 @@ __all__ = [
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
     "ask_user_verification",
+    "get_mcp_server",
     "search_web",
     "send_console_message",
     "show_final_answer",
@@ -35,5 +36,4 @@ __all__ = [
     "visit_webpage",
     "wrap_mcp_server",
     "wrap_tools",
-    "get_mcp_server",
 ]
