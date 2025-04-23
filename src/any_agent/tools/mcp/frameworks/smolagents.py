@@ -1,11 +1,9 @@
 import os
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from contextlib import AsyncExitStack, suppress
+from contextlib import suppress
 from textwrap import dedent
 from typing import Literal
-
-from pydantic import Field
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.logging import logger
@@ -22,7 +20,6 @@ with suppress(ImportError):
 
 class SmolagentsMCPServerBase(MCPServerBase, ABC):
     smolagent_tools: Sequence["SmolagentsTool"] | None = None
-    exit_stack: AsyncExitStack = Field(default_factory=AsyncExitStack)
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
 
     def check_dependencies(self) -> None:
@@ -72,7 +69,7 @@ class SmolagentsMCPServerStdio(SmolagentsMCPServerBase):
             args=list(self.mcp_tool.args),
             env={**os.environ},
         )
-        self.smolagent_tools = self.exit_stack.enter_context(
+        self.smolagent_tools = self._exit_stack.enter_context(
             MCPClient(server_parameters)
         )
 
@@ -86,7 +83,7 @@ class SmolagentsMCPServerSse(SmolagentsMCPServerBase):
         server_parameters = {
             "url": self.mcp_tool.url,
         }
-        self.smolagent_tools = self.exit_stack.enter_context(
+        self.smolagent_tools = self._exit_stack.enter_context(
             MCPClient(server_parameters)
         )
 

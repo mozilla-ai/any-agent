@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from contextlib import AsyncExitStack
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 
@@ -13,6 +14,7 @@ class MCPServerBase(BaseModel, ABC):
     mcp_available: bool = False
     libraries: str = ""
 
+    _exit_stack: AsyncExitStack = PrivateAttr(default_factory=AsyncExitStack)
     tools: Sequence[Tool] = Field(default_factory=list)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)

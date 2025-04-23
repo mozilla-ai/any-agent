@@ -1,9 +1,7 @@
 import os
 from abc import ABC, abstractmethod
-from contextlib import AsyncExitStack, suppress
+from contextlib import suppress
 from typing import Any, Literal
-
-from pydantic import Field
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -20,7 +18,6 @@ with suppress(ImportError):
 
 class LangchainMCPServerBase(MCPServerBase, ABC):
     client: Any | None = None
-    exit_stack: AsyncExitStack = Field(default_factory=AsyncExitStack)
     framework: Literal[AgentFramework.LANGCHAIN] = AgentFramework.LANGCHAIN
 
     def check_dependencies(self) -> None:
@@ -36,10 +33,10 @@ class LangchainMCPServerBase(MCPServerBase, ABC):
             msg = "MCP client is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
-        stdio, write = await self.exit_stack.enter_async_context(self.client)
+        stdio, write = await self._exit_stack.enter_async_context(self.client)
 
         client_session = ClientSession(stdio, write)
-        session = await self.exit_stack.enter_async_context(client_session)
+        session = await self._exit_stack.enter_async_context(client_session)
 
         await session.initialize()
         # List available tools

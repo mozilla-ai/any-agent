@@ -1,9 +1,7 @@
 import os
 from abc import ABC, abstractmethod
-from contextlib import AsyncExitStack, suppress
+from contextlib import suppress
 from typing import Literal
-
-from pydantic import Field
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -23,7 +21,6 @@ with suppress(ImportError):
 
 class GoogleMCPServerBase(MCPServerBase, ABC):
     server: GoogleMCPToolset | None = None
-    exit_stack: AsyncExitStack = Field(default_factory=AsyncExitStack)
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
 
     def check_dependencies(self) -> None:
@@ -39,7 +36,7 @@ class GoogleMCPServerBase(MCPServerBase, ABC):
             msg = "MCP server is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
-        await self.exit_stack.enter_async_context(self.server)
+        await self._exit_stack.enter_async_context(self.server)
         self.tools = await self.server.load_tools()
 
 

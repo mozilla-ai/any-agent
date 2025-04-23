@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
-from contextlib import AsyncExitStack, suppress
+from contextlib import suppress
 from typing import Literal
-
-from pydantic import Field
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.logging import logger
@@ -24,7 +22,6 @@ with suppress(ImportError):
 
 class OpenAIMCPServerBase(MCPServerBase, ABC):
     server: OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None = None
-    exit_stack: AsyncExitStack = Field(default_factory=AsyncExitStack)
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
     def check_dependencies(self) -> None:
@@ -40,7 +37,7 @@ class OpenAIMCPServerBase(MCPServerBase, ABC):
             msg = "MCP server is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
-        await self.exit_stack.enter_async_context(self.server)
+        await self._exit_stack.enter_async_context(self.server)
         # Get tools from the server
         logger.warning(
             "OpenAI MCP currently does not support filtering MCP available tools",
