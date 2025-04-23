@@ -23,7 +23,7 @@ class MCPServerBase(BaseModel, ABC):
         self.check_dependencies()
 
     @abstractmethod
-    def setup_tools(self) -> None: ...
+    async def setup_tools(self) -> None: ...
 
     @abstractmethod
     def check_dependencies(self) -> None:
