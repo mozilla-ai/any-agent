@@ -1,0 +1,34 @@
+name: pre-commit auto-update
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+
+jobs:
+  pre-commit-update:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install pre-commit
+
+      - run: pre-commit autoupdate
+
+      - uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        if: always()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: pre-commit-autoupdate
+          title: pre-commit autoupdate
+          commit-message: "chore: pre-commit autoupdate"
+          body: Update pre-commit hooks.
