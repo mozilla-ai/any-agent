@@ -258,7 +258,7 @@ async def test_google_mcp_sse() -> None:
 
             # Check that tools were stored
             assert server.tools == mock_tools
-            assert server.server == mock_toolset
+            assert server.server == mock_toolset  # type: ignore[union-attr]
 
 
 @pytest.mark.asyncio
@@ -326,7 +326,7 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = TypeAdapter(MCPServer).validate_python(
+    server = TypeAdapter[MCPServer](MCPServer).validate_python(
         {"mcp_tool": mcp_tool, "framework": AgentFramework.AGNO}
     )
 
