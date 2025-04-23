@@ -46,6 +46,12 @@ To define any agent system you will always use the same imports:
 ```py
 from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
+For this example we use a model hosted by openai, but you may need to set the relevant API key for whichever provider being used.
+See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
+
+```bash
+export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
+```
 
 ### Single agent
 
@@ -53,7 +59,7 @@ from any_agent import AgentConfig, AnyAgent, TracingConfig
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # Framework type. See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
@@ -71,7 +77,7 @@ agent.run("Which Agent Framework is the best??")
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # Framework type. See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="You are the main agent. Use the other available agents to find an answer",
