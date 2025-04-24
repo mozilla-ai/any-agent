@@ -1,4 +1,5 @@
 import importlib
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
@@ -117,6 +118,7 @@ class LlamaIndexAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         if not self._agent:
-            raise ValueError("Agent not loaded. Call load_agent() first.")
+            error_message = "Agent not loaded. Call load_agent() first."
+            raise ValueError(error_message)
 
         return await self._agent.run(prompt)

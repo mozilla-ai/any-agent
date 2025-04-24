@@ -104,5 +104,5 @@ class SmolagentsAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        
+
         return self._agent.run(prompt)

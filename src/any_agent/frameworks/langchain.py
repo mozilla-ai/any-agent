@@ -1,5 +1,5 @@
-from collections.abc import Sequence
 import importlib
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -131,6 +131,6 @@ class LangchainAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        
+
         inputs = {"messages": [("user", prompt)]}
         return await self._agent.ainvoke(inputs)
