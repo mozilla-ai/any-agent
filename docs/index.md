@@ -89,3 +89,41 @@ agent = AnyAgent.create(
 
 agent.run("Which Agent Framework is the best??")
 ```
+
+## Async
+
+If you are running in `async` context, you should use the equivalent `create_async` and `run_async` methods:
+
+```py
+import asyncio
+from any_agent.tools import search_web, visit_webpage
+
+async def main():
+    agent = await AnyAgent.create_async(
+        "openai",
+        AgentConfig(
+            model_id="gpt-4.1-mini",
+            instructions="You are the main agent. Use the other available agents to find an answer",
+        ),
+        managed_agents=[
+            AgentConfig(
+                name="search_web_agent",
+                description="An agent that can search the web",
+                model_id="gpt-4.1-nano",
+                tools=[search_web]
+            ),
+            AgentConfig(
+                name="visit_webpage_agent",
+                description="An agent that can visit webpages",
+                model_id="gpt-4.1-nano",
+                tools=[visit_webpage]
+            )
+        ],
+        tracing=TracingConfig()
+    )
+
+    await agent.run_async("Which Agent Framework is the best??")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```

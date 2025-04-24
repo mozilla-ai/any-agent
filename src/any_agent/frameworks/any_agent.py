@@ -87,6 +87,23 @@ class AnyAgent(ABC):
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
+        return asyncio.get_event_loop().run_until_complete(
+            cls.create_async(
+                agent_framework=agent_framework,
+                agent_config=agent_config,
+                managed_agents=managed_agents,
+                tracing=tracing,
+            )
+        )
+
+    @classmethod
+    async def create_async(
+        cls,
+        agent_framework: AgentFramework | str,
+        agent_config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
+    ) -> AnyAgent:
         framework = AgentFramework.from_string(agent_framework)
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config, managed_agents=managed_agents)
@@ -99,7 +116,7 @@ class AnyAgent(ABC):
                 )
             else:
                 agent.trace_filepath = setup_tracing(framework, tracing)
-        asyncio.get_event_loop().run_until_complete(agent.load_agent())
+        await agent.load_agent()
         return agent
 
     def run(self, prompt: str) -> Any:
