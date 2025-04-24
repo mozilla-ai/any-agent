@@ -2,11 +2,9 @@ import os
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from contextlib import suppress
-from textwrap import dedent
 from typing import Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
-from any_agent.logging import logger
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
@@ -35,29 +33,7 @@ class SmolagentsMCPServerBase(MCPServerBase, ABC):
             msg = "Tool collection is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
-        # Only add the tools listed in mcp_tool['tools'] if specified
-        requested_tools = list(self.mcp_tool.tools or [])
-        if not requested_tools:
-            logger.info(
-                "No specific tools requested for MCP server, using all available tools:",
-            )
-            logger.info("Tools available: %s", self.smolagent_tools)
-            self.tools = self.smolagent_tools
-            return
-
-        filtered_tools = [
-            tool for tool in self.smolagent_tools if tool.name in requested_tools
-        ]
-        if len(filtered_tools) == len(requested_tools):
-            self.tools = filtered_tools
-            return
-
-        tool_names = [tool.name for tool in filtered_tools]
-        raise ValueError(
-            dedent(f"""Could not find all requested tools in the MCP server:
-                        Requested: {requested_tools}
-                        Set:   {tool_names}"""),
-        )
+        self.tools = self.filter_tools(self.smolagent_tools)
 
 
 class SmolagentsMCPServerStdio(SmolagentsMCPServerBase):

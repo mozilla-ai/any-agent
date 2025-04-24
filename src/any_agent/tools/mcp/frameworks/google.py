@@ -39,6 +39,8 @@ class GoogleMCPServerBase(MCPServerBase, ABC):
         await self._exit_stack.enter_async_context(self.server)
         self.tools = await self.server.load_tools()
 
+        self.tools = self.filter_tools(self.tools)
+
 
 class GoogleMCPServerStdio(GoogleMCPServerBase):
     mcp_tool: MCPStdioParams

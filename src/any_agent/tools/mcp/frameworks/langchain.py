@@ -49,6 +49,8 @@ class LangchainMCPServerBase(MCPServerBase, ABC):
         # List available tools
         self.tools = await load_mcp_tools(session)
 
+        self.tools = self.filter_tools(self.tools)
+
 
 class LangchainMCPServerStdio(LangchainMCPServerBase):
     mcp_tool: MCPStdioParams

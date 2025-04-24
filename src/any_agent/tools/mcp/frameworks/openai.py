@@ -3,7 +3,6 @@ from contextlib import suppress
 from typing import Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
-from any_agent.logging import logger
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
@@ -38,11 +37,9 @@ class OpenAIMCPServerBase(MCPServerBase, ABC):
             raise ValueError(msg)
 
         await self._exit_stack.enter_async_context(self.server)
-        # Get tools from the server
-        logger.warning(
-            "OpenAI MCP currently does not support filtering MCP available tools",
-        )
         self.tools = await self.server.list_tools()  # type: ignore[assignment]
+
+        self.tools = self.filter_tools(self.tools)
 
 
 class OpenAIMCPServerStdio(OpenAIMCPServerBase):
