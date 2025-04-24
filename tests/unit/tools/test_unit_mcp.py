@@ -3,12 +3,14 @@
 # Disclaim
 
 import asyncio
+import shutil
 import unittest
 from contextlib import AsyncExitStack
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from mcp import Tool as MCPTool
 
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
@@ -363,35 +365,22 @@ async def test_stdio_tool_filtering(
     agent_framework: AgentFramework,
     mock_stdio_client: Any,
 ) -> None:
-    # setup_mock_server(monkeypatch)
-    mock_stdio_params = MagicMock(spec=MCPStdioParams)
-    mock_stdio_params.command = "test"
-    mock_stdio_params.args = ["arg1", "arg2"]
-    mock_stdio_params.tools = ["write_file", "read_file"]
-    mock_stdio_params.client_session_timeout_seconds = 10
-
-    # Create three mock tools with different names
-    from mcp import Tool as MCPTool
-
-    write_tool = MCPTool(
-        name="write_file", inputSchema={"type": "string", "properties": {}}
-    )
-    read_tool = MCPTool(
-        name="read_file", inputSchema={"type": "string", "properties": {}}
-    )
-    other_tool = MCPTool(
-        name="other_tool", inputSchema={"type": "string", "properties": {}}
+    tee = shutil.which("tee") or ""
+    assert tee, "tee not found"
+    # Mocking the command part of stdio is really tricky so instead we'll use
+    # a real command that should be available on all systems (this is what openai-agents does too)
+    mock_stdio_params = MCPStdioParams(
+        command=tee,
+        args=[],
+        tools=["write_file", "read_file"],
     )
 
-    # Create a ToolList object or mock with the same structure
     mock_tool_list = MagicMock()
     mock_tool_list.tools = [
-        write_tool,
-        read_tool,
-        other_tool,
-    ]  # Set the tools attribute directly
-
-    # Mock the list_tools method to return the mock tool list
+        MCPTool(name="write_file", inputSchema={"type": "string", "properties": {}}),
+        MCPTool(name="read_file", inputSchema={"type": "string", "properties": {}}),
+        MCPTool(name="other_tool", inputSchema={"type": "string", "properties": {}}),
+    ]
     mock_list_tools.return_value = mock_tool_list
     server = get_mcp_server(mock_stdio_params, agent_framework)
     await server.setup_tools()
