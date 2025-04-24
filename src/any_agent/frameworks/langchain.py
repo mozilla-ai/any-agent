@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 import importlib
 from typing import TYPE_CHECKING, Any, cast
 

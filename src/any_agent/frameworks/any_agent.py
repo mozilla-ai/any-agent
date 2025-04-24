@@ -28,7 +28,6 @@ class AnyAgent(ABC):
     ):
         self.config = config
         self.managed_agents = managed_agents
-        self._agent = None
         self.trace_filepath: str | None = None
         self._mcp_servers: list[MCPServerBase] = []
 
