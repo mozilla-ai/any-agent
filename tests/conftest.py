@@ -1,4 +1,6 @@
 import json
+from collections.abc import Generator
+from unittest.mock import AsyncMock, patch
 
 import pytest
 import rich.console
@@ -76,3 +78,15 @@ def llm_span():  # type: ignore[no-untyped-def]
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
 def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
     return request.param  # type: ignore[no-any-return]
+
+
+@pytest.fixture
+def mock_stdio_client() -> Generator[
+    tuple[AsyncMock, tuple[AsyncMock, AsyncMock]], None
+]:
+    mock_cm = AsyncMock()
+    mock_transport = (AsyncMock(), AsyncMock())
+    mock_cm.__aenter__.return_value = mock_transport
+
+    with patch("mcp.client.stdio.stdio_client", return_value=mock_cm) as patched:
+        yield patched, mock_transport

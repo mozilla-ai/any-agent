@@ -141,3 +141,9 @@ strict = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 follow_untyped_imports = true
+
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"

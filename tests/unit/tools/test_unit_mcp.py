@@ -5,12 +5,10 @@
 import asyncio
 import unittest
 from contextlib import AsyncExitStack
-from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from mcp import ClientSession
 
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
@@ -352,48 +350,26 @@ async def test_agno_mcp_sse() -> None:
             assert server.server == mock_tools_instance  # type: ignore[union-attr]
 
 
-def setup_mock_server(monkeypatch: Any) -> None:
-    mock_context = AsyncMock(spec=ClientSession)
-    # calling aenter should give back a mock session
-    mock_session = AsyncMock()
-    mock_session.__aenter__.return_value = mock_context
-    mock_session.__aexit__.return_value = None
-    mock_session.initialize = AsyncMock()
-    mock_session.list_tools = AsyncMock()
-    # Create a dummy streams context manager
-    dummy_transport = (AsyncMock(), AsyncMock())
-    mock_stdio_context = MagicMock()
-    mock_stdio_context.__aenter__.return_value = dummy_transport
+@pytest.mark.asyncio
+@patch(
+    "mcp.client.session.ClientSession.initialize",
+    new_callable=AsyncMock,
+    return_value=None,
+)
+@patch("mcp.client.session.ClientSession.list_tools")
+async def test_stdio_tool_filtering(
+    mock_list_tools: AsyncMock,
+    mock_initialize: AsyncMock,
+    agent_framework: AgentFramework,
+    mock_stdio_client: Any,
+) -> None:
+    # setup_mock_server(monkeypatch)
+    mock_stdio_params = MagicMock(spec=MCPStdioParams)
+    mock_stdio_params.command = "test"
+    mock_stdio_params.args = ["arg1", "arg2"]
+    mock_stdio_params.tools = ["write_file", "read_file"]
+    mock_stdio_params.client_session_timeout_seconds = 10
 
-    def mock_stdio_client_func(
-        *args: dict[str, Any], **kwargs: dict[str, Any]
-    ) -> ClientSession:
-        return mock_stdio_context
-
-    # This is fragile because it relies on the 3rd party libs not changing where they import these mcp libs
-    # I am totally open if someone has an idea about a more stable way to do this.
-    where_frameworks_import = [
-        ("agno.tools.mcp.stdio_client", "agno.tools.mcp.ClientSession"),
-        ("agents.mcp.server.stdio_client", "agents.mcp.server.ClientSession"),
-        (
-            "any_agent.tools.mcp.frameworks.langchain.stdio_client",
-            "any_agent.tools.mcp.frameworks.langchain.ClientSession",
-        ),
-        (
-            "llama_index.tools.mcp.client.stdio_client",
-            "llama_index.tools.mcp.client.ClientSession",
-        ),
-        ("mcpadapt.core.stdio_client", "mcpadapt.core.ClientSession"),
-        (
-            "google.adk.tools.mcp_tool.mcp_session_manager.stdio_client",
-            "google.adk.tools.mcp_tool.mcp_session_manager.ClientSession",
-        ),
-    ]
-    for stdio_module, client_module in where_frameworks_import:
-        monkeypatch.setattr(stdio_module, mock_stdio_client_func)
-        monkeypatch.setattr(client_module, lambda *args, **kwargs: mock_session)
-
-    # Use different patches based on the agent framework
     # Create three mock tools with different names
     from mcp import Tool as MCPTool
 
@@ -416,21 +392,7 @@ def setup_mock_server(monkeypatch: Any) -> None:
     ]  # Set the tools attribute directly
 
     # Mock the list_tools method to return the mock tool list
-    mock_context.list_tools.return_value = mock_tool_list
-    mock_context.initialize = AsyncMock()
-
-
-@pytest.mark.asyncio
-async def test_stdio_tool_filtering(
-    agent_framework: AgentFramework, tmp_path: Path, monkeypatch: Any
-) -> None:
-    setup_mock_server(monkeypatch)
-    mock_stdio_params = MagicMock(spec=MCPStdioParams)
-    mock_stdio_params.command = "test_command"
-    mock_stdio_params.args = ["arg1", "arg2"]
-    mock_stdio_params.tools = ["write_file", "read_file"]
-    mock_stdio_params.client_session_timeout_seconds = 10
-
+    mock_list_tools.return_value = mock_tool_list
     server = get_mcp_server(mock_stdio_params, agent_framework)
     await server.setup_tools()
     if agent_framework == AgentFramework.AGNO:
