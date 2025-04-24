@@ -9,6 +9,7 @@ try:
         Agent,
         ModelSettings,
         Runner,
+        Handoff,
     )
     from agents.extensions.models.litellm_model import LitellmModel
 
@@ -62,7 +63,7 @@ class OpenAIAgent(AnyAgent):
         tools, mcp_servers = await self._load_tools(self.config.tools)
         tools = self._filter_mcp_tools(tools, mcp_servers)
 
-        handoffs = []
+        handoffs = list[Agent[Any] | Handoff[Any]]()
         if self.managed_agents:
             for managed_agent in self.managed_agents:
                 managed_tools, managed_mcp_servers = await self._load_tools(
@@ -103,7 +104,7 @@ class OpenAIAgent(AnyAgent):
             model=self._get_model(self.config),
             handoffs=handoffs,
             tools=tools,
-            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
+            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],  # type: ignore[attr-defined]
             **kwargs_,
         )
 
