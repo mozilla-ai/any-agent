@@ -1,6 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
+from datetime import timedelta
 from typing import Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
@@ -35,7 +36,13 @@ class LangchainMCPServerBase(MCPServerBase, ABC):
 
         stdio, write = await self._exit_stack.enter_async_context(self.client)
 
-        client_session = ClientSession(stdio, write)
+        client_session = ClientSession(
+            stdio,
+            write,
+            timedelta(seconds=self.mcp_tool.client_session_timeout_seconds)
+            if self.mcp_tool.client_session_timeout_seconds
+            else None,
+        )
         session = await self._exit_stack.enter_async_context(client_session)
 
         await session.initialize()
