@@ -24,7 +24,7 @@ class AnyAgent(ABC):
     def __init__(
         self,
         config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
+        managed_agents: Sequence[AgentConfig] | None = None,
     ):
         self.config = config
         self.managed_agents = managed_agents

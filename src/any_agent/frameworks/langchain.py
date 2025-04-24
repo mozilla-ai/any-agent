@@ -29,6 +29,15 @@ DEFAULT_MODEL_CLASS = "langchain_litellm.ChatLiteLLM"
 class LangchainAgent(AnyAgent):
     """LangChain agent implementation that handles both loading and running."""
 
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: Sequence[AgentConfig] | None = None,
+    ):
+        super().__init__(config, managed_agents)
+        self._agent: CompiledGraph | None = None
+        self._tools: Sequence[Any] = []
+
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
@@ -64,7 +73,6 @@ class LangchainAgent(AnyAgent):
 
         imported_tools, _ = await self._load_tools(self.config.tools)
 
-        self._agent: CompiledGraph
         if self.managed_agents:
             swarm = []
             managed_names = []
@@ -119,5 +127,9 @@ class LangchainAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the LangChain agent with the given prompt."""
+        if not self._agent:
+            error_message = "Agent not loaded. Call load_agent() first."
+            raise ValueError(error_message)
+        
         inputs = {"messages": [("user", prompt)]}
         return await self._agent.ainvoke(inputs)

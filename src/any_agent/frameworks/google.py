@@ -21,6 +21,14 @@ except ImportError:
 class GoogleAgent(AnyAgent):
     """Google ADK agent implementation that handles both loading and running."""
 
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: Sequence[AgentConfig] | None = None,
+    ):
+        super().__init__(config, managed_agents)
+        self._agent: Agent | None = None
+
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.GOOGLE
@@ -82,7 +90,10 @@ class GoogleAgent(AnyAgent):
         session_id: str | None = None,
     ) -> Any:
         """Run the Google agent with the given prompt."""
-        assert self._agent, "Agent not loaded. Call _load_agent() first."
+        if not self._agent:
+            error_message = "Agent not loaded. Call load_agent() first."
+            raise ValueError(error_message)
+
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
