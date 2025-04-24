@@ -42,7 +42,7 @@ class OpenAIMCPServerBase(MCPServerBase, ABC):
         logger.warning(
             "OpenAI MCP currently does not support filtering MCP available tools",
         )
-        self.tools = await self.server.list_tools()
+        self.tools = await self.server.list_tools()  # type: ignore[assignment]
 
 
 class OpenAIMCPServerStdio(OpenAIMCPServerBase):
@@ -51,7 +51,7 @@ class OpenAIMCPServerStdio(OpenAIMCPServerBase):
     async def setup_tools(self) -> None:
         params = OpenAIInternalMCPServerStdioParams(
             command=self.mcp_tool.command,
-            args=self.mcp_tool.args,
+            args=list(self.mcp_tool.args),
         )
 
         self.server = OpenAIInternalMCPServerStdio(

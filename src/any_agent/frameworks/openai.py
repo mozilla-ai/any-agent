@@ -79,7 +79,7 @@ class OpenAIAgent(AnyAgent):
                     handoffs.append(instance)
                 else:
                     tools.append(
-                        instance.as_tool(  # type: ignore[arg-type]
+                        instance.as_tool(
                             tool_name=instance.name,
                             tool_description=managed_agent.description
                             or f"Use the agent: {managed_agent.name}",
@@ -95,7 +95,7 @@ class OpenAIAgent(AnyAgent):
             model=self._get_model(self.config),
             handoffs=handoffs,
             tools=tools,
-            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],  # type: ignore[attr-defined]
+            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,
         )
 

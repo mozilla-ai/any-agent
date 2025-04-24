@@ -55,7 +55,7 @@ class AgnoMCPServerSse(AgnoMCPServerBase):
     async def setup_tools(self) -> None:
         client = sse_client(
             url=self.mcp_tool.url,
-            headers=self.mcp_tool.headers,
+            headers=dict(self.mcp_tool.headers or {}),
         )
         sse_transport = await self._exit_stack.enter_async_context(client)
         stdio, write = sse_transport
@@ -64,7 +64,7 @@ class AgnoMCPServerSse(AgnoMCPServerBase):
         await session.initialize()
         self.server = AgnoMCPTools(
             session=session,
-            include_tools=self.mcp_tool.tools,
+            include_tools=list(self.mcp_tool.tools or []),
         )
 
         await super().setup_tools()

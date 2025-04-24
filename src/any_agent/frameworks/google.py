@@ -56,20 +56,20 @@ class GoogleAgent(AnyAgent):
                     name=managed_agent.name,
                     instruction=managed_agent.instructions or "",
                     model=self._get_model(managed_agent),
-                    tools=managed_tools,  # type: ignore[arg-type]
+                    tools=managed_tools,
                     **managed_agent.agent_args or {},
                 )
 
                 if managed_agent.handoff:
                     sub_agents_instanced.append(instance)
                 else:
-                    tools.append(AgentTool(instance))  # type: ignore[arg-type]
+                    tools.append(AgentTool(instance))
 
         self._agent = Agent(
             name=self.config.name,
             instruction=self.config.instructions or "",
             model=self._get_model(self.config),
-            tools=tools,  # type: ignore[arg-type]
+            tools=tools,
             sub_agents=sub_agents_instanced,  # type: ignore[arg-type]
             **self.config.agent_args or {},
             output_key="response",

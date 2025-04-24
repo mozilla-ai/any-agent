@@ -72,7 +72,7 @@ class AgnoAgent(AnyAgent):
                 name=f"Team managed by agent {self.config.name}",
                 description=self.config.description,
                 model=self._get_model(self.config),
-                members=members,
+                members=members,  # type: ignore[arg-type]
                 instructions=self.config.instructions,
                 tools=tools,
                 **self.config.agent_args or {},

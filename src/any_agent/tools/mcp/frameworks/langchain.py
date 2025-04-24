@@ -49,7 +49,7 @@ class LangchainMCPServerStdio(LangchainMCPServerBase):
     async def setup_tools(self) -> None:
         server_params = StdioServerParameters(
             command=self.mcp_tool.command,
-            args=self.mcp_tool.args,
+            args=list(self.mcp_tool.args),
             env={**os.environ},
         )
 

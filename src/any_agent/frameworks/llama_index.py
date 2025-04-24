@@ -75,7 +75,7 @@ class LlamaIndexAgent(AnyAgent):
                     name=name,
                     description=managed_agent.description or "A managed agent",
                     system_prompt=managed_agent.instructions,
-                    tools=managed_tools,  # type: ignore[arg-type]
+                    tools=managed_tools,
                     llm=self._get_model(managed_agent),
                     can_handoff_to=[self.config.name],
                     **managed_agent.agent_args or {},
