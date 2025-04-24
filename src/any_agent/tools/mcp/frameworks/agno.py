@@ -32,7 +32,7 @@ class AgnoMCPServerBase(MCPServerBase, ABC):
             msg = "MCP server is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
-        self.tools = [await self._exit_stack.enter_async_context(self.server)]
+        self.tools = [await self._exit_stack.enter_async_context(self.server)]  # type: ignore[arg-type]
 
 
 class AgnoMCPServerStdio(AgnoMCPServerBase):

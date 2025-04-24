@@ -23,6 +23,14 @@ DEFAULT_MODEL_CLASS = "litellm.LiteLLM"
 class LlamaIndexAgent(AnyAgent):
     """LLamaIndex agent implementation that handles both loading and running."""
 
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: Sequence[AgentConfig] | None = None,
+    ):
+        super().__init__(config, managed_agents)
+        self._agent: AgentWorkflow | ReActAgent | None = None
+
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.LLAMA_INDEX
@@ -58,7 +66,6 @@ class LlamaIndexAgent(AnyAgent):
                 visit_webpage,
             ]
 
-        self._agent: AgentWorkflow | ReActAgent
         if self.managed_agents:
             agents = []
             managed_names = []
@@ -109,4 +116,7 @@ class LlamaIndexAgent(AnyAgent):
             )
 
     async def run_async(self, prompt: str) -> Any:
+        if not self._agent:
+            raise ValueError("Agent not loaded. Call load_agent() first.")
+
         return await self._agent.run(prompt)

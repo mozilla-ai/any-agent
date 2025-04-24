@@ -13,7 +13,7 @@ mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
     from smolagents.mcp_client import MCPClient
-    from smolagents.mcp_client import Tool as SmolagentsTool
+    from smolagents.tools import Tool as SmolagentsTool
 
     mcp_available = True
 

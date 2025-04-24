@@ -9,10 +9,10 @@ from any_agent.tools.mcp.mcp_server import MCPServerBase
 mcp_available = False
 with suppress(ImportError):
     from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
-    from google.adk.tools.mcp_tool.mcp_toolset import (
+    from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
         SseServerParams as GoogleSseServerParameters,
     )
-    from google.adk.tools.mcp_tool.mcp_toolset import (
+    from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
         StdioServerParameters as GoogleStdioServerParameters,
     )
 

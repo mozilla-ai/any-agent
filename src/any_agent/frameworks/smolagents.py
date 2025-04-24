@@ -22,6 +22,14 @@ DEFAULT_MODEL_CLASS = "LiteLLMModel"
 class SmolagentsAgent(AnyAgent):
     """Smolagents agent implementation that handles both loading and running."""
 
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
+    ):
+        super().__init__(config, managed_agents)
+        self._agent: MultiStepAgent | None = None
+
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS
@@ -77,7 +85,7 @@ class SmolagentsAgent(AnyAgent):
             self.config.agent_type or DEFAULT_AGENT_TYPE,
         )
 
-        self._agent: MultiStepAgent = main_agent_type(
+        self._agent = main_agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
             tools=tools,
@@ -93,4 +101,8 @@ class SmolagentsAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the Smolagents agent with the given prompt."""
+        if not self._agent:
+            error_message = "Agent not loaded. Call load_agent() first."
+            raise ValueError(error_message)
+        
         return self._agent.run(prompt)

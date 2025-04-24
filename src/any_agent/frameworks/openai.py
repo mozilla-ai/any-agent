@@ -22,6 +22,14 @@ OPENAI_MAX_TURNS = 30
 class OpenAIAgent(AnyAgent):
     """OpenAI agent implementation that handles both loading and running."""
 
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
+    ):
+        super().__init__(config, managed_agents)
+        self._agent: Agent | None = None
+
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.OPENAI
@@ -89,7 +97,7 @@ class OpenAIAgent(AnyAgent):
         kwargs_ = self.config.agent_args or {}
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
-        self._agent: Agent = Agent(
+        self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
             model=self._get_model(self.config),
@@ -110,5 +118,8 @@ class OpenAIAgent(AnyAgent):
 
     async def run_async(self, prompt: str) -> Any:
         """Run the OpenAI agent with the given prompt asynchronously."""
-        assert self._agent
+        if not self._agent:
+            error_message = "Agent not loaded. Call load_agent() first."
+            raise ValueError(error_message)
+
         return await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
