@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 import yaml
 from litellm.utils import validate_environment
 from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import TypedDict
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class CheckpointCriteria(BaseModel):
