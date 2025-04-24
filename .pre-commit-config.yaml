@@ -33,33 +33,7 @@ repos:
         additional_dependencies:
           - types-requests
           - types-pyyaml
-
-      - id: mypy
-        additional_dependencies:
-          - google-adk
-      
-      - id: mypy
-        additional_dependencies:
-          - langchain
-          - langchain-mcp-adapters
-      
-      - id: mypy
-        additional_dependencies:
-          - llama-index
-          - llama-index-tools-mcp
-      
-      - id: mypy
-        additional_dependencies:
-          - smolagents[litellm,mcp]
-      
-      - id: mypy
-        additional_dependencies:
-          - openai-agents[litellm]
-      
-      - id: mypy
-        additional_dependencies:
-          - agno
-      
+          - any-agent[dev, all]
 
   - repo: https://github.com/codespell-project/codespell
     rev: "v2.4.1"
