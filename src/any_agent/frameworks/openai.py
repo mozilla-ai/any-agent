@@ -38,7 +38,7 @@ class OpenAIAgent(AnyAgent):
     def _get_model(
         self,
         agent_config: AgentConfig,
-    ) -> "LitellmModel":
+    ) -> LitellmModel:
         """Get the model configuration for an OpenAI agent."""
         return LitellmModel(
             model=agent_config.model_id,
