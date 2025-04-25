@@ -1,5 +1,5 @@
 from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -103,3 +103,28 @@ def test_load_google_agent_missing() -> None:
     with patch("any_agent.frameworks.google.adk_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))
+
+
+def test_run_google_custom_args() -> None:
+    from google.adk.agents.run_config import RunConfig
+    from google.genai import types
+
+    mock_agent = MagicMock()
+    mock_runner = MagicMock()
+    mock_runner.session_service.get_session.return_value = AsyncMock()
+
+    run_config = RunConfig(max_llm_calls=10)
+    with (
+        patch("any_agent.frameworks.google.Agent", mock_agent),
+        patch("any_agent.frameworks.google.InMemoryRunner", mock_runner),
+        patch("any_agent.frameworks.google.LiteLlm"),
+        patch("google.adk.tools.FunctionTool"),
+    ):
+        agent = AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))
+        agent.run("foo", user_id="1", session_id="2", run_config=run_config)
+        mock_runner.return_value.run_async.assert_called_once_with(
+            user_id="1",
+            session_id="2",
+            new_message=types.Content(role="user", parts=[types.Part(text="foo")]),
+            run_config=run_config,
+        )

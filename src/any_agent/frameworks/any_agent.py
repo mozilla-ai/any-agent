@@ -119,16 +119,18 @@ class AnyAgent(ABC):
         await agent.load_agent()
         return agent
 
-    def run(self, prompt: str) -> Any:
+    def run(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the agent with the given prompt."""
-        return asyncio.get_event_loop().run_until_complete(self.run_async(prompt))
+        return asyncio.get_event_loop().run_until_complete(
+            self.run_async(prompt, **kwargs)
+        )
 
     @abstractmethod
     async def load_agent(self) -> None:
         """Load the agent instance."""
 
     @abstractmethod
-    async def run_async(self, prompt: str) -> Any:
+    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the agent asynchronously with the given prompt."""
 
     @property

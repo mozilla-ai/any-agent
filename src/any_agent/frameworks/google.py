@@ -84,11 +84,12 @@ class GoogleAgent(AnyAgent):
             output_key="response",
         )
 
-    async def run_async(
+    async def run_async(  # type: ignore[no-untyped-def]
         self,
         prompt: str,
         user_id: str | None = None,
         session_id: str | None = None,
+        **kwargs,
     ) -> Any:
         """Run the Google agent with the given prompt."""
         if not self._agent:
@@ -107,6 +108,7 @@ class GoogleAgent(AnyAgent):
             user_id=user_id,
             session_id=session_id,
             new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
+            **kwargs,
         )
 
         async for event in events:
