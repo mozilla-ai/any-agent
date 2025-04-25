@@ -18,14 +18,14 @@ class LlamaIndexMCPServerBase(MCPServerBase, ABC):
     client: LlamaIndexMCPClient | None = None
     framework: Literal[AgentFramework.LLAMA_INDEX] = AgentFramework.LLAMA_INDEX
 
-    def check_dependencies(self) -> None:
+    def _check_dependencies(self) -> None:
         """Check if the required dependencies for the MCP server are available."""
         self.libraries = "any-agent[mcp,llama_index]"
         self.mcp_available = mcp_available
-        super().check_dependencies()
+        super()._check_dependencies()
 
     @abstractmethod
-    async def setup_tools(self) -> None:
+    async def _setup_tools(self) -> None:
         """Set up the LlamaIndex MCP server with the provided configuration."""
         if not self.client:
             msg = "MCP client is not set up. Please call `setup` from a concrete class."
@@ -42,23 +42,23 @@ class LlamaIndexMCPServerBase(MCPServerBase, ABC):
 class LlamaIndexMCPServerStdio(LlamaIndexMCPServerBase):
     mcp_tool: MCPStdioParams
 
-    async def setup_tools(self) -> None:
+    async def _setup_tools(self) -> None:
         self.client = LlamaIndexMCPClient(
             command_or_url=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
             env={**os.environ},
         )
 
-        await super().setup_tools()
+        await super()._setup_tools()
 
 
 class LlamaIndexMCPServerSse(LlamaIndexMCPServerBase):
     mcp_tool: MCPSseParams
 
-    async def setup_tools(self) -> None:
+    async def _setup_tools(self) -> None:
         self.client = LlamaIndexMCPClient(command_or_url=self.mcp_tool.url)
 
-        await super().setup_tools()
+        await super()._setup_tools()
 
 
 LlamaIndexMCPServer = LlamaIndexMCPServerStdio | LlamaIndexMCPServerSse

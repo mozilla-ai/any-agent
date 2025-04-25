@@ -11,7 +11,7 @@ from any_agent.evaluation.test_case import CheckpointCriteria, GroundTruthAnswer
 
 
 class LLMEvaluator(ABC):
-    """Base class for evaluators that use LLM-as-judge"""
+    """Base class for evaluators that use LLM-as-judge."""
 
     def __init__(self, model: str):
         self.model = model
@@ -26,7 +26,7 @@ class LLMEvaluator(ABC):
         hypothesis_final_answer: str | None = None,
         evidence: str | None = None,
     ) -> EvaluationResult:
-        """Evaluate a single criterion using LLM"""
+        """Evaluate a single criterion using LLM."""
         prompt = dedent(f"""
         Evaluate if the following criterion was met {"based on the provided evidence" if evidence else "in the agent's answer"}.
 

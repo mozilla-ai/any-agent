@@ -9,7 +9,7 @@ from typing_extensions import TypedDict
 
 
 class CheckpointCriteria(BaseModel):
-    """Represents a checkpoint criteria with a description"""
+    """Represents a checkpoint criteria with a description."""
 
     model_config = ConfigDict(extra="forbid")
     criteria: str
@@ -39,7 +39,7 @@ class TestCase(BaseModel):
 
     @classmethod
     def from_yaml(cls, test_case_path: str) -> TestCase:
-        """Load a test case from a YAML file and process it"""
+        """Load a test case from a YAML file and process it."""
         with open(test_case_path) as f:
             test_case_dict = yaml.safe_load(f)
         final_answer_criteria = []
@@ -47,7 +47,7 @@ class TestCase(BaseModel):
         def add_gt_final_answer_criteria(
             ground_truth_list: Sequence[GroundTruthAnswer],
         ) -> None:
-            """Add checkpoints for each item in the ground_truth list"""
+            """Add checkpoints for each item in the ground_truth list."""
             for item in ground_truth_list:
                 if "name" in item and "value" in item:
                     points = item.get(

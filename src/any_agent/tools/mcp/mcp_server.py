@@ -20,21 +20,21 @@ class MCPServerBase(BaseModel, ABC):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def model_post_init(self, context: Any) -> None:
-        self.check_dependencies()
+    def model_post_init(self, context: Any) -> None:  # noqa: D102
+        self._check_dependencies()
 
     @abstractmethod
-    async def setup_tools(self) -> None: ...
+    async def _setup_tools(self) -> None: ...
 
     @abstractmethod
-    def check_dependencies(self) -> None:
+    def _check_dependencies(self) -> None:
         if self.mcp_available:
             return
 
         msg = f"You need to `pip install '{self.libraries}'` to use MCP."
         raise ImportError(msg)
 
-    def filter_tools(self, tools: Sequence[Any]) -> Sequence[Any]:
+    def _filter_tools(self, tools: Sequence[Any]) -> Sequence[Any]:
         # Only add the tools listed in mcp_tool['tools'] if specified
         requested_tools = list(self.mcp_tool.tools or [])
         if not requested_tools:

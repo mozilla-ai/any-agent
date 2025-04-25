@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from any_agent.config import AgentFramework, MCPParams, Tool
 from any_agent.tools import (
     MCPServerBase,
-    get_mcp_server,
+    _get_mcp_server,
 )
 
 if TYPE_CHECKING:
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from smolagents import Tool as SmolagentsTool
 
 
-def wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
+def _wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
     from agents import Tool as AgentTool
     from agents import function_tool
 
@@ -27,7 +27,7 @@ def wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
     return function_tool(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
+def _wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
     from langchain_core.tools import BaseTool
     from langchain_core.tools import tool as langchain_tool
 
@@ -37,7 +37,7 @@ def wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
     return langchain_tool(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_smolagents(tool: "Tool | SmolagentsTool") -> "SmolagentsTool":
+def _wrap_tool_smolagents(tool: "Tool | SmolagentsTool") -> "SmolagentsTool":
     from smolagents import Tool as SmolagentsTool
     from smolagents import tool as smolagents_tool
 
@@ -52,7 +52,7 @@ def wrap_tool_smolagents(tool: "Tool | SmolagentsTool") -> "SmolagentsTool":
     return smolagents_tool(wrapped_function)
 
 
-def wrap_tool_llama_index(tool: "Tool | LlamaIndexTool") -> "LlamaIndexTool":
+def _wrap_tool_llama_index(tool: "Tool | LlamaIndexTool") -> "LlamaIndexTool":
     from llama_index.core.tools import FunctionTool
 
     if isinstance(tool, FunctionTool):
@@ -61,7 +61,7 @@ def wrap_tool_llama_index(tool: "Tool | LlamaIndexTool") -> "LlamaIndexTool":
     return FunctionTool.from_defaults(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_google(tool: "Tool | GoogleTool") -> "GoogleTool":
+def _wrap_tool_google(tool: "Tool | GoogleTool") -> "GoogleTool":
     from google.adk.tools import BaseTool, FunctionTool
 
     if isinstance(tool, BaseTool):
@@ -70,40 +70,27 @@ def wrap_tool_google(tool: "Tool | GoogleTool") -> "GoogleTool":
     return FunctionTool(tool)  # type: ignore[arg-type]
 
 
-def wrap_tool_agno(tool: Tool) -> Tool:
+def _wrap_tool_agno(tool: Tool) -> Tool:
     # Agno lets you pass callables directly in as tools ❤️
     return tool
 
 
-async def wrap_mcp_server(
-    mcp_tool: MCPParams,
-    agent_framework: AgentFramework,
-) -> MCPServerBase:
-    """Generic MCP server wrapper that can work with different frameworks
-    based on the specified agent_framework
-    """
-    manager = get_mcp_server(mcp_tool, agent_framework)
-    await manager.setup_tools()
-
-    return manager
-
-
 WRAPPERS: dict[AgentFramework, Callable[..., Any]] = {
-    AgentFramework.GOOGLE: wrap_tool_google,
-    AgentFramework.OPENAI: wrap_tool_openai,
-    AgentFramework.LANGCHAIN: wrap_tool_langchain,
-    AgentFramework.SMOLAGENTS: wrap_tool_smolagents,
-    AgentFramework.LLAMA_INDEX: wrap_tool_llama_index,
-    AgentFramework.AGNO: wrap_tool_agno,
+    AgentFramework.GOOGLE: _wrap_tool_google,
+    AgentFramework.OPENAI: _wrap_tool_openai,
+    AgentFramework.LANGCHAIN: _wrap_tool_langchain,
+    AgentFramework.SMOLAGENTS: _wrap_tool_smolagents,
+    AgentFramework.LLAMA_INDEX: _wrap_tool_llama_index,
+    AgentFramework.AGNO: _wrap_tool_agno,
 }
 
 
 def verify_callable(tool: Callable[..., Any]) -> None:
-    """
-    Verify a few things about the callable:
+    """Verify that `tool` is a valid callable.
+
     - It needs to have some sort of docstring that describes what it does
     - It needs to have typed argument
-    - It needs to have a typed return
+    - It needs to have a typed return.
 
     We need these things because this info gets provided to the agent so that they know how and when to call the tool.
     """
@@ -123,7 +110,7 @@ def verify_callable(tool: Callable[..., Any]) -> None:
             raise ValueError(msg)
 
 
-async def wrap_tools(
+async def _wrap_tools(
     tools: Sequence[Tool],
     agent_framework: AgentFramework,
 ) -> tuple[list[Tool], list[MCPServerBase]]:
@@ -137,7 +124,8 @@ async def wrap_tools(
             # MCP adapters are usually implemented as context managers.
             # We wrap the server using `MCPServerBase` so the
             # tools can be used as any other callable.
-            mcp_server = await wrap_mcp_server(tool, agent_framework)
+            mcp_server = _get_mcp_server(tool, agent_framework)
+            await mcp_server._setup_tools()
             mcp_servers.append(mcp_server)
         elif callable(tool):
             verify_callable(tool)

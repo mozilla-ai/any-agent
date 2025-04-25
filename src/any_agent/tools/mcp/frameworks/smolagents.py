@@ -20,26 +20,26 @@ class SmolagentsMCPServerBase(MCPServerBase, ABC):
     smolagent_tools: Sequence[SmolagentsTool] | None = None
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
 
-    def check_dependencies(self) -> None:
+    def _check_dependencies(self) -> None:
         """Check if the required dependencies for the MCP server are available."""
         self.libraries = "any-agent[mcp,smolagents]"
         self.mcp_available = mcp_available
-        super().check_dependencies()
+        super()._check_dependencies()
 
     @abstractmethod
-    async def setup_tools(self) -> None:
+    async def _setup_tools(self) -> None:
         """Set up the Smolagents MCP server with the provided configuration."""
         if not self.smolagent_tools:
             msg = "Tool collection is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
-        self.tools = self.filter_tools(self.smolagent_tools)
+        self.tools = self._filter_tools(self.smolagent_tools)
 
 
 class SmolagentsMCPServerStdio(SmolagentsMCPServerBase):
     mcp_tool: MCPStdioParams
 
-    async def setup_tools(self) -> None:
+    async def _setup_tools(self) -> None:
         server_parameters = StdioServerParameters(
             command=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
@@ -49,13 +49,13 @@ class SmolagentsMCPServerStdio(SmolagentsMCPServerBase):
             MCPClient(server_parameters)
         )
 
-        await super().setup_tools()
+        await super()._setup_tools()
 
 
 class SmolagentsMCPServerSse(SmolagentsMCPServerBase):
     mcp_tool: MCPSseParams
 
-    async def setup_tools(self) -> None:
+    async def _setup_tools(self) -> None:
         server_parameters = {
             "url": self.mcp_tool.url,
         }
@@ -63,7 +63,7 @@ class SmolagentsMCPServerSse(SmolagentsMCPServerBase):
             MCPClient(server_parameters)
         )
 
-        await super().setup_tools()
+        await super()._setup_tools()
 
 
 SmolagentsMCPServer = SmolagentsMCPServerStdio | SmolagentsMCPServerSse

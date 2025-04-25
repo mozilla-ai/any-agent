@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, assert_never
 
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools.wrappers import wrap_tools
+from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing import setup_tracing
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ class AnyAgent(ABC):
     async def _load_tools(
         self, tools: Sequence[Tool]
     ) -> tuple[list[Any], list[MCPServerBase]]:
-        tools, mcp_servers = await wrap_tools(tools, self.framework)
+        tools, mcp_servers = await _wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
         for mcp_server in mcp_servers:
@@ -134,7 +134,7 @@ class AnyAgent(ABC):
     @property
     @abstractmethod
     def framework(self) -> AgentFramework:
-        """The Agent Framework used"""
+        """The Agent Framework used."""
 
     @property
     def agent(self) -> Any:
