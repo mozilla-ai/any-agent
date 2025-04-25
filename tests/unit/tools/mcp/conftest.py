@@ -48,7 +48,7 @@ def mcp_sse_params_no_tools() -> MCPSseParams:
 
 @pytest.fixture
 def mcp_sse_params_with_tools(
-    mcp_sse_params_no_tools: mcp_sse_params_no_tools, tools: Sequence[Tool]
+    mcp_sse_params_no_tools: MCPSseParams, tools: Sequence[Tool]
 ) -> MCPSseParams:
     return mcp_sse_params_no_tools.model_copy(update={"tools": tools})
 
@@ -99,7 +99,7 @@ def agno_mcp_tool_instance() -> AgnoMCPTools:
 
 
 @pytest.fixture
-def agno_mcp_tools(agno_mcp_tool_instance: AgnoMCPTools) -> Generator[None]:
+def agno_mcp_tools(agno_mcp_tool_instance: AgnoMCPTools) -> Generator[AgnoMCPTools]:
     with patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools:
         mock_mcp_tools.return_value = agno_mcp_tool_instance
         yield mock_mcp_tools
