@@ -1,9 +1,10 @@
 import json
 import os
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import datetime
-from typing import Protocol, assert_never
+from typing import Any, Protocol, assert_never
 
+from litellm.cost_calculator import cost_per_token
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -17,6 +18,7 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 
 from any_agent.config import AgentFramework, TracingConfig
+from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
 
 
@@ -62,7 +64,31 @@ class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
         self.console = Console()
         self.tracing_config = tracing_config
 
-    def export(self, spans: Sequence[Span]) -> SpanExportResult:  # noqa: D102
+    def _extract_token_use_and_cost(
+        self, attributes: Mapping[str, Any]
+    ) -> dict[str, int | float]:
+        span_info: dict[str, int | float] = {}
+
+        for key in ["llm.token_count.prompt", "llm.token_count.completion"]:
+            if key in attributes:
+                name = key.split(".")[-1]
+                span_info[f"token_count_{name}"] = int(attributes[key])
+
+        try:
+            cost_prompt, cost_completion = cost_per_token(
+                model=attributes.get("llm.model_name", ""),
+                prompt_tokens=int(span_info.get("token_count_prompt", 0)),
+                completion_tokens=int(span_info.get("token_count_completion", 0)),
+            )
+            span_info["cost_prompt ($)"] = cost_prompt
+            span_info["cost_completion ($)"] = cost_completion
+        except Exception as e:
+            msg = f"Error computing cost_per_token: {e}"
+            logger.warning(msg)
+
+        return span_info
+
+    def export(self, spans: Sequence[Span]) -> SpanExportResult:   # noqa: D102
         for span in spans:
             style = None
             span_str = span.to_json()
@@ -89,6 +115,14 @@ class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
                         )
                     else:
                         self.console.print(f"{key}: {value}")
+
+                if span_kind == "LLM" and self.tracing_config.cost_info:
+                    cost_info = self._extract_token_use_and_cost(
+                        span_dict.get("attributes", {})
+                    )
+                    for key, value in cost_info.items():
+                        self.console.print(f"{key}: {value}")
+
             except Exception:
                 self.console.print_exception()
             if style:

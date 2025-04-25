@@ -56,6 +56,7 @@ class TracingConfig(BaseModel):
     tool: str | None = "blue"
     agent: str | None = None
     chain: str | None = None
+    cost_info: bool = True
 
 
 MCPParams = MCPStdioParams | MCPSseParams
