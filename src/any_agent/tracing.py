@@ -88,7 +88,7 @@ class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
 
         return span_info
 
-    def export(self, spans: Sequence[Span]) -> SpanExportResult:   # noqa: D102
+    def export(self, spans: Sequence[Span]) -> SpanExportResult:  # noqa: D102
         for span in spans:
             style = None
             span_str = span.to_json()
