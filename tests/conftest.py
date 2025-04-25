@@ -1,5 +1,6 @@
 import json
-from collections.abc import Generator
+from collections.abc import AsyncGenerator, Generator
+from textwrap import dedent
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -90,3 +91,55 @@ def mock_stdio_client() -> Generator[
 
     with patch("mcp.client.stdio.stdio_client", return_value=mock_cm) as patched:
         yield patched, mock_transport
+
+
+SSE_MCP_SERVER_SCRIPT = dedent(
+    '''
+        from mcp.server.fastmcp import FastMCP
+
+        mcp = FastMCP("Echo Server", host="127.0.0.1", port=8000)
+
+        @mcp.tool()
+        def say_hi(text: str) -> str:
+            """Say hi back with the input text"""
+            return f"Hi: {text}"
+
+        @mcp.tool()
+        def say_bye(text: str) -> str:
+            """Say bye back the input text"""
+            return f"Bye: {text}"
+
+        @mcp.tool()
+        def say_boo(text: str) -> str:
+            """Say boo back the input text"""
+            return f"Boo: {text}"
+
+        mcp.run("sse")
+        '''
+)
+
+
+@pytest.fixture(
+    scope="session"
+)  # This means it only gets created once per test session
+async def echo_sse_server() -> AsyncGenerator[dict[str, str]]:
+    """This fixture runs a FastMCP server in a subprocess.
+    I thought about trying to mock all the individual mcp client calls,
+    but I went with this because this way we don't need to actually mock anything.
+    This is similar to what MCPAdapt does in their testing https://github.com/grll/mcpadapt/blob/main/tests/test_core.py
+    """
+    import asyncio
+
+    process = await asyncio.create_subprocess_exec(
+        "python",
+        "-c",
+        SSE_MCP_SERVER_SCRIPT,
+    )
+    await asyncio.sleep(1)
+
+    try:
+        yield {"url": "http://127.0.0.1:8000/sse"}
+    finally:
+        # Clean up the process when test is done
+        process.kill()
+        await process.wait()
