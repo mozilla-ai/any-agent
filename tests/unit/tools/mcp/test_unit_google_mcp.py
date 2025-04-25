@@ -1,63 +1,46 @@
-# pylint: disable=unused-argument, unused-variable
-from contextlib import AsyncExitStack
-from unittest.mock import AsyncMock, MagicMock, patch
+from collections.abc import Sequence
 
 import pytest
+from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
+from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
+    SseServerParams as GoogleSseServerParameters,
+)
 
-from any_agent.config import AgentFramework, MCPSseParams
-from any_agent.tools.mcp.frameworks import _get_mcp_server
+from any_agent.config import AgentFramework, MCPSseParams, Tool
+from any_agent.tools import _get_mcp_server
 
 
 @pytest.mark.asyncio
-async def test_google_mcp_sse() -> None:
-    """Test GoogleMCPServer with SSE configuration."""
-    # Mock the necessary components
-    mock_tools = [MagicMock(), MagicMock()]
+@pytest.mark.usefixtures("enter_context", "google_toolset")
+async def test_google_mcp_sse_tools_loaded(
+    toolset: GoogleMCPToolset,
+    tools: Sequence[Tool],
+    mcp_sse_params_no_tools: MCPSseParams,
+) -> None:
+    mcp_server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.GOOGLE)
+    await mcp_server._setup_tools()
 
-    # Create an MCP tool config for SSE
-    mcp_tool = MCPSseParams(
-        url="http://localhost:8000/sse",
-        headers={"Authorization": "Bearer test-token"},
+    assert mcp_server.tools == tools
+    assert mcp_server.server == toolset  # type: ignore[union-attr]
+
+
+@pytest.mark.asyncio
+@pytest.mark.usefixtures("enter_context")
+async def test_google_mcp_sse_integration(
+    google_toolset: GoogleMCPToolset,
+    google_sse_params: GoogleSseServerParameters,
+    mcp_sse_params_no_tools: MCPSseParams,
+) -> None:
+    mcp_server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.GOOGLE)
+    await mcp_server._setup_tools()
+
+    google_sse_params.assert_called_once_with(
+        url=mcp_sse_params_no_tools.url,
+        headers=mcp_sse_params_no_tools.headers,
     )
 
-    # Create the server instance
-    server = _get_mcp_server(mcp_tool, AgentFramework.GOOGLE)
+    google_toolset.assert_called_once_with(
+        connection_params=google_sse_params.return_value
+    )
 
-    # Mock Google MCP classes
-    with (
-        patch(
-            "any_agent.tools.mcp.frameworks.google.GoogleMCPToolset"
-        ) as mock_toolset_class,
-        patch(
-            "any_agent.tools.mcp.frameworks.google.GoogleSseServerParameters"
-        ) as mock_sse_params,
-    ):
-        # Set up mock toolset
-        mock_toolset = AsyncMock()
-        mock_toolset.load_tools.return_value = mock_tools
-        mock_toolset_class.return_value = mock_toolset
-
-        # Mock AsyncExitStack to avoid actually setting up exit handlers
-        with patch.object(AsyncExitStack, "enter_async_context") as mock_enter_context:
-            mock_enter_context.return_value = mock_toolset
-
-            # Test the _setup_tools method
-            await server._setup_tools()
-
-            # Verify the SseServerParams was created correctly
-            mock_sse_params.assert_called_once_with(
-                url="http://localhost:8000/sse",
-                headers={"Authorization": "Bearer test-token"},
-            )
-
-            # Verify toolset was created with correct params
-            mock_toolset_class.assert_called_once_with(
-                connection_params=mock_sse_params.return_value
-            )
-
-            # Verify tools were loaded
-            mock_toolset.load_tools.assert_called_once()
-
-            # Check that tools were stored
-            assert server.tools == mock_tools
-            assert server.server == mock_toolset  # type: ignore[union-attr]
+    google_toolset().load_tools.assert_called_once()
