@@ -12,7 +12,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS
 
-    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
+    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
                 return str(span["attributes"]["output.value"])

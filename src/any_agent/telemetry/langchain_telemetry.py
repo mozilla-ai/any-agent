@@ -14,7 +14,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
 
-    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
+    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
                 content = span["attributes"]["output.value"]

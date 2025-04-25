@@ -20,18 +20,18 @@ from any_agent.config import AgentFramework, TracingConfig
 from any_agent.telemetry import TelemetryProcessor
 
 
-class Span(Protocol):
-    def to_json(self) -> str: ...
+class Span(Protocol):  # noqa: D101
+    def to_json(self) -> str: ...  # noqa: D102
 
 
-class JsonFileSpanExporter(SpanExporter):
-    def __init__(self, file_name: str):
+class JsonFileSpanExporter(SpanExporter):  # noqa: D101
+    def __init__(self, file_name: str):  # noqa: D107
         self.file_name = file_name
         if not os.path.exists(self.file_name):
             with open(self.file_name, "w") as f:
                 json.dump([], f)
 
-    def export(self, spans: Sequence[Span]) -> SpanExportResult:
+    def export(self, spans: Sequence[Span]) -> SpanExportResult:  # noqa: D102
         try:
             with open(self.file_name) as f:
                 all_spans = json.load(f)
@@ -55,17 +55,14 @@ class JsonFileSpanExporter(SpanExporter):
 
         return SpanExportResult.SUCCESS
 
-    def shutdown(self) -> None:
-        pass
 
-
-class RichConsoleSpanExporter(SpanExporter):
-    def __init__(self, agent_framework: AgentFramework, tracing_config: TracingConfig):
+class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
+    def __init__(self, agent_framework: AgentFramework, tracing_config: TracingConfig):  # noqa: D107
         self.processor = TelemetryProcessor.create(agent_framework)
         self.console = Console()
         self.tracing_config = tracing_config
 
-    def export(self, spans: Sequence[Span]) -> SpanExportResult:
+    def export(self, spans: Sequence[Span]) -> SpanExportResult:  # noqa: D102
         for span in spans:
             style = None
             span_str = span.to_json()
@@ -97,9 +94,6 @@ class RichConsoleSpanExporter(SpanExporter):
             if style:
                 self.console.rule(style=style)
         return SpanExportResult.SUCCESS
-
-    def force_flush(self, timeout_millis: int = 30000) -> bool:
-        return True
 
 
 def _get_tracer_provider(
@@ -133,7 +127,7 @@ def setup_tracing(
     agent_framework: AgentFramework,
     tracing_config: TracingConfig,
 ) -> str:
-    """Setup tracing for `agent_framework` using `openinference.instrumentation`.
+    """Set up tracing for `agent_framework` using `openinference.instrumentation`.
 
     Args:
         agent_framework (AgentFramework): The type of agent being used.
@@ -143,7 +137,6 @@ def setup_tracing(
         str: The name of the JSON file where traces will be stored.
 
     """
-
     agent_framework_ = AgentFramework.from_string(agent_framework)
 
     tracer_provider, file_name = _get_tracer_provider(
@@ -151,17 +144,17 @@ def setup_tracing(
         tracing_config,
     )
 
-    instrumenter = get_instrumenter_by_framework(agent_framework_)
+    instrumenter = _get_instrumenter_by_framework(agent_framework_)
     instrumenter.instrument(tracer_provider=tracer_provider)
 
     return file_name
 
 
-class Instrumenter(Protocol):
-    def instrument(self, *, tracer_provider: TracerProvider) -> None: ...
+class Instrumenter(Protocol):  # noqa: D101
+    def instrument(self, *, tracer_provider: TracerProvider) -> None: ...  # noqa: D102
 
 
-def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
+def _get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
     if framework is AgentFramework.OPENAI:
         from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 

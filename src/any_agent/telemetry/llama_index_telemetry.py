@@ -14,7 +14,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LLAMA_INDEX
 
-    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
+    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             # Looking for the final response that has the summary answer
             if (

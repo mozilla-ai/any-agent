@@ -18,7 +18,7 @@ class GroundTruthAnswers(TypedDict):
 
 
 class QuestionAnsweringSquadEvaluator:
-    """Directly compares answers without using LLM-as-judge"""
+    """Directly compares answers without using LLM-as-judge."""
 
     def __init__(self) -> None:
         self.metric = evaluate.loading.load("squad")
@@ -28,7 +28,7 @@ class QuestionAnsweringSquadEvaluator:
         hypothesis_answer: str,
         ground_truth_answer: Sequence[GroundTruthAnswer],
     ) -> list[EvaluationResult]:
-        """Directly compare answers using simple matching"""
+        """Directly compare answers using simple matching."""
         # format the answers so that they're dicts with 'id' and 'prediction' keys for hypo
         # and the ref has id and answers keys
         hypothesis_answers = [{"id": "1", "prediction_text": hypothesis_answer}]

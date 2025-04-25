@@ -12,7 +12,7 @@ from smolagents.tools import Tool as SmolagentsClass
 from any_agent import AgentFramework
 from any_agent.config import Tool
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tools.wrappers import wrap_tools
+from any_agent.tools.wrappers import _wrap_tools
 
 
 def wrap_sync(
@@ -20,7 +20,7 @@ def wrap_sync(
     framework: AgentFramework,
 ) -> list[Tool]:
     wrapped_tools, _ = asyncio.get_event_loop().run_until_complete(
-        wrap_tools(tools, framework)
+        _wrap_tools(tools, framework)
     )
     return wrapped_tools
 

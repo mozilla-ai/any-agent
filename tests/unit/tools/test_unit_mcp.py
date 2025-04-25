@@ -14,7 +14,7 @@ from mcp import Tool as MCPTool
 
 from any_agent.config import AgentConfig, AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.tools import get_mcp_server
+from any_agent.tools import _get_mcp_server
 
 
 # Common helper functions for all test classes
@@ -61,8 +61,8 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         mock_client_class.return_value.__enter__.return_value = mock_tools
 
         self.test_tool.tools = None
-        mcp_server = get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
-        asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
+        mcp_server = _get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
+        asyncio.get_event_loop().run_until_complete(mcp_server._setup_tools())
 
         # Verify all tools are included
         assert mcp_server.tools == mock_tools
@@ -82,8 +82,8 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         # Create test tool configuration with specific tools
         self.test_tool.tools = ["read_thing", "write_thing"]
 
-        mcp_server = get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
-        asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
+        mcp_server = _get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
+        asyncio.get_event_loop().run_until_complete(mcp_server._setup_tools())
 
         # Verify only the requested tools are included
         assert len(mcp_server.tools) == 2
@@ -131,7 +131,7 @@ async def test_smolagents_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse")
 
     # Create the server instance
-    server = get_mcp_server(mcp_tool, AgentFramework.SMOLAGENTS)
+    server = _get_mcp_server(mcp_tool, AgentFramework.SMOLAGENTS)
 
     # Patch the MCPClient class to return our mock tools
     with patch(
@@ -141,7 +141,7 @@ async def test_smolagents_mcp_sse() -> None:
         mock_client_class.return_value.__enter__.return_value = mock_tools
 
         # Test the setup_tools method
-        await server.setup_tools()
+        await server._setup_tools()
 
         # Verify the client was created with correct parameters
         mock_client_class.assert_called_once_with({"url": "http://localhost:8000/sse"})
@@ -170,7 +170,7 @@ async def test_langchain_mcp_sse() -> None:
         patch("mcp.ClientSession") as mock_client_session,
     ):
         # Create the server instance
-        server = get_mcp_server(mcp_tool, AgentFramework.LANGCHAIN)
+        server = _get_mcp_server(mcp_tool, AgentFramework.LANGCHAIN)
 
         # Set up mocks
         mock_transport = (AsyncMock(), AsyncMock())
@@ -188,7 +188,7 @@ async def test_langchain_mcp_sse() -> None:
             ]
 
             # Test the setup_tools method
-            await server.setup_tools()
+            await server._setup_tools()
             # Verify session was initialized
             mock_session.initialize.assert_called_once()
             # Verify tools were loaded
@@ -210,7 +210,7 @@ async def test_google_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = get_mcp_server(mcp_tool, AgentFramework.GOOGLE)
+    server = _get_mcp_server(mcp_tool, AgentFramework.GOOGLE)
 
     # Mock Google MCP classes
     with (
@@ -231,7 +231,7 @@ async def test_google_mcp_sse() -> None:
             mock_enter_context.return_value = mock_toolset
 
             # Test the setup_tools method
-            await server.setup_tools()
+            await server._setup_tools()
 
             # Verify the SseServerParams was created correctly
             mock_sse_params.assert_called_once_with(
@@ -262,7 +262,7 @@ async def test_llamaindex_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse", tools=["tool1", "tool2"])
 
     # Create the server instance
-    server = get_mcp_server(mcp_tool, AgentFramework.LLAMA_INDEX)
+    server = _get_mcp_server(mcp_tool, AgentFramework.LLAMA_INDEX)
 
     # Mock LlamaIndex MCP classes
     with (
@@ -282,7 +282,7 @@ async def test_llamaindex_mcp_sse() -> None:
         mock_tool_spec_class.return_value = mock_tool_spec
 
         # Test the setup_tools method
-        await server.setup_tools()
+        await server._setup_tools()
 
         # Verify the client was created correctly
         mock_client_class.assert_called_once_with(
@@ -315,7 +315,7 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = get_mcp_server(mcp_tool, AgentFramework.AGNO)
+    server = _get_mcp_server(mcp_tool, AgentFramework.AGNO)
 
     # Mock required components
     with (
@@ -338,7 +338,7 @@ async def test_agno_mcp_sse() -> None:
             mock_enter_context.side_effect = [mock_transport, mock_session, mock_tools]
 
             # Test the setup_tools method
-            await server.setup_tools()
+            await server._setup_tools()
 
             # Verify session was initialized
             mock_session.initialize.assert_called_once()
@@ -382,8 +382,8 @@ async def test_stdio_tool_filtering(
         MCPTool(name="other_tool", inputSchema={"type": "string", "properties": {}}),
     ]
     mock_list_tools.return_value = mock_tool_list
-    server = get_mcp_server(mock_stdio_params, agent_framework)
-    await server.setup_tools()
+    server = _get_mcp_server(mock_stdio_params, agent_framework)
+    await server._setup_tools()
     if agent_framework == AgentFramework.AGNO:
         # Check that only the specified tools are included
         assert set(server.tools[0].functions.keys()) == {"write_file", "read_file"}  # type: ignore[union-attr]
