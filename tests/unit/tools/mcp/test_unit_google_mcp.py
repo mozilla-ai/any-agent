@@ -60,4 +60,4 @@ async def test_google_mcp_sse() -> None:
 
             # Check that tools were stored
             assert server.tools == mock_tools
-            assert server.server == mock_toolset
+            assert server.server == mock_toolset  # type: ignore[union-attr]

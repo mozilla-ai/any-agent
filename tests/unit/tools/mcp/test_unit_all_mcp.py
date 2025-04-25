@@ -44,7 +44,7 @@ async def test_stdio_tool_filtering(
     await server._setup_tools()
     if agent_framework == AgentFramework.AGNO:
         # Check that only the specified tools are included
-        assert set(server.tools[0].functions.keys()) == {"write_file", "read_file"}
+        assert set(server.tools[0].functions.keys()) == {"write_file", "read_file"}  # type: ignore[union-attr]
     else:
         assert len(server.tools) == 2  # ignore[arg-type]
 
@@ -62,6 +62,6 @@ async def test_sse_tool_filtering(
     await server._setup_tools()
     if agent_framework == AgentFramework.AGNO:
         # Check that only the specified tools are included
-        assert set(server.tools[0].functions.keys()) == {"say_hi", "say_bye"}
+        assert set(server.tools[0].functions.keys()) == {"say_hi", "say_bye"}  # type: ignore[union-attr]
     else:
         assert len(server.tools) == 2  # ignore[arg-type]

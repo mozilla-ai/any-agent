@@ -56,4 +56,4 @@ async def test_agno_mcp_sse() -> None:
             )
 
             # Check that tools instance was set as server
-            assert server.server == mock_tools_instance
+            assert server.server == mock_tools_instance  # type: ignore[union-attr]
