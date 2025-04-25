@@ -632,15 +632,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#any_agent.tools.wrap_mcp_server" class="md-nav__link">
-    <span class="md-ellipsis">
-      wrap_mcp_server
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -903,15 +894,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#any_agent.tools.wrap_mcp_server" class="md-nav__link">
-    <span class="md-ellipsis">
-      wrap_mcp_server
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1147,7 +1129,7 @@
 </span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_load_tools</span><span class="p">(</span>
 </span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">tools</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tool</span><span class="p">]</span>
 </span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">MCPServerBase</span><span class="p">]]:</span>
-</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a>        <span class="n">tools</span><span class="p">,</span> <span class="n">mcp_servers</span> <span class="o">=</span> <span class="k">await</span> <span class="n">wrap_tools</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework</span><span class="p">)</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a>        <span class="n">tools</span><span class="p">,</span> <span class="n">mcp_servers</span> <span class="o">=</span> <span class="k">await</span> <span class="n">_wrap_tools</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework</span><span class="p">)</span>
 </span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="c1"># Add to agent so that it doesn&#39;t get garbage collected</span>
 </span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_mcp_servers</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mcp_servers</span><span class="p">)</span>
 </span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a>        <span class="k">for</span> <span class="n">mcp_server</span> <span class="ow">in</span> <span class="n">mcp_servers</span><span class="p">:</span>
@@ -1247,7 +1229,7 @@
 </span><span id="__span-0-134"><a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="nd">@property</span>
 </span><span id="__span-0-135"><a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="nd">@abstractmethod</span>
 </span><span id="__span-0-136"><a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">framework</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentFramework</span><span class="p">:</span>
-</span><span id="__span-0-137"><a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The Agent Framework used&quot;&quot;&quot;</span>
+</span><span id="__span-0-137"><a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The Agent Framework used.&quot;&quot;&quot;</span>
 </span><span id="__span-0-138"><a id="__codelineno-0-138" name="__codelineno-0-138"></a>
 </span><span id="__span-0-139"><a id="__codelineno-0-139" name="__codelineno-0-139"></a>    <span class="nd">@property</span>
 </span><span id="__span-0-140"><a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">agent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
@@ -1348,7 +1330,7 @@ and prevent direct dependency on specific agent implementations.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The Agent Framework used</p>
+        <p>The Agent Framework used.</p>
 
     </div>
 
@@ -1958,7 +1940,7 @@ and prevent direct dependency on specific agent implementations.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.</p>
+        <p>Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2032,7 +2014,7 @@ and prevent direct dependency on specific agent implementations.</p>
 <span class="normal"><a href="#__codelineno-0-31">31</a></span>
 <span class="normal"><a href="#__codelineno-0-32">32</a></span>
 <span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19"></a><span class="k">def</span><span class="w"> </span><span class="nf">search_web</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results.</span>
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a><span class="sd">    Args:</span>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a><span class="sd">        query (str): The search query to perform.</span>
@@ -2063,7 +2045,7 @@ and prevent direct dependency on specific agent implementations.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Sends the specified user a message via console and returns their response.</p>
+        <p>Send the specified user a message via console and returns their response.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2150,7 +2132,7 @@ and prevent direct dependency on specific agent implementations.</p>
 <span class="normal"><a href="#__codelineno-0-45">45</a></span>
 <span class="normal"><a href="#__codelineno-0-46">46</a></span>
 <span class="normal"><a href="#__codelineno-0-47">47</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36"></a><span class="k">def</span><span class="w"> </span><span class="nf">send_console_message</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Sends the specified user a message via console and returns their response.</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Send the specified user a message via console and returns their response.</span>
 </span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a>
 </span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a><span class="sd">    Args:</span>
 </span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a><span class="sd">        query: The question to ask the user.</span>
@@ -2399,54 +2381,6 @@ and prevent direct dependency on specific agent implementations.</p>
 
 </div>
 
-<div class="doc doc-object doc-function">
-
-
-<h4 id="any_agent.tools.wrap_mcp_server" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">wrap_mcp_server</span><span class="p">(</span><span class="n">mcp_tool</span><span class="p">,</span> <span class="n">agent_framework</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Generic MCP server wrapper that can work with different frameworks
-based on the specified agent_framework</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/any_agent/tools/wrappers.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-78">78</a></span>
-<span class="normal"><a href="#__codelineno-0-79">79</a></span>
-<span class="normal"><a href="#__codelineno-0-80">80</a></span>
-<span class="normal"><a href="#__codelineno-0-81">81</a></span>
-<span class="normal"><a href="#__codelineno-0-82">82</a></span>
-<span class="normal"><a href="#__codelineno-0-83">83</a></span>
-<span class="normal"><a href="#__codelineno-0-84">84</a></span>
-<span class="normal"><a href="#__codelineno-0-85">85</a></span>
-<span class="normal"><a href="#__codelineno-0-86">86</a></span>
-<span class="normal"><a href="#__codelineno-0-87">87</a></span>
-<span class="normal"><a href="#__codelineno-0-88">88</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wrap_mcp_server</span><span class="p">(</span>
-</span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="n">mcp_tool</span><span class="p">:</span> <span class="n">MCPParams</span><span class="p">,</span>
-</span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="n">agent_framework</span><span class="p">:</span> <span class="n">AgentFramework</span><span class="p">,</span>
-</span><span id="__span-0-81"><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MCPServerBase</span><span class="p">:</span>
-</span><span id="__span-0-82"><a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic MCP server wrapper that can work with different frameworks</span>
-</span><span id="__span-0-83"><a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    based on the specified agent_framework</span>
-</span><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-85"><a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">manager</span> <span class="o">=</span> <span class="n">get_mcp_server</span><span class="p">(</span><span class="n">mcp_tool</span><span class="p">,</span> <span class="n">agent_framework</span><span class="p">)</span>
-</span><span id="__span-0-86"><a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="k">await</span> <span class="n">manager</span><span class="o">.</span><span class="n">setup_tools</span><span class="p">()</span>
-</span><span id="__span-0-87"><a id="__codelineno-0-87" name="__codelineno-0-87"></a>
-</span><span id="__span-0-88"><a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="k">return</span> <span class="n">manager</span>
-</span></code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
 
 
   </div>
@@ -2496,7 +2430,7 @@ based on the specified agent_framework</p>
 
     <div class="doc doc-contents ">
 
-        <p>Setup tracing for <code>agent_framework</code> using <code>openinference.instrumentation</code>.</p>
+        <p>Set up tracing for <code>agent_framework</code> using <code>openinference.instrumentation</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2571,7 +2505,13 @@ based on the specified agent_framework</p>
 
             <details class="quote">
               <summary>Source code in <code>src/any_agent/tracing.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-132">132</a></span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-126">126</a></span>
+<span class="normal"><a href="#__codelineno-0-127">127</a></span>
+<span class="normal"><a href="#__codelineno-0-128">128</a></span>
+<span class="normal"><a href="#__codelineno-0-129">129</a></span>
+<span class="normal"><a href="#__codelineno-0-130">130</a></span>
+<span class="normal"><a href="#__codelineno-0-131">131</a></span>
+<span class="normal"><a href="#__codelineno-0-132">132</a></span>
 <span class="normal"><a href="#__codelineno-0-133">133</a></span>
 <span class="normal"><a href="#__codelineno-0-134">134</a></span>
 <span class="normal"><a href="#__codelineno-0-135">135</a></span>
@@ -2589,39 +2529,31 @@ based on the specified agent_framework</p>
 <span class="normal"><a href="#__codelineno-0-147">147</a></span>
 <span class="normal"><a href="#__codelineno-0-148">148</a></span>
 <span class="normal"><a href="#__codelineno-0-149">149</a></span>
-<span class="normal"><a href="#__codelineno-0-150">150</a></span>
-<span class="normal"><a href="#__codelineno-0-151">151</a></span>
-<span class="normal"><a href="#__codelineno-0-152">152</a></span>
-<span class="normal"><a href="#__codelineno-0-153">153</a></span>
-<span class="normal"><a href="#__codelineno-0-154">154</a></span>
-<span class="normal"><a href="#__codelineno-0-155">155</a></span>
-<span class="normal"><a href="#__codelineno-0-156">156</a></span>
-<span class="normal"><a href="#__codelineno-0-157">157</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-132"><a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="k">def</span><span class="w"> </span><span class="nf">setup_tracing</span><span class="p">(</span>
-</span><span id="__span-0-133"><a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">agent_framework</span><span class="p">:</span> <span class="n">AgentFramework</span><span class="p">,</span>
-</span><span id="__span-0-134"><a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="n">tracing_config</span><span class="p">:</span> <span class="n">TracingConfig</span><span class="p">,</span>
-</span><span id="__span-0-135"><a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="__span-0-136"><a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup tracing for `agent_framework` using `openinference.instrumentation`.</span>
-</span><span id="__span-0-137"><a id="__codelineno-0-137" name="__codelineno-0-137"></a>
-</span><span id="__span-0-138"><a id="__codelineno-0-138" name="__codelineno-0-138"></a><span class="sd">    Args:</span>
-</span><span id="__span-0-139"><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">        agent_framework (AgentFramework): The type of agent being used.</span>
-</span><span id="__span-0-140"><a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="sd">        tracing_config (TracingConfig): Configuration for tracing, including output directory and styles.</span>
+<span class="normal"><a href="#__codelineno-0-150">150</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-126"><a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="k">def</span><span class="w"> </span><span class="nf">setup_tracing</span><span class="p">(</span>
+</span><span id="__span-0-127"><a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="n">agent_framework</span><span class="p">:</span> <span class="n">AgentFramework</span><span class="p">,</span>
+</span><span id="__span-0-128"><a id="__codelineno-0-128" name="__codelineno-0-128"></a>    <span class="n">tracing_config</span><span class="p">:</span> <span class="n">TracingConfig</span><span class="p">,</span>
+</span><span id="__span-0-129"><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-0-130"><a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Set up tracing for `agent_framework` using `openinference.instrumentation`.</span>
+</span><span id="__span-0-131"><a id="__codelineno-0-131" name="__codelineno-0-131"></a>
+</span><span id="__span-0-132"><a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Args:</span>
+</span><span id="__span-0-133"><a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        agent_framework (AgentFramework): The type of agent being used.</span>
+</span><span id="__span-0-134"><a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">        tracing_config (TracingConfig): Configuration for tracing, including output directory and styles.</span>
+</span><span id="__span-0-135"><a id="__codelineno-0-135" name="__codelineno-0-135"></a>
+</span><span id="__span-0-136"><a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">    Returns:</span>
+</span><span id="__span-0-137"><a id="__codelineno-0-137" name="__codelineno-0-137"></a><span class="sd">        str: The name of the JSON file where traces will be stored.</span>
+</span><span id="__span-0-138"><a id="__codelineno-0-138" name="__codelineno-0-138"></a>
+</span><span id="__span-0-139"><a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-140"><a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="n">agent_framework_</span> <span class="o">=</span> <span class="n">AgentFramework</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">agent_framework</span><span class="p">)</span>
 </span><span id="__span-0-141"><a id="__codelineno-0-141" name="__codelineno-0-141"></a>
-</span><span id="__span-0-142"><a id="__codelineno-0-142" name="__codelineno-0-142"></a><span class="sd">    Returns:</span>
-</span><span id="__span-0-143"><a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">        str: The name of the JSON file where traces will be stored.</span>
-</span><span id="__span-0-144"><a id="__codelineno-0-144" name="__codelineno-0-144"></a>
-</span><span id="__span-0-145"><a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-142"><a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="n">tracer_provider</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">_get_tracer_provider</span><span class="p">(</span>
+</span><span id="__span-0-143"><a id="__codelineno-0-143" name="__codelineno-0-143"></a>        <span class="n">agent_framework</span><span class="p">,</span>
+</span><span id="__span-0-144"><a id="__codelineno-0-144" name="__codelineno-0-144"></a>        <span class="n">tracing_config</span><span class="p">,</span>
+</span><span id="__span-0-145"><a id="__codelineno-0-145" name="__codelineno-0-145"></a>    <span class="p">)</span>
 </span><span id="__span-0-146"><a id="__codelineno-0-146" name="__codelineno-0-146"></a>
-</span><span id="__span-0-147"><a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="n">agent_framework_</span> <span class="o">=</span> <span class="n">AgentFramework</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">agent_framework</span><span class="p">)</span>
-</span><span id="__span-0-148"><a id="__codelineno-0-148" name="__codelineno-0-148"></a>
-</span><span id="__span-0-149"><a id="__codelineno-0-149" name="__codelineno-0-149"></a>    <span class="n">tracer_provider</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">=</span> <span class="n">_get_tracer_provider</span><span class="p">(</span>
-</span><span id="__span-0-150"><a id="__codelineno-0-150" name="__codelineno-0-150"></a>        <span class="n">agent_framework</span><span class="p">,</span>
-</span><span id="__span-0-151"><a id="__codelineno-0-151" name="__codelineno-0-151"></a>        <span class="n">tracing_config</span><span class="p">,</span>
-</span><span id="__span-0-152"><a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="p">)</span>
-</span><span id="__span-0-153"><a id="__codelineno-0-153" name="__codelineno-0-153"></a>
-</span><span id="__span-0-154"><a id="__codelineno-0-154" name="__codelineno-0-154"></a>    <span class="n">instrumenter</span> <span class="o">=</span> <span class="n">get_instrumenter_by_framework</span><span class="p">(</span><span class="n">agent_framework_</span><span class="p">)</span>
-</span><span id="__span-0-155"><a id="__codelineno-0-155" name="__codelineno-0-155"></a>    <span class="n">instrumenter</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="n">tracer_provider</span><span class="o">=</span><span class="n">tracer_provider</span><span class="p">)</span>
-</span><span id="__span-0-156"><a id="__codelineno-0-156" name="__codelineno-0-156"></a>
-</span><span id="__span-0-157"><a id="__codelineno-0-157" name="__codelineno-0-157"></a>    <span class="k">return</span> <span class="n">file_name</span>
+</span><span id="__span-0-147"><a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="n">instrumenter</span> <span class="o">=</span> <span class="n">_get_instrumenter_by_framework</span><span class="p">(</span><span class="n">agent_framework_</span><span class="p">)</span>
+</span><span id="__span-0-148"><a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="n">instrumenter</span><span class="o">.</span><span class="n">instrument</span><span class="p">(</span><span class="n">tracer_provider</span><span class="o">=</span><span class="n">tracer_provider</span><span class="p">)</span>
+</span><span id="__span-0-149"><a id="__codelineno-0-149" name="__codelineno-0-149"></a>
+</span><span id="__span-0-150"><a id="__codelineno-0-150" name="__codelineno-0-150"></a>    <span class="k">return</span> <span class="n">file_name</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
