@@ -82,7 +82,7 @@ def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
 
 
 @pytest.fixture
-def mock_stdio_client() -> Generator[
+def _patch_stdio_client() -> Generator[
     tuple[AsyncMock, tuple[AsyncMock, AsyncMock]], None
 ]:
     mock_cm = AsyncMock()
