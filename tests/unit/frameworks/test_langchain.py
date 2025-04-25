@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -93,4 +93,23 @@ def test_load_langchain_multiagent() -> None:
             model=model_mock.return_value,
             tools=[handoff_mock.return_value],
             prompt=None,
+        )
+
+
+def test_run_langchain_agent_custom_args() -> None:
+    create_mock = MagicMock()
+    agent_mock = AsyncMock()
+    create_mock.return_value = agent_mock
+
+    with (
+        patch("any_agent.frameworks.langchain.create_react_agent", create_mock),
+        patch("langchain_litellm.ChatLiteLLM"),
+        patch("langchain_core.tools.tool"),
+    ):
+        agent = AnyAgent.create(
+            AgentFramework.LANGCHAIN, AgentConfig(model_id="gpt-4o")
+        )
+        agent.run("foo", debug=True)
+        agent_mock.ainvoke.assert_called_once_with(
+            {"messages": [("user", "foo")]}, debug=True
         )

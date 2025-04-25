@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.tools import search_web
 
 
@@ -33,6 +33,12 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    agent = AnyAgent.create(agent_framework, agent_config)
+    traces = tmp_path / "traces"
+    agent = AnyAgent.create(
+        agent_framework, agent_config, tracing=TracingConfig(output_dir=str(traces))
+    )
     result = agent.run("Which agent framework is the best?")
     assert result
+    if agent_framework not in (AgentFramework.AGNO, AgentFramework.GOOGLE):
+        assert traces.exists()
+        assert agent_framework.name in str(next(traces.iterdir()).name)

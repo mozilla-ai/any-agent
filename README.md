@@ -24,10 +24,8 @@ any-agent also provides a 'trace-first' [llm-as-a-judge powered evaluation tool]
 [![Google ADK](https://img.shields.io/badge/Google%20ADK-4285F4?logo=google&logoColor=white)](https://github.com/google/adk-python) [![LangChain](https://img.shields.io/badge/LangChain-1e4545?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph) [![LlamaIndex](https://img.shields.io/badge/🦙%20LlamaIndex-fbcfe2)](https://github.com/run-llama/llama_index) [![OpenAI Agents](https://img.shields.io/badge/OpenAI%20Agents-black?logo=openai)](https://github.com/openai/openai-agents-python) [![Smolagents](https://img.shields.io/badge/Smolagents-ffcb3a?logo=huggingface&logoColor=white)](https://smolagents.org/) [Agno AI](https://docs.agno.com/introduction)
 
 ### Planned for Support (Contributions Welcome!)
-[AWS Bedrock Agents](https://github.com/mozilla-ai/any-agent/issues/16),
-[Pydantic AI](https://github.com/mozilla-ai/any-agent/issues/31),
-[Microsoft AutoGen](https://github.com/mozilla-ai/any-agent/issues/30),
-[Crew AI](https://github.com/mozilla-ai/any-agent/issues/17)
+
+[Open Github tickets for new frameworks](https://github.com/mozilla-ai/any-agent/issues?q=is%3Aissue%20state%3Aopen%20label%3Aframeworks)
 
 ## Requirements
 
@@ -48,6 +46,12 @@ To define any agent system you will always use the same imports:
 ```py
 from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
+For this example we use a model hosted by openai, but you may need to set the relevant API key for whichever provider being used.
+See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
+
+```bash
+export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
+```
 
 ### Single agent
 
@@ -55,7 +59,7 @@ from any_agent import AgentConfig, AnyAgent, TracingConfig
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # Framework type. See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
@@ -73,7 +77,7 @@ agent.run("Which Agent Framework is the best??")
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # Framework type. See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="You are the main agent. Use the other available agents to find an answer",

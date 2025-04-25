@@ -1,4 +1,5 @@
 import importlib
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
@@ -22,6 +23,14 @@ DEFAULT_MODEL_CLASS = "litellm.LiteLLM"
 
 class LlamaIndexAgent(AnyAgent):
     """LLamaIndex agent implementation that handles both loading and running."""
+
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: Sequence[AgentConfig] | None = None,
+    ):
+        super().__init__(config, managed_agents)
+        self._agent: AgentWorkflow | ReActAgent | None = None
 
     @property
     def framework(self) -> AgentFramework:
@@ -58,7 +67,6 @@ class LlamaIndexAgent(AnyAgent):
                 visit_webpage,
             ]
 
-        self._agent: AgentWorkflow | ReActAgent
         if self.managed_agents:
             agents = []
             managed_names = []
@@ -73,7 +81,7 @@ class LlamaIndexAgent(AnyAgent):
                 managed_names.append(name)
                 managed_instance = ReActAgent(
                     name=name,
-                    description=managed_agent.description,
+                    description=managed_agent.description or "A managed agent",
                     system_prompt=managed_agent.instructions,
                     tools=managed_tools,
                     llm=self._get_model(managed_agent),
@@ -85,7 +93,7 @@ class LlamaIndexAgent(AnyAgent):
             main_tools, _ = await self._load_tools(self.config.tools)
             main_agent = ReActAgent(
                 name=self.config.name,
-                description=self.config.description,
+                description=self.config.description or "The main agent",
                 tools=main_tools,
                 llm=self._get_model(self.config),
                 system_prompt=self.config.instructions,
@@ -94,7 +102,7 @@ class LlamaIndexAgent(AnyAgent):
             )
             agents.append(main_agent)
 
-            self._agent = AgentWorkflow(agents=agents, root_agent=main_agent.name)
+            self._agent = AgentWorkflow(agents=agents, root_agent=main_agent.name)  # type: ignore[arg-type]
 
         else:
             imported_tools, _ = await self._load_tools(self.config.tools)
@@ -102,10 +110,15 @@ class LlamaIndexAgent(AnyAgent):
             self._agent = ReActAgent(
                 name=self.config.name,
                 tools=imported_tools,
+                description=self.config.description or "The main agent",
                 llm=self._get_model(self.config),
                 system_prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str) -> Any:
-        return await self._agent.run(prompt)
+    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+        if not self._agent:
+            error_message = "Agent not loaded. Call load_agent() first."
+            raise ValueError(error_message)
+
+        return await self._agent.run(prompt, **kwargs)

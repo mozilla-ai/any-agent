@@ -1,4 +1,5 @@
 import importlib
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -28,6 +29,15 @@ DEFAULT_MODEL_CLASS = "langchain_litellm.ChatLiteLLM"
 
 class LangchainAgent(AnyAgent):
     """LangChain agent implementation that handles both loading and running."""
+
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: Sequence[AgentConfig] | None = None,
+    ):
+        super().__init__(config, managed_agents)
+        self._agent: CompiledGraph | None = None
+        self._tools: Sequence[Any] = []
 
     @property
     def framework(self) -> AgentFramework:
@@ -64,7 +74,6 @@ class LangchainAgent(AnyAgent):
 
         imported_tools, _ = await self._load_tools(self.config.tools)
 
-        self._agent: CompiledGraph
         if self.managed_agents:
             swarm = []
             managed_names = []
@@ -78,7 +87,7 @@ class LangchainAgent(AnyAgent):
                     name = f"managed_agent_{n}"
                 managed_names.append(name)
 
-                managed_agent = create_react_agent(
+                managed_agent = create_react_agent(  # type: ignore[assignment]
                     name=name,
                     model=self._get_model(managed_agent),
                     tools=[
@@ -102,8 +111,8 @@ class LangchainAgent(AnyAgent):
                 prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )
-            swarm.append(main_agent)
-            workflow = create_swarm(swarm, default_active_agent=self.config.name)
+            swarm.append(main_agent)  # type: ignore[arg-type]
+            workflow = create_swarm(swarm, default_active_agent=self.config.name)  # type: ignore[arg-type]
             self._agent = workflow.compile()
         else:
             self._agent = create_react_agent(
@@ -117,7 +126,11 @@ class LangchainAgent(AnyAgent):
         # so we'll store a list of them in this class
         self._tools = imported_tools
 
-    async def run_async(self, prompt: str) -> Any:
+    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the LangChain agent with the given prompt."""
+        if not self._agent:
+            error_message = "Agent not loaded. Call load_agent() first."
+            raise ValueError(error_message)
+
         inputs = {"messages": [("user", prompt)]}
-        return await self._agent.ainvoke(inputs)
+        return await self._agent.ainvoke(inputs, **kwargs)

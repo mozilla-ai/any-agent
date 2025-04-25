@@ -19,7 +19,7 @@ class TelemetryProcessor(ABC):
 
     @classmethod
     def create(cls, agent_framework_raw: AgentFramework | str) -> TelemetryProcessor:
-        """Factory method to create the appropriate telemetry processor."""
+        """Create the appropriate telemetry processor."""
         agent_framework = AgentFramework.from_string(agent_framework_raw)
 
         if agent_framework is AgentFramework.LANGCHAIN:
@@ -56,7 +56,7 @@ class TelemetryProcessor(ABC):
         assert_never(agent_framework)
 
     @abstractmethod
-    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
+    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         """Extract the hypothesis agent final answer from the trace."""
 
     @abstractmethod
@@ -65,23 +65,24 @@ class TelemetryProcessor(ABC):
 
     @abstractmethod
     def _extract_llm_interaction(self, span: Mapping[str, Any]) -> Mapping[str, Any]:
-        """Extract interaction details of a span of type LLM"""
+        """Extract interaction details of a span of type LLM."""
 
     @abstractmethod
     def _extract_tool_interaction(self, span: Mapping[str, Any]) -> Mapping[str, Any]:
-        """Extract interaction details of a span of type TOOL"""
+        """Extract interaction details of a span of type TOOL."""
 
     @abstractmethod
     def _extract_chain_interaction(self, span: Mapping[str, Any]) -> Mapping[str, Any]:
-        """Extract interaction details of a span of type CHAIN"""
+        """Extract interaction details of a span of type CHAIN."""
 
     @abstractmethod
     def _extract_agent_interaction(self, span: Mapping[str, Any]) -> Mapping[str, Any]:
-        """Extract interaction details of a span of type AGENT"""
+        """Extract interaction details of a span of type AGENT."""
 
     @staticmethod
     def determine_agent_framework(trace: Sequence[Mapping[str, Any]]) -> AgentFramework:
         """Determine the agent type based on the trace.
+
         These are not really stable ways to find it, because we're waiting on some
         reliable method for determining the agent type. This is a temporary solution.
         """
@@ -129,8 +130,8 @@ class TelemetryProcessor(ABC):
 
     @staticmethod
     def parse_generic_key_value_string(text: str) -> dict[str, str]:
-        """
-        Parse a string that has items of a dict with key-value pairs separated by '='.
+        """Parse a string that has items of a dict with key-value pairs separated by '='.
+
         Only splits on '=' signs, handling quoted strings properly.
         """
         pattern = r"(\w+)=('.*?'|\".*?\"|[^'\"=]*?)(?=\s+\w+=|\s*$)"

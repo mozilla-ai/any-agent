@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -220,3 +220,20 @@ def test_load_openai_agent_missing() -> None:
     with patch("any_agent.frameworks.openai.agents_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
+
+
+def test_run_openai_with_custom_args() -> None:
+    mock_agent = MagicMock()
+    mock_runner = AsyncMock()
+
+    with (
+        patch("any_agent.frameworks.openai.Runner", mock_runner),
+        patch("any_agent.frameworks.openai.Agent", mock_agent),
+        patch("agents.function_tool"),
+        patch("any_agent.frameworks.openai.LitellmModel"),
+    ):
+        agent = AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
+        agent.run("foo", max_turns=30)
+        mock_runner.run.assert_called_once_with(
+            mock_agent.return_value, "foo", max_turns=30
+        )

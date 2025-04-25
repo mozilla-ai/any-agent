@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 from uuid import uuid4
 
@@ -20,6 +21,14 @@ except ImportError:
 
 class GoogleAgent(AnyAgent):
     """Google ADK agent implementation that handles both loading and running."""
+
+    def __init__(
+        self,
+        config: AgentConfig,
+        managed_agents: Sequence[AgentConfig] | None = None,
+    ):
+        super().__init__(config, managed_agents)
+        self._agent: Agent | None = None
 
     @property
     def framework(self) -> AgentFramework:
@@ -70,18 +79,23 @@ class GoogleAgent(AnyAgent):
             instruction=self.config.instructions or "",
             model=self._get_model(self.config),
             tools=tools,
-            sub_agents=sub_agents_instanced,
+            sub_agents=sub_agents_instanced,  # type: ignore[arg-type]
             **self.config.agent_args or {},
             output_key="response",
         )
 
-    async def run_async(
+    async def run_async(  # type: ignore[no-untyped-def]
         self,
         prompt: str,
         user_id: str | None = None,
         session_id: str | None = None,
+        **kwargs,
     ) -> Any:
         """Run the Google agent with the given prompt."""
+        if not self._agent:
+            error_message = "Agent not loaded. Call load_agent() first."
+            raise ValueError(error_message)
+
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
@@ -94,6 +108,7 @@ class GoogleAgent(AnyAgent):
             user_id=user_id,
             session_id=session_id,
             new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
+            **kwargs,
         )
 
         async for event in events:
@@ -106,4 +121,5 @@ class GoogleAgent(AnyAgent):
             user_id=user_id,
             session_id=session_id,
         )
+        assert session, "Session should not be None"
         return session.state.get("response", None)

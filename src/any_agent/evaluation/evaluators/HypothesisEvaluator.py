@@ -6,7 +6,7 @@ from any_agent.evaluation.test_case import CheckpointCriteria, GroundTruthAnswer
 
 
 class HypothesisEvaluator(LLMEvaluator):
-    """Evaluates the final answer against ground truth"""
+    """Evaluates the final answer against ground truth."""
 
     def evaluate(
         self,
@@ -14,7 +14,7 @@ class HypothesisEvaluator(LLMEvaluator):
         ground_truth_answer_dict: Sequence[GroundTruthAnswer],
         ground_truth_checkpoints: Sequence[CheckpointCriteria],
     ) -> list[EvaluationResult]:
-        """Verify if the final answer meets all specified criteria"""
+        """Verify if the final answer meets all specified criteria."""
         results = []
 
         for criterion in ground_truth_checkpoints:

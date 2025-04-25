@@ -1,4 +1,4 @@
-from collections.abc import Callable, MutableMapping, Sequence
+from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import Enum, auto
 from typing import Any, Self
 
@@ -33,15 +33,24 @@ class MCPStdioParams(BaseModel):
     command: str
     args: Sequence[str]
     tools: Sequence[str] | None = None
+    client_session_timeout_seconds: float | None = 5
+    """the read timeout passed to the MCP ClientSession."""
+
+    model_config = ConfigDict(frozen=True)
 
 
 class MCPSseParams(BaseModel):
     url: str
-    headers: dict[str, str] | None = None
-    tools: list[str] | None = None
+    headers: Mapping[str, str] | None = None
+    tools: Sequence[str] | None = None
+    client_session_timeout_seconds: float | None = 5
+    """the read timeout passed to the MCP ClientSession."""
+
+    model_config = ConfigDict(frozen=True)
 
 
 class TracingConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     output_dir: str | None = "traces"  # None for no json saved trace
     llm: str | None = "yellow"
     tool: str | None = "blue"

@@ -43,7 +43,7 @@ llama_index = [
 ]
 
 smolagents = [
-  "smolagents[litellm,mcp]>=1.10.0",
+  "smolagents[litellm,mcp]>=1.14.0",
   "openinference-instrumentation-smolagents"
 ]
 
@@ -53,7 +53,7 @@ openai = [
 ]
 
 agno = [
-  "agno>=1.3.4",
+  "agno<=1.3.5", # https://github.com/mozilla-ai/any-agent/issues/155
   "litellm"
 ]
 
@@ -108,7 +108,8 @@ disable = [
 
 [tool.ruff.lint]
 ignore = [
-  "D",
+  "D100",  # We don't use module docstrings
+  "D104",  # We don't use package docstrings
   "FBT",
   "COM",
   "ANN",
@@ -136,8 +137,22 @@ ignore = [
 ]
 extend-select = ["ALL"]
 
+[tool.ruff.lint.per-file-ignores]
+"src/any_agent/config.py" = ["D101", "D102"]
+"src/any_agent/evaluation/*" = ["D101", "D103", "D107"]  # TODO: Revisit when working on evaluation
+"src/any_agent/evaluation/evaluators/*" = ["D103", "D107"]
+"src/any_agent/frameworks/*" = ["D107", "D102"]
+"src/any_agent/tools/mcp/*" = ["D101"]
+"tests/*" = ["D"]
+
 [tool.mypy]
 strict = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 follow_untyped_imports = true
+
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"

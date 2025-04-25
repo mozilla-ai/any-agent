@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-import evaluate
+import evaluate.loading
 from typing_extensions import TypedDict
 
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
@@ -18,17 +18,17 @@ class GroundTruthAnswers(TypedDict):
 
 
 class QuestionAnsweringSquadEvaluator:
-    """Directly compares answers without using LLM-as-judge"""
+    """Directly compares answers without using LLM-as-judge."""
 
     def __init__(self) -> None:
-        self.metric = evaluate.load("squad")
+        self.metric = evaluate.loading.load("squad")
 
     def evaluate(
         self,
         hypothesis_answer: str,
         ground_truth_answer: Sequence[GroundTruthAnswer],
     ) -> list[EvaluationResult]:
-        """Directly compare answers using simple matching"""
+        """Directly compare answers using simple matching."""
         # format the answers so that they're dicts with 'id' and 'prediction' keys for hypo
         # and the ref has id and answers keys
         hypothesis_answers = [{"id": "1", "prediction_text": hypothesis_answer}]
@@ -46,6 +46,8 @@ class QuestionAnsweringSquadEvaluator:
             predictions=hypothesis_answers,
             references=ground_truth_answers,
         )
+
+        assert result, "The result of the evaluation is empty"
 
         match = EvaluationResult(
             passed=int(result["exact_match"]) == 1,

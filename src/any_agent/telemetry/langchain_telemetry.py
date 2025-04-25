@@ -14,7 +14,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
 
-    def extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
+    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
                 content = span["attributes"]["output.value"]
@@ -30,7 +30,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                 except UnicodeDecodeError:
                     # If that fails, the escape sequences might already be interpreted
                     pass
-                return final_text  # type: ignore[no-any-return]
+                return final_text
 
         msg = "No agent final answer found in trace"
         raise ValueError(msg)

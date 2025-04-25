@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -76,3 +76,21 @@ def test_load_smolagents_agent_missing() -> None:
     with patch("any_agent.frameworks.smolagents.smolagents_available", False):
         with pytest.raises(ImportError):
             AnyAgent.create(AgentFramework.SMOLAGENTS, AgentConfig(model_id="gpt-4o"))
+
+
+def test_run_smolagent_custom_args() -> None:
+    mock_agent = MagicMock()
+    mock_agent.return_value = AsyncMock()
+    with (
+        patch(f"smolagents.{DEFAULT_AGENT_TYPE}", mock_agent),
+        patch(f"smolagents.{DEFAULT_MODEL_CLASS}"),
+        patch("smolagents.tool"),
+    ):
+        agent = AnyAgent.create(
+            AgentFramework.SMOLAGENTS,
+            AgentConfig(
+                model_id="openai/o3-mini",
+            ),
+        )
+        agent.run("foo", max_steps=30)
+        mock_agent.return_value.run.assert_called_once_with("foo", max_steps=30)
