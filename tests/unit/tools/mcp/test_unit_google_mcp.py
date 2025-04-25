@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework, MCPSseParams
-from any_agent.tools.mcp.frameworks import get_mcp_server
+from any_agent.tools.mcp.frameworks import _get_mcp_server
 
 
 @pytest.mark.asyncio
@@ -21,7 +21,7 @@ async def test_google_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = get_mcp_server(mcp_tool, AgentFramework.GOOGLE)
+    server = _get_mcp_server(mcp_tool, AgentFramework.GOOGLE)
 
     # Mock Google MCP classes
     with (
@@ -41,8 +41,8 @@ async def test_google_mcp_sse() -> None:
         with patch.object(AsyncExitStack, "enter_async_context") as mock_enter_context:
             mock_enter_context.return_value = mock_toolset
 
-            # Test the setup_tools method
-            await server.setup_tools()
+            # Test the _setup_tools method
+            await server._setup_tools()
 
             # Verify the SseServerParams was created correctly
             mock_sse_params.assert_called_once_with(

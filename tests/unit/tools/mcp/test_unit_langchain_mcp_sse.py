@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework, MCPSseParams
-from any_agent.tools.mcp.frameworks import get_mcp_server
+from any_agent.tools.mcp.frameworks import _get_mcp_server
 
 
 @pytest.mark.asyncio
@@ -28,7 +28,7 @@ async def test_langchain_mcp_sse() -> None:
         patch("mcp.ClientSession") as mock_client_session,
     ):
         # Create the server instance
-        server = get_mcp_server(mcp_tool, AgentFramework.LANGCHAIN)
+        server = _get_mcp_server(mcp_tool, AgentFramework.LANGCHAIN)
 
         # Set up mocks
         mock_transport = (AsyncMock(), AsyncMock())
@@ -45,8 +45,8 @@ async def test_langchain_mcp_sse() -> None:
                 mock_session,
             ]
 
-            # Test the setup_tools method
-            await server.setup_tools()
+            # Test the _setup_tools method
+            await server._setup_tools()
             # Verify session was initialized
             mock_session.initialize.assert_called_once()
             # Verify tools were loaded

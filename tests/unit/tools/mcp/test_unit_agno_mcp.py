@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework, MCPSseParams
-from any_agent.tools.mcp.frameworks import get_mcp_server
+from any_agent.tools.mcp.frameworks import _get_mcp_server
 
 
 @pytest.mark.asyncio
@@ -22,7 +22,7 @@ async def test_agno_mcp_sse() -> None:
     )
 
     # Create the server instance
-    server = get_mcp_server(mcp_tool, AgentFramework.AGNO)
+    server = _get_mcp_server(mcp_tool, AgentFramework.AGNO)
 
     # Mock required components
     with (
@@ -44,8 +44,8 @@ async def test_agno_mcp_sse() -> None:
         with patch.object(AsyncExitStack, "enter_async_context") as mock_enter_context:
             mock_enter_context.side_effect = [mock_transport, mock_session, mock_tools]
 
-            # Test the setup_tools method
-            await server.setup_tools()
+            # Test the _setup_tools method
+            await server._setup_tools()
 
             # Verify session was initialized
             mock_session.initialize.assert_called_once()

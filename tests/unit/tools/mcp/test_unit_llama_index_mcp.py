@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework, MCPSseParams
-from any_agent.tools.mcp.frameworks import get_mcp_server
+from any_agent.tools.mcp.frameworks import _get_mcp_server
 
 
 @pytest.mark.asyncio
@@ -17,7 +17,7 @@ async def test_llamaindex_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse", tools=["tool1", "tool2"])
 
     # Create the server instance
-    server = get_mcp_server(mcp_tool, AgentFramework.LLAMA_INDEX)
+    server = _get_mcp_server(mcp_tool, AgentFramework.LLAMA_INDEX)
 
     # Mock LlamaIndex MCP classes
     with (
@@ -36,8 +36,8 @@ async def test_llamaindex_mcp_sse() -> None:
         mock_tool_spec.to_tool_list_async = AsyncMock(return_value=mock_tools)
         mock_tool_spec_class.return_value = mock_tool_spec
 
-        # Test the setup_tools method
-        await server.setup_tools()
+        # Test the _setup_tools method
+        await server._setup_tools()
 
         # Verify the client was created correctly
         mock_client_class.assert_called_once_with(

@@ -7,7 +7,7 @@ import pytest
 from mcp import Tool as MCPTool
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
-from any_agent.tools.mcp.frameworks import get_mcp_server
+from any_agent.tools.mcp.frameworks import _get_mcp_server
 
 
 @pytest.mark.asyncio
@@ -40,8 +40,8 @@ async def test_stdio_tool_filtering(
         MCPTool(name="other_tool", inputSchema={"type": "string", "properties": {}}),
     ]
     mock_list_tools.return_value = mock_tool_list
-    server = get_mcp_server(mock_stdio_params, agent_framework)
-    await server.setup_tools()
+    server = _get_mcp_server(mock_stdio_params, agent_framework)
+    await server._setup_tools()
     if agent_framework == AgentFramework.AGNO:
         # Check that only the specified tools are included
         assert set(server.tools[0].functions.keys()) == {"write_file", "read_file"}
@@ -58,8 +58,8 @@ async def test_sse_tool_filtering(
         url=echo_sse_server["url"], tools=["say_hi", "say_bye"]
     )
 
-    server = get_mcp_server(mock_sse_params, agent_framework)
-    await server.setup_tools()
+    server = _get_mcp_server(mock_sse_params, agent_framework)
+    await server._setup_tools()
     if agent_framework == AgentFramework.AGNO:
         # Check that only the specified tools are included
         assert set(server.tools[0].functions.keys()) == {"say_hi", "say_bye"}

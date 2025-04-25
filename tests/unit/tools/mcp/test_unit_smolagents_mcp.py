@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
-from any_agent.tools.mcp.frameworks import get_mcp_server
+from any_agent.tools.mcp.frameworks import _get_mcp_server
 
 
 def create_mock_tools() -> list[MagicMock]:
@@ -41,7 +41,7 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         self.test_tool.command = "test_command"
         self.test_tool.args = ["arg1", "arg2"]
 
-    def test_setup_tools_with_none_tools(
+    def test__setup_tools_with_none_tools(
         self,
         mock_client_class: Any,
     ) -> None:
@@ -53,14 +53,14 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         mock_client_class.return_value.__enter__.return_value = mock_tools
 
         self.test_tool.tools = None
-        mcp_server = get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
-        asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
+        mcp_server = _get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
+        asyncio.get_event_loop().run_until_complete(mcp_server._setup_tools())
 
         # Verify all tools are included
         assert mcp_server.tools == mock_tools
         assert len(mcp_server.tools) == 2
 
-    def test_setup_tools_with_specific_tools(
+    def test__setup_tools_with_specific_tools(
         self,
         mock_client_class: Any,
     ) -> None:
@@ -74,8 +74,8 @@ class TestSmolagentsMCPServer(unittest.TestCase):
         # Create test tool configuration with specific tools
         self.test_tool.tools = ["read_thing", "write_thing"]
 
-        mcp_server = get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
-        asyncio.get_event_loop().run_until_complete(mcp_server.setup_tools())
+        mcp_server = _get_mcp_server(self.test_tool, AgentFramework.SMOLAGENTS)
+        asyncio.get_event_loop().run_until_complete(mcp_server._setup_tools())
 
         # Verify only the requested tools are included
         assert len(mcp_server.tools) == 2
@@ -98,7 +98,7 @@ async def test_smolagents_mcp_sse() -> None:
     mcp_tool = MCPSseParams(url="http://localhost:8000/sse")
 
     # Create the server instance
-    server = get_mcp_server(mcp_tool, AgentFramework.SMOLAGENTS)
+    server = _get_mcp_server(mcp_tool, AgentFramework.SMOLAGENTS)
 
     # Patch the MCPClient class to return our mock tools
     with patch(
@@ -107,8 +107,8 @@ async def test_smolagents_mcp_sse() -> None:
         # Setup the mock to return our tools when used as a context manager
         mock_client_class.return_value.__enter__.return_value = mock_tools
 
-        # Test the setup_tools method
-        await server.setup_tools()
+        # Test the _setup_tools method
+        await server._setup_tools()
 
         # Verify the client was created with correct parameters
         mock_client_class.assert_called_once_with({"url": "http://localhost:8000/sse"})
