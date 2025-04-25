@@ -17,8 +17,6 @@ try:
 except ImportError:
     agents_available = False
 
-OPENAI_MAX_TURNS = 30
-
 
 class OpenAIAgent(AnyAgent):
     """OpenAI agent implementation that handles both loading and running."""
@@ -117,10 +115,10 @@ class OpenAIAgent(AnyAgent):
             non_mcp_tools.append(tool)
         return non_mcp_tools
 
-    async def run_async(self, prompt: str) -> Any:
+    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the OpenAI agent with the given prompt asynchronously."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
 
-        return await Runner.run(self._agent, prompt, max_turns=OPENAI_MAX_TURNS)
+        return await Runner.run(self._agent, prompt, **kwargs)

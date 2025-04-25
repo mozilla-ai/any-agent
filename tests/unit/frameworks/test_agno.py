@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -72,3 +72,17 @@ def test_load_agno_multi_agent() -> None:
             members=[mock_agent.return_value],
             tools=[search_web],
         )
+
+
+def test_run_agno_custom_args() -> None:
+    mock_agent = MagicMock()
+    mock_agent.return_value = AsyncMock()
+    mock_model = MagicMock()
+
+    with (
+        patch("any_agent.frameworks.agno.Agent", mock_agent),
+        patch("any_agent.frameworks.agno.LiteLLM", mock_model),
+    ):
+        agent = AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
+        agent.run("foo", retries=2)
+        mock_agent.return_value.arun.assert_called_once_with("foo", retries=2)

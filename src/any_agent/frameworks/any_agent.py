@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, assert_never
 
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools.wrappers import wrap_tools
+from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing import setup_tracing
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ class AnyAgent(ABC):
     async def _load_tools(
         self, tools: Sequence[Tool]
     ) -> tuple[list[Any], list[MCPServerBase]]:
-        tools, mcp_servers = await wrap_tools(tools, self.framework)
+        tools, mcp_servers = await _wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
         for mcp_server in mcp_servers:
@@ -119,22 +119,24 @@ class AnyAgent(ABC):
         await agent.load_agent()
         return agent
 
-    def run(self, prompt: str) -> Any:
+    def run(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the agent with the given prompt."""
-        return asyncio.get_event_loop().run_until_complete(self.run_async(prompt))
+        return asyncio.get_event_loop().run_until_complete(
+            self.run_async(prompt, **kwargs)
+        )
 
     @abstractmethod
     async def load_agent(self) -> None:
         """Load the agent instance."""
 
     @abstractmethod
-    async def run_async(self, prompt: str) -> Any:
+    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the agent asynchronously with the given prompt."""
 
     @property
     @abstractmethod
     def framework(self) -> AgentFramework:
-        """The Agent Framework used"""
+        """The Agent Framework used."""
 
     @property
     def agent(self) -> Any:

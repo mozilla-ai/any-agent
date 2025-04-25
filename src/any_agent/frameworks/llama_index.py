@@ -116,9 +116,9 @@ class LlamaIndexAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str) -> Any:
+    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
 
-        return await self._agent.run(prompt)
+        return await self._agent.run(prompt, **kwargs)

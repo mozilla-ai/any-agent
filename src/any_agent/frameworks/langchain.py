@@ -126,11 +126,11 @@ class LangchainAgent(AnyAgent):
         # so we'll store a list of them in this class
         self._tools = imported_tools
 
-    async def run_async(self, prompt: str) -> Any:
+    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the LangChain agent with the given prompt."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
 
         inputs = {"messages": [("user", prompt)]}
-        return await self._agent.ainvoke(inputs)
+        return await self._agent.ainvoke(inputs, **kwargs)

@@ -21,7 +21,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
     agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)
 
     processor = TelemetryProcessor.create(agent_framework)
-    hypothesis_answer = processor.extract_hypothesis_answer(trace=telemetry)
+    hypothesis_answer = processor._extract_hypothesis_answer(trace=telemetry)
 
     checkpoint_evaluator = CheckpointEvaluator(model=test_case.llm_judge)
     checkpoint_results = checkpoint_evaluator.evaluate(

@@ -1,7 +1,3 @@
-# pylint: disable=unused-argument, unused-variable
-# Test MCP Tools Classes.
-# Disclaim
-
 from collections.abc import Sequence
 from typing import Any
 

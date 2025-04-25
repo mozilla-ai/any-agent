@@ -127,3 +127,11 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+
+
+## Run args
+
+You can pass arbitrary `key=value` arguments to `agent.run` and they will be forwarded
+to the corresponding method used by the underlying framework.
+
+For example, you can pass `max_turns=30` when using the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/).
