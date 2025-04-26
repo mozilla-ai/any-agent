@@ -82,7 +82,7 @@ def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
 
 
 @pytest.fixture
-def mock_stdio_client() -> Generator[
+def _patch_stdio_client() -> Generator[
     tuple[AsyncMock, tuple[AsyncMock, AsyncMock]], None
 ]:
     mock_cm = AsyncMock()
@@ -100,17 +100,17 @@ SSE_MCP_SERVER_SCRIPT = dedent(
         mcp = FastMCP("Echo Server", host="127.0.0.1", port=8000)
 
         @mcp.tool()
-        def say_hi(text: str) -> str:
+        def write_file(text: str) -> str:
             """Say hi back with the input text"""
             return f"Hi: {text}"
 
         @mcp.tool()
-        def say_bye(text: str) -> str:
+        def read_file(text: str) -> str:
             """Say bye back the input text"""
             return f"Bye: {text}"
 
         @mcp.tool()
-        def say_boo(text: str) -> str:
+        def other_tool(text: str) -> str:
             """Say boo back the input text"""
             return f"Boo: {text}"
 

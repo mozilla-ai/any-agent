@@ -1,59 +1,51 @@
-# pylint: disable=unused-argument, unused-variable
-from contextlib import AsyncExitStack
-from unittest.mock import AsyncMock, MagicMock, patch
+from collections.abc import Generator, Sequence
+from typing import Any
+from unittest.mock import patch
 
 import pytest
+from agno.tools.mcp import MCPTools as AgnoMCPTools
 
-from any_agent.config import AgentFramework, MCPSseParams
-from any_agent.tools.mcp.frameworks import _get_mcp_server
+from any_agent.config import AgentFramework, MCPSseParams, Tool
+from any_agent.tools import _get_mcp_server
+
+
+@pytest.fixture
+def agno_mcp_tools() -> Generator[AgnoMCPTools]:
+    with patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools:
+        yield mock_mcp_tools
 
 
 @pytest.mark.asyncio
-async def test_agno_mcp_sse() -> None:
-    """Test AgnoMCPToolConnection with SSE configuration."""
-    # Mock the necessary components
-    mock_tools = [MagicMock(), MagicMock()]
+@pytest.mark.usefixtures(
+    "enter_context_with_transport_and_session",
+    "agno_mcp_tools",
+    "_path_client_session",
+)
+async def test_agno_mcp_sse_tools_loaded(
+    mcp_sse_params_with_tools: MCPSseParams,
+    tools: Sequence[Tool],
+) -> None:
+    mcp_server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.AGNO)
 
-    # Create an MCP tool config for SSE
-    mcp_tool = MCPSseParams(
-        url="http://localhost:8000/sse",
-        headers={"Authorization": "Bearer test-token"},
-        tools=["tool1", "tool2"],
-    )
+    await mcp_server._setup_tools()
 
-    # Create the server instance
-    server = _get_mcp_server(mcp_tool, AgentFramework.AGNO)
+    assert mcp_server.tools == [tools]
 
-    # Mock required components
-    with (
-        patch(
-            "any_agent.tools.mcp.frameworks.agno.ClientSession"
-        ) as mock_client_session,
-        patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools,
-    ):
-        # Set up mocks
-        mock_transport = (AsyncMock(), AsyncMock())
 
-        mock_session = AsyncMock()
-        mock_client_session.return_value.__aenter__.return_value = mock_session
+@pytest.mark.asyncio
+@pytest.mark.usefixtures(
+    "enter_context_with_transport_and_session",
+)
+async def test_agno_mcp_sse_integration(
+    mcp_sse_params_with_tools: MCPSseParams,
+    session: Any,
+    tools: Sequence[Tool],
+    agno_mcp_tools: AgnoMCPTools,
+) -> None:
+    mcp_server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.AGNO)
 
-        mock_tools_instance = MagicMock()
-        mock_mcp_tools.return_value = mock_tools_instance
+    await mcp_server._setup_tools()
 
-        # Mock AsyncExitStack to avoid actually setting up exit handlers
-        with patch.object(AsyncExitStack, "enter_async_context") as mock_enter_context:
-            mock_enter_context.side_effect = [mock_transport, mock_session, mock_tools]
+    session.initialize.assert_called_once()
 
-            # Test the _setup_tools method
-            await server._setup_tools()
-
-            # Verify session was initialized
-            mock_session.initialize.assert_called_once()
-
-            # Verify MCPTools was created with correct params
-            mock_mcp_tools.assert_called_once_with(
-                session=mock_session, include_tools=["tool1", "tool2"]
-            )
-
-            # Check that tools instance was set as server
-            assert server.server == mock_tools_instance  # type: ignore[union-attr]
+    agno_mcp_tools.assert_called_once_with(session=session, include_tools=tools)  # type: ignore[attr-defined]
