@@ -88,8 +88,8 @@ def _patch_client_session_initialize() -> Generator[ClientSession]:
         "mcp.client.session.ClientSession.initialize",
         new_callable=AsyncMock,
         return_value=None,
-    ):
-        yield
+    ) as initialize_mock:
+        yield initialize_mock
 
 
 @pytest.fixture

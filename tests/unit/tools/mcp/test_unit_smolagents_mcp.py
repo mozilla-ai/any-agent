@@ -42,4 +42,4 @@ async def test_smolagents_mcp_sse_integration(
 
     await server._setup_tools()
 
-    smolagents_mcp_server.assert_called_once_with({"url": mcp_sse_params_no_tools.url})
+    smolagents_mcp_server.assert_called_once_with({"url": mcp_sse_params_no_tools.url})  # type: ignore[attr-defined]

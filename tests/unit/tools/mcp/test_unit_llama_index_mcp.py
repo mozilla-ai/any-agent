@@ -57,6 +57,6 @@ async def test_llamaindex_mcp_sse_integration(
 
     await server._setup_tools()
 
-    llama_index_mcp_client.assert_called_once_with(
+    llama_index_mcp_client.assert_called_once_with(  # type: ignore[attr-defined]
         command_or_url=mcp_sse_params_with_tools.url
     )

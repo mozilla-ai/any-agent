@@ -48,4 +48,4 @@ async def test_agno_mcp_sse_integration(
 
     session.initialize.assert_called_once()
 
-    agno_mcp_tools.assert_called_once_with(session=session, include_tools=tools)
+    agno_mcp_tools.assert_called_once_with(session=session, include_tools=tools)  # type: ignore[attr-defined]

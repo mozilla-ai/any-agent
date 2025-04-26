@@ -1,6 +1,6 @@
 from collections.abc import Generator, Sequence
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -11,7 +11,7 @@ from any_agent.tools import _get_mcp_server
 @pytest.fixture
 def load_mcp_tools(
     tools: Sequence[Tool],
-) -> Generator[None]:
+) -> Generator[MagicMock]:
     with patch(
         "any_agent.tools.mcp.frameworks.langchain.load_mcp_tools"
     ) as mock_load_tools:
