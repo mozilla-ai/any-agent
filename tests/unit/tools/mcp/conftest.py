@@ -5,6 +5,7 @@ from typing import Any, Protocol
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
 from agno.tools.mcp import MCPTools as AgnoMCPTools
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
 from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
@@ -16,7 +17,6 @@ from mcp import Tool as MCPTool
 from mcp.client.session import ClientSession
 
 from any_agent.config import MCPSseParams, MCPStdioParams, Tool
-from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
 
 
 class Toolset(Protocol):
@@ -63,13 +63,13 @@ def mcp_sse_params_with_tools(
 
 
 @pytest.fixture
-def openai_mcp_sse_server() -> Generator[OpenAIInternalMCPServerSse]:
+def openai_mcp_sse_server(
+    tools: Sequence[Tool],
+) -> Generator[OpenAIInternalMCPServerSse]:
     with patch(
         "any_agent.tools.mcp.frameworks.openai.OpenAIInternalMCPServerSse",
     ) as mock_server:
-        mock_tool = MagicMock(spec=MCPTool)
-        mock_tool.name = "test_tool"
-        mock_server.return_value.list_tools = AsyncMock(return_value=[mock_tool])
+        mock_server.return_value.list_tools = AsyncMock(return_value=tools)
         yield mock_server
 
 
@@ -242,8 +242,7 @@ def _patch_client_session_initialize() -> Generator[ClientSession]:
 
 @pytest.fixture
 def _patch_client_session_list_tools(tool_list: ToolList) -> Generator[None]:
-    with patch("mcp.client.session.ClientSession.list_tools") as mock_list_tools:
-        mock_list_tools.return_value = tool_list
+    with patch("mcp.client.session.ClientSession.list_tools", return_value=tool_list):
         yield
 
 
