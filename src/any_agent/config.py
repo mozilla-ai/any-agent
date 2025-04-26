@@ -12,6 +12,7 @@ class AgentFramework(str, Enum):
     OPENAI = auto()
     AGNO = auto()
     SMOLAGENTS = auto()
+    TINY = auto()
 
     @classmethod
     def from_string(cls, value: str | Self) -> Self:
