@@ -118,7 +118,7 @@ class TinyMCPServerBase(MCPServerBase):
 
             # Call the tool on the MCP server
             try:
-                return await session.execute(tool_name, combined_args)
+                return await session.call_tool(tool_name, combined_args)
             except Exception as e:
                 return f"Error calling tool {tool_name}: {e!s}"
 
