@@ -7,7 +7,7 @@ from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
 from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
 from any_agent.config import AgentFramework, MCPSseParams, Tool
-from any_agent.tools.mcp.frameworks import _get_mcp_server
+from any_agent.tools import _get_mcp_server
 
 
 @pytest.mark.asyncio

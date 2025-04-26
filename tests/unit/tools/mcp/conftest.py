@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
-from agno.tools.mcp import MCPTools as AgnoMCPTools
+from agno.tools import MCPTools as AgnoMCPTools
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
 from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
     SseServerParams as GoogleSseServerParameters,
