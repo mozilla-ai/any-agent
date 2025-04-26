@@ -78,7 +78,7 @@ class AnyAgent(ABC):
             return AgnoAgent
 
         if framework is AgentFramework.TINY:
-            from any_agent.frameworks.tiny_agent import TinyAgent
+            from any_agent.frameworks.tiny import TinyAgent
 
             return TinyAgent
 

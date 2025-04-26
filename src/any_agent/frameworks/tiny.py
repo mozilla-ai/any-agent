@@ -7,14 +7,12 @@ from typing import TYPE_CHECKING, Any
 
 import litellm
 
-from any_agent.config import AgentConfig, AgentFramework, Tool
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator, Sequence
-
-    from any_agent.tools.mcp.mcp_server import MCPServerBase
+    from collections.abc import AsyncGenerator
 
 
 def _raise_abort_error() -> None:
@@ -431,25 +429,6 @@ class TinyAgent(AnyAgent):
             }
         ]
         self.mcp_client = None
-
-    async def _load_tools(
-        self, tools: Sequence[Tool]
-    ) -> tuple[list[Any], list[MCPServerBase]]:
-        """Load tools for the agent.
-
-        Args:
-            tools: List of tools to load
-
-        Returns:
-            Tuple of (wrapped_tools, mcp_servers)
-
-        """
-        from any_agent.tools.wrappers import _wrap_tools
-
-        # Wrap the tools
-        wrapped_tools, mcp_servers = await _wrap_tools(tools, self.framework)
-
-        return wrapped_tools, mcp_servers
 
     async def load_agent(self) -> None:
         """Load the agent and its tools."""

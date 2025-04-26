@@ -37,7 +37,7 @@ class MCPStdioParams(BaseModel):
     client_session_timeout_seconds: float | None = 5
     """the read timeout passed to the MCP ClientSession."""
 
-    model_config = ConfigDict(frozen=True)
+    model_config = ConfigDict(frozen=True, extra="forbid")
 
 
 class MCPSseParams(BaseModel):

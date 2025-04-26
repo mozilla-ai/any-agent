@@ -6,7 +6,7 @@ from contextlib import suppress
 from datetime import timedelta
 from typing import Any, Literal
 
-from mcp import ListToolsResult, Tool
+from mcp import Tool
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -70,11 +70,11 @@ class TinyMCPServerBase(MCPServerBase):
         available_tools = await self.session.list_tools()
 
         # Filter tools if specific tools were requested
-        filtered_tools: ListToolsResult = self._filter_tools(available_tools)
+        filtered_tools = self._filter_tools(available_tools.tools)
 
         # Create callable tool functions
         tool_list = []
-        for tool_info in filtered_tools.tools:
+        for tool_info in filtered_tools:
             tool_list.append(self._create_tool_from_info(tool_info))
 
         # Store tools as a list
