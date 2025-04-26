@@ -1,3 +1,5 @@
+# pylint: disable=unused-argument, unused-variable
+import shutil
 from collections.abc import AsyncGenerator, Callable, Generator, Sequence
 from contextlib import AsyncExitStack
 from typing import Any, Protocol
@@ -9,8 +11,10 @@ from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
 from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
     SseServerParams as GoogleSseServerParameters,
 )
+from mcp import Tool as MCPTool
+from mcp.client.session import ClientSession
 
-from any_agent.config import MCPSseParams, Tool
+from any_agent.config import MCPSseParams, MCPStdioParams, Tool
 
 
 class Toolset(Protocol):
@@ -19,7 +23,7 @@ class Toolset(Protocol):
 
 @pytest.fixture
 def tools() -> list[Tool]:
-    return [MagicMock(), MagicMock()]
+    return ["write_file", "read_file", "other_tool"]
 
 
 @pytest.fixture
@@ -114,3 +118,69 @@ def enter_context_with_transport_and_session(
     with patch.object(AsyncExitStack, "enter_async_context") as mock_context:
         mock_context.side_effect = [transport, session, tools]
         yield
+
+
+# Specific for Stdio params
+
+
+@pytest.fixture
+def command() -> str:
+    # Mocking the command part of stdio is really tricky so instead we'll use
+    # a real command that should be available on all systems (this is what openai-agents does too)
+    tee = shutil.which("tee") or ""
+    assert tee, "tee not found"
+    return tee
+
+
+@pytest.fixture
+def stdio_params(command: str, tools: Sequence[str]) -> MCPStdioParams:
+    return MCPStdioParams(
+        command=command,
+        args=[],
+        tools=tools,
+    )
+
+
+@pytest.fixture
+def mcp_tools(tools: Sequence[str]) -> list[MCPTool]:
+    return [
+        MCPTool(name=tool, inputSchema={"type": "string", "properties": {}})
+        for tool in tools
+    ]
+
+
+class ToolList(Protocol):
+    @property
+    def tools(self) -> list[MCPTool]: ...
+
+
+@pytest.fixture
+def tool_list(mcp_tools: Sequence[MCPTool]) -> ToolList:
+    mock_tool_list = MagicMock()
+    mock_tool_list.tools = mcp_tools
+    return mock_tool_list
+
+
+@pytest.fixture
+def _patch_client_session_initialize() -> Generator[ClientSession]:
+    with patch(
+        "mcp.client.session.ClientSession.initialize",
+        new_callable=AsyncMock,
+        return_value=None,
+    ):
+        yield
+
+
+@pytest.fixture
+def _patch_client_session_list_tools(tool_list: ToolList) -> Generator[None]:
+    with patch("mcp.client.session.ClientSession.list_tools") as mock_list_tools:
+        mock_list_tools.return_value = tool_list
+        yield
+
+
+# Specific for echo server with sse params
+
+
+@pytest.fixture
+def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSseParams:
+    return MCPSseParams(url=echo_sse_server["url"], tools=tools)
