@@ -1,10 +1,22 @@
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 
 from any_agent.config import AgentFramework, MCPSseParams, Tool
 from any_agent.tools import _get_mcp_server
+
+
+@pytest.fixture
+def load_mcp_tools(
+    tools: Sequence[Tool],
+) -> Generator[None]:
+    with patch(
+        "any_agent.tools.mcp.frameworks.langchain.load_mcp_tools"
+    ) as mock_load_tools:
+        mock_load_tools.return_value = tools
+        yield mock_load_tools
 
 
 @pytest.mark.asyncio

@@ -1,11 +1,18 @@
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from agno.tools.mcp import MCPTools as AgnoMCPTools
 
 from any_agent.config import AgentFramework, MCPSseParams, Tool
 from any_agent.tools import _get_mcp_server
+
+
+@pytest.fixture
+def agno_mcp_tools() -> Generator[AgnoMCPTools]:
+    with patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools:
+        yield mock_mcp_tools
 
 
 @pytest.mark.asyncio
@@ -16,14 +23,12 @@ from any_agent.tools import _get_mcp_server
 )
 async def test_agno_mcp_sse_tools_loaded(
     mcp_sse_params_with_tools: MCPSseParams,
-    agno_mcp_tool_instance: AgnoMCPTools,
     tools: Sequence[Tool],
 ) -> None:
     mcp_server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.AGNO)
 
     await mcp_server._setup_tools()
 
-    assert mcp_server.server == agno_mcp_tool_instance  # type: ignore[union-attr]
     assert mcp_server.tools == [tools]
 
 

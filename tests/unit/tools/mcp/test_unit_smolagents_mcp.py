@@ -1,11 +1,23 @@
 # pylint: disable=unused-argument, unused-variable, attr-de
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
+from unittest.mock import patch
 
 import pytest
 from smolagents.mcp_client import MCPClient
 
 from any_agent.config import AgentFramework, MCPSseParams, Tool
 from any_agent.tools import _get_mcp_server
+
+
+@pytest.fixture
+def smolagents_mcp_server(
+    tools: Sequence[Tool],
+) -> Generator[MCPClient]:
+    with patch(
+        "any_agent.tools.mcp.frameworks.smolagents.MCPClient"
+    ) as mock_client_class:
+        mock_client_class.return_value.__enter__.return_value = tools
+        yield mock_client_class
 
 
 @pytest.mark.asyncio
