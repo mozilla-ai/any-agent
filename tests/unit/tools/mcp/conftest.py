@@ -57,6 +57,20 @@ def mcp_sse_params_with_tools(
     return mcp_sse_params_no_tools.model_copy(update={"tools": tools})
 
 
+# Langchain Specific fixtures
+
+
+@pytest.fixture
+def load_mcp_tools(
+    tools: Sequence[Tool],
+) -> Generator[None]:
+    with patch(
+        "any_agent.tools.mcp.frameworks.langchain.load_mcp_tools"
+    ) as mock_load_tools:
+        mock_load_tools.return_value = tools
+        yield mock_load_tools
+
+
 # Google Specific fixtures
 
 
@@ -111,8 +125,8 @@ def agno_mcp_tools(agno_mcp_tool_instance: AgnoMCPTools) -> Generator[AgnoMCPToo
 
 @pytest.fixture
 def enter_context_with_transport_and_session(
-    transport,
-    session,
+    transport: Any,
+    session: Any,
     tools: Sequence[str],
 ) -> Generator[None]:
     with patch.object(AsyncExitStack, "enter_async_context") as mock_context:
