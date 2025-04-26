@@ -1,6 +1,6 @@
 """MCP adapter for Tiny framework."""
 
-from typing import Any, Optional
+from typing import Any
 
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
@@ -44,26 +44,26 @@ class TinyMCPServer(MCPServerBase):
         # Create an MCP server connection
         server = McpServerConnection(server_params)
         await server.connect()
-        
+
         # Get available tools
         tools_result = await server.list_tools()
-        
+
         # Filter tools if specific tools were requested
         available_tools = self._filter_tools(tools_result.get("tools", []))
-        
+
         # Create callable tool functions
         tool_list = []
         for tool_info in available_tools:
             tool_list.append(self._create_tool_from_info(tool_info, server))
-            
+
         # Store tools as a list
         self.tools = tool_list
-    
+
     def _create_tool_from_info(self, tool_info: dict, server: Any) -> callable:
         """Create a tool function from tool information."""
         tool_name = tool_info.get("name", "")
         tool_description = tool_info.get("description", "")
-        
+
         async def tool_function(*args, **kwargs) -> Any:
             """Tool function that calls the MCP server."""
             # Combine args and kwargs
@@ -71,22 +71,22 @@ class TinyMCPServer(MCPServerBase):
             if args and len(args) > 0:
                 combined_args = args[0]
             combined_args.update(kwargs)
-            
+
             # Call the tool
             result = await server.call_tool({
                 "name": tool_name,
                 "arguments": combined_args
             })
-            
+
             # Return the result
             if isinstance(result, dict) and "content" in result:
                 if isinstance(result["content"], list) and len(result["content"]) > 0:
                     return result["content"][0].get("text", "")
                 return str(result["content"])
             return str(result)
-            
+
         # Set attributes for the tool function
         tool_function.__name__ = tool_name
         tool_function.__doc__ = tool_description
-        
-        return tool_function 
+
+        return tool_function
