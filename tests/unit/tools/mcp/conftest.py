@@ -11,6 +11,8 @@ from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
 from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
     SseServerParams as GoogleSseServerParameters,
 )
+from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
+from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 from mcp import Tool as MCPTool
 from mcp.client.session import ClientSession
 
@@ -55,6 +57,45 @@ def mcp_sse_params_with_tools(
     mcp_sse_params_no_tools: MCPSseParams, tools: Sequence[Tool]
 ) -> MCPSseParams:
     return mcp_sse_params_no_tools.model_copy(update={"tools": tools})
+
+
+# Llama index Specific fixtures
+
+
+@pytest.fixture
+def client() -> Any:
+    return MagicMock()
+
+
+@pytest.fixture
+def llama_index_mcp_client(
+    client: Any,
+) -> Generator[LlamaIndexMCPClient]:
+    with patch(
+        "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMCPClient"
+    ) as mock_client:
+        mock_client.return_value = client
+        yield mock_client
+
+
+@pytest.fixture
+def tool_spec(
+    tools: Sequence[Tool],
+) -> Any:
+    tool_spec_ = MagicMock()
+    tool_spec_.to_tool_list_async = AsyncMock(return_value=tools)
+    return tool_spec_
+
+
+@pytest.fixture
+def llama_index_mcp_tool_spec(
+    tool_spec: Any,
+) -> Generator[LlamaIndexMcpToolSpec]:
+    with patch(
+        "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMcpToolSpec"
+    ) as mock_tool_spec:
+        mock_tool_spec.return_value = tool_spec
+        yield mock_tool_spec
 
 
 # Langchain Specific fixtures

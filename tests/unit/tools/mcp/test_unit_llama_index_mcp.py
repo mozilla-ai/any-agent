@@ -1,56 +1,49 @@
 # pylint: disable=unused-argument, unused-variable
-from unittest.mock import AsyncMock, MagicMock, patch
+from collections.abc import Sequence
+from typing import Any
 
 import pytest
+from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
+from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
-from any_agent.config import AgentFramework, MCPSseParams
+from any_agent.config import AgentFramework, MCPSseParams, Tool
 from any_agent.tools.mcp.frameworks import _get_mcp_server
 
 
 @pytest.mark.asyncio
-async def test_llamaindex_mcp_sse() -> None:
-    """Test LlamaIndexMCPServer with SSE configuration."""
-    # Mock the necessary components
-    mock_tools = [MagicMock(), MagicMock()]
+@pytest.mark.usefixtures(
+    "llama_index_mcp_client",
+    "llama_index_mcp_tool_spec",
+)
+async def test_llamaindex_mcp_sse_tools_loaded(
+    mcp_sse_params_with_tools: MCPSseParams,
+    tools: Sequence[Tool],
+) -> None:
+    server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.LLAMA_INDEX)
+    await server._setup_tools()
 
-    # Create an MCP tool config for SSE
-    mcp_tool = MCPSseParams(url="http://localhost:8000/sse", tools=["tool1", "tool2"])
+    assert server.tools == tools
 
-    # Create the server instance
-    server = _get_mcp_server(mcp_tool, AgentFramework.LLAMA_INDEX)
 
-    # Mock LlamaIndex MCP classes
-    with (
-        patch(
-            "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMCPClient"
-        ) as mock_client_class,
-        patch(
-            "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMcpToolSpec"
-        ) as mock_tool_spec_class,
-    ):
-        # Set up mock client and tool spec
-        mock_client = MagicMock()
-        mock_client_class.return_value = mock_client
+@pytest.mark.asyncio
+async def test_llamaindex_mcp_sse_integration(
+    mcp_sse_params_with_tools: MCPSseParams,
+    tools: Sequence[Tool],
+    llama_index_mcp_client: LlamaIndexMCPClient,
+    client: Any,
+    llama_index_mcp_tool_spec: LlamaIndexMcpToolSpec,
+    tool_spec: Any,
+) -> None:
+    server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.LLAMA_INDEX)
 
-        mock_tool_spec = MagicMock()
-        mock_tool_spec.to_tool_list_async = AsyncMock(return_value=mock_tools)
-        mock_tool_spec_class.return_value = mock_tool_spec
+    await server._setup_tools()
 
-        # Test the _setup_tools method
-        await server._setup_tools()
+    llama_index_mcp_client.assert_called_once_with(
+        command_or_url=mcp_sse_params_with_tools.url
+    )
 
-        # Verify the client was created correctly
-        mock_client_class.assert_called_once_with(
-            command_or_url="http://localhost:8000/sse"
-        )
+    llama_index_mcp_tool_spec.assert_called_once_with(
+        client=client, allowed_tools=tools
+    )
 
-        # Verify tool spec was created with correct params
-        mock_tool_spec_class.assert_called_once_with(
-            client=mock_client, allowed_tools=["tool1", "tool2"]
-        )
-
-        # Verify to_tool_list_async was called
-        mock_tool_spec.to_tool_list_async.assert_called_once()
-
-        # Check that tools were stored
-        assert server.tools == mock_tools
+    tool_spec.to_tool_list_async.assert_called_once()
