@@ -3,21 +3,24 @@ from __future__ import annotations
 import asyncio
 import json
 import uuid
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Sequence
 
 import litellm
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, Tool
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
+    from any_agent.tools.mcp.mcp_server import MCPServerBase
+
 
 def _raise_abort_error() -> None:
     """Raise AbortError as ValueError."""
     msg = "AbortError"
     raise ValueError(msg) from None
+
 
 DEFAULT_SYSTEM_PROMPT = """
 You are an agent - please keep going until the user's query is completely resolved, before ending your turn and yielding back to the user. Only terminate your turn when you are sure that the problem is solved, or if you need more info from the user to solve the problem.
@@ -32,7 +35,7 @@ MAX_NUM_TURNS = 10
 
 
 def task_completion_tool() -> dict[str, Any]:
-    """"Tool to indicate task completion."""
+    """ "Tool to indicate task completion."""
     return {
         "type": "function",
         "function": {
@@ -96,7 +99,44 @@ class McpClient:
             server: Server configuration parameters
 
         """
-        # Not yet complete
+        if not hasattr(server, "tools") or not server.tools:
+            logger.warning("MCP server has no tools to register")
+            return
+
+        # Add each tool from the server to the available tools
+        for tool in server.tools:
+            try:
+                tool_name = tool.__name__
+                tool_desc = tool.__doc__ or f"Tool to {tool_name}"
+
+                # Get input schema if available
+                input_schema = getattr(
+                    tool,
+                    "input_schema",
+                    {
+                        "type": "object",
+                        "properties": {},
+                        "required": [],
+                    },
+                )
+
+                # Add the tool to available tools
+                self.available_tools.append(
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": tool_name,
+                            "description": tool_desc,
+                            "parameters": input_schema,
+                        },
+                    }
+                )
+
+                # Register the tool executor
+                self.clients[tool_name] = ToolExecutor(tool)
+                logger.debug("Registered MCP tool: %s", tool_name)
+            except Exception as e:
+                logger.error("Error registering MCP tool: %s", e)
 
     async def process_single_turn_with_tools(
         self, messages: list[dict[str, Any]], opts: dict[str, Any] | None = None
@@ -286,9 +326,7 @@ class McpClient:
             # Check if the tool exists
             if tool_name not in self.clients:
                 logger.error("Tool %s not found in registered tools", tool_name)
-                tool_message["content"] = (
-                    f"Error: No tool found with name: {tool_name}"
-                )
+                tool_message["content"] = f"Error: No tool found with name: {tool_name}"
                 messages.append(tool_message)
                 yield tool_message
                 continue
@@ -329,8 +367,6 @@ class McpClient:
         clients = set(self.clients.values())
         for client in clients:
             await client.close()
-
-
 
 
 class ToolExecutor:
@@ -395,6 +431,22 @@ class TinyAgent(AnyAgent):
         ]
         self.mcp_client = None
 
+    async def _load_tools(self, tools: Sequence[Tool]) -> tuple[list[Any], list[MCPServerBase]]:
+        """Load tools for the agent.
+        
+        Args:
+            tools: List of tools to load
+            
+        Returns:
+            Tuple of (wrapped_tools, mcp_servers)
+        """
+        from any_agent.tools.wrappers import _wrap_tools
+        
+        # Wrap the tools
+        wrapped_tools, mcp_servers = await _wrap_tools(tools, self.framework)
+        
+        return wrapped_tools, mcp_servers
+
     async def load_agent(self) -> None:
         """Load the agent and its tools."""
         # Initialize the MCP client
@@ -437,7 +489,7 @@ class TinyAgent(AnyAgent):
                         # Add the parameter to properties
                         properties[param_name] = {
                             "type": "string",
-                            "description": f"Parameter {param_name}"
+                            "description": f"Parameter {param_name}",
                         }
 
                         # If parameter has no default, it's required
@@ -469,38 +521,14 @@ class TinyAgent(AnyAgent):
                 logger.error("Error registering tool: %s", e)
 
         # Register MCP servers with the client
-        for server in mcp_servers:
-            for tool in server.tools:
-                try:
-                    # Wrap the tool function to work with MCP client
-                    tool_name = tool.__name__
-                    tool_desc = tool.__doc__ or f"Tool to {tool_name}"
+        if mcp_servers:
+            # For each MCP server, ensure it has a server attribute for consistency
+            for server in mcp_servers:
+                if not hasattr(server, "server"):
+                    server.server = server  # Set self as server for simplicity
 
-                    # Add tool to the client's available tools
-                    self.mcp_client.available_tools.append(
-                        {
-                            "type": "function",
-                            "function": {
-                                "name": tool_name,
-                                "description": tool_desc,
-                                "parameters": getattr(
-                                    tool,
-                                    "input_schema",
-                                    {
-                                        "type": "object",
-                                        "properties": {},
-                                        "required": [],
-                                    },
-                                ),
-                            },
-                        }
-                    )
-
-                    # Register the tool with the MCP client
-                    self.mcp_client.clients[tool_name] = ToolExecutor(tool)
-                    logger.debug("Registered MCP tool: %s", tool_name)
-                except Exception as e:
-                    logger.error("Error registering MCP tool: %s", e)
+            await self.mcp_client.add_mcp_servers(mcp_servers)
+            logger.debug("Added %s MCP servers", len(mcp_servers))
 
         # Log available tools
         logger.debug(
@@ -508,9 +536,15 @@ class TinyAgent(AnyAgent):
             [t["function"]["name"] for t in self.mcp_client.available_tools],
         )
 
-    def run(self) -> None:
+    def run(self, prompt: str = None) -> None:
         """Run the agent in an interactive loop, handling user input until exit."""
         try:
+            # If a prompt is provided, run with that prompt and return the result
+            if prompt is not None:
+                result = super().run(prompt)
+                return result
+
+            # Otherwise, run in interactive mode
             while True:
                 # Get user input
                 user_query = input("\n\nEnter your question (or 'quit' to exit): ")
