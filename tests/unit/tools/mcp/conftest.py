@@ -1,12 +1,12 @@
 import shutil
-from collections.abc import AsyncGenerator, Callable, Generator, Sequence
+from collections.abc import AsyncGenerator, Generator, Sequence
 from contextlib import AsyncExitStack
 from typing import Any, Protocol
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
-from agno.tools import MCPTools as AgnoMCPTools
+from agno.tools.mcp import MCPTools as AgnoMCPTools
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
 from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
     SseServerParams as GoogleSseServerParameters,
@@ -27,22 +27,6 @@ class Toolset(Protocol):
 @pytest.fixture
 def tools() -> list[Tool]:
     return ["write_file", "read_file", "other_tool"]
-
-
-@pytest.fixture
-def toolset(tools: Sequence[Tool]) -> Toolset:
-    mock_value = AsyncMock()
-    mock_value.load_tools.return_value = tools
-    return mock_value
-
-
-@pytest.fixture
-def enter_context(
-    toolset: Toolset,
-) -> Generator[Callable[[], Toolset]]:
-    with patch.object(AsyncExitStack, "enter_async_context") as mock_context:
-        mock_context.return_value = toolset
-        yield mock_context
 
 
 @pytest.fixture
@@ -92,38 +76,23 @@ def smolagents_mcp_server(
 
 
 @pytest.fixture
-def client() -> Any:
-    return MagicMock()
-
-
-@pytest.fixture
-def llama_index_mcp_client(
-    client: Any,
-) -> Generator[LlamaIndexMCPClient]:
+def llama_index_mcp_client() -> Generator[LlamaIndexMCPClient]:
     with patch(
         "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMCPClient"
     ) as mock_client:
-        mock_client.return_value = client
         yield mock_client
 
 
 @pytest.fixture
-def tool_spec(
-    tools: Sequence[Tool],
-) -> Any:
-    tool_spec_ = MagicMock()
-    tool_spec_.to_tool_list_async = AsyncMock(return_value=tools)
-    return tool_spec_
-
-
-@pytest.fixture
 def llama_index_mcp_tool_spec(
-    tool_spec: Any,
+    tools: Sequence[Tool],
 ) -> Generator[LlamaIndexMcpToolSpec]:
+    tool_spec = MagicMock()
+    tool_spec.to_tool_list_async = AsyncMock(return_value=tools)
     with patch(
-        "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMcpToolSpec"
+        "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMcpToolSpec",
+        return_value=tool_spec,
     ) as mock_tool_spec:
-        mock_tool_spec.return_value = tool_spec
         yield mock_tool_spec
 
 
@@ -153,9 +122,12 @@ def google_sse_params() -> Generator[GoogleSseServerParameters]:
 
 
 @pytest.fixture
-def google_toolset(toolset: Toolset) -> Generator[GoogleMCPToolset]:
-    with patch("any_agent.tools.mcp.frameworks.google.GoogleMCPToolset") as mock_class:
-        mock_class.return_value = toolset
+def google_toolset(tools: Sequence[Tool]) -> Generator[GoogleMCPToolset]:
+    toolset = AsyncMock()
+    toolset.load_tools.return_value = tools
+    with patch(
+        "any_agent.tools.mcp.frameworks.google.GoogleMCPToolset", return_value=toolset
+    ) as mock_class:
         yield mock_class
 
 
@@ -165,11 +137,6 @@ def google_toolset(toolset: Toolset) -> Generator[GoogleMCPToolset]:
 @pytest.fixture
 def session() -> Generator[Any]:
     return AsyncMock()
-
-
-@pytest.fixture
-def transport() -> tuple[Any, Any]:
-    return (AsyncMock(), AsyncMock())
 
 
 @pytest.fixture
@@ -195,10 +162,10 @@ def agno_mcp_tools(agno_mcp_tool_instance: AgnoMCPTools) -> Generator[AgnoMCPToo
 
 @pytest.fixture
 def enter_context_with_transport_and_session(
-    transport: Any,
     session: Any,
     tools: Sequence[str],
 ) -> Generator[None]:
+    transport = (AsyncMock(), AsyncMock())
     with patch.object(AsyncExitStack, "enter_async_context") as mock_context:
         mock_context.side_effect = [transport, session, tools]
         yield

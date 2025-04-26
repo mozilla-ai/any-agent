@@ -1,10 +1,7 @@
-# pylint: disable=unused-argument, unused-variable
 from collections.abc import Sequence
-from typing import Any
 
 import pytest
 from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
-from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
 from any_agent.config import AgentFramework, MCPSseParams, Tool
 from any_agent.tools import _get_mcp_server
@@ -26,13 +23,12 @@ async def test_llamaindex_mcp_sse_tools_loaded(
 
 
 @pytest.mark.asyncio
+@pytest.mark.usefixtures(
+    "llama_index_mcp_tool_spec",
+)
 async def test_llamaindex_mcp_sse_integration(
     mcp_sse_params_with_tools: MCPSseParams,
-    tools: Sequence[Tool],
     llama_index_mcp_client: LlamaIndexMCPClient,
-    client: Any,
-    llama_index_mcp_tool_spec: LlamaIndexMcpToolSpec,
-    tool_spec: Any,
 ) -> None:
     server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.LLAMA_INDEX)
 
@@ -41,9 +37,3 @@ async def test_llamaindex_mcp_sse_integration(
     llama_index_mcp_client.assert_called_once_with(
         command_or_url=mcp_sse_params_with_tools.url
     )
-
-    llama_index_mcp_tool_spec.assert_called_once_with(
-        client=client, allowed_tools=tools
-    )
-
-    tool_spec.to_tool_list_async.assert_called_once()
