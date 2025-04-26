@@ -1,9 +1,10 @@
 """MCP adapter for Tiny framework."""
 
 import os
+from collections.abc import Sequence
 from contextlib import suppress
 from datetime import timedelta
-from typing import Any, Literal, Sequence
+from typing import Any, Literal
 
 from mcp import ListToolsResult, Tool
 
@@ -84,9 +85,11 @@ class TinyMCPServerBase(MCPServerBase):
 
         Returns:
             Dictionary with tools information
+
         """
         if not self.session:
-            raise ValueError("Not connected to MCP server")
+            msg = "Not connected to MCP server"
+            raise ValueError(msg)
 
         # Get the available tools from the MCP server
         schema = await self.session.schema()
@@ -115,10 +118,9 @@ class TinyMCPServerBase(MCPServerBase):
 
             # Call the tool on the MCP server
             try:
-                result = await session.execute(tool_name, combined_args)
-                return result
+                return await session.execute(tool_name, combined_args)
             except Exception as e:
-                return f"Error calling tool {tool_name}: {str(e)}"
+                return f"Error calling tool {tool_name}: {e!s}"
 
         # Set attributes for the tool function
         tool_function.__name__ = tool_name
@@ -126,7 +128,6 @@ class TinyMCPServerBase(MCPServerBase):
         tool_function.input_schema = parameters
 
         return tool_function
-
 
 
 class TinyMCPServerStdio(TinyMCPServerBase):

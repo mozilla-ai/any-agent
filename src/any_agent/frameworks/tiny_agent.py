@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import uuid
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any
 
 import litellm
 
@@ -12,7 +12,8 @@ from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.logging import logger
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
+    from collections.abc import AsyncGenerator, Sequence
+
     from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 
@@ -35,7 +36,7 @@ MAX_NUM_TURNS = 10
 
 
 def task_completion_tool() -> dict[str, Any]:
-    """ "Tool to indicate task completion."""
+    """Tool to indicate task completion."""
     return {
         "type": "function",
         "function": {
@@ -431,20 +432,23 @@ class TinyAgent(AnyAgent):
         ]
         self.mcp_client = None
 
-    async def _load_tools(self, tools: Sequence[Tool]) -> tuple[list[Any], list[MCPServerBase]]:
+    async def _load_tools(
+        self, tools: Sequence[Tool]
+    ) -> tuple[list[Any], list[MCPServerBase]]:
         """Load tools for the agent.
-        
+
         Args:
             tools: List of tools to load
-            
+
         Returns:
             Tuple of (wrapped_tools, mcp_servers)
+
         """
         from any_agent.tools.wrappers import _wrap_tools
-        
+
         # Wrap the tools
         wrapped_tools, mcp_servers = await _wrap_tools(tools, self.framework)
-        
+
         return wrapped_tools, mcp_servers
 
     async def load_agent(self) -> None:
@@ -536,13 +540,12 @@ class TinyAgent(AnyAgent):
             [t["function"]["name"] for t in self.mcp_client.available_tools],
         )
 
-    def run(self, prompt: str = None) -> None:
+    def run(self, prompt: str | None = None) -> None:
         """Run the agent in an interactive loop, handling user input until exit."""
         try:
             # If a prompt is provided, run with that prompt and return the result
             if prompt is not None:
-                result = super().run(prompt)
-                return result
+                return super().run(prompt)
 
             # Otherwise, run in interactive mode
             while True:
