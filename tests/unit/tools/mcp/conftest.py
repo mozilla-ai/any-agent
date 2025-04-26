@@ -1,4 +1,3 @@
-# pylint: disable=unused-argument, unused-variable
 import shutil
 from collections.abc import AsyncGenerator, Callable, Generator, Sequence
 from contextlib import AsyncExitStack
@@ -17,6 +16,7 @@ from mcp import Tool as MCPTool
 from mcp.client.session import ClientSession
 
 from any_agent.config import MCPSseParams, MCPStdioParams, Tool
+from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
 
 
 class Toolset(Protocol):
@@ -57,6 +57,20 @@ def mcp_sse_params_with_tools(
     mcp_sse_params_no_tools: MCPSseParams, tools: Sequence[Tool]
 ) -> MCPSseParams:
     return mcp_sse_params_no_tools.model_copy(update={"tools": tools})
+
+
+# OpenAI Specific fixtures
+
+
+@pytest.fixture
+def openai_mcp_sse_server() -> Generator[OpenAIInternalMCPServerSse]:
+    with patch(
+        "any_agent.tools.mcp.frameworks.openai.OpenAIInternalMCPServerSse",
+    ) as mock_server:
+        mock_tool = MagicMock(spec=MCPTool)
+        mock_tool.name = "test_tool"
+        mock_server.return_value.list_tools = AsyncMock(return_value=[mock_tool])
+        yield mock_server
 
 
 # Llama index Specific fixtures
