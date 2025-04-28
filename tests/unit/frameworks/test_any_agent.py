@@ -30,7 +30,7 @@ def test_load_agent_tracing(tmp_path: Path, agent_framework: AgentFramework) -> 
     agent_class_path = _get_agent_class_path(agent_framework)
 
     # Skip frameworks that don't support tracing
-    if framework in (
+    if agent_framework in (
         AgentFramework.AGNO,
         AgentFramework.GOOGLE,
         AgentFramework.TINYAGENT,
