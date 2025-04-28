@@ -77,8 +77,8 @@ class AnyAgent(ABC):
 
             return AgnoAgent
 
-        if framework is AgentFramework.TINY:
-            from any_agent.frameworks.tiny import TinyAgent
+        if framework is AgentFramework.TINYAGENT:
+            from any_agent.frameworks.tinyagent import TinyAgent
 
             return TinyAgent
 
@@ -118,7 +118,7 @@ class AnyAgent(ABC):
             if framework in (
                 AgentFramework.AGNO,
                 AgentFramework.GOOGLE,
-                AgentFramework.TINY,
+                AgentFramework.TINYAGENT,
             ):
                 logger.warning(
                     "Tracing is not yet supported for AGNO and GOOGLE frameworks. "

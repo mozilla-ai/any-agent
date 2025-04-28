@@ -76,53 +76,7 @@ def _wrap_tool_agno(tool: Tool) -> Tool:
 
 
 def _wrap_tool_tiny(tool: Tool) -> Tool:
-    """Wrap a tool for use with the Tiny framework.
-
-    Args:
-        tool: The tool to wrap
-
-    Returns:
-        The wrapped tool
-
-    """
-    # For callable tools, ensure they have proper metadata
-    if callable(tool):
-        # Get the tool signature
-        import inspect
-
-        sig = inspect.signature(tool)
-
-        # If the tool doesn't have an input_schema attribute, add one
-        if not hasattr(tool, "input_schema"):
-            # Create an input schema from the function signature
-            properties = {}
-            required = []
-
-            for param_name, param in sig.parameters.items():
-                # Skip *args and **kwargs
-                if param.kind in (
-                    inspect.Parameter.VAR_POSITIONAL,
-                    inspect.Parameter.VAR_KEYWORD,
-                ):
-                    continue
-
-                # Add the parameter to the properties
-                properties[param_name] = {
-                    "type": "string",  # Default to string
-                    "description": f"Parameter {param_name}",
-                }
-
-                # If the parameter doesn't have a default value, it's required
-                if param.default == inspect.Parameter.empty:
-                    required.append(param_name)
-
-            # Set the input schema
-            tool.input_schema = {
-                "type": "object",
-                "properties": properties,
-                "required": required,
-            }
-
+    # Tiny lets you pass callables directly in as tools ❤️
     return tool
 
 
@@ -133,7 +87,7 @@ WRAPPERS: dict[AgentFramework, Callable[..., Any]] = {
     AgentFramework.SMOLAGENTS: _wrap_tool_smolagents,
     AgentFramework.LLAMA_INDEX: _wrap_tool_llama_index,
     AgentFramework.AGNO: _wrap_tool_agno,
-    AgentFramework.TINY: _wrap_tool_tiny,
+    AgentFramework.TINYAGENT: _wrap_tool_tiny,
 }
 
 

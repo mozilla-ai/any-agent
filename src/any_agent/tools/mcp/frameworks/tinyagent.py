@@ -1,7 +1,7 @@
 """MCP adapter for Tiny framework."""
 
 import os
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from contextlib import suppress
 from datetime import timedelta
 from typing import Any, Literal
@@ -21,20 +21,13 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class TinyMCPServerBase(MCPServerBase):
+class TinyAgentMCPServerBase(MCPServerBase):
     """MCP adapter for Tiny framework."""
 
     client: Any | None = None
-    framework: Literal[AgentFramework.TINY] = AgentFramework.TINY
+    framework: Literal[AgentFramework.TINYAGENT] = AgentFramework.TINYAGENT
     libraries: str = "any-agent[mcp]"
     session: Any | None = None
-    server: Any = None  # Required for Pydantic validation
-
-    def __init__(self, *args, **kwargs):
-        """Initialize the MCP server."""
-        super().__init__(*args, **kwargs)
-        # Set self as server for backward compatibility
-        self.server = self
 
     def _check_dependencies(self) -> None:
         """Check if the required libraries are installed."""
@@ -64,6 +57,9 @@ class TinyMCPServerBase(MCPServerBase):
         self.session: ClientSession = await self._exit_stack.enter_async_context(
             client_session
         )
+        if not self.session:
+            msg = "Failed to create MCP session"
+            raise ValueError(msg)
         await self.session.initialize()
 
         # Get the available tools from the MCP server using schema
@@ -101,14 +97,16 @@ class TinyMCPServerBase(MCPServerBase):
 
         return {"tools": tools}
 
-    def _create_tool_from_info(self, tool: Tool) -> callable:
+    def _create_tool_from_info(self, tool: Tool) -> Callable[..., Any]:
         """Create a tool function from tool information."""
         tool_name = tool.name
         tool_description = tool.description
-        parameters = tool.inputSchema
         session = self.session
+        if not self.session:
+            msg = "Not connected to MCP server"
+            raise ValueError(msg)
 
-        async def tool_function(*args, **kwargs) -> Any:
+        async def tool_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
             """Tool function that calls the MCP server."""
             # Combine args and kwargs
             combined_args = {}
@@ -116,6 +114,9 @@ class TinyMCPServerBase(MCPServerBase):
                 combined_args = args[0]
             combined_args.update(kwargs)
 
+            if not session:
+                msg = "Not connected to MCP server"
+                raise ValueError(msg)
             # Call the tool on the MCP server
             try:
                 return await session.call_tool(tool_name, combined_args)
@@ -125,12 +126,11 @@ class TinyMCPServerBase(MCPServerBase):
         # Set attributes for the tool function
         tool_function.__name__ = tool_name
         tool_function.__doc__ = tool_description
-        tool_function.input_schema = parameters
 
         return tool_function
 
 
-class TinyMCPServerStdio(TinyMCPServerBase):
+class TinyAgentMCPServerStdio(TinyAgentMCPServerBase):
     """MCP adapter for Tiny framework using stdio communication."""
 
     mcp_tool: MCPStdioParams
@@ -147,7 +147,7 @@ class TinyMCPServerStdio(TinyMCPServerBase):
         await super()._setup_tools()
 
 
-class TinyMCPServerSse(TinyMCPServerBase):
+class TinyAgentMCPServerSse(TinyAgentMCPServerBase):
     """MCP adapter for Tiny framework using SSE communication."""
 
     mcp_tool: MCPSseParams
@@ -162,4 +162,4 @@ class TinyMCPServerSse(TinyMCPServerBase):
 
 
 # Union type for Tiny MCP server implementations
-TinyMCPServer = TinyMCPServerStdio | TinyMCPServerSse
+TinyAgentMCPServer = TinyAgentMCPServerStdio | TinyAgentMCPServerSse

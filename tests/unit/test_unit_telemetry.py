@@ -10,7 +10,7 @@ def test_telemetry_extract_interaction(agent_framework: AgentFramework, llm_span
     if agent_framework in (
         AgentFramework.AGNO,
         AgentFramework.GOOGLE,
-        AgentFramework.TINY,
+        AgentFramework.TINYAGENT,
     ):
         pytest.skip()
     processor = TelemetryProcessor.create(AgentFramework(agent_framework))
