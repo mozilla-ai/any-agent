@@ -80,7 +80,7 @@ def test_load_smolagents_agent_missing() -> None:
 
 def test_run_smolagent_custom_args() -> None:
     mock_agent = MagicMock()
-    mock_agent.return_value = AsyncMock()
+    mock_agent.return_value = MagicMock()
     with (
         patch(f"smolagents.{DEFAULT_AGENT_TYPE}", mock_agent),
         patch(f"smolagents.{DEFAULT_MODEL_CLASS}"),
