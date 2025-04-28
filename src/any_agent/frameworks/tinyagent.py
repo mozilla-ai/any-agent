@@ -223,9 +223,8 @@ class TinyAgent(AnyAgent):
         while True:
             try:
                 logger.debug("Starting turn %s", num_of_turns + 1)
-                current_assistant_response = ""
 
-                response = await self._process_single_turn_with_tools(
+                last_response = await self._process_single_turn_with_tools(
                     {
                         "exit_loop_tools": self.exit_loop_tools,
                         "exit_if_first_chunk_no_tool": num_of_turns > 0
@@ -233,15 +232,14 @@ class TinyAgent(AnyAgent):
                     },
                 )
 
-                # If this is a response with content, add to current response
-                if hasattr(response, "content") and response.content:
-                    current_assistant_response = response.content
+                if last_response:
+                    logger.debug(last_response)
                     logger.debug(
                         "Assistant response this turn: %s...",
-                        current_assistant_response[:50],
+                        last_response[:50],
                     )
-                    assistant_messages.append(current_assistant_response)
-                    final_response = current_assistant_response
+                    assistant_messages.append(last_response)
+                    final_response = last_response
 
             except Exception as err:
                 logger.error("Error during turn %s: %s", num_of_turns + 1, err)
@@ -292,9 +290,7 @@ class TinyAgent(AnyAgent):
                 next_turn_should_call_tools = True
                 logger.debug("No tool was called, next turn should call tools")
 
-    async def _process_single_turn_with_tools(
-        self, options: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _process_single_turn_with_tools(self, options: dict[str, Any]) -> str:
         """Process a single turn of conversation with potential tool calls.
 
         Args:
@@ -329,42 +325,41 @@ class TinyAgent(AnyAgent):
 
         # Process tool calls if any
         if message.tool_calls:
-            if len(message.tool_calls) > 1:
-                msg = f"TinyAgent currently only calls one tool per turn, but got {len(message.tool_calls)}"
-                raise ValueError(msg)
-            tool_call = message.tool_calls[0]
-            tool_name = tool_call.function.name
-            logger.debug("Processing tool call for: %s", tool_name)
-            tool_args = {}
+            for tool_call in message.tool_calls:
+                tool_name = tool_call.function.name
+                logger.debug("Processing tool call for: %s", tool_name)
+                tool_args = {}
 
-            if tool_call.function.arguments:
-                tool_args = json.loads(tool_call.function.arguments)
-                logger.debug("Tool arguments: %s", tool_args)
+                if tool_call.function.arguments:
+                    tool_args = json.loads(tool_call.function.arguments)
+                    logger.debug("Tool arguments: %s", tool_args)
 
-            tool_message = {
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": "",
-                "name": tool_name,
-            }
+                tool_message = {
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": "",
+                    "name": tool_name,
+                }
 
-            # Check if tool is in exit loop tools
-            exit_tools = options["exit_loop_tools"]
-            if exit_tools and tool_name in [t["function"]["name"] for t in exit_tools]:
-                logger.debug("Exiting loop due to exit tool: %s", tool_name)
-                self.messages.append(tool_message)
-                return tool_message
+                # Check if tool is in exit loop tools
+                exit_tools = options["exit_loop_tools"]
+                if exit_tools and tool_name in [
+                    t["function"]["name"] for t in exit_tools
+                ]:
+                    logger.debug("Exiting loop due to exit tool: %s", tool_name)
+                    self.messages.append(tool_message)
+                    return str(tool_message["content"])
 
-            # Check if the tool exists
-            if tool_name not in self.clients:
-                logger.error("Tool %s not found in registered tools", tool_name)
-                tool_message["content"] = f"Error: No tool found with name: {tool_name}"
-                self.messages.append(tool_message)
-                return tool_message
+                # Check if the tool exists
+                if tool_name not in self.clients:
+                    logger.error("Tool %s not found in registered tools", tool_name)
+                    tool_message["content"] = (
+                        f"Error: No tool found with name: {tool_name}"
+                    )
+                    self.messages.append(tool_message)
+                    return str(tool_message["content"])
 
-            # Call the appropriate tool
-            client = self.clients.get(tool_name)
-            if client:
+                client = self.clients[tool_name]
                 try:
                     logger.debug("Calling tool: %s", tool_name)
                     result = await client.call_tool(
@@ -384,14 +379,10 @@ class TinyAgent(AnyAgent):
                 except Exception as e:
                     logger.error("Error calling tool %s: %s", tool_name, e)
                     tool_message["content"] = f"Error calling tool {tool_name}: {e}"
-            else:
-                tool_message["content"] = (
-                    f"Error: No session found for tool: {tool_name}"
-                )
 
-            self.messages.append(tool_message)
-            return tool_message
-        return message.model_dump()
+                self.messages.append(tool_message)
+                return str(tool_message["content"])
+        return str(message.content)
 
     @property
     def framework(self) -> AgentFramework:

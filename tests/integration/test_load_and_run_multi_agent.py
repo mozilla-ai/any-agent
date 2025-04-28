@@ -18,6 +18,11 @@ def test_load_and_run_multi_agent(
     if agent_framework is AgentFramework.SMOLAGENTS:
         kwargs["agent_type"] = "ToolCallingAgent"
 
+    if agent_framework is AgentFramework.TINYAGENT:
+        pytest.skip(
+            f"Skipping test for {agent_framework.name} because it does not support multi-agent"
+        )
+
     kwargs["model_id"] = "gpt-4.1-nano"
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {agent_framework.name}")
