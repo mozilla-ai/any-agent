@@ -37,16 +37,16 @@ from any_agent import AgentConfig, AnyAgent, TracingConfig
 
 ### Single Agent
 
-```py
+```python
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
-    )
+    ),
     tracing=TracingConfig(output_dir="traces") # Optional, but recommended for saving and viewing traces
 )
 
@@ -62,11 +62,11 @@ agent.run("Which Agent Framework is the best??")
     As stated before, carefully consider whether you need to adopt this pattern to
     solve the task.
 
-```py
+```python
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "smolagents",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="You are the main agent. Use the other available agents to find an answer",
@@ -94,7 +94,7 @@ agent.run("Which Agent Framework is the best??")
 
 If you are running in `async` context, you should use the equivalent `create_async` and `run_async` methods:
 
-```py
+```python
 import asyncio
 from any_agent.tools import search_web, visit_webpage
 

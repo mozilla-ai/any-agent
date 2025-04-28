@@ -43,7 +43,7 @@ pip install 'any-agent[all]'
 
 To define any agent system you will always use the same imports:
 
-```py
+```python
 from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
 For this example we use a model hosted by openai, but you may need to set the relevant API key for whichever provider being used.
@@ -55,7 +55,7 @@ export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
 
 ### Single agent
 
-```py
+```python
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
@@ -73,7 +73,7 @@ agent.run("Which Agent Framework is the best??")
 
 ### Multi-agent
 
-```py
+```python
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
@@ -124,7 +124,7 @@ The AI agent space is moving fast! If you see a new agentic framework that AnyAg
 
 If running in Jupyter Notebook you will need to add the following two lines before running AnyAgent, otherwise you may see the error `RuntimeError: This event loop is already running`. This is a known limitation of Jupyter Notebooks, see [Github Issue](https://github.com/jupyter/notebook/issues/3397#issuecomment-376803076)
 
-```py
+```python
 import nest_asyncio
 nest_asyncio.apply()
 ```
