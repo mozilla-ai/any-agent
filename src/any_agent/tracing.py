@@ -155,7 +155,11 @@ def _get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
 
         return LlamaIndexInstrumentor()
 
-    if framework is AgentFramework.GOOGLE or framework is AgentFramework.AGNO:
+    if (
+        framework is AgentFramework.GOOGLE
+        or framework is AgentFramework.AGNO
+        or framework is AgentFramework.TINYAGENT
+    ):
         msg = f"{framework} tracing is not supported."
         raise NotImplementedError(msg)
 

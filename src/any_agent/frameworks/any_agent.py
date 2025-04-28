@@ -88,6 +88,11 @@ class AnyAgent(ABC):
 
             return AgnoAgent
 
+        if framework is AgentFramework.TINYAGENT:
+            from any_agent.frameworks.tinyagent import TinyAgent
+
+            return TinyAgent
+
         assert_never(framework)
 
     @classmethod
@@ -122,7 +127,11 @@ class AnyAgent(ABC):
         if tracing is not None:
             # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
             # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-            if framework in (AgentFramework.AGNO, AgentFramework.GOOGLE):
+            if framework in (
+                AgentFramework.AGNO,
+                AgentFramework.GOOGLE,
+                AgentFramework.TINYAGENT,
+            ):
                 logger.warning(
                     "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
                 )
