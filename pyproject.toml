@@ -62,7 +62,7 @@ mcp = [
 ]
 
 tinyagent = [
-  "litellm>=1.0.0"
+  "litellm"
 ]
 
 all = [
