@@ -128,6 +128,7 @@ class AnyAgent(ABC):
             return self._tracer.trace_filepath
         return None
 
+    def run(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the agent with the given prompt."""
         return asyncio.get_event_loop().run_until_complete(
             self.run_async(prompt, **kwargs)
