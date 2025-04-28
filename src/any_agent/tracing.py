@@ -130,60 +130,6 @@ class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
         return SpanExportResult.SUCCESS
 
 
-def _get_tracer_provider(
-    agent_framework: AgentFramework,
-    tracing_config: TracingConfig,
-) -> tuple[TracerProvider, str]:
-    tracer_provider = TracerProvider()
-    if tracing_config.output_dir is not None:
-        if not os.path.exists(tracing_config.output_dir):
-            os.makedirs(tracing_config.output_dir)
-        timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        file_name = (
-            f"{tracing_config.output_dir}/{agent_framework.name}-{timestamp}.json"
-        )
-        json_file_exporter = JsonFileSpanExporter(file_name=file_name)
-        span_processor = SimpleSpanProcessor(json_file_exporter)
-        tracer_provider.add_span_processor(span_processor)
-
-    # This is what will log all the span info to stdout: We turn off the agent sdk specific logging so that
-    # the user sees a similar logging format for whichever agent they are using under the hood.
-    processor = BatchSpanProcessor(
-        RichConsoleSpanExporter(agent_framework, tracing_config),
-    )
-    tracer_provider.add_span_processor(processor)
-    trace.set_tracer_provider(tracer_provider)
-
-    return tracer_provider, file_name
-
-
-def setup_tracing(
-    agent_framework: AgentFramework,
-    tracing_config: TracingConfig,
-) -> str:
-    """Set up tracing for `agent_framework` using `openinference.instrumentation`.
-
-    Args:
-        agent_framework (AgentFramework): The type of agent being used.
-        tracing_config (TracingConfig): Configuration for tracing, including output directory and styles.
-
-    Returns:
-        str: The name of the JSON file where traces will be stored.
-
-    """
-    agent_framework_ = AgentFramework.from_string(agent_framework)
-
-    tracer_provider, file_name = _get_tracer_provider(
-        agent_framework,
-        tracing_config,
-    )
-
-    instrumenter = _get_instrumenter_by_framework(agent_framework_)
-    instrumenter.instrument(tracer_provider=tracer_provider)
-
-    return file_name
-
-
 class Instrumenter(Protocol):  # noqa: D101
     def instrument(self, *, tracer_provider: TracerProvider) -> None: ...  # noqa: D102
 
@@ -214,3 +160,59 @@ def _get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
         raise NotImplementedError(msg)
 
     assert_never(framework)
+
+
+class Tracer:
+    """A class that manages tracing for an agent."""
+
+    def __init__(
+        self,
+        agent_framework: AgentFramework,
+        tracing_config: TracingConfig,
+    ):
+        self.agent_framework = agent_framework
+        self.tracing_config = tracing_config
+        if self.tracing_config.enable_file:
+            if not os.path.exists(self.tracing_config.output_dir):
+                os.makedirs(self.tracing_config.output_dir)
+            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+            self.trace_filepath = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
+        else:
+            self.trace_filepath = None
+
+        self._setup_tracing()
+
+    def _setup_tracing(self) -> None:
+        """Set up tracing for the agent."""
+        tracer_provider = TracerProvider()
+
+        if self.tracing_config.enable_file:
+            json_file_exporter = JsonFileSpanExporter(file_name=self.trace_filepath)
+            span_processor = SimpleSpanProcessor(json_file_exporter)
+            tracer_provider.add_span_processor(span_processor)
+
+        if self.tracing_config.enable_console:
+            processor = BatchSpanProcessor(
+                RichConsoleSpanExporter(self.agent_framework, self.tracing_config),
+            )
+            tracer_provider.add_span_processor(processor)
+
+        trace.set_tracer_provider(tracer_provider)
+
+        instrumenter = _get_instrumenter_by_framework(self.agent_framework)
+        instrumenter.instrument(tracer_provider=tracer_provider)
+
+    @property
+    def is_enabled(self) -> bool:
+        """Whether tracing is enabled."""
+        return self.tracing_config.enable_file or self.tracing_config.enable_console
+
+    def get_trace(self) -> dict[str, Any] | None:
+        """Return the trace data if file tracing is enabled."""
+        if self.trace_filepath:
+            try:
+                with open(self.trace_filepath, "r") as f:
+                    return json.load(f)
+            except json.JSONDecodeError:
+                logger.warning("Failed to decode JSON trace file.")
+        return None
