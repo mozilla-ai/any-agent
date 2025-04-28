@@ -18,23 +18,6 @@ def agno_mcp_tools() -> Generator[AgnoMCPTools]:
 @pytest.mark.asyncio
 @pytest.mark.usefixtures(
     "enter_context_with_transport_and_session",
-    "agno_mcp_tools",
-    "_path_client_session",
-)
-async def test_agno_mcp_sse_tools_loaded(
-    mcp_sse_params_with_tools: MCPSseParams,
-    tools: Sequence[Tool],
-) -> None:
-    mcp_server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.AGNO)
-
-    await mcp_server._setup_tools()
-
-    assert mcp_server.tools == [tools]
-
-
-@pytest.mark.asyncio
-@pytest.mark.usefixtures(
-    "enter_context_with_transport_and_session",
 )
 async def test_agno_mcp_sse_integration(
     mcp_sse_params_with_tools: MCPSseParams,

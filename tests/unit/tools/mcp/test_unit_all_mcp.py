@@ -3,8 +3,8 @@ from collections.abc import Sequence
 
 import pytest
 
-from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
-from any_agent.tools import _get_mcp_server
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
+from any_agent.tools import MCPConnection, _get_mcp_server
 
 
 @pytest.mark.asyncio
@@ -40,3 +40,20 @@ async def test_sse_tool_filtering(
         assert set(server.tools[0].functions.keys()) == set(tools)  # type: ignore[union-attr]
     else:
         assert len(server.tools) == len(tools)  # ignore[arg-type]
+
+
+@pytest.mark.asyncio
+async def test_mcp_sse_tools_loaded(
+    agent_framework: AgentFramework,
+    mcp_sse_params_with_tools: MCPSseParams,
+    mcp_connection: MCPConnection,
+    tools: Sequence[Tool],
+) -> None:
+    if agent_framework is not AgentFramework.AGNO:
+        pytest.skip("Only AGNO framework is supported for this test at the moment.")
+
+    mcp_server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.AGNO)
+
+    await mcp_server._setup_tools(mcp_connection=mcp_connection)
+
+    assert mcp_server.tools == list(tools)

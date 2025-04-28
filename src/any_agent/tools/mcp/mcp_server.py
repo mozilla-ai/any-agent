@@ -8,6 +8,8 @@ from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 
+from .mcp_connection import MCPConnection
+
 
 class MCPServerBase(BaseModel, ABC):
     mcp_tool: MCPParams
@@ -24,7 +26,12 @@ class MCPServerBase(BaseModel, ABC):
         self._check_dependencies()
 
     @abstractmethod
-    async def _setup_tools(self) -> None: ...
+    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+        if not mcp_connection:
+            msg = "MCP server is not set up. Please call `_setup_tools` from a concrete class."
+            raise ValueError(msg)
+
+        self.tools = await mcp_connection.list_tools()
 
     @abstractmethod
     def _check_dependencies(self) -> None:

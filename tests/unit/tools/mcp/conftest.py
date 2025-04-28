@@ -9,6 +9,7 @@ from mcp import Tool as MCPTool
 from mcp.client.session import ClientSession
 
 from any_agent.config import MCPSseParams, MCPStdioParams, Tool
+from any_agent.tools import FakeMCPConnection, MCPConnection
 
 
 class Toolset(Protocol):
@@ -103,3 +104,8 @@ def _patch_client_session_list_tools(mcp_tools: Sequence[MCPTool]) -> Generator[
 @pytest.fixture
 def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSseParams:
     return MCPSseParams(url=echo_sse_server["url"], tools=tools)
+
+
+@pytest.fixture
+def mcp_connection(tools: Sequence[str]) -> MCPConnection:
+    return FakeMCPConnection(tools=tools)
