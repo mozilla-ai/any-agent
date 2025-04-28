@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, assert_never
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing import setup_tracing
+from any_agent.tracing import Tracer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -28,8 +28,8 @@ class AnyAgent(ABC):
     ):
         self.config = config
         self.managed_agents = managed_agents
-        self.trace_filepath: str | None = None
         self._mcp_servers: list[MCPServerBase] = []
+        self._tracer: Tracer | None = None
 
     async def _load_tools(
         self, tools: Sequence[Tool]
@@ -112,6 +112,7 @@ class AnyAgent(ABC):
         framework = AgentFramework.from_string(agent_framework)
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config, managed_agents=managed_agents)
+
         if tracing is not None:
             # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
             # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
@@ -124,9 +125,17 @@ class AnyAgent(ABC):
                     "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
                 )
             else:
-                agent.trace_filepath = setup_tracing(framework, tracing)
+                agent._tracer = Tracer(framework, tracing)
+
         await agent.load_agent()
         return agent
+
+    @property
+    def trace_filepath(self) -> str | None:
+        """Return the trace filepath."""
+        if self._tracer is not None:
+            return self._tracer.trace_filepath
+        return None
 
     def run(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Run the agent with the given prompt."""

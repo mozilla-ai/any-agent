@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import Enum, auto
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class AgentFramework(str, Enum):
@@ -52,12 +52,21 @@ class MCPSseParams(BaseModel):
 
 class TracingConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    output_dir: str | None = "traces"  # None for no json saved trace
+    output_dir: str = "traces"  # None for no json saved trace
+    enable_console: bool = True
+    enable_file: bool = True
     llm: str | None = "yellow"
     tool: str | None = "blue"
     agent: str | None = None
     chain: str | None = None
     cost_info: bool = True
+
+    @model_validator(mode="after")
+    def validate_enable_flags(self) -> Self:
+        if not self.enable_console and not self.enable_file:
+            msg = "At least one of enable_console or enable_file must be true"
+            raise ValueError(msg)
+        return self
 
 
 MCPParams = MCPStdioParams | MCPSseParams
