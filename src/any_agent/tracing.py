@@ -163,23 +163,17 @@ def _get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
 
 
 class Tracer:
-    """A class that manages tracing for an agent."""
+    """Tracer is responsible for managing all things tracing for an agent."""
 
     def __init__(
         self,
         agent_framework: AgentFramework,
         tracing_config: TracingConfig,
     ):
+        """Initialize the Tracer and set up tracing filepath, if enabled."""
         self.agent_framework = agent_framework
         self.tracing_config = tracing_config
-        if self.tracing_config.enable_file:
-            if not os.path.exists(self.tracing_config.output_dir):
-                os.makedirs(self.tracing_config.output_dir)
-            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-            self.trace_filepath = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
-        else:
-            self.trace_filepath = None
-
+        self.trace_filepath: str | None = None
         self._setup_tracing()
 
     def _setup_tracing(self) -> None:
@@ -187,6 +181,10 @@ class Tracer:
         tracer_provider = TracerProvider()
 
         if self.tracing_config.enable_file:
+            if not os.path.exists(self.tracing_config.output_dir):
+                os.makedirs(self.tracing_config.output_dir)
+            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+            self.trace_filepath = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
             json_file_exporter = JsonFileSpanExporter(file_name=self.trace_filepath)
             span_processor = SimpleSpanProcessor(json_file_exporter)
             tracer_provider.add_span_processor(span_processor)
@@ -211,8 +209,9 @@ class Tracer:
         """Return the trace data if file tracing is enabled."""
         if self.trace_filepath:
             try:
-                with open(self.trace_filepath, "r") as f:
-                    return json.load(f)
+                with open(self.trace_filepath) as f:
+                    content = json.load(f)
+                return dict(content)
             except json.JSONDecodeError:
                 logger.warning("Failed to decode JSON trace file.")
         return None

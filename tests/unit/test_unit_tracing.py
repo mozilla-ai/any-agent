@@ -38,5 +38,7 @@ def test_tracer_with_unsupported_framework(tmp_path: Path) -> None:
     with pytest.raises(NotImplementedError, match="AGNO tracing is not supported."):
         Tracer(
             agent_framework=AgentFramework.AGNO,
-            tracing_config=TracingConfig(output_dir=str(tmp_path / "traces"), enable_console=False),
+            tracing_config=TracingConfig(
+                output_dir=str(tmp_path / "traces"), enable_console=False
+            ),
         )

@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import Enum, auto
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field,  model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class AgentFramework(str, Enum):
@@ -60,10 +60,11 @@ class TracingConfig(BaseModel):
     chain: str | None = None
     cost_info: bool = True
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_enable_flags(self) -> Self:
         if not self.enable_console and not self.enable_file:
-            raise ValueError("At least one of enable_console or enable_file must be true")
+            msg = "At least one of enable_console or enable_file must be true"
+            raise ValueError(msg)
         return self
 
 

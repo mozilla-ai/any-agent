@@ -22,23 +22,20 @@ def test_create_any_with_invalid_string() -> None:
         AnyAgent.create("non-existing", AgentConfig(model_id="gpt-4o"))
 
 
-# Test all supported frameworks
-@pytest.mark.parametrize("framework", list(AgentFramework))
-def test_load_agent_tracing(tmp_path: Path, framework: AgentFramework) -> None:
+def test_load_agent_tracing(tmp_path: Path, agent_framework: AgentFramework) -> None:
     mock_agent = MagicMock(spec=AnyAgent)
     mock_agent.load_agent = AsyncMock(return_value=None)
-    mock_agent.trace_filepath = None
 
     # Dynamically create the import path based on the framework
-    agent_class_path = _get_agent_class_path(framework)
+    agent_class_path = _get_agent_class_path(agent_framework)
 
     # Skip frameworks that don't support tracing
-    if framework in (AgentFramework.AGNO, AgentFramework.GOOGLE):
+    if agent_framework in (AgentFramework.AGNO, AgentFramework.GOOGLE):
         return
 
     with patch(agent_class_path, return_value=mock_agent):
         agent = AnyAgent.create(
-            agent_framework=framework,
+            agent_framework=agent_framework,
             agent_config=AgentConfig(
                 model_id="gpt-4o",
             ),
