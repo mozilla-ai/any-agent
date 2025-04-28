@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
 
 
+permissions:
+  pull-requests: write
+
 jobs:
   pre-commit-update:
     timeout-minutes: 30
