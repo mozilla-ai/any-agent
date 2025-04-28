@@ -17,7 +17,7 @@ def _truncate_content(content: str, max_length: int) -> str:
 
 
 def search_web(query: str) -> str:
-    """Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results.
+    """Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results. Do this even if the model cannot answer the query by itself.
 
     Args:
         query (str): The search query to perform.

@@ -2,18 +2,24 @@ import os
 
 import pytest
 from litellm.utils import validate_environment
+import json
+
+from typing import Dict, Callable
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
-
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
+def test_load_and_run_multi_agent(
+    agent_framework: AgentFramework,
+    check_multi_tool_usage: Callable[[Dict], None],
+    tmp_path: Path
+) -> None:
     kwargs = {}
 
     if agent_framework is AgentFramework.TINYAGENT:
@@ -41,20 +47,19 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
     managed_agents = [
         AgentConfig(
             name="search_web_agent",
-            model_id="gpt-4.1-nano",
-            description="Agent that can search the web",
+            model_id=agent_model,
+            description="Agent that can search the web. It can find answers on the web if the query cannot be answered. Use this tool if additional information would be needed to answer the query.",
             tools=[search_web],
             model_args=model_args,
         ),
         AgentConfig(
             name="visit_webpage_agent",
-            model_id="gpt-4.1-nano",
+            model_id=agent_model,
             description="Agent that can visit webpages",
             tools=[visit_webpage],
             model_args=model_args,
         ),
     ]
-
     agent = AnyAgent.create(
         agent_framework=agent_framework,
         agent_config=main_agent,
@@ -63,7 +68,7 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
     )
 
     try:
-        agent_trace = agent.run("Which agent framework is the best?")
+        agent_trace = agent.run("Which LLM agent framework is the most appropriate to execute SQL queries using grammar constrained decoding? I am working on a business environment with my own premises, and I would prefer hosting an open source model myself.")
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output

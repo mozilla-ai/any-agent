@@ -6,12 +6,15 @@ from typing import Any
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
+from typing import Callable, Dict, Any, List
 import pytest
 from litellm.types.utils import ModelResponse
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanContext, SpanKind, TraceFlags, TraceState
 from opentelemetry.trace.status import Status, StatusCode
+
+from any_agent import AnyAgent
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
@@ -97,6 +100,68 @@ def _patch_stdio_client() -> Generator[
 
     with patch("mcp.client.stdio.stdio_client", return_value=mock_cm) as patched:
         yield patched, mock_transport
+
+
+def check_multi_tool_usage_google(json_logs: dict):
+    print("google tool usage check")
+
+
+def check_multi_tool_usage_langchain(json_logs: List[Dict]):
+    print("langchain tool usage check")
+    check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_llamaindex(json_logs: dict):
+    print("llamaindex tool usage check")
+    check_multi_tool_usage_all(json_logs, 2)
+
+
+def check_multi_tool_usage_openai(json_logs: dict):
+    print("openai tool usage check")
+    check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_agno(json_logs: dict):
+    print("agno tool usage check")
+    check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_smolagents(json_logs: dict):
+    print("smolagents tool usage check")
+    check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_tinyagent(json_logs: dict):
+    print("smolagents tool usage check")
+    check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_all(json_logs: dict, min: int):
+    tools = 0
+    for json_log in json_logs:
+        attrs = json_log["attributes"]
+        if "metadata" in attrs:
+            metadata = json.loads(attrs["metadata"])
+            if attrs["openinference.span.kind"] == "TOOL":
+                tools += 1
+    if tools < min:
+        raise Exception("Count of tool usage is too low, managed agents were not used")    
+
+
+check_multi_tool_usage_dict = {
+    AgentFramework.GOOGLE: check_multi_tool_usage_google,
+    AgentFramework.LANGCHAIN: check_multi_tool_usage_langchain,
+    AgentFramework.LLAMA_INDEX: check_multi_tool_usage_llamaindex,
+    AgentFramework.OPENAI: check_multi_tool_usage_openai,
+    AgentFramework.AGNO: check_multi_tool_usage_agno,
+    AgentFramework.SMOLAGENTS: check_multi_tool_usage_smolagents,
+    AgentFramework.TINYAGENT: check_multi_tool_usage_tinyagent
+}
+
+
+@pytest.fixture
+def check_multi_tool_usage(agent_framework) -> Callable[[Dict], None]:
+    return check_multi_tool_usage_dict[agent_framework]
 
 
 SSE_MCP_SERVER_SCRIPT = dedent(
