@@ -44,21 +44,6 @@ def task_completion_tool() -> dict[str, Any]:
     }
 
 
-def ask_question_tool() -> dict[str, Any]:
-    """Ask a question."""
-    return {
-        "type": "function",
-        "function": {
-            "name": "ask_question",
-            "description": "Ask a question to the user to get more info required to solve or clarify their problem.",
-            "parameters": {
-                "type": "object",
-                "properties": {},
-            },
-        },
-    }
-
-
 class ToolExecutor:
     """Executor for tools that wraps tool functions to work with the MCP client."""
 
@@ -125,7 +110,7 @@ class TinyAgent(AnyAgent):
         self.model = config.model_id
         self.clients: dict[str, ToolExecutor] = {}
         self.available_tools: list[dict[str, Any]] = []
-        self.exit_loop_tools = [task_completion_tool(), ask_question_tool()]
+        self.exit_loop_tools = [task_completion_tool()]
 
     async def load_agent(self) -> None:
         """Load the agent and its tools."""
