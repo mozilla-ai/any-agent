@@ -4,6 +4,8 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
 
+from pydantic import BaseModel, ConfigDict
+
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
@@ -13,6 +15,15 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from any_agent.tools.mcp.mcp_server import MCPServerBase
+
+
+class AgentResult(BaseModel):
+    """Standardized output format for all agent frameworks."""
+
+    final_output: str | int | float | list[Any] | dict[Any, Any] | None
+    raw_responses: list[Any] | None
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class AnyAgent(ABC):
@@ -137,7 +148,7 @@ class AnyAgent(ABC):
             return self._tracer.trace_filepath
         return None
 
-    def run(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+    def run(self, prompt: str, **kwargs: Any) -> AgentResult:
         """Run the agent with the given prompt."""
         return asyncio.get_event_loop().run_until_complete(
             self.run_async(prompt, **kwargs)
@@ -148,7 +159,7 @@ class AnyAgent(ABC):
         """Load the agent instance."""
 
     @abstractmethod
-    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
         """Run the agent asynchronously with the given prompt."""
 
     @property

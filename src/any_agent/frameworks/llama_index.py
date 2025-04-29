@@ -3,10 +3,12 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.frameworks.any_agent import AgentResult
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
 if TYPE_CHECKING:
+    from llama_index.core.agent.workflow.workflow_events import AgentOutput
     from llama_index.core.llms import LLM
 
 try:
@@ -116,9 +118,17 @@ class LlamaIndexAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
 
-        return await self._agent.run(prompt, **kwargs)
+        result: AgentOutput = await self._agent.run(prompt, **kwargs)
+        # assert that it's a TextBlock
+        if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
+            msg = f"Agent did not return a valid response: {result.response}"
+            raise ValueError(msg)
+        return AgentResult(
+            final_output=result.response.blocks[0].text,
+            raw_responses=None,  # Llama Index isn't giving me the trace history in the result or the _agent.
+        )

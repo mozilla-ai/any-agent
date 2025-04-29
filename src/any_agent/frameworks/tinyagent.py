@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 import litellm
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 
 if TYPE_CHECKING:
@@ -182,7 +182,7 @@ class TinyAgent(AnyAgent):
             self.clients[tool_name] = ToolExecutor(tool)
             logger.debug("Registered tool: %s", tool_name)
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> Any:
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
         """Run the agent asynchronously.
 
         Args:
@@ -235,7 +235,10 @@ class TinyAgent(AnyAgent):
             except Exception as err:
                 logger.error("Error during turn %s: %s", num_of_turns + 1, err)
                 if isinstance(err, Exception) and str(err) == "AbortError":
-                    return final_response or "Task aborted"
+                    return AgentResult(
+                        final_output=final_response or "Task aborted",
+                        raw_responses=self.messages,
+                    )
                 raise
 
             num_of_turns += 1
@@ -263,16 +266,28 @@ class TinyAgent(AnyAgent):
                 # If task is complete, return the last assistant message before this
                 for msg in reversed(self.messages[:-1]):
                     if msg.get("role") == "assistant" and msg.get("content"):
-                        return msg.get("content")
-                return final_response or "Task completed"
+                        return AgentResult(
+                            final_output=msg.get("content"),
+                            raw_responses=self.messages,
+                        )
+                return AgentResult(
+                    final_output=final_response or "Task completed",
+                    raw_responses=self.messages,
+                )
 
             if current_last.get("role") != "tool" and num_of_turns > max_turns:
                 logger.debug("Exiting because max turns (%s) reached", max_turns)
-                return final_response or f"Reached maximum number of turns {max_turns}"
+                return AgentResult(
+                    final_output=final_response or "Max turns reached",
+                    raw_responses=self.messages,
+                )
 
             if current_last.get("role") != "tool" and next_turn_should_call_tools:
                 logger.debug("Exiting because no tools were called when expected")
-                return final_response or "No tools called, stopping"
+                return AgentResult(
+                    final_output=final_response or "No tools called",
+                    raw_responses=self.messages,
+                )
 
             if current_last.get("role") == "tool":
                 next_turn_should_call_tools = False
@@ -285,11 +300,10 @@ class TinyAgent(AnyAgent):
         """Process a single turn of conversation with potential tool calls.
 
         Args:
-            messages: List of conversation messages
             options: Options including exit_loop_tools, exit_if_first_chunk_no_tool
 
         Returns:
-            The response message or tool message result
+            The response message or combined tool results
 
         """
         logger.debug("Start of single turn")
@@ -315,7 +329,12 @@ class TinyAgent(AnyAgent):
         self.messages.append(message.model_dump())
 
         # Process tool calls if any
+        combined_results = []
+        exit_tool_called = False
+
         if message.tool_calls:
+            logger.debug(f"Processing {len(message.tool_calls)} tool calls")
+
             for tool_call in message.tool_calls:
                 tool_name = tool_call.function.name
                 logger.debug("Processing tool call for: %s", tool_name)
@@ -337,9 +356,11 @@ class TinyAgent(AnyAgent):
                 if exit_tools and tool_name in [
                     t["function"]["name"] for t in exit_tools
                 ]:
-                    logger.debug("Exiting loop due to exit tool: %s", tool_name)
+                    logger.debug("Exit tool called: %s", tool_name)
+                    exit_tool_called = True
                     self.messages.append(tool_message)
-                    return str(tool_message["content"])
+                    combined_results.append(str(tool_message["content"]))
+                    continue
 
                 # Check if the tool exists
                 if tool_name not in self.clients:
@@ -347,32 +368,42 @@ class TinyAgent(AnyAgent):
                     tool_message["content"] = (
                         f"Error: No tool found with name: {tool_name}"
                     )
-                    self.messages.append(tool_message)
-                    return str(tool_message["content"])
+                else:
+                    client = self.clients[tool_name]
+                    try:
+                        logger.debug("Calling tool: %s", tool_name)
+                        result = await client.call_tool(
+                            {"name": tool_name, "arguments": tool_args}
+                        )
 
-                client = self.clients[tool_name]
-                try:
-                    logger.debug("Calling tool: %s", tool_name)
-                    result = await client.call_tool(
-                        {"name": tool_name, "arguments": tool_args}
-                    )
+                        if (
+                            isinstance(result, dict)
+                            and "content" in result
+                            and isinstance(result["content"], list)
+                        ):
+                            tool_message["content"] = result["content"][0]["text"]
+                        else:
+                            tool_message["content"] = str(result)
 
-                    if (
-                        isinstance(result, dict)
-                        and "content" in result
-                        and isinstance(result["content"], list)
-                    ):
-                        tool_message["content"] = result["content"][0]["text"]
-                    else:
-                        tool_message["content"] = str(result)
-
-                    logger.debug("Tool result: %s...", tool_message["content"])
-                except Exception as e:
-                    logger.error("Error calling tool %s: %s", tool_name, e)
-                    tool_message["content"] = f"Error calling tool {tool_name}: {e}"
+                        logger.debug(
+                            "Tool result: %s...",
+                            tool_message["content"][:50]
+                            if tool_message["content"]
+                            else "Empty",
+                        )
+                    except Exception as e:
+                        logger.error("Error calling tool %s: %s", tool_name, e)
+                        tool_message["content"] = f"Error calling tool {tool_name}: {e}"
 
                 self.messages.append(tool_message)
-                return str(tool_message["content"])
+                combined_results.append(str(tool_message["content"]))
+
+            # If an exit tool was called, return early with the combined results
+            if exit_tool_called:
+                return "\n".join(combined_results)
+
+            return "\n".join(combined_results)
+
         return str(message.content)
 
     @property
