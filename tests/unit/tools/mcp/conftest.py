@@ -8,8 +8,9 @@ import pytest
 from mcp import Tool as MCPTool
 from mcp.client.session import ClientSession
 from pydantic import Field
+from pytest_lazy_fixtures import lf
 
-from any_agent.config import MCPSseParams, MCPStdioParams, Tool
+from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams, Tool
 from any_agent.tools import MCPConnection
 
 
@@ -118,3 +119,10 @@ class FakeMCPConnection(MCPConnection):
 @pytest.fixture
 def mcp_connection(tools: Sequence[Tool]) -> MCPConnection:
     return FakeMCPConnection(tools=tools)
+
+
+@pytest.fixture(
+    params=[lf("stdio_params"), lf("mcp_sse_params_with_tools")], ids=["STDIO", "SSE"]
+)
+def mcp_params(request: pytest.FixtureRequest) -> MCPParams:
+    return request.param  # type: ignore[no-any-return]
