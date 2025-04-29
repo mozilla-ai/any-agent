@@ -1,13 +1,11 @@
-import asyncio
 import json
-from collections.abc import AsyncGenerator, Generator, Sequence
-from textwrap import dedent
+from collections.abc import Generator
 from unittest.mock import AsyncMock, patch
 
 import pytest
 import rich.console
 
-from any_agent.config import AgentFramework, Tool
+from any_agent.config import AgentFramework
 
 
 @pytest.fixture(autouse=True)
@@ -92,4 +90,3 @@ def _patch_stdio_client() -> Generator[
 
     with patch("mcp.client.stdio.stdio_client", return_value=mock_cm) as patched:
         yield patched, mock_transport
-

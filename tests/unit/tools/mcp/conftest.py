@@ -1,6 +1,8 @@
+import asyncio
 import shutil
 from collections.abc import AsyncGenerator, Generator, Sequence
 from contextlib import AsyncExitStack
+from textwrap import dedent
 from typing import Any, Protocol
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -14,9 +16,11 @@ from any_agent.config import MCPSseParams, MCPStdioParams, Tool
 class Toolset(Protocol):
     def load_tools(self) -> list[Tool]: ...
 
+
 @pytest.fixture(scope="session")
 def tools() -> list[Tool]:
     return ["write_file", "read_file", "other_tool"]
+
 
 @pytest.fixture
 def mcp_sse_params_no_tools() -> MCPSseParams:
@@ -127,8 +131,8 @@ def mcp_server_script(
     port: int,
     tools: Sequence[Tool],
 ) -> str:
-    TOOLS_SCRIPT = [
-    f"""
+    tool_scripts = [
+        f"""
             @mcp.tool()
             def {tool}(text: str) -> str:
                 return f"Hi: {{text}}"
@@ -136,7 +140,7 @@ def mcp_server_script(
         for tool in tools
     ]
 
-    tools_script = "\n".join(TOOLS_SCRIPT)
+    tools_script = "\n".join(tool_scripts)
 
     return dedent(
         f"""
