@@ -1,7 +1,7 @@
 """MCP adapter for Tiny framework."""
 
 import os
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from contextlib import suppress
 from datetime import timedelta
 from typing import Any, Literal
@@ -76,31 +76,11 @@ class TinyAgentMCPServerBase(MCPServerBase):
         # Store tools as a list
         self.tools = tool_list
 
-    async def list_tools(self) -> dict[str, Sequence[Any]]:
-        """List available tools from the MCP server.
-
-        Returns:
-            Dictionary with tools information
-
-        """
-        if not self.session:
-            msg = "Not connected to MCP server"
-            raise ValueError(msg)
-
-        # Get the available tools from the MCP server
-        schema = await self.session.schema()
-
-        # Extract tool schemas from the response
-        tools = []
-        if schema and "tools" in schema:
-            tools = schema["tools"]
-
-        return {"tools": tools}
-
     def _create_tool_from_info(self, tool: Tool) -> Callable[..., Any]:
         """Create a tool function from tool information."""
         tool_name = tool.name
         tool_description = tool.description
+        input_schema = tool.inputSchema
         session = self.session
         if not self.session:
             msg = "Not connected to MCP server"
@@ -126,6 +106,9 @@ class TinyAgentMCPServerBase(MCPServerBase):
         # Set attributes for the tool function
         tool_function.__name__ = tool_name
         tool_function.__doc__ = tool_description
+        # this isn't a defined attribute of a callable, but we pass it to tinyagent so that it can use it appropriately
+        # when constructing the ToolExecutor.
+        tool_function.__input_schema__ = input_schema  # type: ignore[attr-defined]
 
         return tool_function
 

@@ -123,10 +123,11 @@ class TinyAgent(AnyAgent):
         logger.debug("Wrapped tools count: %s", len(wrapped_tools))
 
         for tool in wrapped_tools:
-            try:
-                tool_name = tool.__name__
-                tool_desc = tool.__doc__ or f"Tool to {tool_name}"
+            tool_name = tool.__name__
+            tool_desc = tool.__doc__ or f"Tool to {tool_name}"
 
+            # check if the tool has __input__schema__ attribute which we set when wrapping MCP tools
+            if not hasattr(tool, "__input_schema__"):
                 # Generate one from the function signature
                 import inspect
 
@@ -157,24 +158,25 @@ class TinyAgent(AnyAgent):
                     "properties": properties,
                     "required": required,
                 }
+            else:
+                # Use the provided schema
+                input_schema = tool.__input_schema__
 
-                # Add the tool to available tools
-                self.available_tools.append(
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": tool_name,
-                            "description": tool_desc,
-                            "parameters": input_schema,
-                        },
-                    }
-                )
+            # Add the tool to available tools
+            self.available_tools.append(
+                {
+                    "type": "function",
+                    "function": {
+                        "name": tool_name,
+                        "description": tool_desc,
+                        "parameters": input_schema,
+                    },
+                }
+            )
 
-                # Register tool with the client
-                self.clients[tool_name] = ToolExecutor(tool)
-                logger.debug("Registered tool: %s", tool_name)
-            except Exception as e:
-                logger.error("Error registering tool: %s", e)
+            # Register tool with the client
+            self.clients[tool_name] = ToolExecutor(tool)
+            logger.debug("Registered tool: %s", tool_name)
 
     async def run_async(self, prompt: str, **kwargs: Any) -> Any:
         """Run the agent asynchronously.
