@@ -39,6 +39,11 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     )
     result = agent.run("Which agent framework is the best?")
     assert result
+    assert result.final_output
+    if agent_framework not in [AgentFramework.LLAMA_INDEX]:
+        # Llama Index doesn't currently give back raw_responses.
+        assert result.raw_responses
+        assert len(result.raw_responses) > 0
     if agent_framework not in (
         AgentFramework.AGNO,
         AgentFramework.GOOGLE,
