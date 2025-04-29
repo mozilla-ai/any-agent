@@ -21,7 +21,8 @@ any-agent also provides a 'trace-first' [llm-as-a-judge powered evaluation tool]
 
 ## [Supported Frameworks](https://mozilla-ai.github.io/any-agent/frameworks/)
 
-[![Google ADK](https://img.shields.io/badge/Google%20ADK-4285F4?logo=google&logoColor=white)](https://github.com/google/adk-python) [![LangChain](https://img.shields.io/badge/LangChain-1e4545?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph) [![LlamaIndex](https://img.shields.io/badge/🦙%20LlamaIndex-fbcfe2)](https://github.com/run-llama/llama_index) [![OpenAI Agents](https://img.shields.io/badge/OpenAI%20Agents-black?logo=openai)](https://github.com/openai/openai-agents-python) [![Smolagents](https://img.shields.io/badge/Smolagents-ffcb3a?logo=huggingface&logoColor=white)](https://smolagents.org/) [Agno AI](https://docs.agno.com/introduction)
+[![Google ADK](https://img.shields.io/badge/Google%20ADK-4285F4?logo=google&logoColor=white)](https://github.com/google/adk-python) [![LangChain](https://img.shields.io/badge/LangChain-1e4545?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph) [![LlamaIndex](https://img.shields.io/badge/🦙%20LlamaIndex-fbcfe2)](https://github.com/run-llama/llama_index) [![OpenAI Agents](https://img.shields.io/badge/OpenAI%20Agents-black?logo=openai)](https://github.com/openai/openai-agents-python) [![Smolagents](https://img.shields.io/badge/Smolagents-ffcb3a?logo=huggingface&logoColor=white)](https://smolagents.org/) [![TinyAgents](https://img.shields.io/badge/TinyAgents-ffcb3a?logo=huggingface&logoColor=white)]([https://smolagents.org/](https://huggingface.co/blog/tiny-agents))  [Agno AI](https://docs.agno.com/introduction)
+
 
 ### Planned for Support (Contributions Welcome!)
 
@@ -43,7 +44,7 @@ pip install 'any-agent[all]'
 
 To define any agent system you will always use the same imports:
 
-```py
+```python
 from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
 For this example we use a model hosted by openai, but you may need to set the relevant API key for whichever provider being used.
@@ -55,7 +56,7 @@ export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
 
 ### Single agent
 
-```py
+```python
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
@@ -73,7 +74,7 @@ agent.run("Which Agent Framework is the best??")
 
 ### Multi-agent
 
-```py
+```python
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
@@ -124,7 +125,7 @@ The AI agent space is moving fast! If you see a new agentic framework that AnyAg
 
 If running in Jupyter Notebook you will need to add the following two lines before running AnyAgent, otherwise you may see the error `RuntimeError: This event loop is already running`. This is a known limitation of Jupyter Notebooks, see [Github Issue](https://github.com/jupyter/notebook/issues/3397#issuecomment-376803076)
 
-```py
+```python
 import nest_asyncio
 nest_asyncio.apply()
 ```

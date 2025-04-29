@@ -8,6 +8,7 @@ from .mcp import (
     MCPServerBase,
     OpenAIMCPServer,
     SmolagentsMCPServer,
+    TinyAgentMCPServer,
     _get_mcp_server,
 )
 from .user_interaction import (
@@ -28,6 +29,7 @@ __all__ = [
     "MCPServerBase",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
+    "TinyAgentMCPServer",
     "_get_mcp_server",
     "ask_user_verification",
     "search_web",

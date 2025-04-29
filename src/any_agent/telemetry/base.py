@@ -50,6 +50,7 @@ class TelemetryProcessor(ABC):
         if (
             agent_framework is AgentFramework.GOOGLE
             or agent_framework is AgentFramework.AGNO
+            or agent_framework is AgentFramework.TINYAGENT
         ):
             raise NotImplementedError
 

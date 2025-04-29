@@ -8,6 +8,7 @@ from .langchain import LangchainMCPServer
 from .llama_index import LlamaIndexMCPServer
 from .openai import OpenAIMCPServer
 from .smolagents import SmolagentsMCPServer
+from .tinyagent import TinyAgentMCPServer
 
 MCPServer = (
     AgnoMCPServer
@@ -16,6 +17,7 @@ MCPServer = (
     | LlamaIndexMCPServer
     | OpenAIMCPServer
     | SmolagentsMCPServer
+    | TinyAgentMCPServer
 )
 
 
@@ -33,5 +35,6 @@ __all__ = [
     "MCPServer",
     "OpenAIMCPServer",
     "SmolagentsMCPServer",
+    "TinyAgentMCPServer",
     "_get_mcp_server",
 ]
