@@ -1,7 +1,7 @@
 from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.tools import search_web, visit_webpage
 
 try:
@@ -115,10 +115,14 @@ class OpenAIAgent(AnyAgent):
             non_mcp_tools.append(tool)
         return non_mcp_tools
 
-    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
         """Run the OpenAI agent with the given prompt asynchronously."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
 
-        return await Runner.run(self._agent, prompt, **kwargs)
+        result = await Runner.run(self._agent, prompt, **kwargs)
+        return AgentResult(
+            final_output=result.final_output,
+            raw_responses=result.raw_responses,
+        )

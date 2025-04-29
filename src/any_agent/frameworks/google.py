@@ -1,9 +1,8 @@
 from collections.abc import Sequence
-from typing import Any
 from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
@@ -90,7 +89,7 @@ class GoogleAgent(AnyAgent):
         user_id: str | None = None,
         session_id: str | None = None,
         **kwargs,
-    ) -> Any:
+    ) -> AgentResult:
         """Run the Google agent with the given prompt."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
@@ -122,4 +121,6 @@ class GoogleAgent(AnyAgent):
             session_id=session_id,
         )
         assert session, "Session should not be None"
-        return session.state.get("response", None)
+        response = session.state.get("response", None)
+
+        return AgentResult(final_output=response, raw_responses=session.events)

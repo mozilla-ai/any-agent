@@ -68,3 +68,8 @@ def test_load_and_run_multi_agent(
     result = agent.run("Which agent framework is the best?")
 
     assert result
+    assert result.final_output
+    if agent_framework not in [AgentFramework.LLAMA_INDEX]:
+        # Llama Index doesn't currently give back raw_responses.
+        assert result.raw_responses
+        assert len(result.raw_responses) > 0

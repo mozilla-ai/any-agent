@@ -1,12 +1,13 @@
 from typing import Any
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
 try:
     from agno.agent import Agent
+    from agno.agent import RunResponse as AgnoRunResponse
     from agno.models.litellm import LiteLLM
     from agno.team.team import Team
 
@@ -94,9 +95,10 @@ class AgnoAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
 
-        return await self._agent.arun(prompt, **kwargs)
+        result: AgnoRunResponse = await self._agent.arun(prompt, **kwargs)
+        return AgentResult(final_output=result.content, raw_responses=result.messages)

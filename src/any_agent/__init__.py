@@ -1,4 +1,4 @@
 from .config import AgentConfig, AgentFramework, TracingConfig
-from .frameworks.any_agent import AnyAgent
+from .frameworks.any_agent import AgentResult, AnyAgent
 
-__all__ = ["AgentConfig", "AgentFramework", "AnyAgent", "TracingConfig"]
+__all__ = ["AgentConfig", "AgentFramework", "AgentResult", "AnyAgent", "TracingConfig"]

@@ -54,3 +54,8 @@ def test_mcp(agent_framework: AgentFramework, tmp_path) -> None:  # type: ignore
         content = f.read()
     assert content == str(datetime.now().year)
     assert result
+    assert result.final_output
+    if agent_framework not in [AgentFramework.LLAMA_INDEX]:
+        # Llama Index doesn't currently give back raw_responses.
+        assert result.raw_responses
+        assert len(result.raw_responses) > 0

@@ -76,6 +76,8 @@ class TinyAgentMCPConnection(MCPConnection, ABC):
         """Create a tool function from tool information."""
         tool_name = tool.name if hasattr(tool, "name") else tool
         tool_description = tool.description if hasattr(tool, "description") else ""
+        input_schema = tool.inputSchema if hasattr(tool, "inputSchema") else None
+        session = session
         if not session:
             msg = "Not connected to MCP server"
             raise ValueError(msg)
@@ -100,6 +102,9 @@ class TinyAgentMCPConnection(MCPConnection, ABC):
         # Set attributes for the tool function
         tool_function.__name__ = tool_name  # type: ignore[assignment]
         tool_function.__doc__ = tool_description
+        # this isn't a defined attribute of a callable, but we pass it to tinyagent so that it can use it appropriately
+        # when constructing the ToolExecutor.
+        tool_function.__input_schema__ = input_schema  # type: ignore[attr-defined]
 
         return tool_function
 

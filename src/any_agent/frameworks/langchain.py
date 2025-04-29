@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 if TYPE_CHECKING:
     from langchain_core.language_models import LanguageModelLike
-
+    from langchain_core.messages.base import BaseMessage
 try:
     from langchain_core.language_models import LanguageModelLike
     from langgraph.prebuilt import create_react_agent
@@ -126,11 +126,18 @@ class LangchainAgent(AnyAgent):
         # so we'll store a list of them in this class
         self._tools = imported_tools
 
-    async def run_async(self, prompt: str, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
         """Run the LangChain agent with the given prompt."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
 
         inputs = {"messages": [("user", prompt)]}
-        return await self._agent.ainvoke(inputs, **kwargs)
+        result = await self._agent.ainvoke(inputs, **kwargs)
+        if not result.get("messages"):
+            msg = "No messages returned from the agent."
+            raise ValueError(msg)
+        last_message: BaseMessage = result["messages"][-1]
+        return AgentResult(
+            final_output=last_message.content, raw_responses=result["messages"]
+        )
