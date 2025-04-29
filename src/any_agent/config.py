@@ -1,6 +1,6 @@
 from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import Enum, auto
-from typing import Any, Self
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -30,24 +30,38 @@ class AgentFramework(str, Enum):
         return cls[formatted_value]
 
 
-class MCPStdioParams(BaseModel):
-    command: str
-    args: Sequence[str]
-    tools: Sequence[str] | None = None
-    client_session_timeout_seconds: float | None = 5
-    """the read timeout passed to the MCP ClientSession."""
+class MCPParamType(str, Enum):
+    STDIO = auto()
+    SSE = auto()
+
+
+class MCPParamBase(BaseModel):
+    param_type: MCPParamType
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
 
-class MCPSseParams(BaseModel):
-    url: str
-    headers: Mapping[str, str] | None = None
-    tools: Sequence[str] | None = None
-    client_session_timeout_seconds: float | None = 5
+class MCPStdioParams(MCPParamBase):
+    param_type: Literal[MCPParamType.STDIO] = MCPParamType.STDIO
+
+    command: str
+    args: Sequence[str]
+    tools: Sequence[str] = Field(default_factory=list)
+    client_session_timeout_seconds: float = 5
     """the read timeout passed to the MCP ClientSession."""
 
-    model_config = ConfigDict(frozen=True)
+
+class MCPSseParams(MCPParamBase):
+    param_type: Literal[MCPParamType.SSE] = MCPParamType.SSE
+
+    url: str
+    headers: Mapping[str, str] = Field(default_factory=dict)
+    tools: Sequence[str] = Field(default_factory=list)
+    client_session_timeout_seconds: float = 5
+    """the read timeout passed to the MCP ClientSession."""
+
+
+MCPParams = MCPStdioParams | MCPSseParams
 
 
 class TracingConfig(BaseModel):
@@ -68,8 +82,6 @@ class TracingConfig(BaseModel):
             raise ValueError(msg)
         return self
 
-
-MCPParams = MCPStdioParams | MCPSseParams
 
 Tool = str | MCPParams | Callable[..., Any]
 
