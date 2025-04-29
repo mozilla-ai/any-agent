@@ -14,11 +14,9 @@ from any_agent.config import MCPSseParams, MCPStdioParams, Tool
 class Toolset(Protocol):
     def load_tools(self) -> list[Tool]: ...
 
-
-@pytest.fixture
+@pytest.fixture(scope="session")
 def tools() -> list[Tool]:
     return ["write_file", "read_file", "other_tool"]
-
 
 @pytest.fixture
 def mcp_sse_params_no_tools() -> MCPSseParams:
@@ -103,3 +101,79 @@ def _patch_client_session_list_tools(mcp_tools: Sequence[MCPTool]) -> Generator[
 @pytest.fixture
 def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSseParams:
     return MCPSseParams(url=echo_sse_server["url"], tools=tools)
+
+
+@pytest.fixture(scope="session")
+def host() -> str:
+    return "127.0.0.1"
+
+
+@pytest.fixture(scope="session")
+def port() -> int:
+    return 8000
+
+
+@pytest.fixture(scope="session")
+def sse_url(
+    host: str,
+    port: int,
+) -> str:
+    return f"http://{host}:{port}/sse"
+
+
+@pytest.fixture(scope="session")
+def mcp_server_script(
+    host: str,
+    port: int,
+    tools: Sequence[Tool],
+) -> str:
+    TOOLS_SCRIPT = [
+    f"""
+            @mcp.tool()
+            def {tool}(text: str) -> str:
+                return f"Hi: {{text}}"
+    """
+        for tool in tools
+    ]
+
+    tools_script = "\n".join(TOOLS_SCRIPT)
+
+    return dedent(
+        f"""
+            from mcp.server.fastmcp import FastMCP
+
+            mcp = FastMCP("Echo Server", host="{host}", port="{port}")
+
+            {tools_script}
+
+            mcp.run("sse")
+        """
+    )
+
+
+@pytest.fixture(
+    scope="session"
+)  # This means it only gets created once per test session
+async def echo_sse_server(
+    mcp_server_script: str,
+    sse_url: str,
+) -> AsyncGenerator[dict[str, str]]:
+    """This fixture runs a FastMCP server in a subprocess.
+    I thought about trying to mock all the individual mcp client calls,
+    but I went with this because this way we don't need to actually mock anything.
+    This is similar to what MCPAdapt does in their testing https://github.com/grll/mcpadapt/blob/main/tests/test_core.py
+    """
+
+    process = await asyncio.create_subprocess_exec(
+        "python",
+        "-c",
+        mcp_server_script,
+    )
+    await asyncio.sleep(1)
+
+    try:
+        yield {"url": sse_url}
+    finally:
+        # Clean up the process when test is done
+        process.kill()
+        await process.wait()
