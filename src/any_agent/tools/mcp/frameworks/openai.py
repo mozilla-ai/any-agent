@@ -26,7 +26,6 @@ with suppress(ImportError):
 class OpenAIMCPConnection(MCPConnection, ABC):
     """Base class for OpenAI MCP connections."""
 
-    mcp_tool: MCPStdioParams | MCPSseParams
     _server: OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None = (
         PrivateAttr(default=None)
     )
@@ -39,7 +38,8 @@ class OpenAIMCPConnection(MCPConnection, ABC):
             raise ValueError(msg)
 
         await self._exit_stack.enter_async_context(self._server)
-        return await self._server.list_tools()  # type: ignore[return-value]
+        tools = await self._server.list_tools()
+        return self._filter_tools(tools)  # type: ignore[return-value]
 
     @property
     def server(self) -> MCPServer | None:

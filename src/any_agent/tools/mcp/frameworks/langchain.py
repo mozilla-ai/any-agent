@@ -23,7 +23,6 @@ with suppress(ImportError):
 class LangchainMCPConnection(MCPConnection, ABC):
     """Base class for LangChain MCP connections."""
 
-    mcp_tool: MCPStdioParams | MCPSseParams
     _client: Any | None = PrivateAttr(default=None)
 
     @abstractmethod
@@ -45,8 +44,9 @@ class LangchainMCPConnection(MCPConnection, ABC):
         session = await self._exit_stack.enter_async_context(client_session)
 
         await session.initialize()
-        # List available tools
-        return await load_mcp_tools(session)  # type: ignore[return-value]
+
+        tools = await load_mcp_tools(session)
+        return self._filter_tools(tools)  # type: ignore[return-value]
 
 
 class LangchainMCPStdioConnection(LangchainMCPConnection):

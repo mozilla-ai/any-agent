@@ -7,7 +7,6 @@ from pydantic import PrivateAttr
 
 from any_agent.config import (
     AgentFramework,
-    MCPParams,
     MCPSseParams,
     MCPStdioParams,
     Tool,
@@ -31,7 +30,6 @@ with suppress(ImportError):
 class GoogleMCPConnection(MCPConnection, ABC):
     """Base class for Google MCP connections."""
 
-    mcp_tool: MCPParams
     _params: GoogleStdioServerParameters | GoogleSseServerParameters | None = (
         PrivateAttr(default=None)
     )
@@ -45,7 +43,8 @@ class GoogleMCPConnection(MCPConnection, ABC):
 
         server = GoogleMCPToolset(connection_params=self._params)
         await self._exit_stack.enter_async_context(server)
-        return await server.load_tools()  # type: ignore[no-any-return]
+        tools = await server.load_tools()
+        return self._filter_tools(tools)  # type: ignore[return-value]
 
 
 class GoogleMCPStdioConnection(GoogleMCPConnection):

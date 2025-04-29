@@ -20,7 +20,6 @@ with suppress(ImportError):
 class LlamaIndexMCPConnection(MCPConnection, ABC):
     """Base class for LlamaIndex MCP connections."""
 
-    mcp_tool: MCPStdioParams | MCPSseParams
     _client: LlamaIndexMCPClient | None = PrivateAttr(default=None)
 
     @abstractmethod

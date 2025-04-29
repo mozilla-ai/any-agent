@@ -20,7 +20,6 @@ with suppress(ImportError):
 class SmolagentsMCPConnection(MCPConnection, ABC):
     """Base class for Smolagents MCP connections."""
 
-    mcp_tool: MCPStdioParams | MCPSseParams
     _client: MCPClient | None = PrivateAttr(default=None)
 
     @abstractmethod
@@ -30,7 +29,8 @@ class SmolagentsMCPConnection(MCPConnection, ABC):
             msg = "Tool collection is not set up. Please call `list_tools` from a concrete class."
             raise ValueError(msg)
 
-        return self._exit_stack.enter_context(self._client)  # type: ignore[arg-type]
+        tools = self._client.get_tools()
+        return self._filter_tools(tools)  # type: ignore[return-value]
 
 
 class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):

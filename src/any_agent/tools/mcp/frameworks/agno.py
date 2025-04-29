@@ -7,7 +7,6 @@ from pydantic import PrivateAttr
 
 from any_agent.config import (
     AgentFramework,
-    MCPParams,
     MCPSseParams,
     MCPStdioParams,
     Tool,
@@ -25,7 +24,6 @@ with suppress(ImportError):
 
 
 class AgnoMCPConnection(MCPConnection, ABC):
-    mcp_tool: MCPParams
     _server: AgnoMCPTools | None = PrivateAttr(default=None)
 
     @abstractmethod
@@ -35,7 +33,8 @@ class AgnoMCPConnection(MCPConnection, ABC):
             msg = "MCP server is not set up. Please call `list_tools` from a concrete class."
             raise ValueError(msg)
 
-        return await self._exit_stack.enter_async_context(self._server)  # type: ignore[arg-type]
+        tools = await self._exit_stack.enter_async_context(self._server)
+        return tools if isinstance(tools, list) else [tools]  # type: ignore[return-value, list-item]
 
 
 class AgnoMCPStdioConnection(AgnoMCPConnection):

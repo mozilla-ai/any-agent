@@ -108,6 +108,7 @@ def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSse
 
 
 class FakeMCPConnection(MCPConnection):
+    mcp_tool: None = None  # type: ignore[assignment]
     tools: Sequence[Tool] = Field(default_factory=list)
 
     async def list_tools(self) -> list[Tool]:

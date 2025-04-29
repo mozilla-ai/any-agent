@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from textwrap import dedent
 from typing import Any
 
 from agents.mcp.server import MCPServer
@@ -33,8 +32,7 @@ class MCPServerBase(BaseModel, ABC):
             raise ValueError(msg)
 
         self.mcp_connection = mcp_connection
-        tools = await mcp_connection.list_tools()
-        self.tools = self._filter_tools(tools)
+        self.tools = await mcp_connection.list_tools()
 
     @property
     def server(self) -> MCPServer:
@@ -52,24 +50,3 @@ class MCPServerBase(BaseModel, ABC):
 
         msg = f"You need to `pip install '{self.libraries}'` to use MCP."
         raise ImportError(msg)
-
-    def _filter_tools(self, tools: Sequence[Tool]) -> Sequence[Tool]:
-        # Only add the tools listed in mcp_tool['tools'] if specified
-        requested_tools = list(self.mcp_tool.tools or [])
-
-        if not requested_tools:
-            return tools
-
-        found_tools = [tool for tool in tools if tool in requested_tools]
-
-        if len(found_tools) != len(requested_tools):
-            error_message = (
-                dedent(
-                    f"""Could not find all requested tools in the MCP server:
-                    Requested: {requested_tools}
-                    Set:   {tools}
-                """
-                ),
-            )
-            raise ValueError(error_message)
-        return tools
