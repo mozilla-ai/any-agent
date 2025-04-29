@@ -296,11 +296,10 @@ class TinyAgent(AnyAgent):
         """Process a single turn of conversation with potential tool calls.
 
         Args:
-            messages: List of conversation messages
             options: Options including exit_loop_tools, exit_if_first_chunk_no_tool
 
         Returns:
-            The response message or tool message result
+            The response message or combined tool results
 
         """
         logger.debug("Start of single turn")
@@ -326,7 +325,12 @@ class TinyAgent(AnyAgent):
         self.messages.append(message.model_dump())
 
         # Process tool calls if any
+        combined_results = []
+        exit_tool_called = False
+
         if message.tool_calls:
+            logger.debug(f"Processing {len(message.tool_calls)} tool calls")
+
             for tool_call in message.tool_calls:
                 tool_name = tool_call.function.name
                 logger.debug("Processing tool call for: %s", tool_name)
@@ -348,9 +352,11 @@ class TinyAgent(AnyAgent):
                 if exit_tools and tool_name in [
                     t["function"]["name"] for t in exit_tools
                 ]:
-                    logger.debug("Exiting loop due to exit tool: %s", tool_name)
+                    logger.debug("Exit tool called: %s", tool_name)
+                    exit_tool_called = True
                     self.messages.append(tool_message)
-                    return str(tool_message["content"])
+                    combined_results.append(str(tool_message["content"]))
+                    continue
 
                 # Check if the tool exists
                 if tool_name not in self.clients:
@@ -358,32 +364,42 @@ class TinyAgent(AnyAgent):
                     tool_message["content"] = (
                         f"Error: No tool found with name: {tool_name}"
                     )
-                    self.messages.append(tool_message)
-                    return str(tool_message["content"])
+                else:
+                    client = self.clients[tool_name]
+                    try:
+                        logger.debug("Calling tool: %s", tool_name)
+                        result = await client.call_tool(
+                            {"name": tool_name, "arguments": tool_args}
+                        )
 
-                client = self.clients[tool_name]
-                try:
-                    logger.debug("Calling tool: %s", tool_name)
-                    result = await client.call_tool(
-                        {"name": tool_name, "arguments": tool_args}
-                    )
+                        if (
+                            isinstance(result, dict)
+                            and "content" in result
+                            and isinstance(result["content"], list)
+                        ):
+                            tool_message["content"] = result["content"][0]["text"]
+                        else:
+                            tool_message["content"] = str(result)
 
-                    if (
-                        isinstance(result, dict)
-                        and "content" in result
-                        and isinstance(result["content"], list)
-                    ):
-                        tool_message["content"] = result["content"][0]["text"]
-                    else:
-                        tool_message["content"] = str(result)
-
-                    logger.debug("Tool result: %s...", tool_message["content"])
-                except Exception as e:
-                    logger.error("Error calling tool %s: %s", tool_name, e)
-                    tool_message["content"] = f"Error calling tool {tool_name}: {e}"
+                        logger.debug(
+                            "Tool result: %s...",
+                            tool_message["content"][:50]
+                            if tool_message["content"]
+                            else "Empty",
+                        )
+                    except Exception as e:
+                        logger.error("Error calling tool %s: %s", tool_name, e)
+                        tool_message["content"] = f"Error calling tool {tool_name}: {e}"
 
                 self.messages.append(tool_message)
-                return str(tool_message["content"])
+                combined_results.append(str(tool_message["content"]))
+
+            # If an exit tool was called, return early with the combined results
+            if exit_tool_called:
+                return "\n".join(combined_results)
+
+            return "\n".join(combined_results)
+
         return str(message.content)
 
     @property
