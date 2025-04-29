@@ -84,8 +84,13 @@ tests = [
   "mktestdocs>=0.2.4",
 ]
 
+lint = [
+  "pre-commit==4.2.0",
+  "pre-commit-uv==4.1.4",
+]
+
 dev = [
-  "any-agent[docs,tests]",
+  "any-agent[docs,tests,lint]",
   "pre-commit",
 ]
 
