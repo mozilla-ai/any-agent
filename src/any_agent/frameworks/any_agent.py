@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing import Tracer
+from any_agent.tracing import TotalTokenUseAndCost, Tracer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -22,6 +22,7 @@ class AgentResult(BaseModel):
 
     final_output: str | int | float | list[Any] | dict[Any, Any] | None
     raw_responses: list[Any] | None
+    cost: TotalTokenUseAndCost | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -36,11 +37,25 @@ class AnyAgent(ABC):
         self,
         config: AgentConfig,
         managed_agents: Sequence[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
         self.config = config
         self.managed_agents = managed_agents
         self._mcp_servers: list[MCPServerBase] = []
         self._tracer: Tracer | None = None
+        if tracing is not None:
+            # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
+            # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
+            if self.framework in (
+                AgentFramework.AGNO,
+                AgentFramework.GOOGLE,
+                AgentFramework.TINYAGENT,
+            ):
+                logger.warning(
+                    "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
+                )
+            else:
+                self._tracer = Tracer(self.framework, tracing)
 
     async def _load_tools(
         self, tools: Sequence[Tool]
@@ -120,24 +135,8 @@ class AnyAgent(ABC):
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
-        framework = AgentFramework.from_string(agent_framework)
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
-        agent = agent_cls(agent_config, managed_agents=managed_agents)
-
-        if tracing is not None:
-            # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
-            # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-            if framework in (
-                AgentFramework.AGNO,
-                AgentFramework.GOOGLE,
-                AgentFramework.TINYAGENT,
-            ):
-                logger.warning(
-                    "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
-                )
-            else:
-                agent._tracer = Tracer(framework, tracing)
-
+        agent = agent_cls(agent_config, managed_agents=managed_agents, tracing=tracing)
         await agent.load_agent()
         return agent
 
@@ -185,3 +184,9 @@ class AnyAgent(ABC):
         """
         msg = "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
         raise NotImplementedError(msg)
+
+    def get_cost_summary(self) -> TotalTokenUseAndCost | None:
+        """Get the cost summary of the agent run."""
+        if self._tracer is not None and self._tracer.tracing_config.cost_info:
+            return self._tracer.get_cost_summary()
+        return None

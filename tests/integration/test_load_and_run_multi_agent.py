@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.config import TracingConfig
 from any_agent.tools import search_web, show_final_answer, visit_webpage
 
 
@@ -64,6 +65,9 @@ def test_load_and_run_multi_agent(
         agent_framework=agent_framework,
         agent_config=main_agent,
         managed_agents=managed_agents,
+        tracing=TracingConfig(
+            console=False, file=False, cost_info=True
+        ),  # console and file are off, but we'll still get cost
     )
     result = agent.run("Which agent framework is the best?")
 
@@ -73,3 +77,10 @@ def test_load_and_run_multi_agent(
         # Llama Index doesn't currently give back raw_responses.
         assert result.raw_responses
         assert len(result.raw_responses) > 0
+    if agent_framework not in (
+        AgentFramework.AGNO,
+        AgentFramework.GOOGLE,
+        AgentFramework.TINYAGENT,
+    ):
+        assert result.cost
+        assert result.cost.total_cost > 0

@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from uuid import uuid4
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
@@ -25,8 +25,9 @@ class GoogleAgent(AnyAgent):
         self,
         config: AgentConfig,
         managed_agents: Sequence[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents)
+        super().__init__(config, managed_agents, tracing)
         self._agent: Agent | None = None
 
     @property
@@ -123,4 +124,8 @@ class GoogleAgent(AnyAgent):
         assert session, "Session should not be None"
         response = session.state.get("response", None)
 
-        return AgentResult(final_output=response, raw_responses=session.events)
+        return AgentResult(
+            final_output=response,
+            raw_responses=session.events,
+            cost=self.get_cost_summary(),
+        )

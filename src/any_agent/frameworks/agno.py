@@ -1,6 +1,6 @@
 from typing import Any
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
@@ -23,8 +23,9 @@ class AgnoAgent(AnyAgent):
         self,
         config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents)
+        super().__init__(config, managed_agents, tracing)
         self._agent: Agent | Team | None = None
 
     @property
@@ -101,4 +102,8 @@ class AgnoAgent(AnyAgent):
             raise ValueError(error_message)
 
         result: AgnoRunResponse = await self._agent.arun(prompt, **kwargs)
-        return AgentResult(final_output=result.content, raw_responses=result.messages)
+        return AgentResult(
+            final_output=result.content,
+            raw_responses=result.messages,
+            cost=self.get_cost_summary(),
+        )

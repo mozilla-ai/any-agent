@@ -51,3 +51,5 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     ):
         assert traces.exists()
         assert agent_framework.name in str(next(traces.iterdir()).name)
+        assert result.cost
+        assert result.cost.total_cost > 0

@@ -2,7 +2,7 @@ import importlib
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
@@ -34,8 +34,9 @@ class LangchainAgent(AnyAgent):
         self,
         config: AgentConfig,
         managed_agents: Sequence[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents)
+        super().__init__(config, managed_agents, tracing)
         self._agent: CompiledGraph | None = None
         self._tools: Sequence[Any] = []
 
@@ -139,5 +140,7 @@ class LangchainAgent(AnyAgent):
             raise ValueError(msg)
         last_message: BaseMessage = result["messages"][-1]
         return AgentResult(
-            final_output=last_message.content, raw_responses=result["messages"]
+            final_output=last_message.content,
+            raw_responses=result["messages"],
+            cost=self.get_cost_summary(),
         )

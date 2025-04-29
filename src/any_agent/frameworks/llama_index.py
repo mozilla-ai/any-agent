@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.config import TracingConfig
 from any_agent.frameworks.any_agent import AgentResult
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
@@ -30,8 +31,9 @@ class LlamaIndexAgent(AnyAgent):
         self,
         config: AgentConfig,
         managed_agents: Sequence[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents)
+        super().__init__(config, managed_agents, tracing)
         self._agent: AgentWorkflow | ReActAgent | None = None
 
     @property
@@ -131,4 +133,5 @@ class LlamaIndexAgent(AnyAgent):
         return AgentResult(
             final_output=result.response.blocks[0].text,
             raw_responses=None,  # Llama Index isn't giving me the trace history in the result or the _agent.
+            cost=self.get_cost_summary(),
         )
