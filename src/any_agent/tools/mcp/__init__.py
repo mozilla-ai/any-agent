@@ -8,12 +8,11 @@ from .frameworks import (
     SmolagentsMCPServer,
     _get_mcp_server,
 )
-from .mcp_connection import FakeMCPConnection, MCPConnection
+from .mcp_connection import MCPConnection
 from .mcp_server import MCPServerBase
 
 __all__ = [
     "AgnoMCPServer",
-    "FakeMCPConnection",
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",

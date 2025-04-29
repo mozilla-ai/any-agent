@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from contextlib import AsyncExitStack
 from textwrap import dedent
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from agents.mcp.server import MCPServer
+from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 
@@ -17,8 +17,9 @@ class MCPServerBase(BaseModel, ABC):
     mcp_available: bool = False
     libraries: str = ""
 
-    _exit_stack: AsyncExitStack = PrivateAttr(default_factory=AsyncExitStack)
     tools: Sequence[Tool] = Field(default_factory=list)
+    tool_names: Sequence[str] = Field(default_factory=list)
+    mcp_connection: MCPConnection | None = Field(default=None)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -31,7 +32,18 @@ class MCPServerBase(BaseModel, ABC):
             msg = "MCP server is not set up. Please call `_setup_tools` from a concrete class."
             raise ValueError(msg)
 
-        self.tools = await mcp_connection.list_tools()
+        self.mcp_connection = mcp_connection
+        tools = await mcp_connection.list_tools()
+        self.tools = self._filter_tools(tools)
+
+    @property
+    def server(self) -> MCPServer:
+        """Return the MCP server instance."""
+        if not self.mcp_connection or not self.mcp_connection.server:
+            msg = "MCP server is not set up. Please call `_setup_tools` from a concrete class."
+            raise ValueError(msg)
+
+        return self.mcp_connection.server
 
     @abstractmethod
     def _check_dependencies(self) -> None:
@@ -41,17 +53,23 @@ class MCPServerBase(BaseModel, ABC):
         msg = f"You need to `pip install '{self.libraries}'` to use MCP."
         raise ImportError(msg)
 
-    def _filter_tools(self, tools: Sequence[Any]) -> Sequence[Any]:
+    def _filter_tools(self, tools: Sequence[Tool]) -> Sequence[Tool]:
         # Only add the tools listed in mcp_tool['tools'] if specified
         requested_tools = list(self.mcp_tool.tools or [])
+
         if not requested_tools:
             return tools
-        tools = [tool for tool in tools if tool.name in requested_tools]
-        if len(tools) != len(requested_tools):
-            tool_names = [tool.name for tool in tools]
-            raise ValueError(
-                dedent(f"""Could not find all requested tools in the MCP server:
-                            Requested: {requested_tools}
-                            Set:   {tool_names}"""),
+
+        found_tools = [tool for tool in tools if tool in requested_tools]
+
+        if len(found_tools) != len(requested_tools):
+            error_message = (
+                dedent(
+                    f"""Could not find all requested tools in the MCP server:
+                    Requested: {requested_tools}
+                    Set:   {tools}
+                """
+                ),
             )
+            raise ValueError(error_message)
         return tools

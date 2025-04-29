@@ -1,6 +1,5 @@
 from .mcp import (
     AgnoMCPServer,
-    FakeMCPConnection,
     GoogleMCPServer,
     LangchainMCPServer,
     LlamaIndexMCPServer,
@@ -21,7 +20,6 @@ from .web_browsing import search_web, visit_webpage
 
 __all__ = [
     "AgnoMCPServer",
-    "FakeMCPConnection",
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",

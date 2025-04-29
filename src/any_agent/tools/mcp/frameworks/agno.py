@@ -1,9 +1,9 @@
 import os
 from abc import ABC, abstractmethod
-from contextlib import AsyncExitStack, suppress
+from contextlib import suppress
 from typing import Literal
 
-from pydantic import BaseModel, PrivateAttr
+from pydantic import PrivateAttr
 
 from any_agent.config import (
     AgentFramework,
@@ -24,31 +24,39 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class AgnoMCPConnection(BaseModel, ABC):
+class AgnoMCPConnection(MCPConnection, ABC):
     mcp_tool: MCPParams
-    _exit_stack: AsyncExitStack = PrivateAttr(default_factory=AsyncExitStack)
+    _server: AgnoMCPTools | None = PrivateAttr(default=None)
 
     @abstractmethod
-    async def list_tools(self) -> list[Tool]: ...
+    async def list_tools(self) -> list[Tool]:
+        """List tools from the MCP server."""
+        if self._server is None:
+            msg = "MCP server is not set up. Please call `list_tools` from a concrete class."
+            raise ValueError(msg)
+
+        return await self._exit_stack.enter_async_context(self._server)
 
 
 class AgnoMCPStdioConnection(AgnoMCPConnection):
     mcp_tool: MCPStdioParams
 
     async def list_tools(self) -> list[Tool]:
+        """List tools from the MCP server."""
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
-        server = AgnoMCPTools(
+        self._server = AgnoMCPTools(
             command=server_params,
             include_tools=list(self.mcp_tool.tools or []),
             env={**os.environ},
         )
-        return [await self._exit_stack.enter_async_context(server)]
+        return await super().list_tools()
 
 
 class AgnoMCPSseConnection(AgnoMCPConnection):
     mcp_tool: MCPSseParams
 
     async def list_tools(self) -> list[Tool]:
+        """List tools from the MCP server."""
         client = sse_client(
             url=self.mcp_tool.url,
             headers=dict(self.mcp_tool.headers or {}),
@@ -58,11 +66,11 @@ class AgnoMCPSseConnection(AgnoMCPConnection):
         client_session = ClientSession(stdio, write)
         session = await self._exit_stack.enter_async_context(client_session)
         await session.initialize()
-        server = AgnoMCPTools(
+        self._server = AgnoMCPTools(
             session=session,
             include_tools=list(self.mcp_tool.tools or []),
         )
-        return [await self._exit_stack.enter_async_context(server)]
+        return await super().list_tools()
 
 
 class AgnoMCPServerBase(MCPServerBase, ABC):

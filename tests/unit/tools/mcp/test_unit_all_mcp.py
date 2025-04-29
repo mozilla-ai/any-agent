@@ -49,10 +49,7 @@ async def test_mcp_sse_tools_loaded(
     mcp_connection: MCPConnection,
     tools: Sequence[Tool],
 ) -> None:
-    if agent_framework is not AgentFramework.AGNO:
-        pytest.skip("Only AGNO framework is supported for this test at the moment.")
-
-    mcp_server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.AGNO)
+    mcp_server = _get_mcp_server(mcp_sse_params_with_tools, agent_framework)
 
     await mcp_server._setup_tools(mcp_connection=mcp_connection)
 
