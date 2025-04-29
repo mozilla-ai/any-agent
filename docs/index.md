@@ -135,3 +135,18 @@ You can pass arbitrary `key=value` arguments to `agent.run` and they will be for
 to the corresponding method used by the underlying framework.
 
 For example, you can pass `max_turns=30` when using the [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/).
+
+
+## Return Information
+
+agent.run and agent.run_async return an AgentResult object, which contains some common useful information.
+
+```python
+from any_agent import AgentResult
+
+result: AgentResult = agent.run("Which Agent Framework is the best??")
+print(f"The agent final answer was {result.final_output}")
+print(f"This agent run cost ${result.cost.total_cost}")
+print(f"This agent run used {result.cost.total_tokens} tokens")
+
+```
