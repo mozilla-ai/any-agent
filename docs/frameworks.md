@@ -82,6 +82,20 @@ Here you can find the frameworks currently supported in `any-agent`, along with 
     agent.run("Which Agent Framework is the best??")
     ```
 
+=== "🤗 tinyagent"
+
+    [TinyAgents blogpost](https://huggingface.co/blog/tiny-agents)
+
+    ```python
+    agent = AnyAgent.create(
+        "tinyagent",
+        AgentConfig(
+            model_id="gpt-4o-mini"
+        )
+    )
+    agent.run("Which Agent Framework is the best??")
+    ```
+
 === "Agno Agents"
     [Agno Agents Repo](https://github.com/agno-agi/agno)
 
