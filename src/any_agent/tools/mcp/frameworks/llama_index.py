@@ -1,6 +1,6 @@
 import os
 from abc import ABC, abstractmethod
-from contextlib import suppress
+from contextlib import AsyncExitStack, suppress
 from typing import Literal
 
 from pydantic import PrivateAttr
@@ -35,7 +35,7 @@ class LlamaIndexMCPConnection(MCPConnection, ABC):
             allowed_tools=list(self.mcp_tool.tools or []),
         )
 
-        return await mcp_tool_spec.to_tool_list_async()
+        return await mcp_tool_spec.to_tool_list_async()  # type: ignore[return-value]
 
 
 class LlamaIndexMCPStdioConnection(LlamaIndexMCPConnection):

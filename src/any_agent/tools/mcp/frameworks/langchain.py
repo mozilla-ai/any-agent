@@ -46,7 +46,7 @@ class LangchainMCPConnection(MCPConnection, ABC):
 
         await session.initialize()
         # List available tools
-        return await load_mcp_tools(session)
+        return await load_mcp_tools(session)  # type: ignore[return-value]
 
 
 class LangchainMCPStdioConnection(LangchainMCPConnection):

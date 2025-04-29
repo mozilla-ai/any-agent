@@ -30,7 +30,7 @@ class SmolagentsMCPConnection(MCPConnection, ABC):
             msg = "Tool collection is not set up. Please call `list_tools` from a concrete class."
             raise ValueError(msg)
 
-        return self._exit_stack.enter_context(self._client)
+        return self._exit_stack.enter_context(self._client)  # type: ignore[arg-type]
 
 
 class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):

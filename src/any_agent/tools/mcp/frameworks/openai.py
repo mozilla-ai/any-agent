@@ -39,7 +39,7 @@ class OpenAIMCPConnection(MCPConnection, ABC):
             raise ValueError(msg)
 
         await self._exit_stack.enter_async_context(self._server)
-        return await self._server.list_tools()  # type: ignore[assignment]
+        return await self._server.list_tools()  # type: ignore[return-value]
 
     @property
     def server(self) -> MCPServer | None:

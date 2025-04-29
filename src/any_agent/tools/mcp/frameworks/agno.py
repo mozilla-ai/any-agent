@@ -35,7 +35,7 @@ class AgnoMCPConnection(MCPConnection, ABC):
             msg = "MCP server is not set up. Please call `list_tools` from a concrete class."
             raise ValueError(msg)
 
-        return await self._exit_stack.enter_async_context(self._server)
+        return await self._exit_stack.enter_async_context(self._server)  # type: ignore[arg-type]
 
 
 class AgnoMCPStdioConnection(AgnoMCPConnection):

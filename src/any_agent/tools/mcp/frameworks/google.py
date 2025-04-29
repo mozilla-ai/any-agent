@@ -18,10 +18,10 @@ from any_agent.tools.mcp.mcp_server import MCPServerBase
 mcp_available = False
 with suppress(ImportError):
     from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
-    from google.adk.tools.mcp_tool.mcp_toolset import (
+    from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
         SseServerParams as GoogleSseServerParameters,
     )
-    from google.adk.tools.mcp_tool.mcp_toolset import (
+    from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
         StdioServerParameters as GoogleStdioServerParameters,
     )
 
@@ -45,7 +45,7 @@ class GoogleMCPConnection(MCPConnection, ABC):
 
         server = GoogleMCPToolset(connection_params=self._params)
         await self._exit_stack.enter_async_context(server)
-        return await server.load_tools()
+        return await server.load_tools()  # type: ignore[no-any-return]
 
 
 class GoogleMCPStdioConnection(GoogleMCPConnection):
