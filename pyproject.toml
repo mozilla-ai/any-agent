@@ -66,7 +66,7 @@ tinyagent = [
 ]
 
 all = [
-  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp,tinyagent]",
+  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp,tinyagent,evaluation]",
 ]
 
 docs = [
@@ -87,6 +87,10 @@ tests = [
 dev = [
   "any-agent[docs,tests]",
   "pre-commit",
+]
+
+evaluation = [
+  "fire",
 ]
 
 [project.urls]

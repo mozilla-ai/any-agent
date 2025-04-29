@@ -1,0 +1,313 @@
+[
+  {
+    "name": "mcp_tools",
+    "context": {
+      "trace_id": "0x8670d923e10571522f6db768e6afc32a",
+      "span_id": "0x895834072b15e659",
+      "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x9b5eaf4468569090",
+    "start_time": "2025-04-29T15:21:17.158552Z",
+    "end_time": "2025-04-29T15:21:17.160055Z",
+    "status": {
+      "status_code": "OK"
+    },
+    "attributes": {
+      "llm.system": "openai",
+      "output.value": "[\"read_file\", \"read_multiple_files\", \"write_file\", \"edit_file\", \"create_directory\", \"list_directory\", \"directory_tree\", \"move_file\", \"search_files\", \"get_file_info\", \"list_allowed_directories\"]",
+      "output.mime_type": "application/json",
+      "openinference.span.kind": "CHAIN"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+      "attributes": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.32.1",
+        "service.name": "unknown_service"
+      },
+      "schema_url": ""
+    }
+  },
+  {
+    "name": "generation",
+    "context": {
+      "trace_id": "0x8670d923e10571522f6db768e6afc32a",
+      "span_id": "0x29aaf68f1cbb4c26",
+      "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x9b5eaf4468569090",
+    "start_time": "2025-04-29T15:21:17.160766Z",
+    "end_time": "2025-04-29T15:21:18.504985Z",
+    "status": {
+      "status_code": "OK"
+    },
+    "attributes": {
+      "llm.system": "openai",
+      "llm.model_name": "gpt-4o",
+      "llm.invocation_parameters": "{\"temperature\": 0, \"base_url\": \"\", \"model_impl\": \"litellm\"}",
+      "input.value": "[{\"role\": \"user\", \"content\": \"what's a good brewery near Aspinwall PA? Write the answer to /projects/hi.txt\"}]",
+      "input.mime_type": "application/json",
+      "llm.input_messages.0.message.role": "user",
+      "llm.input_messages.0.message.content": "what's a good brewery near Aspinwall PA? Write the answer to /projects/hi.txt",
+      "output.value": "[{\"content\": null, \"role\": \"assistant\", \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"query\\\":\\\"brewery near Aspinwall PA\\\"}\", \"name\": \"search_web\"}, \"id\": \"call_Fbhr2GMJVJ0J8iJpeSNrHEAK\", \"type\": \"function\"}], \"function_call\": null, \"annotations\": []}]",
+      "output.mime_type": "application/json",
+      "llm.output_messages.0.message.role": "assistant",
+      "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_Fbhr2GMJVJ0J8iJpeSNrHEAK",
+      "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "search_web",
+      "llm.output_messages.0.message.tool_calls.0.tool_call.function.arguments": "{\"query\":\"brewery near Aspinwall PA\"}",
+      "llm.token_count.prompt": 925,
+      "llm.token_count.completion": 21,
+      "openinference.span.kind": "LLM"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+      "attributes": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.32.1",
+        "service.name": "unknown_service"
+      },
+      "schema_url": ""
+    }
+  },
+  {
+    "name": "search_web",
+    "context": {
+      "trace_id": "0x8670d923e10571522f6db768e6afc32a",
+      "span_id": "0xea25a153e0a63d3e",
+      "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x9b5eaf4468569090",
+    "start_time": "2025-04-29T15:21:18.506850Z",
+    "end_time": "2025-04-29T15:21:19.323130Z",
+    "status": {
+      "status_code": "OK"
+    },
+    "attributes": {
+      "llm.system": "openai",
+      "tool.name": "search_web",
+      "input.value": "{\"query\":\"brewery near Aspinwall PA\"}",
+      "input.mime_type": "application/json",
+      "output.value": "[The Best 10 Breweries near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?cflt=breweries&find_loc=Aspinwall,+PA+15215)\nBest Breweries in Aspinwall, PA 15215 - Dancing Gnome, Hitchhiker Brewing, Acclamation Brewing, Old Thunder Brewing Company, CoStar Brewing, Union Brothers Brewing, Grist House Craft Brewery, Trace Brewing, Dig Deep Brewing, Inner Groove Brewing\n[Best Breweries With Live Music near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Breweries+With+Live+Music&find_loc=Aspinwall,+PA+15215)\nTop 10 Best Breweries With Live Music in Aspinwall, PA 15215 - March 2025 - Yelp - Dough Daddy Brewery, Grist House Craft Brewery, Jackworth Ginger Beer, Union Brothers Brewing, Truss Brewing Company, Big Sewickley Creek Brewery, Altered Genius Brewing, Inner Groove Brewing, North Country Brewing Company, Big Rail Brewing.\n[TOP 10 BEST Brewpub near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Brewpub&find_loc=Aspinwall,+PA+15215)\nTop 10 Best Brewpub in Aspinwall, PA 15215 - January 2025 - Yelp - Hitchhiker Brewing, Dancing Gnome, Union Brothers Brewing, Dig Deep Brewing, Big Sewickley Creek Brewery, Grist House Craft Brewery, Yough River Brews, Hop Farm Brewing Co, Big Sandy Brews, Altered Genius Trailside Taproom\n[AleCraft Brewery | New Freedom PA - Facebook](https://www.facebook.com/alecraftbrewerypa/)\n15 S. Main Street, New Freedom, PA, United States, Pennsylvania 17349. 1 person going. Daniel Boggs and 2 others ... AleCraft Brewery, New Freedom, Pennsylvania. 5,839 likes \u00b7 48 talking about this \u00b7 3,291 were here. 20 taps of GLUTEN FREE BEERS & MORE! Food from Streamliner Gastropub We are located along the NCR...\n[Dancing Gnome Brewery](https://dancinggnomebeer.com/)\nDancing Gnome opened in 2016 to foster the growth of our energetic community in Pittsburgh, PA by focusing on hop-forward styles and helping to carve out a new definition of 'American Ale'. Pittsburgh is an industrial city that was built by community; driven by camaraderie, earnest work, and ebullient play.\n[Shy Bear Brewing | Shy Bear Brewing](https://www.shybearbrewing.com/)\nNominated as a Finalist in 7 of 14 Different Categories in the \"Breweries in PA\" 2023 Reader's Choice Awards. CATEGORIES INCLUDE: Best Overall Brewery | Best Food Best Music Venue | Best Beer Garden | Best Taproom ... Having a beer and a bite to eat with us also means sharing a commitment to nature and the craft community as a whole. The entire ...\n[New Home - Northeast Pennsylvania Craft Brewery | Susquehanna Brewing Co.](https://www.sbcbeer.com/)\nGoldencold Lager is a refreshing, German-inspired beer brewed with Pilsner malt and a bit of Sauermalz to bring out a traditional, rounded note. Separating the husk from the mash allows us to brew a beer delicate in flavor and texture. The classic bitterness brings our corner of NEPA a little closer to you. STYLE: LAGER COLOR: GOLDEN\n[Craft Beer Crawl | Aspinwall Chamber of Commerce](https://aspinwallchamber.com/craft-beer-crawl/)\nThe event takes place in Aspinwall, where individual breweries will be represented at local shops along Commercial Avenue, First Street and Brilliant Avenue. Date/Time: Saturday, September 21, 2024 2:30pm to 5:30pm. Location: Aspinwall, Pennsylvania. ... Aspinwall, PA 15215. *Provided the event is not sold out. Must be 21 to participate\n[Brew Pub near Aspinwall, PA - Better Business Bureau](https://www.bbb.org/us/pa/aspinwall/category/brew-pub)\nBBB Directory of Brew Pub near Aspinwall, PA. BBB Start with Trust \u00ae. Your guide to trusted BBB Ratings, customer reviews and BBB Accredited businesses.\n[Best breweries in aspinwall near Freeport Rd, Aspinwall, PA - Yelp](https://www.yelp.com/search?find_desc=breweries+in+aspinwall&find_loc=Freeport+Rd,+Aspinwall,+PA)\nTop 10 Best Breweries in Aspinwall in Freeport Rd, Aspinwall, PA - January 2024 - Yelp - Luma Restaurant, Caliente Pizza & Drafthouse",
+      "openinference.span.kind": "TOOL"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+      "attributes": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.32.1",
+        "service.name": "unknown_service"
+      },
+      "schema_url": ""
+    }
+  },
+  {
+    "name": "generation",
+    "context": {
+      "trace_id": "0x8670d923e10571522f6db768e6afc32a",
+      "span_id": "0xdd803a2a21b0ce6a",
+      "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x9b5eaf4468569090",
+    "start_time": "2025-04-29T15:21:19.324664Z",
+    "end_time": "2025-04-29T15:21:21.268468Z",
+    "status": {
+      "status_code": "OK"
+    },
+    "attributes": {
+      "llm.system": "openai",
+      "llm.model_name": "gpt-4o",
+      "llm.invocation_parameters": "{\"temperature\": 0, \"base_url\": \"\", \"model_impl\": \"litellm\"}",
+      "input.value": "[{\"role\": \"user\", \"content\": \"what's a good brewery near Aspinwall PA? Write the answer to /projects/hi.txt\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_Fbhr2GMJVJ0J8iJpeSNrHEAK\", \"type\": \"function\", \"function\": {\"name\": \"search_web\", \"arguments\": \"{\\\"query\\\":\\\"brewery near Aspinwall PA\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_Fbhr2GMJVJ0J8iJpeSNrHEAK\", \"content\": \"[The Best 10 Breweries near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?cflt=breweries&find_loc=Aspinwall,+PA+15215)\\nBest Breweries in Aspinwall, PA 15215 - Dancing Gnome, Hitchhiker Brewing, Acclamation Brewing, Old Thunder Brewing Company, CoStar Brewing, Union Brothers Brewing, Grist House Craft Brewery, Trace Brewing, Dig Deep Brewing, Inner Groove Brewing\\n[Best Breweries With Live Music near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Breweries+With+Live+Music&find_loc=Aspinwall,+PA+15215)\\nTop 10 Best Breweries With Live Music in Aspinwall, PA 15215 - March 2025 - Yelp - Dough Daddy Brewery, Grist House Craft Brewery, Jackworth Ginger Beer, Union Brothers Brewing, Truss Brewing Company, Big Sewickley Creek Brewery, Altered Genius Brewing, Inner Groove Brewing, North Country Brewing Company, Big Rail Brewing.\\n[TOP 10 BEST Brewpub near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Brewpub&find_loc=Aspinwall,+PA+15215)\\nTop 10 Best Brewpub in Aspinwall, PA 15215 - January 2025 - Yelp - Hitchhiker Brewing, Dancing Gnome, Union Brothers Brewing, Dig Deep Brewing, Big Sewickley Creek Brewery, Grist House Craft Brewery, Yough River Brews, Hop Farm Brewing Co, Big Sandy Brews, Altered Genius Trailside Taproom\\n[AleCraft Brewery | New Freedom PA - Facebook](https://www.facebook.com/alecraftbrewerypa/)\\n15 S. Main Street, New Freedom, PA, United States, Pennsylvania 17349. 1 person going. Daniel Boggs and 2 others ... AleCraft Brewery, New Freedom, Pennsylvania. 5,839 likes \u00b7 48 talking about this \u00b7 3,291 were here. 20 taps of GLUTEN FREE BEERS & MORE! Food from Streamliner Gastropub We are located along the NCR...\\n[Dancing Gnome Brewery](https://dancinggnomebeer.com/)\\nDancing Gnome opened in 2016 to foster the growth of our energetic community in Pittsburgh, PA by focusing on hop-forward styles and helping to carve out a new definition of 'American Ale'. Pittsburgh is an industrial city that was built by community; driven by camaraderie, earnest work, and ebullient play.\\n[Shy Bear Brewing | Shy Bear Brewing](https://www.shybearbrewing.com/)\\nNominated as a Finalist in 7 of 14 Different Categories in the \\\"Breweries in PA\\\" 2023 Reader's Choice Awards. CATEGORIES INCLUDE: Best Overall Brewery | Best Food Best Music Venue | Best Beer Garden | Best Taproom ... Having a beer and a bite to eat with us also means sharing a commitment to nature and the craft community as a whole. The entire ...\\n[New Home - Northeast Pennsylvania Craft Brewery | Susquehanna Brewing Co.](https://www.sbcbeer.com/)\\nGoldencold Lager is a refreshing, German-inspired beer brewed with Pilsner malt and a bit of Sauermalz to bring out a traditional, rounded note. Separating the husk from the mash allows us to brew a beer delicate in flavor and texture. The classic bitterness brings our corner of NEPA a little closer to you. STYLE: LAGER COLOR: GOLDEN\\n[Craft Beer Crawl | Aspinwall Chamber of Commerce](https://aspinwallchamber.com/craft-beer-crawl/)\\nThe event takes place in Aspinwall, where individual breweries will be represented at local shops along Commercial Avenue, First Street and Brilliant Avenue. Date/Time: Saturday, September 21, 2024 2:30pm to 5:30pm. Location: Aspinwall, Pennsylvania. ... Aspinwall, PA 15215. *Provided the event is not sold out. Must be 21 to participate\\n[Brew Pub near Aspinwall, PA - Better Business Bureau](https://www.bbb.org/us/pa/aspinwall/category/brew-pub)\\nBBB Directory of Brew Pub near Aspinwall, PA. BBB Start with Trust \u00ae. Your guide to trusted BBB Ratings, customer reviews and BBB Accredited businesses.\\n[Best breweries in aspinwall near Freeport Rd, Aspinwall, PA - Yelp](https://www.yelp.com/search?find_desc=breweries+in+aspinwall&find_loc=Freeport+Rd,+Aspinwall,+PA)\\nTop 10 Best Breweries in Aspinwall in Freeport Rd, Aspinwall, PA - January 2024 - Yelp - Luma Restaurant, Caliente Pizza & Drafthouse\"}]",
+      "input.mime_type": "application/json",
+      "llm.input_messages.0.message.role": "user",
+      "llm.input_messages.0.message.content": "what's a good brewery near Aspinwall PA? Write the answer to /projects/hi.txt",
+      "llm.input_messages.1.message.role": "assistant",
+      "llm.input_messages.1.message.tool_calls.0.tool_call.id": "call_Fbhr2GMJVJ0J8iJpeSNrHEAK",
+      "llm.input_messages.1.message.tool_calls.0.tool_call.function.name": "search_web",
+      "llm.input_messages.1.message.tool_calls.0.tool_call.function.arguments": "{\"query\":\"brewery near Aspinwall PA\"}",
+      "llm.input_messages.2.message.role": "tool",
+      "llm.input_messages.2.message.content": "[The Best 10 Breweries near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?cflt=breweries&find_loc=Aspinwall,+PA+15215)\nBest Breweries in Aspinwall, PA 15215 - Dancing Gnome, Hitchhiker Brewing, Acclamation Brewing, Old Thunder Brewing Company, CoStar Brewing, Union Brothers Brewing, Grist House Craft Brewery, Trace Brewing, Dig Deep Brewing, Inner Groove Brewing\n[Best Breweries With Live Music near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Breweries+With+Live+Music&find_loc=Aspinwall,+PA+15215)\nTop 10 Best Breweries With Live Music in Aspinwall, PA 15215 - March 2025 - Yelp - Dough Daddy Brewery, Grist House Craft Brewery, Jackworth Ginger Beer, Union Brothers Brewing, Truss Brewing Company, Big Sewickley Creek Brewery, Altered Genius Brewing, Inner Groove Brewing, North Country Brewing Company, Big Rail Brewing.\n[TOP 10 BEST Brewpub near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Brewpub&find_loc=Aspinwall,+PA+15215)\nTop 10 Best Brewpub in Aspinwall, PA 15215 - January 2025 - Yelp - Hitchhiker Brewing, Dancing Gnome, Union Brothers Brewing, Dig Deep Brewing, Big Sewickley Creek Brewery, Grist House Craft Brewery, Yough River Brews, Hop Farm Brewing Co, Big Sandy Brews, Altered Genius Trailside Taproom\n[AleCraft Brewery | New Freedom PA - Facebook](https://www.facebook.com/alecraftbrewerypa/)\n15 S. Main Street, New Freedom, PA, United States, Pennsylvania 17349. 1 person going. Daniel Boggs and 2 others ... AleCraft Brewery, New Freedom, Pennsylvania. 5,839 likes \u00b7 48 talking about this \u00b7 3,291 were here. 20 taps of GLUTEN FREE BEERS & MORE! Food from Streamliner Gastropub We are located along the NCR...\n[Dancing Gnome Brewery](https://dancinggnomebeer.com/)\nDancing Gnome opened in 2016 to foster the growth of our energetic community in Pittsburgh, PA by focusing on hop-forward styles and helping to carve out a new definition of 'American Ale'. Pittsburgh is an industrial city that was built by community; driven by camaraderie, earnest work, and ebullient play.\n[Shy Bear Brewing | Shy Bear Brewing](https://www.shybearbrewing.com/)\nNominated as a Finalist in 7 of 14 Different Categories in the \"Breweries in PA\" 2023 Reader's Choice Awards. CATEGORIES INCLUDE: Best Overall Brewery | Best Food Best Music Venue | Best Beer Garden | Best Taproom ... Having a beer and a bite to eat with us also means sharing a commitment to nature and the craft community as a whole. The entire ...\n[New Home - Northeast Pennsylvania Craft Brewery | Susquehanna Brewing Co.](https://www.sbcbeer.com/)\nGoldencold Lager is a refreshing, German-inspired beer brewed with Pilsner malt and a bit of Sauermalz to bring out a traditional, rounded note. Separating the husk from the mash allows us to brew a beer delicate in flavor and texture. The classic bitterness brings our corner of NEPA a little closer to you. STYLE: LAGER COLOR: GOLDEN\n[Craft Beer Crawl | Aspinwall Chamber of Commerce](https://aspinwallchamber.com/craft-beer-crawl/)\nThe event takes place in Aspinwall, where individual breweries will be represented at local shops along Commercial Avenue, First Street and Brilliant Avenue. Date/Time: Saturday, September 21, 2024 2:30pm to 5:30pm. Location: Aspinwall, Pennsylvania. ... Aspinwall, PA 15215. *Provided the event is not sold out. Must be 21 to participate\n[Brew Pub near Aspinwall, PA - Better Business Bureau](https://www.bbb.org/us/pa/aspinwall/category/brew-pub)\nBBB Directory of Brew Pub near Aspinwall, PA. BBB Start with Trust \u00ae. Your guide to trusted BBB Ratings, customer reviews and BBB Accredited businesses.\n[Best breweries in aspinwall near Freeport Rd, Aspinwall, PA - Yelp](https://www.yelp.com/search?find_desc=breweries+in+aspinwall&find_loc=Freeport+Rd,+Aspinwall,+PA)\nTop 10 Best Breweries in Aspinwall in Freeport Rd, Aspinwall, PA - January 2024 - Yelp - Luma Restaurant, Caliente Pizza & Drafthouse",
+      "llm.input_messages.2.message.tool_call_id": "call_Fbhr2GMJVJ0J8iJpeSNrHEAK",
+      "output.value": "[{\"content\": null, \"role\": \"assistant\", \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"path\\\":\\\"/projects/hi.txt\\\",\\\"content\\\":\\\"A good brewery near Aspinwall, PA is Dancing Gnome. They focus on hop-forward styles and are known for their vibrant community atmosphere.\\\"}\", \"name\": \"write_file\"}, \"id\": \"call_zunplXJRxBCxCue8ywalkE5N\", \"type\": \"function\"}], \"function_call\": null, \"annotations\": []}]",
+      "output.mime_type": "application/json",
+      "llm.output_messages.0.message.role": "assistant",
+      "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_zunplXJRxBCxCue8ywalkE5N",
+      "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "write_file",
+      "llm.output_messages.0.message.tool_calls.0.tool_call.function.arguments": "{\"path\":\"/projects/hi.txt\",\"content\":\"A good brewery near Aspinwall, PA is Dancing Gnome. They focus on hop-forward styles and are known for their vibrant community atmosphere.\"}",
+      "llm.token_count.prompt": 1967,
+      "llm.token_count.completion": 51,
+      "openinference.span.kind": "LLM"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+      "attributes": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.32.1",
+        "service.name": "unknown_service"
+      },
+      "schema_url": ""
+    }
+  },
+  {
+    "name": "write_file",
+    "context": {
+      "trace_id": "0x8670d923e10571522f6db768e6afc32a",
+      "span_id": "0x8d89190a9095257c",
+      "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x9b5eaf4468569090",
+    "start_time": "2025-04-29T15:21:21.269774Z",
+    "end_time": "2025-04-29T15:21:21.277706Z",
+    "status": {
+      "status_code": "OK"
+    },
+    "attributes": {
+      "llm.system": "openai",
+      "tool.name": "write_file",
+      "input.value": "{\"path\":\"/projects/hi.txt\",\"content\":\"A good brewery near Aspinwall, PA is Dancing Gnome. They focus on hop-forward styles and are known for their vibrant community atmosphere.\"}",
+      "input.mime_type": "application/json",
+      "output.value": "{\"type\":\"text\",\"text\":\"Successfully wrote to /projects/hi.txt\",\"annotations\":null}",
+      "output.mime_type": "application/json",
+      "openinference.span.kind": "TOOL"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+      "attributes": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.32.1",
+        "service.name": "unknown_service"
+      },
+      "schema_url": ""
+    }
+  },
+  {
+    "name": "generation",
+    "context": {
+      "trace_id": "0x8670d923e10571522f6db768e6afc32a",
+      "span_id": "0xac6f9f99271b051e",
+      "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x9b5eaf4468569090",
+    "start_time": "2025-04-29T15:21:21.278608Z",
+    "end_time": "2025-04-29T15:21:23.208262Z",
+    "status": {
+      "status_code": "OK"
+    },
+    "attributes": {
+      "llm.system": "openai",
+      "llm.model_name": "gpt-4o",
+      "llm.invocation_parameters": "{\"temperature\": 0, \"base_url\": \"\", \"model_impl\": \"litellm\"}",
+      "input.value": "[{\"role\": \"user\", \"content\": \"what's a good brewery near Aspinwall PA? Write the answer to /projects/hi.txt\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_Fbhr2GMJVJ0J8iJpeSNrHEAK\", \"type\": \"function\", \"function\": {\"name\": \"search_web\", \"arguments\": \"{\\\"query\\\":\\\"brewery near Aspinwall PA\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_Fbhr2GMJVJ0J8iJpeSNrHEAK\", \"content\": \"[The Best 10 Breweries near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?cflt=breweries&find_loc=Aspinwall,+PA+15215)\\nBest Breweries in Aspinwall, PA 15215 - Dancing Gnome, Hitchhiker Brewing, Acclamation Brewing, Old Thunder Brewing Company, CoStar Brewing, Union Brothers Brewing, Grist House Craft Brewery, Trace Brewing, Dig Deep Brewing, Inner Groove Brewing\\n[Best Breweries With Live Music near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Breweries+With+Live+Music&find_loc=Aspinwall,+PA+15215)\\nTop 10 Best Breweries With Live Music in Aspinwall, PA 15215 - March 2025 - Yelp - Dough Daddy Brewery, Grist House Craft Brewery, Jackworth Ginger Beer, Union Brothers Brewing, Truss Brewing Company, Big Sewickley Creek Brewery, Altered Genius Brewing, Inner Groove Brewing, North Country Brewing Company, Big Rail Brewing.\\n[TOP 10 BEST Brewpub near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Brewpub&find_loc=Aspinwall,+PA+15215)\\nTop 10 Best Brewpub in Aspinwall, PA 15215 - January 2025 - Yelp - Hitchhiker Brewing, Dancing Gnome, Union Brothers Brewing, Dig Deep Brewing, Big Sewickley Creek Brewery, Grist House Craft Brewery, Yough River Brews, Hop Farm Brewing Co, Big Sandy Brews, Altered Genius Trailside Taproom\\n[AleCraft Brewery | New Freedom PA - Facebook](https://www.facebook.com/alecraftbrewerypa/)\\n15 S. Main Street, New Freedom, PA, United States, Pennsylvania 17349. 1 person going. Daniel Boggs and 2 others ... AleCraft Brewery, New Freedom, Pennsylvania. 5,839 likes \u00b7 48 talking about this \u00b7 3,291 were here. 20 taps of GLUTEN FREE BEERS & MORE! Food from Streamliner Gastropub We are located along the NCR...\\n[Dancing Gnome Brewery](https://dancinggnomebeer.com/)\\nDancing Gnome opened in 2016 to foster the growth of our energetic community in Pittsburgh, PA by focusing on hop-forward styles and helping to carve out a new definition of 'American Ale'. Pittsburgh is an industrial city that was built by community; driven by camaraderie, earnest work, and ebullient play.\\n[Shy Bear Brewing | Shy Bear Brewing](https://www.shybearbrewing.com/)\\nNominated as a Finalist in 7 of 14 Different Categories in the \\\"Breweries in PA\\\" 2023 Reader's Choice Awards. CATEGORIES INCLUDE: Best Overall Brewery | Best Food Best Music Venue | Best Beer Garden | Best Taproom ... Having a beer and a bite to eat with us also means sharing a commitment to nature and the craft community as a whole. The entire ...\\n[New Home - Northeast Pennsylvania Craft Brewery | Susquehanna Brewing Co.](https://www.sbcbeer.com/)\\nGoldencold Lager is a refreshing, German-inspired beer brewed with Pilsner malt and a bit of Sauermalz to bring out a traditional, rounded note. Separating the husk from the mash allows us to brew a beer delicate in flavor and texture. The classic bitterness brings our corner of NEPA a little closer to you. STYLE: LAGER COLOR: GOLDEN\\n[Craft Beer Crawl | Aspinwall Chamber of Commerce](https://aspinwallchamber.com/craft-beer-crawl/)\\nThe event takes place in Aspinwall, where individual breweries will be represented at local shops along Commercial Avenue, First Street and Brilliant Avenue. Date/Time: Saturday, September 21, 2024 2:30pm to 5:30pm. Location: Aspinwall, Pennsylvania. ... Aspinwall, PA 15215. *Provided the event is not sold out. Must be 21 to participate\\n[Brew Pub near Aspinwall, PA - Better Business Bureau](https://www.bbb.org/us/pa/aspinwall/category/brew-pub)\\nBBB Directory of Brew Pub near Aspinwall, PA. BBB Start with Trust \u00ae. Your guide to trusted BBB Ratings, customer reviews and BBB Accredited businesses.\\n[Best breweries in aspinwall near Freeport Rd, Aspinwall, PA - Yelp](https://www.yelp.com/search?find_desc=breweries+in+aspinwall&find_loc=Freeport+Rd,+Aspinwall,+PA)\\nTop 10 Best Breweries in Aspinwall in Freeport Rd, Aspinwall, PA - January 2024 - Yelp - Luma Restaurant, Caliente Pizza & Drafthouse\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_zunplXJRxBCxCue8ywalkE5N\", \"type\": \"function\", \"function\": {\"name\": \"write_file\", \"arguments\": \"{\\\"path\\\":\\\"/projects/hi.txt\\\",\\\"content\\\":\\\"A good brewery near Aspinwall, PA is Dancing Gnome. They focus on hop-forward styles and are known for their vibrant community atmosphere.\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_zunplXJRxBCxCue8ywalkE5N\", \"content\": \"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"Successfully wrote to /projects/hi.txt\\\",\\\"annotations\\\":null}\"}]",
+      "input.mime_type": "application/json",
+      "llm.input_messages.0.message.role": "user",
+      "llm.input_messages.0.message.content": "what's a good brewery near Aspinwall PA? Write the answer to /projects/hi.txt",
+      "llm.input_messages.1.message.role": "assistant",
+      "llm.input_messages.1.message.tool_calls.0.tool_call.id": "call_Fbhr2GMJVJ0J8iJpeSNrHEAK",
+      "llm.input_messages.1.message.tool_calls.0.tool_call.function.name": "search_web",
+      "llm.input_messages.1.message.tool_calls.0.tool_call.function.arguments": "{\"query\":\"brewery near Aspinwall PA\"}",
+      "llm.input_messages.2.message.role": "tool",
+      "llm.input_messages.2.message.content": "[The Best 10 Breweries near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?cflt=breweries&find_loc=Aspinwall,+PA+15215)\nBest Breweries in Aspinwall, PA 15215 - Dancing Gnome, Hitchhiker Brewing, Acclamation Brewing, Old Thunder Brewing Company, CoStar Brewing, Union Brothers Brewing, Grist House Craft Brewery, Trace Brewing, Dig Deep Brewing, Inner Groove Brewing\n[Best Breweries With Live Music near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Breweries+With+Live+Music&find_loc=Aspinwall,+PA+15215)\nTop 10 Best Breweries With Live Music in Aspinwall, PA 15215 - March 2025 - Yelp - Dough Daddy Brewery, Grist House Craft Brewery, Jackworth Ginger Beer, Union Brothers Brewing, Truss Brewing Company, Big Sewickley Creek Brewery, Altered Genius Brewing, Inner Groove Brewing, North Country Brewing Company, Big Rail Brewing.\n[TOP 10 BEST Brewpub near Aspinwall, PA 15215 - Yelp](https://www.yelp.com/search?find_desc=Brewpub&find_loc=Aspinwall,+PA+15215)\nTop 10 Best Brewpub in Aspinwall, PA 15215 - January 2025 - Yelp - Hitchhiker Brewing, Dancing Gnome, Union Brothers Brewing, Dig Deep Brewing, Big Sewickley Creek Brewery, Grist House Craft Brewery, Yough River Brews, Hop Farm Brewing Co, Big Sandy Brews, Altered Genius Trailside Taproom\n[AleCraft Brewery | New Freedom PA - Facebook](https://www.facebook.com/alecraftbrewerypa/)\n15 S. Main Street, New Freedom, PA, United States, Pennsylvania 17349. 1 person going. Daniel Boggs and 2 others ... AleCraft Brewery, New Freedom, Pennsylvania. 5,839 likes \u00b7 48 talking about this \u00b7 3,291 were here. 20 taps of GLUTEN FREE BEERS & MORE! Food from Streamliner Gastropub We are located along the NCR...\n[Dancing Gnome Brewery](https://dancinggnomebeer.com/)\nDancing Gnome opened in 2016 to foster the growth of our energetic community in Pittsburgh, PA by focusing on hop-forward styles and helping to carve out a new definition of 'American Ale'. Pittsburgh is an industrial city that was built by community; driven by camaraderie, earnest work, and ebullient play.\n[Shy Bear Brewing | Shy Bear Brewing](https://www.shybearbrewing.com/)\nNominated as a Finalist in 7 of 14 Different Categories in the \"Breweries in PA\" 2023 Reader's Choice Awards. CATEGORIES INCLUDE: Best Overall Brewery | Best Food Best Music Venue | Best Beer Garden | Best Taproom ... Having a beer and a bite to eat with us also means sharing a commitment to nature and the craft community as a whole. The entire ...\n[New Home - Northeast Pennsylvania Craft Brewery | Susquehanna Brewing Co.](https://www.sbcbeer.com/)\nGoldencold Lager is a refreshing, German-inspired beer brewed with Pilsner malt and a bit of Sauermalz to bring out a traditional, rounded note. Separating the husk from the mash allows us to brew a beer delicate in flavor and texture. The classic bitterness brings our corner of NEPA a little closer to you. STYLE: LAGER COLOR: GOLDEN\n[Craft Beer Crawl | Aspinwall Chamber of Commerce](https://aspinwallchamber.com/craft-beer-crawl/)\nThe event takes place in Aspinwall, where individual breweries will be represented at local shops along Commercial Avenue, First Street and Brilliant Avenue. Date/Time: Saturday, September 21, 2024 2:30pm to 5:30pm. Location: Aspinwall, Pennsylvania. ... Aspinwall, PA 15215. *Provided the event is not sold out. Must be 21 to participate\n[Brew Pub near Aspinwall, PA - Better Business Bureau](https://www.bbb.org/us/pa/aspinwall/category/brew-pub)\nBBB Directory of Brew Pub near Aspinwall, PA. BBB Start with Trust \u00ae. Your guide to trusted BBB Ratings, customer reviews and BBB Accredited businesses.\n[Best breweries in aspinwall near Freeport Rd, Aspinwall, PA - Yelp](https://www.yelp.com/search?find_desc=breweries+in+aspinwall&find_loc=Freeport+Rd,+Aspinwall,+PA)\nTop 10 Best Breweries in Aspinwall in Freeport Rd, Aspinwall, PA - January 2024 - Yelp - Luma Restaurant, Caliente Pizza & Drafthouse",
+      "llm.input_messages.2.message.tool_call_id": "call_Fbhr2GMJVJ0J8iJpeSNrHEAK",
+      "llm.input_messages.3.message.role": "assistant",
+      "llm.input_messages.3.message.tool_calls.1.tool_call.id": "call_zunplXJRxBCxCue8ywalkE5N",
+      "llm.input_messages.3.message.tool_calls.1.tool_call.function.name": "write_file",
+      "llm.input_messages.3.message.tool_calls.1.tool_call.function.arguments": "{\"path\":\"/projects/hi.txt\",\"content\":\"A good brewery near Aspinwall, PA is Dancing Gnome. They focus on hop-forward styles and are known for their vibrant community atmosphere.\"}",
+      "llm.input_messages.4.message.role": "tool",
+      "llm.input_messages.4.message.content": "{\"type\":\"text\",\"text\":\"Successfully wrote to /projects/hi.txt\",\"annotations\":null}",
+      "llm.input_messages.4.message.tool_call_id": "call_zunplXJRxBCxCue8ywalkE5N",
+      "output.value": "[{\"content\": \"I have written the information about a good brewery near Aspinwall, PA to the file `/projects/hi.txt`.\", \"role\": \"assistant\", \"tool_calls\": null, \"function_call\": null, \"annotations\": []}]",
+      "output.mime_type": "application/json",
+      "llm.output_messages.0.message.role": "assistant",
+      "llm.output_messages.0.message.content": "I have written the information about a good brewery near Aspinwall, PA to the file `/projects/hi.txt`.",
+      "llm.token_count.prompt": 2045,
+      "llm.token_count.completion": 26,
+      "openinference.span.kind": "LLM"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+      "attributes": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.32.1",
+        "service.name": "unknown_service"
+      },
+      "schema_url": ""
+    }
+  },
+  {
+    "name": "any_agent",
+    "context": {
+      "trace_id": "0x8670d923e10571522f6db768e6afc32a",
+      "span_id": "0x9b5eaf4468569090",
+      "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x85440b5209b79ed9",
+    "start_time": "2025-04-29T15:21:17.158454Z",
+    "end_time": "2025-04-29T15:21:23.211637Z",
+    "status": {
+      "status_code": "OK"
+    },
+    "attributes": {
+      "llm.system": "openai",
+      "openinference.span.kind": "AGENT"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+      "attributes": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.32.1",
+        "service.name": "unknown_service"
+      },
+      "schema_url": ""
+    }
+  },
+  {
+    "name": "Agent workflow",
+    "context": {
+      "trace_id": "0x8670d923e10571522f6db768e6afc32a",
+      "span_id": "0x85440b5209b79ed9",
+      "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": null,
+    "start_time": "2025-04-29T15:21:17.158391Z",
+    "end_time": "2025-04-29T15:21:23.212903Z",
+    "status": {
+      "status_code": "OK"
+    },
+    "attributes": {
+      "openinference.span.kind": "AGENT"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+      "attributes": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.32.1",
+        "service.name": "unknown_service"
+      },
+      "schema_url": ""
+    }
+  }
+]
