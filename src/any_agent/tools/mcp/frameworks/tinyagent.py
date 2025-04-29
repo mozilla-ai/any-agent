@@ -77,7 +77,6 @@ class TinyAgentMCPConnection(MCPConnection, ABC):
         tool_name = tool.name if hasattr(tool, "name") else tool
         tool_description = tool.description if hasattr(tool, "description") else ""
         input_schema = tool.inputSchema if hasattr(tool, "inputSchema") else None
-        session = session
         if not session:
             msg = "Not connected to MCP server"
             raise ValueError(msg)
