@@ -1,4 +1,8 @@
+import json
 import os
+from collections.abc import Callable
+from pathlib import Path
+from typing import Any
 
 import pytest
 from litellm.utils import validate_environment
@@ -11,14 +15,15 @@ from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
+
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
 def test_load_and_run_multi_agent(
     agent_framework: AgentFramework,
-    check_multi_tool_usage: Callable[[Dict], None],
-    tmp_path: Path
+    check_multi_tool_usage: Callable[[dict[str, Any]], None],
+    tmp_path: Path,
 ) -> None:
     kwargs = {}
 
