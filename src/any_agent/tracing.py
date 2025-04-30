@@ -173,12 +173,11 @@ def setup_tracing(
     """
     agent_framework_ = AgentFramework.from_string(agent_framework)
 
+    instrumenter = _get_instrumenter_by_framework(agent_framework_)
     tracer_provider, file_name = _get_tracer_provider(
         agent_framework,
         tracing_config,
     )
-
-    instrumenter = _get_instrumenter_by_framework(agent_framework_)
     instrumenter.instrument(tracer_provider=tracer_provider)
 
     return file_name
@@ -209,7 +208,12 @@ def _get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
 
         return LlamaIndexInstrumentor()
 
-    if framework is AgentFramework.GOOGLE or framework is AgentFramework.AGNO:
+    if framework is AgentFramework.GOOGLE:
+        from openinference.instrumentation.google_adk import GoogleADKInstrumentor
+
+        return GoogleADKInstrumentor()
+
+    if framework is AgentFramework.AGNO:
         msg = f"{framework} tracing is not supported."
         raise NotImplementedError(msg)
 

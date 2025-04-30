@@ -109,8 +109,7 @@ class AnyAgent(ABC):
         agent = agent_cls(agent_config, managed_agents=managed_agents)
         if tracing is not None:
             # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
-            # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-            if framework in (AgentFramework.AGNO, AgentFramework.GOOGLE):
+            if framework is AgentFramework.AGNO:
                 logger.warning(
                     "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
                 )

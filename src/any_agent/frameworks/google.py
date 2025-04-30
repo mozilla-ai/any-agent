@@ -4,7 +4,6 @@ from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
 try:
@@ -104,17 +103,14 @@ class GoogleAgent(AnyAgent):
             user_id=user_id,
             session_id=session_id,
         )
-        events = runner.run_async(
+
+        async for _ in runner.run_async(
             user_id=user_id,
             session_id=session_id,
             new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
             **kwargs,
-        )
-
-        async for event in events:
-            logger.debug(event)
-            if event.is_final_response():
-                break
+        ):
+            pass
 
         session = runner.session_service.get_session(
             app_name=runner.app_name,

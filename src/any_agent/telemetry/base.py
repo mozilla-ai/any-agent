@@ -47,10 +47,12 @@ class TelemetryProcessor(ABC):
 
             return LlamaIndexTelemetryProcessor()
 
-        if (
-            agent_framework is AgentFramework.GOOGLE
-            or agent_framework is AgentFramework.AGNO
-        ):
+        if agent_framework is AgentFramework.GOOGLE:
+            from any_agent.telemetry.google_telemetry import GoogleTelemetryProcessor
+
+            return GoogleTelemetryProcessor()
+
+        if agent_framework is AgentFramework.AGNO:
             raise NotImplementedError
 
         assert_never(agent_framework)
