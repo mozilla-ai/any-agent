@@ -23,9 +23,9 @@ def tools() -> list[Tool]:
 
 
 @pytest.fixture
-def mcp_sse_params_no_tools() -> MCPSseParams:
+def mcp_sse_params_no_tools(sse_url: str) -> MCPSseParams:
     return MCPSseParams(
-        url="http://localhost:8000/sse",
+        url=sse_url,
         headers={"Authorization": "Bearer test-token"},
     )
 
