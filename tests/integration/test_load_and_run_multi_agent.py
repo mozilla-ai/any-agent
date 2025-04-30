@@ -1,15 +1,16 @@
+import json
 import os
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import pytest
-import json
-
-from typing import Dict, Callable
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage, show_final_answer
 from any_agent.tracing.trace import AgentTrace, is_tracing_supported
+
 
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
@@ -17,8 +18,8 @@ from any_agent.tracing.trace import AgentTrace, is_tracing_supported
 )
 def test_load_and_run_multi_agent(
     agent_framework: AgentFramework,
-    check_multi_tool_usage: Callable[[Dict], None],
-    tmp_path: Path
+    check_multi_tool_usage: Callable[[dict[str, Any]], None],
+    tmp_path: Path,
 ) -> None:
     kwargs = {}
 
@@ -42,7 +43,14 @@ def test_load_and_run_multi_agent(
     main_agent = AgentConfig(
         instructions="You must use the available agents to complete the task.",
         description="The orchestrator that can use other agents.",
+<<<<<<< HEAD
         model_args=model_args,
+=======
+        model_args={},
+        # model_args={"parallel_tool_calls": False}
+        # if agent_framework is not AgentFramework.AGNO
+        # else {},
+>>>>>>> 3c2d5d4 (Fix checks)
         **kwargs,  # type: ignore[arg-type]
     )
 
