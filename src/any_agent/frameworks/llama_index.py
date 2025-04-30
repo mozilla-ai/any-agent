@@ -88,7 +88,7 @@ class LlamaIndexAgent(AnyAgent):
                     tools=managed_tools,
                     llm=self._get_model(managed_agent),
                     can_handoff_to=[self.config.name],
-                    **managed_agent.agent_args or {},
+                    **managed_agent.agent_args,
                 )
                 agents.append(managed_instance)
 
@@ -100,7 +100,7 @@ class LlamaIndexAgent(AnyAgent):
                 llm=self._get_model(self.config),
                 system_prompt=self.config.instructions,
                 can_handoff_to=managed_names,
-                **self.config.agent_args or {},
+                **self.config.agent_args,
             )
             agents.append(main_agent)
 
@@ -115,7 +115,7 @@ class LlamaIndexAgent(AnyAgent):
                 description=self.config.description or "The main agent",
                 llm=self._get_model(self.config),
                 system_prompt=self.config.instructions,
-                **self.config.agent_args or {},
+                **self.config.agent_args,
             )
 
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:

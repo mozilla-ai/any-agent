@@ -37,7 +37,7 @@ class AgnoAgent(AnyAgent):
             id=agent_config.model_id,
             api_base=agent_config.api_base,
             api_key=agent_config.api_key,
-            **agent_config.model_args or {},
+            **agent_config.model_args,
         )
 
     async def load_agent(self) -> None:
@@ -70,7 +70,7 @@ class AgnoAgent(AnyAgent):
                         instructions=managed_agent.instructions,
                         model=self._get_model(managed_agent),
                         tools=managed_tools,
-                        **managed_agent.agent_args or {},
+                        **managed_agent.agent_args,
                     )
                 )
 
@@ -82,7 +82,7 @@ class AgnoAgent(AnyAgent):
                 members=members,  # type: ignore[arg-type]
                 instructions=self.config.instructions,
                 tools=tools,
-                **self.config.agent_args or {},
+                **self.config.agent_args,
             )
         else:
             tools, _ = await self._load_tools(self.config.tools)
@@ -92,7 +92,7 @@ class AgnoAgent(AnyAgent):
                 instructions=self.config.instructions,
                 model=self._get_model(self.config),
                 tools=tools,
-                **self.config.agent_args or {},
+                **self.config.agent_args,
             )
 
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:

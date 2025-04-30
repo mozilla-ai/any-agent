@@ -24,7 +24,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     model_args = (
         {"parallel_tool_calls": False}
         if agent_framework is not AgentFramework.AGNO
-        else None
+        else {}
     )
 
     agent_config = AgentConfig(

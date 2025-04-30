@@ -95,7 +95,7 @@ class LangchainAgent(AnyAgent):
                         create_handoff_tool(agent_name=self.config.name),
                     ],
                     prompt=managed_agent.instructions,
-                    **managed_agent.agent_args or {},
+                    **managed_agent.agent_args,
                 )
                 swarm.append(managed_agent)
 
@@ -109,7 +109,7 @@ class LangchainAgent(AnyAgent):
                 model=self._get_model(self.config),
                 tools=imported_tools,
                 prompt=self.config.instructions,
-                **self.config.agent_args or {},
+                **self.config.agent_args,
             )
             swarm.append(main_agent)  # type: ignore[arg-type]
             workflow = create_swarm(swarm, default_active_agent=self.config.name)  # type: ignore[arg-type]
@@ -120,7 +120,7 @@ class LangchainAgent(AnyAgent):
                 model=self._get_model(self.config),
                 tools=imported_tools,
                 prompt=self.config.instructions,
-                **self.config.agent_args or {},
+                **self.config.agent_args,
             )
         # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph,
         # so we'll store a list of them in this class
