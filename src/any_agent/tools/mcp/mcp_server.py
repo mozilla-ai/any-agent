@@ -36,7 +36,7 @@ class MCPServerBase(BaseModel, ABC):
 
     def _filter_tools(self, tools: Sequence[Any]) -> Sequence[Any]:
         # Only add the tools listed in mcp_tool['tools'] if specified
-        requested_tools = list(self.mcp_tool.tools or [])
+        requested_tools = list(self.mcp_tool.tools)
         if not requested_tools:
             return tools
         tools = [tool for tool in tools if tool.name in requested_tools]

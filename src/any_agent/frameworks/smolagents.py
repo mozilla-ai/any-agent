@@ -91,7 +91,7 @@ class SmolagentsAgent(AnyAgent):
             tools=tools,
             verbosity_level=-1,  # OFF
             managed_agents=managed_agents_instanced,
-            **self.config.agent_args or {},
+            **self.config.agent_args,
         )
 
         assert self._agent

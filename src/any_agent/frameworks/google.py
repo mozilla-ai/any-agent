@@ -65,7 +65,7 @@ class GoogleAgent(AnyAgent):
                     instruction=managed_agent.instructions or "",
                     model=self._get_model(managed_agent),
                     tools=managed_tools,
-                    **managed_agent.agent_args or {},
+                    **managed_agent.agent_args,
                 )
 
                 if managed_agent.handoff:
@@ -79,7 +79,7 @@ class GoogleAgent(AnyAgent):
             model=self._get_model(self.config),
             tools=tools,
             sub_agents=sub_agents_instanced,  # type: ignore[arg-type]
-            **self.config.agent_args or {},
+            **self.config.agent_args,
             output_key="response",
         )
 

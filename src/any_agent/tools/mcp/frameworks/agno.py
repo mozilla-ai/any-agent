@@ -42,7 +42,7 @@ class AgnoMCPServerStdio(AgnoMCPServerBase):
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
         self.server = AgnoMCPTools(
             command=server_params,
-            include_tools=list(self.mcp_tool.tools or []),
+            include_tools=list(self.mcp_tool.tools),
             env={**os.environ},
         )
 
@@ -64,7 +64,7 @@ class AgnoMCPServerSse(AgnoMCPServerBase):
         await session.initialize()
         self.server = AgnoMCPTools(
             session=session,
-            include_tools=list(self.mcp_tool.tools or []),
+            include_tools=list(self.mcp_tool.tools),
         )
 
         await super()._setup_tools()

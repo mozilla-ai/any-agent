@@ -33,7 +33,7 @@ class LlamaIndexMCPServerBase(MCPServerBase, ABC):
 
         mcp_tool_spec = LlamaIndexMcpToolSpec(
             client=self.client,
-            allowed_tools=list(self.mcp_tool.tools or []),
+            allowed_tools=list(self.mcp_tool.tools),
         )
 
         self.tools = await mcp_tool_spec.to_tool_list_async()

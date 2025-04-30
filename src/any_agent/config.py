@@ -97,6 +97,6 @@ class AgentConfig(BaseModel):
     tools: Sequence[Tool] = Field(default_factory=list)
     handoff: bool = False
     agent_type: str | None = None
-    agent_args: MutableMapping[str, Any] | None = None
+    agent_args: MutableMapping[str, Any] = Field(default_factory=dict)
     model_type: str | None = None
-    model_args: MutableMapping[str, Any] | None = None
+    model_args: MutableMapping[str, Any] = Field(default_factory=dict)
