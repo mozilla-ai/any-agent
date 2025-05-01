@@ -324,6 +324,8 @@ class Tracer:
     ):
         """Initialize the Tracer and set up tracing filepath, if enabled."""
         self.agent_framework = agent_framework
+        # To avoid AttributeError on __del__ if get_instrumentor throws exception
+        self.instrumentor: Instrumenter | None = None 
         self.instrumentor = _get_instrumenter_by_framework(
             agent_framework
         )  # Fail fast if framework is not supported
