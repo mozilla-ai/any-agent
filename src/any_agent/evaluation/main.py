@@ -1,8 +1,7 @@
-from any_agent.evaluation import EvaluationRunner
-
 from fire import Fire
-from any_agent.logging import logger
 
+from any_agent.evaluation import EvaluationRunner
+from any_agent.logging import logger
 
 
 def do_eval(
@@ -24,8 +23,9 @@ def do_eval(
     runner.run()
     logger.info("Evaluation completed.")
 
-def main():
-    Fire(do_eval)
+
+def main() -> None:
+    Fire(do_eval)  # type: ignore[no-untyped-call]
 
 
 if __name__ == "__main__":

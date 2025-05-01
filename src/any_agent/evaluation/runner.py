@@ -5,7 +5,6 @@ from typing import Any
 from any_agent.evaluation.evaluators import (
     CheckpointEvaluator,
     HypothesisEvaluator,
-    LLMEvaluator,
     QuestionAnsweringSquadEvaluator,
 )
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
@@ -16,7 +15,7 @@ from any_agent.telemetry import TelemetryProcessor
 
 
 class EvaluationRunner:
-    def __init__(self):
+    def __init__(self) -> None:
         self._test_cases: list[TestCase] = []
         self._telemetry_paths: list[str] = []
         self.checkpoint_evaluator: CheckpointEvaluator | None = None
@@ -28,9 +27,20 @@ class EvaluationRunner:
         self.hypothesis_evaluator = HypothesisEvaluator(model=test_case.llm_judge)
         self.qa_evaluator = QuestionAnsweringSquadEvaluator()
 
-    def add_test_case(self, test_case_path: str) -> None: ...
+    def add_test_case(self, test_case_path: str) -> None:
+        """Add test case file path to the evaluation runner."""
+        test_case = TestCase.from_yaml(test_case_path)
+        if test_case not in self._test_cases:
+            self._test_cases.append(test_case)
+        else:
+            logger.warning(f"Test case {test_case_path} already added.")
 
-    def add_telemetry(self, telemetry_path: str) -> None: ...
+    def add_telemetry(self, telemetry_path: str) -> None:
+        """Add telemetry file path to the evaluation runner."""
+        if telemetry_path not in self._telemetry_paths:
+            self._telemetry_paths.append(telemetry_path)
+        else:
+            logger.warning(f"Telemetry {telemetry_path} already added.")
 
     def _run_telemetry_eval(self, test_case: TestCase, telemetry_path: str) -> None:
         with open(telemetry_path) as f:
@@ -41,12 +51,17 @@ class EvaluationRunner:
 
         processor = TelemetryProcessor.create(agent_framework)
         hypothesis_answer = processor._extract_hypothesis_answer(trace=telemetry)
-
+        if not self.checkpoint_evaluator:
+            msg = "CheckpointEvaluator not initialized."
+            raise ValueError(msg)
         checkpoint_results = self.checkpoint_evaluator.evaluate(
             telemetry=telemetry,
             checkpoints=test_case.checkpoints,
             processor=processor,
         )
+        if not self.hypothesis_evaluator:
+            msg = "HypothesisEvaluator not initialized."
+            raise ValueError(msg)
         hypothesis_answer_results = self.hypothesis_evaluator.evaluate(
             hypothesis_final_answer=hypothesis_answer,
             ground_truth_answer_dict=test_case.ground_truth,
@@ -54,7 +69,9 @@ class EvaluationRunner:
         )
 
         if test_case.ground_truth:
-            # direct_evaluator = QuestionAnsweringSquadEvaluator()
+            if not self.qa_evaluator:
+                msg = "QuestionAnsweringSquadEvaluator not initialized."
+                raise ValueError(msg)
             direct_results = self.qa_evaluator.evaluate(
                 hypothesis_answer=hypothesis_answer,
                 ground_truth_answer=test_case.ground_truth,
@@ -135,11 +152,12 @@ class EvaluationRunner:
             score=score,
         )
 
-    def _run_test_case(self, test_case: TestCase):
+    def _run_test_case(self, test_case: TestCase) -> None:
         self._setup_evaluators(test_case)
         for telemetry_path in self._telemetry_paths:
             self._run_telemetry_eval(test_case, telemetry_path)
 
     def run(self) -> None:
+        """Run the evaluation for all test cases."""
         for test_case in self._test_cases:
             self._run_test_case(test_case)
