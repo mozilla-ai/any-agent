@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
     from any_agent import AnyAgentSpan
+    from any_agent.tracing import AnyAgentTrace
 
 
 class TelemetryProcessor(ABC):
@@ -59,7 +60,7 @@ class TelemetryProcessor(ABC):
         assert_never(agent_framework)
 
     @abstractmethod
-    def _extract_hypothesis_answer(self, trace: Sequence[AnyAgentSpan]) -> str:
+    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
         """Extract the hypothesis agent final answer from the trace."""
 
     @abstractmethod
@@ -83,13 +84,13 @@ class TelemetryProcessor(ABC):
         """Extract interaction details of a span of type AGENT."""
 
     @staticmethod
-    def determine_agent_framework(trace: Sequence[AnyAgentSpan]) -> AgentFramework:
+    def determine_agent_framework(trace: AnyAgentTrace) -> AgentFramework:
         """Determine the agent type based on the trace.
 
         These are not really stable ways to find it, because we're waiting on some
         reliable method for determining the agent type. This is a temporary solution.
         """
-        for span in trace:
+        for span in trace.spans:
             # This is extremely fragile but there currently isn't
             # any specific key to indicate the agent type
             if span.name == "response":
@@ -106,7 +107,7 @@ class TelemetryProcessor(ABC):
         msg = "Could not determine agent type from trace, or agent type not supported"
         raise ValueError(msg)
 
-    def extract_evidence(self, telemetry: Sequence[AnyAgentSpan]) -> str:
+    def extract_evidence(self, telemetry: AnyAgentTrace) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
         return self._format_evidence(calls)
@@ -160,12 +161,12 @@ class TelemetryProcessor(ABC):
 
     def _extract_telemetry_data(
         self,
-        telemetry: Sequence[AnyAgentSpan],
+        telemetry: AnyAgentTrace,
     ) -> list[Mapping[str, Any]]:
         """Extract the agent-specific data from telemetry."""
         calls = []
 
-        for span in telemetry:
+        for span in telemetry.spans:
             calls.append(self.extract_interaction(span)[1])
 
         return calls

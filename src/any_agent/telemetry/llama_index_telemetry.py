@@ -1,10 +1,10 @@
 import contextlib
 import json
-from collections.abc import Sequence
 from typing import Any
 
 from any_agent import AgentFramework, AnyAgentSpan, TelemetryProcessor
 from any_agent.logging import logger
+from any_agent.tracing import AnyAgentTrace
 
 
 class LlamaIndexTelemetryProcessor(TelemetryProcessor):
@@ -13,8 +13,8 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LLAMA_INDEX
 
-    def _extract_hypothesis_answer(self, trace: Sequence[AnyAgentSpan]) -> str:
-        for span in reversed(trace):
+    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+        for span in reversed(trace.spans):
             # Looking for the final response that has the summary answer
             if span.attributes.get("openinference.span.kind") == "LLM":
                 output_key = (
@@ -65,7 +65,7 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
         }
 
         with contextlib.suppress(json.JSONDecodeError):
-            span_info["input"] = json.loads(span_info["input"])  # type: ignore[arg-type]
+            span_info["input"] = json.loads(span_info["input"])
 
         return span_info
 
@@ -104,12 +104,12 @@ class LlamaIndexTelemetryProcessor(TelemetryProcessor):
 
         # Try to parse JSON if available
         try:
-            span_info["input"] = json.loads(input_value)  # type: ignore[arg-type]
+            span_info["input"] = json.loads(input_value)
         except (json.JSONDecodeError, TypeError):
             span_info["input"] = input_value
 
         try:
-            span_info["output"] = json.loads(output_value)  # type: ignore[arg-type]
+            span_info["output"] = json.loads(output_value)
         except (json.JSONDecodeError, TypeError):
             span_info["output"] = output_value
 

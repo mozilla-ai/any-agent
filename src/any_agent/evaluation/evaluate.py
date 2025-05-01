@@ -11,16 +11,16 @@ from any_agent.evaluation.results_saver import save_evaluation_results
 from any_agent.evaluation.test_case import TestCase
 from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
+from any_agent.tracing import AnyAgentSpan, AnyAgentTrace
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from any_agent import AnyAgentSpan
-
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
     with open(telemetry_path) as f:
-        telemetry: Sequence[AnyAgentSpan] = json.loads(f.read())
+        spans: Sequence[AnyAgentSpan] = json.loads(f.read())
+        telemetry = AnyAgentTrace(spans=spans)
     logger.info(f"Telemetry loaded from {telemetry_path}")
 
     agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)

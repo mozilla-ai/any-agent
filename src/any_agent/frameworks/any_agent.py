@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing import Tracer
+from any_agent.tracing import AnyAgentTrace, Tracer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -22,7 +22,7 @@ class AgentResult(BaseModel):
 
     final_output: str | int | float | list[Any] | dict[Any, Any] | None
     raw_responses: list[Any] | None
-    trace: dict[str, Any] | None = None
+    trace: AnyAgentTrace | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -185,7 +185,7 @@ class AnyAgent(ABC):
         msg = "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
         raise NotImplementedError(msg)
 
-    def _get_trace(self) -> dict[str, Any] | None:
+    def _get_trace(self) -> AnyAgentTrace | None:
         """Get the trace of the agent."""
         if self._tracer is not None:
             return self._tracer.get_trace()

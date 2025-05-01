@@ -1,11 +1,10 @@
 import json
-from collections.abc import Sequence
 from typing import Any
 
 from langchain_core.messages import BaseMessage
-from opentelemetry import trace as trace_api
 
-from any_agent import AgentFramework, AnyAgentSpan, TelemetryProcessor
+from any_agent import AgentFramework, AnyAgentSpan, AnyAgentTrace, TelemetryProcessor
+from any_agent.telemetry.models import StatusCode
 
 
 class LangchainTelemetryProcessor(TelemetryProcessor):
@@ -14,12 +13,12 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
 
-    def _extract_hypothesis_answer(self, trace: Sequence[AnyAgentSpan]) -> str:
-        for span in reversed(trace):
+    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+        for span in reversed(trace.spans):
             if span.attributes["openinference.span.kind"] == "AGENT":
                 content = span.attributes["output.value"]
                 # Extract content from serialized langchain message
-                message = json.loads(content)["messages"][0]  # type: ignore[arg-type]
+                message = json.loads(content)["messages"][0]
                 message = self.parse_generic_key_value_string(message)
                 base_message = BaseMessage(content=message["content"], type="AGENT")
                 # Use the interpreted string for printing
@@ -57,21 +56,21 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         tool_info: dict[str, Any] = {
             "tool_name": attributes.get("tool.name", span.name),
             "status": "success"
-            if span.status.status_code == trace_api.StatusCode.OK
+            if span.status.status_code is StatusCode.OK
             else "error",
             "error": span.status.description,
         }
 
         if "input.value" in attributes:
             try:
-                input_value = json.loads(attributes["input.value"])  # type: ignore[arg-type]
+                input_value = json.loads(attributes["input.value"])
                 tool_info["input"] = input_value
             except Exception:
                 tool_info["input"] = attributes["input.value"]
 
         if "output.value" in attributes:
             try:
-                output_value = json.loads(attributes["output.value"])  # type: ignore[arg-type]
+                output_value = json.loads(attributes["output.value"])
                 if "output" in output_value:
                     parsed_output = self.parse_generic_key_value_string(
                         output_value["output"],
@@ -92,7 +91,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         # Extract input from the chain
         if "input.value" in attributes:
             try:
-                input_data = json.loads(attributes["input.value"])  # type: ignore[arg-type]
+                input_data = json.loads(attributes["input.value"])
                 if "messages" in input_data and isinstance(
                     input_data["messages"],
                     list,
@@ -115,7 +114,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         # Extract output from the chain
         if "output.value" in attributes:
             try:
-                output_data = json.loads(attributes["output.value"])  # type: ignore[arg-type]
+                output_data = json.loads(attributes["output.value"])
                 if "messages" in output_data:
                     # Try to parse the messages
                     parsed_messages = []
@@ -143,7 +142,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         # Extract input from the agent span
         if "input.value" in attributes:
             try:
-                input_data = json.loads(attributes["input.value"])  # type: ignore[arg-type]
+                input_data = json.loads(attributes["input.value"])
                 if "messages" in input_data and isinstance(
                     input_data["messages"],
                     list,
@@ -171,7 +170,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         # Extract output from the agent span
         if "output.value" in attributes:
             try:
-                output_data = json.loads(attributes["output.value"])  # type: ignore[arg-type]
+                output_data = json.loads(attributes["output.value"])
                 if "messages" in output_data and isinstance(
                     output_data["messages"],
                     list,
@@ -195,7 +194,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         # Extract metadata if available
         if "metadata" in attributes:
             try:
-                metadata = json.loads(attributes["metadata"])  # type: ignore[arg-type]
+                metadata = json.loads(attributes["metadata"])
                 agent_info["metadata"] = metadata
             except Exception:
                 agent_info["metadata"] = attributes["metadata"]

@@ -1,10 +1,9 @@
 import json
-from collections.abc import Sequence
 from typing import Any
 
-from opentelemetry.trace.status import StatusCode
-
 from any_agent import AgentFramework, AnyAgentSpan, TelemetryProcessor
+from any_agent.telemetry.models import StatusCode
+from any_agent.tracing import AnyAgentTrace
 
 
 class SmolagentsTelemetryProcessor(TelemetryProcessor):
@@ -13,8 +12,8 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS
 
-    def _extract_hypothesis_answer(self, trace: Sequence[AnyAgentSpan]) -> str:
-        for span in reversed(trace):
+    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+        for span in reversed(trace.spans):
             if span.attributes["openinference.span.kind"] == "AGENT":
                 return str(span.attributes["output.value"])
 
@@ -37,7 +36,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
             span_info["input"] = attributes["llm.input_messages.0.message.content"]
         elif "input.value" in attributes:
             try:
-                input_value = json.loads(attributes["input.value"])  # type: ignore[arg-type]
+                input_value = json.loads(attributes["input.value"])
                 span_info["input"] = input_value.get("content", input_value)
             except (json.JSONDecodeError, TypeError):
                 span_info["input"] = attributes["input.value"]
@@ -48,7 +47,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
             output_content = attributes["llm.output_messages.0.message.content"]
         elif "output.value" in attributes:
             try:
-                output_value = json.loads(attributes["output.value"])  # type: ignore[arg-type]
+                output_value = json.loads(attributes["output.value"])
                 output_content = output_value.get("content", output_value)
             except (json.JSONDecodeError, TypeError):
                 output_content = attributes["output.value"]
@@ -67,7 +66,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
         tool_info = {
             "tool_name": attributes.get("tool.name", span.name),
             "status": "success"
-            if span.status.status_code == StatusCode.OK
+            if span.status.status_code is StatusCode.OK
             else "error",
             "error": span.status.description,
         }
@@ -75,7 +74,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
         # Extract input if available
         if "input.value" in attributes:
             try:
-                input_value = json.loads(attributes["input.value"])  # type: ignore[arg-type]
+                input_value = json.loads(attributes["input.value"])
                 if "kwargs" in input_value:
                     # For SmoLAgents, the actual input is often in the kwargs field
                     tool_info["input"] = input_value["kwargs"]
@@ -113,13 +112,13 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
         chain_info: dict[str, Any] = {
             "type": "chain",
             "name": span.name,
-            "status": "success" if status.status_code == StatusCode.OK else "error",
+            "status": "success" if status.status_code is StatusCode.OK else "error",
         }
 
         # Extract input if available
         if "input.value" in attributes:
             try:
-                input_value = json.loads(attributes["input.value"])  # type: ignore[arg-type]
+                input_value = json.loads(attributes["input.value"])
                 chain_info["input"] = input_value
             except (json.JSONDecodeError, TypeError):
                 chain_info["input"] = attributes["input.value"]
@@ -159,7 +158,7 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
         # Extract input if available
         if "input.value" in attributes:
             try:
-                input_value = json.loads(attributes["input.value"])  # type: ignore[arg-type]
+                input_value = json.loads(attributes["input.value"])
                 agent_info["input"] = input_value
             except (json.JSONDecodeError, TypeError):
                 agent_info["input"] = attributes["input.value"]

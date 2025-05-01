@@ -44,12 +44,16 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         # Llama Index doesn't currently give back raw_responses.
         assert result.raw_responses
         assert len(result.raw_responses) > 0
-    # if agent_framework not in (
-    #     AgentFramework.AGNO,
-    #     AgentFramework.GOOGLE,
-    #     AgentFramework.TINYAGENT,
-    # ):
-    #     assert traces.exists()
-    #     assert agent_framework.name in str(next(traces.iterdir()).name)
-    #     assert result.cost
-    #     assert result.cost.total_cost > 0
+    if agent_framework not in (
+        AgentFramework.AGNO,
+        AgentFramework.GOOGLE,
+        AgentFramework.TINYAGENT,
+    ):
+        assert traces.exists()
+        assert agent_framework.name in str(next(traces.iterdir()).name)
+        assert result.trace is not None
+        cost_sum = result.trace.get_cost_summary()
+        assert cost_sum.total_cost > 0
+        assert cost_sum.total_cost < 1.00
+        assert cost_sum.total_tokens > 0
+        assert cost_sum.total_tokens < 20000
