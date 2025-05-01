@@ -242,7 +242,7 @@ class TinyAgent(AnyAgent):
                     return AgentResult(
                         final_output=final_response or "Task aborted",
                         raw_responses=self.messages,
-                        cost=self.get_cost_summary(),
+                        trace=self._get_trace(),
                     )
                 raise
 
@@ -274,12 +274,12 @@ class TinyAgent(AnyAgent):
                         return AgentResult(
                             final_output=msg.get("content"),
                             raw_responses=self.messages,
-                            cost=self.get_cost_summary(),
+                            trace=self._get_trace(),
                         )
                 return AgentResult(
                     final_output=final_response or "Task completed",
                     raw_responses=self.messages,
-                    cost=self.get_cost_summary(),
+                    trace=self._get_trace(),
                 )
 
             if current_last.get("role") != "tool" and num_of_turns > max_turns:
@@ -287,7 +287,7 @@ class TinyAgent(AnyAgent):
                 return AgentResult(
                     final_output=final_response or "Max turns reached",
                     raw_responses=self.messages,
-                    cost=self.get_cost_summary(),
+                    trace=self._get_trace(),
                 )
 
             if current_last.get("role") != "tool" and next_turn_should_call_tools:
@@ -295,7 +295,7 @@ class TinyAgent(AnyAgent):
                 return AgentResult(
                     final_output=final_response or "No tools called",
                     raw_responses=self.messages,
-                    cost=self.get_cost_summary(),
+                    trace=self._get_trace(),
                 )
 
             if current_last.get("role") == "tool":

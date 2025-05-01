@@ -133,5 +133,5 @@ class LlamaIndexAgent(AnyAgent):
         return AgentResult(
             final_output=result.response.blocks[0].text,
             raw_responses=None,  # Llama Index isn't giving me the trace history in the result or the _agent.
-            cost=self.get_cost_summary(),
+            trace=self._get_trace(),
         )

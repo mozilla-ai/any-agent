@@ -1,11 +1,10 @@
-from collections.abc import MutableMapping, Sequence
-from typing import Any
+from collections.abc import Sequence
 
+from any_agent import AnyAgentSpan, TelemetryProcessor
 from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.test_case import CheckpointCriteria
 from any_agent.logging import logger
-from any_agent.telemetry import TelemetryProcessor
 
 
 class CheckpointEvaluator(LLMEvaluator):
@@ -13,7 +12,7 @@ class CheckpointEvaluator(LLMEvaluator):
 
     def evaluate(
         self,
-        telemetry: Sequence[MutableMapping[str, Any]],
+        telemetry: Sequence[AnyAgentSpan],
         checkpoints: Sequence[CheckpointCriteria],
         processor: TelemetryProcessor,
     ) -> list[EvaluationResult]:

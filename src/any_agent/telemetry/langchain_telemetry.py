@@ -1,11 +1,11 @@
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from typing import Any
 
 from langchain_core.messages import BaseMessage
+from opentelemetry import trace as trace_api
 
-from any_agent import AgentFramework
-from any_agent.telemetry import TelemetryProcessor
+from any_agent import AgentFramework, AnyAgentSpan, TelemetryProcessor
 
 
 class LangchainTelemetryProcessor(TelemetryProcessor):
@@ -14,12 +14,12 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
 
-    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
+    def _extract_hypothesis_answer(self, trace: Sequence[AnyAgentSpan]) -> str:
         for span in reversed(trace):
-            if span["attributes"]["openinference.span.kind"] == "AGENT":
-                content = span["attributes"]["output.value"]
+            if span.attributes["openinference.span.kind"] == "AGENT":
+                content = span.attributes["output.value"]
                 # Extract content from serialized langchain message
-                message = json.loads(content)["messages"][0]
+                message = json.loads(content)["messages"][0]  # type: ignore[arg-type]
                 message = self.parse_generic_key_value_string(message)
                 base_message = BaseMessage(content=message["content"], type="AGENT")
                 # Use the interpreted string for printing
@@ -35,9 +35,9 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         msg = "No agent final answer found in trace"
         raise ValueError(msg)
 
-    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_llm_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
-        attributes = span.get("attributes", {})
+        attributes = span.attributes
         span_info = {
             "model": attributes.get("llm.model_name", "Unknown model"),
             "type": "reasoning",
@@ -51,27 +51,27 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_tool_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract tool interaction details from a span."""
-        attributes = span.get("attributes", {})
-        tool_info = {
-            "tool_name": attributes.get("tool.name", span.get("name", "Unknown tool")),
+        attributes = span.attributes
+        tool_info: dict[str, Any] = {
+            "tool_name": attributes.get("tool.name", span.name),
             "status": "success"
-            if span.get("status", {}).get("status_code") == "OK"
+            if span.status.status_code == trace_api.StatusCode.OK
             else "error",
-            "error": span.get("status", {}).get("description", None),
+            "error": span.status.description,
         }
 
         if "input.value" in attributes:
             try:
-                input_value = json.loads(attributes["input.value"])
+                input_value = json.loads(attributes["input.value"])  # type: ignore[arg-type]
                 tool_info["input"] = input_value
             except Exception:
                 tool_info["input"] = attributes["input.value"]
 
         if "output.value" in attributes:
             try:
-                output_value = json.loads(attributes["output.value"])
+                output_value = json.loads(attributes["output.value"])  # type: ignore[arg-type]
                 if "output" in output_value:
                     parsed_output = self.parse_generic_key_value_string(
                         output_value["output"],
@@ -84,18 +84,15 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return tool_info
 
-    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract chain interaction details from a span."""
-        attributes = span.get("attributes", {})
-        chain_info = {
-            "type": "chain",
-            "name": span.get("name", "Unknown chain"),
-        }
+        attributes = span.attributes
+        chain_info: dict[str, Any] = {"type": "chain", "name": span.name}
 
         # Extract input from the chain
         if "input.value" in attributes:
             try:
-                input_data = json.loads(attributes["input.value"])
+                input_data = json.loads(attributes["input.value"])  # type: ignore[arg-type]
                 if "messages" in input_data and isinstance(
                     input_data["messages"],
                     list,
@@ -118,7 +115,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         # Extract output from the chain
         if "output.value" in attributes:
             try:
-                output_data = json.loads(attributes["output.value"])
+                output_data = json.loads(attributes["output.value"])  # type: ignore[arg-type]
                 if "messages" in output_data:
                     # Try to parse the messages
                     parsed_messages = []
@@ -138,18 +135,15 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return chain_info
 
-    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract agent interaction details from a span."""
-        attributes = span.get("attributes", {})
-        agent_info = {
-            "type": "agent",
-            "name": span.get("name", "Agent"),
-        }
+        attributes = span.attributes
+        agent_info: dict[str, Any] = {"type": "agent", "name": span.name}
 
         # Extract input from the agent span
         if "input.value" in attributes:
             try:
-                input_data = json.loads(attributes["input.value"])
+                input_data = json.loads(attributes["input.value"])  # type: ignore[arg-type]
                 if "messages" in input_data and isinstance(
                     input_data["messages"],
                     list,
@@ -177,7 +171,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         # Extract output from the agent span
         if "output.value" in attributes:
             try:
-                output_data = json.loads(attributes["output.value"])
+                output_data = json.loads(attributes["output.value"])  # type: ignore[arg-type]
                 if "messages" in output_data and isinstance(
                     output_data["messages"],
                     list,
@@ -201,7 +195,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         # Extract metadata if available
         if "metadata" in attributes:
             try:
-                metadata = json.loads(attributes["metadata"])
+                metadata = json.loads(attributes["metadata"])  # type: ignore[arg-type]
                 agent_info["metadata"] = metadata
             except Exception:
                 agent_info["metadata"] = attributes["metadata"]

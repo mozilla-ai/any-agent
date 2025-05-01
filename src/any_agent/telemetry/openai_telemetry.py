@@ -1,11 +1,10 @@
 import contextlib
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from typing import Any
 
-from any_agent import AgentFramework
+from any_agent import AgentFramework, AnyAgentSpan, TelemetryProcessor
 from any_agent.logging import logger
-from any_agent.telemetry import TelemetryProcessor
 
 
 class OpenAITelemetryProcessor(TelemetryProcessor):
@@ -14,23 +13,23 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.OPENAI
 
-    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
+    def _extract_hypothesis_answer(self, trace: Sequence[AnyAgentSpan]) -> str:
         for span in reversed(trace):
             # Looking for the final response that has the summary answer
-            if (
-                "attributes" in span
-                and span.get("attributes", {}).get("openinference.span.kind") == "LLM"
-            ):
+            if span.attributes.get("openinference.span.kind") == "LLM":
                 output_key = (
                     "llm.output_messages.0.message.contents.0.message_content.text"
                 )
-                if output_key in span["attributes"]:
-                    return str(span["attributes"][output_key])
+                if output_key in span.attributes:
+                    return str(span.attributes[output_key])
         logger.warning("No agent final answer found in trace")
         return "NO FINAL ANSWER FOUND"
 
-    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
-        attributes = span.get("attributes", {})
+    def _extract_llm_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+        attributes = span.attributes
+        if not attributes:
+            msg = "Span attributes are empty"
+            raise ValueError(msg)
         span_info = {}
 
         input_key = "llm.input_messages.1.message.content"
@@ -51,8 +50,11 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
-        attributes = span.get("attributes", {})
+    def _extract_tool_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+        attributes = span.attributes
+        if not attributes:
+            msg = "Span attributes are empty"
+            raise ValueError(msg)
         tool_name = attributes.get("tool.name", "Unknown tool")
         tool_output = attributes.get("output.value", "")
 
@@ -63,34 +65,37 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
         }
 
         with contextlib.suppress(json.JSONDecodeError):
-            span_info["input"] = json.loads(span_info["input"])
+            span_info["input"] = json.loads(span_info["input"])  # type: ignore[arg-type]
 
         return span_info
 
-    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract information from an AGENT span."""
-        span_info = {
+        span_info: dict[str, Any] = {
             "type": "agent",
-            "workflow": span.get("name", "Agent workflow"),
-            "start_time": span.get("start_time"),
-            "end_time": span.get("end_time"),
+            "workflow": span.name,
+            "start_time": span.start_time,
+            "end_time": span.end_time,
         }
 
         # Add any additional attributes that might be useful
-        if "service.name" in span.get("resource", {}).get("attributes", {}):
-            span_info["service"] = span["resource"]["attributes"]["service.name"]
+        if "service.name" in span.resource.attributes:
+            span_info["service"] = span.resource.attributes["service.name"]
 
         return span_info
 
-    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract information from a CHAIN span."""
-        attributes = span.get("attributes", {})
+        attributes = span.attributes
+        if not attributes:
+            msg = "Span attributes are empty"
+            raise ValueError(msg)
 
-        span_info = {
+        span_info: dict[str, Any] = {
             "type": "chain",
-            "workflow": span.get("name", "Chain workflow"),
-            "start_time": span.get("start_time"),
-            "end_time": span.get("end_time"),
+            "workflow": span.name,
+            "start_time": span.start_time,
+            "end_time": span.end_time,
         }
 
         # Extract input and output values
@@ -99,17 +104,17 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
         # Try to parse JSON if available
         try:
-            span_info["input"] = json.loads(input_value)
+            span_info["input"] = json.loads(input_value)  # type: ignore[arg-type]
         except (json.JSONDecodeError, TypeError):
             span_info["input"] = input_value
 
         try:
-            span_info["output"] = json.loads(output_value)
+            span_info["output"] = json.loads(output_value)  # type: ignore[arg-type]
         except (json.JSONDecodeError, TypeError):
             span_info["output"] = output_value
 
         # Add service name if available
-        if "service.name" in span.get("resource", {}).get("attributes", {}):
-            span_info["service"] = span["resource"]["attributes"]["service.name"]
+        if "service.name" in span.resource.attributes:
+            span_info["service"] = span.resource.attributes["service.name"]
 
         return span_info

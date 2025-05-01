@@ -6,13 +6,17 @@ from typing import Any, Protocol, assert_never
 
 from litellm.cost_calculator import cost_per_token
 from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry import trace as trace_api
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import Event, ReadableSpan, TracerProvider
 from opentelemetry.sdk.trace.export import (
     BatchSpanProcessor,
     SimpleSpanProcessor,
     SpanExporter,
     SpanExportResult,
 )
+from opentelemetry.util import types
+from opentelemetry.util.types import AttributeValue
 from pydantic import BaseModel, ConfigDict
 from rich.console import Console
 from rich.markdown import Markdown
@@ -21,10 +25,6 @@ from rich.panel import Panel
 from any_agent.config import AgentFramework, TracingConfig
 from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
-
-
-class Span(Protocol):  # noqa: D101
-    def to_json(self) -> str: ...  # noqa: D102
 
 
 class TokenUseAndCost(BaseModel):
@@ -52,20 +52,21 @@ class TotalTokenUseAndCost(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-def extract_token_use_and_cost(attributes: Mapping[str, Any]) -> TokenUseAndCost:
+def extract_token_use_and_cost(
+    attributes: Mapping[str, AttributeValue],
+) -> TokenUseAndCost:
     """Use litellm and openinference keys to extract token use and cost."""
-    span_info: dict[str, int | float] = {}
+    span_info: dict[str, AttributeValue] = {}
 
     for key in ["llm.token_count.prompt", "llm.token_count.completion"]:
         if key in attributes:
             name = key.split(".")[-1]
-            span_info[f"token_count_{name}"] = int(attributes[key])
-
+            span_info[f"token_count_{name}"] = attributes[key]
     try:
         cost_prompt, cost_completion = cost_per_token(
-            model=attributes.get("llm.model_name", ""),
-            prompt_tokens=int(span_info.get("token_count_prompt", 0)),
-            completion_tokens=int(span_info.get("token_count_completion", 0)),
+            model=str(attributes.get("llm.model_name", "")),
+            prompt_tokens=int(attributes.get("llm.token_count.prompt", 0)),  # type: ignore[arg-type]
+            completion_tokens=int(span_info.get("llm.token_count.completion", 0)),  # type: ignore[arg-type]
         )
         span_info["cost_prompt"] = cost_prompt
         span_info["cost_completion"] = cost_completion
@@ -78,34 +79,131 @@ def extract_token_use_and_cost(attributes: Mapping[str, Any]) -> TokenUseAndCost
     return TokenUseAndCost.model_validate(span_info)
 
 
+# only keep a few things that we care about from the AnyAgentSpan,
+# but move it to this class because otherwise we can't recreate it
+class AnyAgentSpan(BaseModel):
+    """A span that can be exported to JSON or printed to the console."""
+
+    name: str
+
+    kind: trace_api.SpanKind
+
+    parent: trace_api.SpanContext | None
+
+    start_time: int | None
+
+    end_time: int | None
+
+    status: trace_api.Status
+
+    context: trace_api.SpanContext
+
+    attributes: dict[str, types.AttributeValue]
+
+    links: Sequence[trace_api.Link]
+
+    events: Sequence[Event]
+
+    resource: Resource
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    def set_attributes(self, attributes: Mapping[str, types.AttributeValue]) -> None:
+        """Set attributes for the span."""
+        for key, value in attributes.items():
+            if key in self.attributes:
+                logger.warning("Overwriting attribute %s with %s", key, value)
+            self.attributes[key] = value
+
+    def set_attribute(self, key: str, value: types.AttributeValue) -> None:
+        """Set a single attribute for the span."""
+        return self.set_attributes({key: value})
+
+    def get_cost_summary(self) -> TotalTokenUseAndCost:
+        """Return the current total cost and token usage statistics."""
+        costs: list[TokenUseAndCost] = []
+        # for span in spans:
+        #     pass
+        total_cost = sum(cost.cost_prompt + cost.cost_completion for cost in costs)
+        total_tokens = sum(
+            cost.token_count_prompt + cost.token_count_completion for cost in costs
+        )
+        total_token_count_prompt = sum(cost.token_count_prompt for cost in costs)
+        total_token_count_completion = sum(
+            cost.token_count_completion for cost in costs
+        )
+        total_cost_prompt = sum(cost.cost_prompt for cost in costs)
+        total_cost_completion = sum(cost.cost_completion for cost in costs)
+        return TotalTokenUseAndCost(
+            total_cost=total_cost,
+            total_tokens=total_tokens,
+            total_token_count_prompt=total_token_count_prompt,
+            total_token_count_completion=total_token_count_completion,
+            total_cost_prompt=total_cost_prompt,
+            total_cost_completion=total_cost_completion,
+        )
+
+
 class JsonFileSpanExporter(SpanExporter):  # noqa: D101
-    def __init__(self, file_name: str):  # noqa: D107
+    def __init__(
+        self,
+        agent_framework: AgentFramework,
+        tracing_config: TracingConfig,
+        file_name: str,
+    ):
+        """Initialize the JsonFileSpanExporter."""
+        self.processor = TelemetryProcessor.create(agent_framework)
         self.file_name = file_name
+        self.tracing_config = tracing_config
         if not os.path.exists(self.file_name):
-            with open(self.file_name, "w") as f:
+            with open(self.file_name, "w", encoding="utf-8") as f:
                 json.dump([], f)
 
-    def export(self, spans: Sequence[Span]) -> SpanExportResult:  # noqa: D102
+    def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:  # noqa: D102
         try:
-            with open(self.file_name) as f:
-                all_spans = json.load(f)
+            with open(self.file_name, "r+", encoding="utf-8") as f:
+                all_spans: list[AnyAgentSpan] = json.load(f)
+                # Add new spans
+                for readable_span in spans:
+                    # turn the readable span into a generic span that we can update
+                    if not readable_span.attributes:
+                        msg = "Span must have attributes"
+                        raise ValueError(msg)
+                    span = AnyAgentSpan(
+                        name=readable_span.name,
+                        kind=readable_span.kind,
+                        context=readable_span.context,
+                        parent=readable_span.parent,
+                        start_time=readable_span.start_time,
+                        end_time=readable_span.end_time,
+                        events=readable_span.events,
+                        attributes=dict(
+                            readable_span.attributes
+                        ),  # turn the mapping into a dict so that it's mutable
+                        status=readable_span.status,
+                        links=readable_span.links,
+                        resource=readable_span.resource,
+                    )
+                    try:
+                        # Try to parse the span data from to_json() if it returns a string
+                        span_kind, _ = self.processor.extract_interaction(span)
+                        if (
+                            span_kind == "LLM"
+                            and self.tracing_config.cost_info
+                            and span.attributes
+                        ):
+                            cost_info = extract_token_use_and_cost(span.attributes)
+                            span.set_attributes(**cost_info.model_dump())
+
+                    except (json.JSONDecodeError, TypeError, AttributeError):
+                        logger.warning("Failed to parse span data, %s", span)
+                        continue
+
+                    all_spans.append(span)
+
+                json.dump(all_spans, f, indent=2)
         except (json.JSONDecodeError, FileNotFoundError):
             all_spans = []
-
-        # Add new spans
-        for span in spans:
-            try:
-                # Try to parse the span data from to_json() if it returns a string
-                span_data = json.loads(span.to_json())
-            except (json.JSONDecodeError, TypeError, AttributeError):
-                # If span.to_json() doesn't return valid JSON string
-                span_data = {"error": "Could not serialize span", "span_str": str(span)}
-
-            all_spans.append(span_data)
-
-        # Write all spans back to the file as a proper JSON array
-        with open(self.file_name, "w") as f:
-            json.dump(all_spans, f, indent=2)
 
         return SpanExportResult.SUCCESS
 
@@ -116,13 +214,29 @@ class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
         self.console = Console()
         self.tracing_config = tracing_config
 
-    def export(self, spans: Sequence[Span]) -> SpanExportResult:  # noqa: D102
-        for span in spans:
+    def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:  # noqa: D102
+        for readable_span in spans:
             style = None
-            span_str = span.to_json()
-            span_dict = json.loads(span_str)
+            if not readable_span.attributes:
+                msg = "Span must have attributes"
+                raise ValueError(msg)
+            span = AnyAgentSpan(
+                name=readable_span.name,
+                kind=readable_span.kind,
+                context=readable_span.context,
+                parent=readable_span.parent,
+                start_time=readable_span.start_time,
+                end_time=readable_span.end_time,
+                events=readable_span.events,
+                attributes=dict(
+                    readable_span.attributes
+                ),  # turn the mapping into a dict so that it's mutable
+                status=readable_span.status,
+                links=readable_span.links,
+                resource=readable_span.resource,
+            )
             try:
-                span_kind, interaction = self.processor.extract_interaction(span_dict)
+                span_kind, interaction = self.processor.extract_interaction(span)
 
                 style = getattr(self.tracing_config, span_kind.lower(), None)
 
@@ -144,10 +258,12 @@ class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
                     else:
                         self.console.print(f"{key}: {value}")
 
-                if span_kind == "LLM" and self.tracing_config.cost_info:
-                    cost_info = extract_token_use_and_cost(
-                        span_dict.get("attributes", {})
-                    )
+                if (
+                    span_kind == "LLM"
+                    and self.tracing_config.cost_info
+                    and span.attributes
+                ):
+                    cost_info = extract_token_use_and_cost(span.attributes)
                     for key, value in cost_info.model_dump().items():
                         self.console.print(f"{key}: {value}")
 
@@ -156,45 +272,6 @@ class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
             if style:
                 self.console.rule(style=style)
         return SpanExportResult.SUCCESS
-
-
-class CostTrackingExporter(SpanExporter):
-    """A span exporter that only tracks the total cost without displaying anything."""
-
-    def __init__(self, agent_framework: AgentFramework):  # noqa: D107
-        self.processor = TelemetryProcessor.create(agent_framework)
-        self.costs: list[TokenUseAndCost] = []
-
-    def export(self, spans: Sequence[Span]) -> SpanExportResult:  # noqa: D102
-        for span in spans:
-            span_str = span.to_json()
-            span_dict = json.loads(span_str)
-            span_kind, _ = self.processor.extract_interaction(span_dict)
-            if span_kind == "LLM":
-                cost_info = extract_token_use_and_cost(span_dict.get("attributes", {}))
-                self.costs.append(cost_info)
-        return SpanExportResult.SUCCESS
-
-    def get_cost_summary(self) -> TotalTokenUseAndCost:
-        """Return the current total cost and token usage statistics."""
-        total_cost = sum(cost.cost_prompt + cost.cost_completion for cost in self.costs)
-        total_tokens = sum(
-            cost.token_count_prompt + cost.token_count_completion for cost in self.costs
-        )
-        total_token_count_prompt = sum(cost.token_count_prompt for cost in self.costs)
-        total_token_count_completion = sum(
-            cost.token_count_completion for cost in self.costs
-        )
-        total_cost_prompt = sum(cost.cost_prompt for cost in self.costs)
-        total_cost_completion = sum(cost.cost_completion for cost in self.costs)
-        return TotalTokenUseAndCost(
-            total_cost=total_cost,
-            total_tokens=total_tokens,
-            total_token_count_prompt=total_token_count_prompt,
-            total_token_count_completion=total_token_count_completion,
-            total_cost_prompt=total_cost_prompt,
-            total_cost_completion=total_cost_completion,
-        )
 
 
 class Instrumenter(Protocol):  # noqa: D101
@@ -266,7 +343,11 @@ class Tracer:
                 os.makedirs(self.tracing_config.output_dir)
             timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
             self.trace_filepath = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
-            json_file_exporter = JsonFileSpanExporter(file_name=self.trace_filepath)
+            json_file_exporter = JsonFileSpanExporter(
+                agent_framework=self.agent_framework,
+                tracing_config=self.tracing_config,
+                file_name=self.trace_filepath,
+            )
             span_processor = SimpleSpanProcessor(json_file_exporter)
             tracer_provider.add_span_processor(span_processor)
 
@@ -275,11 +356,6 @@ class Tracer:
                 RichConsoleSpanExporter(self.agent_framework, self.tracing_config),
             )
             tracer_provider.add_span_processor(processor)
-
-        if self.tracing_config.cost_info:
-            self.cost_tracker = CostTrackingExporter(self.agent_framework)
-            cost_processor = SimpleSpanProcessor(self.cost_tracker)
-            tracer_provider.add_span_processor(cost_processor)
 
         trace.set_tracer_provider(tracer_provider)
 
@@ -298,13 +374,9 @@ class Tracer:
         """Return the trace data if file tracing is enabled."""
         if self.trace_filepath:
             try:
-                with open(self.trace_filepath) as f:
+                with open(self.trace_filepath, encoding="utf-8") as f:
                     content = json.load(f)
                 return dict(content)
             except json.JSONDecodeError:
                 logger.warning("Failed to decode JSON trace file.")
         return None
-
-    def get_cost_summary(self) -> TotalTokenUseAndCost:
-        """Return the current total cost and token usage statistics."""
-        return self.cost_tracker.get_cost_summary()

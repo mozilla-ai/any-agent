@@ -110,5 +110,5 @@ class SmolagentsAgent(AnyAgent):
         return AgentResult(
             final_output=result,
             raw_responses=self._agent.input_messages,
-            cost=self.get_cost_summary(),
+            trace=self._get_trace(),
         )

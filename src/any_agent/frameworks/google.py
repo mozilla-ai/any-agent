@@ -127,5 +127,5 @@ class GoogleAgent(AnyAgent):
         return AgentResult(
             final_output=response,
             raw_responses=session.events,
-            cost=self.get_cost_summary(),
+            trace=self._get_trace(),
         )

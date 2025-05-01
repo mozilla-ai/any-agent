@@ -126,5 +126,5 @@ class OpenAIAgent(AnyAgent):
         return AgentResult(
             final_output=result.final_output,
             raw_responses=result.raw_responses,
-            cost=self.get_cost_summary(),
+            trace=self._get_trace(),
         )

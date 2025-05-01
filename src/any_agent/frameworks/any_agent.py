@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing import TotalTokenUseAndCost, Tracer
+from any_agent.tracing import Tracer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -22,7 +22,7 @@ class AgentResult(BaseModel):
 
     final_output: str | int | float | list[Any] | dict[Any, Any] | None
     raw_responses: list[Any] | None
-    cost: TotalTokenUseAndCost | None = None
+    trace: dict[str, Any] | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -185,8 +185,8 @@ class AnyAgent(ABC):
         msg = "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
         raise NotImplementedError(msg)
 
-    def get_cost_summary(self) -> TotalTokenUseAndCost | None:
-        """Get the cost summary of the agent run."""
-        if self._tracer is not None and self._tracer.tracing_config.cost_info:
-            return self._tracer.get_cost_summary()
+    def _get_trace(self) -> dict[str, Any] | None:
+        """Get the trace of the agent."""
+        if self._tracer is not None:
+            return self._tracer.get_trace()
         return None

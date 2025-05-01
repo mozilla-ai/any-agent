@@ -142,5 +142,5 @@ class LangchainAgent(AnyAgent):
         return AgentResult(
             final_output=last_message.content,
             raw_responses=result["messages"],
-            cost=self.get_cost_summary(),
+            trace=self._get_trace(),
         )

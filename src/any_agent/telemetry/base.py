@@ -11,6 +11,8 @@ from any_agent.logging import logger
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
+    from any_agent import AnyAgentSpan
+
 
 class TelemetryProcessor(ABC):
     """Base class for processing telemetry data from different agent types."""
@@ -57,7 +59,7 @@ class TelemetryProcessor(ABC):
         assert_never(agent_framework)
 
     @abstractmethod
-    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
+    def _extract_hypothesis_answer(self, trace: Sequence[AnyAgentSpan]) -> str:
         """Extract the hypothesis agent final answer from the trace."""
 
     @abstractmethod
@@ -65,44 +67,46 @@ class TelemetryProcessor(ABC):
         """Get the agent type associated with this processor."""
 
     @abstractmethod
-    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> Mapping[str, Any]:
+    def _extract_llm_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type LLM."""
 
     @abstractmethod
-    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> Mapping[str, Any]:
+    def _extract_tool_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type TOOL."""
 
     @abstractmethod
-    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> Mapping[str, Any]:
+    def _extract_chain_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type CHAIN."""
 
     @abstractmethod
-    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> Mapping[str, Any]:
+    def _extract_agent_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type AGENT."""
 
     @staticmethod
-    def determine_agent_framework(trace: Sequence[Mapping[str, Any]]) -> AgentFramework:
+    def determine_agent_framework(trace: Sequence[AnyAgentSpan]) -> AgentFramework:
         """Determine the agent type based on the trace.
 
         These are not really stable ways to find it, because we're waiting on some
         reliable method for determining the agent type. This is a temporary solution.
         """
         for span in trace:
-            if "langchain" in span.get("attributes", {}).get("input.value", ""):
-                logger.info("Agent type is LANGCHAIN")
-                return AgentFramework.LANGCHAIN
-            if span.get("attributes", {}).get("smolagents.max_steps"):
-                logger.info("Agent type is SMOLAGENTS")
-                return AgentFramework.SMOLAGENTS
             # This is extremely fragile but there currently isn't
             # any specific key to indicate the agent type
-            if span.get("name") == "response":
+            if span.name == "response":
                 logger.info("Agent type is OPENAI")
                 return AgentFramework.OPENAI
+            if isinstance(
+                span.attributes.get("input.value"), str
+            ) and "langchain" in str(span.attributes["input.value"]):
+                logger.info("Agent type is LANGCHAIN")
+                return AgentFramework.LANGCHAIN
+            if isinstance(span.attributes.get("smolagents.max_steps"), str):
+                logger.info("Agent type is SMOLAGENTS")
+                return AgentFramework.SMOLAGENTS
         msg = "Could not determine agent type from trace, or agent type not supported"
         raise ValueError(msg)
 
-    def extract_evidence(self, telemetry: Sequence[Mapping[str, Any]]) -> str:
+    def extract_evidence(self, telemetry: Sequence[AnyAgentSpan]) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
         return self._format_evidence(calls)
@@ -156,7 +160,7 @@ class TelemetryProcessor(ABC):
 
     def _extract_telemetry_data(
         self,
-        telemetry: Sequence[Mapping[str, Any]],
+        telemetry: Sequence[AnyAgentSpan],
     ) -> list[Mapping[str, Any]]:
         """Extract the agent-specific data from telemetry."""
         calls = []
@@ -168,15 +172,14 @@ class TelemetryProcessor(ABC):
 
     def extract_interaction(
         self,
-        span: Mapping[str, Any],
+        span: AnyAgentSpan,
     ) -> tuple[str, Mapping[str, Any]]:
         """Extract interaction details from a span."""
-        attributes = span.get("attributes", {})
-        span_kind = attributes.get("openinference.span.kind", "")
+        span_kind = span.attributes.get("openinference.span.kind", "")
 
-        if span_kind == "LLM" or "LiteLLMModel.__call__" in span.get("name", ""):
+        if span_kind == "LLM" or "LiteLLMModel.__call__" in span.name:
             return "LLM", self._extract_llm_interaction(span)
-        if "tool.name" in attributes or span.get("name", "").endswith("Tool"):
+        if "tool.name" in span.attributes or span.name.endswith("Tool"):
             return "TOOL", self._extract_tool_interaction(span)
         if span_kind == "CHAIN":
             return "CHAIN", self._extract_chain_interaction(span)

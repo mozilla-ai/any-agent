@@ -105,5 +105,5 @@ class AgnoAgent(AnyAgent):
         return AgentResult(
             final_output=result.content,
             raw_responses=result.messages,
-            cost=self.get_cost_summary(),
+            trace=self._get_trace(),
         )
