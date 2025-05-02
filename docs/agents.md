@@ -141,7 +141,7 @@ class CalendarEvent(BaseModel):
     date: str
     participants: list[str]
 
-agent = Agent.create(
+agent = AnyAgent.create(
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="Extract calendar events from text",
