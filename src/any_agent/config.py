@@ -52,19 +52,42 @@ class MCPSseParams(BaseModel):
 
 class TracingConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    output_dir: str = "traces"  # None for no json saved trace
+
     console: bool = True
-    file: bool = True
+    """Print to console."""
+
+    output_dir: str = "traces"
+    """Directory to save traces, if json is enabled"""
+
+    save: bool = True
+    """Save to json file."""
+
     cost_info: bool = True
+    """whether json and console logs should include cost information"""
+
     llm: str | None = "yellow"
+    """LLM color in console logs"""
+
     tool: str | None = "blue"
+    """Tool color in console logs"""
+
     agent: str | None = None
+    """Agent color in console logs"""
+
     chain: str | None = None
+    """Chain color in console logs"""
 
     @model_validator(mode="after")
     def validate_enable_flags(self) -> Self:
-        if not self.console and not self.file and not self.cost_info:
-            msg = "At least one of console or file or cost_info must be true"
+        if not self.console and not self.save:
+            msg = "At least one of console or file must be true"
+            raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def validate_output_dir(self) -> Self:
+        if self.save and not self.output_dir:
+            msg = "output_dir must be set if json is enabled"
             raise ValueError(msg)
         return self
 

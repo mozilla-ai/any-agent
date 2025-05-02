@@ -100,6 +100,7 @@ class AgnoAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
+        self._create_tracer()
 
         result: AgnoRunResponse = await self._agent.arun(prompt, **kwargs)
         return AgentResult(

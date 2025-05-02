@@ -1,6 +1,5 @@
 import json
 from textwrap import dedent
-from typing import TYPE_CHECKING
 
 from any_agent.evaluation.evaluators import (
     CheckpointEvaluator,
@@ -13,13 +12,10 @@ from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
 from any_agent.tracing import AnyAgentSpan, AnyAgentTrace
 
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
     with open(telemetry_path) as f:
-        spans: Sequence[AnyAgentSpan] = json.loads(f.read())
+        spans: list[AnyAgentSpan] = json.loads(f.read())
         telemetry = AnyAgentTrace(spans=spans)
     logger.info(f"Telemetry loaded from {telemetry_path}")
 

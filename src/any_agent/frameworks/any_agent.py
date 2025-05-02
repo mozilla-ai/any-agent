@@ -42,20 +42,10 @@ class AnyAgent(ABC):
         self.config = config
         self.managed_agents = managed_agents
         self._mcp_servers: list[MCPServerBase] = []
-        self._tracer: Tracer | None = None
-        if tracing is not None:
-            # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
-            # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-            if self.framework in (
-                AgentFramework.AGNO,
-                AgentFramework.GOOGLE,
-                AgentFramework.TINYAGENT,
-            ):
-                logger.warning(
-                    "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
-                )
-            else:
-                self._tracer = Tracer(self.framework, tracing)
+        self._last_tracer: Tracer | None = (
+            None  # holds the trace from the most recent run
+        )
+        self._tracing_config = tracing
 
     async def _load_tools(
         self, tools: Sequence[Tool]
@@ -143,8 +133,8 @@ class AnyAgent(ABC):
     @property
     def trace_filepath(self) -> str | None:
         """Return the trace filepath."""
-        if self._tracer is not None:
-            return self._tracer.trace_filepath
+        if self._last_tracer is not None:
+            return self._last_tracer.trace_filepath
         return None
 
     def run(self, prompt: str, **kwargs: Any) -> AgentResult:
@@ -187,6 +177,24 @@ class AnyAgent(ABC):
 
     def _get_trace(self) -> AnyAgentTrace | None:
         """Get the trace of the agent."""
-        if self._tracer is not None:
-            return self._tracer.get_trace()
+        if self._last_tracer is not None:
+            return self._last_tracer.get_trace()
         return None
+
+    def _create_tracer(self) -> None:
+        """Initialize the tracer for the agent. This is called by each implementation of the agent run_async method."""
+        if self._last_tracer is not None:
+            self._last_tracer.uninstrument()
+        if self._tracing_config is not None:
+            # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
+            # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
+            if self.framework in (
+                AgentFramework.AGNO,
+                AgentFramework.GOOGLE,
+                AgentFramework.TINYAGENT,
+            ):
+                logger.warning(
+                    "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
+                )
+            else:
+                self._last_tracer = Tracer(self.framework, self._tracing_config)

@@ -121,7 +121,7 @@ class OpenAIAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-
+        self._create_tracer()
         result = await Runner.run(self._agent, prompt, **kwargs)
         return AgentResult(
             final_output=result.final_output,

@@ -142,7 +142,7 @@ class AnyAgentSpan(BaseModel):
 class AnyAgentTrace(BaseModel):
     """A trace that can be exported to JSON or printed to the console."""
 
-    spans: Sequence[AnyAgentSpan]
+    spans: list[AnyAgentSpan]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -181,48 +181,49 @@ class AnyAgentTrace(BaseModel):
         )
 
 
-class JsonFileSpanExporter(SpanExporter):  # noqa: D101
+class TraceSpanExporter(SpanExporter):  # noqa: D101
     def __init__(
         self,
         agent_framework: AgentFramework,
         tracing_config: TracingConfig,
         file_name: str,
+        tracer_trace: AnyAgentTrace,
     ):
         """Initialize the JsonFileSpanExporter."""
+        self.tracer_trace: AnyAgentTrace = tracer_trace  # so that this exporter can set the trace and can be used to get the trace
         self.processor = TelemetryProcessor.create(agent_framework)
         self.file_name = file_name
         self.tracing_config = tracing_config
-        if not os.path.exists(self.file_name):
+        self.save: bool = tracing_config.save
+        if self.save and not os.path.exists(self.tracing_config.output_dir):
+            os.makedirs(self.tracing_config.output_dir)
+        if self.save and not os.path.exists(self.file_name):
             with open(self.file_name, "w", encoding="utf-8") as f:
                 json.dump([], f)
 
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:  # noqa: D102
-        with open(self.file_name, "r+", encoding="utf-8") as f:
-            all_spans: list[str] = json.load(f)
-            # Add new spans
-            for readable_span in spans:
-                span = AnyAgentSpan.from_readable_span(readable_span)
-                try:
-                    # Try to parse the span data from to_json() if it returns a string
-                    span_kind, _ = self.processor.extract_interaction(span)
-                    if (
-                        span_kind == "LLM"
-                        and self.tracing_config.cost_info
-                        and span.attributes
-                    ):
-                        cost_info = extract_token_use_and_cost(span.attributes)
-                        span.set_attributes(cost_info.model_dump())
+        # Add new spans
+        new_spans = []
+        for readable_span in spans:
+            span = AnyAgentSpan.from_readable_span(readable_span)
+            try:
+                # Try to parse the span data from to_json() if it returns a string
+                span_kind, _ = self.processor.extract_interaction(span)
+                if span_kind == "LLM" and self.tracing_config.cost_info:
+                    cost_info = extract_token_use_and_cost(span.attributes)
+                    span.set_attributes(cost_info.model_dump())
 
-                except (json.JSONDecodeError, TypeError, AttributeError) as e:
-                    logger.warning("Failed to parse span data, %s, %s", span, e)
-                    continue
-
-                all_spans.append(span.model_dump_json())
-
-            # Clear file and write updated spans
-            f.seek(0)
-            f.truncate()
-            json.dump(all_spans, f, indent=2)
+            except (json.JSONDecodeError, TypeError, AttributeError) as e:
+                logger.warning("Failed to parse span data, %s, %s", span, e)
+                continue
+            new_spans.append(span)
+        self.tracer_trace.spans.extend(new_spans)
+        with open(self.file_name, "w", encoding="utf-8") as f:
+            json.dump(
+                [span.model_dump_json() for span in self.tracer_trace.spans],
+                f,
+                indent=2,
+            )
 
         return SpanExportResult.SUCCESS
 
@@ -260,11 +261,7 @@ class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
                     else:
                         self.console.print(f"{key}: {value}")
 
-                if (
-                    span_kind == "LLM"
-                    and self.tracing_config.cost_info
-                    and span.attributes
-                ):
+                if span_kind == "LLM" and self.tracing_config.cost_info:
                     cost_info = extract_token_use_and_cost(span.attributes)
                     for key, value in cost_info.model_dump().items():
                         self.console.print(f"{key}: {value}")
@@ -324,36 +321,45 @@ class Tracer:
     ):
         """Initialize the Tracer and set up tracing filepath, if enabled."""
         self.agent_framework = agent_framework
-        # To avoid AttributeError on __del__ if get_instrumentor throws exception
-        self.instrumentor: Instrumenter | None = None 
+        # Set it to None at first To avoid AttributeError on __del__ if _get_instrumenter_by_framework throws exception
+        self.instrumentor: Instrumenter | None = None
         self.instrumentor = _get_instrumenter_by_framework(
             agent_framework
         )  # Fail fast if framework is not supported
         self.tracing_config = tracing_config
         self.trace_filepath: str | None = None
+        self.trace: AnyAgentTrace = AnyAgentTrace(spans=[])
+
         self._setup_tracing()
+
+    def uninstrument(self) -> None:
+        """Uninstrument the tracer."""
+        if self.instrumentor:
+            self.instrumentor.uninstrument()
+            self.instrumentor = None
 
     def __del__(self) -> None:
         """Stop the openinference instrumentation when the tracer is deleted."""
-        if self.instrumentor:
-            self.instrumentor.uninstrument()
+        self.uninstrument()
 
     def _setup_tracing(self) -> None:
         """Set up tracing for the agent."""
         tracer_provider = TracerProvider()
 
-        if self.tracing_config.file:
-            if not os.path.exists(self.tracing_config.output_dir):
-                os.makedirs(self.tracing_config.output_dir)
-            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-            self.trace_filepath = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
-            json_file_exporter = JsonFileSpanExporter(
-                agent_framework=self.agent_framework,
-                tracing_config=self.tracing_config,
-                file_name=self.trace_filepath,
-            )
-            span_processor = SimpleSpanProcessor(json_file_exporter)
-            tracer_provider.add_span_processor(span_processor)
+        if not self.instrumentor:
+            msg = "Instrumenter not found for the agent framework."
+            raise ValueError(msg)
+
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        self.trace_filepath = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
+        json_file_exporter = TraceSpanExporter(
+            agent_framework=self.agent_framework,
+            tracing_config=self.tracing_config,
+            file_name=self.trace_filepath,
+            tracer_trace=self.trace,
+        )
+        span_processor = SimpleSpanProcessor(json_file_exporter)
+        tracer_provider.add_span_processor(span_processor)
 
         if self.tracing_config.console:
             processor = BatchSpanProcessor(
@@ -368,33 +374,12 @@ class Tracer:
     @property
     def is_enabled(self) -> bool:
         """Whether tracing is enabled."""
-        return (
-            self.tracing_config.file
-            or self.tracing_config.console
-            or self.tracing_config.cost_info
-        )
+        return self.tracing_config.save or self.tracing_config.console
 
     def get_trace(self) -> AnyAgentTrace | None:
         """Return the trace data if file tracing is enabled."""
-        if self.trace_filepath:
-            try:
-                with open(self.trace_filepath, encoding="utf-8") as f:
-                    content = json.load(f)
-                    # Parse each span from the JSON format
-                    spans = []
-                    for span_json in content:
-                        try:
-                            # Load the string into a dict first if it's a string
-                            if isinstance(span_json, str):
-                                span_data = json.loads(span_json)
-                            else:
-                                span_data = span_json
-                            # Now validate the dict into our model
-                            spans.append(AnyAgentSpan.model_validate(span_data))
-                        except Exception as e:
-                            logger.warning(f"Failed to parse span: {e}")
-                            continue
-                    return AnyAgentTrace(spans=spans)
-            except json.JSONDecodeError as e:
-                logger.warning(f"Failed to decode JSON trace file: {e}")
+        if self.trace:
+            return self.trace
+        msg = "Tracing is not enabled."
+        logger.warning(msg)
         return None
