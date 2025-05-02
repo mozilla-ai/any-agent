@@ -52,6 +52,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert traces.exists()
         assert agent_framework.name in str(next(traces.iterdir()).name)
         assert result.trace is not None
+        assert agent.trace_filepath is not None
         cost_sum = result.trace.get_total_cost()
         assert cost_sum.total_cost > 0
         assert cost_sum.total_cost < 1.00

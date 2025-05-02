@@ -1,7 +1,8 @@
 import json
 from typing import Any
 
-from any_agent import AgentFramework, AnyAgentSpan, TelemetryProcessor
+from any_agent import AgentFramework, AnyAgentSpan
+from any_agent.telemetry import TelemetryProcessor
 from any_agent.telemetry.types import StatusCode
 from any_agent.tracing import AnyAgentTrace
 

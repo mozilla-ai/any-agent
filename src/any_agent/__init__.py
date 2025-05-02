@@ -1,6 +1,5 @@
 from .config import AgentConfig, AgentFramework, TracingConfig
 from .frameworks.any_agent import AgentResult, AnyAgent
-from .telemetry import TelemetryProcessor
 from .tracing import AnyAgentSpan, AnyAgentTrace
 
 __all__ = [
@@ -10,6 +9,5 @@ __all__ = [
     "AnyAgent",
     "AnyAgentSpan",
     "AnyAgentTrace",
-    "TelemetryProcessor",
     "TracingConfig",
 ]

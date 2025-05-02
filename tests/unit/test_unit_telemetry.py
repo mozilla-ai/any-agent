@@ -1,7 +1,8 @@
 import pytest
 from opentelemetry.sdk.trace import ReadableSpan
 
-from any_agent import AgentFramework, AnyAgentSpan, TelemetryProcessor
+from any_agent import AgentFramework, AnyAgentSpan
+from any_agent.telemetry import TelemetryProcessor
 
 
 def test_telemetry_extract_interaction(

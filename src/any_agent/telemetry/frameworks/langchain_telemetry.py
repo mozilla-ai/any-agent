@@ -3,7 +3,8 @@ from typing import Any
 
 from langchain_core.messages import BaseMessage
 
-from any_agent import AgentFramework, AnyAgentSpan, AnyAgentTrace, TelemetryProcessor
+from any_agent import AgentFramework, AnyAgentSpan, AnyAgentTrace
+from any_agent.telemetry import TelemetryProcessor
 from any_agent.telemetry.types import StatusCode
 
 
