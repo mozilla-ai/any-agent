@@ -65,22 +65,25 @@ def test_load_and_run_multi_agent(
         managed_agents=managed_agents,
         tracing=TracingConfig(console=False, save=True, cost_info=True),
     )
-    result = agent.run("Which agent framework is the best?")
+    try:
+        result = agent.run("Which agent framework is the best?")
 
-    assert result
-    assert result.final_output
-    if agent_framework not in [AgentFramework.LLAMA_INDEX]:
-        # Llama Index doesn't currently give back raw_responses.
-        assert result.raw_responses
-        assert len(result.raw_responses) > 0
-    if agent_framework not in (
-        AgentFramework.AGNO,
-        AgentFramework.GOOGLE,
-        AgentFramework.TINYAGENT,
-    ):
-        assert result.trace is not None
-        cost_sum = result.trace.get_total_cost()
-        assert cost_sum.total_cost > 0
-        assert cost_sum.total_cost < 1.00
-        assert cost_sum.total_tokens > 0
-        assert cost_sum.total_tokens < 20000
+        assert result
+        assert result.final_output
+        if agent_framework not in [AgentFramework.LLAMA_INDEX]:
+            # Llama Index doesn't currently give back raw_responses.
+            assert result.raw_responses
+            assert len(result.raw_responses) > 0
+        if agent_framework not in (
+            AgentFramework.AGNO,
+            AgentFramework.GOOGLE,
+            AgentFramework.TINYAGENT,
+        ):
+            assert result.trace is not None
+            cost_sum = result.trace.get_total_cost()
+            assert cost_sum.total_cost > 0
+            assert cost_sum.total_cost < 1.00
+            assert cost_sum.total_tokens > 0
+            assert cost_sum.total_tokens < 20000
+    finally:
+        agent.exit()
