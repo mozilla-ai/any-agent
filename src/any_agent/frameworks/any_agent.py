@@ -180,6 +180,12 @@ class AnyAgent(ABC):
         if self._last_tracer is not None:
             return self._last_tracer.get_trace()
         return None
+    
+    def __del__(self) -> None:
+        """Destructor to clean up the tracer."""
+        if self._last_tracer is not None:
+            self._last_tracer.uninstrument()
+            self._last_tracer = None
 
     def _create_tracer(self) -> None:
         """Initialize the tracer for the agent. This is called by each implementation of the agent run_async method."""
