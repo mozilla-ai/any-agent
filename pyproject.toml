@@ -11,6 +11,7 @@ dynamic = ["version"]
 dependencies = [
   "duckduckgo_search",
   "fire",
+  "litellm",
   "markdownify",
   "opentelemetry-exporter-otlp",
   "opentelemetry-sdk",
@@ -61,12 +62,8 @@ mcp = [
   "mcp>=1.5.0"
 ]
 
-tinyagent = [
-  "litellm"
-]
-
 all = [
-  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp,tinyagent]",
+  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp]",
 ]
 
 docs = [
