@@ -22,7 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 google = [
-  "google-adk"
+  "google-adk>=0.3.0"
 ]
 
 langchain = [
