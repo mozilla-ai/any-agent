@@ -77,7 +77,7 @@ agent = AnyAgent.create(
 Regardless of the definition (single-agent or multi-agent), you can run the
 agent as follows:
 
-```py
+```python
 agent.run("Which Agent Framework is the best??")
 ```
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
 For example, you can pass `output_type` when using the [OpenAI Agents SDK](https://github.com/openai/openai-agents-python):
 
-```py
+```pythnon
 from pydantic import BaseModel
 
 class CalendarEvent(BaseModel):
@@ -176,6 +176,18 @@ to the corresponding method used by the underlying framework.
 
 For example you can pass `max_turns=30` when using the [OpenAI Agents SDK](https://github.com/openai/openai-agents-python):
 
-```py
+```python
 agent.run("Which agent framework is the best?", max_turns=30)
+```
+
+
+### Cleaning up the Agent
+
+When an AnyAgent object is deleted, the python garbage collector cleans up any resources owned by the object. However, when running or re-creating an agent in the same python process (for example, in test scripts) it may be necessary to forcefully shut down the agent to avoid unexpected side affects. For this purpose, `agent.exit` is available which will shut down all resources the agent was using.
+
+For example,
+
+```python
+agent.run("Which agent framework is the best?")
+agent.exit() # cleans up the agent synchronously
 ```
