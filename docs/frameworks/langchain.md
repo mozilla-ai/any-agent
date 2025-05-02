@@ -14,6 +14,10 @@ Check the reference to find additional supported `agent_args`.
 We use [`langchain_litellm.ChatLiteLLM`](https://python.langchain.com/docs/integrations/chat/litellm/#chatlitellm)
 Check the reference to find additional supported `model_args`.
 
+## Run args
+
+Check [`RunnableConfig`](https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.config.RunnableConfig.html) to find additional supported `AnyAgent.run` args.
+
 ## Examples
 
 ### Limiting the number of steps
