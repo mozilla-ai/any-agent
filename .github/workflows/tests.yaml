@@ -25,6 +25,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           python-version: 3.13
+          activate-environment: true
 
       - name: Install
         run: uv pip install -e '.[all,tests]'
