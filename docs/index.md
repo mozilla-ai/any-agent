@@ -16,7 +16,7 @@
 
 ## Installation
 
-You can install the bare bones library as follows (only the [`tinyagent`](./frameworks/tinyagent.md) framewrok will be available):
+You can install the bare bones library as follows (only [`TinyAgent`](./frameworks/tinyagent.md) will be available):
 
 ```bash
 pip install any-agent
