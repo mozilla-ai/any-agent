@@ -45,7 +45,7 @@ pip install 'any-agent[all]'
 To define any agent system you will always use the same imports:
 
 ```python
-from any_agent import AgentConfig, AnyAgent, TracingConfig, AgentResult
+from any_agent import AgentConfig, AnyAgent, TracingConfig
 ```
 For this example we use a model hosted by openai, but you may need to set the relevant API key for whichever provider being used.
 See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
@@ -69,7 +69,7 @@ agent = AnyAgent.create(
     tracing=TracingConfig(output_dir="traces") # Optional, but recommended for saving and viewing traces
 )
 
-result: AgentResult = agent.run("Which Agent Framework is the best??")
+result = agent.run("Which Agent Framework is the best??")
 ```
 
 ### Multi-agent
@@ -99,19 +99,9 @@ agent = AnyAgent.create(
     ]
 )
 
-result: AgentResult = agent.run("Which Agent Framework is the best??")
+result = agent.run("Which Agent Framework is the best??")
 ```
 
-### Information from the result of agent.run
-
-With the result object you can easily access some of the most common items of interest.
-
-```python
-print(f"The agent final answer was {result.final_output}")
-print(f"This agent run cost ${result.cost.total_cost}")
-print(f"This agent run used {result.cost.total_tokens} tokens")
-
-```
 ## Features
 
 `any-agent` supports the use of Model Context Protocol (MCP) servers, and if the agent framework allows,
