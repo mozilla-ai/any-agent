@@ -273,8 +273,8 @@ class Tracer:
         """Initialize the Tracer and set up tracing filepath, if enabled."""
         self.agent_framework = agent_framework
         # Set it to None at first To avoid AttributeError on __del__ if _get_instrumenter_by_framework throws exception
-        self.instrumentor: Instrumenter | None = None
-        self.instrumentor = _get_instrumenter_by_framework(
+        self.instrumenter: Instrumenter | None = None
+        self.instrumenter = _get_instrumenter_by_framework(
             agent_framework
         )  # Fail fast if framework is not supported
         self.tracing_config = tracing_config
@@ -285,9 +285,9 @@ class Tracer:
 
     def uninstrument(self) -> None:
         """Uninstrument the tracer."""
-        if self.instrumentor:
-            self.instrumentor.uninstrument()
-            self.instrumentor = None
+        if self.instrumenter:
+            self.instrumenter.uninstrument()
+            self.instrumenter = None
 
     def __del__(self) -> None:
         """Stop the openinference instrumentation when the tracer is deleted."""
@@ -297,7 +297,7 @@ class Tracer:
         """Set up tracing for the agent."""
         tracer_provider = TracerProvider()
 
-        if not self.instrumentor:
+        if not self.instrumenter:
             msg = "Instrumenter not found for the agent framework."
             raise ValueError(msg)
 
@@ -320,7 +320,7 @@ class Tracer:
 
         trace.set_tracer_provider(tracer_provider)
 
-        self.instrumentor.instrument(tracer_provider=tracer_provider)
+        self.instrumenter.instrument(tracer_provider=tracer_provider)
 
     @property
     def is_enabled(self) -> bool:
