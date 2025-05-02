@@ -80,7 +80,7 @@ class TracingConfig(BaseModel):
     @model_validator(mode="after")
     def validate_enable_flags(self) -> Self:
         if not self.console and not self.save:
-            msg = "At least one of console or file must be true"
+            msg = "At least one of `console` or `save` must be true"
             raise ValueError(msg)
         return self
 
