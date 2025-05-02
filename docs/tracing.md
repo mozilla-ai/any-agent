@@ -1,7 +1,7 @@
 # Agent Tracing
 
 `any-agent` uses [`openinference`](https://github.com/Arize-ai/openinference) to generate
-standardized [OpenTelemetry](https://opentelemetry.io/) traces for any of the supported [agent frameworks](./frameworks.md).
+standardized [OpenTelemetry](https://opentelemetry.io/) traces for any of the supported `Frameworks`.
 
 ## Example
 

@@ -5,9 +5,17 @@ repo_name: any-agent
 
 nav:
   - Intro: index.md
-  - Frameworks: frameworks.md
-  - Tools: tools.md
+  - Agents: agents.md
+  - Frameworks:
+    - Agno: frameworks/agno.md
+    - Google ADK: frameworks/google_adk.md
+    - Langchain: frameworks/langchain.md
+    - LlamaIndex: frameworks/llama_index.md
+    - OpenAI Agents SDK: frameworks/openai.md
+    - smolagents: frameworks/smolagents.md
+    - TinyAgent: frameworks/tinyagent.md
   - Instructions: instructions.md
+  - Tools: tools.md
   - Tracing: tracing.md
   - Evaluation: evaluation.md
   - API Reference: api.md

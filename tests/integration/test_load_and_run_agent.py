@@ -14,9 +14,6 @@ from any_agent.tools import search_web
 def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:
     kwargs = {}
 
-    if agent_framework is AgentFramework.SMOLAGENTS:
-        kwargs["agent_type"] = "ToolCallingAgent"
-
     kwargs["model_id"] = "gpt-4.1-nano"
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {agent_framework}")

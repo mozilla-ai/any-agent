@@ -16,8 +16,6 @@ def test_load_and_run_multi_agent(
     agent_framework: AgentFramework, tmp_path: Path
 ) -> None:
     kwargs = {}
-    if agent_framework is AgentFramework.SMOLAGENTS:
-        kwargs["agent_type"] = "ToolCallingAgent"
 
     if agent_framework is AgentFramework.TINYAGENT:
         pytest.skip(

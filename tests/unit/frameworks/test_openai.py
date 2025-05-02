@@ -20,7 +20,7 @@ def test_load_openai_default() -> None:
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
-        patch("any_agent.frameworks.openai.LitellmModel", mock_litellm_model),
+        patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
     ):
         AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
 
@@ -45,7 +45,7 @@ def test_openai_with_api_base() -> None:
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch(
-            "any_agent.frameworks.openai.LitellmModel",
+            "any_agent.frameworks.openai.DEFAULT_MODEL_TYPE",
             litllm_model_mock,
         ),
     ):
@@ -66,7 +66,7 @@ def test_openai_with_api_key() -> None:
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch(
-            "any_agent.frameworks.openai.LitellmModel",
+            "any_agent.frameworks.openai.DEFAULT_MODEL_TYPE",
             litellm_model_mock,
         ),
     ):
@@ -92,7 +92,7 @@ def test_load_openai_with_mcp_server() -> None:
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
-        patch("any_agent.frameworks.openai.LitellmModel", mock_litellm_model),
+        patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
         patch.object(AnyAgent, "_load_tools", mock_wrap_tools),
     ):
 
@@ -137,7 +137,7 @@ def test_load_openai_multiagent() -> None:
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
-        patch("any_agent.frameworks.openai.LitellmModel", mock_litellm_model),
+        patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
     ):
         main_agent = AgentConfig(
             model_id="o3-mini",
@@ -230,7 +230,7 @@ def test_run_openai_with_custom_args() -> None:
         patch("any_agent.frameworks.openai.Runner", mock_runner),
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool"),
-        patch("any_agent.frameworks.openai.LitellmModel"),
+        patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE"),
     ):
         agent = AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
         agent.run("foo", max_turns=30)

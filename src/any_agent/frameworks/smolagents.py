@@ -5,7 +5,7 @@ from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.tools import search_web, visit_webpage
 
 try:
-    import smolagents
+    from smolagents import LiteLLMModel, ToolCallingAgent
 
     smolagents_available = True
 except ImportError:
@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     from smolagents import MultiStepAgent
 
 
-DEFAULT_AGENT_TYPE = "CodeAgent"
-DEFAULT_MODEL_CLASS = "LiteLLMModel"
+DEFAULT_AGENT_TYPE = ToolCallingAgent
+DEFAULT_MODEL_TYPE = LiteLLMModel
 
 
 class SmolagentsAgent(AnyAgent):
@@ -37,14 +37,15 @@ class SmolagentsAgent(AnyAgent):
 
     def _get_model(self, agent_config: AgentConfig) -> Any:
         """Get the model configuration for a smolagents agent."""
-        model_type = getattr(smolagents, agent_config.model_type or DEFAULT_MODEL_CLASS)
+        model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        model_args = agent_config.model_args or {}
         kwargs = {
             "model_id": agent_config.model_id,
             "api_key": agent_config.api_key,
             "api_base": agent_config.api_base,
+            **model_args,
         }
-        model_args = agent_config.model_args or {}
-        return model_type(**kwargs, **model_args)
+        return model_type(**kwargs)
 
     async def load_agent(self) -> None:
         """Load the Smolagents agent with the given configuration."""
@@ -62,10 +63,7 @@ class SmolagentsAgent(AnyAgent):
         managed_agents_instanced = []
         if self.managed_agents:
             for managed_agent in self.managed_agents:
-                agent_type = getattr(
-                    smolagents,
-                    managed_agent.agent_type or DEFAULT_AGENT_TYPE,
-                )
+                agent_type = managed_agent.agent_type or DEFAULT_AGENT_TYPE
                 managed_tools, _ = await self._load_tools(managed_agent.tools)
                 managed_agent_instance = agent_type(
                     name=managed_agent.name,
@@ -81,10 +79,7 @@ class SmolagentsAgent(AnyAgent):
                     )
                 managed_agents_instanced.append(managed_agent_instance)
 
-        main_agent_type = getattr(
-            smolagents,
-            self.config.agent_type or DEFAULT_AGENT_TYPE,
-        )
+        main_agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
 
         self._agent = main_agent_type(
             name=self.config.name,
