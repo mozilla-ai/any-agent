@@ -10,9 +10,15 @@ from any_agent import AgentConfig, AnyAgent, TracingConfig
 from any_agent.tools import search_web, visit_webpage
 ```
 
+
+### Model ID
+
+`model_id` allows to select the underlying model used by the agent.
+If you are using the default `model_type` (LiteLLM), you can refer to [LiteLLM Provider Docs](https://docs.litellm.ai/docs/providers) for the list of providers and how to access them.
+
 !!! note
 
-    If you plan on using an agent that requires access to an external service (e.g. OpenAI, Mistral, DeepSeek, etc), you'll need to set any relevant environment variables, e.g.
+    If you plan on using a model that requires access to an external service (e.g. OpenAI, Mistral, DeepSeek, etc), you'll need to set any relevant environment variables, e.g.
 
     ```bash
     export OPENAI_API_KEY=your_api_key_here
@@ -156,12 +162,6 @@ Check the individual `Frameworks` pages for more info on the defaults.
 
 `model_args` allows to set parameters like `temperature`, `top_k`, as well as any other provider-specific parameters.
 Refer to [LiteLLM Completion API Docs](https://docs.litellm.ai/docs/text_completion) for more info.
-
-### Model ID
-
-`model_id` allows to select the underlying model used by the agent.
-If you are using the default `model_type` (LiteLLM), you can refer to [LiteLLM Provider Docs](https://docs.litellm.ai/docs/providers) for the list of providers and how to access them.
-
 
 ### Model Type
 
