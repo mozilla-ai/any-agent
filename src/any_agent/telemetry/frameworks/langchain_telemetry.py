@@ -4,7 +4,7 @@ from typing import Any
 from langchain_core.messages import BaseMessage
 
 from any_agent import AgentFramework, AnyAgentSpan, AnyAgentTrace, TelemetryProcessor
-from any_agent.telemetry.models import StatusCode
+from any_agent.telemetry.types import StatusCode
 
 
 class LangchainTelemetryProcessor(TelemetryProcessor):

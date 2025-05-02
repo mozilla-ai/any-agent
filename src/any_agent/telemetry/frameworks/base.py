@@ -26,25 +26,25 @@ class TelemetryProcessor(ABC):
         agent_framework = AgentFramework.from_string(agent_framework_raw)
 
         if agent_framework is AgentFramework.LANGCHAIN:
-            from any_agent.telemetry.langchain_telemetry import (
+            from any_agent.telemetry.frameworks.langchain_telemetry import (
                 LangchainTelemetryProcessor,
             )
 
             return LangchainTelemetryProcessor()
         if agent_framework is AgentFramework.SMOLAGENTS:
-            from any_agent.telemetry.smolagents_telemetry import (
+            from any_agent.telemetry.frameworks.smolagents_telemetry import (
                 SmolagentsTelemetryProcessor,
             )
 
             return SmolagentsTelemetryProcessor()
         if agent_framework is AgentFramework.OPENAI:
-            from any_agent.telemetry.openai_telemetry import (
+            from any_agent.telemetry.frameworks.openai_telemetry import (
                 OpenAITelemetryProcessor,
             )
 
             return OpenAITelemetryProcessor()
         if agent_framework is AgentFramework.LLAMA_INDEX:
-            from any_agent.telemetry.llama_index_telemetry import (
+            from any_agent.telemetry.frameworks.llama_index_telemetry import (
                 LlamaIndexTelemetryProcessor,
             )
 
