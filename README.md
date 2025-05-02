@@ -19,7 +19,7 @@ Using `any-agent`, you can more easily switch to a new or different agent framew
 
 any-agent also provides a 'trace-first' [llm-as-a-judge powered evaluation tool](https://mozilla-ai.github.io/any-agent/evaluation/) for flexible evaluation of agent execution traces.
 
-## [Supported Frameworks](https://mozilla-ai.github.io/any-agent/frameworks/)
+## [Supported Frameworks](https://mozilla-ai.github.io/any-agent/)
 
 [![Google ADK](https://img.shields.io/badge/Google%20ADK-4285F4?logo=google&logoColor=white)](https://github.com/google/adk-python) [![LangChain](https://img.shields.io/badge/LangChain-1e4545?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph) [![LlamaIndex](https://img.shields.io/badge/🦙%20LlamaIndex-fbcfe2)](https://github.com/run-llama/llama_index) [![OpenAI Agents](https://img.shields.io/badge/OpenAI%20Agents-black?logo=openai)](https://github.com/openai/openai-agents-python) [![Smolagents](https://img.shields.io/badge/Smolagents-ffcb3a?logo=huggingface&logoColor=white)](https://smolagents.org/) [![TinyAgents](https://img.shields.io/badge/TinyAgents-ffcb3a?logo=huggingface&logoColor=white)]([https://smolagents.org/](https://huggingface.co/blog/tiny-agents))  [Agno AI](https://docs.agno.com/introduction)
 
@@ -60,7 +60,7 @@ export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "openai",  # Framework type. See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
@@ -78,7 +78,7 @@ agent.run("Which Agent Framework is the best??")
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "openai",  # Framework type. See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai", # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="You are the main agent. Use the other available agents to find an answer",

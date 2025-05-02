@@ -29,7 +29,7 @@ If you are using the default `model_type` (LiteLLM), you can refer to [LiteLLM P
 
 ```python
 agent = AnyAgent.create(
-    "openai",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # See other options under `Frameworks`
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
@@ -50,7 +50,7 @@ agent = AnyAgent.create(
 
 ```python
 agent = AnyAgent.create(
-    "openai",  # See all options in https://mozilla-ai.github.io/any-agent/frameworks/
+    "openai",  # See other options under `Frameworks`
     AgentConfig(
         model_id="gpt-4.1-mini",
         instructions="You are the main agent. Use the other available agents to find an answer",
