@@ -97,7 +97,7 @@ class AnyAgentTrace(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def get_cost_summary(self) -> TotalTokenUseAndCost:
+    def get_total_cost(self) -> TotalTokenUseAndCost:
         """Return the current total cost and token usage statistics."""
         costs: list[TokenUseAndCost] = []
         for span in self.spans:

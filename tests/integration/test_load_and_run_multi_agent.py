@@ -81,7 +81,7 @@ def test_load_and_run_multi_agent(
         AgentFramework.TINYAGENT,
     ):
         assert result.trace is not None
-        cost_sum = result.trace.get_cost_summary()
+        cost_sum = result.trace.get_total_cost()
         assert cost_sum.total_cost > 0
         assert cost_sum.total_cost < 1.00
         assert cost_sum.total_tokens > 0
