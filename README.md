@@ -99,7 +99,7 @@ agent = AnyAgent.create(
     ]
 )
 
-result = agent.run("Which Agent Framework is the best??")
+agent_trace = agent.run("Which Agent Framework is the best??")
 ```
 
 ## Features
