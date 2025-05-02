@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
 For example, you can pass `output_type` when using the [OpenAI Agents SDK](https://github.com/openai/openai-agents-python):
 
-```pythnon
+```python
 from pydantic import BaseModel
 
 class CalendarEvent(BaseModel):
