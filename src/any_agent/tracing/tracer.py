@@ -19,23 +19,23 @@ from rich.panel import Panel
 
 from any_agent.config import AgentFramework, TracingConfig
 from any_agent.logging import logger
-from any_agent.telemetry import (
-    TelemetryProcessor,
+from any_agent.tracing import (
     TokenUseAndCost,
     TotalTokenUseAndCost,
+    TracingProcessor,
     extract_token_use_and_cost,
 )
-from any_agent.telemetry.types import (
+from any_agent.tracing.types import (
     AttributeValue,
     Link,
     SpanContext,
     SpanKind,
     Status,
 )
-from any_agent.telemetry.types import (
+from any_agent.tracing.types import (
     Event as EventModel,
 )
-from any_agent.telemetry.types import (
+from any_agent.tracing.types import (
     Resource as ResourceModel,
 )
 
@@ -142,7 +142,7 @@ class TraceSpanExporter(SpanExporter):  # noqa: D101
     ):
         """Initialize the JsonFileSpanExporter."""
         self.tracer_trace: AnyAgentTrace = tracer_trace  # so that this exporter can set the trace and can be used to get the trace
-        self.processor = TelemetryProcessor.create(agent_framework)
+        self.processor = TracingProcessor.create(agent_framework)
         self.file_name = file_name
         self.tracing_config = tracing_config
         self.save: bool = tracing_config.save
@@ -181,7 +181,7 @@ class TraceSpanExporter(SpanExporter):  # noqa: D101
 
 class RichConsoleSpanExporter(SpanExporter):  # noqa: D101
     def __init__(self, agent_framework: AgentFramework, tracing_config: TracingConfig):  # noqa: D107
-        self.processor = TelemetryProcessor.create(agent_framework)
+        self.processor = TracingProcessor.create(agent_framework)
         self.console = Console()
         self.tracing_config = tracing_config
 

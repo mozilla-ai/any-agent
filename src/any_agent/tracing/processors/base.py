@@ -12,43 +12,43 @@ if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
     from any_agent import AnyAgentSpan
-    from any_agent.tracing import AnyAgentTrace
+    from any_agent.tracing.tracer import AnyAgentTrace
 
 
-class TelemetryProcessor(ABC):
-    """Base class for processing telemetry data from different agent types."""
+class TracingProcessor(ABC):
+    """Base class for processing tracing data from different agent types."""
 
     MAX_EVIDENCE_LENGTH: ClassVar[int] = 400
 
     @classmethod
-    def create(cls, agent_framework_raw: AgentFramework | str) -> TelemetryProcessor:
-        """Create the appropriate telemetry processor."""
+    def create(cls, agent_framework_raw: AgentFramework | str) -> TracingProcessor:
+        """Create the appropriate tracing processor."""
         agent_framework = AgentFramework.from_string(agent_framework_raw)
 
         if agent_framework is AgentFramework.LANGCHAIN:
-            from any_agent.telemetry.frameworks.langchain_telemetry import (
-                LangchainTelemetryProcessor,
+            from any_agent.tracing.processors.langchain import (
+                LangchainTracingProcessor,
             )
 
-            return LangchainTelemetryProcessor()
+            return LangchainTracingProcessor()
         if agent_framework is AgentFramework.SMOLAGENTS:
-            from any_agent.telemetry.frameworks.smolagents_telemetry import (
-                SmolagentsTelemetryProcessor,
+            from any_agent.tracing.processors.smolagents import (
+                SmolagentsTracingProcessor,
             )
 
-            return SmolagentsTelemetryProcessor()
+            return SmolagentsTracingProcessor()
         if agent_framework is AgentFramework.OPENAI:
-            from any_agent.telemetry.frameworks.openai_telemetry import (
-                OpenAITelemetryProcessor,
+            from any_agent.tracing.processors.openai import (
+                OpenAITracingProcessor,
             )
 
-            return OpenAITelemetryProcessor()
+            return OpenAITracingProcessor()
         if agent_framework is AgentFramework.LLAMA_INDEX:
-            from any_agent.telemetry.frameworks.llama_index_telemetry import (
-                LlamaIndexTelemetryProcessor,
+            from any_agent.tracing.processors.llama_index import (
+                LlamaIndexTracingProcessor,
             )
 
-            return LlamaIndexTelemetryProcessor()
+            return LlamaIndexTracingProcessor()
 
         if (
             agent_framework is AgentFramework.GOOGLE

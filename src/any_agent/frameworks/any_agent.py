@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing import AnyAgentTrace, Tracer
+from any_agent.tracing.tracer import AnyAgentTrace, Tracer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

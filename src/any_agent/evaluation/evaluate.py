@@ -9,8 +9,8 @@ from any_agent.evaluation.evaluators import (
 from any_agent.evaluation.results_saver import save_evaluation_results
 from any_agent.evaluation.test_case import TestCase
 from any_agent.logging import logger
-from any_agent.telemetry import TelemetryProcessor
-from any_agent.tracing import AnyAgentSpan, AnyAgentTrace
+from any_agent.tracing.processors.base import TracingProcessor
+from any_agent.tracing.tracer import AnyAgentSpan, AnyAgentTrace
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
@@ -19,9 +19,9 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
         telemetry = AnyAgentTrace(spans=spans)
     logger.info(f"Telemetry loaded from {telemetry_path}")
 
-    agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)
+    agent_framework = TracingProcessor.determine_agent_framework(telemetry)
 
-    processor = TelemetryProcessor.create(agent_framework)
+    processor = TracingProcessor.create(agent_framework)
     hypothesis_answer = processor._extract_hypothesis_answer(trace=telemetry)
 
     checkpoint_evaluator = CheckpointEvaluator(model=test_case.llm_judge)

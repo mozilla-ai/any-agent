@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework, TracingConfig
-from any_agent.tracing import Tracer
+from any_agent.tracing.tracer import Tracer
 
 
 def test_tracer_initialization(tmp_path: Path) -> None:
@@ -12,8 +12,8 @@ def test_tracer_initialization(tmp_path: Path) -> None:
     mock_tracer_provider = MagicMock()
 
     with (
-        patch("any_agent.tracing.trace", mock_trace),
-        patch("any_agent.tracing.TracerProvider", mock_tracer_provider),
+        patch("any_agent.tracing.tracer.trace", mock_trace),
+        patch("any_agent.tracing.tracer.TracerProvider", mock_tracer_provider),
     ):
         tracer = Tracer(
             agent_framework=AgentFramework.OPENAI,

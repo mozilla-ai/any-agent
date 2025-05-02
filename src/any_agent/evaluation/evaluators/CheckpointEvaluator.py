@@ -4,8 +4,8 @@ from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.test_case import CheckpointCriteria
 from any_agent.logging import logger
-from any_agent.telemetry import TelemetryProcessor
-from any_agent.tracing import AnyAgentTrace
+from any_agent.tracing.processors.base import TracingProcessor
+from any_agent.tracing.tracer import AnyAgentTrace
 
 
 class CheckpointEvaluator(LLMEvaluator):
@@ -15,7 +15,7 @@ class CheckpointEvaluator(LLMEvaluator):
         self,
         telemetry: AnyAgentTrace,
         checkpoints: Sequence[CheckpointCriteria],
-        processor: TelemetryProcessor,
+        processor: TracingProcessor,
     ) -> list[EvaluationResult]:
         """Verify each checkpoint against the telemetry data using LLM.
 

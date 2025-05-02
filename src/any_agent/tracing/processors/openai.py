@@ -4,15 +4,15 @@ from typing import Any
 
 from any_agent import AgentFramework, AnyAgentSpan
 from any_agent.logging import logger
-from any_agent.telemetry import TelemetryProcessor
-from any_agent.tracing import AnyAgentTrace
+from any_agent.tracing.processors.base import TracingProcessor
+from any_agent.tracing.tracer import AnyAgentTrace
 
 
-class LlamaIndexTelemetryProcessor(TelemetryProcessor):
-    """Processor for LlamaIndex agent telemetry data."""
+class OpenAITracingProcessor(TracingProcessor):
+    """Processor for OpenAI agent telemetry data."""
 
     def _get_agent_framework(self) -> AgentFramework:
-        return AgentFramework.LLAMA_INDEX
+        return AgentFramework.OPENAI
 
     def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
         for span in reversed(trace.spans):

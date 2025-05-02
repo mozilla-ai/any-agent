@@ -4,11 +4,11 @@ from typing import Any
 from langchain_core.messages import BaseMessage
 
 from any_agent import AgentFramework, AnyAgentSpan, AnyAgentTrace
-from any_agent.telemetry import TelemetryProcessor
-from any_agent.telemetry.types import StatusCode
+from any_agent.tracing import TracingProcessor
+from any_agent.tracing.types import StatusCode
 
 
-class LangchainTelemetryProcessor(TelemetryProcessor):
+class LangchainTracingProcessor(TracingProcessor):
     """Processor for Langchain agent telemetry data."""
 
     def _get_agent_framework(self) -> AgentFramework:

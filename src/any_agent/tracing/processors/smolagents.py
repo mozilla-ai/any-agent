@@ -2,12 +2,12 @@ import json
 from typing import Any
 
 from any_agent import AgentFramework, AnyAgentSpan
-from any_agent.telemetry import TelemetryProcessor
-from any_agent.telemetry.types import StatusCode
-from any_agent.tracing import AnyAgentTrace
+from any_agent.tracing.processors.base import TracingProcessor
+from any_agent.tracing.tracer import AnyAgentTrace
+from any_agent.tracing.types import StatusCode
 
 
-class SmolagentsTelemetryProcessor(TelemetryProcessor):
+class SmolagentsTracingProcessor(TracingProcessor):
     """Processor for SmoL Agents telemetry data."""
 
     def _get_agent_framework(self) -> AgentFramework:
