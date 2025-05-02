@@ -27,7 +27,6 @@ def check_uvx_installed() -> bool:
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-# @pytest.mark.asyncio
 def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:
     kwargs = {}
 
