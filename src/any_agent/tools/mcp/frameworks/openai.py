@@ -1,9 +1,13 @@
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
+
+if TYPE_CHECKING:
+    from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
+    from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
 
 mcp_available = False
 with suppress(ImportError):
@@ -20,7 +24,7 @@ with suppress(ImportError):
 
 
 class OpenAIMCPServerBase(MCPServerBase, ABC):
-    server: Any = None
+    server: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
     def _check_dependencies(self) -> None:
@@ -32,10 +36,7 @@ class OpenAIMCPServerBase(MCPServerBase, ABC):
     @abstractmethod
     async def _setup_tools(self) -> None:
         """Set up the OpenAI MCP server with the provided configuration."""
-        if not self.server or (
-            not isinstance(self.server, OpenAIInternalMCPServerStdio)
-            and not isinstance(self.server, OpenAIInternalMCPServerSse)
-        ):
+        if not self.server:
             msg = "MCP server is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 

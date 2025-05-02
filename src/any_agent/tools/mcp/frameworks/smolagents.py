@@ -10,13 +10,12 @@ mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
     from smolagents.mcp_client import MCPClient
-    from smolagents.tools import Tool as SmolagentsTool
 
     mcp_available = True
 
 
 class SmolagentsMCPServerBase(MCPServerBase, ABC):
-    smolagent_tools: Any = None
+    smolagent_tools: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
 
     def _check_dependencies(self) -> None:
@@ -28,9 +27,7 @@ class SmolagentsMCPServerBase(MCPServerBase, ABC):
     @abstractmethod
     async def _setup_tools(self) -> None:
         """Set up the Smolagents MCP server with the provided configuration."""
-        if not self.smolagent_tools or not all(
-            isinstance(tool, SmolagentsTool) for tool in self.smolagent_tools
-        ):
+        if not self.smolagent_tools:
             msg = "Tool collection is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 

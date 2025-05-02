@@ -16,7 +16,7 @@ with suppress(ImportError):
 
 
 class AgnoMCPServerBase(MCPServerBase, ABC):
-    server: Any = None
+    server: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.AGNO] = AgentFramework.AGNO
 
     def _check_dependencies(self) -> None:
@@ -28,7 +28,7 @@ class AgnoMCPServerBase(MCPServerBase, ABC):
     @abstractmethod
     async def _setup_tools(self) -> None:
         """Set up the Agno MCP server with the provided configuration."""
-        if not self.server or not isinstance(self.server, AgnoMCPTools):
+        if not self.server:
             msg = "MCP server is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 

@@ -4,9 +4,7 @@ import os
 from collections.abc import Callable
 from contextlib import suppress
 from datetime import timedelta
-from typing import Any, Literal
-
-from mcp import Tool
+from typing import TYPE_CHECKING, Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -19,6 +17,9 @@ with suppress(ImportError):
     from mcp.client.stdio import stdio_client
 
     mcp_available = True
+
+if TYPE_CHECKING:
+    from mcp import Tool
 
 
 class TinyAgentMCPServerBase(MCPServerBase):
@@ -76,7 +77,7 @@ class TinyAgentMCPServerBase(MCPServerBase):
         # Store tools as a list
         self.tools = tool_list
 
-    def _create_tool_from_info(self, tool: Tool) -> Callable[..., Any]:
+    def _create_tool_from_info(self, tool: "Tool") -> Callable[..., Any]:
         """Create a tool function from tool information."""
         tool_name = tool.name
         tool_description = tool.description

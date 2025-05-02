@@ -3,8 +3,6 @@ from abc import ABC, abstractmethod
 from contextlib import suppress
 from typing import Any, Literal
 
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
-
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
@@ -22,7 +20,7 @@ with suppress(ImportError):
 
 
 class GoogleMCPServerBase(MCPServerBase, ABC):
-    server: Any = None
+    server: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
 
     def _check_dependencies(self) -> None:
@@ -34,7 +32,7 @@ class GoogleMCPServerBase(MCPServerBase, ABC):
     @abstractmethod
     async def _setup_tools(self) -> None:
         """Set up the Google MCP server with the provided configuration."""
-        if not self.server or not isinstance(self.server, GoogleMCPToolset):
+        if not self.server:
             msg = "MCP server is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 

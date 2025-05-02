@@ -15,7 +15,7 @@ with suppress(ImportError):
 
 
 class LlamaIndexMCPServerBase(MCPServerBase, ABC):
-    client: Any = None
+    client: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.LLAMA_INDEX] = AgentFramework.LLAMA_INDEX
 
     def _check_dependencies(self) -> None:
@@ -27,7 +27,7 @@ class LlamaIndexMCPServerBase(MCPServerBase, ABC):
     @abstractmethod
     async def _setup_tools(self) -> None:
         """Set up the LlamaIndex MCP server with the provided configuration."""
-        if not self.client or not isinstance(self.client, LlamaIndexMCPClient):
+        if not self.client:
             msg = "MCP client is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
