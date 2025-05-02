@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Literal
+from typing import Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -16,7 +16,7 @@ with suppress(ImportError):
 
 
 class AgnoMCPServerBase(MCPServerBase, ABC):
-    server: AgnoMCPTools | None = None
+    server: Any = None
     framework: Literal[AgentFramework.AGNO] = AgentFramework.AGNO
 
     def _check_dependencies(self) -> None:
@@ -28,11 +28,11 @@ class AgnoMCPServerBase(MCPServerBase, ABC):
     @abstractmethod
     async def _setup_tools(self) -> None:
         """Set up the Agno MCP server with the provided configuration."""
-        if not self.server:
+        if not self.server or not isinstance(self.server, AgnoMCPTools):
             msg = "MCP server is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
-        self.tools = [await self._exit_stack.enter_async_context(self.server)]  # type: ignore[arg-type]
+        self.tools = [await self._exit_stack.enter_async_context(self.server)]
 
 
 class AgnoMCPServerStdio(AgnoMCPServerBase):

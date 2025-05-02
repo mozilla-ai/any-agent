@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Literal
+from typing import Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -15,7 +15,7 @@ with suppress(ImportError):
 
 
 class LlamaIndexMCPServerBase(MCPServerBase, ABC):
-    client: LlamaIndexMCPClient | None = None
+    client: Any = None
     framework: Literal[AgentFramework.LLAMA_INDEX] = AgentFramework.LLAMA_INDEX
 
     def _check_dependencies(self) -> None:
@@ -27,7 +27,7 @@ class LlamaIndexMCPServerBase(MCPServerBase, ABC):
     @abstractmethod
     async def _setup_tools(self) -> None:
         """Set up the LlamaIndex MCP server with the provided configuration."""
-        if not self.client:
+        if not self.client or not isinstance(self.client, LlamaIndexMCPClient):
             msg = "MCP client is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 

@@ -1,8 +1,7 @@
 import os
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 from contextlib import suppress
-from typing import Literal
+from typing import Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -17,7 +16,7 @@ with suppress(ImportError):
 
 
 class SmolagentsMCPServerBase(MCPServerBase, ABC):
-    smolagent_tools: Sequence[SmolagentsTool] | None = None
+    smolagent_tools: Any = None
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
 
     def _check_dependencies(self) -> None:
@@ -29,7 +28,9 @@ class SmolagentsMCPServerBase(MCPServerBase, ABC):
     @abstractmethod
     async def _setup_tools(self) -> None:
         """Set up the Smolagents MCP server with the provided configuration."""
-        if not self.smolagent_tools:
+        if not self.smolagent_tools or not all(
+            isinstance(tool, SmolagentsTool) for tool in self.smolagent_tools
+        ):
             msg = "Tool collection is not set up. Please call `setup` from a concrete class."
             raise ValueError(msg)
 
