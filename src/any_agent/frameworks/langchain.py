@@ -1,4 +1,3 @@
-import importlib
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
@@ -7,24 +6,23 @@ from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
-if TYPE_CHECKING:
-    from langgraph.graph.graph import CompiledGraph
-
-
-if TYPE_CHECKING:
-    from langchain_core.language_models import LanguageModelLike
-    from langchain_core.messages.base import BaseMessage
 try:
     from langchain_core.language_models import LanguageModelLike
+    from langchain_litellm import ChatLiteLLM
     from langgraph.prebuilt import create_react_agent
     from langgraph_swarm import create_handoff_tool, create_swarm
+
+    DEFAULT_AGENT_TYPE = create_react_agent
+    DEFAULT_MODEL_TYPE = ChatLiteLLM
 
     langchain_available = True
 except ImportError:
     langchain_available = False
 
-
-DEFAULT_MODEL_CLASS = "langchain_litellm.ChatLiteLLM"
+if TYPE_CHECKING:
+    from langchain_core.language_models import LanguageModelLike
+    from langchain_core.messages.base import BaseMessage
+    from langgraph.graph.graph import CompiledGraph
 
 
 class LangchainAgent(AnyAgent):
@@ -44,15 +42,12 @@ class LangchainAgent(AnyAgent):
     def framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
 
-    def _get_model(self, agent_config: AgentConfig) -> str | LanguageModelLike:
+    def _get_model(self, agent_config: AgentConfig) -> "LanguageModelLike":
         """Get the model configuration for a LangChain agent."""
-        if not agent_config.model_type:
-            agent_config.model_type = DEFAULT_MODEL_CLASS
-        module, class_name = agent_config.model_type.split(".")
-        model_type = getattr(importlib.import_module(module), class_name)
+        model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
 
         return cast(
-            "str | LanguageModelLike",
+            "LanguageModelLike",
             model_type(
                 model=agent_config.model_id,
                 api_key=agent_config.api_key,
@@ -88,7 +83,8 @@ class LangchainAgent(AnyAgent):
                     name = f"managed_agent_{n}"
                 managed_names.append(name)
 
-                managed_agent = create_react_agent(  # type: ignore[assignment]
+                agent_type = managed_agent.agent_type or DEFAULT_AGENT_TYPE
+                instance = agent_type(
                     name=name,
                     model=self._get_model(managed_agent),
                     tools=[
@@ -98,25 +94,26 @@ class LangchainAgent(AnyAgent):
                     prompt=managed_agent.instructions,
                     **managed_agent.agent_args or {},
                 )
-                swarm.append(managed_agent)
+                swarm.append(instance)
 
             imported_tools = [
                 create_handoff_tool(agent_name=managed_name)
                 for managed_name in managed_names
             ]
-
-            main_agent = create_react_agent(
+            agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+            main_agent = agent_type(
                 name=self.config.name,
                 model=self._get_model(self.config),
                 tools=imported_tools,
                 prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )
-            swarm.append(main_agent)  # type: ignore[arg-type]
-            workflow = create_swarm(swarm, default_active_agent=self.config.name)  # type: ignore[arg-type]
+            swarm.append(main_agent)
+            workflow = create_swarm(swarm, default_active_agent=self.config.name)
             self._agent = workflow.compile()
         else:
-            self._agent = create_react_agent(
+            agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+            self._agent = agent_type(
                 name=self.config.name,
                 model=self._get_model(self.config),
                 tools=imported_tools,

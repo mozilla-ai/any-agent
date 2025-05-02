@@ -8,10 +8,13 @@ try:
     from agents import (
         Agent,
         Handoff,
+        Model,
         ModelSettings,
         Runner,
     )
     from agents.extensions.models.litellm_model import LitellmModel
+
+    DEFAULT_MODEL_TYPE = LitellmModel
 
     agents_available = True
 except ImportError:
@@ -37,9 +40,10 @@ class OpenAIAgent(AnyAgent):
     def _get_model(
         self,
         agent_config: AgentConfig,
-    ) -> LitellmModel:
+    ) -> "Model":
         """Get the model configuration for an OpenAI agent."""
-        return LitellmModel(
+        model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        return model_type(
             model=agent_config.model_id,
             base_url=agent_config.api_base,
             api_key=agent_config.api_key,

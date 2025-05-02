@@ -107,7 +107,7 @@ class AgentConfig(BaseModel):
     instructions: str | None = None
     tools: Sequence[Tool] = Field(default_factory=list)
     handoff: bool = False
-    agent_type: str | None = None
+    agent_type: Callable[..., Any] | None = None
     agent_args: MutableMapping[str, Any] | None = None
-    model_type: str | None = None
+    model_type: Callable[..., Any] | None = None
     model_args: MutableMapping[str, Any] | None = None
