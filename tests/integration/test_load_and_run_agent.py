@@ -1,4 +1,5 @@
 import os
+import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -9,9 +10,17 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdioParams
 
 
-def get_current_year() -> str:
-    """Get the current year"""
-    return str(datetime.now().year)
+def check_uvx_installed() -> bool:
+    """The integration tests requires uvx"""
+    try:
+        result = subprocess.run(  # noqa: S603
+            ["uvx", "--version"],  # noqa: S607
+            capture_output=True,
+            check=True,
+        )
+        return True if result.returncode == 0 else False  # noqa: TRY300
+    except Exception:
+        return False
 
 
 @pytest.mark.skipif(
@@ -21,6 +30,24 @@ def get_current_year() -> str:
 # @pytest.mark.asyncio
 def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:
     kwargs = {}
+
+    tmp_file = "tmp.txt"
+
+    if not check_uvx_installed():
+        msg = "uvx is not installed. Please install it to run this test."
+        raise RuntimeError(msg)
+
+    def write_file(text: str) -> None:
+        """write the text to a file in the tmp_path directory
+
+        Args:
+            text (str): The text to write to the file.
+
+        Returns:
+            None
+        """
+        with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
+            f.write(text)
 
     kwargs["model_id"] = "gpt-4.1-mini"
     if "OPENAI_API_KEY" not in os.environ:
@@ -32,20 +59,12 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     )
     model_args["temperature"] = 0.0
     tools = [
-        get_current_year,
+        write_file,
         MCPStdioParams(
-            command="docker",
-            args=[
-                "run",
-                "-i",
-                "--rm",
-                "--mount",
-                f"type=bind,src={tmp_path},dst=/projects",
-                "mcp/filesystem",
-                "/projects",
-            ],
+            command="uvx",
+            args=["mcp-server-time", "--local-timezone=America/New_York"],
             tools=[
-                "write_file",
+                "get_current_time",
             ],
         ),
     ]
@@ -61,10 +80,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     )
     try:
         result = agent.run(
-            "Use the tools to find what year is it and write the value (single number) to /projects/tmp.txt"
+            "Use the tools to find what year is it and write the value (single number) to a file",
         )
-        assert os.path.exists(os.path.join(tmp_path, "tmp.txt"))
-        with open(os.path.join(tmp_path, "tmp.txt")) as f:
+        assert os.path.exists(os.path.join(tmp_path, tmp_file))
+        with open(os.path.join(tmp_path, tmp_file)) as f:
             content = f.read()
         assert content == str(datetime.now().year)
         assert result
