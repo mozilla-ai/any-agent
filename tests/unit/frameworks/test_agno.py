@@ -15,7 +15,7 @@ def test_load_agno_default() -> None:
 
     with (
         patch("any_agent.frameworks.agno.Agent", mock_agent),
-        patch("any_agent.frameworks.agno.LiteLLM", mock_model),
+        patch("any_agent.frameworks.agno.DEFAULT_MODEL_TYPE", mock_model),
     ):
         AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
         mock_agent.assert_called_once_with(
@@ -40,7 +40,7 @@ def test_load_agno_multi_agent() -> None:
     with (
         patch("any_agent.frameworks.agno.Agent", mock_agent),
         patch("any_agent.frameworks.agno.Team", mock_team),
-        patch("any_agent.frameworks.agno.LiteLLM", mock_model),
+        patch("any_agent.frameworks.agno.DEFAULT_MODEL_TYPE", mock_model),
     ):
         AnyAgent.create(
             AgentFramework.AGNO,
@@ -81,7 +81,7 @@ def test_run_agno_custom_args() -> None:
 
     with (
         patch("any_agent.frameworks.agno.Agent", mock_agent),
-        patch("any_agent.frameworks.agno.LiteLLM", mock_model),
+        patch("any_agent.frameworks.agno.DEFAULT_MODEL_TYPE", mock_model),
     ):
         agent = AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
         agent.run("foo", retries=2)

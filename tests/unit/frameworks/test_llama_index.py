@@ -18,8 +18,8 @@ def test_load_llama_index_agent_default() -> None:
     from llama_index.core.tools import FunctionTool
 
     with (
-        patch("any_agent.frameworks.llama_index.ReActAgent", create_mock),
-        patch("llama_index.llms.litellm.LiteLLM", model_mock),
+        patch("any_agent.frameworks.llama_index.DEFAULT_AGENT_TYPE", create_mock),
+        patch("any_agent.frameworks.llama_index.DEFAULT_MODEL_TYPE", model_mock),
         patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
         AnyAgent.create(
@@ -48,7 +48,7 @@ def test_load_llama_index_agent_missing() -> None:
             AnyAgent.create(AgentFramework.LLAMA_INDEX, AgentConfig(model_id="gpt-4o"))
 
 
-def test_load_langchain_multiagent() -> None:
+def test_load_llama_index_multiagent() -> None:
     model_mock = MagicMock()
     create_mock = MagicMock()
     agent_mock = MagicMock()
@@ -57,9 +57,9 @@ def test_load_langchain_multiagent() -> None:
     from llama_index.core.tools import FunctionTool
 
     with (
-        patch("any_agent.frameworks.llama_index.ReActAgent", create_mock),
+        patch("any_agent.frameworks.llama_index.DEFAULT_AGENT_TYPE", create_mock),
         patch("any_agent.frameworks.llama_index.AgentWorkflow"),
-        patch("llama_index.llms.litellm.LiteLLM", model_mock),
+        patch("any_agent.frameworks.llama_index.DEFAULT_MODEL_TYPE", model_mock),
         patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
         main_agent = AgentConfig(model_id="gpt-4.1-mini")
@@ -107,8 +107,8 @@ def test_run_llama_index_agent_custom_args() -> None:
     from llama_index.core.tools import FunctionTool
 
     with (
-        patch("any_agent.frameworks.llama_index.ReActAgent", create_mock),
-        patch("llama_index.llms.litellm.LiteLLM"),
+        patch("any_agent.frameworks.llama_index.DEFAULT_AGENT_TYPE", create_mock),
+        patch("any_agent.frameworks.llama_index.DEFAULT_MODEL_TYPE"),
         patch.object(FunctionTool, "from_defaults"),
     ):
         agent = AnyAgent.create(

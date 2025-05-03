@@ -52,19 +52,42 @@ class MCPSseParams(BaseModel):
 
 class TracingConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    output_dir: str = "traces"  # None for no json saved trace
-    enable_console: bool = True
-    enable_file: bool = True
-    llm: str | None = "yellow"
-    tool: str | None = "blue"
-    agent: str | None = None
-    chain: str | None = None
+
+    console: bool = True
+    """Print to console."""
+
+    output_dir: str = "traces"
+    """Directory to save traces, if json is enabled"""
+
+    save: bool = True
+    """Save to json file."""
+
     cost_info: bool = True
+    """whether json and console logs should include cost information"""
+
+    llm: str | None = "yellow"
+    """LLM color in console logs"""
+
+    tool: str | None = "blue"
+    """Tool color in console logs"""
+
+    agent: str | None = None
+    """Agent color in console logs"""
+
+    chain: str | None = None
+    """Chain color in console logs"""
 
     @model_validator(mode="after")
     def validate_enable_flags(self) -> Self:
-        if not self.enable_console and not self.enable_file:
-            msg = "At least one of enable_console or enable_file must be true"
+        if not self.console and not self.save:
+            msg = "At least one of `console` or `save` must be true"
+            raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def validate_output_dir(self) -> Self:
+        if self.save and not self.output_dir:
+            msg = "output_dir must be set if json is enabled"
             raise ValueError(msg)
         return self
 
@@ -84,7 +107,7 @@ class AgentConfig(BaseModel):
     instructions: str | None = None
     tools: Sequence[Tool] = Field(default_factory=list)
     handoff: bool = False
-    agent_type: str | None = None
+    agent_type: Callable[..., Any] | None = None
     agent_args: MutableMapping[str, Any] | None = None
-    model_type: str | None = None
+    model_type: Callable[..., Any] | None = None
     model_args: MutableMapping[str, Any] | None = None

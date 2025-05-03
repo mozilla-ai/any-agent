@@ -1,8 +1,7 @@
 import os
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 from contextlib import suppress
-from typing import Literal
+from typing import Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -11,13 +10,12 @@ mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
     from smolagents.mcp_client import MCPClient
-    from smolagents.tools import Tool as SmolagentsTool
 
     mcp_available = True
 
 
 class SmolagentsMCPServerBase(MCPServerBase, ABC):
-    smolagent_tools: Sequence[SmolagentsTool] | None = None
+    smolagent_tools: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
 
     def _check_dependencies(self) -> None:

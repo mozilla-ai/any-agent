@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Literal
+from typing import Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
@@ -20,7 +20,7 @@ with suppress(ImportError):
 
 
 class GoogleMCPServerBase(MCPServerBase, ABC):
-    server: GoogleMCPToolset | None = None
+    server: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
 
     def _check_dependencies(self) -> None:

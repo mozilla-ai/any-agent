@@ -23,8 +23,8 @@ def test_load_google_default() -> None:
             return mock_function_tool
 
     with (
-        patch("any_agent.frameworks.google.Agent", mock_agent),
-        patch("any_agent.frameworks.google.LiteLlm", mock_model),
+        patch("any_agent.frameworks.google.LlmAgent", mock_agent),
+        patch("any_agent.frameworks.google.DEFAULT_MODEL_TYPE", mock_model),
         patch("google.adk.tools.FunctionTool", MockedFunctionTool),
     ):
         AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))
@@ -51,8 +51,8 @@ def test_load_google_multiagent() -> None:
             return mock_function_tool
 
     with (
-        patch("any_agent.frameworks.google.Agent", mock_agent),
-        patch("any_agent.frameworks.google.LiteLlm", mock_model),
+        patch("any_agent.frameworks.google.LlmAgent", mock_agent),
+        patch("any_agent.frameworks.google.DEFAULT_MODEL_TYPE", mock_model),
         patch("any_agent.frameworks.google.AgentTool", mock_agent_tool),
         patch("google.adk.tools.FunctionTool", MockedFunctionTool),
     ):
@@ -115,9 +115,9 @@ def test_run_google_custom_args() -> None:
 
     run_config = RunConfig(max_llm_calls=10)
     with (
-        patch("any_agent.frameworks.google.Agent", mock_agent),
+        patch("any_agent.frameworks.google.LlmAgent", mock_agent),
         patch("any_agent.frameworks.google.InMemoryRunner", mock_runner),
-        patch("any_agent.frameworks.google.LiteLlm"),
+        patch("any_agent.frameworks.google.DEFAULT_MODEL_TYPE"),
         patch("google.adk.tools.FunctionTool"),
     ):
         agent = AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))

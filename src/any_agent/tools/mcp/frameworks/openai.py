@@ -1,9 +1,13 @@
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_server import MCPServerBase
+
+if TYPE_CHECKING:
+    from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
+    from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
 
 mcp_available = False
 with suppress(ImportError):
@@ -20,7 +24,7 @@ with suppress(ImportError):
 
 
 class OpenAIMCPServerBase(MCPServerBase, ABC):
-    server: OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None = None
+    server: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
     def _check_dependencies(self) -> None:
@@ -37,7 +41,7 @@ class OpenAIMCPServerBase(MCPServerBase, ABC):
             raise ValueError(msg)
 
         await self._exit_stack.enter_async_context(self.server)
-        self.tools = await self.server.list_tools()  # type: ignore[assignment]
+        self.tools = await self.server.list_tools()
 
         self.tools = self._filter_tools(self.tools)
 

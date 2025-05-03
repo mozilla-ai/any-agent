@@ -21,14 +21,14 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv and set the python version to 3.11
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.11'
-          cache: "pip"
+          python-version: 3.13
+          activate-environment: true
 
       - name: Install
-        run: pip install -e '.[all,tests]'
+        run: uv pip install -e '.[all,tests]'
 
       - name: Run Documentation tests
         run: pytest -v tests/docs
