@@ -34,7 +34,7 @@ class AgnoMCPConnection(MCPConnection, ABC):
             raise ValueError(msg)
 
         tools = await self._exit_stack.enter_async_context(self._server)
-        return tools if isinstance(tools, list) else [tools]  # type: ignore[return-value, list-item]
+        return [tools]  # type: ignore[list-item]
 
 
 class AgnoMCPStdioConnection(AgnoMCPConnection):
