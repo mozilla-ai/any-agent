@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.config import TracingConfig
 from any_agent.tools import search_web, show_final_answer, visit_webpage
 
 
@@ -15,8 +16,6 @@ def test_load_and_run_multi_agent(
     agent_framework: AgentFramework, tmp_path: Path
 ) -> None:
     kwargs = {}
-    if agent_framework is AgentFramework.SMOLAGENTS:
-        kwargs["agent_type"] = "ToolCallingAgent"
 
     if agent_framework is AgentFramework.TINYAGENT:
         pytest.skip(
@@ -64,12 +63,27 @@ def test_load_and_run_multi_agent(
         agent_framework=agent_framework,
         agent_config=main_agent,
         managed_agents=managed_agents,
+        tracing=TracingConfig(console=False, save=True, cost_info=True),
     )
-    result = agent.run("Which agent framework is the best?")
+    try:
+        result = agent.run("Which agent framework is the best?")
 
-    assert result
-    assert result.final_output
-    if agent_framework not in [AgentFramework.LLAMA_INDEX]:
-        # Llama Index doesn't currently give back raw_responses.
-        assert result.raw_responses
-        assert len(result.raw_responses) > 0
+        assert result
+        assert result.final_output
+        if agent_framework not in [AgentFramework.LLAMA_INDEX]:
+            # Llama Index doesn't currently give back raw_responses.
+            assert result.raw_responses
+            assert len(result.raw_responses) > 0
+        if agent_framework not in (
+            AgentFramework.AGNO,
+            AgentFramework.GOOGLE,
+            AgentFramework.TINYAGENT,
+        ):
+            assert result.trace is not None
+            cost_sum = result.trace.get_total_cost()
+            assert cost_sum.total_cost > 0
+            assert cost_sum.total_cost < 1.00
+            assert cost_sum.total_tokens > 0
+            assert cost_sum.total_tokens < 20000
+    finally:
+        agent.exit()

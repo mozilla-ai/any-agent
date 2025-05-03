@@ -1,7 +1,7 @@
 import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import PrivateAttr
 

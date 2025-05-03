@@ -1,12 +1,16 @@
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import PrivateAttr
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
 from any_agent.tools.mcp.mcp_connection import MCPConnection
 from any_agent.tools.mcp.mcp_server import MCPServerBase
+
+if TYPE_CHECKING:
+    from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
+    from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
 
 mcp_available = False
 with suppress(ImportError):

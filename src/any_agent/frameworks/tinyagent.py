@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 import litellm
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 
@@ -93,20 +93,24 @@ class TinyAgent(AnyAgent):
     """
 
     def __init__(
-        self, config: AgentConfig, managed_agents: list[AgentConfig] | None = None
+        self,
+        config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ) -> None:
         """Initialize the TinyAgent.
 
         Args:
             config: Agent configuration
             managed_agents: Optional list of managed agent configurations
+            tracing: Optional tracing configuration
 
         """
         # we don't yet support multi-agent in tinyagent
         if managed_agents:
             msg = "Managed agents are not supported in TinyAgent."
             raise ValueError(msg)
-        super().__init__(config, managed_agents=managed_agents)
+        super().__init__(config, managed_agents=managed_agents, tracing=tracing)
         self.messages: list[dict[str, Any]] = []
         self.instructions = config.instructions or DEFAULT_SYSTEM_PROMPT
         self.api_key = config.api_key
@@ -193,6 +197,7 @@ class TinyAgent(AnyAgent):
             The final agent response
 
         """
+        self._create_tracer()
         logger.debug("Running agent with prompt: %s...", prompt[:500])
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
         self.messages = [
@@ -238,6 +243,7 @@ class TinyAgent(AnyAgent):
                     return AgentResult(
                         final_output=final_response or "Task aborted",
                         raw_responses=self.messages,
+                        trace=self._get_trace(),
                     )
                 raise
 
@@ -269,10 +275,12 @@ class TinyAgent(AnyAgent):
                         return AgentResult(
                             final_output=msg.get("content"),
                             raw_responses=self.messages,
+                            trace=self._get_trace(),
                         )
                 return AgentResult(
                     final_output=final_response or "Task completed",
                     raw_responses=self.messages,
+                    trace=self._get_trace(),
                 )
 
             if current_last.get("role") != "tool" and num_of_turns > max_turns:
@@ -280,6 +288,7 @@ class TinyAgent(AnyAgent):
                 return AgentResult(
                     final_output=final_response or "Max turns reached",
                     raw_responses=self.messages,
+                    trace=self._get_trace(),
                 )
 
             if current_last.get("role") != "tool" and next_turn_should_call_tools:
@@ -287,6 +296,7 @@ class TinyAgent(AnyAgent):
                 return AgentResult(
                     final_output=final_response or "No tools called",
                     raw_responses=self.messages,
+                    trace=self._get_trace(),
                 )
 
             if current_last.get("role") == "tool":

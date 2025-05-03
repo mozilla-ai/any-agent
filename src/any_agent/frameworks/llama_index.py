@@ -1,26 +1,26 @@
-import importlib
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.config import TracingConfig
 from any_agent.frameworks.any_agent import AgentResult
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
-if TYPE_CHECKING:
-    from llama_index.core.agent.workflow.workflow_events import AgentOutput
-    from llama_index.core.llms import LLM
-
 try:
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
-    from llama_index.core.llms import LLM
+    from llama_index.llms.litellm import LiteLLM
 
+    DEFAULT_AGENT_TYPE = ReActAgent
+    DEFAULT_MODEL_TYPE = LiteLLM
     llama_index_available = True
 except ImportError:
     llama_index_available = False
 
 
-DEFAULT_MODEL_CLASS = "litellm.LiteLLM"
+if TYPE_CHECKING:
+    from llama_index.core.agent.workflow.workflow_events import AgentOutput
+    from llama_index.core.llms import LLM
 
 
 class LlamaIndexAgent(AnyAgent):
@@ -30,23 +30,18 @@ class LlamaIndexAgent(AnyAgent):
         self,
         config: AgentConfig,
         managed_agents: Sequence[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents)
+        super().__init__(config, managed_agents, tracing)
         self._agent: AgentWorkflow | ReActAgent | None = None
 
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.LLAMA_INDEX
 
-    def _get_model(self, agent_config: AgentConfig) -> LLM:
+    def _get_model(self, agent_config: AgentConfig) -> "LLM":
         """Get the model configuration for a llama_index agent."""
-        if not agent_config.model_type:
-            agent_config.model_type = DEFAULT_MODEL_CLASS
-        module, class_name = agent_config.model_type.rsplit(".")
-        model_type = getattr(
-            importlib.import_module(f"llama_index.llms.{module}"),
-            class_name,
-        )
+        model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
         return cast(
             "LLM",
             model_type(
@@ -81,7 +76,8 @@ class LlamaIndexAgent(AnyAgent):
                     )
                     name = f"managed_agent_{n}"
                 managed_names.append(name)
-                managed_instance = ReActAgent(
+                agent_type = managed_agent.agent_type or DEFAULT_AGENT_TYPE
+                managed_instance = agent_type(
                     name=name,
                     description=managed_agent.description or "A managed agent",
                     system_prompt=managed_agent.instructions,
@@ -93,7 +89,8 @@ class LlamaIndexAgent(AnyAgent):
                 agents.append(managed_instance)
 
             main_tools, _ = await self._load_tools(self.config.tools)
-            main_agent = ReActAgent(
+            agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+            main_agent = agent_type(
                 name=self.config.name,
                 description=self.config.description or "The main agent",
                 tools=main_tools,
@@ -104,12 +101,12 @@ class LlamaIndexAgent(AnyAgent):
             )
             agents.append(main_agent)
 
-            self._agent = AgentWorkflow(agents=agents, root_agent=main_agent.name)  # type: ignore[arg-type]
+            self._agent = AgentWorkflow(agents=agents, root_agent=main_agent.name)
 
         else:
             imported_tools, _ = await self._load_tools(self.config.tools)
-
-            self._agent = ReActAgent(
+            agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+            self._agent = agent_type(
                 name=self.config.name,
                 tools=imported_tools,
                 description=self.config.description or "The main agent",
@@ -122,7 +119,7 @@ class LlamaIndexAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-
+        self._create_tracer()
         result: AgentOutput = await self._agent.run(prompt, **kwargs)
         # assert that it's a TextBlock
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
@@ -131,4 +128,5 @@ class LlamaIndexAgent(AnyAgent):
         return AgentResult(
             final_output=result.response.blocks[0].text,
             raw_responses=None,  # Llama Index isn't giving me the trace history in the result or the _agent.
+            trace=self._get_trace(),
         )

@@ -9,7 +9,7 @@
 
     In those cases, you might want to instead copy-paste and **extend** the default
     instructions.
-    For example, check the [`CodeAgent` default instructions](https://github.com/huggingface/smolagents/blob/main/src/smolagents/prompts/code_agent.yaml) in `smolagents`.
+    For example, check the [`ToolCallingAgent` default instructions](https://github.com/huggingface/smolagents/blob/main/src/smolagents/prompts/toolcalling_agent.yaml) in `smolagents`.
 
 
 ```python

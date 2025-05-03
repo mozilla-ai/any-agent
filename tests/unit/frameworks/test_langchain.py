@@ -17,8 +17,8 @@ def test_load_langchain_agent_default() -> None:
     tool_mock = MagicMock()
 
     with (
-        patch("any_agent.frameworks.langchain.create_react_agent", create_mock),
-        patch("langchain_litellm.ChatLiteLLM", model_mock),
+        patch("any_agent.frameworks.langchain.DEFAULT_AGENT_TYPE", create_mock),
+        patch("any_agent.frameworks.langchain.DEFAULT_MODEL_TYPE", model_mock),
         patch("langchain_core.tools.tool", tool_mock),
     ):
         AnyAgent.create(AgentFramework.LANGCHAIN, AgentConfig(model_id="gpt-4o"))
@@ -52,9 +52,9 @@ def test_load_langchain_multiagent() -> None:
     tool_mock = MagicMock()
 
     with (
-        patch("any_agent.frameworks.langchain.create_react_agent", create_mock),
+        patch("any_agent.frameworks.langchain.DEFAULT_AGENT_TYPE", create_mock),
         patch("any_agent.frameworks.langchain.create_handoff_tool", handoff_mock),
-        patch("langchain_litellm.ChatLiteLLM", model_mock),
+        patch("any_agent.frameworks.langchain.DEFAULT_MODEL_TYPE", model_mock),
         patch("langchain_core.tools.tool", tool_mock),
     ):
         main_agent = AgentConfig(
@@ -102,8 +102,8 @@ def test_run_langchain_agent_custom_args() -> None:
     create_mock.return_value = agent_mock
 
     with (
-        patch("any_agent.frameworks.langchain.create_react_agent", create_mock),
-        patch("langchain_litellm.ChatLiteLLM"),
+        patch("any_agent.frameworks.langchain.DEFAULT_AGENT_TYPE", create_mock),
+        patch("any_agent.frameworks.langchain.DEFAULT_MODEL_TYPE"),
         patch("langchain_core.tools.tool"),
     ):
         agent = AnyAgent.create(

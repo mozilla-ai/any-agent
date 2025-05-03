@@ -1,6 +1,5 @@
 import json
 from textwrap import dedent
-from typing import Any
 
 from any_agent.evaluation.evaluators import (
     CheckpointEvaluator,
@@ -11,11 +10,13 @@ from any_agent.evaluation.results_saver import save_evaluation_results
 from any_agent.evaluation.test_case import TestCase
 from any_agent.logging import logger
 from any_agent.telemetry import TelemetryProcessor
+from any_agent.tracing import AnyAgentSpan, AnyAgentTrace
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
     with open(telemetry_path) as f:
-        telemetry: list[dict[str, Any]] = json.loads(f.read())
+        spans: list[AnyAgentSpan] = json.loads(f.read())
+        telemetry = AnyAgentTrace(spans=spans)
     logger.info(f"Telemetry loaded from {telemetry_path}")
 
     agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)

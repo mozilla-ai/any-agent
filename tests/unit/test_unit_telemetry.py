@@ -1,12 +1,13 @@
-import json
-
 import pytest
+from opentelemetry.sdk.trace import ReadableSpan
 
-from any_agent import AgentFramework
+from any_agent import AgentFramework, AnyAgentSpan
 from any_agent.telemetry import TelemetryProcessor
 
 
-def test_telemetry_extract_interaction(agent_framework: AgentFramework, llm_span):  # type: ignore[no-untyped-def]
+def test_telemetry_extract_interaction(
+    agent_framework: AgentFramework, llm_span: ReadableSpan
+) -> None:
     if agent_framework in (
         AgentFramework.AGNO,
         AgentFramework.GOOGLE,
@@ -14,8 +15,8 @@ def test_telemetry_extract_interaction(agent_framework: AgentFramework, llm_span
     ):
         pytest.skip()
     processor = TelemetryProcessor.create(AgentFramework(agent_framework))
-    span_kind, interaction = processor.extract_interaction(
-        json.loads(llm_span.to_json())
-    )
+    assert llm_span.attributes  # to make mypy happy
+    span = AnyAgentSpan.from_readable_span(llm_span)
+    span_kind, interaction = processor.extract_interaction(span)
     assert span_kind == "LLM"
     assert interaction["input"]

@@ -1,19 +1,24 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
 try:
     from agno.agent import Agent
-    from agno.agent import RunResponse as AgnoRunResponse
     from agno.models.litellm import LiteLLM
     from agno.team.team import Team
 
+    DEFAULT_MODEL_TYPE = LiteLLM
     agno_available = True
 except ImportError:
     agno_available = False
+
+
+if TYPE_CHECKING:
+    from agno.agent import RunResponse
+    from agno.models.base import Model
 
 
 class AgnoAgent(AnyAgent):
@@ -23,17 +28,19 @@ class AgnoAgent(AnyAgent):
         self,
         config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents)
+        super().__init__(config, managed_agents, tracing)
         self._agent: Agent | Team | None = None
 
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.AGNO
 
-    def _get_model(self, agent_config: AgentConfig) -> LiteLLM:
+    def _get_model(self, agent_config: AgentConfig) -> "Model":
         """Get the model configuration for an Agno agent."""
-        return LiteLLM(
+        model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        return model_type(
             id=agent_config.model_id,
             api_base=agent_config.api_base,
             api_key=agent_config.api_key,
@@ -99,6 +106,11 @@ class AgnoAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
+        self._create_tracer()
 
-        result: AgnoRunResponse = await self._agent.arun(prompt, **kwargs)
-        return AgentResult(final_output=result.content, raw_responses=result.messages)
+        result: RunResponse = await self._agent.arun(prompt, **kwargs)
+        return AgentResult(
+            final_output=result.content,
+            raw_responses=result.messages,
+            trace=self._get_trace(),
+        )
