@@ -22,9 +22,6 @@ with suppress(ImportError):
 
     mcp_available = True
 
-if TYPE_CHECKING:
-    from mcp import Tool
-
 
 class TinyAgentMCPConnection(MCPConnection, ABC):
     """Base class for TinyAgent MCP connections."""
