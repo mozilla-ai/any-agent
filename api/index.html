@@ -677,6 +677,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#any_agent.AnyAgent.exit" class="md-nav__link">
+    <span class="md-ellipsis">
+      exit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#any_agent.AnyAgent.load_agent" class="md-nav__link">
     <span class="md-ellipsis">
       load_agent
@@ -1161,6 +1170,15 @@
   <a href="#any_agent.AnyAgent.trace_filepath" class="md-nav__link">
     <span class="md-ellipsis">
       trace_filepath
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#any_agent.AnyAgent.exit" class="md-nav__link">
+    <span class="md-ellipsis">
+      exit
     </span>
   </a>
   
@@ -1804,7 +1822,14 @@
 <span class="normal"><a href="#__codelineno-0-197">197</a></span>
 <span class="normal"><a href="#__codelineno-0-198">198</a></span>
 <span class="normal"><a href="#__codelineno-0-199">199</a></span>
-<span class="normal"><a href="#__codelineno-0-200">200</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="k">class</span><span class="w"> </span><span class="nc">AnyAgent</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-200">200</a></span>
+<span class="normal"><a href="#__codelineno-0-201">201</a></span>
+<span class="normal"><a href="#__codelineno-0-202">202</a></span>
+<span class="normal"><a href="#__codelineno-0-203">203</a></span>
+<span class="normal"><a href="#__codelineno-0-204">204</a></span>
+<span class="normal"><a href="#__codelineno-0-205">205</a></span>
+<span class="normal"><a href="#__codelineno-0-206">206</a></span>
+<span class="normal"><a href="#__codelineno-0-207">207</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="k">class</span><span class="w"> </span><span class="nc">AnyAgent</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 </span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Base abstract class for all agent implementations.</span>
 </span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a>
 </span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a><span class="sd">    This provides a unified interface for different agent frameworks.</span>
@@ -1958,23 +1983,30 @@
 </span><span id="__span-0-181"><a id="__codelineno-0-181" name="__codelineno-0-181"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span><span class="o">.</span><span class="n">get_trace</span><span class="p">()</span>
 </span><span id="__span-0-182"><a id="__codelineno-0-182" name="__codelineno-0-182"></a>        <span class="k">return</span> <span class="kc">None</span>
 </span><span id="__span-0-183"><a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-</span><span id="__span-0-184"><a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_tracer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-185"><a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the tracer for the agent. This is called by each implementation of the agent run_async method.&quot;&quot;&quot;</span>
+</span><span id="__span-0-184"><a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-185"><a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Exit the agent and clean up resources.&quot;&quot;&quot;</span>
 </span><span id="__span-0-186"><a id="__codelineno-0-186" name="__codelineno-0-186"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-187"><a id="__codelineno-0-187" name="__codelineno-0-187"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span><span class="o">.</span><span class="n">uninstrument</span><span class="p">()</span>
-</span><span id="__span-0-188"><a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracing_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-189"><a id="__codelineno-0-189" name="__codelineno-0-189"></a>            <span class="c1"># Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302</span>
-</span><span id="__span-0-190"><a id="__codelineno-0-190" name="__codelineno-0-190"></a>            <span class="c1"># Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506</span>
-</span><span id="__span-0-191"><a id="__codelineno-0-191" name="__codelineno-0-191"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework</span> <span class="ow">in</span> <span class="p">(</span>
-</span><span id="__span-0-192"><a id="__codelineno-0-192" name="__codelineno-0-192"></a>                <span class="n">AgentFramework</span><span class="o">.</span><span class="n">AGNO</span><span class="p">,</span>
-</span><span id="__span-0-193"><a id="__codelineno-0-193" name="__codelineno-0-193"></a>                <span class="n">AgentFramework</span><span class="o">.</span><span class="n">GOOGLE</span><span class="p">,</span>
-</span><span id="__span-0-194"><a id="__codelineno-0-194" name="__codelineno-0-194"></a>                <span class="n">AgentFramework</span><span class="o">.</span><span class="n">TINYAGENT</span><span class="p">,</span>
-</span><span id="__span-0-195"><a id="__codelineno-0-195" name="__codelineno-0-195"></a>            <span class="p">):</span>
-</span><span id="__span-0-196"><a id="__codelineno-0-196" name="__codelineno-0-196"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-</span><span id="__span-0-197"><a id="__codelineno-0-197" name="__codelineno-0-197"></a>                    <span class="s2">&quot;Tracing is not yet supported for AGNO and GOOGLE frameworks. &quot;</span>
-</span><span id="__span-0-198"><a id="__codelineno-0-198" name="__codelineno-0-198"></a>                <span class="p">)</span>
-</span><span id="__span-0-199"><a id="__codelineno-0-199" name="__codelineno-0-199"></a>            <span class="k">else</span><span class="p">:</span>
-</span><span id="__span-0-200"><a id="__codelineno-0-200" name="__codelineno-0-200"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span> <span class="o">=</span> <span class="n">Tracer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">framework</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracing_config</span><span class="p">)</span>
+</span><span id="__span-0-187"><a id="__codelineno-0-187" name="__codelineno-0-187"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span><span class="o">.</span><span class="n">uninstrument</span><span class="p">()</span>  <span class="c1"># otherwise, this gets called in the __del__ method of Tracer</span>
+</span><span id="__span-0-188"><a id="__codelineno-0-188" name="__codelineno-0-188"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-189"><a id="__codelineno-0-189" name="__codelineno-0-189"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_mcp_servers</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># drop references to mcp servers so that they get garbage collected</span>
+</span><span id="__span-0-190"><a id="__codelineno-0-190" name="__codelineno-0-190"></a>
+</span><span id="__span-0-191"><a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_create_tracer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-192"><a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the tracer for the agent. This is called by each implementation of the agent run_async method.&quot;&quot;&quot;</span>
+</span><span id="__span-0-193"><a id="__codelineno-0-193" name="__codelineno-0-193"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-194"><a id="__codelineno-0-194" name="__codelineno-0-194"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span><span class="o">.</span><span class="n">uninstrument</span><span class="p">()</span>
+</span><span id="__span-0-195"><a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracing_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-196"><a id="__codelineno-0-196" name="__codelineno-0-196"></a>            <span class="c1"># Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302</span>
+</span><span id="__span-0-197"><a id="__codelineno-0-197" name="__codelineno-0-197"></a>            <span class="c1"># Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506</span>
+</span><span id="__span-0-198"><a id="__codelineno-0-198" name="__codelineno-0-198"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">framework</span> <span class="ow">in</span> <span class="p">(</span>
+</span><span id="__span-0-199"><a id="__codelineno-0-199" name="__codelineno-0-199"></a>                <span class="n">AgentFramework</span><span class="o">.</span><span class="n">AGNO</span><span class="p">,</span>
+</span><span id="__span-0-200"><a id="__codelineno-0-200" name="__codelineno-0-200"></a>                <span class="n">AgentFramework</span><span class="o">.</span><span class="n">GOOGLE</span><span class="p">,</span>
+</span><span id="__span-0-201"><a id="__codelineno-0-201" name="__codelineno-0-201"></a>                <span class="n">AgentFramework</span><span class="o">.</span><span class="n">TINYAGENT</span><span class="p">,</span>
+</span><span id="__span-0-202"><a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="p">):</span>
+</span><span id="__span-0-203"><a id="__codelineno-0-203" name="__codelineno-0-203"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+</span><span id="__span-0-204"><a id="__codelineno-0-204" name="__codelineno-0-204"></a>                    <span class="s2">&quot;Tracing is not yet supported for AGNO and GOOGLE frameworks. &quot;</span>
+</span><span id="__span-0-205"><a id="__codelineno-0-205" name="__codelineno-0-205"></a>                <span class="p">)</span>
+</span><span id="__span-0-206"><a id="__codelineno-0-206" name="__codelineno-0-206"></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-0-207"><a id="__codelineno-0-207" name="__codelineno-0-207"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span> <span class="o">=</span> <span class="n">Tracer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">framework</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracing_config</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
               </details>
 
@@ -2085,6 +2117,39 @@ and prevent direct dependency on specific agent implementations.</p>
 </div>
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="any_agent.AnyAgent.exit" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">exit</span><span class="p">()</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Exit the agent and clean up resources.</p>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/any_agent/frameworks/any_agent.py</code></summary>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-184">184</a></span>
+<span class="normal"><a href="#__codelineno-0-185">185</a></span>
+<span class="normal"><a href="#__codelineno-0-186">186</a></span>
+<span class="normal"><a href="#__codelineno-0-187">187</a></span>
+<span class="normal"><a href="#__codelineno-0-188">188</a></span>
+<span class="normal"><a href="#__codelineno-0-189">189</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-184"><a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="k">def</span><span class="w"> </span><span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-185"><a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Exit the agent and clean up resources.&quot;&quot;&quot;</span>
+</span><span id="__span-0-186"><a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-187"><a id="__codelineno-0-187" name="__codelineno-0-187"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span><span class="o">.</span><span class="n">uninstrument</span><span class="p">()</span>  <span class="c1"># otherwise, this gets called in the __del__ method of Tracer</span>
+</span><span id="__span-0-188"><a id="__codelineno-0-188" name="__codelineno-0-188"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_last_tracer</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-189"><a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_mcp_servers</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># drop references to mcp servers so that they get garbage collected</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
