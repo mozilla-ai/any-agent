@@ -44,16 +44,16 @@ class MCPConnection(BaseModel, ABC):
         if not requested_tools:
             return tools
 
-        tools = [tool.name if isinstance(tool, HasName) else tool for tool in tools]
+        tool_names = [tool.name if isinstance(tool, HasName) else tool for tool in tools]
 
-        found_tools = [tool for tool in tools if tool in requested_tools]
+        found_tools = [tool for tool in tool_names if tool in requested_tools]
 
         if len(found_tools) != len(requested_tools):
             error_message = (
                 dedent(
                     f"""Could not find all requested tools in the MCP server:
                     Requested ({len(requested_tools)}): {requested_tools}
-                    Set ({len(tools)}):   {tools}
+                    Set ({len(tool_names)}):   {tool_names}
                 """
                 ),
             )
