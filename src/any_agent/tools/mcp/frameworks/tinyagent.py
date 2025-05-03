@@ -71,7 +71,7 @@ class TinyAgentMCPConnection(MCPConnection, ABC):
         return tool_list
 
     def _create_tool_from_info(
-        self, tool: Tool, session: ClientSession
+        self, tool: Tool, session: "ClientSession"
     ) -> Callable[..., Any]:
         """Create a tool function from tool information."""
         tool_name = tool.name if hasattr(tool, "name") else tool

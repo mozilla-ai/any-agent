@@ -20,7 +20,7 @@ with suppress(ImportError):
 class SmolagentsMCPConnection(MCPConnection, ABC):
     """Base class for Smolagents MCP connections."""
 
-    _client: MCPClient | None = PrivateAttr(default=None)
+    _client: "MCPClient | None" = PrivateAttr(default=None)
 
     @abstractmethod
     async def list_tools(self) -> list[Tool]:

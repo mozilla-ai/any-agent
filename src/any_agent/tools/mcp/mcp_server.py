@@ -1,13 +1,15 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from agents.mcp.server import MCPServer
 from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 
 from .mcp_connection import MCPConnection
+
+if TYPE_CHECKING:
+    from agents.mcp.server import MCPServer
 
 
 class MCPServerBase(BaseModel, ABC):
@@ -35,7 +37,7 @@ class MCPServerBase(BaseModel, ABC):
         self.tools = await mcp_connection.list_tools()
 
     @property
-    def server(self) -> MCPServer:
+    def server(self) -> "MCPServer":
         """Return the MCP server instance."""
         if not self.mcp_connection or not self.mcp_connection.server:
             msg = "MCP server is not set up. Please call `_setup_tools` from a concrete class."

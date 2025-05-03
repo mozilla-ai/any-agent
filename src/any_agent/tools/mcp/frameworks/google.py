@@ -30,7 +30,7 @@ with suppress(ImportError):
 class GoogleMCPConnection(MCPConnection, ABC):
     """Base class for Google MCP connections."""
 
-    _params: GoogleStdioServerParameters | GoogleSseServerParameters | None = (
+    _params: "GoogleStdioServerParameters | GoogleSseServerParameters | None" = (
         PrivateAttr(default=None)
     )
 

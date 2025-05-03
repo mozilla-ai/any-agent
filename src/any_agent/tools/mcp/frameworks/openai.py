@@ -11,6 +11,7 @@ from any_agent.tools.mcp.mcp_server import MCPServerBase
 if TYPE_CHECKING:
     from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
     from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
+    from agents.mcp.server import MCPServer
 
 mcp_available = False
 with suppress(ImportError):
@@ -22,7 +23,6 @@ with suppress(ImportError):
     from agents.mcp import (
         MCPServerStdioParams as OpenAIInternalMCPServerStdioParams,
     )
-    from agents.mcp.server import MCPServer
 
     mcp_available = True
 
@@ -30,7 +30,7 @@ with suppress(ImportError):
 class OpenAIMCPConnection(MCPConnection, ABC):
     """Base class for OpenAI MCP connections."""
 
-    _server: OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None = (
+    _server: "OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None" = (
         PrivateAttr(default=None)
     )
 
@@ -46,7 +46,7 @@ class OpenAIMCPConnection(MCPConnection, ABC):
         return self._filter_tools(tools)  # type: ignore[return-value]
 
     @property
-    def server(self) -> MCPServer | None:
+    def server(self) -> "MCPServer | None":
         """Return the MCP server instance."""
         return self._server
 

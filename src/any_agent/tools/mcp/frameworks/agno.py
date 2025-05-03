@@ -24,7 +24,7 @@ with suppress(ImportError):
 
 
 class AgnoMCPConnection(MCPConnection, ABC):
-    _server: AgnoMCPTools | None = PrivateAttr(default=None)
+    _server: "AgnoMCPTools | None" = PrivateAttr(default=None)
 
     @abstractmethod
     async def list_tools(self) -> list[Tool]:

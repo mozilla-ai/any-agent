@@ -20,7 +20,7 @@ with suppress(ImportError):
 class LlamaIndexMCPConnection(MCPConnection, ABC):
     """Base class for LlamaIndex MCP connections."""
 
-    _client: LlamaIndexMCPClient | None = PrivateAttr(default=None)
+    _client: "LlamaIndexMCPClient | None" = PrivateAttr(default=None)
 
     @abstractmethod
     async def list_tools(self) -> list[Tool]:
