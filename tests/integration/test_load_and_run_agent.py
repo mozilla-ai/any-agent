@@ -112,10 +112,11 @@ def test_run_agent_twice(agent_framework: AgentFramework) -> None:
         AgentConfig(model_id="gpt-4.1-nano", model_args={"temperature": 0.0}),
     )
     result1 = agent.run("What is the capital of France?")
-    first_spans = result1.spans
     result2 = agent.run("What is the capital of Spain?")
-    second_spans = result2.spans
     assert result1.final_output != result2.final_output
-    assert second_spans[: len(first_spans)] != first_spans, (
-        "Spans from the first run should not be in the second"
-    )
+    if is_tracing_supported(agent_framework):
+        first_spans = result1.spans
+        second_spans = result2.spans
+        assert second_spans[: len(first_spans)] != first_spans, (
+            "Spans from the first run should not be in the second"
+        )

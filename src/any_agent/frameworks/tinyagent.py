@@ -199,6 +199,7 @@ class TinyAgent(AnyAgent):
             The final agent response
 
         """
+        self._setup_tracing()
         logger.debug("Running agent with prompt: %s...", prompt[:500])
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
         self.messages = [
