@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import PrivateAttr
 
-from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_connection import MCPConnection
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
@@ -13,17 +13,18 @@ mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
     from smolagents.mcp_client import MCPClient
+    from smolagents.tools import Tool as SmolagentsTool  # noqa: TC002
 
     mcp_available = True
 
 
-class SmolagentsMCPConnection(MCPConnection, ABC):
+class SmolagentsMCPConnection(MCPConnection["SmolagentsTool"], ABC):
     """Base class for Smolagents MCP connections."""
 
     _client: "MCPClient | None" = PrivateAttr(default=None)
 
     @abstractmethod
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["SmolagentsTool"]:
         """List tools from the MCP server."""
         if not self._client:
             msg = "Tool collection is not set up. Please call `list_tools` from a concrete class."
@@ -36,7 +37,7 @@ class SmolagentsMCPConnection(MCPConnection, ABC):
 class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):
     mcp_tool: MCPStdioParams
 
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["SmolagentsTool"]:
         """List tools from the MCP server."""
         server_parameters = StdioServerParameters(
             command=self.mcp_tool.command,
@@ -50,7 +51,7 @@ class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):
 class SmolagentsMCPSseConnection(SmolagentsMCPConnection):
     mcp_tool: MCPSseParams
 
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["SmolagentsTool"]:
         """List tools from the MCP server."""
         server_parameters = {
             "url": self.mcp_tool.url,
@@ -60,7 +61,7 @@ class SmolagentsMCPSseConnection(SmolagentsMCPConnection):
         return await super().list_tools()
 
 
-class SmolagentsMCPServerBase(MCPServerBase, ABC):
+class SmolagentsMCPServerBase(MCPServerBase["SmolagentsTool"], ABC):
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
 
     def _check_dependencies(self) -> None:
@@ -73,7 +74,9 @@ class SmolagentsMCPServerBase(MCPServerBase, ABC):
 class SmolagentsMCPServerStdio(SmolagentsMCPServerBase):
     mcp_tool: MCPStdioParams
 
-    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+    async def _setup_tools(
+        self, mcp_connection: MCPConnection["SmolagentsTool"] | None = None
+    ) -> None:
         mcp_connection = mcp_connection or SmolagentsMCPStdioConnection(
             mcp_tool=self.mcp_tool
         )
@@ -83,7 +86,9 @@ class SmolagentsMCPServerStdio(SmolagentsMCPServerBase):
 class SmolagentsMCPServerSse(SmolagentsMCPServerBase):
     mcp_tool: MCPSseParams
 
-    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+    async def _setup_tools(
+        self, mcp_connection: MCPConnection["SmolagentsTool"] | None = None
+    ) -> None:
         mcp_connection = mcp_connection or SmolagentsMCPSseConnection(
             mcp_tool=self.mcp_tool
         )
