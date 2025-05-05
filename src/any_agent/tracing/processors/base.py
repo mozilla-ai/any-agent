@@ -11,8 +11,7 @@ from any_agent.logging import logger
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
-    from any_agent import AnyAgentSpan
-    from any_agent.tracing.tracer import AnyAgentTrace
+    from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
 class TracingProcessor(ABC):
@@ -21,7 +20,9 @@ class TracingProcessor(ABC):
     MAX_EVIDENCE_LENGTH: ClassVar[int] = 400
 
     @classmethod
-    def create(cls, agent_framework_raw: AgentFramework | str) -> TracingProcessor:
+    def create(
+        cls, agent_framework_raw: AgentFramework | str
+    ) -> TracingProcessor | None:
         """Create the appropriate tracing processor."""
         agent_framework = AgentFramework.from_string(agent_framework_raw)
 
@@ -55,12 +56,12 @@ class TracingProcessor(ABC):
             or agent_framework is AgentFramework.AGNO
             or agent_framework is AgentFramework.TINYAGENT
         ):
-            raise NotImplementedError
+            return None
 
         assert_never(agent_framework)
 
     @abstractmethod
-    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+    def _extract_hypothesis_answer(self, trace: AgentTrace) -> str:
         """Extract the hypothesis agent final answer from the trace."""
 
     @abstractmethod
@@ -68,23 +69,23 @@ class TracingProcessor(ABC):
         """Get the agent type associated with this processor."""
 
     @abstractmethod
-    def _extract_llm_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
+    def _extract_llm_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type LLM."""
 
     @abstractmethod
-    def _extract_tool_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
+    def _extract_tool_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type TOOL."""
 
     @abstractmethod
-    def _extract_chain_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
+    def _extract_chain_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type CHAIN."""
 
     @abstractmethod
-    def _extract_agent_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
+    def _extract_agent_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type AGENT."""
 
     @staticmethod
-    def determine_agent_framework(trace: AnyAgentTrace) -> AgentFramework:
+    def determine_agent_framework(trace: AgentTrace) -> AgentFramework:
         """Determine the agent type based on the trace.
 
         These are not really stable ways to find it, because we're waiting on some
@@ -107,7 +108,7 @@ class TracingProcessor(ABC):
         msg = "Could not determine agent type from trace, or agent type not supported"
         raise ValueError(msg)
 
-    def extract_evidence(self, telemetry: AnyAgentTrace) -> str:
+    def extract_evidence(self, telemetry: AgentTrace) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
         return self._format_evidence(calls)
@@ -161,7 +162,7 @@ class TracingProcessor(ABC):
 
     def _extract_telemetry_data(
         self,
-        telemetry: AnyAgentTrace,
+        telemetry: AgentTrace,
     ) -> list[Mapping[str, Any]]:
         """Extract the agent-specific data from telemetry."""
         calls = []
@@ -173,7 +174,7 @@ class TracingProcessor(ABC):
 
     def extract_interaction(
         self,
-        span: AnyAgentSpan,
+        span: AgentSpan,
     ) -> tuple[str, Mapping[str, Any]]:
         """Extract interaction details from a span."""
         span_kind = span.attributes.get("openinference.span.kind", "")

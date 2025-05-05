@@ -1,11 +1,12 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent import AgentConfig, AgentFramework
 from any_agent.config import TracingConfig
-from any_agent.frameworks.any_agent import AgentResult
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
+
+from .any_agent import AnyAgent
 
 try:
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
@@ -21,6 +22,8 @@ except ImportError:
 if TYPE_CHECKING:
     from llama_index.core.agent.workflow.workflow_events import AgentOutput
     from llama_index.core.llms import LLM
+
+    from any_agent.tracing.trace import AgentTrace
 
 
 class LlamaIndexAgent(AnyAgent):
@@ -115,18 +118,15 @@ class LlamaIndexAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
+    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._create_tracer()
         result: AgentOutput = await self._agent.run(prompt, **kwargs)
         # assert that it's a TextBlock
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
             msg = f"Agent did not return a valid response: {result.response}"
             raise ValueError(msg)
-        return AgentResult(
-            final_output=result.response.blocks[0].text,
-            raw_responses=None,  # Llama Index isn't giving me the trace history in the result or the _agent.
-            trace=self._get_trace(),
-        )
+
+        self._exporter.trace.final_output = result.response.blocks[0].text
+        return self._exporter.trace

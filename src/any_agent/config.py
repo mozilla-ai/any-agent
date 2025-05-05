@@ -78,16 +78,9 @@ class TracingConfig(BaseModel):
     """Chain color in console logs"""
 
     @model_validator(mode="after")
-    def validate_enable_flags(self) -> Self:
-        if not self.console and not self.save:
-            msg = "At least one of `console` or `save` must be true"
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
     def validate_output_dir(self) -> Self:
         if self.save and not self.output_dir:
-            msg = "output_dir must be set if json is enabled"
+            msg = "output_dir must be set if `save` is enabled"
             raise ValueError(msg)
         return self
 

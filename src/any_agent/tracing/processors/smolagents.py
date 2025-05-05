@@ -1,10 +1,12 @@
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from any_agent import AgentFramework, AnyAgentSpan
+from any_agent import AgentFramework
+from any_agent.tracing.otel_types import StatusCode
 from any_agent.tracing.processors.base import TracingProcessor
-from any_agent.tracing.tracer import AnyAgentTrace
-from any_agent.tracing.types import StatusCode
+
+if TYPE_CHECKING:
+    from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
 class SmolagentsTracingProcessor(TracingProcessor):
@@ -13,7 +15,7 @@ class SmolagentsTracingProcessor(TracingProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS
 
-    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+    def _extract_hypothesis_answer(self, trace: "AgentTrace") -> str:
         for span in reversed(trace.spans):
             if span.attributes["openinference.span.kind"] == "AGENT":
                 return str(span.attributes["output.value"])
@@ -21,7 +23,7 @@ class SmolagentsTracingProcessor(TracingProcessor):
         msg = "No agent final answer found in trace"
         raise ValueError(msg)
 
-    def _extract_llm_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_llm_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
         attributes = span.attributes
         if not attributes:
@@ -58,7 +60,7 @@ class SmolagentsTracingProcessor(TracingProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_tool_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract tool interaction details from a span."""
         attributes = span.attributes
         if not attributes:
@@ -101,7 +103,7 @@ class SmolagentsTracingProcessor(TracingProcessor):
 
         return tool_info
 
-    def _extract_chain_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract chain interaction details from a CHAIN span."""
         attributes = span.attributes
         if not attributes:
@@ -142,7 +144,7 @@ class SmolagentsTracingProcessor(TracingProcessor):
 
         return chain_info
 
-    def _extract_agent_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract agent interaction details from an AGENT span."""
         attributes = span.attributes
         if not attributes:

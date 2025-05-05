@@ -1,11 +1,13 @@
 import contextlib
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from any_agent import AgentFramework, AnyAgentSpan
+from any_agent import AgentFramework
 from any_agent.logging import logger
 from any_agent.tracing.processors.base import TracingProcessor
-from any_agent.tracing.tracer import AnyAgentTrace
+
+if TYPE_CHECKING:
+    from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
 class OpenAITracingProcessor(TracingProcessor):
@@ -14,7 +16,7 @@ class OpenAITracingProcessor(TracingProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.OPENAI
 
-    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+    def _extract_hypothesis_answer(self, trace: "AgentTrace") -> str:
         for span in reversed(trace.spans):
             # Looking for the final response that has the summary answer
             if span.attributes.get("openinference.span.kind") == "LLM":
@@ -26,7 +28,7 @@ class OpenAITracingProcessor(TracingProcessor):
         logger.warning("No agent final answer found in trace")
         return "NO FINAL ANSWER FOUND"
 
-    def _extract_llm_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_llm_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         attributes = span.attributes
         if not attributes:
             msg = "Span attributes are empty"
@@ -51,7 +53,7 @@ class OpenAITracingProcessor(TracingProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_tool_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         attributes = span.attributes
         if not attributes:
             msg = "Span attributes are empty"
@@ -70,7 +72,7 @@ class OpenAITracingProcessor(TracingProcessor):
 
         return span_info
 
-    def _extract_agent_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract information from an AGENT span."""
         span_info: dict[str, Any] = {
             "type": "agent",
@@ -85,7 +87,7 @@ class OpenAITracingProcessor(TracingProcessor):
 
         return span_info
 
-    def _extract_chain_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract information from a CHAIN span."""
         attributes = span.attributes
         if not attributes:
