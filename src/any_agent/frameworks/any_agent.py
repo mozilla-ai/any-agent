@@ -180,6 +180,7 @@ class AnyAgent(ABC):
             logger.warning(
                 "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
             )
+            self._instrumenter = None
             return
 
         tracer_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
