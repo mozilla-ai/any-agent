@@ -12,8 +12,9 @@ def evaluation_case():
         ground_truth=[{"name": "Test Case 1", "value": 1.0, "points": 1.0}],
         checkpoints=[{"criteria": "Check if value is 1.0", "points": 1}],
         llm_judge="gpt-4o-mini",
-        final_answer_criteria=[]
+        final_answer_criteria=[],
     )
+
 
 @pytest.fixture
 def agent_trace():

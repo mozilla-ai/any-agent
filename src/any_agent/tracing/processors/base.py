@@ -83,7 +83,7 @@ class TracingProcessor(ABC):
     @abstractmethod
     def _extract_agent_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type AGENT."""
-        
+
     def extract_evidence(self, telemetry: AgentTrace) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
