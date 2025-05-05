@@ -6,6 +6,7 @@ import pytest
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
+from any_agent.tracing.trace import AgentTrace
 
 
 @pytest.mark.skipif(
@@ -83,3 +84,26 @@ def test_load_and_run_multi_agent(
         assert cost_sum.total_tokens > 0
         assert cost_sum.total_tokens < 20000
 
+    try:
+        agent_trace = agent.run("Which agent framework is the best?")
+
+        assert isinstance(agent_trace, AgentTrace)
+        assert agent_trace.final_output
+        if agent_framework not in (
+            AgentFramework.AGNO,
+            AgentFramework.GOOGLE,
+            AgentFramework.TINYAGENT,
+        ):
+            assert agent_trace.spans
+            assert len(agent_trace.spans) > 0
+            assert traces.exists()
+            trace_files = [str(x) for x in traces.iterdir()]
+            assert agent_trace.output_file in trace_files
+            assert agent_framework.name in agent_trace.output_file
+            cost_sum = agent_trace.get_total_cost()
+            assert cost_sum.total_cost > 0
+            assert cost_sum.total_cost < 1.00
+            assert cost_sum.total_tokens > 0
+            assert cost_sum.total_tokens < 20000
+    finally:
+        agent.exit()

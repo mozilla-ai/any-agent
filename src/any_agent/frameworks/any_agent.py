@@ -189,7 +189,6 @@ class AnyAgent(ABC):
         trace.set_tracer_provider(tracer_provider)
 
         self._instrumenter = self._get_instrumenter_by_framework(self.framework)
-        # TODO: Check if this has been already called by another instance.
         self._instrumenter.instrument(tracer_provider=tracer_provider)
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
@@ -229,3 +228,10 @@ class AnyAgent(ABC):
         """
         msg = "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
         raise NotImplementedError(msg)
+
+    def exit(self) -> None:
+        """Exit the agent and clean up resources."""
+        if getattr(self, "_instrumenter", None):
+            self._instrumenter.uninstrument()  # otherwise, this gets called in the __del__ method of Tracer
+            self._instrumenter = None
+        self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected

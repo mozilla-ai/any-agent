@@ -110,7 +110,7 @@ any LLM and provider using [LiteLLM](https://docs.litellm.ai/docs/) syntax.
 
 Learn more in the docs:
 
-- [Models](https://mozilla-ai.github.io/any-agent/frameworks/#models)
+- [Models](https://mozilla-ai.github.io/any-agent/agents/#model-id)
 - [Tools](https://mozilla-ai.github.io/any-agent/tools/)
 - [Instructions](https://mozilla-ai.github.io/any-agent/instructions/)
 - [Tracing](https://mozilla-ai.github.io/any-agent/tracing/)

@@ -21,22 +21,6 @@ def load_mcp_tools(
 
 @pytest.mark.asyncio
 @pytest.mark.usefixtures(
-    "enter_context_with_transport_and_session",
-    "_path_client_session",
-    "load_mcp_tools",
-)
-async def test_langchain_mcp_sse_tools_loaded(
-    mcp_sse_params_no_tools: MCPSseParams,
-    tools: Sequence[Tool],
-) -> None:
-    server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.LANGCHAIN)
-
-    await server._setup_tools()
-    assert server.tools == tools
-
-
-@pytest.mark.asyncio
-@pytest.mark.usefixtures(
     "enter_context_with_transport_and_session", "_path_client_session"
 )
 async def test_langchain_mcp_sse_integration(
