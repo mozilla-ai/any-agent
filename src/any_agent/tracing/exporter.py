@@ -2,8 +2,9 @@ import json
 import os
 from collections.abc import Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol, assert_never
 
+from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
     SpanExporter,
     SpanExportResult,
@@ -100,3 +101,45 @@ class AnyAgentExporter(SpanExporter):
                 )
 
         return SpanExportResult.SUCCESS
+
+
+
+class Instrumenter(Protocol):  # noqa: D101
+    def instrument(self, *, tracer_provider: TracerProvider) -> None: ...  # noqa: D102
+
+    def uninstrument(self) -> None: ...  # noqa: D102
+
+
+def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
+    """Get the instrumenter for the given agent framework."""
+    if framework is AgentFramework.OPENAI:
+        from openinference.instrumentation.openai_agents import (
+            OpenAIAgentsInstrumentor,
+        )
+
+        return OpenAIAgentsInstrumentor()
+
+    if framework is AgentFramework.SMOLAGENTS:
+        from openinference.instrumentation.smolagents import SmolagentsInstrumentor
+
+        return SmolagentsInstrumentor()
+
+    if framework is AgentFramework.LANGCHAIN:
+        from openinference.instrumentation.langchain import LangChainInstrumentor
+
+        return LangChainInstrumentor()
+
+    if framework is AgentFramework.LLAMA_INDEX:
+        from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+
+        return LlamaIndexInstrumentor()
+
+    if (
+        framework is AgentFramework.GOOGLE
+        or framework is AgentFramework.AGNO
+        or framework is AgentFramework.TINYAGENT
+    ):
+        msg = f"{framework} tracing is not supported."
+        raise NotImplementedError(msg)
+
+    assert_never(framework)

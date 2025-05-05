@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Protocol, assert_never
+from typing import TYPE_CHECKING, Any, assert_never
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
@@ -11,7 +11,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing.exporter import AnyAgentExporter
+from any_agent.tracing.exporter import AnyAgentExporter, get_instrumenter_by_framework
 from any_agent.tracing.trace import is_tracing_supported
 
 if TYPE_CHECKING:
@@ -20,11 +20,6 @@ if TYPE_CHECKING:
     from any_agent.tools.mcp.mcp_server import MCPServerBase
     from any_agent.tracing.trace import AgentTrace
 
-
-class Instrumenter(Protocol):  # noqa: D101
-    def instrument(self, *, tracer_provider: TracerProvider) -> None: ...
-
-    def uninstrument(self) -> None: ...
 
 
 class AnyAgent(ABC):
@@ -48,39 +43,6 @@ class AnyAgent(ABC):
         self._tracing_config: TracingConfig = tracing or TracingConfig()
         self._setup_tracing()
 
-    @staticmethod
-    def _get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
-        if framework is AgentFramework.OPENAI:
-            from openinference.instrumentation.openai_agents import (
-                OpenAIAgentsInstrumentor,
-            )
-
-            return OpenAIAgentsInstrumentor()
-
-        if framework is AgentFramework.SMOLAGENTS:
-            from openinference.instrumentation.smolagents import SmolagentsInstrumentor
-
-            return SmolagentsInstrumentor()
-
-        if framework is AgentFramework.LANGCHAIN:
-            from openinference.instrumentation.langchain import LangChainInstrumentor
-
-            return LangChainInstrumentor()
-
-        if framework is AgentFramework.LLAMA_INDEX:
-            from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
-
-            return LlamaIndexInstrumentor()
-
-        if (
-            framework is AgentFramework.GOOGLE
-            or framework is AgentFramework.AGNO
-            or framework is AgentFramework.TINYAGENT
-        ):
-            msg = f"{framework} tracing is not supported."
-            raise NotImplementedError(msg)
-
-        assert_never(framework)
 
     @staticmethod
     def _get_agent_type_by_framework(
@@ -184,7 +146,7 @@ class AnyAgent(ABC):
 
         trace.set_tracer_provider(tracer_provider)
 
-        self._instrumenter = self._get_instrumenter_by_framework(self.framework)
+        self._instrumenter = get_instrumenter_by_framework(self.framework)
         self._instrumenter.instrument(tracer_provider=tracer_provider)
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
