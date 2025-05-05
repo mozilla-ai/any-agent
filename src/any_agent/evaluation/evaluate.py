@@ -10,23 +10,24 @@ from any_agent.evaluation.results_saver import save_evaluation_results
 from any_agent.evaluation.test_case import TestCase
 from any_agent.logging import logger
 from any_agent.tracing.processors.base import TracingProcessor
-from any_agent.tracing.tracer import AnyAgentSpan, AnyAgentTrace
+from any_agent.tracing.trace import AgentTrace
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> None:
     with open(telemetry_path) as f:
-        spans: list[AnyAgentSpan] = json.loads(f.read())
-        telemetry = AnyAgentTrace(spans=spans)
+        spans = json.loads(f.read())
+        telemetry = AgentTrace(spans=spans)
     logger.info(f"Telemetry loaded from {telemetry_path}")
 
     agent_framework = TracingProcessor.determine_agent_framework(telemetry)
 
     processor = TracingProcessor.create(agent_framework)
+    assert processor
     hypothesis_answer = processor._extract_hypothesis_answer(trace=telemetry)
 
     checkpoint_evaluator = CheckpointEvaluator(model=test_case.llm_judge)
     checkpoint_results = checkpoint_evaluator.evaluate(
-        telemetry=telemetry,
+        trace=telemetry,
         checkpoints=test_case.checkpoints,
         processor=processor,
     )

@@ -138,5 +138,5 @@ class LangchainAgent(AnyAgent):
             msg = "No messages returned from the agent."
             raise ValueError(msg)
         last_message: BaseMessage = result["messages"][-1]
-        self._exporter.trace.final_output = last_message.content
+        self._exporter.trace.final_output = str(last_message.content)
         return self._exporter.trace
