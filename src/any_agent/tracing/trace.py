@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.config import AgentFramework
 from any_agent.logging import logger
