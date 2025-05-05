@@ -39,6 +39,6 @@ def test_tracer_with_unsupported_framework(tmp_path: Path) -> None:
         Tracer(
             agent_framework=AgentFramework.AGNO,
             tracing_config=TracingConfig(
-                output_dir=str(tmp_path / "traces"), enable_console=False
+                output_dir=str(tmp_path / "traces"), console=False
             ),
         )

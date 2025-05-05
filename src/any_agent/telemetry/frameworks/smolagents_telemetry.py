@@ -1,9 +1,10 @@
 import json
-from collections.abc import Mapping, Sequence
 from typing import Any
 
-from any_agent import AgentFramework
+from any_agent import AgentFramework, AnyAgentSpan
 from any_agent.telemetry import TelemetryProcessor
+from any_agent.telemetry.types import StatusCode
+from any_agent.tracing import AnyAgentTrace
 
 
 class SmolagentsTelemetryProcessor(TelemetryProcessor):
@@ -12,17 +13,20 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS
 
-    def _extract_hypothesis_answer(self, trace: Sequence[Mapping[str, Any]]) -> str:
-        for span in reversed(trace):
-            if span["attributes"]["openinference.span.kind"] == "AGENT":
-                return str(span["attributes"]["output.value"])
+    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+        for span in reversed(trace.spans):
+            if span.attributes["openinference.span.kind"] == "AGENT":
+                return str(span.attributes["output.value"])
 
         msg = "No agent final answer found in trace"
         raise ValueError(msg)
 
-    def _extract_llm_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_llm_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
-        attributes = span.get("attributes", {})
+        attributes = span.attributes
+        if not attributes:
+            msg = "Span attributes are empty"
+            raise ValueError(msg)
         span_info = {
             "model": attributes.get("llm.model_name", "Unknown model"),
             "type": "reasoning",
@@ -54,15 +58,18 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_tool_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract tool interaction details from a span."""
-        attributes = span.get("attributes", {})
+        attributes = span.attributes
+        if not attributes:
+            msg = "Span attributes are empty"
+            raise ValueError(msg)
         tool_info = {
-            "tool_name": attributes.get("tool.name", span.get("name", "Unknown tool")),
+            "tool_name": attributes.get("tool.name", span.name),
             "status": "success"
-            if span.get("status", {}).get("status_code") == "OK"
+            if span.status.status_code is StatusCode.OK
             else "error",
-            "error": span.get("status", {}).get("description", None),
+            "error": span.status.description,
         }
 
         # Extract input if available
@@ -94,16 +101,19 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return tool_info
 
-    def _extract_chain_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract chain interaction details from a CHAIN span."""
-        attributes = span.get("attributes", {})
-        status = span.get("status", {})
-        events = span.get("events", [])
+        attributes = span.attributes
+        if not attributes:
+            msg = "Span attributes are empty"
+            raise ValueError(msg)
+        status = span.status
+        events = span.events
 
-        chain_info = {
+        chain_info: dict[str, Any] = {
             "type": "chain",
-            "name": span.get("name", "Unknown chain"),
-            "status": "success" if status.get("status_code") == "OK" else "error",
+            "name": span.name,
+            "status": "success" if status.status_code is StatusCode.OK else "error",
         }
 
         # Extract input if available
@@ -115,13 +125,15 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
                 chain_info["input"] = attributes["input.value"]
 
         # Extract error information if present
-        if status.get("status_code") == "ERROR":
-            chain_info["error"] = status.get("description", "Unknown error")
+        if status.status_code == StatusCode.ERROR:
+            chain_info["error"] = status.description
 
             # Try to extract more detailed error info from events
             for event in events:
-                if event.get("name") == "exception":
-                    event_attrs = event.get("attributes", {})
+                if event.name == "exception":
+                    event_attrs = event.attributes
+                    if event_attrs is None:
+                        continue
                     if "exception.type" in event_attrs:
                         chain_info["error_type"] = event_attrs["exception.type"]
                     if "exception.message" in event_attrs:
@@ -130,15 +142,18 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
 
         return chain_info
 
-    def _extract_agent_interaction(self, span: Mapping[str, Any]) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
         """Extract agent interaction details from an AGENT span."""
-        attributes = span.get("attributes", {})
-        status = span.get("status", {})
+        attributes = span.attributes
+        if not attributes:
+            msg = "Span attributes are empty"
+            raise ValueError(msg)
+        status = span.status
 
-        agent_info = {
+        agent_info: dict[str, Any] = {
             "type": "agent",
-            "name": span.get("name", "Unknown agent"),
-            "status": "success" if status.get("status_code") == "OK" else "error",
+            "name": span.name,
+            "status": "success" if status.status_code == StatusCode.OK else "error",
         }
 
         # Extract input if available

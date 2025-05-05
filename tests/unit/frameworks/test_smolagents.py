@@ -3,10 +3,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.frameworks.smolagents import (
-    DEFAULT_AGENT_TYPE,
-    DEFAULT_MODEL_CLASS,
-)
 from any_agent.tools import search_web, visit_webpage
 
 
@@ -16,8 +12,8 @@ def test_load_smolagent_default() -> None:
     mock_tool = MagicMock()
 
     with (
-        patch(f"smolagents.{DEFAULT_AGENT_TYPE}", mock_agent),
-        patch(f"smolagents.{DEFAULT_MODEL_CLASS}", mock_model),
+        patch("any_agent.frameworks.smolagents.DEFAULT_AGENT_TYPE", mock_agent),
+        patch("any_agent.frameworks.smolagents.DEFAULT_MODEL_TYPE", mock_model),
         patch("smolagents.tool", mock_tool),
     ):
         AnyAgent.create(
@@ -45,8 +41,8 @@ def test_load_smolagent_with_api_base() -> None:
     mock_tool = MagicMock()
 
     with (
-        patch(f"smolagents.{DEFAULT_AGENT_TYPE}", mock_agent),
-        patch(f"smolagents.{DEFAULT_MODEL_CLASS}", mock_model),
+        patch("any_agent.frameworks.smolagents.DEFAULT_AGENT_TYPE", mock_agent),
+        patch("any_agent.frameworks.smolagents.DEFAULT_MODEL_TYPE", mock_model),
         patch("smolagents.tool", mock_tool),
     ):
         AnyAgent.create(
@@ -82,8 +78,8 @@ def test_run_smolagent_custom_args() -> None:
     mock_agent = MagicMock()
     mock_agent.return_value = MagicMock()
     with (
-        patch(f"smolagents.{DEFAULT_AGENT_TYPE}", mock_agent),
-        patch(f"smolagents.{DEFAULT_MODEL_CLASS}"),
+        patch("any_agent.frameworks.smolagents.DEFAULT_AGENT_TYPE", mock_agent),
+        patch("any_agent.frameworks.smolagents.DEFAULT_MODEL_TYPE"),
         patch("smolagents.tool"),
     ):
         agent = AnyAgent.create(

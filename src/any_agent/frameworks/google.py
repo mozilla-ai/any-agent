@@ -1,21 +1,26 @@
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
 
 try:
-    from google.adk.agents import Agent
+    from google.adk.agents.llm_agent import LlmAgent
     from google.adk.models.lite_llm import LiteLlm
     from google.adk.runners import InMemoryRunner
     from google.adk.tools.agent_tool import AgentTool
     from google.genai import types
 
+    DEFAULT_MODEL_TYPE = LiteLlm
     adk_available = True
 except ImportError:
     adk_available = False
+
+if TYPE_CHECKING:
+    from google.adk.models.base_llm import BaseLlm
 
 
 class GoogleAgent(AnyAgent):
@@ -25,17 +30,19 @@ class GoogleAgent(AnyAgent):
         self,
         config: AgentConfig,
         managed_agents: Sequence[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents)
-        self._agent: Agent | None = None
+        super().__init__(config, managed_agents, tracing)
+        self._agent: LlmAgent | None = None
 
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.GOOGLE
 
-    def _get_model(self, agent_config: AgentConfig) -> LiteLlm:
+    def _get_model(self, agent_config: AgentConfig) -> "BaseLlm":
         """Get the model configuration for a Google agent."""
-        return LiteLlm(
+        model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        return model_type(
             model=agent_config.model_id,
             api_key=agent_config.api_key,
             api_base=agent_config.api_base,
@@ -60,7 +67,8 @@ class GoogleAgent(AnyAgent):
             for managed_agent in self.managed_agents:
                 managed_tools, _ = await self._load_tools(managed_agent.tools)
 
-                instance = Agent(
+                agent_type = managed_agent.agent_type or LlmAgent
+                instance = agent_type(
                     name=managed_agent.name,
                     instruction=managed_agent.instructions or "",
                     model=self._get_model(managed_agent),
@@ -72,13 +80,13 @@ class GoogleAgent(AnyAgent):
                     sub_agents_instanced.append(instance)
                 else:
                     tools.append(AgentTool(instance))
-
-        self._agent = Agent(
+        agent_type = self.config.agent_type or LlmAgent
+        self._agent = agent_type(
             name=self.config.name,
             instruction=self.config.instructions or "",
             model=self._get_model(self.config),
             tools=tools,
-            sub_agents=sub_agents_instanced,  # type: ignore[arg-type]
+            sub_agents=sub_agents_instanced,
             **self.config.agent_args or {},
             output_key="response",
         )
@@ -94,7 +102,7 @@ class GoogleAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-
+        self._create_tracer()
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
@@ -123,4 +131,8 @@ class GoogleAgent(AnyAgent):
         assert session, "Session should not be None"
         response = session.state.get("response", None)
 
-        return AgentResult(final_output=response, raw_responses=session.events)
+        return AgentResult(
+            final_output=response,
+            raw_responses=session.events,
+            trace=self._get_trace(),
+        )

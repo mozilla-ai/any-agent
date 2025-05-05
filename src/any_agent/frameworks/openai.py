@@ -1,6 +1,6 @@
 from typing import Any
 
-from any_agent.config import AgentConfig, AgentFramework
+from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.tools import search_web, visit_webpage
 
@@ -8,10 +8,13 @@ try:
     from agents import (
         Agent,
         Handoff,
+        Model,
         ModelSettings,
         Runner,
     )
     from agents.extensions.models.litellm_model import LitellmModel
+
+    DEFAULT_MODEL_TYPE = LitellmModel
 
     agents_available = True
 except ImportError:
@@ -25,8 +28,9 @@ class OpenAIAgent(AnyAgent):
         self,
         config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
+        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents)
+        super().__init__(config, managed_agents, tracing)
         self._agent: Agent | None = None
 
     @property
@@ -36,9 +40,10 @@ class OpenAIAgent(AnyAgent):
     def _get_model(
         self,
         agent_config: AgentConfig,
-    ) -> LitellmModel:
+    ) -> "Model":
         """Get the model configuration for an OpenAI agent."""
-        return LitellmModel(
+        model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        return model_type(
             model=agent_config.model_id,
             base_url=agent_config.api_base,
             api_key=agent_config.api_key,
@@ -77,7 +82,7 @@ class OpenAIAgent(AnyAgent):
                     model=self._get_model(managed_agent),
                     tools=managed_tools,
                     mcp_servers=[
-                        managed_mcp_server.server  # type: ignore[attr-defined]
+                        managed_mcp_server.server
                         for managed_mcp_server in managed_mcp_servers
                     ],
                     **kwargs,  # type: ignore[arg-type]
@@ -102,7 +107,7 @@ class OpenAIAgent(AnyAgent):
             model=self._get_model(self.config),
             handoffs=handoffs,
             tools=tools,
-            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],  # type: ignore[attr-defined]
+            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,
         )
 
@@ -120,9 +125,10 @@ class OpenAIAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-
+        self._create_tracer()
         result = await Runner.run(self._agent, prompt, **kwargs)
         return AgentResult(
             final_output=result.final_output,
             raw_responses=result.raw_responses,
+            trace=self._get_trace(),
         )
