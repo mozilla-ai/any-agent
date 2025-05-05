@@ -18,6 +18,7 @@ def test_files_all(fpath: pathlib.Path) -> None:
             "any_agent.evaluation.evaluation_runner.save_evaluation_results",
             return_value=None,
         ),
+        patch("any_agent.evaluation.evaluation_runner.EvaluationRunner.run"),
         patch("any_agent.AnyAgent.create", mock_create),
         patch("any_agent.AnyAgent.create_async", mock_create_async),
     ):
