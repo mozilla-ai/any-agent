@@ -82,7 +82,7 @@ class OpenAIAgent(AnyAgent):
                     model=self._get_model(managed_agent),
                     tools=managed_tools,
                     mcp_servers=[
-                        managed_mcp_server.server  # type: ignore[attr-defined]
+                        managed_mcp_server.server
                         for managed_mcp_server in managed_mcp_servers
                     ],
                     **kwargs,  # type: ignore[arg-type]
@@ -107,7 +107,7 @@ class OpenAIAgent(AnyAgent):
             model=self._get_model(self.config),
             handoffs=handoffs,
             tools=tools,
-            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],  # type: ignore[attr-defined]
+            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,
         )
 

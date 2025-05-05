@@ -1,9 +1,17 @@
 import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
-from typing import Any, Literal
+from typing import Literal
 
-from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
+from pydantic import PrivateAttr
+
+from any_agent.config import (
+    AgentFramework,
+    MCPSseParams,
+    MCPStdioParams,
+    Tool,
+)
+from any_agent.tools.mcp.mcp_connection import MCPConnection
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
@@ -19,8 +27,52 @@ with suppress(ImportError):
     mcp_available = True
 
 
+class GoogleMCPConnection(MCPConnection, ABC):
+    """Base class for Google MCP connections."""
+
+    _params: "GoogleStdioServerParameters | GoogleSseServerParameters | None" = (
+        PrivateAttr(default=None)
+    )
+
+    @abstractmethod
+    async def list_tools(self) -> list[Tool]:
+        """List tools from the MCP server."""
+        if not self._params:
+            msg = "MCP params is not set up. Please call `list_tools` from a concrete class."
+            raise ValueError(msg)
+
+        server = GoogleMCPToolset(connection_params=self._params)
+        await self._exit_stack.enter_async_context(server)
+        tools = await server.load_tools()
+        return self._filter_tools(tools)  # type: ignore[return-value]
+
+
+class GoogleMCPStdioConnection(GoogleMCPConnection):
+    mcp_tool: MCPStdioParams
+
+    async def list_tools(self) -> list[Tool]:
+        """List tools from the MCP server."""
+        self._params = GoogleStdioServerParameters(
+            command=self.mcp_tool.command,
+            args=list(self.mcp_tool.args),
+            env={**os.environ},
+        )
+        return await super().list_tools()
+
+
+class GoogleMCPSseConnection(GoogleMCPConnection):
+    mcp_tool: MCPSseParams
+
+    async def list_tools(self) -> list[Tool]:
+        """List tools from the MCP server."""
+        self._params = GoogleSseServerParameters(
+            url=self.mcp_tool.url,
+            headers=dict(self.mcp_tool.headers or {}),
+        )
+        return await super().list_tools()
+
+
 class GoogleMCPServerBase(MCPServerBase, ABC):
-    server: Any | None = None  # Using `Any` to avoid circular import issues
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
 
     def _check_dependencies(self) -> None:
@@ -29,44 +81,25 @@ class GoogleMCPServerBase(MCPServerBase, ABC):
         self.mcp_available = mcp_available
         super()._check_dependencies()
 
-    @abstractmethod
-    async def _setup_tools(self) -> None:
-        """Set up the Google MCP server with the provided configuration."""
-        if not self.server:
-            msg = "MCP server is not set up. Please call `setup` from a concrete class."
-            raise ValueError(msg)
-
-        await self._exit_stack.enter_async_context(self.server)
-        self.tools = await self.server.load_tools()
-
-        self.tools = self._filter_tools(self.tools)
-
 
 class GoogleMCPServerStdio(GoogleMCPServerBase):
     mcp_tool: MCPStdioParams
 
-    async def _setup_tools(self) -> None:
-        params = GoogleStdioServerParameters(
-            command=self.mcp_tool.command,
-            args=list(self.mcp_tool.args),
-            env={**os.environ},
+    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+        mcp_connection = mcp_connection or GoogleMCPStdioConnection(
+            mcp_tool=self.mcp_tool
         )
-        self.server = GoogleMCPToolset(connection_params=params)
-
-        await super()._setup_tools()
+        await super()._setup_tools(mcp_connection)
 
 
 class GoogleMCPServerSse(GoogleMCPServerBase):
     mcp_tool: MCPSseParams
 
-    async def _setup_tools(self) -> None:
-        params = GoogleSseServerParameters(
-            url=self.mcp_tool.url,
-            headers=dict(self.mcp_tool.headers or {}),
+    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+        mcp_connection = mcp_connection or GoogleMCPSseConnection(
+            mcp_tool=self.mcp_tool
         )
-        self.server = GoogleMCPToolset(connection_params=params)
-
-        await super()._setup_tools()
+        await super()._setup_tools(mcp_connection)
 
 
 GoogleMCPServer = GoogleMCPServerStdio | GoogleMCPServerSse

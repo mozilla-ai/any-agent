@@ -7,8 +7,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from mcp import Tool as MCPTool
 from mcp.client.session import ClientSession
+from pydantic import Field
+from pytest_lazy_fixtures import lf
 
-from any_agent.config import MCPSseParams, MCPStdioParams, Tool
+from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams, Tool
+from any_agent.tools import MCPConnection
 
 
 class Toolset(Protocol):
@@ -103,3 +106,23 @@ def _patch_client_session_list_tools(mcp_tools: Sequence[MCPTool]) -> Generator[
 @pytest.fixture
 def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSseParams:
     return MCPSseParams(url=echo_sse_server["url"], tools=tools)
+
+
+class FakeMCPConnection(MCPConnection):
+    mcp_tool: None = None  # type: ignore[assignment]
+    tools: Sequence[Tool] = Field(default_factory=list)
+
+    async def list_tools(self) -> list[Tool]:
+        return list(self.tools)
+
+
+@pytest.fixture
+def mcp_connection(tools: Sequence[Tool]) -> MCPConnection:
+    return FakeMCPConnection(tools=tools)
+
+
+@pytest.fixture(
+    params=[lf("stdio_params"), lf("mcp_sse_params_with_tools")], ids=["STDIO", "SSE"]
+)
+def mcp_params(request: pytest.FixtureRequest) -> MCPParams:
+    return request.param  # type: ignore[no-any-return]
