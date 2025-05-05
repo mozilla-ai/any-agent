@@ -10,8 +10,8 @@ from any_agent.tracing.trace import AgentTrace
 
 def test_save_evaluation_results_creates_file(
     evaluation_case: EvaluationCase, agent_trace: AgentTrace, tmp_path: Path
-):
-    output_path = tmp_path / "test_output.json"
+) -> None:
+    output_path = str(tmp_path / "test_output.json")
 
     save_evaluation_results(
         evaluation_case=evaluation_case,
@@ -32,8 +32,8 @@ def test_save_evaluation_results_creates_file(
 
 def test_save_evaluation_results_writes_correct_data(
     evaluation_case: EvaluationCase, agent_trace: AgentTrace, tmp_path: Path
-):
-    output_path = tmp_path / "test_output.json"
+) -> None:
+    output_path = str(tmp_path / "test_output.json")
     if os.path.exists(output_path):
         os.remove(output_path)  # Clean up before test
 

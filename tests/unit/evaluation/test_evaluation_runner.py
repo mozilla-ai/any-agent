@@ -8,8 +8,8 @@ from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.tracing.trace import AgentTrace
 
 
-def test_runner_add_case(evaluation_case: EvaluationCase, tmp_path: Path):
-    output_path = tmp_path / "test_output"
+def test_runner_add_case(evaluation_case: EvaluationCase, tmp_path: Path) -> None:
+    output_path = str(tmp_path / "test_output")
     runner = EvaluationRunner(output_path)
 
     # Add the test case
@@ -33,29 +33,29 @@ def test_runner_add_case(evaluation_case: EvaluationCase, tmp_path: Path):
     )
 
 
-def test_evaluation_runner_add_trace(agent_trace: AgentTrace, tmp_path: Path):
-    output_path = tmp_path / "test_output"
+def test_evaluation_runner_add_trace(agent_trace: AgentTrace, tmp_path: Path) -> None:
+    output_path = str(tmp_path / "test_output")
     runner = EvaluationRunner(output_path)
 
-    runner.add_trace(agent_trace, "OPENAI")
+    runner.add_trace(agent_trace, AgentFramework.OPENAI)
     assert len(runner._traces) == 1, "Trace should be added to the runner."
 
-    runner.add_trace(agent_trace, "OPENAI")
+    runner.add_trace(agent_trace, AgentFramework.OPENAI)
     assert len(runner._traces) == 1, "Trace should not be added again."
 
     second_trace = agent_trace.model_copy(deep=True)
     second_trace.spans[0].name = "Different Span"
-    runner.add_trace(second_trace, "OPENAI")
+    runner.add_trace(second_trace, AgentFramework.OPENAI)
     assert len(runner._traces) == 2, "Second trace should be added to the runner."
 
 
 def test_evaluation_runner_runs_all_cases(
     evaluation_case: EvaluationCase, agent_trace: AgentTrace, tmp_path: Path
-):
+) -> None:
     """This unit test is designed to ensure that the EvaluationRunner properly iterates over all the traces and eval cases"""
 
     ### Set up the Runner and add the traces and eval cases
-    output_path = tmp_path / "test_output"
+    output_path = str(tmp_path / "test_output")
     runner = EvaluationRunner(output_path)
 
     second_case = evaluation_case.model_copy(deep=True)
