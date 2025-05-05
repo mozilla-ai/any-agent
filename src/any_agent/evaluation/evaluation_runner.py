@@ -1,7 +1,7 @@
-import json
 from textwrap import dedent
 
 from any_agent.config import AgentFramework
+from any_agent.evaluation.evaluation_case import EvaluationCase
 from any_agent.evaluation.evaluators import (
     CheckpointEvaluator,
     HypothesisEvaluator,
@@ -9,50 +9,47 @@ from any_agent.evaluation.evaluators import (
 )
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.results_saver import save_evaluation_results
-from any_agent.evaluation.test_case import TestCase
 from any_agent.logging import logger
 from any_agent.tracing import TracingProcessor
-from any_agent.tracing.trace import AgentSpan, AgentTrace
+from any_agent.tracing.trace import AgentTrace
 
 
 class EvaluationRunner:
-    def __init__(self) -> None:
-        self._test_cases: list[TestCase] = []
-        self._telemetry_paths: list[tuple[str, AgentFramework]] = []
+    def __init__(self, output_path: str = "output") -> None:
+        self._evaluation_cases: list[EvaluationCase] = []
+        self._traces: list[AgentTrace] = []
+        self._trace_frameworks: list[AgentFramework] = []
         self.checkpoint_evaluator: CheckpointEvaluator | None = None
         self.hypothesis_evaluator: HypothesisEvaluator | None = None
         self.qa_evaluator: QuestionAnsweringSquadEvaluator | None = None
+        self.output_path: str = output_path
 
-    def _setup_evaluators(self, test_case: TestCase) -> None:
-        self.checkpoint_evaluator = CheckpointEvaluator(model=test_case.llm_judge)
-        self.hypothesis_evaluator = HypothesisEvaluator(model=test_case.llm_judge)
+    def _setup_evaluators(self, evaluation_case: EvaluationCase) -> None:
+        self.checkpoint_evaluator = CheckpointEvaluator(model=evaluation_case.llm_judge)
+        self.hypothesis_evaluator = HypothesisEvaluator(model=evaluation_case.llm_judge)
         self.qa_evaluator = QuestionAnsweringSquadEvaluator()
 
-    def add_test_case(self, test_case_path: str) -> None:
+    def add_evaluation_case(self, evaluation_case: EvaluationCase) -> None:
         """Add test case file path to the evaluation runner."""
-        test_case = TestCase.from_yaml(test_case_path)
-        if test_case not in self._test_cases:
-            self._test_cases.append(test_case)
+        if evaluation_case not in self._evaluation_cases:
+            self._evaluation_cases.append(evaluation_case)
         else:
-            logger.warning("Test case %s already added.", test_case_path)
+            logger.warning("Test case %s already added.", evaluation_case)
 
-    def add_telemetry(
-        self, telemetry_path: str, agent_framework: AgentFramework
-    ) -> None:
+    def add_trace(self, trace: AgentTrace, agent_framework: AgentFramework) -> None:
         """Add telemetry file path to the evaluation runner."""
-        if telemetry_path not in [t[1] for t in self._telemetry_paths]:
-            self._telemetry_paths.append((telemetry_path, agent_framework))
+        if trace not in self._traces:
+            self._traces.append(trace)
+            self._trace_frameworks.append(agent_framework)
         else:
-            logger.warning("Telemetry %salready added.", telemetry_path)
+            logger.warning("Telemetry %salready added.", trace)
 
-    def _run_telemetry_eval(
-        self, test_case: TestCase, telemetry_path: str, agent_framework: AgentFramework
+    def _run_trace_eval(
+        self,
+        evaluation_case: EvaluationCase,
+        trace: AgentTrace,
+        agent_framework: AgentFramework,
     ) -> None:
-        with open(telemetry_path, encoding="utf-8") as f:
-            spans = json.loads(f.read())
-        spans = [AgentSpan.model_validate_json(span) for span in spans]
-        trace = AgentTrace(spans=spans)
-        logger.info("Telemetry loaded from %s", telemetry_path)
         processor = TracingProcessor.create(agent_framework)
         if not processor:
             msg = f"Processor for {agent_framework} not available."
@@ -63,7 +60,7 @@ class EvaluationRunner:
             raise ValueError(msg)
         checkpoint_results = self.checkpoint_evaluator.evaluate(
             trace=trace,
-            checkpoints=test_case.checkpoints,
+            checkpoints=evaluation_case.checkpoints,
             processor=processor,
         )
         if not self.hypothesis_evaluator:
@@ -71,23 +68,23 @@ class EvaluationRunner:
             raise ValueError(msg)
         hypothesis_answer_results = self.hypothesis_evaluator.evaluate(
             hypothesis_final_answer=hypothesis_answer,
-            ground_truth_answer_dict=test_case.ground_truth,
-            ground_truth_checkpoints=test_case.final_answer_criteria,
+            ground_truth_answer_dict=evaluation_case.ground_truth,
+            ground_truth_checkpoints=evaluation_case.final_answer_criteria,
         )
 
-        if test_case.ground_truth:
+        if evaluation_case.ground_truth:
             if not self.qa_evaluator:
                 msg = "QuestionAnsweringSquadEvaluator not initialized."
                 raise ValueError(msg)
             direct_results = self.qa_evaluator.evaluate(
                 hypothesis_answer=hypothesis_answer,
-                ground_truth_answer=test_case.ground_truth,
+                ground_truth_answer=evaluation_case.ground_truth,
             )
         else:
             direct_results = []
         self._compile_results(
-            test_case=test_case,
-            telemetry_path=telemetry_path,
+            evaluation_case=evaluation_case,
+            trace=trace,
             hypothesis_answer=hypothesis_answer,
             checkpoint_results=checkpoint_results,
             hypothesis_answer_results=hypothesis_answer_results,
@@ -96,8 +93,8 @@ class EvaluationRunner:
 
     def _compile_results(
         self,
-        test_case: TestCase,
-        telemetry_path: str,
+        evaluation_case: EvaluationCase,
+        trace: AgentTrace,
         hypothesis_answer: str,
         checkpoint_results: list[EvaluationResult],
         hypothesis_answer_results: list[EvaluationResult],
@@ -149,22 +146,24 @@ class EvaluationRunner:
 
         # Save the evaluation results
         save_evaluation_results(
-            test_case=test_case,
-            output_path=test_case.output_path,
+            evaluation_case=evaluation_case,
+            output_path=self.output_path,
             output_message=output_message,
-            telemetry_path=telemetry_path,
+            trace=trace,
             hypothesis_answer=hypothesis_answer,
             passed_checks=len(passed_checks),
             failed_checks=len(failed_checks),
             score=score,
         )
 
-    def _run_test_case(self, test_case: TestCase) -> None:
-        self._setup_evaluators(test_case)
-        for telemetry_path, agent_framework in self._telemetry_paths:
-            self._run_telemetry_eval(test_case, telemetry_path, agent_framework)
+    def _run_evaluation_case(self, evaluation_case: EvaluationCase) -> None:
+        self._setup_evaluators(evaluation_case)
+        for trace, agent_framework in zip(
+            self._traces, self._trace_frameworks, strict=True
+        ):
+            self._run_trace_eval(evaluation_case, trace, agent_framework)
 
     def run(self) -> None:
         """Run the evaluation for all test cases."""
-        for test_case in self._test_cases:
-            self._run_test_case(test_case)
+        for evaluation_case in self._evaluation_cases:
+            self._run_evaluation_case(evaluation_case)

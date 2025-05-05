@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+# This can't go into a TYPE_CHECKING block because it's used at runtime by Pydantic to build the fields
 from collections.abc import Sequence  # noqa: TC003
 
 import yaml
@@ -22,7 +23,7 @@ class GroundTruthAnswer(TypedDict):
     points: float
 
 
-class TestCase(BaseModel):
+class EvaluationCase(BaseModel):
     model_config = ConfigDict(extra="forbid")
     ground_truth: Sequence[GroundTruthAnswer] = Field(
         default_factory=list[GroundTruthAnswer],
@@ -34,14 +35,13 @@ class TestCase(BaseModel):
     final_answer_criteria: Sequence[CheckpointCriteria] = Field(
         default_factory=list[CheckpointCriteria],
     )
-    test_case_path: str
-    output_path: str = "output/results.json"
+    evaluation_case_path: str | None = None
 
     @classmethod
-    def from_yaml(cls, test_case_path: str) -> TestCase:
+    def from_yaml(cls, evaluation_case_path: str) -> EvaluationCase:
         """Load a test case from a YAML file and process it."""
-        with open(test_case_path) as f:
-            test_case_dict = yaml.safe_load(f)
+        with open(evaluation_case_path, encoding="utf-8") as f:
+            evaluation_case_dict = yaml.safe_load(f)
         final_answer_criteria = []
 
         def add_gt_final_answer_criteria(
@@ -61,17 +61,17 @@ class TestCase(BaseModel):
                         },
                     )
 
-        if "ground_truth" in test_case_dict:
-            add_gt_final_answer_criteria(test_case_dict["ground_truth"])
-            test_case_dict["final_answer_criteria"] = final_answer_criteria
+        if "ground_truth" in evaluation_case_dict:
+            add_gt_final_answer_criteria(evaluation_case_dict["ground_truth"])
+            evaluation_case_dict["final_answer_criteria"] = final_answer_criteria
             # remove the points from the ground_truth list but keep the name and value
-            test_case_dict["ground_truth"] = [
+            evaluation_case_dict["ground_truth"] = [
                 item
-                for item in test_case_dict["ground_truth"]
+                for item in evaluation_case_dict["ground_truth"]
                 if isinstance(item, dict)
             ]
 
-        test_case_dict["test_case_path"] = test_case_path
+        evaluation_case_dict["evaluation_case_path"] = evaluation_case_path
         # verify that the llm_judge is a valid litellm model
-        validate_environment(test_case_dict["llm_judge"])
-        return cls.model_validate(test_case_dict)
+        validate_environment(evaluation_case_dict["llm_judge"])
+        return cls.model_validate(evaluation_case_dict)

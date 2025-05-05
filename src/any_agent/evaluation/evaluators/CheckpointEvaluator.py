@@ -1,9 +1,9 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
+from any_agent.evaluation.evaluation_case import CheckpointCriteria
 from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
-from any_agent.evaluation.test_case import CheckpointCriteria
 from any_agent.logging import logger
 from any_agent.tracing.processors.base import TracingProcessor
 

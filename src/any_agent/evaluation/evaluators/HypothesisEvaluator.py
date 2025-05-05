@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 
+from any_agent.evaluation.evaluation_case import CheckpointCriteria, GroundTruthAnswer
 from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
-from any_agent.evaluation.test_case import CheckpointCriteria, GroundTruthAnswer
 
 
 class HypothesisEvaluator(LLMEvaluator):
