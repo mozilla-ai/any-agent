@@ -1,10 +1,12 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
 from opentelemetry.sdk.trace import ReadableSpan
 
 from any_agent.config import AgentFramework, TracingConfig
 from any_agent.tracing.exporter import AnyAgentExporter
+from any_agent.tracing.trace import AgentTrace, is_tracing_supported
 
 
 def test_exporter_initialization(
@@ -83,3 +85,34 @@ def test_rich_console_cost_info_disabled(llm_span: ReadableSpan):  # type: ignor
             "cost_completion",
         ):
             assert key not in attributes
+
+
+def test_save_trace(
+    agent_framework: AgentFramework, llm_span: ReadableSpan, tmp_path: Path
+) -> None:
+    if not is_tracing_supported(agent_framework):
+        pytest.skip(
+            f"Tracing is not supported for {agent_framework.name}. Skipping test."
+        )
+    #  This test assumes that these attributes are set in the span when the test starts
+    assert llm_span.attributes
+    assert llm_span.attributes.get("cost_prompt") is None
+    assert llm_span.attributes.get("cost_completion") is None
+
+    exporter = AnyAgentExporter(
+        agent_framework=AgentFramework.LANGCHAIN,
+        tracing_config=TracingConfig(
+            output_dir=str(tmp_path), console=False, save=True, cost_info=True
+        ),
+    )
+    exporter.export([llm_span])
+    exporter.export([llm_span])
+    assert exporter.trace.output_file
+    # make sure that we can load it back
+    with open(exporter.trace.output_file, encoding="utf-8") as f:
+        trace_str = f.read()
+    trace = AgentTrace.model_validate_json(trace_str)
+    assert len(trace.spans) == 2
+    assert trace.spans == exporter.trace.spans
+    assert trace.output_file == exporter.trace.output_file
+    assert trace.final_output is None

@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from any_agent.config import AgentFramework
 from any_agent.logging import logger
@@ -138,7 +138,7 @@ class AgentSpan(BaseModel):
 class AgentTrace(BaseModel):
     """A trace that can be exported to JSON or printed to the console."""
 
-    spans: list[AgentSpan] = Field(default_factory=list)
+    spans: list[AgentSpan] = []
     output_file: str | None = None
     final_output: str | None = None
 
@@ -181,6 +181,15 @@ class AgentTrace(BaseModel):
             total_cost_prompt=total_cost_prompt,
             total_cost_completion=total_cost_completion,
         )
+
+    def add_span(self, span: AgentSpan) -> None:
+        """Add a span to the trace."""
+        self.spans.append(span)
+
+    def save(self, output_path: str) -> None:
+        """Save the trace to a JSON file."""
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(self.model_dump_json(indent=2))
 
 
 def is_tracing_supported(agent_framework: AgentFramework) -> bool:

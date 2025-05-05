@@ -1,8 +1,8 @@
 import json
 import os
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import datetime
-from typing import TYPE_CHECKING, Protocol, assert_never
+from typing import TYPE_CHECKING, Any, Protocol, assert_never
 
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -34,30 +34,56 @@ class AnyAgentExporter(SpanExporter):
         self.agent_framework = agent_framework
         self.tracing_config = tracing_config
         self.trace: AgentTrace = AgentTrace()
+        self.output_file: str | None = None
         self.processor: TracingProcessor | None = TracingProcessor.create(
             agent_framework
         )
         self.console: Console | None = None
 
+        if self.tracing_config.console:
+            self.console = Console()
+
         if self.tracing_config.save:
             if not os.path.exists(self.tracing_config.output_dir):
                 os.makedirs(self.tracing_config.output_dir)
+            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+            self.output_file = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
+            # Currently, we pass this file back to the user via the AgentTrace object returned by agent.run.
+            # This is flaky since nothing prevents the user from moving the file after it's saved, which then would
+            # invalidate the path that is saved with the trace
+            self.trace.output_file = self.output_file
 
-        if self.tracing_config.console:
-            self.console = Console()
+    def print_to_console(self, span_kind: str, interaction: Mapping[str, Any]) -> None:
+        """Print the span to the console."""
+        if not self.console:
+            msg = "Console is not initialized"
+            raise RuntimeError(msg)
+        style = getattr(self.tracing_config, span_kind.lower(), None)
+        if not style:
+            logger.debug("No style for %s", span_kind)
+            return
+        if not interaction:
+            logger.debug("No interaction for %s", span_kind)
+            return
+
+        self.console.rule(span_kind, style=style)
+
+        for key, value in interaction.items():
+            if key == "output":
+                self.console.print(
+                    Panel(
+                        Markdown(str(value or "")),
+                        title="Output",
+                    ),
+                )
+            else:
+                self.console.print(f"{key}: {value}")
+
+        self.console.rule(style=style)
 
     def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:  # noqa: D102
         if not self.processor:
             return SpanExportResult.SUCCESS
-
-        if self.tracing_config.save and not self.trace.output_file:
-            # Init the value on the first `export` call.
-            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-            output_file = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
-            if not os.path.exists(output_file):
-                with open(output_file, "w", encoding="utf-8") as f:
-                    json.dump([], f)
-            self.trace.output_file = output_file
 
         for readable_span in spans:
             span = AgentSpan.from_readable_span(readable_span)
@@ -66,39 +92,20 @@ class AnyAgentExporter(SpanExporter):
                 if span_kind == "LLM" and self.tracing_config.cost_info:
                     span.add_cost_info()
 
-                self.trace.spans.append(span)
+                self.trace.add_span(span)
 
                 if self.tracing_config.console and self.console:
-                    style = getattr(self.tracing_config, span_kind.lower(), None)
-                    if not style or interaction == {}:
-                        continue
-
-                    self.console.rule(span_kind, style=style)
-
-                    for key, value in interaction.items():
-                        if key == "output":
-                            self.console.print(
-                                Panel(
-                                    Markdown(str(value or "")),
-                                    title="Output",
-                                ),
-                            )
-                        else:
-                            self.console.print(f"{key}: {value}")
-
-                    self.console.rule(style=style)
+                    self.print_to_console(span_kind, interaction)
 
             except (json.JSONDecodeError, TypeError, AttributeError) as e:
                 logger.warning("Failed to parse span data, %s, %s", span, e)
                 continue
 
-        if self.tracing_config.save and self.trace.output_file:
-            with open(self.trace.output_file, "w", encoding="utf-8") as f:
-                json.dump(
-                    [span.model_dump_json() for span in self.trace.spans],
-                    f,
-                    indent=2,
-                )
+        if self.tracing_config.save:
+            if not self.output_file:
+                msg = "Output file is not set"
+                raise RuntimeError(msg)
+            self.trace.save(self.output_file)
 
         return SpanExportResult.SUCCESS
 
