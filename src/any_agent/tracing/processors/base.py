@@ -84,9 +84,9 @@ class TracingProcessor(ABC):
     def _extract_agent_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type AGENT."""
 
-    def extract_evidence(self, telemetry: AgentTrace) -> str:
-        """Extract relevant telemetry evidence."""
-        calls = self._extract_telemetry_data(telemetry)
+    def extract_evidence(self, trace: AgentTrace) -> str:
+        """Extract relevant evidence."""
+        calls = self._extract_tracing_data(trace)
         return self._format_evidence(calls)
 
     def _format_evidence(self, calls: Sequence[Mapping[str, Any]]) -> str:
@@ -136,14 +136,14 @@ class TracingProcessor(ABC):
 
         return result
 
-    def _extract_telemetry_data(
+    def _extract_trace_data(
         self,
-        telemetry: AgentTrace,
+        trace: AgentTrace,
     ) -> list[Mapping[str, Any]]:
-        """Extract the agent-specific data from telemetry."""
+        """Extract the agent-specific data from trace."""
         calls = []
 
-        for span in telemetry.spans:
+        for span in trace.spans:
             calls.append(self.extract_interaction(span)[1])
 
         return calls

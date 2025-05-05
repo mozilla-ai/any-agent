@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class OpenAITracingProcessor(TracingProcessor):
-    """Processor for OpenAI agent telemetry data."""
+    """Processor for OpenAI agent trace."""
 
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.OPENAI

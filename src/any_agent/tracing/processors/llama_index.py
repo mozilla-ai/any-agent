@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class LlamaIndexTracingProcessor(TracingProcessor):
-    """Processor for LlamaIndex agent telemetry data."""
+    """Processor for LlamaIndex agent trace."""
 
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LLAMA_INDEX

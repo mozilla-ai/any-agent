@@ -10,7 +10,7 @@ class HypothesisEvaluator(LLMEvaluator):
 
     def evaluate(
         self,
-        hypothesis_final_answer: str,
+        hypothesis_final_output: str,
         ground_truth_answer_dict: Sequence[GroundTruthAnswer],
         ground_truth_checkpoints: Sequence[CheckpointCriteria],
     ) -> list[EvaluationResult]:
@@ -22,7 +22,7 @@ class HypothesisEvaluator(LLMEvaluator):
                 criteria=criterion.criteria,
                 points=criterion.points,
                 ground_truth_output=ground_truth_answer_dict,
-                hypothesis_final_answer=hypothesis_final_answer,
+                hypothesis_final_output=hypothesis_final_output,
             )
 
             results.append(evaluation)

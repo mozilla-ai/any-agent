@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class SmolagentsTracingProcessor(TracingProcessor):
-    """Processor for SmoL Agents telemetry data."""
+    """Processor for SmoL Agents trace."""
 
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS

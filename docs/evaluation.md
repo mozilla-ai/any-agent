@@ -34,9 +34,7 @@ agent = AnyAgent.create(
 )
 
 agent_trace = agent.run("How many seconds would it take for a leopard at full speed to run through Pont des Arts?")
-# If doing an evaluation via a separate python process, the trace can also be dumped to a json file:
-# with open("agent_trace.json", "w", encoding="utf-8") as f:
-#     f.write(agent_trace.model_dump_json(indent=2))
+
 ```
 
 
@@ -59,7 +57,7 @@ agent_trace = agent.run("How many seconds would it take for a leopard at full sp
             ground_truth=[{"name": "Test Case 1", "value": 1.0, "points": 1.0}],
             checkpoints=[{"criteria": "Check if value is 1.0", "points": 1}],
             llm_judge="gpt-4o-mini",
-            final_answer_criteria=[]
+            final_output_criteria=[]
     )
     ```
 
@@ -73,7 +71,7 @@ evaluation_case = EvaluationCase(
     ground_truth=[{"name": "Test Case 1", "value": 1.0, "points": 1.0}],
     checkpoints=[{"criteria": "Check if value is 1.0", "points": 1}],
     llm_judge="gpt-4o-mini",
-    final_answer_criteria=[]
+    final_output_criteria=[]
 )
 runner = EvaluationRunner(output_path=output_path)
 runner.add_evaluation_case(evaluation_case)
@@ -85,7 +83,7 @@ The output will look something like this:
 ```text
 Passed:
 - Ensure that the agent called the search_web tool in order to retrieve the length of Pont des Arts
-- The agent called the search_web tool with the query 'Pont des Arts length' as indicated in the telemetry evidence.
+- The agent called the search_web tool with the query 'Pont des Arts length' as indicated in the trace evidence.
 
 Passed:
 - Ensure that the agent ran a python snippet to combine the information from the info retrieved from the web searches
@@ -122,6 +120,6 @@ It can be called like so
 ```bash
 any-agent-evaluate \
     --evaluation_case_paths="['docs/examples/evaluation_case.yaml']" \
-    --telemetry_paths "['tests/unit/evaluation/sample_traces/OPENAI.json']" \
+    --trace_paths "['tests/unit/evaluation/sample_traces/OPENAI.json']" \
     --agent_framework 'OPENAI'
 ```

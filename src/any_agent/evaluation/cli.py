@@ -11,7 +11,7 @@ from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 def do_eval(
     evaluation_case_paths: list[str],
-    telemetry_paths: list[str],
+    trace_paths: list[str],
     agent_framework: AgentFramework,
     output_path: str = "output/results.json",
 ) -> None:
@@ -23,9 +23,9 @@ def do_eval(
         evaluation_case = EvaluationCase.from_yaml(evaluation_case_path)
         runner.add_evaluation_case(evaluation_case)
 
-    for telemetry_path in telemetry_paths:
-        logger.info("Loading telemetry from %s", telemetry_path)
-        with open(telemetry_path, encoding="utf-8") as f:
+    for trace_path in trace_paths:
+        logger.info("Loading tracing from %s", trace_path)
+        with open(trace_path, encoding="utf-8") as f:
             spans = json.loads(f.read())
         spans = [AgentSpan.model_validate_json(span) for span in spans]
         trace = AgentTrace(spans=spans)

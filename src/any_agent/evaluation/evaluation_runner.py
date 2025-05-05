@@ -37,12 +37,12 @@ class EvaluationRunner:
             logger.warning("Test case %s already added.", evaluation_case)
 
     def add_trace(self, trace: AgentTrace, agent_framework: AgentFramework) -> None:
-        """Add telemetry file path to the evaluation runner."""
+        """Add trace file path to the evaluation runner."""
         if trace not in self._traces:
             self._traces.append(trace)
             self._trace_frameworks.append(agent_framework)
         else:
-            logger.warning("Telemetry %salready added.", trace)
+            logger.warning("trace %salready added.", trace)
 
     def _run_trace_eval(
         self,
@@ -67,9 +67,9 @@ class EvaluationRunner:
             msg = "HypothesisEvaluator not initialized."
             raise ValueError(msg)
         hypothesis_answer_results = self.hypothesis_evaluator.evaluate(
-            hypothesis_final_answer=hypothesis_answer,
+            hypothesis_final_output=hypothesis_answer,
             ground_truth_answer_dict=evaluation_case.ground_truth,
-            ground_truth_checkpoints=evaluation_case.final_answer_criteria,
+            ground_truth_checkpoints=evaluation_case.final_output_criteria,
         )
 
         if evaluation_case.ground_truth:

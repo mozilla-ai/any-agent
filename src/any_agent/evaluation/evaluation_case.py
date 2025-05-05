@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-# This can't go into a TYPE_CHECKING block because it's used at runtime by Pydantic to build the fields
-from collections.abc import Sequence  # noqa: TC003
-
 import yaml
 from litellm.utils import validate_environment
 from pydantic import BaseModel, ConfigDict, Field
@@ -25,14 +22,14 @@ class GroundTruthAnswer(TypedDict):
 
 class EvaluationCase(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    ground_truth: Sequence[GroundTruthAnswer] = Field(
+    ground_truth: list[GroundTruthAnswer] = Field(
         default_factory=list[GroundTruthAnswer],
     )
-    checkpoints: Sequence[CheckpointCriteria] = Field(
+    checkpoints: list[CheckpointCriteria] = Field(
         default_factory=list[CheckpointCriteria],
     )
     llm_judge: str
-    final_answer_criteria: Sequence[CheckpointCriteria] = Field(
+    final_output_criteria: list[CheckpointCriteria] = Field(
         default_factory=list[CheckpointCriteria],
     )
     evaluation_case_path: str | None = None
@@ -42,10 +39,10 @@ class EvaluationCase(BaseModel):
         """Load a test case from a YAML file and process it."""
         with open(evaluation_case_path, encoding="utf-8") as f:
             evaluation_case_dict = yaml.safe_load(f)
-        final_answer_criteria = []
+        final_output_criteria = []
 
-        def add_gt_final_answer_criteria(
-            ground_truth_list: Sequence[GroundTruthAnswer],
+        def add_gt_final_output_criteria(
+            ground_truth_list: list[GroundTruthAnswer],
         ) -> None:
             """Add checkpoints for each item in the ground_truth list."""
             for item in ground_truth_list:
@@ -54,7 +51,7 @@ class EvaluationCase(BaseModel):
                         "points",
                         1,
                     )  # Default to 1 if points not specified
-                    final_answer_criteria.append(
+                    final_output_criteria.append(
                         {
                             "points": points,
                             "criteria": f"Check if {item['name']} is approximately '{item['value']}'.",
@@ -62,8 +59,8 @@ class EvaluationCase(BaseModel):
                     )
 
         if "ground_truth" in evaluation_case_dict:
-            add_gt_final_answer_criteria(evaluation_case_dict["ground_truth"])
-            evaluation_case_dict["final_answer_criteria"] = final_answer_criteria
+            add_gt_final_output_criteria(evaluation_case_dict["ground_truth"])
+            evaluation_case_dict["final_output_criteria"] = final_output_criteria
             # remove the points from the ground_truth list but keep the name and value
             evaluation_case_dict["ground_truth"] = [
                 item

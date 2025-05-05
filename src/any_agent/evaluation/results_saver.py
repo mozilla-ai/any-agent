@@ -26,7 +26,7 @@ def save_evaluation_results(
         agent_config: Path to the agent configuration file
         output_path: Path to save the results
         output_message: Formatted output message with evaluation details
-        trace: The telemetry trace
+        trace: The trace
         hypothesis_answer: The extracted hypothesis answer
         passed_checks: Number of passed checkpoints
         failed_checks: Number of failed checkpoints

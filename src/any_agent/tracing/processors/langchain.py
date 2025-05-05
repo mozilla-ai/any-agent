@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class LangchainTracingProcessor(TracingProcessor):
-    """Processor for Langchain agent telemetry data."""
+    """Processor for Langchain agent trace data."""
 
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN

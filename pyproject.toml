@@ -20,6 +20,7 @@ dependencies = [
   "requests",
   "rich",
   "evaluate",
+  "fire",
 ]
 
 [project.optional-dependencies]
@@ -59,7 +60,7 @@ agno = [
 ]
 
 all = [
-  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp,evaluation]",
+  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp]",
 ]
 
 docs = [
@@ -81,10 +82,6 @@ tests = [
 dev = [
   "any-agent[docs,tests]",
   "pre-commit",
-]
-
-evaluation = [
-  "fire",
 ]
 
 [project.urls]
