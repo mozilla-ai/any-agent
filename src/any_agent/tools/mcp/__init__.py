@@ -9,6 +9,7 @@ from .frameworks import (
     TinyAgentMCPServer,
     _get_mcp_server,
 )
+from .mcp_connection import MCPConnection
 from .mcp_server import MCPServerBase
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     "GoogleMCPServer",
     "LangchainMCPServer",
     "LlamaIndexMCPServer",
+    "MCPConnection",
     "MCPServer",
     "MCPServerBase",
     "OpenAIMCPServer",

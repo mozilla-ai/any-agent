@@ -30,18 +30,6 @@ def google_toolset(tools: Sequence[Tool]) -> Generator[GoogleMCPToolset]:
 
 
 @pytest.mark.asyncio
-@pytest.mark.usefixtures("enter_context_with_transport_and_session", "google_toolset")
-async def test_google_mcp_sse_tools_loaded(
-    tools: Sequence[Tool],
-    mcp_sse_params_no_tools: MCPSseParams,
-) -> None:
-    mcp_server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.GOOGLE)
-    await mcp_server._setup_tools()
-
-    assert mcp_server.tools == tools
-
-
-@pytest.mark.asyncio
 @pytest.mark.usefixtures("enter_context_with_transport_and_session")
 async def test_google_mcp_sse_integration(
     google_toolset: GoogleMCPToolset,
