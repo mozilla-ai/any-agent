@@ -12,6 +12,7 @@ from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.exporter import AnyAgentExporter
+from any_agent.tracing.trace import is_tracing_supported
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -71,11 +72,7 @@ class AnyAgent(ABC):
 
             return LlamaIndexInstrumentor()
 
-        if (
-            framework is AgentFramework.GOOGLE
-            or framework is AgentFramework.AGNO
-            or framework is AgentFramework.TINYAGENT
-        ):
+        if not is_tracing_supported(framework):
             msg = f"{framework} tracing is not supported."
             raise NotImplementedError(msg)
 
@@ -172,11 +169,7 @@ class AnyAgent(ABC):
 
         # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
         # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-        if self.framework in (
-            AgentFramework.AGNO,
-            AgentFramework.GOOGLE,
-            AgentFramework.TINYAGENT,
-        ):
+        if not is_tracing_supported(self.framework):
             logger.warning(
                 "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
             )

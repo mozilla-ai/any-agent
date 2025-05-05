@@ -3,17 +3,13 @@ from opentelemetry.sdk.trace import ReadableSpan
 
 from any_agent import AgentFramework
 from any_agent.tracing import TracingProcessor
-from any_agent.tracing.trace import AgentSpan
+from any_agent.tracing.trace import AgentSpan, is_tracing_supported
 
 
 def test_extract_interaction(
     agent_framework: AgentFramework, llm_span: ReadableSpan
 ) -> None:
-    if agent_framework in (
-        AgentFramework.AGNO,
-        AgentFramework.GOOGLE,
-        AgentFramework.TINYAGENT,
-    ):
+    if not is_tracing_supported(agent_framework):
         pytest.skip()
     processor = TracingProcessor.create(AgentFramework(agent_framework))
     # to make mypy happy

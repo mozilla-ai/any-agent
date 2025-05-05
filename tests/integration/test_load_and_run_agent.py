@@ -8,7 +8,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdioParams
-from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.trace import AgentTrace, is_tracing_supported
 
 
 def check_uvx_installed() -> bool:
@@ -89,11 +89,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert content == str(datetime.now().year)
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-        if agent_framework not in (
-            AgentFramework.AGNO,
-            AgentFramework.GOOGLE,
-            AgentFramework.TINYAGENT,
-        ):
+        if is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
             assert traces.exists()
@@ -107,3 +103,17 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             assert cost_sum.total_tokens < 20000
     finally:
         agent.exit()
+
+
+def test_run_agent_twice(agent_framework: AgentFramework) -> None:
+    """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
+    agent = AnyAgent.create(
+        agent_framework,
+        AgentConfig(model_id="gpt-4.1-nano", model_args={"temperature": 0.0}),
+    )
+    result1 = agent.run("What is the capital of France?")
+    first_spans = result1.spans
+    result2 = agent.run("What is the capital of Spain?")
+    second_spans = result2.spans
+    assert result1.final_output != result2.final_output
+    assert second_spans[: len(first_spans)] != first_spans, "Spans from the first run should not be in the second"

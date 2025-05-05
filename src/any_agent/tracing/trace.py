@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 from litellm.cost_calculator import cost_per_token
 from pydantic import BaseModel, ConfigDict, Field
 
+from any_agent.config import AgentFramework
 from any_agent.logging import logger
 
 from .otel_types import (
@@ -180,3 +181,16 @@ class AgentTrace(BaseModel):
             total_cost_prompt=total_cost_prompt,
             total_cost_completion=total_cost_completion,
         )
+
+
+def is_tracing_supported(agent_framework: AgentFramework) -> bool:
+    """Check if tracing is supported for the given agent framework."""
+    # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
+    # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
+    if agent_framework in (
+        AgentFramework.AGNO,
+        AgentFramework.GOOGLE,
+        AgentFramework.TINYAGENT,
+    ):
+        return False
+    return True

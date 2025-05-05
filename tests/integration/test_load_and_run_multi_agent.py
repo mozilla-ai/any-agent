@@ -6,7 +6,7 @@ import pytest
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.trace import AgentTrace, is_tracing_supported
 
 
 @pytest.mark.skipif(
@@ -69,11 +69,7 @@ def test_load_and_run_multi_agent(
 
     assert agent_trace
     assert agent_trace.final_output
-    if agent_framework not in (
-        AgentFramework.AGNO,
-        AgentFramework.GOOGLE,
-        AgentFramework.TINYAGENT,
-    ):
+    if is_tracing_supported(agent_framework):
         assert agent_trace.spans
         assert len(agent_trace.spans) > 0
         assert traces.exists()
@@ -91,11 +87,7 @@ def test_load_and_run_multi_agent(
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-        if agent_framework not in (
-            AgentFramework.AGNO,
-            AgentFramework.GOOGLE,
-            AgentFramework.TINYAGENT,
-        ):
+        if is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
             assert traces.exists()
