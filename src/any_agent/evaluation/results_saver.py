@@ -32,6 +32,9 @@ def save_evaluation_results(
         score: Evaluation score as a percentage
 
     """
+    # Ensure the output directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
     # See if the output_path file exists
     if os.path.exists(output_path):
         logger.info(f"Reading existing output from {output_path}")

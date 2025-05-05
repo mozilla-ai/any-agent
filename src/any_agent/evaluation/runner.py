@@ -1,7 +1,7 @@
 import json
 from textwrap import dedent
-from typing import Any
 
+from any_agent.config import AgentFramework
 from any_agent.evaluation.evaluators import (
     CheckpointEvaluator,
     HypothesisEvaluator,
@@ -11,13 +11,14 @@ from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.results_saver import save_evaluation_results
 from any_agent.evaluation.test_case import TestCase
 from any_agent.logging import logger
-from any_agent.telemetry import TelemetryProcessor
+from any_agent.tracing import TracingProcessor
+from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
 class EvaluationRunner:
     def __init__(self) -> None:
         self._test_cases: list[TestCase] = []
-        self._telemetry_paths: list[str] = []
+        self._telemetry_paths: list[tuple[str, AgentFramework]] = []
         self.checkpoint_evaluator: CheckpointEvaluator | None = None
         self.hypothesis_evaluator: HypothesisEvaluator | None = None
         self.qa_evaluator: QuestionAnsweringSquadEvaluator | None = None
@@ -33,29 +34,35 @@ class EvaluationRunner:
         if test_case not in self._test_cases:
             self._test_cases.append(test_case)
         else:
-            logger.warning(f"Test case {test_case_path} already added.")
+            logger.warning("Test case %s already added.", test_case_path)
 
-    def add_telemetry(self, telemetry_path: str) -> None:
+    def add_telemetry(
+        self, telemetry_path: str, agent_framework: AgentFramework
+    ) -> None:
         """Add telemetry file path to the evaluation runner."""
-        if telemetry_path not in self._telemetry_paths:
-            self._telemetry_paths.append(telemetry_path)
+        if telemetry_path not in [t[1] for t in self._telemetry_paths]:
+            self._telemetry_paths.append((telemetry_path, agent_framework))
         else:
-            logger.warning(f"Telemetry {telemetry_path} already added.")
+            logger.warning("Telemetry %salready added.", telemetry_path)
 
-    def _run_telemetry_eval(self, test_case: TestCase, telemetry_path: str) -> None:
-        with open(telemetry_path) as f:
-            telemetry: list[dict[str, Any]] = json.loads(f.read())
-        logger.info(f"Telemetry loaded from {telemetry_path}")
-
-        agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)
-
-        processor = TelemetryProcessor.create(agent_framework)
-        hypothesis_answer = processor._extract_hypothesis_answer(trace=telemetry)
+    def _run_telemetry_eval(
+        self, test_case: TestCase, telemetry_path: str, agent_framework: AgentFramework
+    ) -> None:
+        with open(telemetry_path, encoding="utf-8") as f:
+            spans = json.loads(f.read())
+        spans = [AgentSpan.model_validate_json(span) for span in spans]
+        trace = AgentTrace(spans=spans)
+        logger.info("Telemetry loaded from %s", telemetry_path)
+        processor = TracingProcessor.create(agent_framework)
+        if not processor:
+            msg = f"Processor for {agent_framework} not available."
+            raise ValueError(msg)
+        hypothesis_answer = processor._extract_hypothesis_answer(trace=trace)
         if not self.checkpoint_evaluator:
             msg = "CheckpointEvaluator not initialized."
             raise ValueError(msg)
         checkpoint_results = self.checkpoint_evaluator.evaluate(
-            telemetry=telemetry,
+            trace=trace,
             checkpoints=test_case.checkpoints,
             processor=processor,
         )
@@ -154,8 +161,8 @@ class EvaluationRunner:
 
     def _run_test_case(self, test_case: TestCase) -> None:
         self._setup_evaluators(test_case)
-        for telemetry_path in self._telemetry_paths:
-            self._run_telemetry_eval(test_case, telemetry_path)
+        for telemetry_path, agent_framework in self._telemetry_paths:
+            self._run_telemetry_eval(test_case, telemetry_path, agent_framework)
 
     def run(self) -> None:
         """Run the evaluation for all test cases."""

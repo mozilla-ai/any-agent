@@ -84,30 +84,6 @@ class TracingProcessor(ABC):
     def _extract_agent_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type AGENT."""
 
-    @staticmethod
-    def determine_agent_framework(trace: AgentTrace) -> AgentFramework:
-        """Determine the agent type based on the trace.
-
-        These are not really stable ways to find it, because we're waiting on some
-        reliable method for determining the agent type. This is a temporary solution.
-        """
-        for span in trace.spans:
-            # This is extremely fragile but there currently isn't
-            # any specific key to indicate the agent type
-            if span.name == "response":
-                logger.info("Agent type is OPENAI")
-                return AgentFramework.OPENAI
-            if isinstance(
-                span.attributes.get("input.value"), str
-            ) and "langchain" in str(span.attributes["input.value"]):
-                logger.info("Agent type is LANGCHAIN")
-                return AgentFramework.LANGCHAIN
-            if isinstance(span.attributes.get("smolagents.max_steps"), str):
-                logger.info("Agent type is SMOLAGENTS")
-                return AgentFramework.SMOLAGENTS
-        msg = "Could not determine agent type from trace, or agent type not supported"
-        raise ValueError(msg)
-
     def extract_evidence(self, telemetry: AgentTrace) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
