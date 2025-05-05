@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 class AnyAgentExporter(SpanExporter):
     """Build an `AgentTrace` and export to the different outputs."""
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         agent_framework: AgentFramework,
         tracing_config: TracingConfig,
@@ -67,7 +67,7 @@ class AnyAgentExporter(SpanExporter):
 
                 self.trace.spans.append(span)
 
-                if self.tracing_config.console:
+                if self.tracing_config.console and self.console:
                     style = getattr(self.tracing_config, span_kind.lower(), None)
                     if not style or interaction == {}:
                         continue
@@ -91,7 +91,7 @@ class AnyAgentExporter(SpanExporter):
                 logger.warning("Failed to parse span data, %s, %s", span, e)
                 continue
 
-        if self.tracing_config.save:
+        if self.tracing_config.save and self.trace.output_file:
             with open(self.trace.output_file, "w", encoding="utf-8") as f:
                 json.dump(
                     [span.model_dump_json() for span in self.trace.spans],

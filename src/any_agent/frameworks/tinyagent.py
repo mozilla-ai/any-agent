@@ -112,7 +112,7 @@ class TinyAgent(AnyAgent):
         if managed_agents:
             msg = "Managed agents are not supported in TinyAgent."
             raise ValueError(msg)
-        super().__init__(config, managed_agents=managed_agents, tracing_config=tracing)
+        super().__init__(config, managed_agents=managed_agents, tracing=tracing)
         self.messages: list[dict[str, Any]] = []
         self.instructions = config.instructions or DEFAULT_SYSTEM_PROMPT
         self.api_key = config.api_key

@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 class CountInfo(BaseModel):
     """Token Count information."""
 
-    token_count_prompt: float
-    token_count_completion: float
+    token_count_prompt: int
+    token_count_completion: int
 
     model_config = ConfigDict(extra="forbid")
 
@@ -66,7 +66,7 @@ def extract_token_use_and_cost(
     if not span_info:
         return None
 
-    new_info: dict[str, AttributeValue] = {}
+    new_info: dict[str, float] = {}
     try:
         cost_prompt, cost_completion = cost_per_token(
             model=str(attributes.get("llm.model_name", "")),

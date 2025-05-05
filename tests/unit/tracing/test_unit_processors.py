@@ -6,7 +6,7 @@ from any_agent.tracing import TracingProcessor
 from any_agent.tracing.trace import AgentSpan
 
 
-def test_telemetry_extract_interaction(
+def test_extract_interaction(
     agent_framework: AgentFramework, llm_span: ReadableSpan
 ) -> None:
     if agent_framework in (
@@ -16,7 +16,10 @@ def test_telemetry_extract_interaction(
     ):
         pytest.skip()
     processor = TracingProcessor.create(AgentFramework(agent_framework))
-    assert llm_span.attributes  # to make mypy happy
+    # to make mypy happy
+    assert processor
+    assert llm_span.attributes
+
     span = AgentSpan.from_readable_span(llm_span)
     span_kind, interaction = processor.extract_interaction(span)
     assert span_kind == "LLM"

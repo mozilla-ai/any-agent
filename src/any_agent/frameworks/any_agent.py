@@ -36,7 +36,7 @@ class AnyAgent(ABC):
         self,
         config: AgentConfig,
         managed_agents: Sequence[AgentConfig] | None = None,
-        tracing_config: TracingConfig | None = None,
+        tracing: TracingConfig | None = None,
     ):
         self.config = config
         self.managed_agents = managed_agents
@@ -44,7 +44,7 @@ class AnyAgent(ABC):
         self._mcp_servers: list[MCPServerBase] = []
 
         # Tracing is enabled by default
-        self._tracing_config: TracingConfig = tracing_config or TracingConfig()
+        self._tracing_config: TracingConfig = tracing or TracingConfig()
         self._setup_tracing()
 
     @staticmethod
@@ -230,7 +230,7 @@ class AnyAgent(ABC):
 
     def exit(self) -> None:
         """Exit the agent and clean up resources."""
-        if getattr(self, "_instrumenter", None):
+        if self._instrumenter is not None:
             self._instrumenter.uninstrument()  # otherwise, this gets called in the __del__ method of Tracer
             self._instrumenter = None
         self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected
