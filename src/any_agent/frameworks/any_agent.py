@@ -72,7 +72,11 @@ class AnyAgent(ABC):
 
             return LlamaIndexInstrumentor()
 
-        if not is_tracing_supported(framework):
+        if (
+            framework is AgentFramework.GOOGLE
+            or framework is AgentFramework.AGNO
+            or framework is AgentFramework.TINYAGENT
+        ):
             msg = f"{framework} tracing is not supported."
             raise NotImplementedError(msg)
 

@@ -116,4 +116,6 @@ def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     result2 = agent.run("What is the capital of Spain?")
     second_spans = result2.spans
     assert result1.final_output != result2.final_output
-    assert second_spans[: len(first_spans)] != first_spans, "Spans from the first run should not be in the second"
+    assert second_spans[: len(first_spans)] != first_spans, (
+        "Spans from the first run should not be in the second"
+    )

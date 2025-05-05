@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any, ClassVar, assert_never
 
 from any_agent import AgentFramework
 from any_agent.logging import logger
-from any_agent.tracing.trace import is_tracing_supported
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -52,7 +51,11 @@ class TracingProcessor(ABC):
 
             return LlamaIndexTracingProcessor()
 
-        if not is_tracing_supported(agent_framework):
+        if (
+            agent_framework is AgentFramework.GOOGLE
+            or agent_framework is AgentFramework.AGNO
+            or agent_framework is AgentFramework.TINYAGENT
+        ):
             return None
 
         assert_never(agent_framework)
