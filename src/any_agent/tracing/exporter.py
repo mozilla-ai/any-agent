@@ -103,7 +103,6 @@ class AnyAgentExporter(SpanExporter):
         return SpanExportResult.SUCCESS
 
 
-
 class Instrumenter(Protocol):  # noqa: D101
     def instrument(self, *, tracer_provider: TracerProvider) -> None: ...  # noqa: D102
 

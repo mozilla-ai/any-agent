@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     from any_agent.tracing.trace import AgentTrace
 
 
-
 class AnyAgent(ABC):
     """Base abstract class for all agent implementations.
 
@@ -42,7 +41,6 @@ class AnyAgent(ABC):
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
         self._setup_tracing()
-
 
     @staticmethod
     def _get_agent_type_by_framework(
