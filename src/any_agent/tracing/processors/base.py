@@ -86,7 +86,7 @@ class TracingProcessor(ABC):
 
     def extract_evidence(self, trace: AgentTrace) -> str:
         """Extract relevant evidence."""
-        calls = self._extract_tracing_data(trace)
+        calls = self._extract_trace_data(trace)
         return self._format_evidence(calls)
 
     def _format_evidence(self, calls: Sequence[Mapping[str, Any]]) -> str:
