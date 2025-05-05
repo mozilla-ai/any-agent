@@ -79,7 +79,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     )
     try:
         result = agent.run(
-            "Use the tools to find what year is it and write the value (single number) to a file",
+            "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
         )
         assert os.path.exists(os.path.join(tmp_path, tmp_file))
         with open(os.path.join(tmp_path, tmp_file)) as f:
