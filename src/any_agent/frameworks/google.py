@@ -3,9 +3,10 @@ from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
+
+from .any_agent import AnyAgent
 
 try:
     from google.adk.agents.llm_agent import LlmAgent
@@ -21,6 +22,8 @@ except ImportError:
 
 if TYPE_CHECKING:
     from google.adk.models.base_llm import BaseLlm
+
+    from any_agent.tracing.trace import AgentTrace
 
 
 class GoogleAgent(AnyAgent):
@@ -97,12 +100,11 @@ class GoogleAgent(AnyAgent):
         user_id: str | None = None,
         session_id: str | None = None,
         **kwargs,
-    ) -> AgentResult:
+    ) -> "AgentTrace":
         """Run the Google agent with the given prompt."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._create_tracer()
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
@@ -131,8 +133,5 @@ class GoogleAgent(AnyAgent):
         assert session, "Session should not be None"
         response = session.state.get("response", None)
 
-        return AgentResult(
-            final_output=response,
-            raw_responses=session.events,
-            trace=self._get_trace(),
-        )
+        self._exporter.trace.final_output = response
+        return self._exporter.trace

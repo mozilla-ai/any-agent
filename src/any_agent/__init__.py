@@ -1,13 +1,11 @@
 from .config import AgentConfig, AgentFramework, TracingConfig
-from .frameworks.any_agent import AgentResult, AnyAgent
-from .tracing import AnyAgentSpan, AnyAgentTrace
+from .frameworks.any_agent import AnyAgent
+from .tracing.trace import AgentTrace
 
 __all__ = [
     "AgentConfig",
     "AgentFramework",
-    "AgentResult",
+    "AgentTrace",
     "AnyAgent",
-    "AnyAgentSpan",
-    "AnyAgentTrace",
     "TracingConfig",
 ]

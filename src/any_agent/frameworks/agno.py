@@ -1,9 +1,10 @@
 from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
+
+from .any_agent import AnyAgent
 
 try:
     from agno.agent import Agent
@@ -19,6 +20,8 @@ except ImportError:
 if TYPE_CHECKING:
     from agno.agent import RunResponse
     from agno.models.base import Model
+
+    from any_agent.tracing.trace import AgentTrace
 
 
 class AgnoAgent(AnyAgent):
@@ -102,15 +105,11 @@ class AgnoAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
+    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._create_tracer()
 
         result: RunResponse = await self._agent.arun(prompt, **kwargs)
-        return AgentResult(
-            final_output=result.content,
-            raw_responses=result.messages,
-            trace=self._get_trace(),
-        )
+        self._exporter.trace.final_output = result.content
+        return self._exporter.trace

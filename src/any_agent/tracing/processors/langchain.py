@@ -1,20 +1,23 @@
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from langchain_core.messages import BaseMessage
 
-from any_agent import AgentFramework, AnyAgentSpan, AnyAgentTrace
-from any_agent.telemetry import TelemetryProcessor
-from any_agent.telemetry.types import StatusCode
+from any_agent import AgentFramework
+from any_agent.tracing import TracingProcessor
+from any_agent.tracing.otel_types import StatusCode
+
+if TYPE_CHECKING:
+    from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
-class LangchainTelemetryProcessor(TelemetryProcessor):
+class LangchainTracingProcessor(TracingProcessor):
     """Processor for Langchain agent telemetry data."""
 
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
 
-    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+    def _extract_hypothesis_answer(self, trace: "AgentTrace") -> str:
         for span in reversed(trace.spans):
             if span.attributes["openinference.span.kind"] == "AGENT":
                 content = span.attributes["output.value"]
@@ -35,7 +38,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
         msg = "No agent final answer found in trace"
         raise ValueError(msg)
 
-    def _extract_llm_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_llm_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
         attributes = span.attributes
         span_info = {
@@ -51,7 +54,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return span_info
 
-    def _extract_tool_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_tool_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract tool interaction details from a span."""
         attributes = span.attributes
         tool_info: dict[str, Any] = {
@@ -84,7 +87,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return tool_info
 
-    def _extract_chain_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_chain_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract chain interaction details from a span."""
         attributes = span.attributes
         chain_info: dict[str, Any] = {"type": "chain", "name": span.name}
@@ -135,7 +138,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
 
         return chain_info
 
-    def _extract_agent_interaction(self, span: AnyAgentSpan) -> dict[str, Any]:
+    def _extract_agent_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract agent interaction details from a span."""
         attributes = span.attributes
         agent_info: dict[str, Any] = {"type": "agent", "name": span.name}

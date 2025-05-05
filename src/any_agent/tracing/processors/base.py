@@ -11,56 +11,57 @@ from any_agent.logging import logger
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
 
-    from any_agent import AnyAgentSpan
-    from any_agent.tracing import AnyAgentTrace
+    from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
-class TelemetryProcessor(ABC):
-    """Base class for processing telemetry data from different agent types."""
+class TracingProcessor(ABC):
+    """Base class for processing tracing data from different agent types."""
 
     MAX_EVIDENCE_LENGTH: ClassVar[int] = 400
 
     @classmethod
-    def create(cls, agent_framework_raw: AgentFramework | str) -> TelemetryProcessor:
-        """Create the appropriate telemetry processor."""
+    def create(
+        cls, agent_framework_raw: AgentFramework | str
+    ) -> TracingProcessor | None:
+        """Create the appropriate tracing processor."""
         agent_framework = AgentFramework.from_string(agent_framework_raw)
 
         if agent_framework is AgentFramework.LANGCHAIN:
-            from any_agent.telemetry.frameworks.langchain_telemetry import (
-                LangchainTelemetryProcessor,
+            from any_agent.tracing.processors.langchain import (
+                LangchainTracingProcessor,
             )
 
-            return LangchainTelemetryProcessor()
+            return LangchainTracingProcessor()
         if agent_framework is AgentFramework.SMOLAGENTS:
-            from any_agent.telemetry.frameworks.smolagents_telemetry import (
-                SmolagentsTelemetryProcessor,
+            from any_agent.tracing.processors.smolagents import (
+                SmolagentsTracingProcessor,
             )
 
-            return SmolagentsTelemetryProcessor()
+            return SmolagentsTracingProcessor()
         if agent_framework is AgentFramework.OPENAI:
-            from any_agent.telemetry.frameworks.openai_telemetry import (
-                OpenAITelemetryProcessor,
+            from any_agent.tracing.processors.openai import (
+                OpenAITracingProcessor,
             )
 
-            return OpenAITelemetryProcessor()
+            return OpenAITracingProcessor()
         if agent_framework is AgentFramework.LLAMA_INDEX:
-            from any_agent.telemetry.frameworks.llama_index_telemetry import (
-                LlamaIndexTelemetryProcessor,
+            from any_agent.tracing.processors.llama_index import (
+                LlamaIndexTracingProcessor,
             )
 
-            return LlamaIndexTelemetryProcessor()
+            return LlamaIndexTracingProcessor()
 
         if (
             agent_framework is AgentFramework.GOOGLE
             or agent_framework is AgentFramework.AGNO
             or agent_framework is AgentFramework.TINYAGENT
         ):
-            raise NotImplementedError
+            return None
 
         assert_never(agent_framework)
 
     @abstractmethod
-    def _extract_hypothesis_answer(self, trace: AnyAgentTrace) -> str:
+    def _extract_hypothesis_answer(self, trace: AgentTrace) -> str:
         """Extract the hypothesis agent final answer from the trace."""
 
     @abstractmethod
@@ -68,23 +69,23 @@ class TelemetryProcessor(ABC):
         """Get the agent type associated with this processor."""
 
     @abstractmethod
-    def _extract_llm_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
+    def _extract_llm_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type LLM."""
 
     @abstractmethod
-    def _extract_tool_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
+    def _extract_tool_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type TOOL."""
 
     @abstractmethod
-    def _extract_chain_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
+    def _extract_chain_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type CHAIN."""
 
     @abstractmethod
-    def _extract_agent_interaction(self, span: AnyAgentSpan) -> Mapping[str, Any]:
+    def _extract_agent_interaction(self, span: AgentSpan) -> Mapping[str, Any]:
         """Extract interaction details of a span of type AGENT."""
 
     @staticmethod
-    def determine_agent_framework(trace: AnyAgentTrace) -> AgentFramework:
+    def determine_agent_framework(trace: AgentTrace) -> AgentFramework:
         """Determine the agent type based on the trace.
 
         These are not really stable ways to find it, because we're waiting on some
@@ -107,7 +108,7 @@ class TelemetryProcessor(ABC):
         msg = "Could not determine agent type from trace, or agent type not supported"
         raise ValueError(msg)
 
-    def extract_evidence(self, telemetry: AnyAgentTrace) -> str:
+    def extract_evidence(self, telemetry: AgentTrace) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
         return self._format_evidence(calls)
@@ -161,7 +162,7 @@ class TelemetryProcessor(ABC):
 
     def _extract_telemetry_data(
         self,
-        telemetry: AnyAgentTrace,
+        telemetry: AgentTrace,
     ) -> list[Mapping[str, Any]]:
         """Extract the agent-specific data from telemetry."""
         calls = []
@@ -173,7 +174,7 @@ class TelemetryProcessor(ABC):
 
     def extract_interaction(
         self,
-        span: AnyAgentSpan,
+        span: AgentSpan,
     ) -> tuple[str, Mapping[str, Any]]:
         """Extract interaction details from a span."""
         span_kind = span.attributes.get("openinference.span.kind", "")

@@ -8,6 +8,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdioParams
+from any_agent.tracing.trace import AgentTrace
 
 
 def check_uvx_installed() -> bool:
@@ -77,30 +78,29 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     agent = AnyAgent.create(
         agent_framework, agent_config, tracing=TracingConfig(output_dir=str(traces))
     )
+
     try:
-        result = agent.run(
+        agent_trace = agent.run(
             "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
         )
         assert os.path.exists(os.path.join(tmp_path, tmp_file))
         with open(os.path.join(tmp_path, tmp_file)) as f:
             content = f.read()
         assert content == str(datetime.now().year)
-        assert result
-        assert result.final_output
-        if agent_framework not in [AgentFramework.LLAMA_INDEX]:
-            # Llama Index doesn't currently give back raw_responses.
-            assert result.raw_responses
-            assert len(result.raw_responses) > 0
+        assert isinstance(agent_trace, AgentTrace)
+        assert agent_trace.final_output
         if agent_framework not in (
             AgentFramework.AGNO,
             AgentFramework.GOOGLE,
             AgentFramework.TINYAGENT,
         ):
+            assert agent_trace.spans
+            assert len(agent_trace.spans) > 0
             assert traces.exists()
-            assert agent_framework.name in str(next(traces.iterdir()).name)
-            assert result.trace is not None
-            assert agent.trace_filepath is not None
-            cost_sum = result.trace.get_total_cost()
+            trace_files = [str(x) for x in traces.iterdir()]
+            assert agent_trace.output_file in trace_files
+            assert agent_framework.name in agent_trace.output_file
+            cost_sum = agent_trace.get_total_cost()
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00
             assert cost_sum.total_tokens > 0

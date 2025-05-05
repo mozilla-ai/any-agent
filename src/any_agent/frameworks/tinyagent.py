@@ -7,8 +7,10 @@ from typing import TYPE_CHECKING, Any
 import litellm
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
+from any_agent.tracing.trace import AgentTrace
+
+from .any_agent import AnyAgent
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -186,7 +188,7 @@ class TinyAgent(AnyAgent):
             self.clients[tool_name] = ToolExecutor(tool)
             logger.debug("Registered tool: %s", tool_name)
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent asynchronously.
 
         Args:
@@ -197,7 +199,6 @@ class TinyAgent(AnyAgent):
             The final agent response
 
         """
-        self._create_tracer()
         logger.debug("Running agent with prompt: %s...", prompt[:500])
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
         self.messages = [
@@ -240,11 +241,7 @@ class TinyAgent(AnyAgent):
             except Exception as err:
                 logger.error("Error during turn %s: %s", num_of_turns + 1, err)
                 if isinstance(err, Exception) and str(err) == "AbortError":
-                    return AgentResult(
-                        final_output=final_response or "Task aborted",
-                        raw_responses=self.messages,
-                        trace=self._get_trace(),
-                    )
+                    return AgentTrace(final_output=final_response or "Task aborted")
                 raise
 
             num_of_turns += 1
@@ -272,32 +269,18 @@ class TinyAgent(AnyAgent):
                 # If task is complete, return the last assistant message before this
                 for msg in reversed(self.messages[:-1]):
                     if msg.get("role") == "assistant" and msg.get("content"):
-                        return AgentResult(
-                            final_output=msg.get("content"),
-                            raw_responses=self.messages,
-                            trace=self._get_trace(),
-                        )
-                return AgentResult(
-                    final_output=final_response or "Task completed",
-                    raw_responses=self.messages,
-                    trace=self._get_trace(),
-                )
+                        return AgentTrace(final_output=msg.get("content"))
+                return AgentTrace(final_output=final_response or "Task completed")
 
             if current_last.get("role") != "tool" and num_of_turns > max_turns:
                 logger.debug("Exiting because max turns (%s) reached", max_turns)
-                return AgentResult(
+                return AgentTrace(
                     final_output=final_response or "Max turns reached",
-                    raw_responses=self.messages,
-                    trace=self._get_trace(),
                 )
 
             if current_last.get("role") != "tool" and next_turn_should_call_tools:
                 logger.debug("Exiting because no tools were called when expected")
-                return AgentResult(
-                    final_output=final_response or "No tools called",
-                    raw_responses=self.messages,
-                    trace=self._get_trace(),
-                )
+                return AgentTrace(final_output=final_response or "No tools called")
 
             if current_last.get("role") == "tool":
                 next_turn_should_call_tools = False

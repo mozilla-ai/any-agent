@@ -1,8 +1,9 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.tools import search_web, visit_webpage
+
+from .any_agent import AnyAgent
 
 try:
     from agents import (
@@ -19,6 +20,12 @@ try:
     agents_available = True
 except ImportError:
     agents_available = False
+
+
+if TYPE_CHECKING:
+    from agents import Model
+
+    from any_agent.tracing.trace import AgentTrace
 
 
 class OpenAIAgent(AnyAgent):
@@ -120,15 +127,11 @@ class OpenAIAgent(AnyAgent):
             non_mcp_tools.append(tool)
         return non_mcp_tools
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
+    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
         """Run the OpenAI agent with the given prompt asynchronously."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._create_tracer()
         result = await Runner.run(self._agent, prompt, **kwargs)
-        return AgentResult(
-            final_output=result.final_output,
-            raw_responses=result.raw_responses,
-            trace=self._get_trace(),
-        )
+        self._exporter.trace.final_output = result.final_output
+        return self._exporter.trace

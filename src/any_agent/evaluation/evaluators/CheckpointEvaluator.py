@@ -1,34 +1,37 @@
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from any_agent.evaluation.evaluators.LLMEvaluator import LLMEvaluator
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.evaluation.test_case import CheckpointCriteria
 from any_agent.logging import logger
-from any_agent.telemetry import TelemetryProcessor
-from any_agent.tracing import AnyAgentTrace
+from any_agent.tracing.processors.base import TracingProcessor
+
+if TYPE_CHECKING:
+    from any_agent.tracing.trace import AgentTrace
 
 
 class CheckpointEvaluator(LLMEvaluator):
-    """Evaluates checkpoints against telemetry."""
+    """Evaluates checkpoints against trace."""
 
     def evaluate(
         self,
-        telemetry: AnyAgentTrace,
+        trace: "AgentTrace",
         checkpoints: Sequence[CheckpointCriteria],
-        processor: TelemetryProcessor,
+        processor: TracingProcessor,
     ) -> list[EvaluationResult]:
-        """Verify each checkpoint against the telemetry data using LLM.
+        """Verify each checkpoint against the trace data using LLM.
 
         Args:
-            telemetry: The telemetry data to evaluate
+            trace: The trace data to evaluate
             checkpoints: List of checkpoint criteria to verify
-            processor: Telemetry processor to extract evidence
+            processor: Trace processor to extract evidence
 
         Returns:
             List of evaluation results
 
         """
-        evidence = processor.extract_evidence(telemetry)
+        evidence = processor.extract_evidence(trace)
         evidence = evidence.replace("<", "\\<").replace(">", "\\>")
         logger.info(f"""<yellow>Evidence\n{evidence}</yellow>\n""")
         results = []

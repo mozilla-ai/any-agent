@@ -1,0 +1,102 @@
+import json
+import os
+from collections.abc import Sequence
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from opentelemetry.sdk.trace.export import (
+    SpanExporter,
+    SpanExportResult,
+)
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.panel import Panel
+
+from any_agent import AgentFramework, TracingConfig
+from any_agent.logging import logger
+
+from .processors import TracingProcessor
+from .trace import AgentSpan, AgentTrace
+
+if TYPE_CHECKING:
+    from opentelemetry.sdk.trace import ReadableSpan
+
+
+class AnyAgentExporter(SpanExporter):
+    """Build an `AgentTrace` and export to the different outputs."""
+
+    def __init__(  # noqa: D107
+        self,
+        agent_framework: AgentFramework,
+        tracing_config: TracingConfig,
+    ):
+        self.agent_framework = agent_framework
+        self.tracing_config = tracing_config
+        self.trace: AgentTrace = AgentTrace()
+        self.processor: TracingProcessor | None = TracingProcessor.create(
+            agent_framework
+        )
+        self.console: Console | None = None
+
+        if self.tracing_config.save:
+            if not os.path.exists(self.tracing_config.output_dir):
+                os.makedirs(self.tracing_config.output_dir)
+
+        if self.tracing_config.console:
+            self.console = Console()
+
+    def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:  # noqa: D102
+        if not self.processor:
+            return SpanExportResult.SUCCESS
+
+        if self.tracing_config.save and not self.trace.output_file:
+            # Init the value on the first `export` call.
+            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+            output_file = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
+            if not os.path.exists(output_file):
+                with open(output_file, "w", encoding="utf-8") as f:
+                    json.dump([], f)
+            self.trace.output_file = output_file
+
+        for readable_span in spans:
+            span = AgentSpan.from_readable_span(readable_span)
+            try:
+                span_kind, interaction = self.processor.extract_interaction(span)
+                if span_kind == "LLM" and self.tracing_config.cost_info:
+                    span.add_cost_info()
+
+                self.trace.spans.append(span)
+
+                if self.tracing_config.console and self.console:
+                    style = getattr(self.tracing_config, span_kind.lower(), None)
+                    if not style or interaction == {}:
+                        continue
+
+                    self.console.rule(span_kind, style=style)
+
+                    for key, value in interaction.items():
+                        if key == "output":
+                            self.console.print(
+                                Panel(
+                                    Markdown(str(value or "")),
+                                    title="Output",
+                                ),
+                            )
+                        else:
+                            self.console.print(f"{key}: {value}")
+
+                    self.console.rule(style=style)
+
+            except (json.JSONDecodeError, TypeError, AttributeError) as e:
+                logger.warning("Failed to parse span data, %s, %s", span, e)
+                continue
+
+        if self.tracing_config.save and self.trace.output_file:
+            with open(self.trace.output_file, "w", encoding="utf-8") as f:
+                json.dump(
+                    [span.model_dump_json() for span in self.trace.spans],
+                    f,
+                    indent=2,
+                )
+
+        return SpanExportResult.SUCCESS
