@@ -150,9 +150,7 @@ class AnyAgent(ABC):
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
-        agent = agent_cls(
-            agent_config, managed_agents=managed_agents, tracing=tracing
-        )
+        agent = agent_cls(agent_config, managed_agents=managed_agents, tracing=tracing)
         await agent.load_agent()
         return agent
 

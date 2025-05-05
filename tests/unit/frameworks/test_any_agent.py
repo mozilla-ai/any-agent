@@ -1,10 +1,6 @@
-import os
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
-
 import pytest
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 
 
 def test_create_any_with_framework(agent_framework: AgentFramework) -> None:

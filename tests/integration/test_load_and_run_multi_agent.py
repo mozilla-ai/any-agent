@@ -61,7 +61,9 @@ def test_load_and_run_multi_agent(
         agent_framework=agent_framework,
         agent_config=main_agent,
         managed_agents=managed_agents,
-        tracing=TracingConfig(output_dir=str(traces), console=False, save=True, cost_info=True),
+        tracing=TracingConfig(
+            output_dir=str(traces), console=False, save=True, cost_info=True
+        ),
     )
     agent_trace = agent.run("Which agent framework is the best?")
 

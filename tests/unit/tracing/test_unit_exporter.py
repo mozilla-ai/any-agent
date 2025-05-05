@@ -7,7 +7,9 @@ from any_agent.config import AgentFramework, TracingConfig
 from any_agent.tracing.exporter import AnyAgentExporter
 
 
-def test_exporter_initialization(agent_framework: AgentFramework, tmp_path: Path) -> None:
+def test_exporter_initialization(
+    agent_framework: AgentFramework, tmp_path: Path
+) -> None:
     exporter = AnyAgentExporter(
         agent_framework=agent_framework,
         tracing_config=TracingConfig(
@@ -36,7 +38,6 @@ def test_rich_console_span_exporter_disable(llm_span: ReadableSpan):  # type: ig
         )
         exporter.export([llm_span])
         console_mock.return_value.rule.assert_not_called()
-
 
 
 def test_save_default(tmp_path, llm_span: ReadableSpan):  # type: ignore[no-untyped-def]

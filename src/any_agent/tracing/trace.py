@@ -153,7 +153,7 @@ class AgentTrace(BaseModel):
                     token_count_prompt=span.attributes["llm.token_count.prompt"],
                     token_count_completion=span.attributes[
                         "llm.token_count.completion"
-                    ]
+                    ],
                 )
                 cost = CostInfo(
                     cost_prompt=span.attributes["cost_prompt"],

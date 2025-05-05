@@ -5,6 +5,7 @@ from any_agent import AgentFramework
 from any_agent.tracing import TracingProcessor
 from any_agent.tracing.trace import AgentSpan
 
+
 def test_telemetry_extract_interaction(
     agent_framework: AgentFramework, llm_span: ReadableSpan
 ) -> None:
