@@ -1,5 +1,6 @@
 # pylint: disable=unused-argument, unused-variable
 from collections.abc import Sequence
+from typing import Any
 
 import pytest
 
@@ -26,7 +27,7 @@ async def test_sse_tool_filtering(
 async def test_mcp_tools_loaded(
     agent_framework: AgentFramework,
     mcp_params: MCPParams,
-    mcp_connection: MCPConnection,
+    mcp_connection: MCPConnection[Any],
     tools: Sequence[Tool],
 ) -> None:
     mcp_server = _get_mcp_server(mcp_params, agent_framework)

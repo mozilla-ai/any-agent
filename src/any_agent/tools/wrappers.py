@@ -1,7 +1,7 @@
 import inspect
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, MutableSequence, Sequence
 from functools import wraps
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 from any_agent.tools import (
@@ -116,14 +116,17 @@ def verify_callable(tool: Callable[..., Any]) -> None:
             raise ValueError(msg)
 
 
+T_co = TypeVar("T_co", covariant=True)
+
+
 async def _wrap_tools(
-    tools: Sequence[Tool],
+    tools: Sequence[T_co],
     agent_framework: AgentFramework,
-) -> tuple[list[Tool], list[MCPServerBase]]:
+) -> tuple[list[T_co], list[MCPServerBase[T_co]]]:
     wrapper = WRAPPERS[agent_framework]
 
-    wrapped_tools = list[Tool]()
-    mcp_servers = list[MCPServerBase]()
+    wrapped_tools = list[T_co]()
+    mcp_servers: MutableSequence[MCPServerBase[T_co]] = []
     for tool in tools:
         # if it's MCPStdioParams or MCPSseParams, we need to wrap it in a server
         if isinstance(tool, MCPParams):
@@ -132,7 +135,7 @@ async def _wrap_tools(
             # tools can be used as any other callable.
             mcp_server = _get_mcp_server(tool, agent_framework)
             await mcp_server._setup_tools()
-            mcp_servers.append(mcp_server)
+            mcp_servers.append(mcp_server)  # type: ignore[arg-type]
         elif callable(tool):
             verify_callable(tool)
             wrapped_tools.append(wrapper(tool))
@@ -140,4 +143,4 @@ async def _wrap_tools(
             msg = f"Tool {tool} needs to be of type `MCPStdioParams`, `str` or `callable` but is {type(tool)}"
             raise ValueError(msg)
 
-    return wrapped_tools, mcp_servers
+    return wrapped_tools, mcp_servers  # type: ignore[return-value]

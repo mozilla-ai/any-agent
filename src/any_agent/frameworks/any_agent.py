@@ -40,7 +40,7 @@ class AnyAgent(ABC):
         self.config = config
         self.managed_agents = managed_agents
 
-        self._mcp_servers: list[MCPServerBase] = []
+        self._mcp_servers: list[MCPServerBase[Any]] = []
 
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
@@ -122,7 +122,7 @@ class AnyAgent(ABC):
 
     async def _load_tools(
         self, tools: Sequence[Tool]
-    ) -> tuple[list[Any], list[MCPServerBase]]:
+    ) -> tuple[list[Any], list[MCPServerBase[Any]]]:
         tools, mcp_servers = await _wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)

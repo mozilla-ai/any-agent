@@ -1,26 +1,28 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from any_agent.config import AgentFramework, MCPParams, Tool
+from any_agent.config import AgentFramework, MCPParams
 
 from .mcp_connection import MCPConnection
 
 if TYPE_CHECKING:
     from agents.mcp.server import MCPServer
 
+T_co = TypeVar("T_co", covariant=True)
 
-class MCPServerBase(BaseModel, ABC):
+
+class MCPServerBase(BaseModel, ABC, Generic[T_co]):
     mcp_tool: MCPParams
     framework: AgentFramework
     mcp_available: bool = False
     libraries: str = ""
 
-    tools: Sequence[Tool] = Field(default_factory=list)
+    tools: Sequence[T_co] = Field(default_factory=list)
     tool_names: Sequence[str] = Field(default_factory=list)
-    mcp_connection: MCPConnection | None = Field(default=None)
+    mcp_connection: MCPConnection[T_co] | None = Field(default=None)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -28,7 +30,9 @@ class MCPServerBase(BaseModel, ABC):
         self._check_dependencies()
 
     @abstractmethod
-    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+    async def _setup_tools(
+        self, mcp_connection: MCPConnection[T_co] | None = None
+    ) -> None:
         if not mcp_connection:
             msg = "MCP server is not set up. Please call `_setup_tools` from a concrete class."
             raise ValueError(msg)

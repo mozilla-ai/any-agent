@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from contextlib import AsyncExitStack
 from textwrap import dedent
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Generic, Protocol, TypeVar, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 
-from any_agent.config import MCPParams, Tool
+from any_agent.config import MCPParams
 
 if TYPE_CHECKING:
     from agents.mcp.server import MCPServer
@@ -19,17 +19,17 @@ class HasName(Protocol):
     name: str
 
 
-ToolsWithName = Sequence[str] | Sequence[HasName]
+T = TypeVar("T")
 
 
-class MCPConnection(BaseModel, ABC):
+class MCPConnection(BaseModel, ABC, Generic[T]):
     mcp_tool: MCPParams
     _exit_stack: AsyncExitStack = PrivateAttr(default_factory=AsyncExitStack)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @abstractmethod
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list[T]:
         """List tools from the MCP server."""
 
     @property
@@ -37,7 +37,7 @@ class MCPConnection(BaseModel, ABC):
         """Return the MCP server instance."""
         return None
 
-    def _filter_tools(self, tools: ToolsWithName) -> ToolsWithName:
+    def _filter_tools(self, tools: Sequence[T]) -> Sequence[T]:
         # Only add the tools listed in mcp_tool['tools'] if specified
         requested_tools = list(self.mcp_tool.tools or [])
 

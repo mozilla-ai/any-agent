@@ -108,7 +108,7 @@ def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSse
     return MCPSseParams(url=echo_sse_server["url"], tools=tools)
 
 
-class FakeMCPConnection(MCPConnection):
+class FakeMCPConnection(MCPConnection[Any]):
     mcp_tool: None = None  # type: ignore[assignment]
     tools: Sequence[Tool] = Field(default_factory=list)
 
@@ -117,7 +117,7 @@ class FakeMCPConnection(MCPConnection):
 
 
 @pytest.fixture
-def mcp_connection(tools: Sequence[Tool]) -> MCPConnection:
+def mcp_connection(tools: Sequence[Tool]) -> MCPConnection[Any]:
     return FakeMCPConnection(tools=tools)
 
 

@@ -6,12 +6,13 @@ from typing import Any, Literal
 
 from pydantic import PrivateAttr
 
-from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams, Tool
+from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
 from any_agent.tools.mcp.mcp_connection import MCPConnection
 from any_agent.tools.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
 with suppress(ImportError):
+    from langchain.tools import BaseTool  # noqa: TC002
     from langchain_mcp_adapters.tools import load_mcp_tools
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.sse import sse_client
@@ -20,13 +21,13 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class LangchainMCPConnection(MCPConnection, ABC):
+class LangchainMCPConnection(MCPConnection["BaseTool"], ABC):
     """Base class for LangChain MCP connections."""
 
     _client: Any | None = PrivateAttr(default=None)
 
     @abstractmethod
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["BaseTool"]:
         """List tools from the MCP server."""
         if not self._client:
             msg = "MCP client is not set up. Please call `list_tools` from a concrete class."
@@ -52,7 +53,7 @@ class LangchainMCPConnection(MCPConnection, ABC):
 class LangchainMCPStdioConnection(LangchainMCPConnection):
     mcp_tool: MCPStdioParams
 
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["BaseTool"]:
         """List tools from the MCP server."""
         server_params = StdioServerParameters(
             command=self.mcp_tool.command,
@@ -68,7 +69,7 @@ class LangchainMCPStdioConnection(LangchainMCPConnection):
 class LangchainMCPSseConnection(LangchainMCPConnection):
     mcp_tool: MCPSseParams
 
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["BaseTool"]:
         """List tools from the MCP server."""
         self._client = sse_client(
             url=self.mcp_tool.url,
@@ -77,7 +78,7 @@ class LangchainMCPSseConnection(LangchainMCPConnection):
         return await super().list_tools()
 
 
-class LangchainMCPServerBase(MCPServerBase, ABC):
+class LangchainMCPServerBase(MCPServerBase["BaseTool"], ABC):
     framework: Literal[AgentFramework.LANGCHAIN] = AgentFramework.LANGCHAIN
 
     def _check_dependencies(self) -> None:
@@ -89,7 +90,9 @@ class LangchainMCPServerBase(MCPServerBase, ABC):
 class LangchainMCPServerStdio(LangchainMCPServerBase):
     mcp_tool: MCPStdioParams
 
-    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+    async def _setup_tools(
+        self, mcp_connection: MCPConnection["BaseTool"] | None = None
+    ) -> None:
         mcp_connection = mcp_connection or LangchainMCPStdioConnection(
             mcp_tool=self.mcp_tool
         )
@@ -99,7 +102,9 @@ class LangchainMCPServerStdio(LangchainMCPServerBase):
 class LangchainMCPServerSse(LangchainMCPServerBase):
     mcp_tool: MCPSseParams
 
-    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+    async def _setup_tools(
+        self, mcp_connection: MCPConnection["BaseTool"] | None = None
+    ) -> None:
         mcp_connection = mcp_connection or LangchainMCPSseConnection(
             mcp_tool=self.mcp_tool
         )
