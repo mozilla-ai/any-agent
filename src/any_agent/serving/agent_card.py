@@ -1,9 +1,12 @@
 import inspect
 from typing import TYPE_CHECKING
 
-from common.types import AgentCapabilities, AgentCard, AgentSkill
+try:
+    from common.types import AgentCapabilities, AgentCard, AgentSkill
 
-from any_agent.config import MCPParams
+    a2a_available = True
+except ImportError:
+    a2a_available = False
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
@@ -11,10 +14,14 @@ if TYPE_CHECKING:
 
 
 def _get_agent_card(agent: "AnyAgent", serving_config: "ServingConfig") -> AgentCard:
+    if not a2a_available:
+        msg = "You need to `pip install 'any-agent[serving]'` to use this"
+        raise ImportError(msg)
+
     skills = []
     for tool in agent.config.tools:
         # TODO: handle MCP tools
-        if isinstance(tool, MCPParams):
+        if not callable(tool):
             continue
         skills.append(
             # TODO: find what other arguments can be set.

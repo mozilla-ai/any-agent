@@ -21,10 +21,13 @@ dependencies = [
   "rich",
   "evaluate",
   "fire",
-  "a2a-samples",
 ]
 
 [project.optional-dependencies]
+seving = [
+  "a2a-samples"
+]
+
 google = [
   "google-adk>=0.3.0"
 ]
