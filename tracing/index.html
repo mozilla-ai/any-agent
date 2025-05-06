@@ -608,9 +608,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#outputs" class="md-nav__link">
+  <a href="#console-output" class="md-nav__link">
     <span class="md-ellipsis">
-      Outputs
+      Console Output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spans" class="md-nav__link">
+    <span class="md-ellipsis">
+      Spans
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dumping-to-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dumping to File
     </span>
   </a>
   
@@ -710,9 +728,27 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#outputs" class="md-nav__link">
+  <a href="#console-output" class="md-nav__link">
     <span class="md-ellipsis">
-      Outputs
+      Console Output
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spans" class="md-nav__link">
+    <span class="md-ellipsis">
+      Spans
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dumping-to-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dumping to File
     </span>
   </a>
   
@@ -744,9 +780,10 @@
 
 <h1 id="agent-tracing">Agent Tracing</h1>
 <p><code>any-agent</code> uses <a href="https://github.com/Arize-ai/openinference"><code>openinference</code></a> to generate
-standardized <a href="https://opentelemetry.io/">OpenTelemetry</a> traces for any of the supported <code>Frameworks</code>.</p>
+standardized <a href="https://opentelemetry.io/">OpenTelemetry</a> traces for any of the supported <code>Frameworks</code>.
+The trace is returned by calling the <code>agent.run</code> or <code>agent.run_async</code> functions.</p>
 <h2 id="example">Example</h2>
-<p>To configure tracing, pass a TracingConfig object <a class="autorefs autorefs-internal" title="any_agent.config.TracingConfig" href="../api/#any_agent.config.TracingConfig"><code>TracingConfig</code></a> when creating an agent.</p>
+<p>By default, tracing to console and cost tracking is enabled. To configure tracing, pass a TracingConfig object <a class="autorefs autorefs-internal" title="any_agent.config.TracingConfig" href="../api/#any_agent.config.TracingConfig"><code>TracingConfig</code></a> when creating an agent.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span><span class="p">,</span> <span class="n">TracingConfig</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -760,9 +797,9 @@ standardized <a href="https://opentelemetry.io/">OpenTelemetry</a> traces for an
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>      <span class="p">)</span>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which agent framework is the best?&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<h3 id="outputs">Outputs</h3>
+<h3 id="console-output">Console Output</h3>
 <p>Tracing will output standardized console output regardless of the
-framework used, and will also save the trace as a json file in the directory set by the TracingConfig object. The file path of the trace is stored in the Agent.trace_filepath member variable.</p>
+framework used.</p>
 <div class="language-console highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="go">──────────────────────────────────────────────────────────────────────────── LLM ─────────────────────────────────────────────────────────────────────────────</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">input: Which agent framework is the best?</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="go">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
@@ -793,7 +830,8 @@ framework used, and will also save the trace as a json file in the directory set
 </span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="go">╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="go">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
 </span></code></pre></div>
-<p>In addition, an output JSON will be stored in the selected <code>output_dir</code>, which is <code>"traces"</code> by default:</p>
+<h3 id="spans">Spans</h3>
+<p>Here's what that returned trace spans would look like, accessible via the attribute <code>agent_trace.spans</code>:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">[</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p">{</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;response&quot;</span><span class="p">,</span>
@@ -877,6 +915,11 @@ framework used, and will also save the trace as a json file in the directory set
 </span><span id="__span-2-81"><a id="__codelineno-2-81" name="__codelineno-2-81" href="#__codelineno-2-81"></a><span class="w">      </span><span class="nt">&quot;schema_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 </span><span id="__span-2-82"><a id="__codelineno-2-82" name="__codelineno-2-82" href="#__codelineno-2-82"></a><span class="w">    </span><span class="p">}</span>
 </span><span id="__span-2-83"><a id="__codelineno-2-83" name="__codelineno-2-83" href="#__codelineno-2-83"></a><span class="w">  </span><span class="p">},</span>
+</span></code></pre></div>
+<h3 id="dumping-to-file">Dumping to File</h3>
+<p>The AgentTrace object is a pydantic model and can be saved to disk via standard pydantic practices:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;output.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
 </span></code></pre></div>
 
 
