@@ -122,7 +122,7 @@ class AnyAgent(ABC):
 
     async def _load_tools(
         self, tools: Sequence[Tool]
-    ) -> tuple[list[Any], list[MCPServerBase]]:
+    ) -> tuple[list[Any], list[MCPServerBase[Any]]]:
         tools, mcp_servers = await _wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
