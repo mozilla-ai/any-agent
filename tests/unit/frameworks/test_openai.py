@@ -7,7 +7,7 @@ from any_agent.config import MCPStdioParams
 from any_agent.tools import (
     ask_user_verification,
     search_web,
-    show_final_answer,
+    show_final_output,
     visit_webpage,
 )
 
@@ -160,7 +160,7 @@ def test_load_openai_multiagent() -> None:
             AgentConfig(
                 model_id="gpt-4o-mini",
                 name="communication-agent",
-                tools=[show_final_answer],
+                tools=[show_final_output],
                 handoff=True,
             ),
         ]
@@ -198,7 +198,7 @@ def test_load_openai_multiagent() -> None:
             model=mock_litellm_model.return_value,
             instructions=None,
             name="communication-agent",
-            tools=[mock_function_tool(show_final_answer)],
+            tools=[mock_function_tool(show_final_output)],
             mcp_servers=[],
         )
 

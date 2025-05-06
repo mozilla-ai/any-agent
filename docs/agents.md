@@ -5,7 +5,7 @@
 To define any agent system you will always use the same imports:
 
 ```python
-from any_agent import AgentConfig, AnyAgent, TracingConfig
+from any_agent import AgentConfig, AnyAgent
 # In these examples, the built-in tools will be used
 from any_agent.tools import search_web, visit_webpage
 ```
@@ -35,7 +35,6 @@ agent = AnyAgent.create(
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
     ),
-    tracing=TracingConfig(output_dir="traces") # Optional, but recommended for saving and viewing traces
 )
 ```
 
@@ -78,7 +77,8 @@ Regardless of the definition (single-agent or multi-agent), you can run the
 agent as follows:
 
 ```python
-agent.run("Which Agent Framework is the best??")
+agent_trace = agent.run("Which Agent Framework is the best??")
+print(agent_trace.final_output)
 ```
 
 ### Async
@@ -108,16 +108,14 @@ async def main():
                 model_id="gpt-4.1-nano",
                 tools=[visit_webpage]
             )
-        ],
-        tracing=TracingConfig()
+        ]
     )
 
-    await agent.run_async("Which Agent Framework is the best??")
-
+    agent_trace = await agent.run_async("Which Agent Framework is the best??")
+    print(agent_trace.final_output)
 
 if __name__ == "__main__":
     asyncio.run(main())
-
 ```
 
 ## Advanced configuration

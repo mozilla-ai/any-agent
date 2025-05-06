@@ -6,7 +6,7 @@ import pytest
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import (
     search_web,
-    show_final_answer,
+    show_final_output,
     visit_webpage,
 )
 
@@ -71,7 +71,7 @@ def test_load_google_multiagent() -> None:
                 AgentConfig(
                     model_id="gpt-4o-mini",
                     name="communication-agent",
-                    tools=[show_final_answer],
+                    tools=[show_final_output],
                     handoff=True,
                 ),
             ],
@@ -87,7 +87,7 @@ def test_load_google_multiagent() -> None:
             model=mock_model(model="gpt-4o-mini"),
             instruction="",
             name="communication-agent",
-            tools=[MockedFunctionTool(show_final_answer)],
+            tools=[MockedFunctionTool(show_final_output)],
         )
         mock_agent.assert_any_call(
             name="any_agent",

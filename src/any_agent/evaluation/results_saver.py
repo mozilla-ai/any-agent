@@ -2,17 +2,18 @@ import os
 
 import pandas as pd
 
-from any_agent.evaluation.test_case import TestCase
+from any_agent.evaluation.evaluation_case import EvaluationCase
 from any_agent.logging import logger
+from any_agent.tracing.trace import AgentTrace
 
 # Use the shared logger
 
 
 def save_evaluation_results(
-    test_case: TestCase,
+    evaluation_case: EvaluationCase,
     output_path: str,
     output_message: str,
-    telemetry_path: str,
+    trace: AgentTrace,
     hypothesis_answer: str,
     passed_checks: int,
     failed_checks: int,
@@ -21,17 +22,20 @@ def save_evaluation_results(
     """Save evaluation results to the specified output path.
 
     Args:
-        test_case: Path to the test case file
+        evaluation_case: Path to the test case file
         agent_config: Path to the agent configuration file
         output_path: Path to save the results
         output_message: Formatted output message with evaluation details
-        telemetry_path: Path to the telemetry file used
+        trace: The trace
         hypothesis_answer: The extracted hypothesis answer
         passed_checks: Number of passed checkpoints
         failed_checks: Number of failed checkpoints
         score: Evaluation score as a percentage
 
     """
+    # Ensure the output directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
     # See if the output_path file exists
     if os.path.exists(output_path):
         logger.info(f"Reading existing output from {output_path}")
@@ -46,10 +50,10 @@ def save_evaluation_results(
             pd.DataFrame(
                 [
                     {
-                        "config": test_case.model_dump(),
-                        "test_case_path": test_case.test_case_path,
+                        "config": evaluation_case.model_dump(),
+                        "evaluation_case_path": evaluation_case.evaluation_case_path,
                         "output_message": output_message,
-                        "telemetry_path": telemetry_path,
+                        "trace": trace.model_dump_json(),
                         "hypothesis_answer": hypothesis_answer,
                         "passed_checks": passed_checks,
                         "failed_checks": failed_checks,

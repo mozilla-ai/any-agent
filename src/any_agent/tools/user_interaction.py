@@ -12,14 +12,14 @@ def show_plan(plan: str) -> str:
     return plan
 
 
-def show_final_answer(answer: str) -> str:
+def show_final_output(answer: str) -> str:
     """Show the final answer to the user.
 
     Args:
         answer: The final answer.
 
     """
-    logger.info(f"Final answer: {answer}")
+    logger.info(f"Final output: {answer}")
     return answer
 
 

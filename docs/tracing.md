@@ -5,7 +5,7 @@ standardized [OpenTelemetry](https://opentelemetry.io/) traces for any of the su
 
 ## Example
 
-To enable tracing, add a TracingConfig object [`TracingConfig`][any_agent.config.TracingConfig] when creating an agent
+To configure tracing, pass a TracingConfig object [`TracingConfig`][any_agent.config.TracingConfig] when creating an agent.
 
 ```python
 from any_agent import AgentConfig, AnyAgent, TracingConfig
@@ -17,9 +17,9 @@ agent = AnyAgent.create(
                 model_id="gpt-4o",
                 tools=[search_web],
         ),
-        tracing=TracingConfig()
+        tracing=TracingConfig(console=False)
       )
-agent.run("Which agent framework is the best?")
+agent_trace = agent.run("Which agent framework is the best?")
 ```
 
 ### Outputs

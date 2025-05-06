@@ -6,8 +6,8 @@ from textwrap import dedent
 
 from litellm import completion
 
+from any_agent.evaluation.evaluation_case import CheckpointCriteria, GroundTruthAnswer
 from any_agent.evaluation.evaluators.schemas import EvaluationResult
-from any_agent.evaluation.test_case import CheckpointCriteria, GroundTruthAnswer
 
 
 class LLMEvaluator(ABC):
@@ -23,7 +23,7 @@ class LLMEvaluator(ABC):
         ground_truth_output: Sequence[CheckpointCriteria]
         | Sequence[GroundTruthAnswer]
         | None = None,
-        hypothesis_final_answer: str | None = None,
+        hypothesis_final_output: str | None = None,
         evidence: str | None = None,
     ) -> EvaluationResult:
         """Evaluate a single criterion using LLM."""
@@ -37,14 +37,14 @@ class LLMEvaluator(ABC):
             prompt += dedent(f"""
             Expected output: {json.dumps(ground_truth_output)}
             """)
-        if hypothesis_final_answer:
+        if hypothesis_final_output:
             prompt += dedent(f"""
-            Agent's answer: {hypothesis_final_answer}
+            Agent's answer: {hypothesis_final_output}
             """)
 
         if evidence:
             prompt += dedent(f"""
-            Telemetry evidence:
+            Trace evidence:
             {evidence}
             """)
 

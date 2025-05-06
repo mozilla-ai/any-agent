@@ -6,7 +6,7 @@
     we welcome contributions.
 
 Evaluation using any_agent.evaluation is designed to be a "trace-first" evaluation. The evaluation of a trace
-is not designed to be pass/fail, but is designed to be a score based on the achievement of user-defined criteria for
+is not designed to be pass/fail, but is rather a score based on the achievement of user-defined criteria for
 each example. Agent systems are hyper-specific to each use case, and it's difficult to provide a single set of metrics
 that would reliably provide the insight needed to make a decision about the effectiveness of an agent.
 
@@ -18,7 +18,7 @@ evaluate which criteria are satisfied.
 Using the unified tracing format provided by any-agent's [tracing functionality](./tracing.md), the trace can be evaluated
 with user defined criteria. The steps for evaluating an agent are as follows:
 
-1. Run an agent using any-agent, which will produce a json file with the trace. For example
+### Run an agent using any-agent, which will produce a trace. For example
 
 ```python
 from any_agent import AgentConfig, AnyAgent, TracingConfig
@@ -33,28 +33,57 @@ agent = AnyAgent.create(
     tracing=TracingConfig(output_dir="traces")
 )
 
-agent.run("How many seconds would it take for a leopard at full speed to run through Pont des Arts?")
+agent_trace = agent.run("How many seconds would it take for a leopard at full speed to run through Pont des Arts?")
+
 ```
-1. Define a test case in a yaml file, e.g.
 
 
-~~~yaml
-{% include "./examples/test_case.yaml" %}
-~~~
+### Define an evaluation case either in a yaml file or in python:
 
-1. Run the evaluation using the test case and trace.
+=== "YAML"
+    ~~~yaml
+    {% include "./examples/evaluation_case.yaml" %}
+    ~~~
+    Then in python
+    ```python
+    from any_agent.evaluation.evaluation_case import EvaluationCase
+    evaluation_case = EvaluationCase.from_yaml(evaluation_case_path)
+    ```
+
+=== "Python"
+    ```python
+    from any_agent.evaluation.evaluation_case import EvaluationCase
+    evaluation_case = EvaluationCase(
+            ground_truth=[{"name": "Test Case 1", "value": 1.0, "points": 1.0}],
+            checkpoints=[{"criteria": "Check if value is 1.0", "points": 1}],
+            llm_judge="gpt-4o-mini",
+            final_output_criteria=[]
+    )
+    ```
+
+### Run the evaluation using the test case and trace.
+
 ```python
-from any_agent.evaluation.test_case import TestCase
-from any_agent.evaluation.evaluate import evaluate_telemetry
-test_case = TestCase.from_yaml("./docs/examples/test_case.yaml")
-evaluate_telemetry(test_case, '/path/to/telemetry/output')
+from any_agent.evaluation import EvaluationRunner
+from any_agent.evaluation.evaluation_case import EvaluationCase
+output_path="tmp/path/result.json"
+evaluation_case = EvaluationCase(
+    ground_truth=[{"name": "Test Case 1", "value": 1.0, "points": 1.0}],
+    checkpoints=[{"criteria": "Check if value is 1.0", "points": 1}],
+    llm_judge="gpt-4o-mini",
+    final_output_criteria=[]
+)
+runner = EvaluationRunner(output_path=output_path)
+runner.add_evaluation_case(evaluation_case)
+runner.add_trace(agent_trace, 'OPENAI')
+runner.run()
 ```
 The output will look something like this:
 
 ```text
 Passed:
 - Ensure that the agent called the search_web tool in order to retrieve the length of Pont des Arts
-- The agent called the search_web tool with the query 'Pont des Arts length' as indicated in the telemetry evidence.
+- The agent called the search_web tool with the query 'Pont des Arts length' as indicated in the trace evidence.
 
 Passed:
 - Ensure that the agent ran a python snippet to combine the information from the info retrieved from the web searches
@@ -79,4 +108,18 @@ Score: 2/9
 
 Reading existing output from output/results.json
 Writing output to output/results.json
+```
+
+
+## Command Line
+
+If you have the file and test case prepared, a command line tools is provided for convenience called `any-agent-evaluate`.
+
+It can be called like so
+
+```bash
+any-agent-evaluate \
+    --evaluation_case_paths="['docs/examples/evaluation_case.yaml']" \
+    --trace_paths "['tests/unit/evaluation/sample_traces/OPENAI.json']" \
+    --agent_framework 'OPENAI'
 ```

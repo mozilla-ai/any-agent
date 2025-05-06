@@ -13,6 +13,11 @@ if TYPE_CHECKING:
 
 T_co = TypeVar("T_co", covariant=True)
 
+from .mcp_connection import MCPConnection
+
+if TYPE_CHECKING:
+    from agents.mcp.server import MCPServer
+
 
 class MCPServerBase(BaseModel, ABC, Generic[T_co]):
     mcp_tool: MCPParams
