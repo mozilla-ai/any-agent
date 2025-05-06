@@ -78,6 +78,16 @@ class MCPSse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class ServingConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    host: str = "localhost"
+    port: int = 5000
+    endpoint: str = "/"
+
+    version: str = "0.1.0"
+
+
 class TracingConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -109,7 +119,7 @@ class TracingConfig(BaseModel):
 
 MCPParams = MCPStdio | MCPSse
 
-Tool = str | MCPParams | Callable[..., Any]
+Tool = MCPParams | Callable[..., Any]
 
 
 class AgentConfig(BaseModel):

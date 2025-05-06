@@ -21,6 +21,7 @@ dependencies = [
   "rich",
   "evaluate",
   "fire",
+  "a2a-samples",
 ]
 
 [project.optional-dependencies]
@@ -113,6 +114,8 @@ disable = [
 
 [tool.ruff.lint]
 ignore = [
+  "TD",
+  "FIX",
   "D100",  # We don't use module docstrings
   "D104",  # We don't use package docstrings
   "FBT",
@@ -156,13 +159,13 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 follow_untyped_imports = true
 
-
-
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 timeout = 300
 
-
 [project.scripts]
 any-agent-evaluate = "any_agent.evaluation.cli:main"
+
+[tool.uv.sources]
+a2a-samples = { git = "https://github.com/google/A2A", subdirectory = "samples/python" }

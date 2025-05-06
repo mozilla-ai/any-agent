@@ -8,8 +8,15 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
-from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
+from any_agent.config import (
+    AgentConfig,
+    AgentFramework,
+    ServingConfig,
+    Tool,
+    TracingConfig,
+)
 from any_agent.logging import logger
+from any_agent.serving import _get_a2a_server
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.exporter import (
     AnyAgentExporter,
@@ -152,6 +159,10 @@ class AnyAgent(ABC):
         return asyncio.get_event_loop().run_until_complete(
             self.run_async(prompt, **kwargs)
         )
+
+    def serve(self, serving_config: ServingConfig | None = None) -> None:
+        server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())
+        server.start()
 
     @abstractmethod
     async def _load_agent(self) -> None:
