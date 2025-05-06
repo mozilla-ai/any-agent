@@ -1,6 +1,7 @@
 import time
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Callable, Generator
 from textwrap import dedent
+from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -107,6 +108,63 @@ def _patch_stdio_client() -> Generator[
 
     with patch("mcp.client.stdio.stdio_client", return_value=mock_cm) as patched:
         yield patched, mock_transport
+
+
+def check_multi_tool_usage_google(json_logs: list[dict[str, Any]]) -> None:
+    return check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_langchain(json_logs: list[dict[str, Any]]) -> None:
+    return check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_llamaindex(json_logs: list[dict[str, Any]]) -> None:
+    return check_multi_tool_usage_all(json_logs, 2)
+
+
+def check_multi_tool_usage_openai(json_logs: list[dict[str, Any]]) -> None:
+    return check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_agno(json_logs: list[dict[str, Any]]) -> None:
+    return check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_smolagents(json_logs: list[dict[str, Any]]) -> None:
+    return check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_tinyagent(json_logs: list[dict[str, Any]]) -> None:
+    return check_multi_tool_usage_all(json_logs, 1)
+
+
+def check_multi_tool_usage_all(json_logs: list[dict[str, Any]], min_tools: int) -> None:
+    tools = 0
+    for json_log in json_logs:
+        attrs = json_log["attributes"]
+        if attrs["openinference.span.kind"] == "TOOL":
+            tools += 1
+    assert tools < min_tools, (
+        "Count of tool usage is too low, managed agents were not used"
+    )
+
+
+check_multi_tool_usage_dict = {
+    AgentFramework.GOOGLE: check_multi_tool_usage_google,
+    AgentFramework.LANGCHAIN: check_multi_tool_usage_langchain,
+    AgentFramework.LLAMA_INDEX: check_multi_tool_usage_llamaindex,
+    AgentFramework.OPENAI: check_multi_tool_usage_openai,
+    AgentFramework.AGNO: check_multi_tool_usage_agno,
+    AgentFramework.SMOLAGENTS: check_multi_tool_usage_smolagents,
+    AgentFramework.TINYAGENT: check_multi_tool_usage_tinyagent,
+}
+
+
+@pytest.fixture
+def check_multi_tool_usage(
+    agent_framework: AgentFramework,
+) -> Callable[[list[dict[str, Any]]], None]:
+    return check_multi_tool_usage_dict[agent_framework]
 
 
 SSE_MCP_SERVER_SCRIPT = dedent(
