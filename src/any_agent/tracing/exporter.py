@@ -95,7 +95,7 @@ class AnyAgentExporter(SpanExporter):
         if self.tracing_config.save and self.trace.output_file:
             with open(self.trace.output_file, "w", encoding="utf-8") as f:
                 json.dump(
-                    [span.model_dump_json() for span in self.trace.spans],
+                    [span.model_dump(mode='json') for span in self.trace.spans],
                     f,
                     indent=2,
                 )
