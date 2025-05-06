@@ -99,6 +99,7 @@ def test_load_langchain_multiagent() -> None:
 def test_run_langchain_agent_custom_args() -> None:
     create_mock = MagicMock()
     agent_mock = AsyncMock()
+    agent_mock.ainvoke.return_value = MagicMock()
     create_mock.return_value = agent_mock
 
     with (
