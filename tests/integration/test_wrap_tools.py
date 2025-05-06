@@ -19,9 +19,7 @@ def wrap_sync(
     tools: Sequence[Tool],
     framework: AgentFramework,
 ) -> list[Tool]:
-    wrapped_tools, _ = asyncio.get_event_loop().run_until_complete(
-        _wrap_tools(tools, framework)
-    )
+    wrapped_tools, _ = asyncio.run(_wrap_tools(tools, framework))
     return wrapped_tools
 
 

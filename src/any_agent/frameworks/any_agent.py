@@ -99,12 +99,7 @@ class AnyAgent(ABC):
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         """Create an agent instance synchronously, creating a new event loop if none is running."""
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        return loop.run_until_complete(
+        return asyncio.run(
             cls.create_async(
                 agent_framework=agent_framework,
                 agent_config=agent_config,
@@ -162,9 +157,7 @@ class AnyAgent(ABC):
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
-        return asyncio.get_event_loop().run_until_complete(
-            self.run_async(prompt, **kwargs)
-        )
+        return asyncio.run(self.run_async(prompt, **kwargs))
 
     @abstractmethod
     async def load_agent(self) -> None:
