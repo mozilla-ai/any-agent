@@ -119,7 +119,7 @@ class TracingConfig(BaseModel):
 
 MCPParams = MCPStdio | MCPSse
 
-Tool = MCPParams | Callable[..., Any]
+Tool = str | MCPParams | Callable[..., Any]
 
 
 class AgentConfig(BaseModel):
