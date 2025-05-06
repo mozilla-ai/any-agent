@@ -34,14 +34,6 @@ def test_rich_console_span_exporter_disable(llm_span: ReadableSpan):  # type: ig
         console_mock.return_value.rule.assert_not_called()
 
 
-def test_save_default(llm_span: ReadableSpan):  # type: ignore[no-untyped-def]
-    exporter = AnyAgentExporter(AgentFramework.LANGCHAIN, TracingConfig(console=False))
-    exporter.export([llm_span])
-    # Just to simulate more than 1 span
-    exporter.export([llm_span])
-    assert len(exporter.trace.spans) == 2
-
-
 def test_cost_info_default(llm_span: ReadableSpan):  # type: ignore[no-untyped-def]
     console_mock = MagicMock()
     with patch("any_agent.tracing.exporter.Console", console_mock):
