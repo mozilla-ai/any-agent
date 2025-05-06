@@ -139,7 +139,6 @@ class AgentTrace(BaseModel):
     """A trace that can be exported to JSON or printed to the console."""
 
     spans: list[AgentSpan] = Field(default_factory=list)
-    output_file: str | None = None
     final_output: str | None = None
 
     model_config = ConfigDict(arbitrary_types_allowed=True)

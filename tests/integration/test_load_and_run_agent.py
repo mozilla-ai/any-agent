@@ -74,10 +74,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    traces = tmp_path / "traces"
-    agent = AnyAgent.create(
-        agent_framework, agent_config, tracing=TracingConfig(output_dir=str(traces))
-    )
+    agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
 
     try:
         agent_trace = agent.run(
@@ -92,10 +89,6 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         if is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
-            assert traces.exists()
-            trace_files = [str(x) for x in traces.iterdir()]
-            assert agent_trace.output_file in trace_files
-            assert agent_framework.name in agent_trace.output_file
             cost_sum = agent_trace.get_total_cost()
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00

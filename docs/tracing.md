@@ -2,10 +2,11 @@
 
 `any-agent` uses [`openinference`](https://github.com/Arize-ai/openinference) to generate
 standardized [OpenTelemetry](https://opentelemetry.io/) traces for any of the supported `Frameworks`.
+The trace is returned by calling the `agent.run` or `agent.run_async` functions.
 
 ## Example
 
-To configure tracing, pass a TracingConfig object [`TracingConfig`][any_agent.config.TracingConfig] when creating an agent.
+By default, tracing to console and cost tracking is enabled. To configure tracing, pass a TracingConfig object [`TracingConfig`][any_agent.config.TracingConfig] when creating an agent.
 
 ```python
 from any_agent import AgentConfig, AnyAgent, TracingConfig
@@ -22,10 +23,10 @@ agent = AnyAgent.create(
 agent_trace = agent.run("Which agent framework is the best?")
 ```
 
-### Outputs
+### Console Output
 
 Tracing will output standardized console output regardless of the
-framework used, and will also save the trace as a json file in the directory set by the TracingConfig object. The file path of the trace is stored in the Agent.trace_filepath member variable.
+framework used.
 
 ```console
 ──────────────────────────────────────────────────────────────────────────── LLM ─────────────────────────────────────────────────────────────────────────────
@@ -59,7 +60,9 @@ input: {'query': 'best agent framework 2023'}
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 
-In addition, an output JSON will be stored in the selected `output_dir`, which is `"traces"` by default:
+### Spans
+
+Here's what that returned trace spans would look like, accessible via the attribute `agent_trace.spans`:
 
 ```json
 [
@@ -145,4 +148,14 @@ In addition, an output JSON will be stored in the selected `output_dir`, which i
       "schema_url": ""
     }
   },
+```
+
+
+### Dumping to File
+
+The AgentTrace object is a pydantic model and can be saved to disk via standard pydantic practices:
+
+```
+with open("output.json", "w", encoding="utf-8) as f:
+  f.write(agent_trace.model_dump_json(indent=2))
 ```

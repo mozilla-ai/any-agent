@@ -1,7 +1,5 @@
 import json
-import os
 from collections.abc import Sequence
-from datetime import datetime
 from typing import TYPE_CHECKING, Protocol, assert_never
 
 from opentelemetry.sdk.trace import TracerProvider
@@ -39,25 +37,12 @@ class AnyAgentExporter(SpanExporter):
         )
         self.console: Console | None = None
 
-        if self.tracing_config.save:
-            if not os.path.exists(self.tracing_config.output_dir):
-                os.makedirs(self.tracing_config.output_dir)
-
         if self.tracing_config.console:
             self.console = Console()
 
     def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:  # noqa: D102
         if not self.processor:
             return SpanExportResult.SUCCESS
-
-        if self.tracing_config.save and not self.trace.output_file:
-            # Init the value on the first `export` call.
-            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-            output_file = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
-            if not os.path.exists(output_file):
-                with open(output_file, "w", encoding="utf-8") as f:
-                    json.dump([], f)
-            self.trace.output_file = output_file
 
         for readable_span in spans:
             span = AgentSpan.from_readable_span(readable_span)
@@ -91,15 +76,6 @@ class AnyAgentExporter(SpanExporter):
             except (json.JSONDecodeError, TypeError, AttributeError) as e:
                 logger.warning("Failed to parse span data, %s, %s", span, e)
                 continue
-
-        if self.tracing_config.save and self.trace.output_file:
-            with open(self.trace.output_file, "w", encoding="utf-8") as f:
-                json.dump(
-                    [span.model_dump_json() for span in self.trace.spans],
-                    f,
-                    indent=2,
-                )
-
         return SpanExportResult.SUCCESS
 
 

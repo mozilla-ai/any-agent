@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import Enum, auto
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AgentFramework(str, Enum):
@@ -56,12 +56,6 @@ class TracingConfig(BaseModel):
     console: bool = True
     """Print to console."""
 
-    output_dir: str = "traces"
-    """Directory to save traces, if json is enabled"""
-
-    save: bool = True
-    """Save to json file."""
-
     cost_info: bool = True
     """whether json and console logs should include cost information"""
 
@@ -76,13 +70,6 @@ class TracingConfig(BaseModel):
 
     chain: str | None = None
     """Chain color in console logs"""
-
-    @model_validator(mode="after")
-    def validate_output_dir(self) -> Self:
-        if self.save and not self.output_dir:
-            msg = "output_dir must be set if `save` is enabled"
-            raise ValueError(msg)
-        return self
 
 
 MCPParams = MCPStdioParams | MCPSseParams
