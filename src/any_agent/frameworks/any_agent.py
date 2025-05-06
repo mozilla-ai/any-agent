@@ -98,7 +98,13 @@ class AnyAgent(ABC):
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
-        return asyncio.get_event_loop().run_until_complete(
+        """Create an agent instance synchronously, creating a new event loop if none is running."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        return loop.run_until_complete(
             cls.create_async(
                 agent_framework=agent_framework,
                 agent_config=agent_config,
