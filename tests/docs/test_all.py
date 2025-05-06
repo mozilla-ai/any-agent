@@ -12,8 +12,8 @@ def test_files_all(fpath: pathlib.Path) -> None:
     mock_create = MagicMock(return_value=mock_agent)
 
     mock_create_async = AsyncMock()
-    # Mocking the sav_eval results function so that no actual file is created from running the code in evaluation.md
     with (
+        patch("builtins.open", new_callable=MagicMock),
         patch(
             "any_agent.evaluation.evaluation_runner.save_evaluation_results",
             return_value=None,

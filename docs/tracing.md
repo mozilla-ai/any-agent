@@ -156,6 +156,6 @@ Here's what that returned trace spans would look like, accessible via the attrib
 The AgentTrace object is a pydantic model and can be saved to disk via standard pydantic practices:
 
 ```python
-with open("output.json", "w", encoding="utf-8) as f:
+with open("output.json", "w", encoding="utf-8") as f:
   f.write(agent_trace.model_dump_json(indent=2))
 ```
