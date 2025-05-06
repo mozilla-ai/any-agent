@@ -8,7 +8,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
-from any_agent.tools import search_web, visit_webpage, show_final_answer
+from any_agent.tools import search_web, visit_webpage
 from any_agent.tracing.trace import AgentTrace, is_tracing_supported
 
 
@@ -29,8 +29,6 @@ def test_load_and_run_multi_agent(
         )
 
     agent_model = "gpt-4.1-nano"
-    # kwargs["model_id"] = "gemini/gemini-2.0-flash-lite"
-    # kwargs["model_id"] = "gemini/gemini-2.5-flash-preview-04-17"
     kwargs["model_id"] = agent_model
     if "OPENAI_API_KEY" not in os.environ:
         pytest.skip(f"OPENAI_API_KEY needed for {agent_framework.name}")
@@ -41,16 +39,9 @@ def test_load_and_run_multi_agent(
         else None
     )
     main_agent = AgentConfig(
-        instructions="You must use the available agents to complete the task.",
+        instructions="Use the available tools to complete the task to obtain additional information to answer the query.",
         description="The orchestrator that can use other agents.",
-<<<<<<< HEAD
         model_args=model_args,
-=======
-        model_args={},
-        # model_args={"parallel_tool_calls": False}
-        # if agent_framework is not AgentFramework.AGNO
-        # else {},
->>>>>>> 3c2d5d4 (Fix checks)
         **kwargs,  # type: ignore[arg-type]
     )
 
@@ -58,7 +49,7 @@ def test_load_and_run_multi_agent(
         AgentConfig(
             name="search_web_agent",
             model_id=agent_model,
-            description="Agent that can search the web. It can find answers on the web if the query cannot be answered. Use this tool if additional information would be needed to answer the query.",
+            description="Agent that can search the web. It can find answers on the web if the query cannot be answered.",
             tools=[search_web],
             model_args=model_args,
         ),
@@ -81,7 +72,9 @@ def test_load_and_run_multi_agent(
     )
 
     try:
-        agent_trace = agent.run("Which LLM agent framework is the most appropriate to execute SQL queries using grammar constrained decoding? I am working on a business environment with my own premises, and I would prefer hosting an open source model myself.")
+        agent_trace = agent.run(
+            "Which LLM agent framework is the most appropriate to execute SQL queries using grammar constrained decoding? I am working on a business environment with my own premises, and I would prefer hosting an open source model myself."
+        )
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
@@ -97,5 +90,16 @@ def test_load_and_run_multi_agent(
             assert cost_sum.total_cost < 1.00
             assert cost_sum.total_tokens > 0
             assert cost_sum.total_tokens < 20000
+        if agent_framework not in (
+            AgentFramework.AGNO,
+            AgentFramework.GOOGLE,
+            AgentFramework.TINYAGENT,
+        ):
+            assert traces.exists()
+            log_files = traces.glob("*.json")
+            with open(next(log_files)) as log_file:
+                contents = json.load(log_file)
+                check_multi_tool_usage(contents)
+            assert agent_framework.name in str(next(traces.iterdir()).name)
     finally:
         agent.exit()
