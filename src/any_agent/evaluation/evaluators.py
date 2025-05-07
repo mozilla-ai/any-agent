@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-from any_agent.evaluation.schemas import EvaluationResult, CheckpointCriteria
+from any_agent.evaluation.schemas import CheckpointCriteria, EvaluationResult
 from any_agent.logging import logger
 from any_agent.tracing.processors.base import TracingProcessor
 
@@ -15,7 +15,7 @@ from textwrap import dedent
 import evaluate.loading
 from litellm import completion
 
-from any_agent.evaluation.schemas import GroundTruthAnswers, GroundTruthAnswer
+from any_agent.evaluation.schemas import GroundTruthAnswer, GroundTruthAnswers
 
 
 def llm_evaluate_with_criterion(
@@ -109,6 +109,7 @@ def evaluate_checkpoint(
     """Verify each checkpoint against the trace data using LLM.
 
     Args:
+        model: The model to use for evaluation
         trace: The trace data to evaluate
         checkpoints: List of checkpoint criteria to verify
         processor: Trace processor to extract evidence
@@ -155,8 +156,6 @@ def evaluate_hypothesis(
         results.append(evaluation)
 
     return results
-
-
 
 
 def evaluate_qa_squad(

@@ -33,12 +33,17 @@ def test_evaluate_runs_all_evaluators(
         evaluate_fn.return_value = eval_result
 
     with (
-        patch("any_agent.evaluation.evaluate.evaluate_checkpoint", mock_checkpoint_evaluate),
-        patch("any_agent.evaluation.evaluate.evaluate_hypothesis", mock_hypothesis_evaluate),
+        patch(
+            "any_agent.evaluation.evaluate.evaluate_checkpoint",
+            mock_checkpoint_evaluate,
+        ),
+        patch(
+            "any_agent.evaluation.evaluate.evaluate_hypothesis",
+            mock_hypothesis_evaluate,
+        ),
         patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
         patch("any_agent.evaluation.evaluate.TracingProcessor.create"),
     ):
-
         evaluate(
             evaluation_case=evaluation_case,
             trace=agent_trace,
@@ -75,12 +80,17 @@ def test_evaluate_when_no_final_output(
         evaluate_fn.return_value = eval_result
 
     with (
-        patch("any_agent.evaluation.evaluate.evaluate_checkpoint", mock_checkpoint_evaluate),
-        patch("any_agent.evaluation.evaluate.evaluate_hypothesis", mock_hypothesis_evaluate),
+        patch(
+            "any_agent.evaluation.evaluate.evaluate_checkpoint",
+            mock_checkpoint_evaluate,
+        ),
+        patch(
+            "any_agent.evaluation.evaluate.evaluate_hypothesis",
+            mock_hypothesis_evaluate,
+        ),
         patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
         patch("any_agent.evaluation.evaluate.TracingProcessor.create"),
     ):
-
         evaluate(
             evaluation_case=evaluation_case,
             trace=agent_trace,
