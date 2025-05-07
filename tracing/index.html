@@ -675,9 +675,20 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -686,7 +697,111 @@
   </span>
   
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent
+    
+  </span>
+  
+
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Config
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/tracing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tracing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -780,10 +895,15 @@
 
 <h1 id="agent-tracing">Agent Tracing</h1>
 <p><code>any-agent</code> uses <a href="https://github.com/Arize-ai/openinference"><code>openinference</code></a> to generate
-standardized <a href="https://opentelemetry.io/">OpenTelemetry</a> traces for any of the supported <code>Frameworks</code>.
-The trace is returned by calling the <code>agent.run</code> or <code>agent.run_async</code> functions.</p>
+standardized <a href="https://opentelemetry.io/">OpenTelemetry</a> traces for any of the supported <code>Frameworks</code>.</p>
+<p>An <a class="autorefs autorefs-internal" title="any_agent.tracing.trace.AgentTrace" href="../api/tracing/#any_agent.tracing.trace.AgentTrace"><code>AgentTrace</code></a> is returned when calling <a class="autorefs autorefs-internal" title="run(prompt, **kwargs)" href="../api/agent/#any_agent.AnyAgent.run"><code>agent.run</code></a> or <a class="autorefs autorefs-internal" title="run_async(prompt, **kwargs)
+
+  
+      abstractmethod
+      async
+  " href="../api/agent/#any_agent.AnyAgent.run_async"><code>agent.run_async</code></a>.</p>
 <h2 id="example">Example</h2>
-<p>By default, tracing to console and cost tracking is enabled. To configure tracing, pass a TracingConfig object <a class="autorefs autorefs-internal" title="any_agent.config.TracingConfig" href="../api/#any_agent.config.TracingConfig"><code>TracingConfig</code></a> when creating an agent.</p>
+<p>By default, tracing to console and cost tracking is enabled. To configure tracing, pass a TracingConfig object <a class="autorefs autorefs-internal" title="any_agent.config.TracingConfig" href="../api/config/#any_agent.config.TracingConfig"><code>TracingConfig</code></a> when creating an agent.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span><span class="p">,</span> <span class="n">TracingConfig</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
