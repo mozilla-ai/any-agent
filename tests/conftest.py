@@ -17,6 +17,22 @@ from opentelemetry.trace.status import Status, StatusCode
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
+from any_agent.tracing.trace import AgentSpan
+
+
+@pytest.fixture(autouse=True)
+def disable_rich_console(
+    monkeypatch: pytest.MonkeyPatch,
+    pytestconfig: pytest.Config,
+) -> None:
+    original_init = rich.console.Console.__init__
+
+    def quiet_init(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        if pytestconfig.option.capture != "no":
+            kwargs["quiet"] = True
+        original_init(self, *args, **kwargs)
+
+    monkeypatch.setattr(rich.console.Console, "__init__", quiet_init)
 
 
 @pytest.fixture
@@ -101,53 +117,25 @@ def _patch_stdio_client() -> Generator[
         yield patched, mock_transport
 
 
-def check_multi_tool_usage_google(json_logs: list[dict[str, Any]]) -> None:
-    return check_multi_tool_usage_all(json_logs, 1)
-
-
-def check_multi_tool_usage_langchain(json_logs: list[dict[str, Any]]) -> None:
-    return check_multi_tool_usage_all(json_logs, 1)
-
-
-def check_multi_tool_usage_llamaindex(json_logs: list[dict[str, Any]]) -> None:
-    return check_multi_tool_usage_all(json_logs, 2)
-
-
-def check_multi_tool_usage_openai(json_logs: list[dict[str, Any]]) -> None:
-    return check_multi_tool_usage_all(json_logs, 1)
-
-
-def check_multi_tool_usage_agno(json_logs: list[dict[str, Any]]) -> None:
-    return check_multi_tool_usage_all(json_logs, 1)
-
-
-def check_multi_tool_usage_smolagents(json_logs: list[dict[str, Any]]) -> None:
-    return check_multi_tool_usage_all(json_logs, 1)
-
-
-def check_multi_tool_usage_tinyagent(json_logs: list[dict[str, Any]]) -> None:
-    return check_multi_tool_usage_all(json_logs, 1)
-
-
-def check_multi_tool_usage_all(json_logs: list[dict[str, Any]], min_tools: int) -> None:
-    tools = 0
-    for json_log in json_logs:
-        attrs = json_log["attributes"]
-        if attrs["openinference.span.kind"] == "TOOL":
-            tools += 1
+def check_multi_tool_usage_all(json_logs: list[AgentSpan], min_tools: int) -> None:
+    tools = len(
+        [l for l in json_logs if 
+            "openinference.span.kind" in l.attributes and
+            l.attributes["openinference.span.kind"] == "TOOL"]
+    )
     assert tools < min_tools, (
         "Count of tool usage is too low, managed agents were not used"
     )
 
 
 check_multi_tool_usage_dict = {
-    AgentFramework.GOOGLE: check_multi_tool_usage_google,
-    AgentFramework.LANGCHAIN: check_multi_tool_usage_langchain,
-    AgentFramework.LLAMA_INDEX: check_multi_tool_usage_llamaindex,
-    AgentFramework.OPENAI: check_multi_tool_usage_openai,
-    AgentFramework.AGNO: check_multi_tool_usage_agno,
-    AgentFramework.SMOLAGENTS: check_multi_tool_usage_smolagents,
-    AgentFramework.TINYAGENT: check_multi_tool_usage_tinyagent,
+    AgentFramework.GOOGLE: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
+    AgentFramework.LANGCHAIN: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
+    AgentFramework.LLAMA_INDEX: lambda json_logs: check_multi_tool_usage_all(json_logs, 2),
+    AgentFramework.OPENAI: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
+    AgentFramework.AGNO: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
+    AgentFramework.SMOLAGENTS: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
+    AgentFramework.TINYAGENT: lambda json_logs: check_multi_tool_usage_all(json_logs, 1)
 }
 
 

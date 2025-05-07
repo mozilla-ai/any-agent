@@ -9,11 +9,45 @@ from litellm.utils import validate_environment
 import json
 
 from typing import Dict, Callable
+import logging
+from rich.logging import RichHandler
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
+
+import pytest
+
+
+FORMAT = "%(message)s"
+logging.basicConfig(
+    level=logging.DEBUG, format=FORMAT, datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
+)
+logger = logging.getLogger("any_agent_test")
+
+
+CHILD_TAG = "any_agent.children"
+
+def organize(items):
+    traces = {}
+    for trace in items:
+        k = trace.context.span_id
+        logger.warning(f'--> {k}')
+        trace.attributes[CHILD_TAG] = {}
+        traces[k] = trace
+    for trace in items:
+        parent_k = trace.parent.span_id
+        logger.warning(f'++> {parent_k}')
+        if parent_k:
+            traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = trace
+        else:
+            traces[parent_k] = trace
+    logger.warning(traces[None].model_dump_json(indent=2))
+
+
+
+
 
 
 @pytest.mark.skipif(
@@ -23,7 +57,6 @@ from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 def test_load_and_run_multi_agent(
     agent_framework: AgentFramework,
     check_multi_tool_usage: Callable[[dict[str, Any]], None],
-    tmp_path: Path,
 ) -> None:
     kwargs = {}
 
@@ -92,11 +125,10 @@ def test_load_and_run_multi_agent(
             AgentFramework.GOOGLE,
             AgentFramework.TINYAGENT,
         ):
-            assert traces.exists()
-            log_files = traces.glob("*.json")
-            with open(next(log_files)) as log_file:
-                contents = json.load(log_file)
-                check_multi_tool_usage(contents)
-            assert agent_framework.name in str(next(traces.iterdir()).name)
+            traces = agent_trace.spans
+            organize(traces)
+            check_multi_tool_usage(traces)
+            # TODO use a top level trace span for any_agent?
+            # assert agent_framework.name in str(next(traces.iterdir()).name)
     finally:
         agent.exit()
