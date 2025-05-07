@@ -46,11 +46,7 @@ class AnyAgentExporter(SpanExporter):
             msg = "Console is not initialized"
             raise RuntimeError(msg)
         style = getattr(self.tracing_config, span_kind.lower(), None)
-        if not style:
-            logger.debug("No style for %s", span_kind)
-            return
-        if not interaction:
-            logger.debug("No interaction for %s", span_kind)
+        if not style or interaction == {}:
             return
 
         self.console.rule(span_kind, style=style)
