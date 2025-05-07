@@ -28,10 +28,13 @@ class AnyAgentExporter(SpanExporter):
         self,
         agent_framework: AgentFramework,
         tracing_config: TracingConfig,
+        prompt: str | None = None,
     ):
         self.agent_framework = agent_framework
         self.tracing_config = tracing_config
         self.trace: AgentTrace = AgentTrace()
+        self.trace_id: int | None = None
+        self.prompt = prompt
         self.processor: TracingProcessor | None = TracingProcessor.create(
             agent_framework
         )
@@ -66,6 +69,18 @@ class AnyAgentExporter(SpanExporter):
 
     def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:  # noqa: D102
         if not self.processor:
+            return SpanExportResult.SUCCESS
+        if not self.trace_id:
+            if self.prompt in spans[0].attributes.get("input.value"):
+                self.trace_id = spans[0].context.trace_id
+            else:
+                return SpanExportResult.SUCCESS
+        elif self.trace_id != spans[0].context.trace_id:
+            logger.warning(
+                "Trace ID mismatch. Expected %s, got %s",
+                self.trace_id,
+                spans[0].context.trace_id,
+            )
             return SpanExportResult.SUCCESS
 
         for readable_span in spans:

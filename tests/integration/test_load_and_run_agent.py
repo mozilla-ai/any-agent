@@ -124,10 +124,10 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
         agent.run_async("What is the capital of Spain?"),
     )
     result1, result2 = results
+    assert "Paris" in result1.final_output
+    assert "Madrid" in result2.final_output
     if _is_tracing_supported(agent_framework):
         first_spans = result1.spans
-        assert "Paris" in result1.final_output
-        assert "Madrid" in result2.final_output
         second_spans = result2.spans
         assert second_spans[: len(first_spans)] != first_spans, (
             "Spans from the first run should not be in the second"

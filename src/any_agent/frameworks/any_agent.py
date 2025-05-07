@@ -45,6 +45,7 @@ class AnyAgent(ABC):
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
         self._instrumenter: Instrumenter | None = None
+        self._tracer_provider: TracerProvider | None = None
         self._setup_tracing()
 
     @staticmethod
@@ -134,27 +135,21 @@ class AnyAgent(ABC):
 
     def _setup_tracing(self) -> None:
         """Initialize the tracing for the agent."""
-        if self._instrumenter is not None:
-            self._instrumenter.uninstrument()  # otherwise, this gets called in the __del__ method of Tracer
-        tracer_provider = TracerProvider()
-
-        self._exporter = AnyAgentExporter(self.framework, self._tracing_config)
-
-        # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
-        # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
+        self._tracer_provider = TracerProvider()
+        trace.set_tracer_provider(self._tracer_provider)
         if not _is_tracing_supported(self.framework):
             logger.warning(
                 "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
             )
             self._instrumenter = None
             return
-
-        tracer_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
-
-        trace.set_tracer_provider(tracer_provider)
-
         self._instrumenter = get_instrumenter_by_framework(self.framework)
-        self._instrumenter.instrument(tracer_provider=tracer_provider)
+        self._instrumenter.instrument(tracer_provider=self._tracer_provider)
+
+    def _add_exporter(self, prompt=None) -> AnyAgentExporter:
+        exporter = AnyAgentExporter(self.framework, self._tracing_config, prompt)
+        self._tracer_provider.add_span_processor(SimpleSpanProcessor(exporter))
+        return exporter
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""

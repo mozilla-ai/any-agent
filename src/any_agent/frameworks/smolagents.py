@@ -102,7 +102,8 @@ class SmolagentsAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._setup_tracing()
+        exporter = self._add_exporter(prompt)
         result = self._agent.run(prompt, **kwargs)
-        self._exporter.trace.final_output = result
-        return self._exporter.trace
+        exporter.trace.final_output = result
+        exporter.shutdown()
+        return exporter.trace
