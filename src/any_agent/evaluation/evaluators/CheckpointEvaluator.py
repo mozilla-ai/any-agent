@@ -33,7 +33,7 @@ class CheckpointEvaluator(LLMEvaluator):
         """
         evidence = processor.extract_evidence(trace)
         evidence = evidence.replace("<", "\\<").replace(">", "\\>")
-        logger.info(f"""Evidence\n{evidence}\n""")
+        logger.debug(f"""Evidence\n{evidence}\n""")
         results = []
 
         for checkpoint in checkpoints:
