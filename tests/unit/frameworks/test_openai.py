@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import MCPStdioParams
+from any_agent.config import MCPStdio
 from any_agent.tools import (
     OpenAITool,
     ask_user_verification,
@@ -106,7 +106,7 @@ def test_load_openai_with_mcp_server() -> None:
             AgentConfig(
                 model_id="gpt-4o",
                 tools=[
-                    MCPStdioParams(
+                    MCPStdio(
                         command="docker",
                         args=["run", "-i", "--rm", "mcp/fetch"],
                         tools=["fetch"],

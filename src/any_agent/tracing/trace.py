@@ -122,7 +122,7 @@ class AgentSpan(BaseModel):
         )
 
     def add_cost_info(self) -> None:
-        """Extend attributes with TokenUseAndCost."""
+        """Extend attributes with `TokenUseAndCost`."""
         cost_info = extract_token_use_and_cost(self.attributes)
         if cost_info:
             self.set_attributes(cost_info.model_dump(exclude_none=True))
@@ -139,7 +139,12 @@ class AgentTrace(BaseModel):
     """A trace that can be exported to JSON or printed to the console."""
 
     spans: list[AgentSpan] = Field(default_factory=list)
+    """A list of [`AgentSpan`][any_agent.tracing.trace.AgentSpan] that form the trace.
+    """
+
     final_output: str | None = None
+    """Contains the final output message returned by the agent.
+    """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -182,7 +187,7 @@ class AgentTrace(BaseModel):
         )
 
 
-def is_tracing_supported(agent_framework: AgentFramework) -> bool:
+def _is_tracing_supported(agent_framework: AgentFramework) -> bool:
     """Check if tracing is supported for the given agent framework."""
     # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
     # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506

@@ -7,8 +7,8 @@ from typing import Any
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
-from any_agent.config import MCPStdioParams
-from any_agent.tracing.trace import AgentTrace, is_tracing_supported
+from any_agent.config import MCPStdio
+from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
 def check_uvx_installed() -> bool:
@@ -60,7 +60,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     model_args["temperature"] = 0.0
     tools = [
         write_file,
-        MCPStdioParams(
+        MCPStdio(
             command="uvx",
             args=["mcp-server-time", "--local-timezone=America/New_York"],
             tools=[
@@ -86,7 +86,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert content == str(datetime.now().year)
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-        if is_tracing_supported(agent_framework):
+        if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
             cost_sum = agent_trace.get_total_cost()
@@ -107,7 +107,7 @@ def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     result1 = agent.run("What is the capital of France?")
     result2 = agent.run("What is the capital of Spain?")
     assert result1.final_output != result2.final_output
-    if is_tracing_supported(agent_framework):
+    if _is_tracing_supported(agent_framework):
         first_spans = result1.spans
         second_spans = result2.spans
         assert second_spans[: len(first_spans)] != first_spans, (

@@ -5,7 +5,7 @@ import pytest
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tracing.trace import AgentTrace, is_tracing_supported
+from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
 @pytest.mark.skipif(
@@ -63,7 +63,7 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
 
     assert agent_trace
     assert agent_trace.final_output
-    if is_tracing_supported(agent_framework):
+    if _is_tracing_supported(agent_framework):
         assert agent_trace.spans
         assert len(agent_trace.spans) > 0
         cost_sum = agent_trace.get_total_cost()
@@ -77,7 +77,7 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-        if is_tracing_supported(agent_framework):
+        if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
             cost_sum = agent_trace.get_total_cost()

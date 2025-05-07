@@ -18,7 +18,11 @@ nav:
   - Tools: tools.md
   - Tracing: tracing.md
   - Evaluation: evaluation.md
-  - API Reference: api.md
+  - API Reference:
+    - Agent: api/agent.md
+    - Config: api/config.md
+    - Tools: api/tools.md
+    - Tracing: api/tracing.md
 
 theme:
   name: material

@@ -122,7 +122,7 @@ class TinyAgent(AnyAgent):
         self.available_tools: list[dict[str, Any]] = []
         self.exit_loop_tools = [task_completion_tool()]
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the agent and its tools."""
         # Load tools
         logger.debug("Loading tools: %s", self.config.tools)

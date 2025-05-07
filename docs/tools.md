@@ -26,12 +26,12 @@ See [SuperGateway](https://github.com/supercorp-ai/supergateway) for an easy way
 
     ```python
     from any_agent import AgentConfig
-    from any_agent.config import MCPStdioParams
+    from any_agent.config import MCPStdio
 
     main_agent = AgentConfig(
         model_id="gpt-4o-mini",
         tools=[
-            MCPStdioParams(
+            MCPStdio(
                 command="docker",
                 args=["run", "-i", "--rm", "mcp/fetch"],
                 tools=["fetch"]
@@ -44,12 +44,12 @@ See [SuperGateway](https://github.com/supercorp-ai/supergateway) for an easy way
 
     ```python
     from any_agent import AgentConfig
-    from any_agent.config import MCPSseParams
+    from any_agent.config import MCPSse
 
     main_agent = AgentConfig(
         model_id="gpt-4o-mini",
         tools=[
-            MCPSseParams(
+            MCPSse(
                 url="http://localhost:8000/sse"
             ),
         ]

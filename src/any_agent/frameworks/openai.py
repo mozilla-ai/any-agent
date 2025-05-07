@@ -56,7 +56,7 @@ class OpenAIAgent(AnyAgent):
             api_key=agent_config.api_key,
         )
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
         if not agents_available:
             msg = "You need to `pip install 'any-agent[openai]'` to use this agent"
