@@ -45,7 +45,7 @@ def test_cost_info_default(llm_span: ReadableSpan):  # type: ignore[no-untyped-d
         )
         exporter.export([llm_span])
         attributes = (
-            exporter.traces[str(llm_span.attributes["any_agent.run_id"])]
+            exporter.traces[str(llm_span.attributes["any_agent.run_id"])]  # type: ignore[index]
             .spans[0]
             .attributes
         )
@@ -65,7 +65,7 @@ def test_rich_console_cost_info_disabled(llm_span: ReadableSpan):  # type: ignor
         )
         exporter.export([llm_span])
         attributes = (
-            exporter.traces[str(llm_span.attributes["any_agent.run_id"])]
+            exporter.traces[str(llm_span.attributes["any_agent.run_id"])]  # type: ignore[index]
             .spans[0]
             .attributes
         )

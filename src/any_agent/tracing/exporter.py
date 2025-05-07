@@ -74,7 +74,10 @@ class AnyAgentExporter(SpanExporter):
             # Check if this span belongs to our run
             if not readable_span.attributes:
                 continue
-            agent_run_id = readable_span.attributes.get("any_agent.run_id", None)
+            agent_run_id = readable_span.attributes.get("any_agent.run_id")
+            if not agent_run_id or not isinstance(agent_run_id, str):
+                msg = "Span does not contain 'any_agent.run_id' attribute."
+                raise ValueError(msg)
             span = AgentSpan.from_readable_span(readable_span)
             if not self.traces.get(agent_run_id):
                 self.traces[agent_run_id] = AgentTrace(spans=[])
