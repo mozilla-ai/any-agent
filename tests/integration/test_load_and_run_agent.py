@@ -1,3 +1,4 @@
+import asyncio
 import os
 import subprocess
 from datetime import datetime
@@ -100,8 +101,8 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     finally:
         agent.exit()
 
-
-def test_run_agent_twice(agent_framework: AgentFramework) -> None:
+@pytest.mark.asyncio
+async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
     model_id = "gpt-4.1-nano"
     env_check = validate_environment(model_id)
@@ -114,15 +115,19 @@ def test_run_agent_twice(agent_framework: AgentFramework) -> None:
         else {}
     )
     model_args["temperature"] = 0.0
-    agent = AnyAgent.create(
+    agent = await AnyAgent.create_async(
         agent_framework,
         AgentConfig(model_id=model_id, model_args=model_args),
     )
-    result1 = agent.run("What is the capital of France?")
-    result2 = agent.run("What is the capital of Spain?")
-    assert result1.final_output != result2.final_output
+    results = await asyncio.gather(
+        agent.run_async("What is the capital of France?"),
+        agent.run_async("What is the capital of Spain?"),
+    )
+    result1, result2 = results
     if _is_tracing_supported(agent_framework):
         first_spans = result1.spans
+        assert "Paris" in result1.final_output
+        assert "Madrid" in result2.final_output
         second_spans = result2.spans
         assert second_spans[: len(first_spans)] != first_spans, (
             "Spans from the first run should not be in the second"
