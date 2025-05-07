@@ -52,7 +52,7 @@ class GoogleAgent(AnyAgent):
             **agent_config.model_args or {},
         )
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the Google agent with the given configuration."""
         if not adk_available:
             msg = "You need to `pip install 'any-agent[google]'` to use this agent"

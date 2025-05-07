@@ -22,7 +22,7 @@ class HasName(Protocol):
 T = TypeVar("T")
 
 
-class MCPConnection(BaseModel, ABC, Generic[T]):
+class _MCPConnection(BaseModel, ABC, Generic[T]):
     mcp_tool: MCPParams
     _exit_stack: AsyncExitStack = PrivateAttr(default_factory=AsyncExitStack)
 

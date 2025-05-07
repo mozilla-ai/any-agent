@@ -16,12 +16,12 @@ from any_agent.tracing.exporter import (
     Instrumenter,
     get_instrumenter_by_framework,
 )
-from any_agent.tracing.trace import is_tracing_supported
+from any_agent.tracing.trace import _is_tracing_supported
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from any_agent.tools.mcp.mcp_server import MCPServerBase
+    from any_agent.tools.mcp.mcp_server import _MCPServerBase
     from any_agent.tracing.trace import AgentTrace
 
 
@@ -40,7 +40,7 @@ class AnyAgent(ABC):
         self.config = config
         self.managed_agents = managed_agents
 
-        self._mcp_servers: list[MCPServerBase[Any]] = []
+        self._mcp_servers: list[_MCPServerBase[Any]] = []
 
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
@@ -98,6 +98,7 @@ class AnyAgent(ABC):
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
+        """Create an agent using the given framework and config."""
         return asyncio.get_event_loop().run_until_complete(
             cls.create_async(
                 agent_framework=agent_framework,
@@ -115,14 +116,15 @@ class AnyAgent(ABC):
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
+        """Create an agent using the given framework and config."""
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config, managed_agents=managed_agents, tracing=tracing)
-        await agent.load_agent()
+        await agent._load_agent()
         return agent
 
     async def _load_tools(
         self, tools: Sequence[Tool]
-    ) -> tuple[list[Any], list[MCPServerBase[Any]]]:
+    ) -> tuple[list[Any], list[_MCPServerBase[Any]]]:
         tools, mcp_servers = await _wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
@@ -140,7 +142,7 @@ class AnyAgent(ABC):
 
         # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
         # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-        if not is_tracing_supported(self.framework):
+        if not _is_tracing_supported(self.framework):
             logger.warning(
                 "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
             )
@@ -161,7 +163,7 @@ class AnyAgent(ABC):
         )
 
     @abstractmethod
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the agent instance."""
 
     @abstractmethod

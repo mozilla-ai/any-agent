@@ -10,8 +10,8 @@ from mcp.client.session import ClientSession
 from pydantic import Field
 from pytest_lazy_fixtures import lf
 
-from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams, Tool
-from any_agent.tools import MCPConnection
+from any_agent.config import MCPParams, MCPSse, MCPStdio, Tool
+from any_agent.tools import _MCPConnection
 
 
 class Toolset(Protocol):
@@ -24,8 +24,8 @@ def tools() -> list[Tool]:
 
 
 @pytest.fixture
-def mcp_sse_params_no_tools() -> MCPSseParams:
-    return MCPSseParams(
+def mcp_sse_params_no_tools() -> MCPSse:
+    return MCPSse(
         url="http://localhost:8000/sse",
         headers={"Authorization": "Bearer test-token"},
     )
@@ -47,8 +47,8 @@ def _path_client_session(session: AsyncGenerator[Any]) -> Generator[None]:
 
 @pytest.fixture
 def mcp_sse_params_with_tools(
-    mcp_sse_params_no_tools: MCPSseParams, tools: Sequence[Tool]
-) -> MCPSseParams:
+    mcp_sse_params_no_tools: MCPSse, tools: Sequence[Tool]
+) -> MCPSse:
     return mcp_sse_params_no_tools.model_copy(update={"tools": tools})
 
 
@@ -73,8 +73,8 @@ def command() -> str:
 
 
 @pytest.fixture
-def stdio_params(command: str, tools: Sequence[str]) -> MCPStdioParams:
-    return MCPStdioParams(command=command, args=[], tools=tools)
+def stdio_params(command: str, tools: Sequence[str]) -> MCPStdio:
+    return MCPStdio(command=command, args=[], tools=tools)
 
 
 @pytest.fixture
@@ -104,11 +104,11 @@ def _patch_client_session_list_tools(mcp_tools: Sequence[MCPTool]) -> Generator[
 
 
 @pytest.fixture
-def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSseParams:
-    return MCPSseParams(url=echo_sse_server["url"], tools=tools)
+def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSse:
+    return MCPSse(url=echo_sse_server["url"], tools=tools)
 
 
-class FakeMCPConnection(MCPConnection[Any]):
+class FakeMCPConnection(_MCPConnection[Any]):
     mcp_tool: None = None  # type: ignore[assignment]
     tools: Sequence[Tool] = Field(default_factory=list)
 
@@ -117,7 +117,7 @@ class FakeMCPConnection(MCPConnection[Any]):
 
 
 @pytest.fixture
-def mcp_connection(tools: Sequence[Tool]) -> MCPConnection[Any]:
+def mcp_connection(tools: Sequence[Tool]) -> _MCPConnection[Any]:
     return FakeMCPConnection(tools=tools)
 
 

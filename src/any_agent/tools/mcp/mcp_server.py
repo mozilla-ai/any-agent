@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.config import AgentFramework, MCPParams
 
-from .mcp_connection import MCPConnection
+from .mcp_connection import _MCPConnection
 
 if TYPE_CHECKING:
     from agents.mcp.server import MCPServer
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 T_co = TypeVar("T_co", covariant=True)
 
 
-class MCPServerBase(BaseModel, ABC, Generic[T_co]):
+class _MCPServerBase(BaseModel, ABC, Generic[T_co]):
     mcp_tool: MCPParams
     framework: AgentFramework
     mcp_available: bool = False
@@ -22,16 +22,16 @@ class MCPServerBase(BaseModel, ABC, Generic[T_co]):
 
     tools: Sequence[T_co] = Field(default_factory=list)
     tool_names: Sequence[str] = Field(default_factory=list)
-    mcp_connection: MCPConnection[T_co] | None = Field(default=None)
+    mcp_connection: _MCPConnection[T_co] | None = Field(default=None)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def model_post_init(self, context: Any) -> None:  # noqa: D102
+    def model_post_init(self, context: Any) -> None:
         self._check_dependencies()
 
     @abstractmethod
     async def _setup_tools(
-        self, mcp_connection: MCPConnection[T_co] | None = None
+        self, mcp_connection: _MCPConnection[T_co] | None = None
     ) -> None:
         if not mcp_connection:
             msg = "MCP server is not set up. Please call `_setup_tools` from a concrete class."

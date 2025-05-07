@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 from any_agent.config import AgentFramework, MCPParams, Tool
 from any_agent.tools import (
-    MCPServerBase,
     _get_mcp_server,
+    _MCPServerBase,
 )
 
 if TYPE_CHECKING:
@@ -122,13 +122,13 @@ T_co = TypeVar("T_co", covariant=True)
 async def _wrap_tools(
     tools: Sequence[T_co],
     agent_framework: AgentFramework,
-) -> tuple[list[T_co], list[MCPServerBase[T_co]]]:
+) -> tuple[list[T_co], list[_MCPServerBase[T_co]]]:
     wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = list[T_co]()
-    mcp_servers: MutableSequence[MCPServerBase[T_co]] = []
+    mcp_servers: MutableSequence[_MCPServerBase[T_co]] = []
     for tool in tools:
-        # if it's MCPStdioParams or MCPSseParams, we need to wrap it in a server
+        # if it's MCPStdio or MCPSse, we need to wrap it in a server
         if isinstance(tool, MCPParams):
             # MCP adapters are usually implemented as context managers.
             # We wrap the server using `MCPServerBase` so the
@@ -140,7 +140,7 @@ async def _wrap_tools(
             verify_callable(tool)
             wrapped_tools.append(wrapper(tool))
         else:
-            msg = f"Tool {tool} needs to be of type `MCPStdioParams`, `str` or `callable` but is {type(tool)}"
+            msg = f"Tool {tool} needs to be of type `MCPStdio`, `str` or `callable` but is {type(tool)}"
             raise ValueError(msg)
 
     return wrapped_tools, mcp_servers  # type: ignore[return-value]

@@ -49,7 +49,7 @@ class SmolagentsAgent(AnyAgent):
         }
         return model_type(**kwargs)
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the Smolagents agent with the given configuration."""
         if not smolagents_available:
             msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
