@@ -1,3 +1,5 @@
+from pydantic import BaseModel, ConfigDict
+
 from any_agent.config import AgentFramework
 from any_agent.evaluation.evaluation_case import EvaluationCase
 from any_agent.evaluation.evaluators import (
@@ -5,9 +7,36 @@ from any_agent.evaluation.evaluators import (
     HypothesisEvaluator,
     QuestionAnsweringSquadEvaluator,
 )
-from any_agent.evaluation.evaluators.schemas import TraceEvaluationResult
+from any_agent.evaluation.evaluators.schemas import EvaluationResult
 from any_agent.tracing import TracingProcessor
 from any_agent.tracing.trace import AgentTrace
+
+
+class TraceEvaluationResult(BaseModel):
+    """Represents the result of evaluating a trace."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    trace: AgentTrace
+    hypothesis_answer: str
+    checkpoint_results: list[EvaluationResult]
+    hypothesis_answer_results: list[EvaluationResult]
+    direct_results: list[EvaluationResult]
+
+    @property
+    def score(self) -> float:
+        """Calculate the score based on the evaluation results."""
+        all_results = (
+            self.checkpoint_results
+            + self.hypothesis_answer_results
+            + self.direct_results
+        )
+        total_points = sum([result.points for result in all_results])
+        if total_points == 0:
+            msg = "Total points is 0, cannot calculate score."
+            raise ValueError(msg)
+        passed_points = sum([result.points for result in all_results if result.passed])
+        return float(passed_points / total_points)
 
 
 def evaluate(

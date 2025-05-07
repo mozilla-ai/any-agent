@@ -3,10 +3,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework
-from any_agent.evaluation import EvaluationCase, evaluate
+from any_agent.evaluation import EvaluationCase, TraceEvaluationResult, evaluate
 from any_agent.evaluation.evaluators.schemas import (
     EvaluationResult,
-    TraceEvaluationResult,
 )
 from any_agent.tracing.trace import AgentTrace
 

@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from mktestdocs import check_md_file
 
-from any_agent.evaluation.evaluators.schemas import TraceEvaluationResult
+from any_agent.evaluation import TraceEvaluationResult
 
 
 # Note the use of `str`, makes for pretty output
