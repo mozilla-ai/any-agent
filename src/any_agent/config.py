@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import Enum, auto
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class AgentFramework(str, Enum):
@@ -98,6 +98,13 @@ class TracingConfig(BaseModel):
 
     cost_info: bool = True
     """Whether traces should include cost information"""
+
+    @model_validator(mode="after")
+    def validate_console_flags(self) -> Self:
+        if self.console and not any([self.llm, self.tool, self.agent, self.chain]):
+            msg = "At least one of `[self.llm, self.tool, self.agent, self.chain]` must be set"
+            raise ValueError(msg)
+        return self
 
 
 MCPParams = MCPStdio | MCPSse
