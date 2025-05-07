@@ -1,6 +1,6 @@
 import json
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, Protocol, assert_never
+from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Protocol, assert_never
 
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -40,6 +40,30 @@ class AnyAgentExporter(SpanExporter):
         if self.tracing_config.console:
             self.console = Console()
 
+    def print_to_console(self, span_kind: str, interaction: Mapping[str, Any]) -> None:
+        """Print the span to the console."""
+        if not self.console:
+            msg = "Console is not initialized"
+            raise RuntimeError(msg)
+        style = getattr(self.tracing_config, span_kind.lower(), None)
+        if not style or interaction == {}:
+            return
+
+        self.console.rule(span_kind, style=style)
+
+        for key, value in interaction.items():
+            if key == "output":
+                self.console.print(
+                    Panel(
+                        Markdown(str(value or "")),
+                        title="Output",
+                    ),
+                )
+            else:
+                self.console.print(f"{key}: {value}")
+
+        self.console.rule(style=style)
+
     def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:  # noqa: D102
         if not self.processor:
             return SpanExportResult.SUCCESS
@@ -54,24 +78,7 @@ class AnyAgentExporter(SpanExporter):
                 self.trace.spans.append(span)
 
                 if self.tracing_config.console and self.console:
-                    style = getattr(self.tracing_config, span_kind.lower(), None)
-                    if not style or interaction == {}:
-                        continue
-
-                    self.console.rule(span_kind, style=style)
-
-                    for key, value in interaction.items():
-                        if key == "output":
-                            self.console.print(
-                                Panel(
-                                    Markdown(str(value or "")),
-                                    title="Output",
-                                ),
-                            )
-                        else:
-                            self.console.print(f"{key}: {value}")
-
-                    self.console.rule(style=style)
+                    self.print_to_console(span_kind, interaction)
 
             except (json.JSONDecodeError, TypeError, AttributeError) as e:
                 logger.warning("Failed to parse span data, %s, %s", span, e)
