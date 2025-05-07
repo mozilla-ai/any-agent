@@ -3,11 +3,10 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from any_agent import AgentFramework
-from any_agent.logging import logger
 from any_agent.tracing.processors.base import TracingProcessor
 
 if TYPE_CHECKING:
-    from any_agent.tracing.trace import AgentSpan, AgentTrace
+    from any_agent.tracing.trace import AgentSpan
 
 
 class OpenAITracingProcessor(TracingProcessor):
@@ -15,18 +14,6 @@ class OpenAITracingProcessor(TracingProcessor):
 
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.OPENAI
-
-    def _extract_hypothesis_answer(self, trace: "AgentTrace") -> str:
-        for span in reversed(trace.spans):
-            # Looking for the final response that has the summary answer
-            if span.attributes.get("openinference.span.kind") == "LLM":
-                output_key = (
-                    "llm.output_messages.0.message.contents.0.message_content.text"
-                )
-                if output_key in span.attributes:
-                    return str(span.attributes[output_key])
-        logger.warning("No agent final answer found in trace")
-        return "NO FINAL ANSWER FOUND"
 
     def _extract_llm_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         attributes = span.attributes

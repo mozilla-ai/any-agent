@@ -1,14 +1,12 @@
 import json
 from typing import TYPE_CHECKING, Any
 
-from langchain_core.messages import BaseMessage
-
 from any_agent import AgentFramework
 from any_agent.tracing import TracingProcessor
 from any_agent.tracing.otel_types import StatusCode
 
 if TYPE_CHECKING:
-    from any_agent.tracing.trace import AgentSpan, AgentTrace
+    from any_agent.tracing.trace import AgentSpan
 
 
 class LangchainTracingProcessor(TracingProcessor):
@@ -16,27 +14,6 @@ class LangchainTracingProcessor(TracingProcessor):
 
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.LANGCHAIN
-
-    def _extract_hypothesis_answer(self, trace: "AgentTrace") -> str:
-        for span in reversed(trace.spans):
-            if span.attributes["openinference.span.kind"] == "AGENT":
-                content = span.attributes["output.value"]
-                # Extract content from serialized langchain message
-                message = json.loads(content)["messages"][0]
-                message = self.parse_generic_key_value_string(message)
-                base_message = BaseMessage(content=message["content"], type="AGENT")
-                # Use the interpreted string for printing
-                final_text = base_message.text()
-                # Either decode escape sequences if they're present
-                try:
-                    final_text = final_text.encode().decode("unicode_escape")
-                except UnicodeDecodeError:
-                    # If that fails, the escape sequences might already be interpreted
-                    pass
-                return final_text
-
-        msg = "No agent final answer found in trace"
-        raise ValueError(msg)
 
     def _extract_llm_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract LLM interaction details from a span."""

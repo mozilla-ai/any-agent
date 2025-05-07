@@ -6,7 +6,7 @@ from any_agent.tracing.otel_types import StatusCode
 from any_agent.tracing.processors.base import TracingProcessor
 
 if TYPE_CHECKING:
-    from any_agent.tracing.trace import AgentSpan, AgentTrace
+    from any_agent.tracing.trace import AgentSpan
 
 
 class SmolagentsTracingProcessor(TracingProcessor):
@@ -14,14 +14,6 @@ class SmolagentsTracingProcessor(TracingProcessor):
 
     def _get_agent_framework(self) -> AgentFramework:
         return AgentFramework.SMOLAGENTS
-
-    def _extract_hypothesis_answer(self, trace: "AgentTrace") -> str:
-        for span in reversed(trace.spans):
-            if span.attributes["openinference.span.kind"] == "AGENT":
-                return str(span.attributes["output.value"])
-
-        msg = "No agent final answer found in trace"
-        raise ValueError(msg)
 
     def _extract_llm_interaction(self, span: "AgentSpan") -> dict[str, Any]:
         """Extract LLM interaction details from a span."""
