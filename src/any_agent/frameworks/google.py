@@ -71,15 +71,18 @@ class GoogleAgent(AnyAgent):
                 managed_tools, _ = await self._load_tools(managed_agent.tools)
 
                 agent_type = managed_agent.agent_type or LlmAgent
+
+                managed_agent_args = managed_agent.agent_args or {}
+                handoff = managed_agent_args.pop("handoff", None)
                 instance = agent_type(
                     name=managed_agent.name,
                     instruction=managed_agent.instructions or "",
                     model=self._get_model(managed_agent),
                     tools=managed_tools,
-                    **managed_agent.agent_args or {},
+                    **managed_agent_args or {},
                 )
 
-                if managed_agent.handoff:
+                if handoff:
                     sub_agents_instanced.append(instance)
                 else:
                     tools.append(AgentTool(instance))
