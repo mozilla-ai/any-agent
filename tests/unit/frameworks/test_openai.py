@@ -9,17 +9,16 @@ from any_agent.tools import (
     search_web,
     show_final_output,
     visit_webpage,
+    OpenAITool
 )
 
 
 def test_load_openai_default() -> None:
     mock_agent = MagicMock()
-    mock_function_tool = MagicMock()
     mock_litellm_model = MagicMock()
 
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
-        patch("agents.function_tool", mock_function_tool),
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
     ):
         AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
@@ -34,7 +33,7 @@ def test_load_openai_default() -> None:
             model=mock_litellm_model.return_value,
             instructions=None,
             handoffs=[],
-            tools=[mock_function_tool(search_web), mock_function_tool(visit_webpage)],
+            tools=[OpenAITool(tool=search_web), OpenAITool(tool=visit_webpage)],
             mcp_servers=[],
         )
 
@@ -83,7 +82,6 @@ def test_openai_with_api_key() -> None:
 
 def test_load_openai_with_mcp_server() -> None:
     mock_agent = MagicMock()
-    mock_function_tool = MagicMock()
     mock_mcp_server = MagicMock()
     mock_mcp_server.server = MagicMock()
     mock_litellm_model = MagicMock()
@@ -91,14 +89,13 @@ def test_load_openai_with_mcp_server() -> None:
 
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
-        patch("agents.function_tool", mock_function_tool),
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
         patch.object(AnyAgent, "_load_tools", mock_wrap_tools),
     ):
 
         async def side_effect(self):  # type: ignore[no-untyped-def]
             return (
-                [mock_function_tool(search_web)],  # tools
+                [OpenAITool(tool=search_web)],  # tools
                 [mock_mcp_server],  # mcp_servers
             )
 
@@ -124,19 +121,17 @@ def test_load_openai_with_mcp_server() -> None:
             model=mock_litellm_model.return_value,
             instructions=None,
             handoffs=[],
-            tools=[mock_function_tool(search_web)],
+            tools=[OpenAITool(tool=search_web)],
             mcp_servers=[mock_mcp_server.server],
         )
 
 
 def test_load_openai_multiagent() -> None:
     mock_agent = MagicMock()
-    mock_function_tool = MagicMock()
     mock_litellm_model = MagicMock()
     mock_litellm_model.return_value = MagicMock()
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
-        patch("agents.function_tool", mock_function_tool),
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
     ):
         main_agent = AgentConfig(
@@ -178,7 +173,7 @@ def test_load_openai_multiagent() -> None:
             instructions=None,
             name="user-verification-agent",
             tools=[
-                mock_function_tool(ask_user_verification),
+                OpenAITool(tool=ask_user_verification),
             ],
             mcp_servers=[],
         )
@@ -187,7 +182,7 @@ def test_load_openai_multiagent() -> None:
             model=mock_litellm_model.return_value,
             instructions=None,
             name="search-web-agent",
-            tools=[mock_function_tool(search_web), mock_function_tool(visit_webpage)],
+            tools=[OpenAITool(tool=search_web), OpenAITool(tool=visit_webpage)],
             mcp_servers=[],
         )
 
@@ -198,7 +193,7 @@ def test_load_openai_multiagent() -> None:
             model=mock_litellm_model.return_value,
             instructions=None,
             name="communication-agent",
-            tools=[mock_function_tool(show_final_output)],
+            tools=[OpenAITool(tool=show_final_output)],
             mcp_servers=[],
         )
 

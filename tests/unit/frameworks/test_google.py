@@ -8,53 +8,40 @@ from any_agent.tools import (
     search_web,
     show_final_output,
     visit_webpage,
+    GoogleTool
 )
 
 
 def test_load_google_default() -> None:
-    from google.adk.tools import FunctionTool
 
     mock_agent = MagicMock()
     mock_model = MagicMock()
-    mock_function_tool = MagicMock()
-
-    class MockedFunctionTool(FunctionTool):
-        def __new__(cls, *args: Any, **kwargs: Any) -> MagicMock:
-            return mock_function_tool
 
     with (
         patch("any_agent.frameworks.google.LlmAgent", mock_agent),
         patch("any_agent.frameworks.google.DEFAULT_MODEL_TYPE", mock_model),
-        patch("google.adk.tools.FunctionTool", MockedFunctionTool),
     ):
         AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))
         mock_agent.assert_called_once_with(
             name="any_agent",
             instruction="",
             model=mock_model(model="gpt-4o"),
-            tools=[MockedFunctionTool(search_web), MockedFunctionTool(visit_webpage)],
+            tools=[GoogleTool(tool=search_web), GoogleTool(tool=visit_webpage)],
             sub_agents=[],
             output_key="response",
         )
 
 
 def test_load_google_multiagent() -> None:
-    from google.adk.tools import FunctionTool
-
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_agent_tool = MagicMock()
-    mock_function_tool = MagicMock()
 
-    class MockedFunctionTool(FunctionTool):
-        def __new__(cls, *args: Any, **kwargs: Any) -> "MockedFunctionTool":
-            return mock_function_tool
 
     with (
         patch("any_agent.frameworks.google.LlmAgent", mock_agent),
         patch("any_agent.frameworks.google.DEFAULT_MODEL_TYPE", mock_model),
         patch("any_agent.frameworks.google.AgentTool", mock_agent_tool),
-        patch("google.adk.tools.FunctionTool", MockedFunctionTool),
     ):
         AnyAgent.create(
             AgentFramework.GOOGLE,
@@ -81,13 +68,13 @@ def test_load_google_multiagent() -> None:
             model=mock_model(model="gpt-4o-mini"),
             instruction="",
             name="search-web-agent",
-            tools=[MockedFunctionTool(search_web), MockedFunctionTool(visit_webpage)],
+            tools=[GoogleTool(tool=search_web), GoogleTool(tool=visit_webpage)],
         )
         mock_agent.assert_any_call(
             model=mock_model(model="gpt-4o-mini"),
             instruction="",
             name="communication-agent",
-            tools=[MockedFunctionTool(show_final_output)],
+            tools=[GoogleTool(tool=show_final_output)],
         )
         mock_agent.assert_any_call(
             name="any_agent",
