@@ -4,7 +4,7 @@ import pytest
 
 from any_agent.config import AgentFramework
 from any_agent.evaluation import EvaluationCase, TraceEvaluationResult, evaluate
-from any_agent.evaluation.evaluators.schemas import (
+from any_agent.evaluation.schemas import (
     EvaluationResult,
 )
 from any_agent.tracing.trace import AgentTrace
@@ -13,66 +13,93 @@ from any_agent.tracing.trace import AgentTrace
 def test_evaluate_runs_all_evaluators(
     evaluation_case: EvaluationCase, agent_trace: AgentTrace
 ) -> None:
-    """This unit test is designed to ensure that the EvaluationRunner properly iterates over all the traces and eval cases"""
+    """This unit test checks that all evaluators are called when evaluating a trace."""
     #### Set up the mocks for the evaluators so that we don't actually call LLMs.
-    mock_checkpoint_evaluator = MagicMock()
-    mock_hypothesis_evaluator = MagicMock()
-    mock_qa_evaluator = MagicMock()
+    mock_checkpoint_evaluate = MagicMock()
+    mock_hypothesis_evaluate = MagicMock()
+    mock_qa_evaluate = MagicMock()
 
-    ### Every evaluator will return the same result
+    ### Every evaluate will return the same result
     eval_result = [
         EvaluationResult(
             criteria="test criteria", passed=True, reason="test passed", points=1
         )
     ]
-    for evaluator in [
-        mock_checkpoint_evaluator,
-        mock_hypothesis_evaluator,
-        mock_qa_evaluator,
+    for evaluate_fn in [
+        mock_checkpoint_evaluate,
+        mock_hypothesis_evaluate,
+        mock_qa_evaluate,
     ]:
-        evaluator.evaluate.return_value = eval_result
+        evaluate_fn.return_value = eval_result
 
     with (
         patch(
-            "any_agent.evaluation.evaluate.CheckpointEvaluator"
-        ) as mock_checkpoint_eval_cls,
+            "any_agent.evaluation.evaluate.evaluate_checkpoint",
+            mock_checkpoint_evaluate,
+        ),
         patch(
-            "any_agent.evaluation.evaluate.HypothesisEvaluator"
-        ) as mock_hypothesis_eval_cls,
-        patch(
-            "any_agent.evaluation.evaluate.QuestionAnsweringSquadEvaluator"
-        ) as mock_qa_eval_cls,
-        patch(
-            "any_agent.evaluation.evaluate.TracingProcessor.create"
-        ) as mock_processor_create,
+            "any_agent.evaluation.evaluate.evaluate_hypothesis",
+            mock_hypothesis_evaluate,
+        ),
+        patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
+        patch("any_agent.evaluation.evaluate.TracingProcessor.create"),
     ):
-        # Evaluators are created for each evaluation case (but not for each trace)
-        mock_checkpoint_eval_cls.side_effect = [
-            mock_checkpoint_evaluator,
-        ]
-        mock_hypothesis_eval_cls.side_effect = [mock_hypothesis_evaluator]
-        mock_qa_eval_cls.side_effect = [mock_qa_evaluator]
-
-        # Mock processor is used to extract the hypothesis answer
-        mock_processor = MagicMock()
-        mock_processor._extract_hypothesis_answer.return_value = (
-            "Mock hypothesis answer"
-        )
-        mock_processor_create.return_value = mock_processor
-
         evaluate(
             evaluation_case=evaluation_case,
             trace=agent_trace,
             agent_framework=AgentFramework.OPENAI,
         )
 
-        assert mock_checkpoint_eval_cls.call_count == 1
-        assert mock_hypothesis_eval_cls.call_count == 1
-        assert mock_qa_eval_cls.call_count == 1
+        assert mock_checkpoint_evaluate.call_count == 1
+        assert mock_hypothesis_evaluate.call_count == 1
+        assert mock_qa_evaluate.call_count == 1
 
-        assert mock_checkpoint_evaluator.evaluate.call_count == 1
-        assert mock_hypothesis_evaluator.evaluate.call_count == 1
-        assert mock_qa_evaluator.evaluate.call_count == 1
+
+def test_evaluate_when_no_final_output(
+    evaluation_case: EvaluationCase, agent_trace: AgentTrace
+) -> None:
+    """This unit test checks that the hypothesis and qa evaluators are not called when there is no final output."""
+    #### Set up the mocks for the evaluators so that we don't actually call LLMs.
+    mock_checkpoint_evaluate = MagicMock()
+    mock_hypothesis_evaluate = MagicMock()
+    mock_qa_evaluate = MagicMock()
+
+    agent_trace.final_output = None
+
+    ### Every evaluate will return the same result
+    eval_result = [
+        EvaluationResult(
+            criteria="test criteria", passed=True, reason="test passed", points=1
+        )
+    ]
+    for evaluate_fn in [
+        mock_checkpoint_evaluate,
+        mock_hypothesis_evaluate,
+        mock_qa_evaluate,
+    ]:
+        evaluate_fn.return_value = eval_result
+
+    with (
+        patch(
+            "any_agent.evaluation.evaluate.evaluate_checkpoint",
+            mock_checkpoint_evaluate,
+        ),
+        patch(
+            "any_agent.evaluation.evaluate.evaluate_hypothesis",
+            mock_hypothesis_evaluate,
+        ),
+        patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
+        patch("any_agent.evaluation.evaluate.TracingProcessor.create"),
+    ):
+        evaluate(
+            evaluation_case=evaluation_case,
+            trace=agent_trace,
+            agent_framework=AgentFramework.OPENAI,
+        )
+
+        assert mock_checkpoint_evaluate.call_count == 1
+        assert mock_hypothesis_evaluate.call_count == 0
+        assert mock_qa_evaluate.call_count == 0
 
 
 def test_trace_evaluation_result_score_calculation(agent_trace: AgentTrace) -> None:

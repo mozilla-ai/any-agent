@@ -3,21 +3,8 @@ from __future__ import annotations
 import yaml
 from litellm.utils import validate_environment
 from pydantic import BaseModel, ConfigDict, Field
-from typing_extensions import TypedDict
 
-
-class CheckpointCriteria(BaseModel):
-    """Represents a checkpoint criteria with a description."""
-
-    model_config = ConfigDict(extra="forbid")
-    criteria: str
-    points: int
-
-
-class GroundTruthAnswer(TypedDict):
-    name: str
-    value: float
-    points: float
+from any_agent.evaluation.schemas import CheckpointCriteria, GroundTruthAnswer
 
 
 class EvaluationCase(BaseModel):

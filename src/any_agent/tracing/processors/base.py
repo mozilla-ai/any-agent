@@ -61,10 +61,6 @@ class TracingProcessor(ABC):
         assert_never(agent_framework)
 
     @abstractmethod
-    def _extract_hypothesis_answer(self, trace: AgentTrace) -> str:
-        """Extract the hypothesis agent final answer from the trace."""
-
-    @abstractmethod
     def _get_agent_framework(self) -> AgentFramework:
         """Get the agent type associated with this processor."""
 
