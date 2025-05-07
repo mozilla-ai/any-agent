@@ -1,19 +1,12 @@
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tools import (
-    search_web,
-    show_final_output,
-    visit_webpage,
-    GoogleTool
-)
+from any_agent.tools import GoogleTool, search_web, show_final_output, visit_webpage
 
 
 def test_load_google_default() -> None:
-
     mock_agent = MagicMock()
     mock_model = MagicMock()
 
@@ -36,7 +29,6 @@ def test_load_google_multiagent() -> None:
     mock_agent = MagicMock()
     mock_model = MagicMock()
     mock_agent_tool = MagicMock()
-
 
     with (
         patch("any_agent.frameworks.google.LlmAgent", mock_agent),

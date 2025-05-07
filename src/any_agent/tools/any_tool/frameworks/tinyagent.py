@@ -5,6 +5,8 @@ from any_agent.tools.any_tool.any_tool import AnyToolBase
 
 
 class TinyAgentTool(AnyToolBase[Tool]):
+    """Wrapper class for the Tools used by TinyAgent."""
+
     framework: Literal[AgentFramework.TINYAGENT] = AgentFramework.TINYAGENT
 
     @classmethod

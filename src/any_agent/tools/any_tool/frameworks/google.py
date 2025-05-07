@@ -5,16 +5,18 @@ from any_agent.config import AgentFramework
 from any_agent.tools.any_tool.any_tool import AnyToolBase
 
 with suppress(ImportError):
-    from google.adk.tools import BaseTool as GoogleTool
+    from google.adk.tools import BaseTool as GoogleToolBase
     from google.adk.tools import FunctionTool as GoogleFunctionTool
 
 
-class GoogleTool(AnyToolBase["GoogleTool | GoogleFunctionTool"]):
+class GoogleTool(AnyToolBase["GoogleToolBase | GoogleFunctionTool"]):
+    """Wrapper class for the Tools used by Google."""
+
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
 
     @classmethod
-    def _validate_tool_type(cls, tool: Any) -> "GoogleTool | GoogleFunctionTool":
-        if isinstance(tool, GoogleTool):
+    def _validate_tool_type(cls, tool: Any) -> "GoogleToolBase | GoogleFunctionTool":
+        if isinstance(tool, GoogleToolBase):
             return tool
 
         return GoogleFunctionTool(tool)  # type: ignore[arg-type]

@@ -3,11 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tools import (
-    search_web,
-    visit_webpage,
-    LangchainTool
-)
+from any_agent.tools import LangchainTool, search_web, visit_webpage
 
 
 def test_load_langchain_agent_default() -> None:

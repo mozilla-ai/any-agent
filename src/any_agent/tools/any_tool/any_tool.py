@@ -42,6 +42,7 @@ class AnyToolBase(ABC, BaseModel, Generic[T]):
         )
 
     def __call__(self, *args, **kwargs):
+        """Call the inner tool with the same parameters."""
         return self.tool(*args, **kwargs)
 
     @field_validator("tool", mode="before")

@@ -12,6 +12,8 @@ with suppress(ImportError):
 
 
 class SmolagentsTool(AnyToolBase["SmolagentsToolBase"], SmolagentsToolBase):
+    """Wrapper class for the Tools used by Smolagents."""
+
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
     description: str | None = None
     inputs: str | None = None
@@ -19,6 +21,7 @@ class SmolagentsTool(AnyToolBase["SmolagentsToolBase"], SmolagentsToolBase):
     forward: str | None = None
 
     def model_post_init(self, _: Any) -> None:
+        """Post-init tool parameters."""
         self.__dict__["name"] = lambda _: self.tool.name
         self.description = self.tool.description
         self.inputs = self.tool.inputs
@@ -33,8 +36,8 @@ class SmolagentsTool(AnyToolBase["SmolagentsToolBase"], SmolagentsToolBase):
             return tool
 
         # Wrapping needed until upstream changes are merged
-        @wraps(tool)  # type: ignore[arg-type]
+        @wraps(tool)
         def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
-            return tool(*args, **kwargs)  # type: ignore[operator]
+            return tool(*args, **kwargs)
 
         return smolagents_tool(wrapped_function)

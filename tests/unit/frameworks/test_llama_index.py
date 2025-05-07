@@ -3,11 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tools import (
-    search_web,
-    visit_webpage,
-    LlamaIndexTool
-)
+from any_agent.tools import LlamaIndexTool, search_web, visit_webpage
 
 
 def test_load_llama_index_agent_default() -> None:

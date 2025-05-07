@@ -9,6 +9,8 @@ with suppress(ImportError):
 
 
 class OpenAITool(AnyToolBase["AgentTool"]):
+    """Wrapper class for the Tools used by OpenAI."""
+
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
     @classmethod
