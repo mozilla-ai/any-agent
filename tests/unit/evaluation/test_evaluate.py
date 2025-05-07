@@ -13,7 +13,7 @@ from any_agent.tracing.trace import AgentTrace
 def test_evaluate_runs_all_evaluators(
     evaluation_case: EvaluationCase, agent_trace: AgentTrace
 ) -> None:
-    """This unit test chacks that all evaluators are called when evaluating a trace."""
+    """This unit test checks that all evaluators are called when evaluating a trace."""
     #### Set up the mocks for the evaluators so that we don't actually call LLMs.
     mock_checkpoint_evaluate = MagicMock()
     mock_hypothesis_evaluate = MagicMock()
