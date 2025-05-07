@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
@@ -50,8 +51,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             f.write(text)
 
     kwargs["model_id"] = "gpt-4.1-mini"
-    if "OPENAI_API_KEY" not in os.environ:
-        pytest.skip(f"OPENAI_API_KEY needed for {agent_framework}")
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
     model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
         if agent_framework is not AgentFramework.AGNO
@@ -100,9 +103,20 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
 
 def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
+    model_id = "gpt-4.1-mini"
+    env_check = validate_environment(model_id)
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
+    model_args: dict[str, Any] = (
+        {"parallel_tool_calls": False}
+        if agent_framework is not AgentFramework.AGNO
+        else {}
+    )
+    model_args["temperature"] = 0.0
     agent = AnyAgent.create(
         agent_framework,
-        AgentConfig(model_id="gpt-4.1-nano", model_args={"temperature": 0.0}),
+        AgentConfig(model_id=model_id, model_args=model_args),
     )
     result1 = agent.run("What is the capital of France?")
     result2 = agent.run("What is the capital of Spain?")
