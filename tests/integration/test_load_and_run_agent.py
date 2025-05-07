@@ -5,10 +5,11 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
-from any_agent.config import MCPStdioParams
-from any_agent.tracing.trace import AgentTrace, is_tracing_supported
+from any_agent.config import MCPStdio
+from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
 def check_uvx_installed() -> bool:
@@ -50,8 +51,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             f.write(text)
 
     kwargs["model_id"] = "gpt-4.1-mini"
-    if "OPENAI_API_KEY" not in os.environ:
-        pytest.skip(f"OPENAI_API_KEY needed for {agent_framework}")
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
     model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
         if agent_framework is not AgentFramework.AGNO
@@ -60,7 +63,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     model_args["temperature"] = 0.0
     tools = [
         write_file,
-        MCPStdioParams(
+        MCPStdio(
             command="uvx",
             args=["mcp-server-time", "--local-timezone=America/New_York"],
             tools=[
@@ -74,10 +77,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    traces = tmp_path / "traces"
-    agent = AnyAgent.create(
-        agent_framework, agent_config, tracing=TracingConfig(output_dir=str(traces))
-    )
+    agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
 
     try:
         agent_trace = agent.run(
@@ -89,13 +89,9 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert content == str(datetime.now().year)
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-        if is_tracing_supported(agent_framework):
+        if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
-            assert traces.exists()
-            trace_files = [str(x) for x in traces.iterdir()]
-            assert agent_trace.output_file in trace_files
-            assert agent_framework.name in agent_trace.output_file
             cost_sum = agent_trace.get_total_cost()
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00
@@ -107,14 +103,25 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
 
 def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
+    model_id = "gpt-4.1-mini"
+    env_check = validate_environment(model_id)
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
+    model_args: dict[str, Any] = (
+        {"parallel_tool_calls": False}
+        if agent_framework is not AgentFramework.AGNO
+        else {}
+    )
+    model_args["temperature"] = 0.0
     agent = AnyAgent.create(
         agent_framework,
-        AgentConfig(model_id="gpt-4.1-nano", model_args={"temperature": 0.0}),
+        AgentConfig(model_id=model_id, model_args=model_args),
     )
     result1 = agent.run("What is the capital of France?")
     result2 = agent.run("What is the capital of Spain?")
     assert result1.final_output != result2.final_output
-    if is_tracing_supported(agent_framework):
+    if _is_tracing_supported(agent_framework):
         first_spans = result1.spans
         second_spans = result2.spans
         assert second_spans[: len(first_spans)] != first_spans, (

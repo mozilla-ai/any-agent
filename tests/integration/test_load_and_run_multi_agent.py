@@ -1,21 +1,19 @@
 import os
-from pathlib import Path
 
 import pytest
+from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tracing.trace import AgentTrace, is_tracing_supported
+from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_multi_agent(
-    agent_framework: AgentFramework, tmp_path: Path
-) -> None:
+def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
     kwargs = {}
 
     if agent_framework is AgentFramework.TINYAGENT:
@@ -24,8 +22,9 @@ def test_load_and_run_multi_agent(
         )
 
     kwargs["model_id"] = "gpt-4.1-nano"
-    if "OPENAI_API_KEY" not in os.environ:
-        pytest.skip(f"OPENAI_API_KEY needed for {agent_framework.name}")
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
     model_args = (
         {"parallel_tool_calls": False}
@@ -56,26 +55,19 @@ def test_load_and_run_multi_agent(
         ),
     ]
 
-    traces = tmp_path / "traces"
     agent = AnyAgent.create(
         agent_framework=agent_framework,
         agent_config=main_agent,
         managed_agents=managed_agents,
-        tracing=TracingConfig(
-            output_dir=str(traces), console=False, save=True, cost_info=True
-        ),
+        tracing=TracingConfig(console=False, cost_info=True),
     )
     agent_trace = agent.run("Which agent framework is the best?")
 
     assert agent_trace
     assert agent_trace.final_output
-    if is_tracing_supported(agent_framework):
+    if _is_tracing_supported(agent_framework):
         assert agent_trace.spans
         assert len(agent_trace.spans) > 0
-        assert traces.exists()
-        trace_files = [str(x) for x in traces.iterdir()]
-        assert agent_trace.output_file in trace_files
-        assert agent_framework.name in agent_trace.output_file
         cost_sum = agent_trace.get_total_cost()
         assert cost_sum.total_cost > 0
         assert cost_sum.total_cost < 1.00
@@ -87,13 +79,9 @@ def test_load_and_run_multi_agent(
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-        if is_tracing_supported(agent_framework):
+        if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
-            assert traces.exists()
-            trace_files = [str(x) for x in traces.iterdir()]
-            assert agent_trace.output_file in trace_files
-            assert agent_framework.name in agent_trace.output_file
             cost_sum = agent_trace.get_total_cost()
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00

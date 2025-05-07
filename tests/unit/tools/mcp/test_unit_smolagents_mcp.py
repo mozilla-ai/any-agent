@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 from smolagents.mcp_client import MCPClient
 
-from any_agent.config import AgentFramework, MCPSseParams, Tool
+from any_agent.config import AgentFramework, MCPSse, Tool
 from any_agent.tools import _get_mcp_server
 
 
@@ -22,7 +22,7 @@ def smolagents_mcp_server(
 
 @pytest.mark.asyncio
 async def test_smolagents_mcp_sse_integration(
-    mcp_sse_params_no_tools: MCPSseParams,
+    mcp_sse_params_no_tools: MCPSse,
     smolagents_mcp_server: MCPClient,
 ) -> None:
     server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.SMOLAGENTS)

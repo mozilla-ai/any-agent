@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from any_agent.config import AgentFramework, MCPSseParams, Tool
+from any_agent.config import AgentFramework, MCPSse, Tool
 from any_agent.tools import _get_mcp_server
 
 
@@ -24,7 +24,7 @@ def load_mcp_tools(
     "enter_context_with_transport_and_session", "_path_client_session"
 )
 async def test_langchain_mcp_sse_integration(
-    mcp_sse_params_no_tools: MCPSseParams,
+    mcp_sse_params_no_tools: MCPSse,
     session: Any,
     load_mcp_tools: Any,
 ) -> None:

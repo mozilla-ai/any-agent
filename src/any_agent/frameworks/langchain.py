@@ -59,7 +59,7 @@ class LangchainAgent(AnyAgent):
             ),
         )
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the LangChain agent with the given configuration."""
         if not langchain_available:
             msg = "You need to `pip install 'any-agent[langchain]'` to use this agent"

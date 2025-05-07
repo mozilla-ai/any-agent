@@ -7,16 +7,16 @@ from pydantic import PrivateAttr
 
 from any_agent.config import (
     AgentFramework,
-    MCPSseParams,
-    MCPStdioParams,
-    Tool,
+    MCPSse,
+    MCPStdio,
 )
-from any_agent.tools.mcp.mcp_connection import MCPConnection
-from any_agent.tools.mcp.mcp_server import MCPServerBase
+from any_agent.tools.mcp.mcp_connection import _MCPConnection
+from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 mcp_available = False
 with suppress(ImportError):
-    from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
+    from google.adk.tools.mcp_tool import MCPTool as GoogleMCPTool
+    from google.adk.tools.mcp_tool import MCPToolset as GoogleMCPToolset
     from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
         SseServerParams as GoogleSseServerParameters,
     )
@@ -27,7 +27,7 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class GoogleMCPConnection(MCPConnection, ABC):
+class GoogleMCPConnection(_MCPConnection["GoogleMCPTool"], ABC):
     """Base class for Google MCP connections."""
 
     _params: "GoogleStdioServerParameters | GoogleSseServerParameters | None" = (
@@ -35,7 +35,7 @@ class GoogleMCPConnection(MCPConnection, ABC):
     )
 
     @abstractmethod
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["GoogleMCPTool"]:
         """List tools from the MCP server."""
         if not self._params:
             msg = "MCP params is not set up. Please call `list_tools` from a concrete class."
@@ -48,9 +48,9 @@ class GoogleMCPConnection(MCPConnection, ABC):
 
 
 class GoogleMCPStdioConnection(GoogleMCPConnection):
-    mcp_tool: MCPStdioParams
+    mcp_tool: MCPStdio
 
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["GoogleMCPTool"]:
         """List tools from the MCP server."""
         self._params = GoogleStdioServerParameters(
             command=self.mcp_tool.command,
@@ -61,9 +61,9 @@ class GoogleMCPStdioConnection(GoogleMCPConnection):
 
 
 class GoogleMCPSseConnection(GoogleMCPConnection):
-    mcp_tool: MCPSseParams
+    mcp_tool: MCPSse
 
-    async def list_tools(self) -> list[Tool]:
+    async def list_tools(self) -> list["GoogleMCPTool"]:
         """List tools from the MCP server."""
         self._params = GoogleSseServerParameters(
             url=self.mcp_tool.url,
@@ -72,7 +72,7 @@ class GoogleMCPSseConnection(GoogleMCPConnection):
         return await super().list_tools()
 
 
-class GoogleMCPServerBase(MCPServerBase, ABC):
+class GoogleMCPServerBase(_MCPServerBase["GoogleMCPTool"], ABC):
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
 
     def _check_dependencies(self) -> None:
@@ -83,9 +83,11 @@ class GoogleMCPServerBase(MCPServerBase, ABC):
 
 
 class GoogleMCPServerStdio(GoogleMCPServerBase):
-    mcp_tool: MCPStdioParams
+    mcp_tool: MCPStdio
 
-    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+    async def _setup_tools(
+        self, mcp_connection: _MCPConnection["GoogleMCPTool"] | None = None
+    ) -> None:
         mcp_connection = mcp_connection or GoogleMCPStdioConnection(
             mcp_tool=self.mcp_tool
         )
@@ -93,9 +95,11 @@ class GoogleMCPServerStdio(GoogleMCPServerBase):
 
 
 class GoogleMCPServerSse(GoogleMCPServerBase):
-    mcp_tool: MCPSseParams
+    mcp_tool: MCPSse
 
-    async def _setup_tools(self, mcp_connection: MCPConnection | None = None) -> None:
+    async def _setup_tools(
+        self, mcp_connection: _MCPConnection["GoogleMCPTool"] | None = None
+    ) -> None:
         mcp_connection = mcp_connection or GoogleMCPSseConnection(
             mcp_tool=self.mcp_tool
         )

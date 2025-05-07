@@ -30,7 +30,7 @@ agent = AnyAgent.create(
         model_id="gpt-4o-mini",
         tools=[search_web]
     ),
-    tracing=TracingConfig(output_dir="traces")
+    tracing=TracingConfig(console=True, cost_info=False)
 )
 
 agent_trace = agent.run("How many seconds would it take for a leopard at full speed to run through Pont des Arts?")

@@ -1,8 +1,6 @@
 import json
-import os
-from collections.abc import Mapping, Sequence
-from datetime import datetime
-from typing import TYPE_CHECKING, Any, Protocol, assert_never
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Protocol, assert_never
 
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -42,16 +40,6 @@ class AnyAgentExporter(SpanExporter):
 
         if self.tracing_config.console:
             self.console = Console()
-
-        if self.tracing_config.save:
-            if not os.path.exists(self.tracing_config.output_dir):
-                os.makedirs(self.tracing_config.output_dir)
-            timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-            self.output_file = f"{self.tracing_config.output_dir}/{self.agent_framework.name}-{timestamp}.json"
-            # Currently, we pass this file back to the user via the AgentTrace object returned by agent.run.
-            # This is flaky since nothing prevents the user from moving the file after it's saved, which then would
-            # invalidate the path that is saved with the trace
-            self.trace.output_file = self.output_file
 
     def print_to_console(self, span_kind: str, interaction: Mapping[str, Any]) -> None:
         """Print the span to the console."""
@@ -100,13 +88,6 @@ class AnyAgentExporter(SpanExporter):
             except (json.JSONDecodeError, TypeError, AttributeError) as e:
                 logger.warning("Failed to parse span data, %s, %s", span, e)
                 continue
-
-        if self.tracing_config.save:
-            if not self.output_file:
-                msg = "Output file is not set"
-                raise RuntimeError(msg)
-            self.trace.save(self.output_file)
-
         return SpanExportResult.SUCCESS
 
 

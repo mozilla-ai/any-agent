@@ -10,20 +10,7 @@ from any_agent import AgentConfig, AnyAgent
 from any_agent.tools import search_web, visit_webpage
 ```
 
-
-### Model ID
-
-`model_id` allows to select the underlying model used by the agent.
-If you are using the default `model_type` (LiteLLM), you can refer to [LiteLLM Provider Docs](https://docs.litellm.ai/docs/providers) for the list of providers and how to access them.
-
-!!! note
-
-    If you plan on using a model that requires access to an external service (e.g. OpenAI, Mistral, DeepSeek, etc), you'll need to set any relevant environment variables, e.g.
-
-    ```bash
-    export OPENAI_API_KEY=your_api_key_here
-    export DEEPSEEK_API_KEY=your_api_key_here
-    ```
+Check [`AgentConfig`][any_agent.config.AgentConfig] for more info on how to configure agents.
 
 ### Single Agent
 
@@ -81,9 +68,11 @@ agent_trace = agent.run("Which Agent Framework is the best??")
 print(agent_trace.final_output)
 ```
 
+Check [`AgentTrace`][any_agent.tracing.trace.AgentTrace] for more info on the return type.
+
 ### Async
 
-If you are running in `async` context, you should use the equivalent `create_async` and `run_async` methods:
+If you are running in `async` context, you should use the equivalent [`create_async`][any_agent.AnyAgent.create_async] and [`run_async`][any_agent.AnyAgent.run_async] methods:
 
 ```python
 import asyncio
@@ -117,67 +106,6 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
-
-## Advanced configuration
-
-!!! tip
-
-    Check the `Frameworks` pages for more details on each of these
-    configuration options.
-
-### Agent Args
-
-`agent_args` are passed when creating the instance used by the underlying framework.
-
-For example, you can pass `output_type` when using the [OpenAI Agents SDK](https://github.com/openai/openai-agents-python):
-
-```python
-from pydantic import BaseModel
-
-class CalendarEvent(BaseModel):
-    name: str
-    date: str
-    participants: list[str]
-
-agent = AnyAgent.create(
-    AgentConfig(
-        model_id="gpt-4.1-mini",
-        instructions="Extract calendar events from text",
-        agent_args={
-            "output_type": CalendarEvent
-        }
-    )
-)
-```
-
-### Agent Type
-
-`agent_type` controls the type of agent class that is used by the framework, and is unique to the framework used.
-
-Check the individual `Frameworks` pages for more info on the defaults.
-
-### Model Args
-
-`model_args` allows to set parameters like `temperature`, `top_k`, as well as any other provider-specific parameters.
-Refer to [LiteLLM Completion API Docs](https://docs.litellm.ai/docs/text_completion) for more info.
-
-### Model Type
-
-`model_type` controls the type of model class that is used by the agent framework, and is unique to the agent framework being used.
-
-For each framework, we leverage their support for [`LiteLLM`](https://github.com/BerriAI/litellm) and use it as default `model_type`, allowing you to use the same `model_id` syntax across these frameworks.
-
-### Run Args
-
-You can pass arbitrary `key=value` arguments to `agent.run` and they will be forwarded
-to the corresponding method used by the underlying framework.
-
-For example you can pass `max_turns=30` when using the [OpenAI Agents SDK](https://github.com/openai/openai-agents-python):
-
-```python
-agent.run("Which agent framework is the best?", max_turns=30)
-```
-
 
 ### Cleaning up the Agent
 

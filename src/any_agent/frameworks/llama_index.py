@@ -55,7 +55,7 @@ class LlamaIndexAgent(AnyAgent):
             ),
         )
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the LLamaIndex agent with the given configuration."""
         if not llama_index_available:
             msg = "You need to `pip install 'any-agent[llama_index]'` to use this agent"
