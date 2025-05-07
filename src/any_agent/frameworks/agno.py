@@ -109,8 +109,11 @@ class AgnoAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        exporter = self._add_exporter(prompt)
-        result: RunResponse = await self._agent.arun(prompt, **kwargs)
+        exporter = self._add_exporter()
+        tracer = self._tracer_provider.get_tracer("any_agent")
+        with tracer.start_as_current_span("agent_run") as span:
+            span.set_attribute("any_agent.run_id", str(exporter.run_id))
+            result: RunResponse = await self._agent.arun(prompt, **kwargs)
         exporter.trace.final_output = result.content
         exporter.shutdown()
         return exporter.trace

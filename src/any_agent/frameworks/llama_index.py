@@ -122,8 +122,11 @@ class LlamaIndexAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        exporter = self._add_exporter(prompt)
-        result: AgentOutput = await self._agent.run(prompt, **kwargs)
+        exporter = self._add_exporter()
+        tracer = self._tracer_provider.get_tracer("any_agent")
+        with tracer.start_as_current_span("agent_run") as span:
+            span.set_attribute("any_agent.run_id", str(exporter.run_id))
+            result: AgentOutput = await self._agent.run(prompt, **kwargs)
         # assert that it's a TextBlock
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
             msg = f"Agent did not return a valid response: {result.response}"

@@ -1,6 +1,7 @@
 import json
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Protocol, assert_never
+from uuid import UUID, uuid4
 
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -28,13 +29,13 @@ class AnyAgentExporter(SpanExporter):
         self,
         agent_framework: AgentFramework,
         tracing_config: TracingConfig,
-        prompt: str | None = None,
+        run_id: UUID | None = None,
     ):
         self.agent_framework = agent_framework
         self.tracing_config = tracing_config
         self.trace: AgentTrace = AgentTrace()
         self.trace_id: int | None = None
-        self.prompt = prompt
+        self.run_id = run_id or uuid4()
         self.processor: TracingProcessor | None = TracingProcessor.create(
             agent_framework
         )
@@ -70,22 +71,15 @@ class AnyAgentExporter(SpanExporter):
     def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:  # noqa: D102
         if not self.processor:
             return SpanExportResult.SUCCESS
-        if not self.trace_id:
-            if not self.prompt:
-                self.trace_id = spans[0].context.trace_id
-            elif self.prompt in spans[0].attributes.get("input.value"):
-                self.trace_id = spans[0].context.trace_id
-            else:
-                return SpanExportResult.SUCCESS
-        elif self.trace_id != spans[0].context.trace_id:
-            logger.warning(
-                "Trace ID mismatch. Expected %s, got %s",
-                self.trace_id,
-                spans[0].context.trace_id,
-            )
-            return SpanExportResult.SUCCESS
 
         for readable_span in spans:
+            # Check if this span belongs to our run
+            if readable_span.attributes:
+                span_run_id = readable_span.attributes.get("any_agent.run_id", None)
+            else:
+                span_run_id = None
+            if span_run_id and str(self.run_id) != span_run_id:
+                continue
             span = AgentSpan.from_readable_span(readable_span)
             try:
                 span_kind, interaction = self.processor.extract_interaction(span)

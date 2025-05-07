@@ -132,9 +132,12 @@ class LangchainAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        exporter = self._add_exporter(prompt)
+        exporter = self._add_exporter()
         inputs = {"messages": [("user", prompt)]}
-        result = await self._agent.ainvoke(inputs, **kwargs)
+        tracer = self._tracer_provider.get_tracer("any_agent")
+        with tracer.start_as_current_span("agent_run") as span:
+            span.set_attribute("any_agent.run_id", str(exporter.run_id))
+            result = await self._agent.ainvoke(inputs, **kwargs)
         if not result.get("messages"):
             msg = "No messages returned from the agent."
             raise ValueError(msg)

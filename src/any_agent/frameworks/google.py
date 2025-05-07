@@ -112,22 +112,25 @@ class GoogleAgent(AnyAgent):
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
-        runner.session_service.create_session(
-            app_name=runner.app_name,
-            user_id=user_id,
-            session_id=session_id,
-        )
-        events = runner.run_async(
-            user_id=user_id,
-            session_id=session_id,
-            new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
-            **kwargs,
-        )
+        tracer = self._tracer_provider.get_tracer("any_agent")
+        with tracer.start_as_current_span("agent_run") as span:
+            span.set_attribute("any_agent.run_id", str(exporter.run_id))
+            runner.session_service.create_session(
+                app_name=runner.app_name,
+                user_id=user_id,
+                session_id=session_id,
+            )
+            events = runner.run_async(
+                user_id=user_id,
+                session_id=session_id,
+                new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
+                **kwargs,
+            )
 
-        async for event in events:
-            logger.debug(event)
-            if event.is_final_response():
-                break
+            async for event in events:
+                logger.debug(event)
+                if event.is_final_response():
+                    break
 
         session = runner.session_service.get_session(
             app_name=runner.app_name,

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
+from uuid import uuid4
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
@@ -45,7 +46,6 @@ class AnyAgent(ABC):
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
         self._instrumenter: Instrumenter | None = None
-        self._tracer_provider: TracerProvider | None = None
         self._setup_tracing()
 
     @staticmethod
@@ -146,8 +146,9 @@ class AnyAgent(ABC):
         self._instrumenter = get_instrumenter_by_framework(self.framework)
         self._instrumenter.instrument(tracer_provider=self._tracer_provider)
 
-    def _add_exporter(self, prompt=None) -> AnyAgentExporter:
-        exporter = AnyAgentExporter(self.framework, self._tracing_config, prompt)
+    def _add_exporter(self) -> AnyAgentExporter:
+        run_id = uuid4()
+        exporter = AnyAgentExporter(self.framework, self._tracing_config, run_id=run_id)
         self._tracer_provider.add_span_processor(SimpleSpanProcessor(exporter))
         return exporter
 

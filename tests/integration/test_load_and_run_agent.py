@@ -101,6 +101,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     finally:
         agent.exit()
 
+
 @pytest.mark.asyncio
 async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
@@ -124,6 +125,8 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
         agent.run_async("What is the capital of Spain?"),
     )
     result1, result2 = results
+    assert result1.final_output is not None
+    assert result2.final_output is not None
     assert "Paris" in result1.final_output
     assert "Madrid" in result2.final_output
     if _is_tracing_supported(agent_framework):
