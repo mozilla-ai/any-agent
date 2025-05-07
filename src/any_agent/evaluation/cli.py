@@ -32,7 +32,7 @@ def do_eval(
         agent_framework=agent_framework,
     )
     logger.info(f"Final score: {result.score}")
-    
+
     logger.info("Writing results to %s", output_path)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:

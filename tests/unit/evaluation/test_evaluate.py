@@ -51,9 +51,7 @@ def test_evaluate_runs_all_evaluators(
         mock_checkpoint_eval_cls.side_effect = [
             mock_checkpoint_evaluator,
         ]
-        mock_hypothesis_eval_cls.side_effect = [
-            mock_hypothesis_evaluator
-        ]
+        mock_hypothesis_eval_cls.side_effect = [mock_hypothesis_evaluator]
         mock_qa_eval_cls.side_effect = [mock_qa_evaluator]
 
         # Mock processor is used to extract the hypothesis answer
@@ -76,6 +74,7 @@ def test_evaluate_runs_all_evaluators(
         assert mock_checkpoint_evaluator.evaluate.call_count == 1
         assert mock_hypothesis_evaluator.evaluate.call_count == 1
         assert mock_qa_evaluator.evaluate.call_count == 1
+
 
 def test_trace_evaluation_result_score_calculation(agent_trace: AgentTrace) -> None:
     """Test that the score property of TraceEvaluationResult correctly calculates the ratio of passed points to total points."""
@@ -130,4 +129,4 @@ def test_trace_evaluation_result_score_calculation(agent_trace: AgentTrace) -> N
         direct_results=[],
     )
     with pytest.raises(ValueError, match="Total points is 0, cannot calculate score."):
-        zero_point_result.score
+        zero_point_result.score  # noqa: B018
