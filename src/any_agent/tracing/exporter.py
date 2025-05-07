@@ -1,6 +1,6 @@
 import json
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, Protocol, assert_never
+from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Protocol, assert_never
 
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -32,7 +32,6 @@ class AnyAgentExporter(SpanExporter):
         self.agent_framework = agent_framework
         self.tracing_config = tracing_config
         self.trace: AgentTrace = AgentTrace()
-        self.output_file: str | None = None
         self.processor: TracingProcessor | None = TracingProcessor.create(
             agent_framework
         )
@@ -80,7 +79,7 @@ class AnyAgentExporter(SpanExporter):
                 if span_kind == "LLM" and self.tracing_config.cost_info:
                     span.add_cost_info()
 
-                self.trace.add_span(span)
+                self.trace.spans.append(span)
 
                 if self.tracing_config.console and self.console:
                     self.print_to_console(span_kind, interaction)

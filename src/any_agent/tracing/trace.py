@@ -186,15 +186,6 @@ class AgentTrace(BaseModel):
             total_cost_completion=total_cost_completion,
         )
 
-    def add_span(self, span: AgentSpan) -> None:
-        """Add a span to the trace."""
-        self.spans.append(span)
-
-    def save(self, output_path: str) -> None:
-        """Save the trace to a JSON file."""
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(self.model_dump_json(indent=2))
-
 
 def _is_tracing_supported(agent_framework: AgentFramework) -> bool:
     """Check if tracing is supported for the given agent framework."""
