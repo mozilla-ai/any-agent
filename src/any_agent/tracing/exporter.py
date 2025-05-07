@@ -71,7 +71,9 @@ class AnyAgentExporter(SpanExporter):
         if not self.processor:
             return SpanExportResult.SUCCESS
         if not self.trace_id:
-            if self.prompt in spans[0].attributes.get("input.value"):
+            if not self.prompt:
+                self.trace_id = spans[0].context.trace_id
+            elif self.prompt in spans[0].attributes.get("input.value"):
                 self.trace_id = spans[0].context.trace_id
             else:
                 return SpanExportResult.SUCCESS
