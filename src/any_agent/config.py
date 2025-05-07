@@ -135,8 +135,6 @@ class AgentConfig(BaseModel):
     See more info at [Tools](../tools.md).
     """
 
-    handoff: bool = False
-
     agent_type: Callable[..., Any] | None = None
     """Control the type of agent class that is used by the framework, and is unique to the framework used.
 

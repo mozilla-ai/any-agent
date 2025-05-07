@@ -80,9 +80,10 @@ class OpenAIAgent(AnyAgent):
                     managed_agent.tools
                 )
                 managed_tools = self._filter_mcp_tools(managed_tools, mcp_servers)
-                kwargs = {}
+                managed_agent_args = managed_agent.agent_args or {}
+                handoff = managed_agent_args.pop("handoff", None)
                 if managed_agent.model_args:
-                    kwargs["model_settings"] = managed_agent.model_args
+                    managed_agent_args["model_settings"] = managed_agent.model_args
                 instance = Agent(
                     name=managed_agent.name,
                     instructions=managed_agent.instructions,
@@ -92,9 +93,9 @@ class OpenAIAgent(AnyAgent):
                         managed_mcp_server.server
                         for managed_mcp_server in managed_mcp_servers
                     ],
-                    **kwargs,  # type: ignore[arg-type]
+                    **managed_agent_args,
                 )
-                if managed_agent.handoff:
+                if handoff:
                     handoffs.append(instance)
                 else:
                     tools.append(

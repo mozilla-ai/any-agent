@@ -156,7 +156,7 @@ def test_load_openai_multiagent() -> None:
                 model_id="gpt-4o-mini",
                 name="communication-agent",
                 tools=[show_final_output],
-                handoff=True,
+                agent_args={"handoff": True},
             ),
         ]
 
