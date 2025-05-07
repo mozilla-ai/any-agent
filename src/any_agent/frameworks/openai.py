@@ -139,5 +139,6 @@ class OpenAIAgent(AnyAgent):
         with tracer.start_as_current_span("agent_run") as span:
             span.set_attribute("any_agent.run_id", run_id)
             result = await Runner.run(self._agent, prompt, **kwargs)
-        self._exporter.traces[run_id].final_output = result.final_output
-        return self._exporter.traces[run_id]
+        trace = self._exporter.pop_trace(run_id)
+        trace.final_output = result.final_output
+        return trace

@@ -132,6 +132,6 @@ class LlamaIndexAgent(AnyAgent):
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
             msg = f"Agent did not return a valid response: {result.response}"
             raise ValueError(msg)
-
-        self._exporter.traces[run_id].final_output = result.response.blocks[0].text
-        return self._exporter.traces[run_id]
+        trace = self._exporter.pop_trace(run_id)
+        trace.final_output = result.response.blocks[0].text
+        return trace

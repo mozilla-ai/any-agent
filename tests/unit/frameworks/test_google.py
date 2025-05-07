@@ -1,5 +1,5 @@
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -112,7 +112,7 @@ def test_run_google_custom_args() -> None:
     mock_agent = MagicMock()
     mock_runner = MagicMock()
     mock_session = MagicMock()
-    
+
     # More explicit mock setup
     mock_state = MagicMock()
     mock_state.get.return_value = "mock response"
@@ -128,11 +128,11 @@ def test_run_google_custom_args() -> None:
     ):
         agent = AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))
         result = agent.run("foo", user_id="1", session_id="2", run_config=run_config)
-        
+
         # Verify the result is as expected
         assert isinstance(result.final_output, str)
         assert result.final_output == "mock response"
-        
+
         mock_runner.return_value.run_async.assert_called_once_with(
             user_id="1",
             session_id="2",

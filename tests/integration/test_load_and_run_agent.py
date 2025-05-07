@@ -105,6 +105,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
 @pytest.mark.asyncio
 async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
+    if agent_framework is AgentFramework.AGNO:
+        pytest.skip(
+            "AGNO bug https://github.com/agno-agi/agno/issues/3120 prevents mixes concurrent runs in async"
+        )
     model_id = "gpt-4.1-nano"
     env_check = validate_environment(model_id)
     if not env_check["keys_in_environment"]:
@@ -112,7 +116,7 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
 
     model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
-        if agent_framework is not AgentFramework.AGNO
+        if agent_framework is not AgentFramework.AGNO  # type: ignore[comparison-overlap]
         else {}
     )
     model_args["temperature"] = 0.0
@@ -135,3 +139,10 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
         assert second_spans[: len(first_spans)] != first_spans, (
             "Spans from the first run should not be in the second"
         )
+        assert result1.spans
+        assert len(result1.spans) > 0
+        cost_sum = result1.get_total_cost()
+        assert cost_sum.total_cost > 0
+        assert cost_sum.total_cost < 1.00
+        assert cost_sum.total_tokens > 0
+        assert cost_sum.total_tokens < 20000

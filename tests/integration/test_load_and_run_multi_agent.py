@@ -61,18 +61,6 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
         managed_agents=managed_agents,
         tracing=TracingConfig(console=False, cost_info=True),
     )
-    agent_trace = agent.run("Which agent framework is the best?")
-
-    assert agent_trace
-    assert agent_trace.final_output
-    if _is_tracing_supported(agent_framework):
-        assert agent_trace.spans
-        assert len(agent_trace.spans) > 0
-        cost_sum = agent_trace.get_total_cost()
-        assert cost_sum.total_cost > 0
-        assert cost_sum.total_cost < 1.00
-        assert cost_sum.total_tokens > 0
-        assert cost_sum.total_tokens < 20000
 
     try:
         agent_trace = agent.run("Which agent framework is the best?")

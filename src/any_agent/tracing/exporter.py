@@ -1,7 +1,6 @@
 import json
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Protocol, assert_never
-from uuid import UUID
 
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -29,15 +28,15 @@ class AnyAgentExporter(SpanExporter):
         self,
         agent_framework: AgentFramework,
         tracing_config: TracingConfig,
-        run_id: UUID | None = None,
     ):
         self.agent_framework = agent_framework
         self.tracing_config = tracing_config
-        self.traces: dict[str, AgentTrace] = {}
+        self.traces: dict[int, AgentTrace] = {}
         self.processor: TracingProcessor | None = TracingProcessor.create(
             agent_framework
         )
         self.console: Console | None = None
+        self.run_trace_mapping: dict[str, int] = {}
 
         if self.tracing_config.console:
             self.console = Console()
@@ -75,18 +74,19 @@ class AnyAgentExporter(SpanExporter):
             if not readable_span.attributes:
                 continue
             agent_run_id = readable_span.attributes.get("any_agent.run_id")
-            if not agent_run_id or not isinstance(agent_run_id, str):
-                msg = "Span does not contain 'any_agent.run_id' attribute."
-                raise ValueError(msg)
+            trace_id = readable_span.context.trace_id
+            if agent_run_id is not None:
+                assert isinstance(agent_run_id, str)
+                self.run_trace_mapping[agent_run_id] = trace_id
             span = AgentSpan.from_readable_span(readable_span)
-            if not self.traces.get(agent_run_id):
-                self.traces[agent_run_id] = AgentTrace(spans=[])
+            if not self.traces.get(trace_id):
+                self.traces[trace_id] = AgentTrace(spans=[])
             try:
                 span_kind, interaction = self.processor.extract_interaction(span)
                 if span_kind == "LLM" and self.tracing_config.cost_info:
                     span.add_cost_info()
 
-                self.traces[agent_run_id].spans.append(span)
+                self.traces[trace_id].spans.append(span)
 
                 if self.tracing_config.console and self.console:
                     self.print_to_console(span_kind, interaction)
@@ -95,6 +95,21 @@ class AnyAgentExporter(SpanExporter):
                 logger.warning("Failed to parse span data, %s, %s", span, e)
                 continue
         return SpanExportResult.SUCCESS
+
+    def pop_trace(
+        self,
+        agent_run_id: str,
+    ) -> AgentTrace:
+        """Pop the trace for the given agent run ID."""
+        trace_id = self.run_trace_mapping.pop(agent_run_id, None)
+        if trace_id is None:
+            msg = f"Trace ID not found for agent run ID: {agent_run_id}"
+            raise ValueError(msg)
+        trace = self.traces.pop(trace_id, None)
+        if trace is None:
+            msg = f"Trace not found for trace ID: {trace_id}"
+            raise ValueError(msg)
+        return trace
 
 
 class Instrumenter(Protocol):  # noqa: D101

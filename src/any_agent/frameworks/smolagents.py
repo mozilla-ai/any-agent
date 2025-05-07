@@ -108,5 +108,6 @@ class SmolagentsAgent(AnyAgent):
         with tracer.start_as_current_span("agent_run") as span:
             span.set_attribute("any_agent.run_id", run_id)
             result = self._agent.run(prompt, **kwargs)
-        self._exporter.traces[run_id].final_output = result
-        return self._exporter.traces[run_id]
+        trace = self._exporter.pop_trace(run_id)
+        trace.final_output = result
+        return trace

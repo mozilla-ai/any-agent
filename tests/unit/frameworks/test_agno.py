@@ -79,12 +79,12 @@ def test_run_agno_custom_args() -> None:
     # Create a mock response object with the required content attribute
     mock_response = MagicMock()
     mock_response.content = "mock response"
-    
+
     # Set up the AsyncMock to return the mock response
     mock_agent_instance = AsyncMock()
     mock_agent_instance.arun.return_value = mock_response
     mock_agent.return_value = mock_agent_instance
-    
+
     mock_model = MagicMock()
 
     with (
@@ -93,10 +93,10 @@ def test_run_agno_custom_args() -> None:
     ):
         agent = AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
         result = agent.run("foo", retries=2)
-        
+
         # Verify the result is as expected
         assert isinstance(result.final_output, str)
         assert result.final_output == "mock response"
-        
+
         # Verify the agent was called with the right parameters
         mock_agent_instance.arun.assert_called_once_with("foo", retries=2)
