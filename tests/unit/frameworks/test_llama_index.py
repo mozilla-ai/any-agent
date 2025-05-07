@@ -6,6 +6,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import (
     search_web,
     visit_webpage,
+    LlamaIndexTool
 )
 
 
@@ -14,13 +15,10 @@ def test_load_llama_index_agent_default() -> None:
     create_mock = MagicMock()
     agent_mock = MagicMock()
     create_mock.return_value = agent_mock
-    tool_mock = MagicMock()
-    from llama_index.core.tools import FunctionTool
 
     with (
         patch("any_agent.frameworks.llama_index.DEFAULT_AGENT_TYPE", create_mock),
         patch("any_agent.frameworks.llama_index.DEFAULT_MODEL_TYPE", model_mock),
-        patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
         AnyAgent.create(
             AgentFramework.LLAMA_INDEX,
@@ -38,7 +36,7 @@ def test_load_llama_index_agent_default() -> None:
             llm=model_mock.return_value,
             system_prompt="You are a helpful assistant",
             description="The main agent",
-            tools=[tool_mock(search_web), tool_mock(visit_webpage)],
+            tools=[LlamaIndexTool(tool=search_web), LlamaIndexTool(tool=visit_webpage)],
         )
 
 
@@ -53,14 +51,11 @@ def test_load_llama_index_multiagent() -> None:
     create_mock = MagicMock()
     agent_mock = MagicMock()
     create_mock.return_value = agent_mock
-    tool_mock = MagicMock()
-    from llama_index.core.tools import FunctionTool
 
     with (
         patch("any_agent.frameworks.llama_index.DEFAULT_AGENT_TYPE", create_mock),
         patch("any_agent.frameworks.llama_index.AgentWorkflow"),
         patch("any_agent.frameworks.llama_index.DEFAULT_MODEL_TYPE", model_mock),
-        patch.object(FunctionTool, "from_defaults", tool_mock),
     ):
         main_agent = AgentConfig(model_id="gpt-4.1-mini")
 
@@ -83,8 +78,8 @@ def test_load_llama_index_multiagent() -> None:
             description="A managed agent",
             llm=model_mock.return_value,
             tools=[
-                tool_mock(search_web),
-                tool_mock(visit_webpage),
+                LlamaIndexTool(tool=search_web),
+                LlamaIndexTool(tool=visit_webpage),
             ],
             system_prompt=None,
             can_handoff_to=["any_agent"],

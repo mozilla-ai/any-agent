@@ -10,7 +10,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
 from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools.wrappers import _wrap_tools
+from any_agent.tools import AnyTool, wrap_tools
 from any_agent.tracing.exporter import (
     AnyAgentExporter,
     Instrumenter,
@@ -122,13 +122,13 @@ class AnyAgent(ABC):
 
     async def _load_tools(
         self, tools: Sequence[Tool]
-    ) -> tuple[list[Any], list[MCPServerBase[Any]]]:
-        tools, mcp_servers = await _wrap_tools(tools, self.framework)
+    ) -> tuple[list[AnyTool], list[MCPServerBase[Any]]]:
+        tools_, mcp_servers = await wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
         for mcp_server in mcp_servers:
-            tools.extend(mcp_server.tools)
-        return tools, mcp_servers
+            tools_.extend(mcp_server.tools)
+        return tools_, mcp_servers
 
     def _setup_tracing(self) -> None:
         """Initialize the tracing for the agent."""

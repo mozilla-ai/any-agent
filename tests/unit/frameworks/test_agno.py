@@ -4,6 +4,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import (
+    AgnoTool,
     search_web,
     visit_webpage,
 )
@@ -22,7 +23,7 @@ def test_load_agno_default() -> None:
             name="any_agent",
             instructions=None,
             model=mock_model(model="gpt-4o"),
-            tools=[search_web, visit_webpage],
+            tools=[AgnoTool(tool=search_web), AgnoTool(tool=visit_webpage)],
         )
 
 
@@ -61,7 +62,7 @@ def test_load_agno_multi_agent() -> None:
             role="You can visit webpages",
             instructions=None,
             model=mock_model(model="gpt-4o-mini"),
-            tools=[visit_webpage],
+            tools=[AgnoTool(tool=visit_webpage)],
         )
         mock_team.assert_called_once_with(
             mode="collaborate",
@@ -70,7 +71,7 @@ def test_load_agno_multi_agent() -> None:
             instructions=None,
             model=mock_model(model="gpt-4o"),
             members=[mock_agent.return_value],
-            tools=[search_web],
+            tools=[AgnoTool(tool=search_web)],
         )
 
 
