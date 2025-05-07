@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
@@ -21,8 +22,9 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
         )
 
     kwargs["model_id"] = "gpt-4.1-nano"
-    if "OPENAI_API_KEY" not in os.environ:
-        pytest.skip(f"OPENAI_API_KEY needed for {agent_framework.name}")
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
     model_args = (
         {"parallel_tool_calls": False}

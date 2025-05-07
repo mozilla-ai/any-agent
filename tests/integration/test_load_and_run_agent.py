@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
@@ -50,8 +51,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             f.write(text)
 
     kwargs["model_id"] = "gpt-4.1-mini"
-    if "OPENAI_API_KEY" not in os.environ:
-        pytest.skip(f"OPENAI_API_KEY needed for {agent_framework}")
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
     model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
         if agent_framework is not AgentFramework.AGNO
