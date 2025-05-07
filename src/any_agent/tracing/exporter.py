@@ -1,7 +1,7 @@
 import json
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Protocol, assert_never
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -33,9 +33,7 @@ class AnyAgentExporter(SpanExporter):
     ):
         self.agent_framework = agent_framework
         self.tracing_config = tracing_config
-        self.trace: AgentTrace = AgentTrace()
-        self.trace_id: int | None = None
-        self.run_id = run_id or uuid4()
+        self.traces: dict[str, AgentTrace] = {}
         self.processor: TracingProcessor | None = TracingProcessor.create(
             agent_framework
         )
@@ -74,19 +72,18 @@ class AnyAgentExporter(SpanExporter):
 
         for readable_span in spans:
             # Check if this span belongs to our run
-            if readable_span.attributes:
-                span_run_id = readable_span.attributes.get("any_agent.run_id", None)
-            else:
-                span_run_id = None
-            if span_run_id and str(self.run_id) != span_run_id:
+            if not readable_span.attributes:
                 continue
+            agent_run_id = readable_span.attributes.get("any_agent.run_id", None)
             span = AgentSpan.from_readable_span(readable_span)
+            if not self.traces.get(agent_run_id):
+                self.traces[agent_run_id] = AgentTrace(spans=[])
             try:
                 span_kind, interaction = self.processor.extract_interaction(span)
                 if span_kind == "LLM" and self.tracing_config.cost_info:
                     span.add_cost_info()
 
-                self.trace.spans.append(span)
+                self.traces[agent_run_id].spans.append(span)
 
                 if self.tracing_config.console and self.console:
                     self.print_to_console(span_kind, interaction)

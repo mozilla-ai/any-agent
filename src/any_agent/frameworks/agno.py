@@ -1,8 +1,10 @@
 from typing import TYPE_CHECKING, Any
+from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
+from any_agent.tracing.trace import AgentTrace
 
 from .any_agent import AnyAgent
 
@@ -20,8 +22,6 @@ except ImportError:
 if TYPE_CHECKING:
     from agno.agent import RunResponse
     from agno.models.base import Model
-
-    from any_agent.tracing.trace import AgentTrace
 
 
 class AgnoAgent(AnyAgent):
@@ -109,11 +109,7 @@ class AgnoAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        exporter = self._add_exporter()
-        tracer = self._tracer_provider.get_tracer("any_agent")
-        with tracer.start_as_current_span("agent_run") as span:
-            span.set_attribute("any_agent.run_id", str(exporter.run_id))
-            result: RunResponse = await self._agent.arun(prompt, **kwargs)
-        exporter.trace.final_output = result.content
-        exporter.shutdown()
-        return exporter.trace
+        result: RunResponse = await self._agent.arun(prompt, **kwargs)
+        return AgentTrace(
+            final_output=result.content,
+        )

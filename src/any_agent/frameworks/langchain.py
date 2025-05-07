@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
+from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
@@ -132,16 +133,15 @@ class LangchainAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        exporter = self._add_exporter()
         inputs = {"messages": [("user", prompt)]}
+        run_id = str(uuid4())
         tracer = self._tracer_provider.get_tracer("any_agent")
         with tracer.start_as_current_span("agent_run") as span:
-            span.set_attribute("any_agent.run_id", str(exporter.run_id))
+            span.set_attribute("any_agent.run_id", run_id)
             result = await self._agent.ainvoke(inputs, **kwargs)
         if not result.get("messages"):
             msg = "No messages returned from the agent."
             raise ValueError(msg)
         last_message: BaseMessage = result["messages"][-1]
-        exporter.trace.final_output = str(last_message.content)
-        exporter.shutdown()
-        return exporter.trace
+        self._exporter.traces[run_id].final_output = str(last_message.content)
+        return self._exporter.traces[run_id]

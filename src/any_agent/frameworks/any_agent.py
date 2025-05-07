@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
-from uuid import uuid4
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
@@ -143,14 +142,10 @@ class AnyAgent(ABC):
             )
             self._instrumenter = None
             return
+        self._exporter = AnyAgentExporter(self.framework, self._tracing_config)
+        self._tracer_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
         self._instrumenter = get_instrumenter_by_framework(self.framework)
         self._instrumenter.instrument(tracer_provider=self._tracer_provider)
-
-    def _add_exporter(self) -> AnyAgentExporter:
-        run_id = uuid4()
-        exporter = AnyAgentExporter(self.framework, self._tracing_config, run_id=run_id)
-        self._tracer_provider.add_span_processor(SimpleSpanProcessor(exporter))
-        return exporter
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""

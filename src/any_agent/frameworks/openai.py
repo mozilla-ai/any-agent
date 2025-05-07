@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Any
+from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.tools import search_web, visit_webpage
@@ -133,11 +134,10 @@ class OpenAIAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        exporter = self._add_exporter()
         tracer = self._tracer_provider.get_tracer("any_agent")
+        run_id = str(uuid4())
         with tracer.start_as_current_span("agent_run") as span:
-            span.set_attribute("any_agent.run_id", str(exporter.run_id))
+            span.set_attribute("any_agent.run_id", run_id)
             result = await Runner.run(self._agent, prompt, **kwargs)
-        exporter.trace.final_output = result.final_output
-        exporter.shutdown()
-        return exporter.trace
+        self._exporter.traces[run_id].final_output = result.final_output
+        return self._exporter.traces[run_id]

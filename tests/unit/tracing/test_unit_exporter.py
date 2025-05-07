@@ -44,7 +44,11 @@ def test_cost_info_default(llm_span: ReadableSpan):  # type: ignore[no-untyped-d
             ),
         )
         exporter.export([llm_span])
-        attributes = exporter.trace.spans[0].attributes
+        attributes = (
+            exporter.traces[str(llm_span.attributes["any_agent.run_id"])]
+            .spans[0]
+            .attributes
+        )
         for key in (
             "cost_prompt",
             "cost_completion",
@@ -60,7 +64,11 @@ def test_rich_console_cost_info_disabled(llm_span: ReadableSpan):  # type: ignor
             TracingConfig(console=False, cost_info=False),
         )
         exporter.export([llm_span])
-        attributes = exporter.trace.spans[0].attributes
+        attributes = (
+            exporter.traces[str(llm_span.attributes["any_agent.run_id"])]
+            .spans[0]
+            .attributes
+        )
         for key in (
             "cost_prompt",
             "cost_completion",
