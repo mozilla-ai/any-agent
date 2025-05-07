@@ -32,7 +32,6 @@ class EvaluationCase(BaseModel):
     final_output_criteria: list[CheckpointCriteria] = Field(
         default_factory=list[CheckpointCriteria],
     )
-    evaluation_case_path: str | None = None
 
     @classmethod
     def from_yaml(cls, evaluation_case_path: str) -> EvaluationCase:
@@ -67,8 +66,6 @@ class EvaluationCase(BaseModel):
                 for item in evaluation_case_dict["ground_truth"]
                 if isinstance(item, dict)
             ]
-
-        evaluation_case_dict["evaluation_case_path"] = evaluation_case_path
         # verify that the llm_judge is a valid litellm model
         validate_environment(evaluation_case_dict["llm_judge"])
         return cls.model_validate(evaluation_case_dict)

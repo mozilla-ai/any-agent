@@ -1,4 +1,4 @@
+from .evaluate import evaluate
 from .evaluation_case import EvaluationCase
-from .evaluation_runner import EvaluationRunner
 
-__all__ = ["EvaluationCase", "EvaluationRunner"]
+__all__ = ["EvaluationCase", "evaluate"]
