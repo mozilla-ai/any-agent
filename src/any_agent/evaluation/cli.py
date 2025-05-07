@@ -23,9 +23,6 @@ def do_eval(
         spans = json.loads(f.read())
     spans = [AgentSpan.model_validate_json(span) for span in spans]
     trace = AgentTrace(spans=spans)
-    # dump the trace to a file
-    with open("tmp.tmp", "w", encoding="utf-8") as f:
-        f.write(trace.model_dump_json(indent=2))
     result = evaluate(
         evaluation_case=evaluation_case,
         trace=trace,
