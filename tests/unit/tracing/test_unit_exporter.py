@@ -45,7 +45,7 @@ def test_cost_info_default(llm_span: ReadableSpan):  # type: ignore[no-untyped-d
         )
         exporter.export([llm_span])
         attributes = (
-            exporter.pop_trace(str(llm_span.attributes["any_agent.run_id"])) # type: ignore[index]
+            exporter.pop_trace(str(llm_span.attributes["any_agent.run_id"]))  # type: ignore[index]
             .spans[0]
             .attributes
         )
