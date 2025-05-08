@@ -6,7 +6,7 @@ import pytest
 from agno.tools.mcp import MCPTools as AgnoMCPTools
 
 from any_agent.config import AgentFramework, MCPSse, Tool
-from any_agent.mcp import _get_mcp_server
+from any_agent.mcp import _wrap_mcp_server
 
 
 @pytest.fixture
@@ -25,7 +25,7 @@ async def test_agno_mcp_sse_integration(
     tools: Sequence[Tool],
     agno_mcp_tools: AgnoMCPTools,
 ) -> None:
-    mcp_server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.AGNO)
+    mcp_server = _wrap_mcp_server(mcp_sse_params_with_tools, AgentFramework.AGNO)
 
     await mcp_server._setup_tools()
 

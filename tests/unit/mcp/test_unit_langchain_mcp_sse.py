@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework, MCPSse, Tool
-from any_agent.mcp import _get_mcp_server
+from any_agent.mcp import _wrap_mcp_server
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ async def test_langchain_mcp_sse_integration(
     session: Any,
     load_mcp_tools: Any,
 ) -> None:
-    server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.LANGCHAIN)
+    server = _wrap_mcp_server(mcp_sse_params_no_tools, AgentFramework.LANGCHAIN)
 
     await server._setup_tools()
 

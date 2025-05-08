@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 
 from any_agent.config import AgentFramework, MCPParams, MCPSse, Tool
-from any_agent.mcp import _get_mcp_server, _MCPConnection
+from any_agent.mcp import _MCPConnection, _wrap_mcp_server
 
 
 @pytest.mark.asyncio
@@ -14,7 +14,7 @@ async def test_sse_tool_filtering(
     sse_params_echo_server: MCPSse,
     tools: Sequence[str],
 ) -> None:
-    server = _get_mcp_server(sse_params_echo_server, agent_framework)
+    server = _wrap_mcp_server(sse_params_echo_server, agent_framework)
     await server._setup_tools()
     if agent_framework is AgentFramework.AGNO:
         # Check that only the specified tools are included
@@ -30,7 +30,7 @@ async def test_mcp_tools_loaded(
     mcp_connection: _MCPConnection[Any],
     tools: Sequence[Tool],
 ) -> None:
-    mcp_server = _get_mcp_server(mcp_params, agent_framework)
+    mcp_server = _wrap_mcp_server(mcp_params, agent_framework)
 
     await mcp_server._setup_tools(mcp_connection=mcp_connection)
 

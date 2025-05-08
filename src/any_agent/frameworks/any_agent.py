@@ -8,8 +8,9 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
-from any_agent.config import AgentConfig, AgentFramework, Tool, TracingConfig
+from any_agent.config import AgentConfig, AgentFramework, MCPParams, Tool, TracingConfig
 from any_agent.logging import logger
+from any_agent.mcp import wrap_mcp_servers
 from any_agent.tools import AnyTool, wrap_tools
 from any_agent.tracing.exporter import (
     AnyAgentExporter,
@@ -21,7 +22,7 @@ from any_agent.tracing.trace import _is_tracing_supported
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from any_agent.tools.mcp.mcp_server import _MCPServerBase
+    from any_agent.mcp import _MCPServerBase
     from any_agent.tracing.trace import AgentTrace
 
 
@@ -124,8 +125,27 @@ class AnyAgent(ABC):
 
     async def _load_tools(
         self, tools: Sequence[Tool]
-    ) -> tuple[list[Any], list[_MCPServerBase[Any]]]:
-        tools, mcp_servers = await _wrap_tools(tools, self.framework)
+    ) -> tuple[list[AnyTool], Sequence[_MCPServerBase[AnyTool]]]:
+        unsupported_tools = [
+            tool
+            for tool in tools
+            if not isinstance(tool, MCPParams) and not callable(tool)
+        ]
+
+        if unsupported_tools:
+            error_message = (
+                f"Tool {unsupported_tools[0]} needs to be of type `MCPStdioParams`, "
+                f"`str` or `callable` but is {type(unsupported_tools[0])}"
+            )
+            raise ValueError(error_message)
+
+        raw_tools = [
+            tool for tool in tools if callable(tool) and not isinstance(tool, MCPParams)
+        ]
+        tools_ = await wrap_tools(raw_tools, self.framework)
+
+        mcp_params = [tool for tool in tools if isinstance(tool, MCPParams)]
+        mcp_servers = await wrap_mcp_servers(mcp_params, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
         for mcp_server in mcp_servers:

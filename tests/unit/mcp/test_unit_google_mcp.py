@@ -8,7 +8,7 @@ from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined
 )
 
 from any_agent.config import AgentFramework, MCPSse, Tool
-from any_agent.mcp import _get_mcp_server
+from any_agent.mcp import _wrap_mcp_server
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ async def test_google_mcp_sse_integration(
     google_sse_params: GoogleSseServerParameters,
     mcp_sse_params_no_tools: MCPSse,
 ) -> None:
-    mcp_server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.GOOGLE)
+    mcp_server = _wrap_mcp_server(mcp_sse_params_no_tools, AgentFramework.GOOGLE)
     await mcp_server._setup_tools()
 
     google_sse_params.assert_called_once_with(  # type: ignore[attr-defined]

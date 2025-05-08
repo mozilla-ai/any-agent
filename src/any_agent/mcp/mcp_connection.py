@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Generic, Protocol, TypeVar, runtime_checkable
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 
 from any_agent.config import MCPParams
+from any_agent.tools import AnyTool
 
 if TYPE_CHECKING:
     from agents.mcp.server import MCPServer
@@ -19,7 +20,7 @@ class HasName(Protocol):
     name: str
 
 
-T = TypeVar("T")
+T = TypeVar("T", bound=AnyTool)
 
 
 class _MCPConnection(BaseModel, ABC, Generic[T]):

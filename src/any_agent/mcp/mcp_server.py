@@ -5,13 +5,15 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.config import AgentFramework, MCPParams
+from any_agent.tools import AnyTool
 
 from .mcp_connection import _MCPConnection
 
 if TYPE_CHECKING:
     from agents.mcp.server import MCPServer
 
-T_co = TypeVar("T_co", covariant=True)
+
+T_co = TypeVar("T_co", bound=AnyTool, covariant=True)
 
 
 class _MCPServerBase(BaseModel, ABC, Generic[T_co]):

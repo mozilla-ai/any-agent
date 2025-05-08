@@ -6,7 +6,7 @@ import pytest
 from smolagents.mcp_client import MCPClient
 
 from any_agent.config import AgentFramework, MCPSse, Tool
-from any_agent.mcp import _get_mcp_server
+from any_agent.mcp import _wrap_mcp_server
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ async def test_smolagents_mcp_sse_integration(
     mcp_sse_params_no_tools: MCPSse,
     smolagents_mcp_server: MCPClient,
 ) -> None:
-    server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.SMOLAGENTS)
+    server = _wrap_mcp_server(mcp_sse_params_no_tools, AgentFramework.SMOLAGENTS)
 
     await server._setup_tools()
 
