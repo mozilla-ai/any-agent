@@ -72,6 +72,19 @@ class ToolExecutor:
             # Extract arguments
             arguments = request.get("arguments", {})
 
+            if hasattr(self.tool_function, "__annotations__"):
+                func_args = self.tool_function.__annotations__
+                for arg_name, arg_type in func_args.items():
+                    if arg_name in arguments:
+                        try:
+                            # Convert the argument to the expected type
+                            arguments[arg_name] = arg_type(arguments[arg_name])
+                        except Exception as e:
+                            # fallback to original value if conversion fails
+                            logger.error(
+                                f"Error converting argument {arg_name} to {arg_type}: {e}"
+                            )
+
             # Call the tool function
             if asyncio.iscoroutinefunction(self.tool_function):
                 result = await self.tool_function(**arguments)
