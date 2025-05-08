@@ -120,29 +120,32 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
         else {}
     )
     model_args["temperature"] = 0.0
-    agent = await AnyAgent.create_async(
-        agent_framework,
-        AgentConfig(model_id=model_id, model_args=model_args),
-    )
-    results = await asyncio.gather(
-        agent.run_async("What is the capital of France?"),
-        agent.run_async("What is the capital of Spain?"),
-    )
-    result1, result2 = results
-    assert result1.final_output is not None
-    assert result2.final_output is not None
-    assert "Paris" in result1.final_output
-    assert "Madrid" in result2.final_output
-    if _is_tracing_supported(agent_framework):
-        first_spans = result1.spans
-        second_spans = result2.spans
-        assert second_spans[: len(first_spans)] != first_spans, (
-            "Spans from the first run should not be in the second"
+    try:
+        agent = await AnyAgent.create_async(
+            agent_framework,
+            AgentConfig(model_id=model_id, model_args=model_args),
         )
-        assert result1.spans
-        assert len(result1.spans) > 0
-        cost_sum = result1.get_total_cost()
-        assert cost_sum.total_cost > 0
-        assert cost_sum.total_cost < 1.00
-        assert cost_sum.total_tokens > 0
-        assert cost_sum.total_tokens < 20000
+        results = await asyncio.gather(
+            agent.run_async("What is the capital of France?"),
+            agent.run_async("What is the capital of Spain?"),
+        )
+        result1, result2 = results
+        assert result1.final_output is not None
+        assert result2.final_output is not None
+        assert "Paris" in result1.final_output
+        assert "Madrid" in result2.final_output
+        if _is_tracing_supported(agent_framework):
+            first_spans = result1.spans
+            second_spans = result2.spans
+            assert second_spans[: len(first_spans)] != first_spans, (
+                "Spans from the first run should not be in the second"
+            )
+            assert result1.spans
+            assert len(result1.spans) > 0
+            cost_sum = result1.get_total_cost()
+            assert cost_sum.total_cost > 0
+            assert cost_sum.total_cost < 1.00
+            assert cost_sum.total_tokens > 0
+            assert cost_sum.total_tokens < 20000
+    finally:
+        agent.exit()
