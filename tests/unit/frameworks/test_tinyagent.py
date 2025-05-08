@@ -1,6 +1,38 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.frameworks.tinyagent import TinyAgent, ToolExecutor
+
+
+async def sample_tool_function(arg1: int, arg2: str) -> str:
+    assert isinstance(arg1, int), "arg1 should be an int"
+    assert isinstance(arg2, str), "arg2 should be a str"
+    return f"Received int: {arg1}, str: {arg2}"
+
+
+@pytest.mark.asyncio
+async def test_tool_argument_casting() -> None:
+    agent: TinyAgent = await AnyAgent.create_async(
+        AgentFramework.TINYAGENT, AgentConfig(model_id="gpt-4o")
+    )  # type: ignore[assignment]
+
+    # Register the sample tool function
+    agent.clients["sample_tool"] = ToolExecutor(sample_tool_function)
+
+    request = {
+        "name": "sample_tool",
+        "arguments": {
+            "arg1": "42",  # This should be cast to int
+            "arg2": 100,  # This should be cast to str
+        },
+    }
+
+    # Call the tool and get the result
+    result = await agent.clients["sample_tool"].call_tool(request)
+    # Check the result
+    assert result["content"][0]["text"] == "Received int: 42, str: 100"
 
 
 def test_run_tinyagent_agent_custom_args() -> None:
