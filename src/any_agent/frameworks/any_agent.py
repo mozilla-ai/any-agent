@@ -21,7 +21,7 @@ from any_agent.tracing.trace import is_tracing_supported
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from any_agent.tools.mcp.mcp_server import MCPServerBase
+    from any_agent.mcp.mcp_server import MCPServerBase
     from any_agent.tracing.trace import AgentTrace
 
 

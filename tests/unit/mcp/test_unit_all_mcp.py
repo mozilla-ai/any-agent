@@ -5,7 +5,7 @@ from typing import Any
 import pytest
 
 from any_agent.config import AgentFramework, MCPParams, MCPSseParams, Tool
-from any_agent.tools import MCPConnection, _get_mcp_server
+from any_agent.mcp import MCPConnection, _get_mcp_server
 
 
 @pytest.mark.asyncio

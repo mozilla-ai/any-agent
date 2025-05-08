@@ -8,13 +8,13 @@ from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined
 )
 
 from any_agent.config import AgentFramework, MCPSseParams, Tool
-from any_agent.tools import _get_mcp_server
+from any_agent.mcp import _get_mcp_server
 
 
 @pytest.fixture
 def google_sse_params() -> Generator[GoogleSseServerParameters]:
     with patch(
-        "any_agent.tools.mcp.frameworks.google.GoogleSseServerParameters"
+        "any_agent.mcp.frameworks.google.GoogleSseServerParameters"
     ) as mock_params:
         yield mock_params
 
@@ -24,7 +24,7 @@ def google_toolset(tools: Sequence[Tool]) -> Generator[GoogleMCPToolset]:
     toolset = AsyncMock()
     toolset.load_tools.return_value = tools
     with patch(
-        "any_agent.tools.mcp.frameworks.google.GoogleMCPToolset", return_value=toolset
+        "any_agent.mcp.frameworks.google.GoogleMCPToolset", return_value=toolset
     ) as mock_class:
         yield mock_class
 

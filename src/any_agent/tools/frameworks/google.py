@@ -2,7 +2,7 @@ from contextlib import suppress
 from typing import Any, Literal
 
 from any_agent.config import AgentFramework
-from any_agent.tools.any_tool.any_tool import AnyToolBase
+from any_agent.tools.any_tool import AnyToolBase
 
 with suppress(ImportError):
     from google.adk.tools import BaseTool as GoogleToolBase

@@ -6,12 +6,12 @@ import pytest
 from agno.tools.mcp import MCPTools as AgnoMCPTools
 
 from any_agent.config import AgentFramework, MCPSseParams, Tool
-from any_agent.tools import _get_mcp_server
+from any_agent.mcp import _get_mcp_server
 
 
 @pytest.fixture
 def agno_mcp_tools() -> Generator[AgnoMCPTools]:
-    with patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools:
+    with patch("any_agent.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools:
         yield mock_mcp_tools
 
 

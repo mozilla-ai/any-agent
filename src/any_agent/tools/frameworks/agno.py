@@ -1,7 +1,7 @@
 from typing import Any, Literal
 
 from any_agent.config import AgentFramework, Tool
-from any_agent.tools.any_tool.any_tool import AnyToolBase
+from any_agent.tools.any_tool import AnyToolBase
 
 
 class AgnoTool(AnyToolBase[Tool]):

@@ -5,16 +5,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent.config import AgentFramework, MCPSseParams, Tool
-from any_agent.tools import _get_mcp_server
+from any_agent.mcp import _get_mcp_server
 
 
 @pytest.fixture
 def load_mcp_tools(
     tools: Sequence[Tool],
 ) -> Generator[MagicMock]:
-    with patch(
-        "any_agent.tools.mcp.frameworks.langchain.load_mcp_tools"
-    ) as mock_load_tools:
+    with patch("any_agent.mcp.frameworks.langchain.load_mcp_tools") as mock_load_tools:
         mock_load_tools.return_value = tools
         yield mock_load_tools
 

@@ -13,7 +13,7 @@ def openai_mcp_sse_server(
     tools: Sequence[Tool],
 ) -> Generator[OpenAIInternalMCPServerSse]:
     with patch(
-        "any_agent.tools.mcp.frameworks.openai.OpenAIInternalMCPServerSse",
+        "any_agent.mcp.frameworks.openai.OpenAIInternalMCPServerSse",
     ) as mock_server:
         mock_server.return_value.list_tools = AsyncMock(return_value=tools)
         yield mock_server

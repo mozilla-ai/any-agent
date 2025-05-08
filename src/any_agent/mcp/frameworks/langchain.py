@@ -7,8 +7,8 @@ from typing import Any, Literal
 from pydantic import PrivateAttr
 
 from any_agent.config import AgentFramework, MCPSseParams, MCPStdioParams
-from any_agent.tools.mcp.mcp_connection import MCPConnection
-from any_agent.tools.mcp.mcp_server import MCPServerBase
+from any_agent.mcp.mcp_connection import MCPConnection
+from any_agent.mcp.mcp_server import MCPServerBase
 
 mcp_available = False
 with suppress(ImportError):

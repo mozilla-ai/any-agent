@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from pydantic import TypeAdapter
 
 from any_agent.config import AgentFramework, MCPParams, Tool
-from any_agent.tools.mcp.frameworks import MCPServer, _get_mcp_server
+from any_agent.mcp.frameworks import MCPServer, _get_mcp_server
 
 from .agno import AgnoTool
 from .google import GoogleTool

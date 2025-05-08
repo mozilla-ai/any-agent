@@ -2,7 +2,7 @@ from contextlib import suppress
 from typing import Any, Literal
 
 from any_agent.config import AgentFramework
-from any_agent.tools.any_tool.any_tool import AnyToolBase
+from any_agent.tools.any_tool import AnyToolBase
 
 with suppress(ImportError):
     from llama_index.core.tools import FunctionTool as LlamaIndexToolBase
@@ -16,7 +16,6 @@ class LlamaIndexTool(AnyToolBase["LlamaIndexToolBase"]):
     def model_post_init(self, _: Any) -> None:
         """Post-init tool parameters."""
         self.__name__ = self.tool.metadata.name
-
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         """Call the inner tool with the same parameters."""

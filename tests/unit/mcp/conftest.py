@@ -11,7 +11,7 @@ from pydantic import Field
 from pytest_lazy_fixtures import lf
 
 from any_agent.config import MCPParams, MCPSseParams, MCPStdioParams, Tool
-from any_agent.tools import MCPConnection
+from any_agent.mcp import MCPConnection
 
 
 class Toolset(Protocol):
@@ -38,9 +38,7 @@ def session() -> Generator[Any]:
 
 @pytest.fixture
 def _path_client_session(session: AsyncGenerator[Any]) -> Generator[None]:
-    with patch(
-        "any_agent.tools.mcp.frameworks.agno.ClientSession"
-    ) as mock_client_session:
+    with patch("any_agent.mcp.frameworks.agno.ClientSession") as mock_client_session:
         mock_client_session.return_value.__aenter__.return_value = session
         yield
 
