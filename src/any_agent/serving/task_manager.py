@@ -1,30 +1,25 @@
 from collections.abc import AsyncIterable
 from typing import TYPE_CHECKING
 
-try:
-    from common.server.task_manager import InMemoryTaskManager
-    from common.server.utils import (
-        are_modalities_compatible,
-        new_incompatible_types_error,
-    )
-    from common.types import (
-        Artifact,
-        JSONRPCResponse,
-        Message,
-        SendTaskRequest,
-        SendTaskResponse,
-        SendTaskStreamingRequest,
-        SendTaskStreamingResponse,
-        Task,
-        TaskSendParams,
-        TaskState,
-        TaskStatus,
-        TextPart,
-    )
-
-    a2a_available = True
-except ImportError:
-    a2a_available = False
+from common.server.task_manager import InMemoryTaskManager
+from common.server.utils import (
+    are_modalities_compatible,
+    new_incompatible_types_error,
+)
+from common.types import (
+    Artifact,
+    JSONRPCResponse,
+    Message,
+    SendTaskRequest,
+    SendTaskResponse,
+    SendTaskStreamingRequest,
+    SendTaskStreamingResponse,
+    Task,
+    TaskSendParams,
+    TaskState,
+    TaskStatus,
+    TextPart,
+)
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
@@ -34,9 +29,6 @@ class AnyAgentTaskManager(InMemoryTaskManager):  # type: ignore[misc]
     """Adapted from google/a2a/samples/python."""
 
     def __init__(self, agent: "AnyAgent"):  # noqa: D107
-        if not a2a_available:
-            msg = "You need to `pip install 'any-agent[serving]'` to use this"
-            raise ImportError(msg)
         super().__init__()
         self.agent = agent
 

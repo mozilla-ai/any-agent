@@ -1,23 +1,16 @@
+from __future__ import annotations
+
 import inspect
 from typing import TYPE_CHECKING
 
-try:
-    from common.types import AgentCapabilities, AgentCard, AgentSkill
-
-    a2a_available = True
-except ImportError:
-    a2a_available = False
+from common.types import AgentCapabilities, AgentCard, AgentSkill
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
     from any_agent.config import ServingConfig
 
 
-def _get_agent_card(agent: "AnyAgent", serving_config: "ServingConfig") -> AgentCard:
-    if not a2a_available:
-        msg = "You need to `pip install 'any-agent[serving]'` to use this"
-        raise ImportError(msg)
-
+def _get_agent_card(agent: AnyAgent, serving_config: ServingConfig) -> AgentCard:
     skills = []
     for tool in agent.config.tools:
         # TODO: handle MCP tools
