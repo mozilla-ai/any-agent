@@ -20,11 +20,11 @@ def test_run_tinyagent_agent_custom_args() -> None:
         mock_message.content = output
         mock_message.tool_calls = []  # No tool calls in this response
         mock_message.model_dump.return_value = {
-            "content":output,
-            "role":"assistant",
-            "tool_calls":None,
-            "function_call":None,
-            "annotations":[]
+            "content": output,
+            "role": "assistant",
+            "tool_calls": None,
+            "function_call": None,
+            "annotations": [],
         }
 
         mock_response.choices = [MagicMock(message=mock_message)]
