@@ -41,9 +41,9 @@ class AnyToolBase(ABC, BaseModel, Generic[T]):
             else self.__class__.__name__
         )
 
-    def __call__(self, *args, **kwargs):
-        """Call the inner tool with the same parameters."""
-        return self.tool(*args, **kwargs)
+    def __getattr__(self, name: str) -> Any:
+        """Use AnyTool as proxy of the underlying tool."""
+        return getattr(self.tool, name)
 
     @field_validator("tool", mode="before")
     @classmethod
@@ -52,29 +52,16 @@ class AnyToolBase(ABC, BaseModel, Generic[T]):
 
     @field_validator("tool", mode="before")
     @classmethod
-    def _verify_tool_has_docstring(cls, tool: Any) -> Any:
-        """Verify that `tool` has a docostring."""
+    def _verify_tool(cls, tool: Any) -> Any:
         if not tool.__doc__:
             msg = f"Tool {tool} needs to have a docstring but does not"
             raise ValueError(msg)
 
-        return tool
-
-    @field_validator("tool", mode="before")
-    @classmethod
-    def _verify_tool_has_return_type(cls, tool: Any) -> Any:
-        """Verify that `tool` has a a return type."""
         signature = inspect.signature(tool)
         if signature.return_annotation is inspect.Signature.empty:
             msg = f"Tool {tool} needs to have a return type but does not"
             raise ValueError(msg)
 
-        return tool
-
-    @field_validator("tool", mode="before")
-    @classmethod
-    def _verify_tool_has_typed_parameters(cls, tool: Any) -> Any:
-        """Verify that `tool` parameters with type annotations."""
         signature = inspect.signature(tool)
         for param in signature.parameters.values():
             if param.annotation is inspect.Signature.empty:

@@ -17,6 +17,11 @@ class LlamaIndexTool(AnyToolBase["LlamaIndexToolBase"]):
         """Post-init tool parameters."""
         self.__name__ = self.tool.metadata.name
 
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        """Call the inner tool with the same parameters."""
+        return self.tool(*args, **kwargs)
+
     @classmethod
     def _validate_tool_type(cls, tool: Any) -> "LlamaIndexToolBase":
         if isinstance(tool, LlamaIndexToolBase):

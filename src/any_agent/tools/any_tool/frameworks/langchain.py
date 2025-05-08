@@ -20,6 +20,10 @@ class LangchainTool(AnyToolBase["LangchainToolBase"]):
         self.__qualname__ = self.tool.name
         self.__doc__ = self.tool.description
 
+    def __call__(self, *args, **kwargs) -> Any:
+        """Call the inner tool with the same parameters."""
+        return self.tool(*args, **kwargs)
+
     @classmethod
     def _validate_tool_type(cls, tool: Any) -> "LangchainToolBase":
         if isinstance(tool, LangchainToolBase):

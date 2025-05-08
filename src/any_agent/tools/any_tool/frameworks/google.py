@@ -14,6 +14,10 @@ class GoogleTool(AnyToolBase["GoogleToolBase | GoogleFunctionTool"]):
 
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
 
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        """Call the inner tool with the same parameters."""
+        return self.tool(*args, **kwargs)
+
     @classmethod
     def _validate_tool_type(cls, tool: Any) -> "GoogleToolBase | GoogleFunctionTool":
         if isinstance(tool, GoogleToolBase):
