@@ -64,7 +64,7 @@ agno = [
 ]
 
 all = [
-  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp]",
+  "any-agent[google,langchain,llama_index,smolagents,openai,agno,serving]",
 ]
 
 docs = [
