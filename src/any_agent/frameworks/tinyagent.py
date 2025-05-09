@@ -6,6 +6,7 @@ import json
 from typing import TYPE_CHECKING, Any
 
 import litellm
+from litellm.types.utils import ChatCompletionMessageToolCall
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
@@ -45,7 +46,6 @@ def task_completion_tool() -> dict[str, Any]:
             },
         },
     }
-
 
 class ToolExecutor:
     """Executor for tools that wraps tool functions to work with the MCP client."""
@@ -140,7 +140,6 @@ class TinyAgent(AnyAgent):
             mcp_servers  # Store servers so that they don't get garbage collected
         )
         logger.debug("Wrapped tools count: %s", len(wrapped_tools))
-
         for tool in wrapped_tools:
             tool_name = tool.__name__
             tool_desc = tool.__doc__ or f"Tool to {tool_name}"
@@ -329,6 +328,14 @@ class TinyAgent(AnyAgent):
         response = await litellm.acompletion(**completion_params)
         message: LiteLLMMessage = response.choices[0].message
         logger.debug("Response message: %s", message.model_dump())
+        # if no tools were called, add the exit tool to the message and return
+        if not message.tool_calls:
+            logger.debug("No tool calls found in response, calling exit")
+            # Add the exit tool to the message
+            exit_tool = task_completion_tool()
+            message.tool_calls = [ChatCompletionMessageToolCall(
+                function=exit_tool["function"],
+            )]
         self.messages.append(message.model_dump())
 
         # Process tool calls if any
@@ -406,7 +413,6 @@ class TinyAgent(AnyAgent):
                 return "\n".join(combined_results)
 
             return "\n".join(combined_results)
-
         return str(message.content)
 
     @property
