@@ -116,7 +116,7 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
 
     model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
-        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]  # type: ignore[comparison-overlap]
+        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
         else {}
     )
     model_args["temperature"] = 0.0

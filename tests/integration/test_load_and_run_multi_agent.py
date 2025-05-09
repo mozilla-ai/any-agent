@@ -28,7 +28,7 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
 
     model_args = (
         {"parallel_tool_calls": False}
-        if agent_framework is not AgentFramework.AGNO
+        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
         else None
     )
     main_agent = AgentConfig(
