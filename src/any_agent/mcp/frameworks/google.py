@@ -16,7 +16,6 @@ from any_agent.tools import GoogleTool
 
 mcp_available = False
 with suppress(ImportError):
-    from google.adk.tools.mcp_tool import MCPTool as GoogleMCPTool
     from google.adk.tools.mcp_tool import MCPToolset as GoogleMCPToolset
     from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
         SseServerParams as GoogleSseServerParameters,

@@ -24,7 +24,6 @@ with suppress(ImportError):
     from agents.mcp import (
         MCPServerStdioParams as OpenAIInternalMCPServerStdioParams,
     )
-    from mcp.types import Tool as MCPTool  # noqa: TC002
 
     mcp_available = True
 

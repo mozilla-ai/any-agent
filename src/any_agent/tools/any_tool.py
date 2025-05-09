@@ -5,9 +5,9 @@ from typing import Any, Generic, Protocol, TypeVar, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-from any_agent.config import AgentFramework, Tool
+from any_agent.config import AgentFramework
 
-T = TypeVar("T", bound=Callable[..., Any])
+T = TypeVar("T")
 
 
 @runtime_checkable
@@ -21,7 +21,7 @@ class AnyToolBase(ABC, BaseModel, Generic[T]):
     """Abstract base class for wrapping tools for specific frameworks."""
 
     framework: AgentFramework
-    tool: T | Tool
+    tool: T | Callable[..., Any]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 

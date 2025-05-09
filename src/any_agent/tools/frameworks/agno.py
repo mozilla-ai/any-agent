@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Any, Literal
 
-from any_agent.config import AgentFramework, Tool
+from any_agent.config import AgentFramework
 from any_agent.tools.any_tool import AnyToolBase
 
 AgnoToolType = Callable[..., Any]

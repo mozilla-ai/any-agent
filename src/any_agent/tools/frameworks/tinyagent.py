@@ -1,10 +1,11 @@
 from collections.abc import Callable
 from typing import Any, Literal
 
-from any_agent.config import AgentFramework, Tool
+from any_agent.config import AgentFramework
 from any_agent.tools.any_tool import AnyToolBase
 
 TinyAgentToolType = Callable[..., Any]
+
 
 class TinyAgentTool(AnyToolBase[TinyAgentToolType]):
     """Wrapper class for the Tools used by TinyAgent."""

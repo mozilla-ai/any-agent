@@ -16,9 +16,16 @@ class LangchainTool(AnyToolBase["LangchainToolBase"]):
 
     def model_post_init(self, _: Any) -> None:
         """Post-init tool parameters."""
-        self.__name__ = self.tool.name
-        self.__qualname__ = self.tool.name
-        self.__doc__ = self.tool.description
+        from langchain_core.tools import BaseTool as LangchainToolBase
+
+        if isinstance(self.tool, LangchainToolBase):
+            self.__name__ = self.tool.name
+            self.__qualname__ = self.tool.name
+            self.__doc__ = self.tool.description
+        else:
+            self.__name__ = self.tool.__name__
+            self.__qualname__ = self.tool.__name__
+            self.__doc__ = self.tool.__doc__
 
     def __call__(self, *args, **kwargs) -> Any:
         """Call the inner tool with the same parameters."""

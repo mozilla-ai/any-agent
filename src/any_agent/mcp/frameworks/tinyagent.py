@@ -12,6 +12,7 @@ from pydantic import PrivateAttr
 from any_agent.config import AgentFramework, MCPSse, MCPStdio, Tool
 from any_agent.mcp.mcp_connection import _MCPConnection
 from any_agent.mcp.mcp_server import _MCPServerBase
+from any_agent.tools import TinyAgentTool
 
 # Check for MCP dependencies
 mcp_available = False
@@ -24,13 +25,13 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class TinyAgentMCPConnection(_MCPConnection["MCPTool"], ABC):
+class TinyAgentMCPConnection(_MCPConnection[TinyAgentTool], ABC):
     """Base class for TinyAgent MCP connections."""
 
     _client: Any | None = PrivateAttr(default=None)
 
     @abstractmethod
-    async def list_tools(self) -> list["MCPTool"]:
+    async def list_tools(self) -> list[TinyAgentTool]:
         """List tools from the MCP server."""
         if not self._client:
             msg = "MCP client is not set up. Please call `setup` from a concrete class."
@@ -69,7 +70,7 @@ class TinyAgentMCPConnection(_MCPConnection["MCPTool"], ABC):
         for tool_info in filtered_tools:
             tool_list.append(self._create_tool_from_info(tool_info, session))  # type: ignore[arg-type]
 
-        return tool_list
+        return [TinyAgentTool(tool=tool) for tool in tool_list]
 
     def _create_tool_from_info(
         self, tool: Tool, session: "ClientSession"
@@ -112,7 +113,7 @@ class TinyAgentMCPConnection(_MCPConnection["MCPTool"], ABC):
 class TinyAgentMCPStdioConnection(TinyAgentMCPConnection):
     mcp_tool: MCPStdio
 
-    async def list_tools(self) -> list["MCPTool"]:
+    async def list_tools(self) -> list[TinyAgentTool]:
         """List tools from the MCP server."""
         server_params = StdioServerParameters(
             command=self.mcp_tool.command,
@@ -128,7 +129,7 @@ class TinyAgentMCPStdioConnection(TinyAgentMCPConnection):
 class TinyAgentMCPSseConnection(TinyAgentMCPConnection):
     mcp_tool: MCPSse
 
-    async def list_tools(self) -> list["MCPTool"]:
+    async def list_tools(self) -> list[TinyAgentTool]:
         """List tools from the MCP server."""
         self._client = sse_client(
             url=self.mcp_tool.url,
@@ -138,7 +139,7 @@ class TinyAgentMCPSseConnection(TinyAgentMCPConnection):
         return await super().list_tools()
 
 
-class TinyAgentMCPServerBase(_MCPServerBase["MCPTool"], ABC):
+class TinyAgentMCPServerBase(_MCPServerBase[TinyAgentTool], ABC):
     framework: Literal[AgentFramework.TINYAGENT] = AgentFramework.TINYAGENT
     libraries: str = "any-agent[mcp]"
 
@@ -152,7 +153,7 @@ class TinyAgentMCPServerStdio(TinyAgentMCPServerBase):
     mcp_tool: MCPStdio
 
     async def _setup_tools(
-        self, mcp_connection: _MCPConnection["MCPTool"] | None = None
+        self, mcp_connection: _MCPConnection[TinyAgentTool] | None = None
     ) -> None:
         mcp_connection = mcp_connection or TinyAgentMCPStdioConnection(
             mcp_tool=self.mcp_tool
@@ -164,7 +165,7 @@ class TinyAgentMCPServerSse(TinyAgentMCPServerBase):
     mcp_tool: MCPSse
 
     async def _setup_tools(
-        self, mcp_connection: _MCPConnection["MCPTool"] | None = None
+        self, mcp_connection: _MCPConnection[TinyAgentTool] | None = None
     ) -> None:
         mcp_connection = mcp_connection or TinyAgentMCPSseConnection(
             mcp_tool=self.mcp_tool
