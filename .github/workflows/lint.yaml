@@ -20,14 +20,11 @@ jobs:
         with:
           python-version: 3.13
           activate-environment: true
+          enable-cache: true
+          cache-dependency-glob: ".pre-commit-config.yaml"
 
       - name: Install pre-commit
         run: uv sync --extra lint
-
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit/
-          key: pre-commit-4|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: pre-commit
         env:
