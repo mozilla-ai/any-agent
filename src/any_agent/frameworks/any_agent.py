@@ -161,6 +161,15 @@ class AnyAgent(ABC):
         )
 
     def serve(self, serving_config: ServingConfig | None = None) -> None:
+        """Serve this agent using the Agent2Agent Protocol (A2A).
+
+        Args:
+            serving_config: See [ServingConfig][any_agent.config.ServingConfig].
+
+        Raises:
+            ImportError: If the `serving` dependencies are not installed.
+
+        """
         try:
             from any_agent.serving import _get_a2a_server
         except ImportError as e:

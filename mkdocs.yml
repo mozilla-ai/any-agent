@@ -18,6 +18,7 @@ nav:
   - Tools: tools.md
   - Tracing: tracing.md
   - Evaluation: evaluation.md
+  - Serving (A2A): serving.md
   - API Reference:
     - Agent: api/agent.md
     - Config: api/config.md
