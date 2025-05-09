@@ -56,7 +56,7 @@ class LangchainAgent(AnyAgent):
                 model=agent_config.model_id,
                 api_key=agent_config.api_key,
                 api_base=agent_config.api_base,
-                model_kwargs=agent_config.model_args or {},
+                model_kwargs=agent_config.model_args or {},  # type: ignore[arg-type]
             ),
         )
 

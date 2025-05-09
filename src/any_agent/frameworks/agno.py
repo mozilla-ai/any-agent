@@ -48,7 +48,7 @@ class AgnoAgent(AnyAgent):
             id=agent_config.model_id,
             api_base=agent_config.api_base,
             api_key=agent_config.api_key,
-            request_params=agent_config.model_args or {},
+            request_params=agent_config.model_args or {},  # type: ignore[arg-type]
         )
 
     @staticmethod
