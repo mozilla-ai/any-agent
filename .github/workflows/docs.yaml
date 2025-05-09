@@ -25,11 +25,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install the latest version of uv and set the python version to 3.13
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.11'
-          cache: "pip"
+          python-version: 3.13
+          activate-environment: true
 
       - name: Configure git
         run: |
@@ -38,7 +38,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          pip install -e '.[docs]'
+          uv sync --extra docs
           uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'
 
       - name: Build docs
