@@ -24,5 +24,7 @@ jobs:
       - name: Install pre-commit
         run: uv sync --extra lint
 
+      # In case of considering adding caching, check the following PR first:
+      # https://github.com/mozilla-ai/any-agent/pull/186
       - name: pre-commit
         run: uv run pre-commit run --all-files
