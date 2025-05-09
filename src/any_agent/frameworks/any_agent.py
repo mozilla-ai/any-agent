@@ -47,6 +47,7 @@ class AnyAgent(ABC):
         self.managed_agents = managed_agents
 
         self._mcp_servers: list[_MCPServerBase[Any]] = []
+        self._main_agent_tools: list[Any] = []
 
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()

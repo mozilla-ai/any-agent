@@ -140,7 +140,7 @@ async def _wrap_tools(
             verify_callable(tool)
             wrapped_tools.append(wrapper(tool))
         else:
-            msg = f"Tool {tool} needs to be of type `MCPStdio`, `str` or `callable` but is {type(tool)}"
+            msg = f"Tool {tool} needs to be of type `MCPStdio` or `callable` but is {type(tool)}"
             raise ValueError(msg)
 
     return wrapped_tools, mcp_servers  # type: ignore[return-value]

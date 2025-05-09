@@ -84,6 +84,7 @@ class SmolagentsAgent(AnyAgent):
 
         main_agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
 
+        self._main_agent_tools = tools
         self._agent = main_agent_type(
             name=self.config.name,
             model=self._get_model(self.config),

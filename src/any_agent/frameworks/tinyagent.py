@@ -145,6 +145,7 @@ class TinyAgent(AnyAgent):
         )
         logger.debug("Wrapped tools count: %s", len(wrapped_tools))
 
+        self._main_agent_tools = wrapped_tools
         for tool in wrapped_tools:
             tool_name = tool.__name__
             tool_desc = tool.__doc__ or f"Tool to {tool_name}"

@@ -11,6 +11,7 @@ try:
     from agno.agent import Agent
     from agno.models.litellm import LiteLLM
     from agno.team.team import Team
+    from agno.tools.toolkit import Toolkit
 
     DEFAULT_MODEL_TYPE = LiteLLM
     agno_available = True
@@ -49,6 +50,16 @@ class AgnoAgent(AnyAgent):
             **agent_config.model_args or {},
         )
 
+    @staticmethod
+    def _unpack_tools(tools: list[Any]) -> list[Any]:
+        unpacked: list[Any] = []
+        for tool in tools:
+            if isinstance(tool, Toolkit):
+                unpacked.extend(f for f in tool.functions.values())
+            else:
+                unpacked.append(tool)
+        return unpacked
+
     async def _load_agent(self) -> None:
         if not agno_available:
             msg = "You need to `pip install 'any-agent[agno]'` to use this agent"
@@ -61,8 +72,6 @@ class AgnoAgent(AnyAgent):
             ]
 
         if self.managed_agents:
-            tools, _ = await self._load_tools(self.config.tools)
-
             members = []
             for n, managed_agent in enumerate(self.managed_agents):
                 managed_tools, _ = await self._load_tools(managed_agent.tools)
@@ -83,6 +92,9 @@ class AgnoAgent(AnyAgent):
                     )
                 )
 
+            tools, _ = await self._load_tools(self.config.tools)
+            self._main_agent_tools = self._unpack_tools(tools)
+
             self._agent = Team(
                 mode="collaborate",
                 name=f"Team managed by agent {self.config.name}",
@@ -96,6 +108,7 @@ class AgnoAgent(AnyAgent):
         else:
             tools, _ = await self._load_tools(self.config.tools)
 
+            self._main_agent_tools = self._unpack_tools(tools)
             self._agent = Agent(
                 name=self.config.name,
                 instructions=self.config.instructions,

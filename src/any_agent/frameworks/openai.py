@@ -110,6 +110,8 @@ class OpenAIAgent(AnyAgent):
         kwargs_ = self.config.agent_args or {}
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
+
+        self._main_agent_tools = tools
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,

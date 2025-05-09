@@ -105,6 +105,7 @@ class LangchainAgent(AnyAgent):
                 for managed_name in managed_names
             ]
             agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+            self._main_agent_tools = imported_tools
             main_agent = agent_type(
                 name=self.config.name,
                 model=self._get_model(self.config),
@@ -116,6 +117,7 @@ class LangchainAgent(AnyAgent):
             workflow = create_swarm(swarm, default_active_agent=self.config.name)
             self._agent = workflow.compile()
         else:
+            self._main_agent_tools = imported_tools
             agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
             self._agent = agent_type(
                 name=self.config.name,

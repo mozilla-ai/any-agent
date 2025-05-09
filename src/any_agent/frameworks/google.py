@@ -86,6 +86,8 @@ class GoogleAgent(AnyAgent):
                 else:
                     tools.append(AgentTool(instance))
         agent_type = self.config.agent_type or LlmAgent
+
+        self._main_agent_tools = tools
         self._agent = agent_type(
             name=self.config.name,
             instruction=self.config.instructions or "",

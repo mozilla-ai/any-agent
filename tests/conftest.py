@@ -153,7 +153,7 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, str]]:
         "-c",
         SSE_MCP_SERVER_SCRIPT,
     )
-    await asyncio.sleep(1)
+    await asyncio.sleep(3)
 
     try:
         yield {"url": "http://127.0.0.1:8000/sse"}
