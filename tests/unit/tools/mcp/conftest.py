@@ -78,6 +78,11 @@ def stdio_params(command: str, tools: Sequence[str]) -> MCPStdio:
 
 
 @pytest.fixture
+def stdio_params_no_tools(command: str) -> MCPStdio:
+    return MCPStdio(command=command, args=[])
+
+
+@pytest.fixture
 def mcp_tools(tools: Sequence[str]) -> list[MCPTool]:
     return [
         MCPTool(name=tool, inputSchema={"type": "string", "properties": {}})
@@ -125,4 +130,12 @@ def mcp_connection(tools: Sequence[Tool]) -> _MCPConnection[Any]:
     params=[lf("stdio_params"), lf("mcp_sse_params_with_tools")], ids=["STDIO", "SSE"]
 )
 def mcp_params(request: pytest.FixtureRequest) -> MCPParams:
+    return request.param  # type: ignore[no-any-return]
+
+
+@pytest.fixture(
+    params=[lf("stdio_params_no_tools"), lf("mcp_sse_params_no_tools")],
+    ids=["STDIO", "SSE"],
+)
+def mcp_params_no_tools(request: pytest.FixtureRequest) -> MCPParams:
     return request.param  # type: ignore[no-any-return]

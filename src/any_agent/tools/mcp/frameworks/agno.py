@@ -44,7 +44,7 @@ class AgnoMCPStdioConnection(AgnoMCPConnection):
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
         self._server = AgnoMCPTools(
             command=server_params,
-            include_tools=list(self.mcp_tool.tools or []),
+            include_tools=list(self.mcp_tool.tools) if self.mcp_tool.tools else None,
             env={**os.environ},
         )
         return await super().list_tools()
@@ -66,7 +66,7 @@ class AgnoMCPSseConnection(AgnoMCPConnection):
         await session.initialize()
         self._server = AgnoMCPTools(
             session=session,
-            include_tools=list(self.mcp_tool.tools or []),
+            include_tools=list(self.mcp_tool.tools) if self.mcp_tool.tools else None,
         )
         return await super().list_tools()
 
