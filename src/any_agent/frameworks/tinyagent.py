@@ -128,6 +128,7 @@ class TinyAgent(AnyAgent):
         self.api_key = config.api_key
         self.api_base = config.api_base
         self.model = config.model_id
+        self.model_kwargs = config.model_args or {}
         self.clients: dict[str, ToolExecutor] = {}
         self.available_tools: list[dict[str, Any]] = []
         self.exit_loop_tools = [task_completion_tool()]
@@ -321,6 +322,7 @@ class TinyAgent(AnyAgent):
             "messages": self.messages,
             "tools": tools,
             "tool_choice": "auto",
+            **self.model_kwargs,
         }
 
         # Add API key and base if provided

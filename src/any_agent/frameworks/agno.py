@@ -43,11 +43,12 @@ class AgnoAgent(AnyAgent):
     def _get_model(self, agent_config: AgentConfig) -> "Model":
         """Get the model configuration for an Agno agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+
         return model_type(
             id=agent_config.model_id,
             api_base=agent_config.api_base,
             api_key=agent_config.api_key,
-            **agent_config.model_args or {},
+            request_params=agent_config.model_args or {},
         )
 
     @staticmethod
