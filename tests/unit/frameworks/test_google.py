@@ -1,12 +1,12 @@
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import (
     search_web,
-    show_final_answer,
+    show_final_output,
     visit_webpage,
 )
 
@@ -71,8 +71,8 @@ def test_load_google_multiagent() -> None:
                 AgentConfig(
                     model_id="gpt-4o-mini",
                     name="communication-agent",
-                    tools=[show_final_answer],
-                    handoff=True,
+                    tools=[show_final_output],
+                    agent_args={"handoff": True},
                 ),
             ],
         )
@@ -87,7 +87,7 @@ def test_load_google_multiagent() -> None:
             model=mock_model(model="gpt-4o-mini"),
             instruction="",
             name="communication-agent",
-            tools=[MockedFunctionTool(show_final_answer)],
+            tools=[MockedFunctionTool(show_final_output)],
         )
         mock_agent.assert_any_call(
             name="any_agent",
@@ -111,7 +111,13 @@ def test_run_google_custom_args() -> None:
 
     mock_agent = MagicMock()
     mock_runner = MagicMock()
-    mock_runner.session_service.get_session.return_value = AsyncMock()
+    mock_session = MagicMock()
+
+    # More explicit mock setup
+    mock_state = MagicMock()
+    mock_state.get.return_value = "mock response"
+    mock_session.state = mock_state
+    mock_runner.return_value.session_service.get_session.return_value = mock_session
 
     run_config = RunConfig(max_llm_calls=10)
     with (
@@ -121,7 +127,12 @@ def test_run_google_custom_args() -> None:
         patch("google.adk.tools.FunctionTool"),
     ):
         agent = AnyAgent.create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))
-        agent.run("foo", user_id="1", session_id="2", run_config=run_config)
+        result = agent.run("foo", user_id="1", session_id="2", run_config=run_config)
+
+        # Verify the result is as expected
+        assert isinstance(result.final_output, str)
+        assert result.final_output == "mock response"
+
         mock_runner.return_value.run_async.assert_called_once_with(
             user_id="1",
             session_id="2",

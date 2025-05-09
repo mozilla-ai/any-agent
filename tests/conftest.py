@@ -2,6 +2,7 @@ import time
 from collections.abc import AsyncGenerator, Generator
 from textwrap import dedent
 from unittest.mock import AsyncMock, patch
+from uuid import uuid4
 
 import pytest
 import rich.console
@@ -69,6 +70,7 @@ def llm_span() -> ReadableSpan:
         end_time=int(time.time() + 1),
         status=Status(StatusCode.OK),
         attributes={
+            "any_agent.run_id": str(uuid4()),
             "input.value": '{"messages": [[{"lc": 1, "type": "constructor", "id": ["langchain", "schema", "messages", "SystemMessage"], "kwargs": {"content": "Use the available tools to find the answer", "type": "system"}}, {"lc": 1, "type": "constructor", "id": ["langchain", "schema", "messages", "HumanMessage"], "kwargs": {"content": "Which agent framework is the best?", "type": "human", "id": "2aaf3de6-edf7-4cfa-9483-da348a6749da"}}]]}',
             "input.mime_type": "application/json",
             "output.value": '{"generations": [[{"text": "", "generation_info": {"finish_reason": "tool_calls"}, "type": "ChatGeneration", "message": {"lc": 1, "type": "constructor", "id": ["langchain", "schema", "messages", "AIMessage"], "kwargs": {"content": "", "additional_kwargs": {"tool_calls": [{"lc": 1, "type": "not_implemented", "id": ["litellm", "types", "utils", "ChatCompletionMessageToolCall"], "repr": "ChatCompletionMessageToolCall(function=Function(arguments=\'{\\"query\\":\\"best agent frameworks 2023\\"}\', name=\'search_web\'), id=\'call_hYPpXiyNNLiRRytLlJdNFpGN\', type=\'function\')"}]}, "response_metadata": {"token_usage": {"lc": 1, "type": "not_implemented", "id": ["litellm", "types", "utils", "Usage"], "repr": "Usage(completion_tokens=20, prompt_tokens=145, total_tokens=165, completion_tokens_details=CompletionTokensDetailsWrapper(accepted_prediction_tokens=0, audio_tokens=0, reasoning_tokens=0, rejected_prediction_tokens=0, text_tokens=None), prompt_tokens_details=PromptTokensDetailsWrapper(audio_tokens=0, cached_tokens=0, text_tokens=None, image_tokens=None))"}, "model": "gpt-4o-mini", "finish_reason": "tool_calls", "model_name": "gpt-4o-mini"}, "type": "ai", "id": "run-984943f2-6546-47fc-9b1d-81714109e374-0", "tool_calls": [{"name": "search_web", "args": {"query": "best agent frameworks 2023"}, "id": "call_hYPpXiyNNLiRRytLlJdNFpGN", "type": "tool_call"}], "usage_metadata": {"input_tokens": 145, "output_tokens": 20, "total_tokens": 165}, "invalid_tool_calls": []}}}]], "llm_output": {"token_usage": {"completion_tokens": 20, "prompt_tokens": 145, "total_tokens": 165, "completion_tokens_details": {"accepted_prediction_tokens": 0, "audio_tokens": 0, "reasoning_tokens": 0, "rejected_prediction_tokens": 0}, "prompt_tokens_details": {"audio_tokens": 0, "cached_tokens": 0}}, "model": "gpt-4o-mini"}, "run": null, "type": "LLMResult"}',

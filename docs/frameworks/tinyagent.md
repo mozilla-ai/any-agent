@@ -10,7 +10,7 @@ You can find it in [`any_agent.frameworks.tinyagent`](https://github.com/mozilla
 
 ```python
 from any_agent import AnyAgent, AgentConfig
-from any_agent.config import MCPStdioParams
+from any_agent.config import MCPStdio
 
 agent = AnyAgent.create(
     "tinyagent",
@@ -18,7 +18,7 @@ agent = AnyAgent.create(
         model_id="gpt-4.1-nano",
         instructions="You must use the available tools to find an answer",
         tools=[
-            MCPStdioParams(
+            MCPStdio(
                 command="uvx",
                 args=["duckduckgo-mcp-server"]
             )

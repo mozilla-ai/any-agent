@@ -1,9 +1,11 @@
 from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
+from any_agent.tracing.trace import AgentTrace
+
+from .any_agent import AnyAgent
 
 try:
     from agno.agent import Agent
@@ -47,7 +49,7 @@ class AgnoAgent(AnyAgent):
             **agent_config.model_args or {},
         )
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         if not agno_available:
             msg = "You need to `pip install 'any-agent[agno]'` to use this agent"
             raise ImportError(msg)
@@ -102,15 +104,11 @@ class AgnoAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
+    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._create_tracer()
-
         result: RunResponse = await self._agent.arun(prompt, **kwargs)
-        return AgentResult(
+        return AgentTrace(
             final_output=result.content,
-            raw_responses=result.messages,
-            trace=self._get_trace(),
         )

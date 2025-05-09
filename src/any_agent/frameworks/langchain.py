@@ -1,10 +1,12 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
+from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
+
+from .any_agent import AnyAgent
 
 try:
     from langchain_core.language_models import LanguageModelLike
@@ -23,6 +25,8 @@ if TYPE_CHECKING:
     from langchain_core.language_models import LanguageModelLike
     from langchain_core.messages.base import BaseMessage
     from langgraph.graph.graph import CompiledGraph
+
+    from any_agent.tracing.trace import AgentTrace
 
 
 class LangchainAgent(AnyAgent):
@@ -56,7 +60,7 @@ class LangchainAgent(AnyAgent):
             ),
         )
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the LangChain agent with the given configuration."""
         if not langchain_available:
             msg = "You need to `pip install 'any-agent[langchain]'` to use this agent"
@@ -124,20 +128,21 @@ class LangchainAgent(AnyAgent):
         # so we'll store a list of them in this class
         self._tools = imported_tools
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
+    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
         """Run the LangChain agent with the given prompt."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._create_tracer()
         inputs = {"messages": [("user", prompt)]}
-        result = await self._agent.ainvoke(inputs, **kwargs)
+        run_id = str(uuid4())
+        tracer = self._tracer_provider.get_tracer("any_agent")
+        with tracer.start_as_current_span("agent_run") as span:
+            span.set_attribute("any_agent.run_id", run_id)
+            result = await self._agent.ainvoke(inputs, **kwargs)
         if not result.get("messages"):
             msg = "No messages returned from the agent."
             raise ValueError(msg)
         last_message: BaseMessage = result["messages"][-1]
-        return AgentResult(
-            final_output=last_message.content,
-            raw_responses=result["messages"],
-            trace=self._get_trace(),
-        )
+        trace = self._exporter.pop_trace(run_id)
+        trace.final_output = str(last_message.content)
+        return trace

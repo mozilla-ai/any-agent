@@ -1,8 +1,10 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
+from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.frameworks.any_agent import AgentResult, AnyAgent
 from any_agent.tools import search_web, visit_webpage
+
+from .any_agent import AnyAgent
 
 try:
     from agents import (
@@ -19,6 +21,12 @@ try:
     agents_available = True
 except ImportError:
     agents_available = False
+
+
+if TYPE_CHECKING:
+    from agents import Model
+
+    from any_agent.tracing.trace import AgentTrace
 
 
 class OpenAIAgent(AnyAgent):
@@ -49,7 +57,7 @@ class OpenAIAgent(AnyAgent):
             api_key=agent_config.api_key,
         )
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
         if not agents_available:
             msg = "You need to `pip install 'any-agent[openai]'` to use this agent"
@@ -73,9 +81,10 @@ class OpenAIAgent(AnyAgent):
                     managed_agent.tools
                 )
                 managed_tools = self._filter_mcp_tools(managed_tools, mcp_servers)
-                kwargs = {}
+                managed_agent_args = managed_agent.agent_args or {}
+                handoff = managed_agent_args.pop("handoff", None)
                 if managed_agent.model_args:
-                    kwargs["model_settings"] = managed_agent.model_args
+                    managed_agent_args["model_settings"] = managed_agent.model_args
                 instance = Agent(
                     name=managed_agent.name,
                     instructions=managed_agent.instructions,
@@ -85,9 +94,9 @@ class OpenAIAgent(AnyAgent):
                         managed_mcp_server.server
                         for managed_mcp_server in managed_mcp_servers
                     ],
-                    **kwargs,  # type: ignore[arg-type]
+                    **managed_agent_args,
                 )
-                if managed_agent.handoff:
+                if handoff:
                     handoffs.append(instance)
                 else:
                     tools.append(
@@ -120,15 +129,16 @@ class OpenAIAgent(AnyAgent):
             non_mcp_tools.append(tool)
         return non_mcp_tools
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
+    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
         """Run the OpenAI agent with the given prompt asynchronously."""
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._create_tracer()
-        result = await Runner.run(self._agent, prompt, **kwargs)
-        return AgentResult(
-            final_output=result.final_output,
-            raw_responses=result.raw_responses,
-            trace=self._get_trace(),
-        )
+        tracer = self._tracer_provider.get_tracer("any_agent")
+        run_id = str(uuid4())
+        with tracer.start_as_current_span("agent_run") as span:
+            span.set_attribute("any_agent.run_id", run_id)
+            result = await Runner.run(self._agent, prompt, **kwargs)
+        trace = self._exporter.pop_trace(run_id)
+        trace.final_output = result.final_output
+        return trace

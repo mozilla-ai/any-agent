@@ -3,11 +3,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import MCPStdioParams
+from any_agent.config import MCPStdio
 from any_agent.tools import (
     ask_user_verification,
     search_web,
-    show_final_answer,
+    show_final_output,
     visit_webpage,
 )
 
@@ -109,7 +109,7 @@ def test_load_openai_with_mcp_server() -> None:
             AgentConfig(
                 model_id="gpt-4o",
                 tools=[
-                    MCPStdioParams(
+                    MCPStdio(
                         command="docker",
                         args=["run", "-i", "--rm", "mcp/fetch"],
                         tools=["fetch"],
@@ -160,8 +160,8 @@ def test_load_openai_multiagent() -> None:
             AgentConfig(
                 model_id="gpt-4o-mini",
                 name="communication-agent",
-                tools=[show_final_answer],
-                handoff=True,
+                tools=[show_final_output],
+                agent_args={"handoff": True},
             ),
         ]
 
@@ -198,7 +198,7 @@ def test_load_openai_multiagent() -> None:
             model=mock_litellm_model.return_value,
             instructions=None,
             name="communication-agent",
-            tools=[mock_function_tool(show_final_answer)],
+            tools=[mock_function_tool(show_final_output)],
             mcp_servers=[],
         )
 

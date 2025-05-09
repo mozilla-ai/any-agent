@@ -1,11 +1,13 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
+from uuid import uuid4
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent import AgentConfig, AgentFramework
 from any_agent.config import TracingConfig
-from any_agent.frameworks.any_agent import AgentResult
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
+
+from .any_agent import AnyAgent
 
 try:
     from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
@@ -21,6 +23,8 @@ except ImportError:
 if TYPE_CHECKING:
     from llama_index.core.agent.workflow.workflow_events import AgentOutput
     from llama_index.core.llms import LLM
+
+    from any_agent.tracing.trace import AgentTrace
 
 
 class LlamaIndexAgent(AnyAgent):
@@ -52,7 +56,7 @@ class LlamaIndexAgent(AnyAgent):
             ),
         )
 
-    async def load_agent(self) -> None:
+    async def _load_agent(self) -> None:
         """Load the LLamaIndex agent with the given configuration."""
         if not llama_index_available:
             msg = "You need to `pip install 'any-agent[llama_index]'` to use this agent"
@@ -115,18 +119,19 @@ class LlamaIndexAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentResult:
+    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        self._create_tracer()
-        result: AgentOutput = await self._agent.run(prompt, **kwargs)
+        run_id = str(uuid4())
+        tracer = self._tracer_provider.get_tracer("any_agent")
+        with tracer.start_as_current_span("agent_run") as span:
+            span.set_attribute("any_agent.run_id", run_id)
+            result: AgentOutput = await self._agent.run(prompt, **kwargs)
         # assert that it's a TextBlock
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
             msg = f"Agent did not return a valid response: {result.response}"
             raise ValueError(msg)
-        return AgentResult(
-            final_output=result.response.blocks[0].text,
-            raw_responses=None,  # Llama Index isn't giving me the trace history in the result or the _agent.
-            trace=self._get_trace(),
-        )
+        trace = self._exporter.pop_trace(run_id)
+        trace.final_output = result.response.blocks[0].text
+        return trace

@@ -1,3 +1,4 @@
+import asyncio
 import os
 import subprocess
 from datetime import datetime
@@ -5,9 +6,11 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
-from any_agent.config import MCPStdioParams
+from any_agent.config import MCPStdio
+from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
 def check_uvx_installed() -> bool:
@@ -49,8 +52,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             f.write(text)
 
     kwargs["model_id"] = "gpt-4.1-mini"
-    if "OPENAI_API_KEY" not in os.environ:
-        pytest.skip(f"OPENAI_API_KEY needed for {agent_framework}")
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
     model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
         if agent_framework is not AgentFramework.AGNO
@@ -59,7 +64,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     model_args["temperature"] = 0.0
     tools = [
         write_file,
-        MCPStdioParams(
+        MCPStdio(
             command="uvx",
             args=["mcp-server-time", "--local-timezone=America/New_York"],
             tools=[
@@ -73,34 +78,71 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    traces = tmp_path / "traces"
-    agent = AnyAgent.create(
-        agent_framework, agent_config, tracing=TracingConfig(output_dir=str(traces))
-    )
+    agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
+
     try:
-        result = agent.run(
+        agent_trace = agent.run(
             "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
         )
         assert os.path.exists(os.path.join(tmp_path, tmp_file))
         with open(os.path.join(tmp_path, tmp_file)) as f:
             content = f.read()
         assert content == str(datetime.now().year)
-        assert result
-        assert result.final_output
-        if agent_framework not in [AgentFramework.LLAMA_INDEX]:
-            # Llama Index doesn't currently give back raw_responses.
-            assert result.raw_responses
-            assert len(result.raw_responses) > 0
-        if agent_framework not in (
-            AgentFramework.AGNO,
-            AgentFramework.GOOGLE,
-            AgentFramework.TINYAGENT,
-        ):
-            assert traces.exists()
-            assert agent_framework.name in str(next(traces.iterdir()).name)
-            assert result.trace is not None
-            assert agent.trace_filepath is not None
-            cost_sum = result.trace.get_total_cost()
+        assert isinstance(agent_trace, AgentTrace)
+        assert agent_trace.final_output
+        if _is_tracing_supported(agent_framework):
+            assert agent_trace.spans
+            assert len(agent_trace.spans) > 0
+            cost_sum = agent_trace.get_total_cost()
+            assert cost_sum.total_cost > 0
+            assert cost_sum.total_cost < 1.00
+            assert cost_sum.total_tokens > 0
+            assert cost_sum.total_tokens < 20000
+    finally:
+        agent.exit()
+
+
+@pytest.mark.asyncio
+async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
+    """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
+    if agent_framework is AgentFramework.AGNO:
+        pytest.skip(
+            "AGNO bug https://github.com/agno-agi/agno/issues/3120 prevents mixes concurrent runs in async"
+        )
+    model_id = "gpt-4.1-nano"
+    env_check = validate_environment(model_id)
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
+    model_args: dict[str, Any] = (
+        {"parallel_tool_calls": False}
+        if agent_framework is not AgentFramework.AGNO  # type: ignore[comparison-overlap]
+        else {}
+    )
+    model_args["temperature"] = 0.0
+    try:
+        agent = await AnyAgent.create_async(
+            agent_framework,
+            AgentConfig(model_id=model_id, model_args=model_args),
+        )
+        results = await asyncio.gather(
+            agent.run_async("What is the capital of France?"),
+            agent.run_async("What is the capital of Spain?"),
+        )
+        result1, result2 = results
+        assert result1.final_output is not None
+        assert result2.final_output is not None
+        assert "Paris" in result1.final_output
+        assert "Madrid" in result2.final_output
+        if _is_tracing_supported(agent_framework):
+            first_spans = result1.spans
+            second_spans = result2.spans
+            assert second_spans[: len(first_spans)] != first_spans, (
+                "Spans from the first run should not be in the second"
+            )
+            assert result1.spans
+            assert len(result1.spans) > 0
+            cost_sum = result1.get_total_cost()
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00
             assert cost_sum.total_tokens > 0

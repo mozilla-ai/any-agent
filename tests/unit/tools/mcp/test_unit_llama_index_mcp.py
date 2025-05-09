@@ -5,7 +5,7 @@ import pytest
 from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
 from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
-from any_agent.config import AgentFramework, MCPSseParams, Tool
+from any_agent.config import AgentFramework, MCPSse, Tool
 from any_agent.tools import _get_mcp_server
 
 
@@ -35,7 +35,7 @@ def llama_index_mcp_tool_spec(
     "llama_index_mcp_tool_spec",
 )
 async def test_llamaindex_mcp_sse_integration(
-    mcp_sse_params_with_tools: MCPSseParams,
+    mcp_sse_params_with_tools: MCPSse,
     llama_index_mcp_client: LlamaIndexMCPClient,
 ) -> None:
     server = _get_mcp_server(mcp_sse_params_with_tools, AgentFramework.LLAMA_INDEX)

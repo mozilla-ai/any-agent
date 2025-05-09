@@ -20,6 +20,7 @@ dependencies = [
   "requests",
   "rich",
   "evaluate",
+  "fire",
 ]
 
 [project.optional-dependencies]
@@ -59,7 +60,7 @@ agno = [
 ]
 
 all = [
-  "any-agent[google,langchain,llama_index,smolagents,openai,agno]",
+  "any-agent[google,langchain,llama_index,smolagents,openai,agno,mcp]",
 ]
 
 docs = [
@@ -74,6 +75,7 @@ tests = [
   "pytest-sugar>=0.9.6",
   "pytest-asyncio>=0.26.0",
   "pytest-lazy-fixtures>=1.1.2",
+  "pytest-timeout>=2.4.0",
   "debugpy>=1.8.13",
   "mktestdocs>=0.2.4",
 ]
@@ -159,3 +161,8 @@ follow_untyped_imports = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
+timeout = 300
+
+
+[project.scripts]
+any-agent-evaluate = "any_agent.evaluation.cli:main"

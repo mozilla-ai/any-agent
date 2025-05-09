@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
 
-from any_agent.config import AgentConfig, MCPSseParams, Tool
+from any_agent.config import AgentConfig, MCPSse, Tool
 from any_agent.frameworks.any_agent import AnyAgent
 
 
@@ -23,7 +23,7 @@ def openai_mcp_sse_server(
     "openai_mcp_sse_server",
 )
 def test_openai_mcpsse(
-    mcp_sse_params_no_tools: MCPSseParams,
+    mcp_sse_params_no_tools: MCPSse,
 ) -> None:
     """This is a test kept for legacy purposes."""
     agent_config = AgentConfig(model_id="gpt-4o", tools=[mcp_sse_params_no_tools])
