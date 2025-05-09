@@ -12,6 +12,7 @@ from any_agent.config import (
 )
 from any_agent.mcp.mcp_connection import _MCPConnection
 from any_agent.mcp.mcp_server import _MCPServerBase
+from any_agent.tools import AgnoTool
 
 mcp_available = False
 with suppress(ImportError):
@@ -22,24 +23,24 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class AgnoMCPConnection(_MCPConnection["AgnoMCPTools"], ABC):
+class AgnoMCPConnection(_MCPConnection[AgnoTool], ABC):
     _server: "AgnoMCPTools | None" = PrivateAttr(default=None)
 
     @abstractmethod
-    async def list_tools(self) -> list["AgnoMCPTools"]:
+    async def list_tools(self) -> list[AgnoTool]:
         """List tools from the MCP server."""
         if self._server is None:
             msg = "MCP server is not set up. Please call `list_tools` from a concrete class."
             raise ValueError(msg)
 
         tools = await self._exit_stack.enter_async_context(self._server)
-        return [tools]
+        return [AgnoTool(tool=tools)]
 
 
 class AgnoMCPStdioConnection(AgnoMCPConnection):
     mcp_tool: MCPStdio
 
-    async def list_tools(self) -> list["AgnoMCPTools"]:
+    async def list_tools(self) -> list[AgnoTool]:
         """List tools from the MCP server."""
         server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
         self._server = AgnoMCPTools(
@@ -53,7 +54,7 @@ class AgnoMCPStdioConnection(AgnoMCPConnection):
 class AgnoMCPSseConnection(AgnoMCPConnection):
     mcp_tool: MCPSse
 
-    async def list_tools(self) -> list["AgnoMCPTools"]:
+    async def list_tools(self) -> list[AgnoTool]:
         """List tools from the MCP server."""
         client = sse_client(
             url=self.mcp_tool.url,
@@ -71,7 +72,7 @@ class AgnoMCPSseConnection(AgnoMCPConnection):
         return await super().list_tools()
 
 
-class AgnoMCPServerBase(_MCPServerBase["AgnoMCPTools"], ABC):
+class AgnoMCPServerBase(_MCPServerBase[AgnoTool], ABC):
     framework: Literal[AgentFramework.AGNO] = AgentFramework.AGNO
 
     def _check_dependencies(self) -> None:
@@ -85,7 +86,7 @@ class AgnoMCPServerStdio(AgnoMCPServerBase):
     mcp_tool: MCPStdio
 
     async def _setup_tools(
-        self, mcp_connection: _MCPConnection["AgnoMCPTools"] | None = None
+        self, mcp_connection: _MCPConnection[AgnoTool] | None = None
     ) -> None:
         mcp_connection = mcp_connection or AgnoMCPStdioConnection(
             mcp_tool=self.mcp_tool
@@ -97,7 +98,7 @@ class AgnoMCPServerSse(AgnoMCPServerBase):
     mcp_tool: MCPSse
 
     async def _setup_tools(
-        self, mcp_connection: _MCPConnection["AgnoMCPTools"] | None = None
+        self, mcp_connection: _MCPConnection[AgnoTool] | None = None
     ) -> None:
         mcp_connection = mcp_connection or AgnoMCPSseConnection(mcp_tool=self.mcp_tool)
         await super()._setup_tools(mcp_connection)

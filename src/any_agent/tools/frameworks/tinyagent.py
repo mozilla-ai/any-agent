@@ -1,15 +1,17 @@
+from collections.abc import Callable
 from typing import Any, Literal
 
 from any_agent.config import AgentFramework, Tool
 from any_agent.tools.any_tool import AnyToolBase
 
+TinyAgentToolType = Callable[..., Any]
 
-class TinyAgentTool(AnyToolBase[Tool]):
+class TinyAgentTool(AnyToolBase[TinyAgentToolType]):
     """Wrapper class for the Tools used by TinyAgent."""
 
     framework: Literal[AgentFramework.TINYAGENT] = AgentFramework.TINYAGENT
 
     @classmethod
-    def _validate_tool_type(cls, tool: Any) -> Tool:
+    def _validate_tool_type(cls, tool: Any) -> TinyAgentToolType:
         # Agno lets you pass callables directly in as tools ❤️
         return tool

@@ -7,6 +7,7 @@ from pydantic import PrivateAttr
 from any_agent.config import AgentFramework, MCPSse, MCPStdio
 from any_agent.mcp.mcp_connection import _MCPConnection
 from any_agent.mcp.mcp_server import _MCPServerBase
+from any_agent.tools import OpenAITool
 
 if TYPE_CHECKING:
     from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
@@ -28,7 +29,7 @@ with suppress(ImportError):
     mcp_available = True
 
 
-class OpenAIMCPConnection(_MCPConnection["MCPTool"], ABC):
+class OpenAIMCPConnection(_MCPConnection[OpenAITool], ABC):
     """Base class for OpenAI MCP connections."""
 
     _server: "OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None" = (
@@ -36,7 +37,7 @@ class OpenAIMCPConnection(_MCPConnection["MCPTool"], ABC):
     )
 
     @abstractmethod
-    async def list_tools(self) -> list["MCPTool"]:
+    async def list_tools(self) -> list[OpenAITool]:
         """List tools from the MCP server."""
         if not self._server:
             msg = "MCP server is not set up. Please call `setup` from a concrete class."
@@ -44,7 +45,7 @@ class OpenAIMCPConnection(_MCPConnection["MCPTool"], ABC):
 
         await self._exit_stack.enter_async_context(self._server)
         tools = await self._server.list_tools()
-        return self._filter_tools(tools)  # type: ignore[return-value]
+        return [OpenAITool(tool=tool) for tool in self._filter_tools(tools)]
 
     @property
     def server(self) -> "MCPServer | None":
@@ -55,7 +56,7 @@ class OpenAIMCPConnection(_MCPConnection["MCPTool"], ABC):
 class OpenAIMCPStdioConnection(OpenAIMCPConnection):
     mcp_tool: MCPStdio
 
-    async def list_tools(self) -> list["MCPTool"]:
+    async def list_tools(self) -> list[OpenAITool]:
         """List tools from the MCP server."""
         params = OpenAIInternalMCPServerStdioParams(
             command=self.mcp_tool.command,
@@ -72,7 +73,7 @@ class OpenAIMCPStdioConnection(OpenAIMCPConnection):
 class OpenAIMCPSseConnection(OpenAIMCPConnection):
     mcp_tool: MCPSse
 
-    async def list_tools(self) -> list["MCPTool"]:
+    async def list_tools(self) -> list[OpenAITool]:
         """List tools from the MCP server."""
         params = OpenAIInternalMCPServerSseParams(url=self.mcp_tool.url)
 
@@ -83,7 +84,7 @@ class OpenAIMCPSseConnection(OpenAIMCPConnection):
         return await super().list_tools()
 
 
-class OpenAIMCPServerBase(_MCPServerBase["MCPTool"], ABC):
+class OpenAIMCPServerBase(_MCPServerBase[OpenAITool], ABC):
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
     def _check_dependencies(self) -> None:
@@ -97,7 +98,7 @@ class OpenAIMCPServerStdio(OpenAIMCPServerBase):
     mcp_tool: MCPStdio
 
     async def _setup_tools(
-        self, mcp_connection: _MCPConnection["MCPTool"] | None = None
+        self, mcp_connection: _MCPConnection[OpenAITool] | None = None
     ) -> None:
         mcp_connection = mcp_connection or OpenAIMCPStdioConnection(
             mcp_tool=self.mcp_tool
@@ -109,7 +110,7 @@ class OpenAIMCPServerSse(OpenAIMCPServerBase):
     mcp_tool: MCPSse
 
     async def _setup_tools(
-        self, mcp_connection: _MCPConnection["MCPTool"] | None = None
+        self, mcp_connection: _MCPConnection[OpenAITool] | None = None
     ) -> None:
         mcp_connection = mcp_connection or OpenAIMCPSseConnection(
             mcp_tool=self.mcp_tool

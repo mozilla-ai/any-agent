@@ -8,25 +8,23 @@ from pydantic import PrivateAttr
 from any_agent.config import AgentFramework, MCPSse, MCPStdio
 from any_agent.mcp.mcp_connection import _MCPConnection
 from any_agent.mcp.mcp_server import _MCPServerBase
+from any_agent.tools import LlamaIndexTool
 
 mcp_available = False
 with suppress(ImportError):
-    from llama_index.core.tools import (
-        FunctionTool as LlamaIndexFunctionTool,  # noqa: TC002
-    )
     from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
     from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
     mcp_available = True
 
 
-class LlamaIndexMCPConnection(_MCPConnection["LlamaIndexFunctionTool"], ABC):
+class LlamaIndexMCPConnection(_MCPConnection[LlamaIndexTool], ABC):
     """Base class for LlamaIndex MCP connections."""
 
     _client: "LlamaIndexMCPClient | None" = PrivateAttr(default=None)
 
     @abstractmethod
-    async def list_tools(self) -> list["LlamaIndexFunctionTool"]:
+    async def list_tools(self) -> list[LlamaIndexTool]:
         """List tools from the MCP server."""
         if not self._client:
             msg = "MCP client is not set up. Please call `list_tool` from a concrete class."
@@ -37,13 +35,16 @@ class LlamaIndexMCPConnection(_MCPConnection["LlamaIndexFunctionTool"], ABC):
             allowed_tools=list(self.mcp_tool.tools or []),
         )
 
-        return await mcp_tool_spec.to_tool_list_async()
+        return [
+            LlamaIndexTool(tool=tool)
+            for tool in await mcp_tool_spec.to_tool_list_async()
+        ]
 
 
 class LlamaIndexMCPStdioConnection(LlamaIndexMCPConnection):
     mcp_tool: MCPStdio
 
-    async def list_tools(self) -> list["LlamaIndexFunctionTool"]:
+    async def list_tools(self) -> list[LlamaIndexTool]:
         """List tools from the MCP server."""
         self._client = LlamaIndexMCPClient(
             command_or_url=self.mcp_tool.command,
@@ -56,13 +57,13 @@ class LlamaIndexMCPStdioConnection(LlamaIndexMCPConnection):
 class LlamaIndexMCPSseConnection(LlamaIndexMCPConnection):
     mcp_tool: MCPSse
 
-    async def list_tools(self) -> list["LlamaIndexFunctionTool"]:
+    async def list_tools(self) -> list[LlamaIndexTool]:
         """List tools from the MCP server."""
         self._client = LlamaIndexMCPClient(command_or_url=self.mcp_tool.url)
         return await super().list_tools()
 
 
-class LlamaIndexMCPServerBase(_MCPServerBase["LlamaIndexFunctionTool"], ABC):
+class LlamaIndexMCPServerBase(_MCPServerBase[LlamaIndexTool], ABC):
     framework: Literal[AgentFramework.LLAMA_INDEX] = AgentFramework.LLAMA_INDEX
 
     def _check_dependencies(self) -> None:
@@ -76,7 +77,7 @@ class LlamaIndexMCPServerStdio(LlamaIndexMCPServerBase):
     mcp_tool: MCPStdio
 
     async def _setup_tools(
-        self, mcp_connection: _MCPConnection["LlamaIndexFunctionTool"] | None = None
+        self, mcp_connection: _MCPConnection[LlamaIndexTool] | None = None
     ) -> None:
         mcp_connection = mcp_connection or LlamaIndexMCPStdioConnection(
             mcp_tool=self.mcp_tool
@@ -88,7 +89,7 @@ class LlamaIndexMCPServerSse(LlamaIndexMCPServerBase):
     mcp_tool: MCPSse
 
     async def _setup_tools(
-        self, mcp_connection: _MCPConnection["LlamaIndexFunctionTool"] | None = None
+        self, mcp_connection: _MCPConnection[LlamaIndexTool] | None = None
     ) -> None:
         mcp_connection = mcp_connection or LlamaIndexMCPSseConnection(
             mcp_tool=self.mcp_tool
