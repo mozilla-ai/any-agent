@@ -24,7 +24,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-seving = [
+serving = [
   "a2a-samples"
 ]
 
