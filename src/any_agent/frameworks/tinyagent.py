@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import suppress
 import json
 from typing import TYPE_CHECKING, Any
 
@@ -76,14 +77,9 @@ class ToolExecutor:
                 func_args = self.tool_function.__annotations__
                 for arg_name, arg_type in func_args.items():
                     if arg_name in arguments:
-                        try:
+                        with suppress(Exception):
                             # Convert the argument to the expected type
                             arguments[arg_name] = arg_type(arguments[arg_name])
-                        except Exception as e:
-                            # fallback to original value if conversion fails
-                            logger.error(
-                                f"Error converting argument {arg_name} to {arg_type}: {e}"
-                            )
 
             # Call the tool function
             if asyncio.iscoroutinefunction(self.tool_function):
@@ -242,14 +238,13 @@ class TinyAgent(AnyAgent):
                     },
                 )
 
-                if last_response:
+                if last_response is not None:
                     logger.debug(last_response)
                     logger.debug(
                         "Assistant response this turn: %s...",
                         last_response[:50],
                     )
                     assistant_messages.append(last_response)
-                    final_response = last_response
 
             except Exception as err:
                 logger.error("Error during turn %s: %s", num_of_turns + 1, err)
@@ -268,6 +263,7 @@ class TinyAgent(AnyAgent):
                     "Updated final response from assistant message: %s...",
                     final_response[:50],
                 )
+
 
             # Check exit conditions
             if (
@@ -329,6 +325,7 @@ class TinyAgent(AnyAgent):
             completion_params["api_key"] = self.api_key
         if self.api_base:
             completion_params["api_base"] = self.api_base
+        logger.debug("Sending new message to LLM: %s", self.messages[-1])
         response = await litellm.acompletion(**completion_params)
         message: LiteLLMMessage = response.choices[0].message
         logger.debug("Response message: %s", message.model_dump())
