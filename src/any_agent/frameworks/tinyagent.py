@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 import litellm
+from litellm.types.utils import ChatCompletionMessageToolCall
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
@@ -76,14 +78,9 @@ class ToolExecutor:
                 func_args = self.tool_function.__annotations__
                 for arg_name, arg_type in func_args.items():
                     if arg_name in arguments:
-                        try:
+                        with suppress(Exception):
                             # Convert the argument to the expected type
                             arguments[arg_name] = arg_type(arguments[arg_name])
-                        except Exception as e:
-                            # fallback to original value if conversion fails
-                            logger.error(
-                                f"Error converting argument {arg_name} to {arg_type}: {e}"
-                            )
 
             # Call the tool function
             if asyncio.iscoroutinefunction(self.tool_function):
@@ -146,6 +143,7 @@ class TinyAgent(AnyAgent):
         logger.debug("Wrapped tools count: %s", len(wrapped_tools))
 
         self._main_agent_tools = wrapped_tools
+
         for tool in wrapped_tools:
             tool_name = tool.__name__
             tool_desc = tool.__doc__ or f"Tool to {tool_name}"
@@ -330,9 +328,18 @@ class TinyAgent(AnyAgent):
             completion_params["api_key"] = self.api_key
         if self.api_base:
             completion_params["api_base"] = self.api_base
+        logger.debug("Sending new message to LLM: %s", self.messages[-1])
         response = await litellm.acompletion(**completion_params)
         message: LiteLLMMessage = response.choices[0].message
         logger.debug("Response message: %s", message.model_dump())
+        # if no tools were called, add the exit tool to the message and return
+        if not message.tool_calls and options.get("exit_if_first_chunk_no_tool"):
+            logger.debug("No tool calls found in response, adding exit tool")
+            message.tool_calls = [
+                ChatCompletionMessageToolCall(
+                    function=task_completion_tool()["function"],
+                )
+            ]
         self.messages.append(message.model_dump())
 
         # Process tool calls if any
@@ -410,7 +417,6 @@ class TinyAgent(AnyAgent):
                 return "\n".join(combined_results)
 
             return "\n".join(combined_results)
-
         return str(message.content)
 
     @property
