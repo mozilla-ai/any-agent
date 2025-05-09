@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-from contextlib import suppress
 import json
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 import litellm
@@ -46,6 +46,7 @@ def task_completion_tool() -> dict[str, Any]:
             },
         },
     }
+
 
 class ToolExecutor:
     """Executor for tools that wraps tool functions to work with the MCP client."""
@@ -237,13 +238,14 @@ class TinyAgent(AnyAgent):
                     },
                 )
 
-                if last_response is not None:
+                if last_response:
                     logger.debug(last_response)
                     logger.debug(
                         "Assistant response this turn: %s...",
                         last_response[:50],
                     )
                     assistant_messages.append(last_response)
+                    final_response = last_response
 
             except Exception as err:
                 logger.error("Error during turn %s: %s", num_of_turns + 1, err)
@@ -262,7 +264,6 @@ class TinyAgent(AnyAgent):
                     "Updated final response from assistant message: %s...",
                     final_response[:50],
                 )
-
 
             # Check exit conditions
             if (
@@ -329,13 +330,13 @@ class TinyAgent(AnyAgent):
         message: LiteLLMMessage = response.choices[0].message
         logger.debug("Response message: %s", message.model_dump())
         # if no tools were called, add the exit tool to the message and return
-        if not message.tool_calls:
-            logger.debug("No tool calls found in response, calling exit")
-            # Add the exit tool to the message
-            exit_tool = task_completion_tool()
-            message.tool_calls = [ChatCompletionMessageToolCall(
-                function=exit_tool["function"],
-            )]
+        if not message.tool_calls and options.get("exit_if_first_chunk_no_tool"):
+            logger.debug("No tool calls found in response, adding exit tool")
+            message.tool_calls = [
+                ChatCompletionMessageToolCall(
+                    function=task_completion_tool()["function"],
+                )
+            ]
         self.messages.append(message.model_dump())
 
         # Process tool calls if any
