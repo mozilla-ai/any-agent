@@ -3,8 +3,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tools import GoogleTool, search_web, show_final_output, visit_webpage
-from any_agent.tools import AnyTool
+from any_agent.tools import (
+    AnyTool,
+    GoogleTool,
+    search_web,
+    show_final_output,
+    visit_webpage,
+)
 
 
 def test_load_google_default() -> None:
@@ -100,7 +105,9 @@ def test_run_google_custom_args() -> None:
         patch("any_agent.frameworks.google.DEFAULT_MODEL_TYPE"),
         patch("google.adk.tools.FunctionTool"),
     ):
-        agent = AnyAgent[AnyTool].create(AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o"))
+        agent = AnyAgent[AnyTool].create(
+            AgentFramework.GOOGLE, AgentConfig(model_id="gpt-4o")
+        )
         agent.run("foo", user_id="1", session_id="2", run_config=run_config)
         mock_runner.return_value.run_async.assert_called_once_with(
             user_id="1",

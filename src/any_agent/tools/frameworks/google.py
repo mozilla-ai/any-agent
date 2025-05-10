@@ -24,7 +24,9 @@ class GoogleTool(AnyToolBase["GoogleFunctionTool"]):
         return self.tool(*args, **kwargs)
 
     @classmethod
-    def _validate_tool_type(cls, tool: "GoogleFunctionTool | Callable[..., Any]") -> "GoogleFunctionTool":
+    def _validate_tool_type(
+        cls, tool: "GoogleFunctionTool | Callable[..., Any]"
+    ) -> "GoogleFunctionTool":
         from google.adk.tools import FunctionTool as GoogleFunctionTool
 
         if isinstance(tool, GoogleFunctionTool):

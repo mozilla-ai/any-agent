@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage, AgnoTool
+from any_agent.tools import AgnoTool, search_web, visit_webpage
 
 from .any_agent import AnyAgent
 

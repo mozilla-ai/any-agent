@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, cast
 from any_agent import AgentConfig, AgentFramework
 from any_agent.config import TracingConfig
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage, LlamaIndexTool
+from any_agent.tools import LlamaIndexTool, search_web, visit_webpage
 
 from .any_agent import AnyAgent
 

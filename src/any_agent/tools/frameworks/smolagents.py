@@ -30,7 +30,9 @@ class SmolagentsTool(AnyToolBase["SmolagentsToolBase"], SmolagentsToolBase):  # 
         self.forward = self._tool.forward
 
     @classmethod
-    def _validate_tool_type(cls, tool: "SmolagentsToolBase | Callable[..., Any]") -> SmolagentsToolBase:
+    def _validate_tool_type(
+        cls, tool: SmolagentsToolBase | Callable[..., Any]
+    ) -> SmolagentsToolBase:
         from smolagents import tool as smolagents_tool
 
         if isinstance(tool, SmolagentsToolBase):

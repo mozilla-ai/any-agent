@@ -78,7 +78,9 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    agent = AnyAgent[AnyTool].create(agent_framework, agent_config, tracing=TracingConfig())
+    agent = AnyAgent[AnyTool].create(
+        agent_framework, agent_config, tracing=TracingConfig()
+    )
 
     try:
         agent_trace = agent.run(

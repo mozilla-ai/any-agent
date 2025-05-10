@@ -7,7 +7,6 @@ from any_agent.tools.any_tool import AnyToolBase
 
 with suppress(ImportError):
     from langchain_core.tools import BaseTool as LangchainToolBase
-    from langchain_core.tools import tool as langchain_tool
 
 
 class LangchainTool(AnyToolBase["LangchainToolBase"]):
@@ -33,7 +32,9 @@ class LangchainTool(AnyToolBase["LangchainToolBase"]):
         return self.tool(*args, **kwargs)
 
     @classmethod
-    def _validate_tool_type(cls, tool: "LangchainToolBase | Callable[..., Any]") -> "LangchainToolBase":
+    def _validate_tool_type(
+        cls, tool: "LangchainToolBase | Callable[..., Any]"
+    ) -> "LangchainToolBase":
         from langchain_core.tools import BaseTool as LangchainToolBase
         from langchain_core.tools import tool as langchain_tool
 

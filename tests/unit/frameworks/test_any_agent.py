@@ -10,7 +10,9 @@ def test_create_any_with_framework(agent_framework: AgentFramework) -> None:
 
 
 def test_create_any_with_valid_string(agent_framework: AgentFramework) -> None:
-    agent = AnyAgent[AnyTool].create(agent_framework.name, AgentConfig(model_id="gpt-4o"))
+    agent = AnyAgent[AnyTool].create(
+        agent_framework.name, AgentConfig(model_id="gpt-4o")
+    )
     assert agent
 
 

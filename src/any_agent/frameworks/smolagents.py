@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.tools import search_web, visit_webpage, SmolagentsTool
+from any_agent.tools import SmolagentsTool, search_web, visit_webpage
 
 try:
     from smolagents import LiteLLMModel, ToolCallingAgent

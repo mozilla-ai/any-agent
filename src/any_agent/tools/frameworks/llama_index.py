@@ -23,7 +23,9 @@ class LlamaIndexTool(AnyToolBase["LlamaIndexToolBase"]):
         return self.tool(*args, **kwargs)
 
     @classmethod
-    def _validate_tool_type(cls, tool: "LlamaIndexToolBase | Callable[..., Any]") -> "LlamaIndexToolBase":
+    def _validate_tool_type(
+        cls, tool: "LlamaIndexToolBase | Callable[..., Any]"
+    ) -> "LlamaIndexToolBase":
         from llama_index.core.tools import FunctionTool as LlamaIndexToolBase
 
         if isinstance(tool, LlamaIndexToolBase):

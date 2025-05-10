@@ -8,8 +8,8 @@ import litellm
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
-from any_agent.tracing.trace import AgentTrace
 from any_agent.tools import TinyAgentTool
+from any_agent.tracing.trace import AgentTrace
 
 from .any_agent import AnyAgent
 
