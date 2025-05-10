@@ -44,7 +44,8 @@ class OpenAIMCPConnection(_MCPConnection[OpenAITool], ABC):
 
         await self._exit_stack.enter_async_context(self._server)
         tools = await self._server.list_tools()
-        return [OpenAITool(tool=tool) for tool in self._filter_tools(tools)]
+        typed_tools = [OpenAITool(tool=tool) for tool in tools]  # type: ignore[arg-type]
+        return list(self._filter_tools(typed_tools))
 
     @property
     def server(self) -> "MCPServer | None":

@@ -18,7 +18,7 @@ async def test_sse_tool_filtering(
     await server._setup_tools()
     if agent_framework is AgentFramework.AGNO:
         # Check that only the specified tools are included
-        assert set(server.tools[0].functions.keys()) == set(tools)  # type: ignore[union-attr]
+        assert set(server.tools[0].functions.keys()) == set(tools)
     else:
         assert len(server.tools) == len(tools)  # ignore[arg-type]
 

@@ -7,9 +7,9 @@ from any_agent.tools.any_tool import AnyToolBase
 
 with suppress(ImportError):
     from google.adk.tools import FunctionTool as GoogleFunctionTool
+    from google.adk.tools.agent_tool import AgentTool
 
-
-class GoogleTool(AnyToolBase["GoogleFunctionTool"]):
+class GoogleTool(AnyToolBase["GoogleFunctionTool | AgentTool"]):
     """Wrapper class for the Tools used by Google."""
 
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
@@ -25,11 +25,16 @@ class GoogleTool(AnyToolBase["GoogleFunctionTool"]):
 
     @classmethod
     def _validate_tool_type(
-        cls, tool: "GoogleFunctionTool | Callable[..., Any]"
-    ) -> "GoogleFunctionTool":
+        cls, tool: "GoogleFunctionTool | AgentTool | Callable[..., Any]"
+    ) -> "GoogleFunctionTool | AgentTool":
         from google.adk.tools import FunctionTool as GoogleFunctionTool
+        from google.adk.tools.agent_tool import AgentTool
+
 
         if isinstance(tool, GoogleFunctionTool):
+            return tool
+
+        if isinstance(tool, AgentTool):
             return tool
 
         return GoogleFunctionTool(tool)

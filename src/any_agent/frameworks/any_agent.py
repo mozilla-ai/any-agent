@@ -45,7 +45,7 @@ class AnyAgent(ABC, Generic[T]):
         self.config = config
         self.managed_agents = managed_agents
 
-        self._mcp_servers: list[_MCPServerBase[AnyTool]] = []
+        self._mcp_servers: list[MCPServer] = []
 
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
@@ -129,7 +129,7 @@ class AnyAgent(ABC, Generic[T]):
 
     async def _load_tools(
         self, tools: Sequence[T | MCPParams | str | Callable[..., Any]]
-    ) -> tuple[list[AnyTool], Sequence[MCPServer]]:
+    ) -> tuple[list[T], Sequence[_MCPServerBase[T]]]:
         unsupported_tools = [
             tool
             for tool in tools

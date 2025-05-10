@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tools import LangchainTool, search_web, visit_webpage
+from any_agent.tools import AnyTool, LangchainTool, search_web, visit_webpage
 
 
 def test_load_langchain_agent_default() -> None:
@@ -100,7 +100,7 @@ def test_run_langchain_agent_custom_args() -> None:
         patch("any_agent.frameworks.langchain.DEFAULT_MODEL_TYPE"),
         patch("langchain_core.tools.tool"),
     ):
-        agent = AnyAgent.create(
+        agent = AnyAgent[AnyTool].create(
             AgentFramework.LANGCHAIN, AgentConfig(model_id="gpt-4o")
         )
         agent.run("foo", debug=True)

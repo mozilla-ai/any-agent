@@ -90,7 +90,7 @@ class OpenAIAgent(AnyAgent[OpenAITool]):
                     name=managed_agent.name,
                     instructions=managed_agent.instructions,
                     model=self._get_model(managed_agent),
-                    tools=managed_tools,
+                    tools=[tool._tool for tool in managed_tools],
                     mcp_servers=[
                         managed_mcp_server.server
                         for managed_mcp_server in managed_mcp_servers
@@ -100,13 +100,12 @@ class OpenAIAgent(AnyAgent[OpenAITool]):
                 if handoff:
                     handoffs.append(instance)
                 else:
-                    tools.append(
-                        instance.as_tool(
-                            tool_name=instance.name,
-                            tool_description=managed_agent.description
-                            or f"Use the agent: {managed_agent.name}",
-                        ),
+                    tool = instance.as_tool(
+                        tool_name=instance.name,
+                        tool_description=managed_agent.description
+                        or f"Use the agent: {managed_agent.name}",
                     )
+                    tools.append(OpenAITool(tool=tool))
 
         kwargs_ = self.config.agent_args or {}
         if self.config.model_args:
@@ -116,16 +115,16 @@ class OpenAIAgent(AnyAgent[OpenAITool]):
             instructions=self.config.instructions,
             model=self._get_model(self.config),
             handoffs=handoffs,
-            tools=tools,
+            tools=[tool._tool for tool in tools],
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,
         )
 
     def _filter_mcp_tools(
-        self, tools: Sequence[AnyTool], mcp_servers: Sequence[_MCPServerBase[AnyTool]]
-    ) -> list[Any]:
+        self, tools: Sequence[OpenAITool], mcp_servers: Sequence[_MCPServerBase[AnyTool]]
+    ) -> list[OpenAITool]:
         """OpenAI frameowrk doesn't expect the mcp tool to be included in `tools`."""
-        non_mcp_tools = []
+        non_mcp_tools = list[OpenAITool]()
         for tool in tools:
             if any(tool in mcp_server.tools for mcp_server in mcp_servers):
                 continue

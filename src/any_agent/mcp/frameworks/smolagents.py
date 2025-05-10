@@ -32,7 +32,7 @@ class SmolagentsMCPConnection(_MCPConnection[SmolagentsTool], ABC):
 
         tools = self._client.get_tools()
         typed_tools = [SmolagentsTool(tool=tool) for tool in tools]
-        return self._filter_tools(typed_tools)
+        return list(self._filter_tools(typed_tools))
 
 
 class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):

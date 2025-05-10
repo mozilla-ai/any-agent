@@ -60,20 +60,17 @@ class TinyAgentMCPConnection(_MCPConnection[TinyAgentTool], ABC):
 
         # Get the available tools from the MCP server using schema
         available_tools = await session.list_tools()
+        typed_tools = [TinyAgentTool(tool=tool) for tool in available_tools.tools]  # type: ignore[arg-type]
 
         # Filter tools if specific tools were requested
-        filtered_tools = self._filter_tools(available_tools.tools)
+        filtered_tools = self._filter_tools(typed_tools)
 
         # Create callable tool functions
-        tool_list = list[Any]()
-        for tool_info in filtered_tools:
-            tool_list.append(self._create_tool_from_info(tool_info, session))  # type: ignore[arg-type]
-
-        return [TinyAgentTool(tool=tool) for tool in tool_list]
+        return [self._create_tool_from_info(tool, session) for tool in filtered_tools]
 
     def _create_tool_from_info(
-        self, tool: Tool, session: "ClientSession"
-    ) -> Callable[..., Any]:
+        self, tool: TinyAgentTool, session: "ClientSession"
+    ) -> TinyAgentTool:
         """Create a tool function from tool information."""
         tool_name = tool.name if hasattr(tool, "name") else tool
         tool_description = tool.description if hasattr(tool, "description") else ""

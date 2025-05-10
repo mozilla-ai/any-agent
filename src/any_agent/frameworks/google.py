@@ -85,7 +85,8 @@ class GoogleAgent(AnyAgent[GoogleTool]):
                 if handoff:
                     sub_agents_instanced.append(instance)
                 else:
-                    tools.append(AgentTool(instance))
+                    tool = AgentTool(instance)
+                    tools.append(GoogleTool(tool=tool))
         agent_type = self.config.agent_type or LlmAgent
         self._agent = agent_type(
             name=self.config.name,

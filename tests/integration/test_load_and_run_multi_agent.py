@@ -5,7 +5,7 @@ from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
-from any_agent.tools import search_web, visit_webpage
+from any_agent.tools import AnyTool, search_web, visit_webpage
 from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
@@ -55,7 +55,7 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
         ),
     ]
 
-    agent = AnyAgent.create(
+    agent = AnyAgent[AnyTool].create(
         agent_framework=agent_framework,
         agent_config=main_agent,
         managed_agents=managed_agents,

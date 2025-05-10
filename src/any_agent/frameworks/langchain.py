@@ -75,7 +75,7 @@ class LangchainAgent(AnyAgent[LangchainTool]):
 
         if self.managed_agents:
             swarm = []
-            managed_names = []
+            managed_names = list[str]()
             for n, managed_agent in enumerate(self.managed_agents):
                 managed_tools, _ = await self._load_tools(managed_agent.tools)
                 name = managed_agent.name
@@ -99,7 +99,7 @@ class LangchainAgent(AnyAgent[LangchainTool]):
                 )
                 swarm.append(instance)
 
-            imported_tools = [
+            imported_tools_ = [
                 create_handoff_tool(agent_name=managed_name)
                 for managed_name in managed_names
             ]
@@ -107,7 +107,7 @@ class LangchainAgent(AnyAgent[LangchainTool]):
             main_agent = agent_type(
                 name=self.config.name,
                 model=self._get_model(self.config),
-                tools=imported_tools,
+                tools=imported_tools_,
                 prompt=self.config.instructions,
                 **self.config.agent_args or {},
             )

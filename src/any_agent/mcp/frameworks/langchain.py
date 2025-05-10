@@ -48,7 +48,7 @@ class LangchainMCPConnection(_MCPConnection[LangchainTool], ABC):
 
         tools = await load_mcp_tools(session)
         typed_tools = [LangchainTool(tool=tool) for tool in tools]
-        return self._filter_tools(typed_tools)
+        return list(self._filter_tools(typed_tools))
 
 
 class LangchainMCPStdioConnection(LangchainMCPConnection):
