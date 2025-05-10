@@ -20,7 +20,6 @@ with suppress(ImportError):
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.sse import sse_client
     from mcp.client.stdio import stdio_client
-    from mcp.types import Tool as MCPTool  # noqa: TC002
 
     mcp_available = True
 

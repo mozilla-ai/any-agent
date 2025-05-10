@@ -1,7 +1,9 @@
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.tools import search_web, visit_webpage
+from any_agent.mcp import _MCPServerBase
+from any_agent.tools import AnyTool, search_web, visit_webpage, OpenAITool
 
 from .any_agent import AnyAgent
 
@@ -28,7 +30,7 @@ if TYPE_CHECKING:
     from any_agent.tracing.trace import AgentTrace
 
 
-class OpenAIAgent(AnyAgent):
+class OpenAIAgent(AnyAgent[OpenAITool]):
     """OpenAI agent implementation that handles both loading and running."""
 
     def __init__(
@@ -119,7 +121,7 @@ class OpenAIAgent(AnyAgent):
             **kwargs_,
         )
 
-    def _filter_mcp_tools(self, tools: list[Any], mcp_servers: list[Any]) -> list[Any]:
+    def _filter_mcp_tools(self, tools: Sequence[AnyTool], mcp_servers: Sequence[_MCPServerBase[AnyTool]]) -> list[Any]:
         """OpenAI frameowrk doesn't expect the mcp tool to be included in `tools`."""
         non_mcp_tools = []
         for tool in tools:

@@ -14,7 +14,6 @@ mcp_available = False
 with suppress(ImportError):
     from mcp import StdioServerParameters
     from smolagents.mcp_client import MCPClient
-    from smolagents.tools import Tool as SmolagentsTool
 
     mcp_available = True
 
@@ -32,7 +31,8 @@ class SmolagentsMCPConnection(_MCPConnection[SmolagentsTool], ABC):
             raise ValueError(msg)
 
         tools = self._client.get_tools()
-        return [SmolagentsTool(tool=tool) for tool in self._filter_tools(tools)]
+        typed_tools = [SmolagentsTool(tool=tool) for tool in tools]
+        return self._filter_tools(typed_tools)
 
 
 class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):

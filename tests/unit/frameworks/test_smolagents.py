@@ -4,6 +4,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import SmolagentsTool, search_web, visit_webpage
+from any_agent.tools.frameworks import AnyTool
 
 
 def test_load_smolagent_default() -> None:
@@ -78,7 +79,7 @@ def test_run_smolagent_custom_args() -> None:
         patch("any_agent.frameworks.smolagents.DEFAULT_MODEL_TYPE"),
         patch("smolagents.tool"),
     ):
-        agent = AnyAgent.create(
+        agent = AnyAgent[AnyTool].create(
             AgentFramework.SMOLAGENTS,
             AgentConfig(
                 model_id="openai/o3-mini",

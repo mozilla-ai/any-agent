@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, cast
 from any_agent import AgentConfig, AgentFramework
 from any_agent.config import TracingConfig
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
+from any_agent.tools import search_web, visit_webpage, LlamaIndexTool
 
 from .any_agent import AnyAgent
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from any_agent.tracing.trace import AgentTrace
 
 
-class LlamaIndexAgent(AnyAgent):
+class LlamaIndexAgent(AnyAgent[LlamaIndexTool]):
     """LLamaIndex agent implementation that handles both loading and running."""
 
     def __init__(
@@ -84,7 +84,7 @@ class LlamaIndexAgent(AnyAgent):
                     name=name,
                     description=managed_agent.description or "A managed agent",
                     system_prompt=managed_agent.instructions,
-                    tools=managed_tools,
+                    tools=[tool._tool for tool in managed_tools],
                     llm=self._get_model(managed_agent),
                     can_handoff_to=[self.config.name],
                     **managed_agent.agent_args or {},
@@ -96,7 +96,7 @@ class LlamaIndexAgent(AnyAgent):
             main_agent = agent_type(
                 name=self.config.name,
                 description=self.config.description or "The main agent",
-                tools=main_tools,
+                tools=[tool._tool for tool in main_tools],
                 llm=self._get_model(self.config),
                 system_prompt=self.config.instructions,
                 can_handoff_to=managed_names,
@@ -111,7 +111,7 @@ class LlamaIndexAgent(AnyAgent):
             agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
             self._agent = agent_type(
                 name=self.config.name,
-                tools=imported_tools,
+                tools=[tool._tool for tool in imported_tools],
                 description=self.config.description or "The main agent",
                 llm=self._get_model(self.config),
                 system_prompt=self.config.instructions,

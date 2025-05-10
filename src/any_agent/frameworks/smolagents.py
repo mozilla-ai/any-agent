@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.tools import search_web, visit_webpage
+from any_agent.tools import search_web, visit_webpage, SmolagentsTool
 
 try:
     from smolagents import LiteLLMModel, ToolCallingAgent
@@ -21,7 +21,7 @@ DEFAULT_AGENT_TYPE = ToolCallingAgent
 DEFAULT_MODEL_TYPE = LiteLLMModel
 
 
-class SmolagentsAgent(AnyAgent):
+class SmolagentsAgent(AnyAgent[SmolagentsTool]):
     """Smolagents agent implementation that handles both loading and running."""
 
     def __init__(
@@ -70,7 +70,7 @@ class SmolagentsAgent(AnyAgent):
                 managed_agent_instance = agent_type(
                     name=managed_agent.name,
                     model=self._get_model(managed_agent),
-                    tools=managed_tools,
+                    tools=[tool._tool for tool in managed_tools],
                     verbosity_level=-1,  # OFF
                     description=managed_agent.description
                     or f"Use the agent: {managed_agent.name}",
@@ -86,7 +86,7 @@ class SmolagentsAgent(AnyAgent):
         self._agent = main_agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
-            tools=tools,
+            tools=[tool._tool for tool in tools],
             verbosity_level=-1,  # OFF
             managed_agents=managed_agents_instanced,
             **self.config.agent_args or {},

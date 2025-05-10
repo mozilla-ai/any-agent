@@ -11,6 +11,7 @@ from any_agent.tools import (
     show_final_output,
     visit_webpage,
 )
+from any_agent.tools import AnyTool
 
 
 def test_load_openai_default() -> None:
@@ -227,7 +228,7 @@ def test_run_openai_with_custom_args() -> None:
         patch("agents.function_tool"),
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE"),
     ):
-        agent = AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
+        agent = AnyAgent[AnyTool].create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
         agent.run("foo", max_turns=30)
         mock_runner.run.assert_called_once_with(
             mock_agent.return_value, "foo", max_turns=30

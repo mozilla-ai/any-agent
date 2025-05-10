@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
+from any_agent.tools import search_web, visit_webpage, LangchainTool
 
 from .any_agent import AnyAgent
 
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from any_agent.tracing.trace import AgentTrace
 
 
-class LangchainAgent(AnyAgent):
+class LangchainAgent(AnyAgent[LangchainTool]):
     """LangChain agent implementation that handles both loading and running."""
 
     def __init__(
@@ -39,7 +39,7 @@ class LangchainAgent(AnyAgent):
     ):
         super().__init__(config, managed_agents, tracing)
         self._agent: CompiledGraph | None = None
-        self._tools: Sequence[Any] = []
+        self._tools: Sequence[LangchainTool] = []
 
     @property
     def framework(self) -> AgentFramework:
@@ -91,7 +91,7 @@ class LangchainAgent(AnyAgent):
                     name=name,
                     model=self._get_model(managed_agent),
                     tools=[
-                        *managed_tools,
+                        *[tool._tool for tool in managed_tools],
                         create_handoff_tool(agent_name=self.config.name),
                     ],
                     prompt=managed_agent.instructions,

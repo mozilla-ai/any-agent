@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from contextlib import suppress
 from typing import Any, Literal
 
@@ -15,7 +16,6 @@ class GoogleTool(AnyToolBase["GoogleFunctionTool"]):
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         """Call the inner tool with the same parameters."""
-
         from google.adk.tools import FunctionTool as GoogleFunctionTool
 
         if isinstance(self.tool, GoogleFunctionTool):
@@ -24,13 +24,15 @@ class GoogleTool(AnyToolBase["GoogleFunctionTool"]):
         return self.tool(*args, **kwargs)
 
     @classmethod
-    def _validate_tool_type(cls, tool: Any) -> "GoogleToolBase | GoogleFunctionTool":
-        if isinstance(tool, GoogleToolBase):
+    def _validate_tool_type(cls, tool: "GoogleFunctionTool | Callable[..., Any]") -> "GoogleFunctionTool":
+        from google.adk.tools import FunctionTool as GoogleFunctionTool
+
+        if isinstance(tool, GoogleFunctionTool):
             return tool
 
-        return GoogleFunctionTool(tool)  # type: ignore[arg-type]
+        return GoogleFunctionTool(tool)
 
     @property
     def name(self) -> str:
         """Returns the name of the tool."""
-        return self.tool.name
+        return self._tool.name

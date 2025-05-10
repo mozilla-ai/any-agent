@@ -13,7 +13,7 @@ class AgnoTool(AnyToolBase[AgnoToolType]):
     framework: Literal[AgentFramework.AGNO] = AgentFramework.AGNO
 
     @classmethod
-    def _validate_tool_type(cls, tool: Any) -> AgnoToolType:
+    def _validate_tool_type(cls, tool: AgnoToolType) -> AgnoToolType:
         # Agno lets you pass callables directly in as tools ❤️
         return tool
 

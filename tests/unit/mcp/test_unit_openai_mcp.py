@@ -6,6 +6,7 @@ from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
 
 from any_agent.config import AgentConfig, MCPSse, Tool
 from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.tools import AnyTool
 
 
 @pytest.fixture
@@ -28,7 +29,7 @@ def test_openai_mcpsse(
     """This is a test kept for legacy purposes."""
     agent_config = AgentConfig(model_id="gpt-4o", tools=[mcp_sse_params_no_tools])
 
-    agent = AnyAgent.create("openai", agent_config)
+    agent = AnyAgent[AnyTool].create("openai", agent_config)
 
     servers = agent._mcp_servers
     assert servers

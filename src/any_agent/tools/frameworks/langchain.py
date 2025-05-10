@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from contextlib import suppress
 from typing import Any, Literal
 
@@ -27,18 +28,21 @@ class LangchainTool(AnyToolBase["LangchainToolBase"]):
             self.__qualname__ = self.tool.__name__
             self.__doc__ = self.tool.__doc__
 
-    def __call__(self, *args, **kwargs) -> Any:
+    def __call__(self, *args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
         """Call the inner tool with the same parameters."""
         return self.tool(*args, **kwargs)
 
     @classmethod
-    def _validate_tool_type(cls, tool: Any) -> "LangchainToolBase":
+    def _validate_tool_type(cls, tool: "LangchainToolBase | Callable[..., Any]") -> "LangchainToolBase":
+        from langchain_core.tools import BaseTool as LangchainToolBase
+        from langchain_core.tools import tool as langchain_tool
+
         if isinstance(tool, LangchainToolBase):
             return tool
 
-        return langchain_tool(tool)  # type: ignore[arg-type]
+        return langchain_tool(tool)
 
     @property
     def name(self) -> str:
         """Name of the tool."""
-        return self.tool.name
+        return self._tool.name

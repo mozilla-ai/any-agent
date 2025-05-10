@@ -8,6 +8,7 @@ from any_agent.tools import (
     search_web,
     visit_webpage,
 )
+from any_agent.tools import AnyTool
 
 
 def test_load_agno_default() -> None:
@@ -84,6 +85,6 @@ def test_run_agno_custom_args() -> None:
         patch("any_agent.frameworks.agno.Agent", mock_agent),
         patch("any_agent.frameworks.agno.DEFAULT_MODEL_TYPE", mock_model),
     ):
-        agent = AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
+        agent = AnyAgent[AnyTool].create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
         agent.run("foo", retries=2)
         mock_agent.return_value.arun.assert_called_once_with("foo", retries=2)

@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from contextlib import suppress
 from typing import Any, Literal
 
@@ -14,7 +15,7 @@ class OpenAITool(AnyToolBase["AgentTool"]):
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
 
     @classmethod
-    def _validate_tool_type(cls, tool: Any) -> "AgentTool":
+    def _validate_tool_type(cls, tool: "AgentTool| Callable[..., Any]") -> "AgentTool":
         from agents import function_tool
 
         if isinstance(tool, AgentTool):  # type: ignore[arg-type, misc]
@@ -25,4 +26,4 @@ class OpenAITool(AnyToolBase["AgentTool"]):
     @property
     def name(self) -> str:
         """Name of the tool."""
-        return self.tool.name
+        return self._tool.name

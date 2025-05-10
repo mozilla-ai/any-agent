@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from contextlib import suppress
 from functools import wraps
 from typing import Any, Literal
@@ -11,25 +12,25 @@ with suppress(ImportError):
     from smolagents import Tool as SmolagentsToolBase
 
 
-class SmolagentsTool(AnyToolBase["SmolagentsToolBase"], SmolagentsToolBase):
+class SmolagentsTool(AnyToolBase["SmolagentsToolBase"], SmolagentsToolBase):  # type: ignore[misc]
     """Wrapper class for the Tools used by Smolagents."""
 
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
-    description: str | None = None
-    inputs: str | None = None
-    output_type: str | None = None
-    forward: str | None = None
+    description: str | None = None  # type: ignore[assignment]
+    inputs: Mapping[str, Mapping[str, str | type | bool]] | None = None  # type: ignore[assignment]
+    output_type: str | None = None  # type: ignore[assignment]
+    forward: Callable[..., Any] | None = None
 
     def model_post_init(self, _: Any) -> None:
         """Post-init tool parameters."""
-        self.__dict__["name"] = lambda _: self.tool.name
-        self.description = self.tool.description
-        self.inputs = self.tool.inputs
-        self.output_type = self.tool.output_type
-        self.forward = self.tool.forward
+        self.__dict__["name"] = lambda _: self._tool.name
+        self.description = self._tool.description
+        self.inputs = self._tool.inputs
+        self.output_type = self._tool.output_type
+        self.forward = self._tool.forward
 
     @classmethod
-    def _validate_tool_type(cls, tool: Any) -> SmolagentsToolBase:
+    def _validate_tool_type(cls, tool: "SmolagentsToolBase | Callable[..., Any]") -> SmolagentsToolBase:
         from smolagents import tool as smolagents_tool
 
         if isinstance(tool, SmolagentsToolBase):

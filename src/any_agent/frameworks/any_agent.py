@@ -2,15 +2,16 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, assert_never
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, assert_never
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
-from any_agent.config import AgentConfig, AgentFramework, MCPParams, Tool, TracingConfig
+from any_agent.config import AgentConfig, AgentFramework, MCPParams, TracingConfig
 from any_agent.logging import logger
-from any_agent.mcp import wrap_mcp_servers
+from any_agent.mcp import MCPServer, wrap_mcp_servers
 from any_agent.tools import AnyTool, wrap_tools
 from any_agent.tracing.exporter import (
     AnyAgentExporter,
@@ -26,7 +27,10 @@ if TYPE_CHECKING:
     from any_agent.tracing.trace import AgentTrace
 
 
-class AnyAgent(ABC):
+T = TypeVar("T", bound=AnyTool, covariant=True)
+
+
+class AnyAgent(ABC, Generic[T]):
     """Base abstract class for all agent implementations.
 
     This provides a unified interface for different agent frameworks.
@@ -41,7 +45,7 @@ class AnyAgent(ABC):
         self.config = config
         self.managed_agents = managed_agents
 
-        self._mcp_servers: list[_MCPServerBase[Any]] = []
+        self._mcp_servers: list[_MCPServerBase[AnyTool]] = []
 
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
@@ -51,43 +55,43 @@ class AnyAgent(ABC):
     @staticmethod
     def _get_agent_type_by_framework(
         framework_raw: AgentFramework | str,
-    ) -> type[AnyAgent]:
+    ) -> type[AnyAgent[T]]:
         framework = AgentFramework.from_string(framework_raw)
 
         if framework is AgentFramework.SMOLAGENTS:
             from any_agent.frameworks.smolagents import SmolagentsAgent
 
-            return SmolagentsAgent
+            return SmolagentsAgent  # type: ignore[return-value]
 
         if framework is AgentFramework.LANGCHAIN:
             from any_agent.frameworks.langchain import LangchainAgent
 
-            return LangchainAgent
+            return LangchainAgent  # type: ignore[return-value]
 
         if framework is AgentFramework.OPENAI:
             from any_agent.frameworks.openai import OpenAIAgent
 
-            return OpenAIAgent
+            return OpenAIAgent  # type: ignore[return-value]
 
         if framework is AgentFramework.LLAMA_INDEX:
             from any_agent.frameworks.llama_index import LlamaIndexAgent
 
-            return LlamaIndexAgent
+            return LlamaIndexAgent  # type: ignore[return-value]
 
         if framework is AgentFramework.GOOGLE:
             from any_agent.frameworks.google import GoogleAgent
 
-            return GoogleAgent
+            return GoogleAgent  # type: ignore[return-value]
 
         if framework is AgentFramework.AGNO:
             from any_agent.frameworks.agno import AgnoAgent
 
-            return AgnoAgent
+            return AgnoAgent  # type: ignore[return-value]
 
         if framework is AgentFramework.TINYAGENT:
             from any_agent.frameworks.tinyagent import TinyAgent
 
-            return TinyAgent
+            return TinyAgent  # type: ignore[return-value]
 
         assert_never(framework)
 
@@ -98,7 +102,7 @@ class AnyAgent(ABC):
         agent_config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
-    ) -> AnyAgent:
+    ) -> AnyAgent[T]:
         """Create an agent using the given framework and config."""
         return asyncio.get_event_loop().run_until_complete(
             cls.create_async(
@@ -116,7 +120,7 @@ class AnyAgent(ABC):
         agent_config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
-    ) -> AnyAgent:
+    ) -> AnyAgent[T]:
         """Create an agent using the given framework and config."""
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config, managed_agents=managed_agents, tracing=tracing)
@@ -124,8 +128,8 @@ class AnyAgent(ABC):
         return agent
 
     async def _load_tools(
-        self, tools: Sequence[Tool]
-    ) -> tuple[list[AnyTool], Sequence[_MCPServerBase[AnyTool]]]:
+        self, tools: Sequence[T | MCPParams | str | Callable[..., Any]]
+    ) -> tuple[list[AnyTool], Sequence[MCPServer]]:
         unsupported_tools = [
             tool
             for tool in tools

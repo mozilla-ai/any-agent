@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from contextlib import suppress
 from typing import Any, Literal
 
@@ -15,20 +16,22 @@ class LlamaIndexTool(AnyToolBase["LlamaIndexToolBase"]):
 
     def model_post_init(self, _: Any) -> None:
         """Post-init tool parameters."""
-        self.__name__ = self.tool.metadata.name
+        self.__name__ = self.name
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         """Call the inner tool with the same parameters."""
         return self.tool(*args, **kwargs)
 
     @classmethod
-    def _validate_tool_type(cls, tool: Any) -> "LlamaIndexToolBase":
+    def _validate_tool_type(cls, tool: "LlamaIndexToolBase | Callable[..., Any]") -> "LlamaIndexToolBase":
+        from llama_index.core.tools import FunctionTool as LlamaIndexToolBase
+
         if isinstance(tool, LlamaIndexToolBase):
             return tool
 
-        return LlamaIndexToolBase.from_defaults(tool)  # type: ignore[arg-type]
+        return LlamaIndexToolBase.from_defaults(tool)
 
     @property
     def name(self) -> str:
         """Name of the tool."""
-        return self.tool.metadata.name
+        return self._tool.metadata.name or ""

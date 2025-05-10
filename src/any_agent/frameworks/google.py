@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
+from any_agent.tools import search_web, visit_webpage, GoogleTool
 
 from .any_agent import AnyAgent
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from any_agent.tracing.trace import AgentTrace
 
 
-class GoogleAgent(AnyAgent):
+class GoogleAgent(AnyAgent[GoogleTool]):
     """Google ADK agent implementation that handles both loading and running."""
 
     def __init__(
@@ -78,7 +78,7 @@ class GoogleAgent(AnyAgent):
                     name=managed_agent.name,
                     instruction=managed_agent.instructions or "",
                     model=self._get_model(managed_agent),
-                    tools=managed_tools,
+                    tools=[tool._tool for tool in managed_tools],
                     **managed_agent_args or {},
                 )
 
@@ -91,7 +91,7 @@ class GoogleAgent(AnyAgent):
             name=self.config.name,
             instruction=self.config.instructions or "",
             model=self._get_model(self.config),
-            tools=tools,
+            tools=[tool._tool for tool in tools],
             sub_agents=sub_agents_instanced,
             **self.config.agent_args or {},
             output_key="response",

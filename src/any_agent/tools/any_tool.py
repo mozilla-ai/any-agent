@@ -33,11 +33,16 @@ class AnyToolBase(ABC, BaseModel, Generic[T]):
         return self.name == other.name
 
     @property
+    def _tool(self) -> T:
+        """Name of the tool."""
+        return self.tool  # type: ignore[return-value]
+
+    @property
     def name(self) -> str:
         """Name of the tool."""
         return (
-            self.tool.name
-            if isinstance(self.tool, HasName)
+            self._tool.name
+            if isinstance(self._tool, HasName)
             else self.__class__.__name__
         )
 
@@ -48,7 +53,7 @@ class AnyToolBase(ABC, BaseModel, Generic[T]):
     @field_validator("tool", mode="before")
     @classmethod
     @abstractmethod
-    def _validate_tool_type(cls, tool: Any) -> T: ...
+    def _validate_tool_type(cls, tool: T | Callable[..., Any]) -> T: ...
 
     @field_validator("tool", mode="before")
     @classmethod

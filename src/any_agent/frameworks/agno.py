@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
+from any_agent.tools import search_web, visit_webpage, AgnoTool
 
 from .any_agent import AnyAgent
 
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from any_agent.tracing.trace import AgentTrace
 
 
-class AgnoAgent(AnyAgent):
+class AgnoAgent(AnyAgent[AgnoTool]):
     """Agno agent implementation that handles both loading and running."""
 
     def __init__(
@@ -64,7 +64,7 @@ class AgnoAgent(AnyAgent):
         if self.managed_agents:
             tools, _ = await self._load_tools(self.config.tools)
 
-            members = []
+            members = list[Agent]()
             for n, managed_agent in enumerate(self.managed_agents):
                 managed_tools, _ = await self._load_tools(managed_agent.tools)
                 name = managed_agent.name
@@ -79,7 +79,7 @@ class AgnoAgent(AnyAgent):
                         role=managed_agent.description,
                         instructions=managed_agent.instructions,
                         model=self._get_model(managed_agent),
-                        tools=managed_tools,
+                        tools=[tool._tool for tool in managed_tools],
                         **managed_agent.agent_args or {},
                     )
                 )
@@ -91,7 +91,7 @@ class AgnoAgent(AnyAgent):
                 model=self._get_model(self.config),
                 members=members,  # type: ignore[arg-type]
                 instructions=self.config.instructions,
-                tools=tools,
+                tools=[tool._tool for tool in tools],
                 **self.config.agent_args or {},
             )
         else:
@@ -101,7 +101,7 @@ class AgnoAgent(AnyAgent):
                 name=self.config.name,
                 instructions=self.config.instructions,
                 model=self._get_model(self.config),
-                tools=tools,
+                tools=[tool._tool for tool in tools],
                 **self.config.agent_args or {},
             )
 

@@ -4,6 +4,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import LlamaIndexTool, search_web, visit_webpage
+from any_agent.tools import AnyTool
 
 
 def test_load_llama_index_agent_default() -> None:
@@ -102,7 +103,7 @@ def test_run_llama_index_agent_custom_args() -> None:
         patch("any_agent.frameworks.llama_index.DEFAULT_MODEL_TYPE"),
         patch.object(FunctionTool, "from_defaults"),
     ):
-        agent = AnyAgent.create(
+        agent = AnyAgent[AnyTool].create(
             AgentFramework.LLAMA_INDEX,
             AgentConfig(
                 model_id="gemini/gemini-2.0-flash",

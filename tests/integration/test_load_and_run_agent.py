@@ -9,6 +9,7 @@ from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
+from any_agent.tools.frameworks import AnyTool
 from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
@@ -77,7 +78,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
+    agent = AnyAgent[AnyTool].create(agent_framework, agent_config, tracing=TracingConfig())
 
     try:
         agent_trace = agent.run(
@@ -114,7 +115,7 @@ def test_run_agent_twice(agent_framework: AgentFramework) -> None:
         else {}
     )
     model_args["temperature"] = 0.0
-    agent = AnyAgent.create(
+    agent = AnyAgent[AnyTool].create(
         agent_framework,
         AgentConfig(model_id=model_id, model_args=model_args),
     )
