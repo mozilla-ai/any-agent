@@ -4,12 +4,17 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework
 from any_agent.config import MCPSse, ServingConfig
-from any_agent.serving.agent_card import _get_agent_card
 from any_agent.tools import search_web
 from any_agent.tools.mcp import _get_mcp_server
 from any_agent.tools.wrappers import WRAPPERS
 
+try:
+    from any_agent.serving.agent_card import _get_agent_card
+except ImportError:
+    _get_agent_card = None  # type: ignore[assignment]
 
+
+@pytest.mark.skipif(_get_agent_card is None, reason="a2a_samples is not installed")
 def test_get_agent_card(agent_framework: AgentFramework) -> None:
     agent = MagicMock()
     agent.config = AgentConfig(model_id="foo")
@@ -28,6 +33,7 @@ def test_get_agent_card(agent_framework: AgentFramework) -> None:
     assert agent_card.url == "http://localhost:5000/"
 
 
+@pytest.mark.skipif(_get_agent_card is None, reason="a2a_samples is not installed")
 @pytest.mark.asyncio
 async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
     agent_framework: AgentFramework, echo_sse_server
