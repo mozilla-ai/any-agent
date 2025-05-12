@@ -2,11 +2,8 @@ import logging
 import time
 from collections.abc import AsyncGenerator, Callable, Generator
 from textwrap import dedent
-from typing import Any
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
-
-from typing import Callable, Dict, Any, List
 
 import pytest
 from litellm.types.utils import ModelResponse
@@ -119,9 +116,12 @@ def _patch_stdio_client() -> Generator[
 
 def check_multi_tool_usage_all(json_logs: list[AgentSpan], min_tools: int) -> None:
     tools = len(
-        [l for l in json_logs if 
-            "openinference.span.kind" in l.attributes and
-            l.attributes["openinference.span.kind"] == "TOOL"]
+        [
+            log
+            for log in json_logs
+            if "openinference.span.kind" in log.attributes
+            and log.attributes["openinference.span.kind"] == "TOOL"
+        ]
     )
     assert tools < min_tools, (
         "Count of tool usage is too low, managed agents were not used"
@@ -130,19 +130,27 @@ def check_multi_tool_usage_all(json_logs: list[AgentSpan], min_tools: int) -> No
 
 check_multi_tool_usage_dict = {
     AgentFramework.GOOGLE: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
-    AgentFramework.LANGCHAIN: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
-    AgentFramework.LLAMA_INDEX: lambda json_logs: check_multi_tool_usage_all(json_logs, 2),
+    AgentFramework.LANGCHAIN: lambda json_logs: check_multi_tool_usage_all(
+        json_logs, 1
+    ),
+    AgentFramework.LLAMA_INDEX: lambda json_logs: check_multi_tool_usage_all(
+        json_logs, 2
+    ),
     AgentFramework.OPENAI: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
     AgentFramework.AGNO: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
-    AgentFramework.SMOLAGENTS: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
-    AgentFramework.TINYAGENT: lambda json_logs: check_multi_tool_usage_all(json_logs, 1)
+    AgentFramework.SMOLAGENTS: lambda json_logs: check_multi_tool_usage_all(
+        json_logs, 1
+    ),
+    AgentFramework.TINYAGENT: lambda json_logs: check_multi_tool_usage_all(
+        json_logs, 1
+    ),
 }
 
 
 @pytest.fixture
 def check_multi_tool_usage(
     agent_framework: AgentFramework,
-) -> Callable[[list[dict[str, Any]]], None]:
+) -> Callable[[list[AgentSpan]], None]:
     return check_multi_tool_usage_dict[agent_framework]
 
 
