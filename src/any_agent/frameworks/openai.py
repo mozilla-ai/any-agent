@@ -1,5 +1,9 @@
+import traceback
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
+
+from agent.run_context import RunContextWrapper
+from agent.tools import function_tool
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.tools import search_web, visit_webpage
@@ -57,6 +61,13 @@ class OpenAIAgent(AnyAgent):
             api_key=agent_config.api_key,
         )
 
+    @staticmethod
+    def any_agent_tool_error_function(
+        ctx: RunContextWrapper[Any], error: Exception
+    ) -> str:
+        traceback.print_exception(error)
+        return f"An error occurred while running the tool. Please try again. Error: {error!s}"
+
     async def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
         if not agents_available:
@@ -111,13 +122,21 @@ class OpenAIAgent(AnyAgent):
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
 
+        # TODO create tool function calls from function calls
+        wrapped_tools = [
+            function_tool(
+                tool, failure_error_function=self.any_agent_tool_error_function
+            )
+            for tool in tools
+        ]
+
         self._main_agent_tools = tools
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
             model=self._get_model(self.config),
             handoffs=handoffs,
-            tools=tools,
+            tools=wrapped_tools,
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,
         )
