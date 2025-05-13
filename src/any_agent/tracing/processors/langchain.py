@@ -73,22 +73,11 @@ class LangchainTracingProcessor(TracingProcessor):
         if "input.value" in attributes:
             try:
                 input_data = json.loads(attributes["input.value"])
-                if "messages" in input_data and isinstance(
-                    input_data["messages"],
-                    list,
-                ):
-                    # Extract message content if available
-                    messages = []
-                    for msg in input_data["messages"]:
-                        if isinstance(msg, list) and len(msg) > 1:
-                            # Format: ["role", "content"]
-                            messages.append({"role": msg[0], "content": msg[1]})
-                    if messages:
-                        chain_info["input"] = messages
-                    else:
-                        chain_info["input"] = input_data
-                else:
-                    chain_info["input"] = input_data
+                # Extract message content if available
+                message = self.parse_generic_key_value_string(
+                        input_data["messages"][0],
+                )
+                chain_info["input"] = message.get("content", input_data["messages"][0])
             except Exception:
                 chain_info["input"] = attributes["input.value"]
 
