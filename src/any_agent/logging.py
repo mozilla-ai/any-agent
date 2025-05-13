@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from rich.logging import RichHandler
 
@@ -10,7 +11,7 @@ def setup_logger(
     rich_tracebacks: bool = True,
     log_format: str | None = None,
     propagate: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     """Configure the any_agent logger with the specified settings.
 
@@ -24,11 +25,11 @@ def setup_logger(
     """
     logger.setLevel(level)
     logger.propagate = propagate
+
     # Remove any existing handlers
     for handler in logger.handlers[:]:
         logger.removeHandler(handler)
 
-    # Configure RichHandler with specified settings
     handler = RichHandler(rich_tracebacks=rich_tracebacks, markup=True, **kwargs)
 
     if log_format:
