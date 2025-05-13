@@ -5,7 +5,6 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
-from litellm.types.utils import ModelResponse
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 
@@ -14,7 +13,7 @@ TEST_PENALTY = 0.5
 TEST_QUERY = "what's the state capital of Pennsylvania"
 EXPECTED_OUTPUT = "The state capital of Pennsylvania is Harrisburg."
 
-# Framework-specific LiteLLM import paths
+# Google ADK uses a different import path for LiteLLM, and smolagents uses the sync call
 LITELLM_IMPORT_PATHS = {
     AgentFramework.GOOGLE: "google.adk.models.lite_llm.acompletion",
     AgentFramework.LANGCHAIN: "litellm.acompletion",
@@ -24,15 +23,6 @@ LITELLM_IMPORT_PATHS = {
     AgentFramework.SMOLAGENTS: "litellm.completion",
     AgentFramework.LLAMA_INDEX: "litellm.acompletion",
 }
-
-
-# Fixtures
-@pytest.fixture
-def mock_litellm_response() -> ModelResponse:
-    """Fixture to create a standard mock LiteLLM response"""
-    return ModelResponse.model_validate_json(
-        '{"id":"chatcmpl-BWnfbHWPsQp05roQ06LAD1mZ9tOjT","created":1747157127,"model":"gpt-4o-2024-08-06","object":"chat.completion","system_fingerprint":"fp_f5bdcc3276","choices":[{"finish_reason":"stop","index":0,"message":{"content":"The state capital of Pennsylvania is Harrisburg.","role":"assistant","tool_calls":null,"function_call":null,"annotations":[]}}],"usage":{"completion_tokens":11,"prompt_tokens":138,"total_tokens":149,"completion_tokens_details":{"accepted_prediction_tokens":0,"audio_tokens":0,"reasoning_tokens":0,"rejected_prediction_tokens":0},"prompt_tokens_details":{"audio_tokens":0,"cached_tokens":0}},"service_tier":"default"}'
-    )
 
 
 def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
@@ -53,6 +43,7 @@ async def mock_streaming_response() -> AsyncGenerator[dict[str, Any], None]:
     """
     Mock the streaming response from litellm's acompletion function.
     Accepts all arguments that would be passed to the real acompletion function.
+    I used Claude 3.7 to help me make this.
     """
     # First chunk with role
     yield {
@@ -90,7 +81,6 @@ async def mock_streaming_response() -> AsyncGenerator[dict[str, Any], None]:
     }
 
 
-# Tests for agent creation
 class TestAgentCreation:
     def test_create_any_with_framework(self, agent_framework: AgentFramework) -> None:
         agent = AnyAgent.create(agent_framework, AgentConfig(model_id="gpt-4o"))
@@ -113,9 +103,7 @@ class TestModelArguments:
         self, agent_framework: AgentFramework, mock_litellm_response: Any
     ) -> None:
         if agent_framework == AgentFramework.LLAMA_INDEX:
-            pytest.skip(
-                "LlamaIndex agent uses a litellm streaming syntax that isn't mockable like the rest of the frameworks"
-            )
+            pytest.skip("LlamaIndex agent uses a litellm streaming syntax")
 
         agent = create_agent_with_model_args(agent_framework)
 
