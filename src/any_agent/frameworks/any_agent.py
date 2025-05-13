@@ -144,9 +144,7 @@ class AnyAgent(ABC):
         self._tracer_provider = TracerProvider()
         trace.set_tracer_provider(self._tracer_provider)
         if not _is_tracing_supported(self.framework):
-            logger.warning(
-                "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
-            )
+            logger.warning("Tracing is not yet supported for %s", self.framework.name)
             self._instrumenter = None
             return
         self._exporter = AnyAgentExporter(self.framework, self._tracing_config)

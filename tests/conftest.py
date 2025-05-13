@@ -1,3 +1,4 @@
+import logging
 import time
 from collections.abc import AsyncGenerator, Generator
 from textwrap import dedent
@@ -5,28 +6,24 @@ from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import pytest
-import rich.console
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanContext, SpanKind, TraceFlags, TraceState
 from opentelemetry.trace.status import Status, StatusCode
 
 from any_agent.config import AgentFramework
+from any_agent.logging import setup_logger
 
 
-@pytest.fixture(autouse=True)
-def disable_rich_console(
-    monkeypatch: pytest.MonkeyPatch,
+@pytest.fixture(autouse=True, scope="session")
+def configure_logging(
     pytestconfig: pytest.Config,
 ) -> None:
-    original_init = rich.console.Console.__init__
-
-    def quiet_init(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        if pytestconfig.option.capture != "no":
-            kwargs["quiet"] = True
-        original_init(self, *args, **kwargs)
-
-    monkeypatch.setattr(rich.console.Console, "__init__", quiet_init)
+    if pytestconfig.option.capture == "no":
+        level = logging.INFO
+    else:
+        level = logging.CRITICAL
+    setup_logger(level=level)
 
 
 @pytest.fixture
