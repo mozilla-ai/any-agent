@@ -150,7 +150,7 @@ class AnyAgent(ABC):
         self._exporter = AnyAgentExporter(self.framework, self._tracing_config)
         self._tracer_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
         self._instrumenter = get_instrumenter_by_framework(self.framework)
-        self._instrumenter.instrument(tracer_provider=self._tracer_provider)
+        self._instrumenter._instrument(tracer_provider=self._tracer_provider)
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
@@ -212,6 +212,6 @@ class AnyAgent(ABC):
     def exit(self) -> None:
         """Exit the agent and clean up resources."""
         if self._instrumenter is not None:
-            self._instrumenter.uninstrument()  # otherwise, this gets called in the __del__ method of Tracer
+            self._instrumenter._uninstrument()  # otherwise, this gets called in the __del__ method of Tracer
             self._instrumenter = None
         self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected

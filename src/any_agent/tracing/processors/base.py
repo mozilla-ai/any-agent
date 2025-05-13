@@ -50,10 +50,16 @@ class TracingProcessor(ABC):
             )
 
             return LlamaIndexTracingProcessor()
+        if agent_framework is AgentFramework.AGNO:
+            from any_agent.tracing.processors.agno import (
+                AgnoTracingProcessor,
+            )
+
+            return AgnoTracingProcessor()
 
         if (
             agent_framework is AgentFramework.GOOGLE
-            or agent_framework is AgentFramework.AGNO
+            # or agent_framework is AgentFramework.AGNO
             or agent_framework is AgentFramework.TINYAGENT
         ):
             return None

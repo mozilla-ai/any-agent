@@ -1,4 +1,4 @@
-import logging
+from logging import Logger
 import os
 from collections.abc import Callable
 
@@ -11,42 +11,13 @@ from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tracing.trace import AgentSpan, AgentTrace, _is_tracing_supported
 
-FORMAT = "%(message)s"
-logging.basicConfig(
-    level=logging.DEBUG,
-    format=FORMAT,
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)],
-)
-logger = logging.getLogger("any_agent_test")
-logger.setLevel(logging.DEBUG)
-
-
-CHILD_TAG = "any_agent.children"
-
-
-def organize(items: list[AgentSpan]) -> None:
-    traces = {}
-    for trace in items:
-        k = trace.context.span_id
-        trace.attributes[CHILD_TAG] = {}
-        traces[k] = trace
-    for trace in items:
-        if trace.parent:
-            parent_k = trace.parent.span_id
-            if parent_k:
-                traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = trace
-            else:
-                traces[None] = trace
-    logger.info(traces[None].model_dump_json(indent=2))
-
-
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
 def test_load_and_run_multi_agent(
     agent_framework: AgentFramework,
+    organize: Callable[[list[AgentSpan]], None],
     check_multi_tool_usage: Callable[[list[AgentSpan]], None],
 ) -> None:
     kwargs = {}
@@ -113,11 +84,11 @@ def test_load_and_run_multi_agent(
             assert cost_sum.total_tokens > 0
             assert cost_sum.total_tokens < 20000
             traces = agent_trace.spans
-            organize(traces)
+            organize(traces, test_logger)
             if agent_framework == AgentFramework.AGNO:
                 check_multi_tool_usage(traces)
             else:
-                logger.warning(
+                test_logger.warning(
                     "See https://github.com/mozilla-ai/any-agent/issues/256, multi-agent trace checks not working"
                 )
     finally:

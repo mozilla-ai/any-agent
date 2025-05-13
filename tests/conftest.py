@@ -1,4 +1,5 @@
 import logging
+from logging import Logger
 import time
 from collections.abc import AsyncGenerator, Callable, Generator
 from textwrap import dedent
@@ -17,6 +18,7 @@ from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 from any_agent.tracing.trace import AgentSpan
 
+CHILD_TAG = "any_agent.children"
 
 @pytest.fixture
 def llm_span() -> ReadableSpan:
@@ -98,6 +100,24 @@ def _patch_stdio_client() -> Generator[
 
     with patch("mcp.client.stdio.stdio_client", return_value=mock_cm) as patched:
         yield patched, mock_transport
+
+@pytest.fixture
+def organize(test_logger: Logger) -> Callable[[list[AgentSpan]], None]:
+    def _organize(items: list[AgentSpan]) -> None:
+        traces = {}
+        for trace in items:
+            k = trace.context.span_id
+            trace.attributes[CHILD_TAG] = {}
+            traces[k] = trace
+        for trace in items:
+            if trace.parent:
+                parent_k = trace.parent.span_id
+                if parent_k:
+                    traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = trace
+                else:
+                    traces[None] = trace
+        test_logger.info(traces[None].model_dump_json(indent=2))
+    return _organize
 
 
 def check_multi_tool_usage_all(json_logs: list[AgentSpan], min_tools: int) -> None:
@@ -200,6 +220,12 @@ def configure_logging(pytestconfig: pytest.Config) -> None:
     verbosity = pytestconfig.getoption("verbose")
     level = logging.DEBUG if verbosity > 0 else logging.INFO
     setup_logger(level=level)
+
+@pytest.fixture(autouse=True, scope="session")
+def test_logger() -> Logger:
+    logger = logging.getLogger("any_agent_test")
+    logger.setLevel(logging.DEBUG)
+    return logger
 
 
 @pytest.fixture

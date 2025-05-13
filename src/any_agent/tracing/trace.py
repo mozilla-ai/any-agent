@@ -192,7 +192,7 @@ def _is_tracing_supported(agent_framework: AgentFramework) -> bool:
     # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
     # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
     if agent_framework in (
-        AgentFramework.AGNO,
+        # AgentFramework.AGNO,
         AgentFramework.GOOGLE,
         AgentFramework.TINYAGENT,
     ):
