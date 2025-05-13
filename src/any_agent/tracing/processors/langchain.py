@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 from any_agent import AgentFramework
 from any_agent.tracing import TracingProcessor
 from any_agent.tracing.otel_types import StatusCode
+from any_agent.logging import logger
 
 if TYPE_CHECKING:
     from any_agent.tracing.trace import AgentSpan
@@ -73,33 +74,20 @@ class LangchainTracingProcessor(TracingProcessor):
         if "input.value" in attributes:
             try:
                 input_data = json.loads(attributes["input.value"])
-                # Extract message content if available
-                message = self.parse_generic_key_value_string(
-                        input_data["messages"][0],
-                )
-                chain_info["input"] = message.get("content", input_data["messages"][0])
-            except Exception:
+                message = self.parse_generic_key_value_string(input_data['messages'][-1])
+                chain_info["input"] = message.get("content", message)
+            except Exception as e:
+                logger.warning(f"Error parsing input: {e}")
                 chain_info["input"] = attributes["input.value"]
 
         # Extract output from the chain
         if "output.value" in attributes:
             try:
                 output_data = json.loads(attributes["output.value"])
-                if "messages" in output_data:
-                    # Try to parse the messages
-                    parsed_messages = []
-                    for msg in output_data["messages"]:
-                        parsed_msg = self.parse_generic_key_value_string(msg)
-                        if parsed_msg:
-                            parsed_messages.append(parsed_msg)
-
-                    if parsed_messages:
-                        chain_info["output"] = parsed_messages
-                    else:
-                        chain_info["output"] = output_data["messages"]
-                else:
-                    chain_info["output"] = output_data
-            except Exception:
+                message = self.parse_generic_key_value_string(output_data['output'][-1])
+                chain_info["output"] = message.get("content", message)
+            except Exception as e:
+                logger.warning(f"Error parsing output: {e}")
                 chain_info["output"] = attributes["output.value"]
 
         return chain_info
