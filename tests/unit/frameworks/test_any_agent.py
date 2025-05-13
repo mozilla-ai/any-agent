@@ -39,11 +39,12 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
     )
 
 
-async def mock_streaming_response() -> AsyncGenerator[dict[str, Any], None]:
+async def mock_streaming_response(
+    *args: Any, **kwargs: Any
+) -> AsyncGenerator[dict[str, Any], None]:
     """
     Mock the streaming response from litellm's acompletion function.
     Accepts all arguments that would be passed to the real acompletion function.
-    I used Claude 3.7 to help me make this.
     """
     # First chunk with role
     yield {
