@@ -24,7 +24,7 @@ def test_evaluate_runs_all_evaluators(
             criteria="test criteria", passed=True, reason="test passed", points=1
         )
     ]
-    
+
     mock_checkpoint_evaluate.return_value = eval_result
     mock_qa_evaluate.return_value = eval_result[0]
 
@@ -113,7 +113,7 @@ def test_trace_evaluation_result_score_calculation(agent_trace: AgentTrace) -> N
         ground_truth_result=ground_truth_result,
     )
 
-    expected_score = 5/8
+    expected_score = 5 / 8
 
     # Check that the score property returns the correct value
     assert evaluation_result.score == expected_score, (
