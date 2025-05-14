@@ -2,7 +2,6 @@ import json
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Protocol, assert_never
 
-from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
     SpanExporter,
     SpanExportResult,
@@ -116,9 +115,9 @@ class AnyAgentExporter(SpanExporter):
 
 
 class Instrumenter(Protocol):  # noqa: D101
-    def instrument(self, *, tracer_provider: TracerProvider) -> None: ...  # noqa: D102
+    def _instrument(self, **kwargs: Any) -> None: ...
 
-    def uninstrument(self) -> None: ...  # noqa: D102
+    def _uninstrument(self, **kwargs: Any) -> None: ...
 
 
 def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
@@ -145,9 +144,15 @@ def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
 
         return LlamaIndexInstrumentor()
 
+    if framework is AgentFramework.AGNO:
+        from openinference.instrumentation.agno import AgnoInstrumentor
+
+        # FIXME check why AgnoInstrumentor is not correctly identified
+        return AgnoInstrumentor()  # type: ignore[no-any-return]
+
     if (
         framework is AgentFramework.GOOGLE
-        or framework is AgentFramework.AGNO
+        # or framework is AgentFramework.AGNO
         or framework is AgentFramework.TINYAGENT
     ):
         msg = f"{framework} tracing is not supported."

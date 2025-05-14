@@ -58,6 +58,7 @@ openai = [
 
 agno = [
   "agno>=1.4.6",
+  "openinference-instrumentation-agno"
 ]
 
 all = [

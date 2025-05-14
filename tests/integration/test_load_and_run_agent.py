@@ -1,16 +1,18 @@
 import asyncio
+from logging import Logger
 import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from collections.abc import Callable
 
 import pytest
 from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
-from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
+from any_agent.tracing.trace import AgentSpan, AgentTrace, _is_tracing_supported
 
 
 def check_uvx_installed() -> bool:
@@ -30,7 +32,7 @@ def check_uvx_installed() -> bool:
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:
+def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path, organize: Callable[[list[AgentSpan]], None]) -> None:
     kwargs = {}
 
     tmp_file = "tmp.txt"
@@ -91,6 +93,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
         if _is_tracing_supported(agent_framework):
+            organize(agent_trace.spans, test_logger)
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
             cost_sum = agent_trace.get_total_cost()
