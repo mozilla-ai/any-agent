@@ -2,9 +2,6 @@ import traceback
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-from agent.run_context import RunContextWrapper
-from agent.tools import function_tool
-
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.tools import search_web, visit_webpage
 
@@ -17,6 +14,8 @@ try:
         Model,
         ModelSettings,
         Runner,
+        RunContextWrapper,
+        function_tool,
     )
     from agents.extensions.models.litellm_model import LitellmModel
 
