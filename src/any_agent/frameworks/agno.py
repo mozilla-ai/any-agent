@@ -65,9 +65,6 @@ class AgnoAgent(AnyAgent):
             msg = "You need to `pip install 'any-agent[agno]'` to use this agent"
             raise ImportError(msg)
 
-        if not self.managed_agents and not self.config.tools:
-            self.config.tools = []
-
         if self.managed_agents:
             members = []
             for n, managed_agent in enumerate(self.managed_agents):
