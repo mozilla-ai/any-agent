@@ -15,6 +15,7 @@ from opentelemetry.trace.status import Status, StatusCode
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
+from any_agent.tracing.trace import AgentSpan
 
 
 @pytest.fixture
@@ -97,6 +98,46 @@ def _patch_stdio_client() -> Generator[
 
     with patch("mcp.client.stdio.stdio_client", return_value=mock_cm) as patched:
         yield patched, mock_transport
+
+
+def check_multi_tool_usage_all(json_logs: list[AgentSpan], min_tools: int) -> None:
+    tools = len(
+        [
+            log
+            for log in json_logs
+            if "openinference.span.kind" in log.attributes
+            and log.attributes["openinference.span.kind"] == "TOOL"
+        ]
+    )
+    assert tools < min_tools, (
+        "Count of tool usage is too low, managed agents were not used"
+    )
+
+
+check_multi_tool_usage_dict = {
+    AgentFramework.GOOGLE: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
+    AgentFramework.LANGCHAIN: lambda json_logs: check_multi_tool_usage_all(
+        json_logs, 1
+    ),
+    AgentFramework.LLAMA_INDEX: lambda json_logs: check_multi_tool_usage_all(
+        json_logs, 2
+    ),
+    AgentFramework.OPENAI: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
+    AgentFramework.AGNO: lambda json_logs: check_multi_tool_usage_all(json_logs, 1),
+    AgentFramework.SMOLAGENTS: lambda json_logs: check_multi_tool_usage_all(
+        json_logs, 1
+    ),
+    AgentFramework.TINYAGENT: lambda json_logs: check_multi_tool_usage_all(
+        json_logs, 1
+    ),
+}
+
+
+@pytest.fixture
+def check_multi_tool_usage(
+    agent_framework: AgentFramework,
+) -> Callable[[list[AgentSpan]], None]:
+    return check_multi_tool_usage_dict[agent_framework]
 
 
 SSE_MCP_SERVER_SCRIPT = dedent(
