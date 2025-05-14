@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.tools import search_web, visit_webpage
 
 
 def test_load_smolagent_default() -> None:
