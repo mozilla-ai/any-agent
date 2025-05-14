@@ -1,10 +1,7 @@
 import logging
-import pytest
-from unittest.mock import patch
-from typing import Generator
-from pytest import MonkeyPatch
 
 from any_agent.logging import setup_logger
+
 
 def test_setup_logger_sets_level_and_propagate(local_logger: logging.Logger) -> None:
     setup_logger(level=logging.INFO, propagate=False)
@@ -24,7 +21,7 @@ def test_setup_logger_removes_existing_handlers(local_logger: logging.Logger) ->
 
 
 def test_setup_logger_with_custom_format(local_logger: logging.Logger) -> None:
-    custom_format = '%(levelname)s: %(message)s'
+    custom_format = "%(levelname)s: %(message)s"
     setup_logger(log_format=custom_format)
     handler = local_logger.handlers[0]
     assert isinstance(handler.formatter, logging.Formatter)
@@ -48,4 +45,4 @@ def test_setup_logger_edits_global_logger(local_logger: logging.Logger) -> None:
     setup_logger()
     assert dummy_handler not in local_logger.handlers
     assert local_logger.level == logging.ERROR
-    assert local_logger.propagate is False 
+    assert local_logger.propagate is False

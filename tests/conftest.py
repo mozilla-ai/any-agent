@@ -7,7 +7,6 @@ from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import pytest
-import rich.console
 from litellm.types.utils import ModelResponse
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import ReadableSpan
@@ -151,6 +150,7 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, str]]:
         process.kill()
         await process.wait()
 
+
 @pytest.fixture(autouse=True, scope="session")
 def configure_logging(pytestconfig: pytest.Config) -> None:
     """Configure the logging level based on the verbosity of the test run.
@@ -159,6 +159,7 @@ def configure_logging(pytestconfig: pytest.Config) -> None:
     verbosity = pytestconfig.getoption("verbose")
     level = logging.DEBUG if verbosity > 0 else logging.INFO
     setup_logger(level=level)
+
 
 @pytest.fixture
 def mock_litellm_response() -> ModelResponse:

@@ -1,11 +1,13 @@
 import logging
-import pytest
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import patch
-from typing import Generator
-from pytest import MonkeyPatch
+
+import pytest
+
 
 @pytest.fixture
-def local_logger(monkeypatch: MonkeyPatch) -> Generator[logging.Logger, None, None]:
+def local_logger(monkeypatch: Any) -> Generator[logging.Logger, None, None]:
     # Create a fresh logger instance for each test
     test_logger = logging.getLogger(f"test_logger_{id(object())}")
     # Remove all handlers
