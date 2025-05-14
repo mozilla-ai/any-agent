@@ -110,12 +110,7 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
-    model_args: dict[str, Any] = (
-        {"parallel_tool_calls": False}
-        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
-        else {}
-    )
-    model_args["temperature"] = 0.0
+    model_args = {"temperature": 0.0}
     try:
         agent = await AnyAgent.create_async(
             agent_framework,
