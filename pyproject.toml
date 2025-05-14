@@ -118,6 +118,8 @@ ignore = [
   "FIX",
   "D100",  # We don't use module docstrings
   "D104",  # We don't use package docstrings
+  "D203",  # <- disable to resolve conflict with D211
+  "D213",  # <- disable to resolve conflict with D212
   "FBT",
   "COM",
   "ANN",
