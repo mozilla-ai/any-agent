@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../instructions/">
+        <link rel="prev" href="../tools/">
       
       
-        <link rel="next" href="../logging/">
+        <link rel="next" href="../tracing/">
       
       
       <link rel="icon" href="../images/mozilla.ai_black.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Tools - Any Agent</title>
+        <title>Logging - Any Agent</title>
       
     
     
@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#agent-tools" class="md-skip">
+        <a href="#logging-with-any-agent" class="md-skip">
           Skip to content
         </a>
       
@@ -109,7 +109,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Tools
+              Logging
             
           </span>
         </div>
@@ -523,6 +523,28 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -535,30 +557,20 @@
         
       
       
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
   
   
   <span class="md-ellipsis">
-    Tools
+    Logging
     
   </span>
   
 
-      </a>
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../logging/" class="md-nav__link">
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -569,6 +581,77 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customizing-the-logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customizing the Logger
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customizing the Logger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-set-log-level-to-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Set Log Level to DEBUG
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-custom-log-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Custom Log Format
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-propagate-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Propagate Logs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -819,6 +902,65 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customizing-the-logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Customizing the Logger
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Customizing the Logger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-set-log-level-to-debug" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Set Log Level to DEBUG
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-custom-log-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Custom Log Format
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-propagate-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Propagate Logs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -836,57 +978,28 @@
   
 
 
-<h1 id="agent-tools">Agent Tools</h1>
-<p><code>any-agent</code> provides 2 options to specify what <code>tools</code> are available to your agent: <code>Callable</code>, or <code>MCP</code> (<a href="https://modelcontextprotocol.io/introduction">Model Context Protocol</a>).</p>
-<p>You can use any combination of options in the same agent.</p>
-<p>Under the hood, <code>any-agent</code> takes care of wrapping the
-tool so it becomes usable by the selected framework.</p>
-<p>MCP can either be run locally (MCPStdio) or you can connect to an MCP that is running elsewhere (MCPSse).
-See <a href="https://github.com/supercorp-ai/supergateway">SuperGateway</a> for an easy way to turn a Stdio server into an SSE server.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Callable</label><label for="__tabbed_1_2">MCP (Stdio)</label><label for="__tabbed_1_3">MCP (SSE)</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">main_agent</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">]</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
+<h1 id="logging-with-any-agent">Logging with <code>any-agent</code></h1>
+<p><code>any-agent</code> comes with a logger powered by <a href="https://github.com/Textualize/rich">Rich</a></p>
+<h2 id="quick-start">Quick Start</h2>
+<p>By default, logging is set up for you. But if you want to customize it, you can call:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_logger</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">setup_logger</span><span class="p">()</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span>
+<h2 id="customizing-the-logger">Customizing the Logger</h2>
+<p>View the docstring in <a class="autorefs autorefs-internal" title="any_agent.logging.setup_logger(level=logging.ERROR, rich_tracebacks=True, log_format=None, propagate=False, **kwargs)" href="../api/logging/#any_agent.logging.setup_logger"><code>setup_logger</code></a> for a description of the arguments available .</p>
+<h3 id="example-set-log-level-to-debug">Example: Set Log Level to DEBUG</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_logger</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">main_agent</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="n">MCPStdio</span><span class="p">(</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>            <span class="n">command</span><span class="o">=</span><span class="s2">&quot;docker&quot;</span><span class="p">,</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>            <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;run&quot;</span><span class="p">,</span> <span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--rm&quot;</span><span class="p">,</span> <span class="s2">&quot;mcp/fetch&quot;</span><span class="p">],</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;fetch&quot;</span><span class="p">]</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="p">),</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="p">]</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="p">)</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">setup_logger</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPSse</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">main_agent</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">MCPSse</span><span class="p">(</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://localhost:8000/sse&quot;</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="p">),</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="p">]</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="p">)</span>
+<h3 id="example-custom-log-format">Example: Custom Log Format</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">setup_logger</span><span class="p">(</span><span class="n">log_format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-</div>
-</div>
-</div>
+<h3 id="example-propagate-logs">Example: Propagate Logs</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">setup_logger</span><span class="p">(</span><span class="n">propagate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
 
 
 
