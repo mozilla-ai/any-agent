@@ -16,6 +16,7 @@ nav:
     - TinyAgent: frameworks/tinyagent.md
   - Instructions: instructions.md
   - Tools: tools.md
+  - Logging: logging.md
   - Tracing: tracing.md
   - Evaluation: evaluation.md
   - Serving (A2A): serving.md
@@ -24,6 +25,7 @@ nav:
     - Config: api/config.md
     - Tools: api/tools.md
     - Tracing: api/tracing.md
+    - Logging: api/logging.md
 
 theme:
   name: material

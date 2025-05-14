@@ -14,15 +14,7 @@ setup_logger()
 
 ## Customizing the Logger
 
-The `setup_logger` function lets you tweak how logs look and behave. Here are the options you can play with:
-
-| Argument         | Type      | Default           | Description                                                                 |
-|------------------|-----------|-------------------|-----------------------------------------------------------------------------|
-| `level`          | int       | `logging.ERROR`   | The logging level (e.g., `logging.INFO`, `logging.DEBUG`).                  |
-| `rich_tracebacks`| bool      | `True`            | Show beautiful tracebacks with Rich.                                        |
-| `log_format`     | str/None  | `None`            | Custom log format string (uses Python's `logging.Formatter`).               |
-| `propagate`      | bool      | `False`           | If `True`, logs also go to parent loggers.                                  |
-| `**kwargs`       | Any       |                   | Extra options passed to `RichHandler` (see [Rich docs](https://rich.readthedocs.io/en/stable/logging.html)). |
+View the docstring in [`setup_logger`][any_agent.logging.setup_logger] for a description of the arguments available .
 
 ### Example: Set Log Level to DEBUG
 
@@ -44,4 +36,3 @@ setup_logger(log_format="%(asctime)s - %(levelname)s - %(message)s")
 ```python
 setup_logger(propagate=True)
 ```
-
