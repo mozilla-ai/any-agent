@@ -16,10 +16,15 @@ def test_load_openai_default() -> None:
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
     mock_litellm_model = MagicMock()
+    mock_ctx_wrapper = MagicMock()
+    mock_tool = MagicMock()
 
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
+        patch("any_agent.frameworks.openai.function_tool", mock_function_tool),
+        patch("agents.tool", mock_tool),
+        patch("agents.RunContextWrapper", mock_ctx_wrapper),
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
     ):
         AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
@@ -92,6 +97,7 @@ def test_load_openai_with_mcp_server() -> None:
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
+        patch("any_agent.frameworks.openai.function_tool", mock_function_tool),
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
         patch.object(AnyAgent, "_load_tools", mock_wrap_tools),
     ):
@@ -137,6 +143,7 @@ def test_load_openai_multiagent() -> None:
     with (
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool", mock_function_tool),
+        patch("any_agent.frameworks.openai.function_tool", mock_function_tool),
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
     ):
         main_agent = AgentConfig(
@@ -230,6 +237,7 @@ def test_run_openai_with_custom_args() -> None:
         patch("any_agent.frameworks.openai.Runner", mock_runner),
         patch("any_agent.frameworks.openai.Agent", mock_agent),
         patch("agents.function_tool"),
+        patch("any_agent.frameworks.openai.function_tool"),
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE"),
     ):
         agent = AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))

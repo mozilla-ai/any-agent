@@ -1,3 +1,4 @@
+import traceback
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
@@ -12,9 +13,15 @@ try:
         Handoff,
         Model,
         ModelSettings,
+        RunContextWrapper,
         Runner,
+        Tool,
+        function_tool,
     )
     from agents.extensions.models.litellm_model import LitellmModel
+    from agents.tool import (
+        ToolFunction,
+    )
 
     DEFAULT_MODEL_TYPE = LitellmModel
 
@@ -44,6 +51,22 @@ class OpenAIAgent(AnyAgent):
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.OPENAI
+
+    def _wrap_tools(self, tools: list[ToolFunction[...]]) -> list[Tool]:
+        wrapped_tools: list[Tool] = [
+            function_tool(
+                tool, failure_error_function=self.any_agent_tool_error_function
+            )
+            for tool in tools
+        ]
+        return wrapped_tools
+
+    @staticmethod
+    def any_agent_tool_error_function(
+        ctx: RunContextWrapper[Any], error: Exception
+    ) -> str:
+        traceback.print_exception(error)
+        return f"An error occurred while running the tool. Please try again. Error: {error!s}"
 
     def _get_model(
         self,
@@ -89,7 +112,7 @@ class OpenAIAgent(AnyAgent):
                     name=managed_agent.name,
                     instructions=managed_agent.instructions,
                     model=self._get_model(managed_agent),
-                    tools=managed_tools,
+                    tools=self._wrap_tools(managed_tools),
                     mcp_servers=[
                         managed_mcp_server.server
                         for managed_mcp_server in managed_mcp_servers
@@ -117,7 +140,7 @@ class OpenAIAgent(AnyAgent):
             instructions=self.config.instructions,
             model=self._get_model(self.config),
             handoffs=handoffs,
-            tools=tools,
+            tools=self._wrap_tools(tools),
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,
         )
