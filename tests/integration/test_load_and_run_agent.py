@@ -10,6 +10,9 @@ from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
+from any_agent.evaluation import evaluate
+from any_agent.evaluation import EvaluationCase
+from any_agent.evaluation.schemas import TraceEvaluationResult, EvaluationResult
 from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
@@ -98,6 +101,31 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             assert cost_sum.total_cost < 1.00
             assert cost_sum.total_tokens > 0
             assert cost_sum.total_tokens < 20000
+        if _is_tracing_supported(agent_framework):
+            case = EvaluationCase(
+                llm_judge="gpt-4.1-mini",
+                checkpoints=[
+                    {
+                        "criteria": "Check if the agent called the write_file tool and it succeeded",
+                        "points": 1,
+                    },
+                    {
+                        "criteria": "Check if the agent wrote the year to the file.",
+                        "points": 1,
+                    },
+                    { # this should fail
+                        "criteria": "Check if the year was 1990",
+                        "points": 1,
+                    },
+                ],
+            )
+            result: TraceEvaluationResult = evaluate(
+                evaluation_case=case,
+                trace=agent_trace,
+                agent_framework=agent_framework,
+            )
+            assert result
+            assert result.score == float(2 / 3)
     finally:
         agent.exit()
 
