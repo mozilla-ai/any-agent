@@ -15,17 +15,6 @@ from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 
 
-@pytest.fixture(autouse=True, scope="session")
-def configure_logging(
-    pytestconfig: pytest.Config,
-) -> None:
-    if pytestconfig.option.capture == "no":
-        level = logging.INFO
-    else:
-        level = logging.CRITICAL
-    setup_logger(level=level)
-
-
 @pytest.fixture
 def llm_span() -> ReadableSpan:
     # Convert hex trace and span IDs to integers
@@ -158,3 +147,13 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, str]]:
         # Clean up the process when test is done
         process.kill()
         await process.wait()
+
+
+@pytest.fixture(autouse=True, scope="session")
+def configure_logging(pytestconfig: pytest.Config) -> None:
+    """Configure the logging level based on the verbosity of the test run.
+    This is a session fixture, so it only gets called once per test session.
+    """
+    verbosity = pytestconfig.getoption("verbose")
+    level = logging.DEBUG if verbosity > 0 else logging.INFO
+    setup_logger(level=level)
