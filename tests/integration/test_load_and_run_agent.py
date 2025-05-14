@@ -100,7 +100,6 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             assert cost_sum.total_cost < 1.00
             assert cost_sum.total_tokens > 0
             assert cost_sum.total_tokens < 20000
-        if _is_tracing_supported(agent_framework):
             case = EvaluationCase(
                 llm_judge="gpt-4.1-mini",
                 checkpoints=[
