@@ -160,7 +160,7 @@ class AnyAgent(ABC):
             self.run_async(prompt, **kwargs)
         )
 
-    def serve(self, serving_config: ServingConfig | None = None) -> None:
+    async def serve(self, serving_config: ServingConfig | None = None) -> None:
         """Serve this agent using the Agent2Agent Protocol (A2A).
 
         Args:
@@ -171,13 +171,13 @@ class AnyAgent(ABC):
 
         """
         try:
-            from any_agent.serving import _get_a2a_server
+            from any_agent.serving import _get_a2a_server_async
         except ImportError as e:
             msg = "You need to `pip install 'git+https://github.com/google/A2A#subdirectory=samples/python' to use this method."
             raise ImportError(msg) from e
 
-        server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())
-        server.start()
+        server = _get_a2a_server_async(self, serving_config=serving_config or ServingConfig())
+        await server.start_async()
 
     @abstractmethod
     async def _load_agent(self) -> None:
