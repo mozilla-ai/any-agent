@@ -105,10 +105,6 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
 @pytest.mark.asyncio
 async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
-    if agent_framework is AgentFramework.AGNO:
-        pytest.skip(
-            "AGNO bug https://github.com/agno-agi/agno/issues/3120 prevents mixes concurrent runs in async"
-        )
     model_id = "gpt-4.1-nano"
     env_check = validate_environment(model_id)
     if not env_check["keys_in_environment"]:
