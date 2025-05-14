@@ -1,8 +1,10 @@
+from typing import Any
+
 import pytest
 
 
 @pytest.fixture(autouse=True)
-def mock_web_browsing(monkeypatch):
+def mock_web_browsing(monkeypatch: Any) -> None:
     import tests.integration.test_load_and_run_multi_agent as test_mod
 
     monkeypatch.setattr("any_agent.tools.search_web", mock_search_web)
