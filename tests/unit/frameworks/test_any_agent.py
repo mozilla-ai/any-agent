@@ -1,6 +1,5 @@
 # pylint: disable=missing-function-docstring
 # pylint: disable=missing-class-docstring
-from collections.abc import AsyncGenerator
 from typing import Any
 from unittest.mock import patch
 
@@ -39,49 +38,6 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
     )
 
 
-async def mock_streaming_response(
-    *args: Any, **kwargs: Any
-) -> AsyncGenerator[dict[str, Any], None]:
-    """
-    Mock the streaming response from litellm's acompletion function.
-    Accepts all arguments that would be passed to the real acompletion function.
-    """
-    # First chunk with role
-    yield {
-        "choices": [
-            {
-                "delta": {"role": "assistant", "content": "The state "},
-                "index": 0,
-                "finish_reason": None,
-            }
-        ]
-    }
-
-    # Middle chunks with content
-    yield {
-        "choices": [
-            {"delta": {"content": "capital of "}, "index": 0, "finish_reason": None}
-        ]
-    }
-
-    yield {
-        "choices": [
-            {
-                "delta": {"content": "Pennsylvania is "},
-                "index": 0,
-                "finish_reason": None,
-            }
-        ]
-    }
-
-    # Final chunk with finish reason
-    yield {
-        "choices": [
-            {"delta": {"content": "Harrisburg."}, "index": 0, "finish_reason": "stop"}
-        ]
-    }
-
-
 class TestAgentCreation:
     def test_create_any_with_framework(self, agent_framework: AgentFramework) -> None:
         agent = AnyAgent.create(agent_framework, AgentConfig(model_id="gpt-4o"))
@@ -110,10 +66,7 @@ class TestModelArguments:
 
         # Patch the appropriate litellm import path for this framework
         import_path = LITELLM_IMPORT_PATHS[agent_framework]
-        with patch(import_path) as mock_litellm:
-            # Configure the mock
-            mock_litellm.return_value = mock_litellm_response
-
+        with patch(import_path, return_value=mock_litellm_response) as mock_litellm:
             # Run the agent
             result = agent.run(TEST_QUERY)
 
@@ -123,7 +76,9 @@ class TestModelArguments:
             assert mock_litellm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
             assert mock_litellm.call_count > 0
 
-    def test_model_args_streaming(self, agent_framework: AgentFramework) -> None:
+    def test_model_args_streaming(
+        self, agent_framework: AgentFramework, mock_litellm_streaming: Any
+    ) -> None:
         if agent_framework != AgentFramework.LLAMA_INDEX:
             pytest.skip("This test is only for LlamaIndex framework")
 
@@ -131,10 +86,7 @@ class TestModelArguments:
 
         # Patch the appropriate litellm import path for LlamaIndex
         import_path = LITELLM_IMPORT_PATHS[agent_framework]
-        with patch(import_path) as mock_litellm:
-            # Configure the mock to return our async generator
-            mock_litellm.side_effect = mock_streaming_response
-
+        with patch(import_path, side_effect=mock_litellm_streaming) as mock_litellm:
             # Run the agent
             result = agent.run(TEST_QUERY)
 
