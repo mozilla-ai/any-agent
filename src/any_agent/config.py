@@ -1,11 +1,11 @@
 from collections.abc import Callable, Mapping, MutableMapping, Sequence
-from enum import Enum, auto
+from enum import StrEnum, auto
 from typing import Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
-class AgentFramework(str, Enum):
+class AgentFramework(StrEnum):
     GOOGLE = auto()
     LANGCHAIN = auto()
     LLAMA_INDEX = auto()
