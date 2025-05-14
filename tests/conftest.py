@@ -2,6 +2,7 @@ import logging
 import time
 from collections.abc import AsyncGenerator, Callable, Generator
 from textwrap import dedent
+from typing import Any
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
@@ -15,21 +16,6 @@ from opentelemetry.trace.status import Status, StatusCode
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 from any_agent.tracing.trace import AgentSpan
-
-
-@pytest.fixture(autouse=True)
-def disable_rich_console(
-    monkeypatch: pytest.MonkeyPatch,
-    pytestconfig: pytest.Config,
-) -> None:
-    original_init = rich.console.Console.__init__
-
-    def quiet_init(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
-        if pytestconfig.option.capture != "no":
-            kwargs["quiet"] = True
-        original_init(self, *args, **kwargs)
-
-    monkeypatch.setattr(rich.console.Console, "__init__", quiet_init)
 
 
 @pytest.fixture

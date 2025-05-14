@@ -13,8 +13,9 @@ try:
         Handoff,
         Model,
         ModelSettings,
-        Runner,
         RunContextWrapper,
+        Runner,
+        Tool,
         function_tool,
     )
     from agents.extensions.models.litellm_model import LitellmModel
@@ -122,7 +123,7 @@ class OpenAIAgent(AnyAgent):
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
 
         # TODO create tool function calls from function calls
-        wrapped_tools = [
+        wrapped_tools: list[Tool] = [
             function_tool(
                 tool, failure_error_function=self.any_agent_tool_error_function
             )
