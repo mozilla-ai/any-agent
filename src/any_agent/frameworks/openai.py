@@ -1,4 +1,3 @@
-import traceback
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
@@ -13,10 +12,7 @@ try:
         Handoff,
         Model,
         ModelSettings,
-        RunContextWrapper,
         Runner,
-        Tool,
-        function_tool,
     )
     from agents.extensions.models.litellm_model import LitellmModel
 
@@ -60,13 +56,6 @@ class OpenAIAgent(AnyAgent):
             base_url=agent_config.api_base,
             api_key=agent_config.api_key,
         )
-
-    @staticmethod
-    def any_agent_tool_error_function(
-        ctx: RunContextWrapper[Any], error: Exception
-    ) -> str:
-        traceback.print_exception(error)
-        return f"An error occurred while running the tool. Please try again. Error: {error!s}"
 
     async def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""
@@ -122,21 +111,13 @@ class OpenAIAgent(AnyAgent):
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
 
-        # TODO create tool function calls from function calls
-        wrapped_tools: list[Tool] = [
-            function_tool(
-                tool, failure_error_function=self.any_agent_tool_error_function
-            )
-            for tool in tools
-        ]
-
         self._main_agent_tools = tools
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
             model=self._get_model(self.config),
             handoffs=handoffs,
-            tools=wrapped_tools,
+            tools=tools,
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,
         )
