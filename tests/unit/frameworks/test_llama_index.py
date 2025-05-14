@@ -41,7 +41,7 @@ def test_load_llama_index_agent_default() -> None:
             llm=model_mock.return_value,
             system_prompt="You are a helpful assistant",
             description="The main agent",
-            tools=[tool_mock(search_web), tool_mock(visit_webpage)],
+            tools=[],
         )
 
 

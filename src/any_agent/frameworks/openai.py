@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.tools import search_web, visit_webpage
 
 from .any_agent import AnyAgent
 
@@ -66,11 +65,6 @@ class OpenAIAgent(AnyAgent):
             msg = "You need to `pip install openai-agents` to use this agent"
             raise ImportError(msg)
 
-        if not self.managed_agents and not self.config.tools:
-            self.config.tools = [
-                search_web,
-                visit_webpage,
-            ]
         tools, mcp_servers = await self._load_tools(self.config.tools)
         tools = self._filter_mcp_tools(tools, mcp_servers)
 

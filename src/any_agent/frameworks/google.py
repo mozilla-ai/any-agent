@@ -4,7 +4,6 @@ from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
 from any_agent.tracing.trace import AgentTrace
 
 from .any_agent import AnyAgent
@@ -57,11 +56,6 @@ class GoogleAgent(AnyAgent):
             msg = "You need to `pip install 'any-agent[google]'` to use this agent"
             raise ImportError(msg)
 
-        if not self.managed_agents and not self.config.tools:
-            self.config.tools = [
-                search_web,
-                visit_webpage,
-            ]
         tools, _ = await self._load_tools(self.config.tools)
 
         sub_agents_instanced = []

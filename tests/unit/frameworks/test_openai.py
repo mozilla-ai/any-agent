@@ -34,7 +34,7 @@ def test_load_openai_default() -> None:
             model=mock_litellm_model.return_value,
             instructions=None,
             handoffs=[],
-            tools=[mock_function_tool(search_web), mock_function_tool(visit_webpage)],
+            tools=[],
             mcp_servers=[],
         )
 

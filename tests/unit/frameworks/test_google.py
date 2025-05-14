@@ -32,7 +32,7 @@ def test_load_google_default() -> None:
             name="any_agent",
             instruction="",
             model=mock_model(model="gpt-4o"),
-            tools=[MockedFunctionTool(search_web), MockedFunctionTool(visit_webpage)],
+            tools=[],
             sub_agents=[],
             output_key="response",
         )

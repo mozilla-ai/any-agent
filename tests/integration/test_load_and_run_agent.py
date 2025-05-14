@@ -119,7 +119,7 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     try:
         agent = await AnyAgent.create_async(
             agent_framework,
-            AgentConfig(model_id=model_id, model_args=model_args),
+            AgentConfig(model_id=model_id, model_args=model_args, tools=[]),
         )
         results = await asyncio.gather(
             agent.run_async("What is the capital of France?"),

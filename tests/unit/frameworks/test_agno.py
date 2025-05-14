@@ -22,7 +22,7 @@ def test_load_agno_default() -> None:
             name="any_agent",
             instructions=None,
             model=mock_model(model="gpt-4o"),
-            tools=[search_web, visit_webpage],
+            tools=[],
         )
 
 
