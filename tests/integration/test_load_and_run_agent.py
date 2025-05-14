@@ -10,9 +10,8 @@ from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
-from any_agent.evaluation import evaluate
-from any_agent.evaluation import EvaluationCase
-from any_agent.evaluation.schemas import TraceEvaluationResult, EvaluationResult
+from any_agent.evaluation import EvaluationCase, evaluate
+from any_agent.evaluation.schemas import CheckpointCriteria, TraceEvaluationResult
 from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 
@@ -105,18 +104,18 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             case = EvaluationCase(
                 llm_judge="gpt-4.1-mini",
                 checkpoints=[
-                    {
-                        "criteria": "Check if the agent called the write_file tool and it succeeded",
-                        "points": 1,
-                    },
-                    {
-                        "criteria": "Check if the agent wrote the year to the file.",
-                        "points": 1,
-                    },
-                    { # this should fail
-                        "criteria": "Check if the year was 1990",
-                        "points": 1,
-                    },
+                    CheckpointCriteria(
+                        criteria="Check if the agent called the write_file tool and it succeeded",
+                        points=1,
+                    ),
+                    CheckpointCriteria(
+                        criteria="Check if the agent wrote the year to the file.",
+                        points=1,
+                    ),
+                    CheckpointCriteria(
+                        criteria="Check if the year was 1990",
+                        points=1,
+                    ),
                 ],
             )
             result: TraceEvaluationResult = evaluate(
