@@ -1,11 +1,14 @@
 import logging
 import time
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator, Callable, Generator
 from textwrap import dedent
+from typing import Any
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import pytest
+import rich.console
+from litellm.types.utils import ModelResponse
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanContext, SpanKind, TraceFlags, TraceState
@@ -148,7 +151,6 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, str]]:
         process.kill()
         await process.wait()
 
-
 @pytest.fixture(autouse=True, scope="session")
 def configure_logging(pytestconfig: pytest.Config) -> None:
     """Configure the logging level based on the verbosity of the test run.
@@ -157,3 +159,62 @@ def configure_logging(pytestconfig: pytest.Config) -> None:
     verbosity = pytestconfig.getoption("verbose")
     level = logging.DEBUG if verbosity > 0 else logging.INFO
     setup_logger(level=level)
+
+@pytest.fixture
+def mock_litellm_response() -> ModelResponse:
+    """Fixture to create a standard mock LiteLLM response"""
+    return ModelResponse.model_validate_json(
+        '{"id":"chatcmpl-BWnfbHWPsQp05roQ06LAD1mZ9tOjT","created":1747157127,"model":"gpt-4o-2024-08-06","object":"chat.completion","system_fingerprint":"fp_f5bdcc3276","choices":[{"finish_reason":"stop","index":0,"message":{"content":"The state capital of Pennsylvania is Harrisburg.","role":"assistant","tool_calls":null,"function_call":null,"annotations":[]}}],"usage":{"completion_tokens":11,"prompt_tokens":138,"total_tokens":149,"completion_tokens_details":{"accepted_prediction_tokens":0,"audio_tokens":0,"reasoning_tokens":0,"rejected_prediction_tokens":0},"prompt_tokens_details":{"audio_tokens":0,"cached_tokens":0}},"service_tier":"default"}'
+    )
+
+
+@pytest.fixture
+def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any, None]]:
+    """
+    Create a fixture that returns an async generator function to mock streaming responses.
+    This returns a function that can be used as a side_effect.
+    """
+
+    async def _mock_streaming_response(
+        *args: Any, **kwargs: Any
+    ) -> AsyncGenerator[Any, None]:
+        # First chunk with role
+        yield {
+            "choices": [
+                {
+                    "delta": {"role": "assistant", "content": "The state "},
+                    "index": 0,
+                    "finish_reason": None,
+                }
+            ]
+        }
+
+        # Middle chunks with content
+        yield {
+            "choices": [
+                {"delta": {"content": "capital of "}, "index": 0, "finish_reason": None}
+            ]
+        }
+
+        yield {
+            "choices": [
+                {
+                    "delta": {"content": "Pennsylvania is "},
+                    "index": 0,
+                    "finish_reason": None,
+                }
+            ]
+        }
+
+        # Final chunk with finish reason
+        yield {
+            "choices": [
+                {
+                    "delta": {"content": "Harrisburg."},
+                    "index": 0,
+                    "finish_reason": "stop",
+                }
+            ]
+        }
+
+    return _mock_streaming_response
