@@ -41,7 +41,7 @@ theme:
         icon: material/lightbulb-outline
         name: Switch to light mode
   logo: images/mozilla.ai_white.png
-  favicon: images/mozilla.ai_black.png
+  favicon: images/any-agent_favicon.png
   extra_css:
     - assets/custom.css
   features:
