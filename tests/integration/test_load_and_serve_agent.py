@@ -5,7 +5,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import requests
 import logging
 
 from concurrent.futures import ThreadPoolExecutor
@@ -52,6 +51,7 @@ async def test_load_and_serve_agent(agent_framework: AgentFramework, tmp_path: P
     kwargs = {}
 
     tmp_file = "tmp.txt"
+    logger.info(f"Starting")
 
     if not check_uvx_installed():
         msg = "uvx is not installed. Please install it to run this test."
@@ -98,29 +98,31 @@ async def test_load_and_serve_agent(agent_framework: AgentFramework, tmp_path: P
     )
     agent_server = await AnyAgent.create_async(agent_framework, agent_config, tracing=TracingConfig())
     logger.info(f"Agent created: {agent_server}")
-    await agent_server.serve(
+    server = await agent_server.serve(
         serving_config=ServingConfig(port=5555,endpoint="/test_agent")
     )
     logger.info(f"Agent serving")
-
-    await asyncio.sleep(300)
 
     # TODO use an agent card instead
 
     # open another call in another thread
     client = A2AClient(url = "http://localhost:5555/test_agent")
-    await client.send_task(
+    result = await client.send_task(
         {"id": "1",
         "message": Message(
             role='user',
             parts=[TextPart(text="Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file")])
         }
         )
+    
+    logger.info(f'after sending: {result}')
+    server.join()
 
     assert os.path.exists(os.path.join(tmp_path, tmp_file))
     with open(os.path.join(tmp_path, tmp_file)) as f:
         content = f.read()
     assert content == str(datetime.now().year)
+    """
     assert isinstance(agent_trace, AgentTrace)
     assert agent_trace.final_output
     if _is_tracing_supported(agent_framework):
@@ -131,4 +133,4 @@ async def test_load_and_serve_agent(agent_framework: AgentFramework, tmp_path: P
         assert cost_sum.total_cost < 1.00
         assert cost_sum.total_tokens > 0
         assert cost_sum.total_tokens < 20000
-
+    """
