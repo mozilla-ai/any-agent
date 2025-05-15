@@ -1,8 +1,4 @@
-import os
-import sys
-import types
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 from src.any_agent.tools import web_browsing
 
@@ -74,7 +70,8 @@ def test_search_tavily_exception(monkeypatch):
             self.api_key = api_key
 
         def search(self, query, include_images=False):
-            raise RuntimeError("Oops!")
+            msg = "Oops!"
+            raise RuntimeError(msg)
 
     monkeypatch.setattr(web_browsing, "TavilyClient", FakeClient)
     monkeypatch.setenv("TAVILY_API_KEY", "fake-key")

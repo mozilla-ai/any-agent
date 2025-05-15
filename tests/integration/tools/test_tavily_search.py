@@ -1,6 +1,9 @@
 import os
+
 import pytest
+
 from src.any_agent.tools import web_browsing
+
 
 @pytest.mark.skipif(
     not os.getenv("TAVILY_API_KEY"),
