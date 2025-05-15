@@ -1,5 +1,7 @@
 # Agent Tools
 
+👉 **View the built-in callable tools that any-agent provides via the [API docs](api/tools.md)**
+
 `any-agent` provides 2 options to specify what `tools` are available to your agent: `Callable`, or `MCP` ([Model Context Protocol](https://modelcontextprotocol.io/introduction)).
 
 You can use any combination of options in the same agent.
