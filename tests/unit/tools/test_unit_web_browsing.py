@@ -1,27 +1,28 @@
+from typing import Any
 from unittest.mock import MagicMock
 
-from src.any_agent.tools import web_browsing
+from any_agent.tools import search_tavily
 
 
-def test_search_tavily_no_client(monkeypatch):
-    monkeypatch.setattr(web_browsing, "TavilyClient", None)
-    result = web_browsing.search_tavily("test")
+def test_search_tavily_no_client(monkeypatch: Any) -> None:
+    monkeypatch.setattr("any_agent.tools.web_browsing.TavilyClient", None)
+    result = search_tavily("test")
     assert "not installed" in result
 
 
-def test_search_tavily_no_api_key(monkeypatch):
-    monkeypatch.setattr(web_browsing, "TavilyClient", MagicMock())
+def test_search_tavily_no_api_key(monkeypatch: Any) -> None:
+    monkeypatch.setattr("any_agent.tools.web_browsing.TavilyClient", MagicMock())
     monkeypatch.delenv("TAVILY_API_KEY", raising=False)
-    result = web_browsing.search_tavily("test")
+    result = search_tavily("test")
     assert "environment variable not set" in result
 
 
-def test_search_tavily_success(monkeypatch):
+def test_search_tavily_success(monkeypatch: Any) -> None:
     class FakeClient:
-        def __init__(self, api_key):
+        def __init__(self, api_key: str) -> None:
             self.api_key = api_key
 
-        def search(self, query, include_images=False):
+        def search(self, query: str, include_images: bool = False) -> Any:
             return {
                 "results": [
                     {
@@ -32,19 +33,19 @@ def test_search_tavily_success(monkeypatch):
                 ]
             }
 
-    monkeypatch.setattr(web_browsing, "TavilyClient", FakeClient)
+    monkeypatch.setattr("any_agent.tools.web_browsing.TavilyClient", FakeClient)
     monkeypatch.setenv("TAVILY_API_KEY", "fake-key")
-    result = web_browsing.search_tavily("test")
+    result = search_tavily("test")
     assert "Test Title" in result
     assert "Test content!" in result
 
 
-def test_search_tavily_with_images(monkeypatch):
+def test_search_tavily_with_images(monkeypatch: Any) -> None:
     class FakeClient:
-        def __init__(self, api_key):
+        def __init__(self, api_key: str) -> None:
             self.api_key = api_key
 
-        def search(self, query, include_images=False):
+        def search(self, query: str, include_images: bool = False) -> Any:
             return {
                 "results": [
                     {
@@ -56,24 +57,24 @@ def test_search_tavily_with_images(monkeypatch):
                 "images": ["http://image.com/cat.jpg"],
             }
 
-    monkeypatch.setattr(web_browsing, "TavilyClient", FakeClient)
+    monkeypatch.setattr("any_agent.tools.web_browsing.TavilyClient", FakeClient)
     monkeypatch.setenv("TAVILY_API_KEY", "fake-key")
-    result = web_browsing.search_tavily("test", include_images=True)
+    result = search_tavily("test", include_images=True)
     assert "Test Title" in result
     assert "Images:" in result
     assert "cat.jpg" in result
 
 
-def test_search_tavily_exception(monkeypatch):
+def test_search_tavily_exception(monkeypatch: Any) -> None:
     class FakeClient:
-        def __init__(self, api_key):
+        def __init__(self, api_key: str) -> None:
             self.api_key = api_key
 
-        def search(self, query, include_images=False):
+        def search(self, query: str, include_images: bool = False) -> Any:
             msg = "Oops!"
             raise RuntimeError(msg)
 
-    monkeypatch.setattr(web_browsing, "TavilyClient", FakeClient)
+    monkeypatch.setattr("any_agent.tools.web_browsing.TavilyClient", FakeClient)
     monkeypatch.setenv("TAVILY_API_KEY", "fake-key")
-    result = web_browsing.search_tavily("test")
+    result = search_tavily("test")
     assert "Error performing Tavily search" in result
