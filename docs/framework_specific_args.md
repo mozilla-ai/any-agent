@@ -2,7 +2,7 @@
 
 The `agent_args` parameter in `any_agent.config.AgentConfig` allows you to pass arguments specific to the underlying framework that the agent instance is built on. 
 
-Example-1: To pass the `output_type` parameter for structured output, when using the OpenAI Agents SDK:
+**Example-1**: To pass the `output_type` parameter for structured output, when using the OpenAI Agents SDK:
 
 ```python
 from pydantic import BaseModel
@@ -30,7 +30,7 @@ agent_trace = agent.run("The book is called 'The Alchemist' by Paulo Coelho and 
 print(agent_trace.final_output)
 ```
 
-Example-2: In smolagents, for structured output one needs to use the `grammar` parameter. Additionally, `planning_interval` defines the interval at which the agent will run a planning step.
+**Example-2**: In smolagents, for structured output one needs to use the `grammar` parameter. Additionally, `planning_interval` defines the interval at which the agent will run a planning step.
 
 ```python
 from pydantic import BaseModel
