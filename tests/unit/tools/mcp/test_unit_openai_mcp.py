@@ -1,11 +1,19 @@
-from collections.abc import Generator, Sequence
-from unittest.mock import AsyncMock, patch
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
 
-from any_agent.config import AgentConfig, MCPSse, Tool
+from any_agent import AgentFramework
+from any_agent.config import AgentConfig, MCPSse, MCPStdio, Tool
 from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.tools import _get_mcp_server
+
+if TYPE_CHECKING:
+    from collections.abc import Generator, Sequence
+
+    from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
 
 
 @pytest.fixture
@@ -35,3 +43,22 @@ def test_openai_mcpsse(
 
     server, *_ = agent._mcp_servers
     assert server.mcp_tool == mcp_sse_params_no_tools
+
+
+@pytest.mark.asyncio
+async def test_openai_mcp_env() -> None:
+    mcp_server = _get_mcp_server(
+        MCPStdio(command="print('Hello MCP')", args=[], env={"FOO": "BAR"}),
+        AgentFramework.OPENAI,
+    )
+    mocked_class = MagicMock()
+    mocked_class.return_value = AsyncMock()
+
+    with (
+        patch(
+            "any_agent.tools.mcp.frameworks.openai.OpenAIInternalMCPServerStdio",
+            mocked_class,
+        ),
+    ):
+        await mcp_server._setup_tools()
+        assert mocked_class.call_args_list[0][1]["params"]["env"] == {"FOO": "BAR"}
