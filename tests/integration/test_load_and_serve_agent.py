@@ -18,8 +18,10 @@ from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
 from queue import Queue
 
-from common.client import A2AClient
-from common.types import TaskSendParams, Message, TextPart
+import any_agent.serving
+if any_agent.serving.serving_available:
+    from common.client import A2AClient
+    from common.types import TaskSendParams, Message, TextPart
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -45,6 +47,10 @@ def check_uvx_installed() -> bool:
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
+)
+@pytest.mark.skipif(
+    not any_agent.serving.serving_available,
+    reason="Integration tests require the installation of the ADK samples (`pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'`)",
 )
 @pytest.mark.asyncio
 async def test_load_and_serve_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:

@@ -46,12 +46,6 @@ class A2AServerAsync(A2AServer):
         await self._server.shutdown()
         self._task.cancel()
 
-
-
-
-
-
-
     def server(self) -> uvicorn.Server:
         return self._server
     
