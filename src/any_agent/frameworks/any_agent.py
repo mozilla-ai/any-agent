@@ -23,7 +23,8 @@ from any_agent.tracing.exporter import (
     get_instrumenter_by_framework,
 )
 from any_agent.tracing.trace import _is_tracing_supported
-from any_agent.serving.server import A2AServerThreaded
+from any_agent.serving import _get_a2a_server_async
+from any_agent.serving.server import A2AServerAsync
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -159,7 +160,7 @@ class AnyAgent(ABC):
             self.run_async(prompt, **kwargs)
         )
 
-    async def serve(self, serving_config: ServingConfig | None = None) -> A2AServerThreaded:
+    async def serve(self, serving_config: ServingConfig | None = None) -> A2AServerAsync:
         """Serve this agent using the Agent2Agent Protocol (A2A).
 
         Args:
@@ -170,13 +171,13 @@ class AnyAgent(ABC):
             ServerNotStartingError: If the uvicorn server didn't start in the maximum time
         """
         try:
-            from any_agent.serving import _get_a2a_server_threaded
+            from any_agent.serving import _get_a2a_server_async
         except ImportError as e:
             msg = "You need to `pip install 'git+https://github.com/google/A2A#subdirectory=samples/python' to use this method."
             raise ImportError(msg) from e
 
-        server = _get_a2a_server_threaded(self, serving_config=serving_config or ServingConfig())
-        await server.start_threaded()
+        server = _get_a2a_server_async(self, serving_config=serving_config or ServingConfig())
+        await server.serve()
         return server
 
     @abstractmethod

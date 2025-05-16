@@ -97,26 +97,26 @@ async def test_load_and_serve_agent(agent_framework: AgentFramework, tmp_path: P
         **kwargs,  # type: ignore[arg-type]
     )
     agent_server = await AnyAgent.create_async(agent_framework, agent_config, tracing=TracingConfig())
-    logger.info(f"Agent created: {agent_server}")
-    server = await agent_server.serve(
-        serving_config=ServingConfig(port=5555,endpoint="/test_agent")
-    )
-    logger.info(f"Agent serving")
+    try:
+        logger.info(f"Agent created: {agent_server}")
+        async_server = await agent_server.serve(ServingConfig(port=5555,endpoint="/test_agent"))
+        logger.info(f"Agent serving")
 
-    # TODO use an agent card instead
+        # TODO use an agent card instead
 
-    # open another call in another thread
-    client = A2AClient(url = "http://localhost:5555/test_agent")
-    result = await client.send_task(
-        {"id": "1",
-        "message": Message(
-            role='user',
-            parts=[TextPart(text="Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file")])
-        }
-        )
+        # open another call in another thread
+        client = A2AClient(url = "http://localhost:5555/test_agent")
+        result = await client.send_task(
+            {"id": "1",
+            "message": Message(
+                role='user',
+                parts=[TextPart(text="Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file")])
+            }
+            )
+    finally:
+        async_server.shutdown()
     
     logger.info(f'after sending: {result}')
-    server.join()
 
     assert os.path.exists(os.path.join(tmp_path, tmp_file))
     with open(os.path.join(tmp_path, tmp_file)) as f:
