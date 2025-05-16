@@ -43,6 +43,9 @@ class MCPStdio(BaseModel):
     For example, `["run", "-i", "--rm", "mcp/fetch"]`.
     """
 
+    env: dict[str, str] | None = None
+    """The environment variables to set for the server."""
+
     tools: Sequence[str] | None = None
     """List of tool names to use from the MCP Server.
 

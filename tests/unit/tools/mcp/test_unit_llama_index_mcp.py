@@ -5,7 +5,7 @@ import pytest
 from llama_index.tools.mcp import BasicMCPClient as LlamaIndexMCPClient
 from llama_index.tools.mcp import McpToolSpec as LlamaIndexMcpToolSpec
 
-from any_agent.config import AgentFramework, MCPSse, Tool
+from any_agent.config import AgentFramework, MCPSse, MCPStdio, Tool
 from any_agent.tools import _get_mcp_server
 
 
@@ -45,3 +45,22 @@ async def test_llamaindex_mcp_sse_integration(
     llama_index_mcp_client.assert_called_once_with(  # type: ignore[attr-defined]
         command_or_url=mcp_sse_params_with_tools.url
     )
+
+
+@pytest.mark.asyncio
+async def test_llama_index_mcp_env() -> None:
+    mcp_server = _get_mcp_server(
+        MCPStdio(command="print('Hello MCP')", args=[], env={"FOO": "BAR"}),
+        AgentFramework.LLAMA_INDEX,
+    )
+    mocked_class = MagicMock()
+    mocked_class.return_value = AsyncMock()
+
+    with (
+        patch(
+            "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMcpToolSpec",
+            mocked_class,
+        ),
+    ):
+        await mcp_server._setup_tools()
+        assert mocked_class.call_args_list[0][1]["client"].env == {"FOO": "BAR"}

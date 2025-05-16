@@ -1,4 +1,3 @@
-import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
 from typing import Literal
@@ -48,7 +47,7 @@ class LlamaIndexMCPStdioConnection(LlamaIndexMCPConnection):
         self._client = LlamaIndexMCPClient(
             command_or_url=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
-            env={**os.environ},
+            env=self.mcp_tool.env,
         )
         return await super().list_tools()
 

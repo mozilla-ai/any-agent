@@ -1,4 +1,3 @@
-import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
 from typing import Literal
@@ -45,7 +44,7 @@ class AgnoMCPStdioConnection(AgnoMCPConnection):
         self._server = AgnoMCPTools(
             command=server_params,
             include_tools=list(self.mcp_tool.tools) if self.mcp_tool.tools else None,
-            env={**os.environ},
+            env=self.mcp_tool.env,
         )
         return await super().list_tools()
 

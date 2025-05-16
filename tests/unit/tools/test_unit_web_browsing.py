@@ -1,13 +1,15 @@
 from typing import Any
 from unittest.mock import MagicMock
 
+import pytest
+
 from any_agent.tools import search_tavily
 
 
-def test_search_tavily_no_client(monkeypatch: Any) -> None:
-    monkeypatch.setattr("any_agent.tools.web_browsing.TavilyClient", None)
-    result = search_tavily("test")
-    assert "not installed" in result
+def test_search_tavily_unavailable(monkeypatch: Any) -> None:
+    monkeypatch.setattr("any_agent.tools.web_browsing.talivy_available", False)
+    with pytest.raises(ImportError, match="pip install 'tavily-python'"):
+        search_tavily("test")
 
 
 def test_search_tavily_no_api_key(monkeypatch: Any) -> None:
