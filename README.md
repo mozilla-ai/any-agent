@@ -1,10 +1,14 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/images/any-agent_white.png">
-    <source media="(prefers-color-scheme: light)" srcset="docs/images/any-agent_black.png">
-    <img src="./images/Blueprint-logo-black.png" width="20%" alt="Project logo"/>
+    <img src="docs/images/any-agent-logo-mark.png" width="20%" alt="Project logo"/>
   </picture>
 </p>
+
+<div align="center">
+
+# any-agent
+
+</div>
 
 <div align="center">
 
