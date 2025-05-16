@@ -87,6 +87,7 @@ lint = [
   "pre-commit-uv==4.1.4",
 ]
 
+[dependency-groups]
 dev = [
   "any-agent[docs,tests,lint]",
   "pre-commit",
