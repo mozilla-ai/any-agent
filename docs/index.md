@@ -1,4 +1,10 @@
-# **any-agent**
+# any-agent
+
+<p align="center">
+  <picture>
+    <img src="./images/any-agent-logo-mark.png" width="20%" alt="Project logo"/>
+  </picture>
+</p>
 
 `any-agent` is a Python library providing a single interface to different agent frameworks.
 

@@ -1,4 +1,3 @@
-import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
 from datetime import timedelta
@@ -58,7 +57,7 @@ class LangchainMCPStdioConnection(LangchainMCPConnection):
         server_params = StdioServerParameters(
             command=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
-            env={**os.environ},
+            env=self.mcp_tool.env,
         )
 
         self._client = stdio_client(server_params)

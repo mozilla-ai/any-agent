@@ -4,7 +4,7 @@
 
 ## Default Agent Type
 
-We use [`smolagents.CodeAgent`](https://huggingface.co/docs/smolagents/reference/agents#smolagents.CodeAgent) as default.
+We use [`smolagents.ToolCallingAgent`](https://huggingface.co/docs/smolagents/reference/agents#smolagents.ToolCallingAgent) as default.
 Check the reference to find additional supported `agent_args`.
 
 ## Default Model Type

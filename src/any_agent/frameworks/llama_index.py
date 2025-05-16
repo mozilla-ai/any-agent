@@ -5,7 +5,6 @@ from uuid import uuid4
 from any_agent import AgentConfig, AgentFramework
 from any_agent.config import TracingConfig
 from any_agent.logging import logger
-from any_agent.tools import search_web, visit_webpage
 
 from .any_agent import AnyAgent
 
@@ -61,12 +60,6 @@ class LlamaIndexAgent(AnyAgent):
         if not llama_index_available:
             msg = "You need to `pip install 'any-agent[llama_index]'` to use this agent"
             raise ImportError(msg)
-
-        if not self.managed_agents and not self.config.tools:
-            self.config.tools = [
-                search_web,
-                visit_webpage,
-            ]
 
         if self.managed_agents:
             agents = []
