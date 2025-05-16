@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from any_agent import AnyAgent
 
 
-class AnyAgentTaskManager(InMemoryTaskManager):  # type: ignore[misc]
+class AnyAgentTaskManager(InMemoryTaskManager):
     """Adapted from google/a2a/samples/python."""
 
     def __init__(self, agent: "AnyAgent"):  # noqa: D107

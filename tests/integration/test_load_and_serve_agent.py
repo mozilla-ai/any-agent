@@ -1,27 +1,20 @@
-import asyncio
+import logging
 import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import logging
-
-from concurrent.futures import ThreadPoolExecutor
-
 import pytest
 from litellm.utils import validate_environment
 
+import any_agent.serving
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio, ServingConfig
-from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
 
-from queue import Queue
-
-import any_agent.serving
 if any_agent.serving.serving_available:
     from common.client import A2AClient
-    from common.types import TaskSendParams, Message, TextPart
+    from common.types import Message, TextPart
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -30,6 +23,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("any_agent_test")
 logger.setLevel(logging.DEBUG)
+
 
 def check_uvx_installed() -> bool:
     """The integration tests requires uvx"""
@@ -53,11 +47,13 @@ def check_uvx_installed() -> bool:
     reason="Integration tests require the installation of the ADK samples (`pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'`)",
 )
 @pytest.mark.asyncio
-async def test_load_and_serve_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:
+async def test_load_and_serve_agent(
+    agent_framework: AgentFramework, tmp_path: Path
+) -> None:
     kwargs = {}
 
     tmp_file = "tmp.txt"
-    logger.info(f"Starting")
+    logger.info("Starting")
 
     if not check_uvx_installed():
         msg = "uvx is not installed. Please install it to run this test."
@@ -102,32 +98,45 @@ async def test_load_and_serve_agent(agent_framework: AgentFramework, tmp_path: P
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    agent_server = await AnyAgent.create_async(agent_framework, agent_config, tracing=TracingConfig())
+    agent_server = await AnyAgent.create_async(
+        agent_framework, agent_config, tracing=TracingConfig()
+    )
     try:
-        logger.info(f"Agent created: {agent_server}")
-        async_server = await agent_server.serve(ServingConfig(port=5555,endpoint="/test_agent"))
-        logger.info(f"Agent serving")
+        logger.info(f"Agent created: {agent_server}")  # noqa: G004
+        async_server = await agent_server.serve(
+            ServingConfig(port=5555, endpoint="/test_agent")
+        )
+        logger.info("Agent serving")
 
         # TODO use an agent card instead
 
         # open another call in another thread
-        client = A2AClient(url = "http://localhost:5555/test_agent")
+        client = A2AClient(url="http://localhost:5555/test_agent")
         result = await client.send_task(
-            {"id": "1",
-            "message": Message(
-                role='user',
-                parts=[TextPart(text="Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file")])
+            {
+                "id": "1",
+                "message": Message(
+                    role="user",
+                    parts=[
+                        TextPart(
+                            text="Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file"
+                        )
+                    ],
+                ),
             }
-            )
+        )
     finally:
-        async_server.shutdown()
-    
-    logger.info(f'after sending: {result}')
+        await async_server.shutdown()
 
-    assert os.path.exists(os.path.join(tmp_path, tmp_file))
-    with open(os.path.join(tmp_path, tmp_file)) as f:
-        content = f.read()
-    assert content == str(datetime.now().year)
+    logger.info(f"after sending: {result}")  # noqa: G004
+
+    def check_file() -> None:
+        assert os.path.exists(os.path.join(tmp_path, tmp_file))
+        with open(os.path.join(tmp_path, tmp_file)) as f:
+            content = f.read()
+        assert content == str(datetime.now().year)
+
+    check_file()
     """
     assert isinstance(agent_trace, AgentTrace)
     assert agent_trace.final_output

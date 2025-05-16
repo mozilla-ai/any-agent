@@ -158,6 +158,7 @@ strict = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 follow_untyped_imports = true
+disallow_subclassing_any = false
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

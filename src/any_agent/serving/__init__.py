@@ -1,7 +1,7 @@
 try:
-    from .server import _get_a2a_server, _get_a2a_server_async, A2AServerAsync
+    from .server import A2AServerAsync, _get_a2a_server, _get_a2a_server_async
 
-    __all__ = ["_get_a2a_server", "_get_a2a_server_async", "A2AServerAsync"]
+    __all__ = ["A2AServerAsync", "_get_a2a_server", "_get_a2a_server_async"]
 
     serving_available = True
 except ImportError:
