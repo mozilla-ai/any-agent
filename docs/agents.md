@@ -60,7 +60,7 @@ agent = AnyAgent.create(
 
 ### Framework Specific Arguments
 
-The `agent_args` parameter in `any_agent.config.AgentConfig` allows you to pass arguments specific to the underlying framework that the agent instance is built on. 
+The `agent_args` parameter in `AgentConfig` allows you to pass arguments specific to the underlying framework that the agent instance is built on. 
 
 **Example-1**: To pass the `output_type` parameter for structured output, when using the OpenAI Agents SDK:
 
