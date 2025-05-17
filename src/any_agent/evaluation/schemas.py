@@ -35,7 +35,6 @@ class CheckpointCriteria(BaseModel):
 
 
 class GroundTruthAnswer(TypedDict):
-    name: str
     value: float
     points: float
 
@@ -46,19 +45,16 @@ class TraceEvaluationResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     trace: AgentTrace
-    hypothesis_answer: str | None
     checkpoint_results: list[EvaluationResult]
-    hypothesis_answer_results: list[EvaluationResult]
-    direct_results: list[EvaluationResult]
+    ground_truth_result: EvaluationResult | None = None
 
     @property
     def score(self) -> float:
         """Calculate the score based on the evaluation results."""
-        all_results = (
-            self.checkpoint_results
-            + self.hypothesis_answer_results
-            + self.direct_results
-        )
+        if self.ground_truth_result is not None:
+            all_results = [*self.checkpoint_results, self.ground_truth_result]
+        else:
+            all_results = self.checkpoint_results
         total_points = sum([result.points for result in all_results])
         if total_points == 0:
             msg = "Total points is 0, cannot calculate score."

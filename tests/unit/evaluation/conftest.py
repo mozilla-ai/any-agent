@@ -10,14 +10,13 @@ from any_agent.tracing.trace import AgentSpan, AgentTrace
 @pytest.fixture
 def evaluation_case() -> EvaluationCase:
     return EvaluationCase(
-        ground_truth=[{"name": "Test Case 1", "value": 1.0, "points": 1.0}],
+        ground_truth={"value": 1.0, "points": 1.0},
         checkpoints=[
             CheckpointCriteria.model_validate(
-                {"criteria": "Check if value is 1.0", "points": 1}
+                {"criteria": "Check if the agent ran a calculation", "points": 1}
             )
         ],
         llm_judge="gpt-4o-mini",
-        final_output_criteria=[],
     )
 
 

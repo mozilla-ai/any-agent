@@ -16,7 +16,6 @@ def test_evaluate_runs_all_evaluators(
     """This unit test checks that all evaluators are called when evaluating a trace."""
     #### Set up the mocks for the evaluators so that we don't actually call LLMs.
     mock_checkpoint_evaluate = MagicMock()
-    mock_hypothesis_evaluate = MagicMock()
     mock_qa_evaluate = MagicMock()
 
     ### Every evaluate will return the same result
@@ -25,21 +24,14 @@ def test_evaluate_runs_all_evaluators(
             criteria="test criteria", passed=True, reason="test passed", points=1
         )
     ]
-    for evaluate_fn in [
-        mock_checkpoint_evaluate,
-        mock_hypothesis_evaluate,
-        mock_qa_evaluate,
-    ]:
-        evaluate_fn.return_value = eval_result
+
+    mock_checkpoint_evaluate.return_value = eval_result
+    mock_qa_evaluate.return_value = eval_result[0]
 
     with (
         patch(
             "any_agent.evaluation.evaluate.evaluate_checkpoint",
             mock_checkpoint_evaluate,
-        ),
-        patch(
-            "any_agent.evaluation.evaluate.evaluate_hypothesis",
-            mock_hypothesis_evaluate,
         ),
         patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
         patch("any_agent.evaluation.evaluate.TracingProcessor.create"),
@@ -51,7 +43,6 @@ def test_evaluate_runs_all_evaluators(
         )
 
         assert mock_checkpoint_evaluate.call_count == 1
-        assert mock_hypothesis_evaluate.call_count == 1
         assert mock_qa_evaluate.call_count == 1
 
 
@@ -84,10 +75,6 @@ def test_evaluate_when_no_final_output(
             "any_agent.evaluation.evaluate.evaluate_checkpoint",
             mock_checkpoint_evaluate,
         ),
-        patch(
-            "any_agent.evaluation.evaluate.evaluate_hypothesis",
-            mock_hypothesis_evaluate,
-        ),
         patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
         patch("any_agent.evaluation.evaluate.TracingProcessor.create"),
     ):
@@ -115,31 +102,18 @@ def test_trace_evaluation_result_score_calculation(agent_trace: AgentTrace) -> N
         ),
     ]
 
-    hypothesis_results = [
-        EvaluationResult(
-            criteria="Hypothesis 1", passed=True, reason="Passed", points=5
-        ),
-        EvaluationResult(
-            criteria="Hypothesis 2", passed=False, reason="Failed", points=1
-        ),
-    ]
-
-    direct_results = [
-        EvaluationResult(criteria="Direct 1", passed=True, reason="Passed", points=3),
-        EvaluationResult(criteria="Direct 2", passed=True, reason="Passed", points=4),
-        EvaluationResult(criteria="Direct 3", passed=False, reason="Failed", points=2),
-    ]
+    ground_truth_result = EvaluationResult(
+        criteria="Direct 1", passed=True, reason="Passed", points=3
+    )
 
     # Create a TraceEvaluationResult instance
     evaluation_result = TraceEvaluationResult(
         trace=agent_trace,
-        hypothesis_answer="Test hypothesis",
         checkpoint_results=checkpoint_results,
-        hypothesis_answer_results=hypothesis_results,
-        direct_results=direct_results,
+        ground_truth_result=ground_truth_result,
     )
 
-    expected_score = 14 / 20
+    expected_score = 5 / 8
 
     # Check that the score property returns the correct value
     assert evaluation_result.score == expected_score, (
@@ -147,12 +121,6 @@ def test_trace_evaluation_result_score_calculation(agent_trace: AgentTrace) -> N
     )
 
     # Test case with no points (should raise ValueError)
-    zero_point_result = TraceEvaluationResult(
-        trace=agent_trace,
-        hypothesis_answer="Test hypothesis",
-        checkpoint_results=[],
-        hypothesis_answer_results=[],
-        direct_results=[],
-    )
+    zero_point_result = TraceEvaluationResult(trace=agent_trace, checkpoint_results=[])
     with pytest.raises(ValueError, match="Total points is 0, cannot calculate score."):
         zero_point_result.score  # noqa: B018
