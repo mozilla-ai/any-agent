@@ -22,7 +22,7 @@ jobs:
           activate-environment: true
 
       - name: Install pre-commit
-        run: uv sync --extra lint
+        run: uv sync --group lint
 
       # In case of considering adding caching, check the following PR first:
       # https://github.com/mozilla-ai/any-agent/pull/186
