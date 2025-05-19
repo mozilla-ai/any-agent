@@ -9,7 +9,7 @@ from any_agent.tracing.otel_types import (
 from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
-def test_agent_trace_execution_time_simple() -> None:
+def test_agent_trace_duration_simple() -> None:
     # Create a span with the correct AGENT kind and name
     agent_span = AgentSpan(
         name="any_agent",
@@ -26,16 +26,16 @@ def test_agent_trace_execution_time_simple() -> None:
     )
     trace = AgentTrace(spans=[agent_span])
     expected = datetime.timedelta(seconds=(2000 - 1000) / 1_000_000_000)
-    assert isinstance(trace.execution_time, datetime.timedelta)
-    assert abs(trace.execution_time.total_seconds() - expected.total_seconds()) < 1e-9
+    assert isinstance(trace.duration, datetime.timedelta)
+    assert abs(trace.duration.total_seconds() - expected.total_seconds()) < 1e-9
 
 
-def test_agent_trace_execution_time_from_sample(agent_trace: AgentTrace) -> None:
+def test_agent_trace_duration_from_sample(agent_trace: AgentTrace) -> None:
     """
     This test relies upon the sample trace that is saved in the sample_traces directory. If the content of that trace
     changes, this test will need to be updated
     (because it is using start and end times that were manually parsed from the trace)
     """
     expected_seconds = (1747660970774416000 - 1747660964057285000) / 1_000_000_000
-    assert isinstance(agent_trace.execution_time, datetime.timedelta)
-    assert abs(agent_trace.execution_time.total_seconds() - expected_seconds) < 1e-6
+    assert isinstance(agent_trace.duration, datetime.timedelta)
+    assert abs(agent_trace.duration.total_seconds() - expected_seconds) < 1e-6

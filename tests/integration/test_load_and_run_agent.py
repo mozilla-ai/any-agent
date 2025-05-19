@@ -99,14 +99,14 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
-            assert agent_trace.execution_time is not None
-            assert isinstance(agent_trace.execution_time, timedelta)
-            assert agent_trace.execution_time.total_seconds() > 0
-            # Compare execution_time to measured wall time (allow 0.1s difference)
+            assert agent_trace.duration is not None
+            assert isinstance(agent_trace.duration, timedelta)
+            assert agent_trace.duration.total_seconds() > 0
+            # Compare duration to measured wall time (allow 0.1s difference)
             wall_time_s = wall_time_ns / 1_000_000_000
-            diff = abs(agent_trace.execution_time.total_seconds() - wall_time_s)
+            diff = abs(agent_trace.duration.total_seconds() - wall_time_s)
             assert diff < 0.1, (
-                f"execution_time ({agent_trace.execution_time.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
+                f"duration ({agent_trace.duration.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
             )
             cost_sum = agent_trace.get_total_cost()
             assert cost_sum.total_cost > 0

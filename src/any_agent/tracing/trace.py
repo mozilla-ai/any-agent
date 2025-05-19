@@ -150,8 +150,8 @@ class AgentTrace(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
-    def execution_time(self) -> timedelta:
-        """Returns the execution time of the AGENT span named 'any_agent' as a datetime.timedelta object.
+    def duration(self) -> timedelta:
+        """Returns the duration of the AGENT span named 'any_agent' as a datetime.timedelta object.
 
         The duration is computed from the span's start and end time (in nanoseconds).
         This functionality relies on the trace behavior where we create a span named 'any_agent' for each agent run,
