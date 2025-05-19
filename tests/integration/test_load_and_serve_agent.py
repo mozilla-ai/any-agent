@@ -125,10 +125,9 @@ async def test_load_and_serve_agent(
                 ),
             }
         )
+        logger.info(f"after sending: {result}")  # noqa: G004
     finally:
         await async_server.shutdown()
-
-    logger.info(f"after sending: {result}")  # noqa: G004
 
     def check_file() -> None:
         assert os.path.exists(os.path.join(tmp_path, tmp_file))

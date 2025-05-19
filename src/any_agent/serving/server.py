@@ -46,7 +46,7 @@ class A2AServerAsync(A2AServer):
             self.app, host=self.host, port=self.port, log_level="info"
         )
         self._server = uvicorn.Server(config)
-        self._server_task = asyncio.create_task(self._server.serve())
+        self._task = asyncio.create_task(self._server.serve())
         while not self._server.started:  # noqa: ASYNC110
             # TODO check if events could be provided inside uvicorn to notify
             # lifecycle events
