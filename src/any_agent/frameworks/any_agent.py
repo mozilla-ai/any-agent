@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, assert_never
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
 from any_agent.config import (
     AgentConfig,
@@ -126,10 +126,15 @@ class AnyAgent(ABC):
         agent_config: AgentConfig,
         managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
+
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
-        agent = agent_cls(agent_config, managed_agents=managed_agents, tracing=tracing)
+        agent = agent_cls(
+            agent_config,
+            managed_agents=managed_agents,
+            tracing=tracing,
+        )
         await agent._load_agent()
         return agent
 
@@ -153,6 +158,8 @@ class AnyAgent(ABC):
             return
         self._exporter = AnyAgentExporter(self.framework, self._tracing_config)
         self._tracer_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
+        for exporter in self._tracing_config.additional_exporters:
+            self._tracer_provider.add_span_processor(SimpleSpanProcessor(exporter))
         self._instrumenter = get_instrumenter_by_framework(self.framework)
         self._instrumenter.instrument(tracer_provider=self._tracer_provider)
 

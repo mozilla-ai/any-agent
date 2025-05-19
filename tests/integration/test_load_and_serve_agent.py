@@ -12,6 +12,11 @@ import any_agent.serving
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio, ServingConfig
 
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+    InMemorySpanExporter,
+)
+from opentelemetry.sdk.trace import ReadableSpan
+
 if any_agent.serving.serving_available:
     from common.client import A2AClient
     from common.types import Message, TextPart
@@ -24,6 +29,28 @@ logging.basicConfig(
 logger = logging.getLogger("any_agent_test")
 logger.setLevel(logging.DEBUG)
 
+"""
+def organize(items: list[AgentSpan]) -> None:
+    traces = {}
+    for trace in items:
+        k = trace.context.span_id
+        trace.attributes[CHILD_TAG] = {}
+        traces[k] = trace
+    for trace in items:
+        if trace.parent:
+            parent_k = trace.parent.span_id
+            if parent_k:
+                traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = trace
+            else:
+                traces[None] = trace
+"""
+class SpanNode:
+    def __init__(span):
+        _span: ReadableSpan = span
+        _children: list["SpanNode"] = []
+    def add_span(child_span):
+        """Add child span sorted according to timestamps"""
+        ...
 
 def check_uvx_installed() -> bool:
     """The integration tests requires uvx"""
@@ -92,6 +119,9 @@ async def test_load_and_serve_agent(
             ],
         ),
     ]
+    test_tracer = InMemorySpanExporter()
+    additional_exporters=[test_tracer]
+    tracing_config = TracingConfig(additional_exporters=additional_exporters)
     agent_config = AgentConfig(
         tools=tools,  # type: ignore[arg-type]
         instructions="Search the web to answer",
@@ -99,7 +129,9 @@ async def test_load_and_serve_agent(
         **kwargs,  # type: ignore[arg-type]
     )
     agent_server = await AnyAgent.create_async(
-        agent_framework, agent_config, tracing=TracingConfig()
+        agent_framework,
+        agent_config,
+        tracing=tracing_config,
     )
     try:
         logger.info(f"Agent created: {agent_server}")  # noqa: G004
@@ -126,6 +158,9 @@ async def test_load_and_serve_agent(
             }
         )
         logger.info(f"after sending: {result}")  # noqa: G004
+        logger.info(f"after sending (traces):")
+        for s in test_tracer.get_finished_spans():  # noqa: G004
+            logger.info(s.to_json())
     finally:
         await async_server.shutdown()
 
