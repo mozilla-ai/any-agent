@@ -1,6 +1,9 @@
 import json
+
 import pytest
-from any_agent.tracing.trace import AgentSpan, AgentTrace
+
+from any_agent.tracing.trace import AgentTrace
+
 
 @pytest.fixture
 def agent_trace() -> AgentTrace:

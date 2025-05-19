@@ -1,6 +1,12 @@
-import pytest
-from any_agent.tracing.trace import AgentTrace, AgentSpan, SpanKind, Status, SpanContext, Resource
 import datetime
+
+from any_agent.tracing.otel_types import (
+    Resource,
+    SpanContext,
+    SpanKind,
+    Status,
+)
+from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
 def test_agent_trace_execution_time_simple() -> None:
@@ -27,7 +33,7 @@ def test_agent_trace_execution_time_simple() -> None:
 def test_agent_trace_execution_time_from_sample(agent_trace: AgentTrace) -> None:
     """
     This test relies upon the sample trace that is saved in the sample_traces directory. If the content of that trace
-    changes, this test will need to be updated 
+    changes, this test will need to be updated
     (because it is using start and end times that were manually parsed from the trace)
     """
     expected_seconds = (1747660970774416000 - 1747660964057285000) / 1_000_000_000
