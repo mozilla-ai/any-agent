@@ -26,4 +26,7 @@ def agent_trace() -> AgentTrace:
     with open(trace_path, encoding="utf-8") as f:
         spans = json.loads(f.read())
     spans = [AgentSpan.model_validate_json(span) for span in spans]
-    return AgentTrace(spans=spans, final_output="Final output")
+    trace = AgentTrace()
+    trace.final_output = "Final output"
+    trace.add_spans(spans)
+    return trace

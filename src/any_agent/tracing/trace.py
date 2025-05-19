@@ -1,8 +1,9 @@
 from collections.abc import Mapping
+from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, PrivateAttr
 
 from any_agent.config import AgentFramework
 from any_agent.logging import logger
@@ -138,9 +139,8 @@ class AgentSpan(BaseModel):
 class AgentTrace(BaseModel):
     """A trace that can be exported to JSON or printed to the console."""
 
-    spans: list[AgentSpan] = Field(default_factory=list)
-    """A list of [`AgentSpan`][any_agent.tracing.trace.AgentSpan] that form the trace.
-    """
+    _spans: list[AgentSpan] = PrivateAttr(default_factory=list)
+    """A private list of [`AgentSpan`][any_agent.tracing.trace.AgentSpan] that form the trace."""
 
     final_output: str | None = None
     """Contains the final output message returned by the agent.
@@ -148,11 +148,31 @@ class AgentTrace(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def get_total_cost(self) -> TotalTokenUseAndCost:
-        """Return the current total cost and token usage statistics."""
+    def add_span(self, span: AgentSpan) -> None:
+        """Add an AgentSpan to the trace and clear the usage_and_cost cache if present."""
+        self._spans.append(span)
+        # Clear the cached property if it exists
+        if "usage_and_cost" in self.__dict__:
+            del self.usage_and_cost
+
+    def add_spans(self, spans: list[AgentSpan]) -> None:
+        """Add a list of AgentSpans to the trace and clear the usage_and_cost cache if present."""
+        self._spans.extend(spans)
+        # Clear the cached property if it exists
+        if "usage_and_cost" in self.__dict__:
+            del self.usage_and_cost
+
+    @property
+    def spans(self) -> list[AgentSpan]:
+        """Read-only access to the list of AgentSpans in the trace."""
+        return list(self._spans)
+
+    @cached_property
+    def usage_and_cost(self) -> TotalTokenUseAndCost:
+        """The current total cost and token usage statistics for this trace. Cached after first computation."""
         counts: list[CountInfo] = []
         costs: list[CostInfo] = []
-        for span in self.spans:
+        for span in self._spans:
             if span.attributes and "cost_prompt" in span.attributes:
                 count = CountInfo(
                     token_count_prompt=span.attributes["llm.token_count.prompt"],

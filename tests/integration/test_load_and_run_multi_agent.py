@@ -107,7 +107,7 @@ def test_load_and_run_multi_agent(
         if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
-            cost_sum = agent_trace.get_total_cost()
+            cost_sum = agent_trace.usage_and_cost
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00
             assert cost_sum.total_tokens > 0

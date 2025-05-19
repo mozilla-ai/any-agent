@@ -80,7 +80,7 @@ class AnyAgentExporter(SpanExporter):
                 self.run_trace_mapping[agent_run_id] = trace_id
             span = AgentSpan.from_readable_span(readable_span)
             if not self.traces.get(trace_id):
-                self.traces[trace_id] = AgentTrace(spans=[])
+                self.traces[trace_id] = AgentTrace()
             try:
                 span.attributes["service.name"] = (
                     self.processor._get_agent_framework().value
@@ -89,7 +89,7 @@ class AnyAgentExporter(SpanExporter):
                 if span_kind == "LLM" and self.tracing_config.cost_info:
                     span.add_cost_info()
 
-                self.traces[trace_id].spans.append(span)
+                self.traces[trace_id].add_span(span)
 
                 if self.tracing_config.console and self.console:
                     self.print_to_console(span_kind, interaction)
