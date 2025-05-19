@@ -1,4 +1,3 @@
-import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
 from typing import Literal
@@ -42,7 +41,7 @@ class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):
         server_parameters = StdioServerParameters(
             command=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
-            env={**os.environ},
+            env=self.mcp_tool.env,
         )
         self._client = MCPClient(server_parameters)
         return await super().list_tools()

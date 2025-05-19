@@ -7,9 +7,11 @@ from markdownify import markdownify
 from requests.exceptions import RequestException
 
 try:
-    from tavily import TavilyClient
+    from tavily.tavily import TavilyClient
+
+    talivy_available = True
 except ImportError:
-    TavilyClient = None
+    talivy_available = False
 
 
 def _truncate_content(content: str, max_length: int) -> str:
@@ -74,8 +76,9 @@ def search_tavily(query: str, include_images: bool = False) -> str:
         The top search results as a formatted string.
 
     """
-    if TavilyClient is None:
-        return "TavilyClient is not installed. Please install tavily-python."
+    if not talivy_available:
+        msg = "You need to `pip install 'tavily-python'` to use this tool"
+        raise ImportError(msg)
     api_key = os.getenv("TAVILY_API_KEY")
     if not api_key:
         return "TAVILY_API_KEY environment variable not set."

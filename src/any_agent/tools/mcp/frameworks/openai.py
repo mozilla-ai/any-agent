@@ -60,6 +60,7 @@ class OpenAIMCPStdioConnection(OpenAIMCPConnection):
         params = OpenAIInternalMCPServerStdioParams(
             command=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
+            env=self.mcp_tool.env,  # type: ignore[typeddict-item]
         )
 
         self._server = OpenAIInternalMCPServerStdio(

@@ -10,21 +10,23 @@ requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
   "duckduckgo_search",
-  "tavily-python",
+  "evaluate",
   "fire",
   "litellm",
-  "mcp>=1.5.0",
   "markdownify",
+  "mcp>=1.5.0",
   "opentelemetry-exporter-otlp",
   "opentelemetry-sdk",
   "pydantic",
   "requests",
   "rich",
-  "evaluate",
-  "fire",
+  "tavily-python",
 ]
 
 [project.optional-dependencies]
+agno = [
+  "agno>=1.4.6",
+]
 
 google = [
   "google-adk>=0.3.0"
@@ -43,13 +45,8 @@ llama_index = [
   "llama-index",
   "llama-index-llms-litellm",
   "llama-index-tools-mcp",
+  "openinference-instrumentation-llama-index",
   "platformdirs>=4.3.7",
-  "openinference-instrumentation-llama-index"
-]
-
-smolagents = [
-  "smolagents[mcp]>=1.14.0",
-  "openinference-instrumentation-smolagents"
 ]
 
 openai = [
@@ -57,45 +54,22 @@ openai = [
   "openinference-instrumentation-openai-agents>=0.1.5"
 ]
 
-agno = [
-  "agno>=1.4.6",
+smolagents = [
+  "openinference-instrumentation-smolagents",
+  "smolagents[mcp]>=1.14.0",
 ]
 
 all = [
-  "any-agent[google,langchain,llama_index,smolagents,openai,agno,serving]",
-]
-
-docs = [
-  "mkdocs",
-  "mkdocs-material",
-  "mkdocstrings-python",
-  "mkdocs-include-markdown-plugin>=7.1.5",
-]
-
-tests = [
-  "pytest>=8,<9",
-  "pytest-sugar>=0.9.6",
-  "pytest-asyncio>=0.26.0",
-  "pytest-lazy-fixtures>=1.1.2",
-  "pytest-timeout>=2.4.0",
-  "debugpy>=1.8.13",
-  "mktestdocs>=0.2.4",
-]
-
-lint = [
-  "pre-commit==4.2.0",
-  "pre-commit-uv==4.1.4",
-]
-
-dev = [
-  "any-agent[docs,tests,lint]",
-  "pre-commit",
+  "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
 ]
 
 [project.urls]
 Documentation = "https://mozilla-ai.github.io/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
 Source = "https://github.com/mozilla-ai/any-agent"
+
+[project.scripts]
+any-agent-evaluate = "any_agent.evaluation.cli:main"
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
@@ -167,5 +141,40 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 timeout = 300
 
-[project.scripts]
-any-agent-evaluate = "any_agent.evaluation.cli:main"
+
+[dependency-groups]
+dev = [
+  { include-group = "docs" },
+  { include-group = "lint" },
+  { include-group = "tests" },
+]
+
+docs = [
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings-python",
+  "mkdocs-include-markdown-plugin>=7.1.5",
+]
+
+lint = [
+  "pre-commit==4.2.0",
+  "pre-commit-uv==4.1.4",
+]
+
+tests = [
+  "pytest>=8,<9",
+  "pytest-sugar>=0.9.6",
+  "pytest-asyncio>=0.26.0",
+  "pytest-lazy-fixtures>=1.1.2",
+  "pytest-timeout>=2.4.0",
+  "debugpy>=1.8.13",
+  "mktestdocs>=0.2.4",
+]
+
+# For completeness, but 'uv sync --group dev' currently installs the others too.
+all = [
+  { include-group = "dev" },
+  { include-group = "docs" },
+  { include-group = "lint" },
+  { include-group = "tests" },
+]

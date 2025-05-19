@@ -1,4 +1,4 @@
-site_name: Any Agent
+site_name: any-agent
 
 repo_url: https://github.com/mozilla-ai/any-agent
 repo_name: any-agent
@@ -40,8 +40,8 @@ theme:
       toggle:
         icon: material/lightbulb-outline
         name: Switch to light mode
-  logo: images/mozilla.ai_white.png
-  favicon: images/mozilla.ai_black.png
+  logo: images/any-agent-logo-mark.png
+  favicon: images/any-agent_favicon.png
   extra_css:
     - assets/custom.css
   features:
