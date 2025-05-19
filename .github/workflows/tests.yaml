@@ -43,4 +43,4 @@ jobs:
         env:
           ANY_AGENT_INTEGRATION_TESTS: TRUE
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: pytest -v tests/integration -n auto
+        run: pytest -v tests/integration -d --tx '4*popen//python=python'
