@@ -109,7 +109,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             assert diff < 0.1, (
                 f"duration ({agent_trace.duration.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
             )
-            cost_sum = agent_trace.get_total_cost()
+            cost_sum = agent_trace.usage_and_cost
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00
             assert cost_sum.total_tokens > 0

@@ -1,6 +1,6 @@
 from collections.abc import Mapping
-from functools import cached_property
 from datetime import timedelta
+from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
@@ -191,7 +191,7 @@ class AgentTrace(BaseModel):
                 raise ValueError(msg)
         msg = "Span with any_agent.run_id not found in trace"
         raise ValueError(msg)
-    
+
     @cached_property
     def usage_and_cost(self) -> TotalTokenUseAndCost:
         """The current total cost and token usage statistics for this trace. Cached after first computation."""

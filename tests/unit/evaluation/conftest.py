@@ -15,4 +15,3 @@ def evaluation_case() -> EvaluationCase:
         ],
         llm_judge="gpt-4o-mini",
     )
- 
