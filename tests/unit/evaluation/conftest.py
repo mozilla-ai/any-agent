@@ -1,10 +1,7 @@
-import json
-
 import pytest
 
 from any_agent.evaluation.evaluation_case import EvaluationCase
 from any_agent.evaluation.schemas import CheckpointCriteria
-from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
 @pytest.fixture
@@ -18,12 +15,3 @@ def evaluation_case() -> EvaluationCase:
         ],
         llm_judge="gpt-4o-mini",
     )
-
-
-@pytest.fixture
-def agent_trace() -> AgentTrace:
-    trace_path = "tests/unit/evaluation/sample_traces/OPENAI.json"
-    with open(trace_path, encoding="utf-8") as f:
-        spans = json.loads(f.read())
-    spans = [AgentSpan.model_validate_json(span) for span in spans]
-    return AgentTrace(spans=spans, final_output="Final output")

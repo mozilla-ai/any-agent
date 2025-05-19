@@ -1,0 +1,35 @@
+import pytest
+from any_agent.tracing.trace import AgentTrace, AgentSpan, SpanKind, Status, SpanContext, Resource
+import datetime
+
+
+def test_agent_trace_execution_time_simple() -> None:
+    # Create a span with the correct AGENT kind and name
+    agent_span = AgentSpan(
+        name="any_agent",
+        kind=SpanKind.INTERNAL,
+        parent=None,
+        start_time=1000,
+        end_time=2000,
+        status=Status(),
+        context=SpanContext(),
+        attributes={"any_agent.run_id": "123"},
+        links=[],
+        events=[],
+        resource=Resource(),
+    )
+    trace = AgentTrace(spans=[agent_span])
+    expected = datetime.timedelta(seconds=(2000 - 1000) / 1_000_000_000)
+    assert isinstance(trace.execution_time, datetime.timedelta)
+    assert abs(trace.execution_time.total_seconds() - expected.total_seconds()) < 1e-9
+
+
+def test_agent_trace_execution_time_from_sample(agent_trace: AgentTrace) -> None:
+    """
+    This test relies upon the sample trace that is saved in the sample_traces directory. If the content of that trace
+    changes, this test will need to be updated 
+    (because it is using start and end times that were manually parsed from the trace)
+    """
+    expected_seconds = (1747660970774416000 - 1747660964057285000) / 1_000_000_000
+    assert isinstance(agent_trace.execution_time, datetime.timedelta)
+    assert abs(agent_trace.execution_time.total_seconds() - expected_seconds) < 1e-6

@@ -1,7 +1,8 @@
 import asyncio
 import os
 import subprocess
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -83,9 +84,12 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
 
     try:
+        start_ns = time.time_ns()
         agent_trace = agent.run(
             "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
         )
+        end_ns = time.time_ns()
+        wall_time_ns = end_ns - start_ns
         assert os.path.exists(os.path.join(tmp_path, tmp_file))
         with open(os.path.join(tmp_path, tmp_file)) as f:
             content = f.read()
@@ -95,6 +99,15 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
+            assert agent_trace.execution_time is not None
+            assert isinstance(agent_trace.execution_time, timedelta)
+            assert agent_trace.execution_time.total_seconds() > 0
+            # Compare execution_time to measured wall time (allow 0.1s difference)
+            wall_time_s = wall_time_ns / 1_000_000_000
+            diff = abs(agent_trace.execution_time.total_seconds() - wall_time_s)
+            assert diff < 0.1, (
+                f"execution_time ({agent_trace.execution_time.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
+            )
             cost_sum = agent_trace.get_total_cost()
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00
