@@ -148,19 +148,20 @@ class AgentTrace(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    def _invalidate_usage_and_cost_cache(self) -> None:
+        """Clear the cached usage_and_cost property if it exists."""
+        if "usage_and_cost" in self.__dict__:
+            del self.usage_and_cost
+
     def add_span(self, span: AgentSpan) -> None:
         """Add an AgentSpan to the trace and clear the usage_and_cost cache if present."""
         self._spans.append(span)
-        # Clear the cached property if it exists
-        if "usage_and_cost" in self.__dict__:
-            del self.usage_and_cost
+        self._invalidate_usage_and_cost_cache()
 
     def add_spans(self, spans: list[AgentSpan]) -> None:
         """Add a list of AgentSpans to the trace and clear the usage_and_cost cache if present."""
         self._spans.extend(spans)
-        # Clear the cached property if it exists
-        if "usage_and_cost" in self.__dict__:
-            del self.usage_and_cost
+        self._invalidate_usage_and_cost_cache()
 
     @property
     def spans(self) -> list[AgentSpan]:
