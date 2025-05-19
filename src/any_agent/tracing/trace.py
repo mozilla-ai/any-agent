@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 from functools import cached_property
+from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
@@ -168,6 +169,29 @@ class AgentTrace(BaseModel):
         """Read-only access to the list of AgentSpans in the trace."""
         return list(self._spans)
 
+    @property
+    def duration(self) -> timedelta:
+        """Returns the duration of the AGENT span named 'any_agent' as a datetime.timedelta object.
+
+        The duration is computed from the span's start and end time (in nanoseconds).
+        This functionality relies on the trace behavior where we create a span named 'any_agent' for each agent run,
+        which is defined in each agent framework's `run` function.
+
+        Raises ValueError if there are no spans, if the AGENT span is not found, or if start/end times are missing.
+        """
+        if not self.spans:
+            msg = "No spans found in trace"
+            raise ValueError(msg)
+        for span in self.spans:
+            if span.attributes.get("any_agent.run_id"):
+                if span.start_time is not None and span.end_time is not None:
+                    duration_ns = span.end_time - span.start_time
+                    return timedelta(seconds=duration_ns / 1_000_000_000)
+                msg = "Start or end time is missing for the AGENT span"
+                raise ValueError(msg)
+        msg = "Span with any_agent.run_id not found in trace"
+        raise ValueError(msg)
+    
     @cached_property
     def usage_and_cost(self) -> TotalTokenUseAndCost:
         """The current total cost and token usage statistics for this trace. Cached after first computation."""
