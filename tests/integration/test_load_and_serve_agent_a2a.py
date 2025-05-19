@@ -4,6 +4,7 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from datetime import datetime
 
 import pytest
 from litellm.utils import validate_environment
@@ -17,6 +18,11 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
 )
 from opentelemetry.sdk.trace import ReadableSpan
 
+from common.types import (
+    Message,
+    TaskState,
+)
+
 if any_agent.serving.serving_available:
     from common.client import A2AClient
     from common.types import Message, TextPart
@@ -28,29 +34,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("any_agent_test")
 logger.setLevel(logging.DEBUG)
-
-"""
-def organize(items: list[AgentSpan]) -> None:
-    traces = {}
-    for trace in items:
-        k = trace.context.span_id
-        trace.attributes[CHILD_TAG] = {}
-        traces[k] = trace
-    for trace in items:
-        if trace.parent:
-            parent_k = trace.parent.span_id
-            if parent_k:
-                traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = trace
-            else:
-                traces[None] = trace
-"""
-class SpanNode:
-    def __init__(span):
-        _span: ReadableSpan = span
-        _children: list["SpanNode"] = []
-    def add_span(child_span):
-        """Add child span sorted according to timestamps"""
-        ...
 
 def check_uvx_installed() -> bool:
     """The integration tests requires uvx"""
@@ -119,9 +102,6 @@ async def test_load_and_serve_agent(
             ],
         ),
     ]
-    test_tracer = InMemorySpanExporter()
-    additional_exporters=[test_tracer]
-    tracing_config = TracingConfig(additional_exporters=additional_exporters)
     agent_config = AgentConfig(
         tools=tools,  # type: ignore[arg-type]
         instructions="Search the web to answer",
@@ -131,11 +111,11 @@ async def test_load_and_serve_agent(
     agent_server = await AnyAgent.create_async(
         agent_framework,
         agent_config,
-        tracing=tracing_config,
+        tracing=TracingConfig(),
     )
     try:
         logger.info(f"Agent created: {agent_server}")  # noqa: G004
-        async_server = await agent_server.serve(
+        async_server = await agent_server.serve_async(
             ServingConfig(port=5555, endpoint="/test_agent")
         )
         logger.info("Agent serving")
@@ -157,29 +137,15 @@ async def test_load_and_serve_agent(
                 ),
             }
         )
-        logger.info(f"after sending: {result}")  # noqa: G004
-        logger.info(f"after sending (traces):")
-        for s in test_tracer.get_finished_spans():  # noqa: G004
-            logger.info(s.to_json())
+        def check_file() -> None:
+            assert os.path.exists(os.path.join(tmp_path, tmp_file))
+            with open(os.path.join(tmp_path, tmp_file)) as f:
+                content = f.read()
+            assert content == str(datetime.now().year)
+
+        check_file()
+        assert result.error is None
+        assert result.result.status.state == TaskState.COMPLETED
+        assert str(datetime.now().year) in result.result.artifacts[0].parts[0].text
     finally:
         await async_server.shutdown()
-
-    def check_file() -> None:
-        assert os.path.exists(os.path.join(tmp_path, tmp_file))
-        with open(os.path.join(tmp_path, tmp_file)) as f:
-            content = f.read()
-        assert content == str(datetime.now().year)
-
-    check_file()
-    """
-    assert isinstance(agent_trace, AgentTrace)
-    assert agent_trace.final_output
-    if _is_tracing_supported(agent_framework):
-        assert agent_trace.spans
-        assert len(agent_trace.spans) > 0
-        cost_sum = agent_trace.get_total_cost()
-        assert cost_sum.total_cost > 0
-        assert cost_sum.total_cost < 1.00
-        assert cost_sum.total_tokens > 0
-        assert cost_sum.total_tokens < 20000
-    """
