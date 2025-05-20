@@ -89,9 +89,7 @@ def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
 
 
 @pytest.fixture
-def _patch_stdio_client() -> Generator[
-    tuple[AsyncMock, tuple[AsyncMock, AsyncMock]], None
-]:
+def _patch_stdio_client() -> Generator[tuple[AsyncMock, tuple[AsyncMock, AsyncMock]]]:
     mock_cm = AsyncMock()
     mock_transport = (AsyncMock(), AsyncMock())
     mock_cm.__aenter__.return_value = mock_transport
@@ -211,7 +209,7 @@ def mock_litellm_response() -> ModelResponse:
 
 
 @pytest.fixture
-def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any, None]]:
+def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any]]:
     """
     Create a fixture that returns an async generator function to mock streaming responses.
     This returns a function that can be used as a side_effect.
@@ -219,7 +217,7 @@ def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any, None]]:
 
     async def _mock_streaming_response(
         *args: Any, **kwargs: Any
-    ) -> AsyncGenerator[Any, None]:
+    ) -> AsyncGenerator[Any]:
         # First chunk with role
         yield {
             "choices": [

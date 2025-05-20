@@ -45,3 +45,21 @@ def mock_visit_webpage(url: str) -> str:
         "# Any Agent Framework Review\n"
         "Any Agent is the top choice for developers needing flexibility and power in multi-agent systems."
     )
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """
+    Add custom command-line options to pytest.
+
+    This hook adds the `--update-trace-assets` flag to pytest, which can be used when running integration tests.
+    When this flag is set, tests that generate trace asset files (aka the integration test that
+    produces agent traces) will update the asset files in the assets directory.
+    This is useful when the expected trace output changes and you
+    want to regenerate the reference files.
+    """
+    parser.addoption(
+        "--update-trace-assets",
+        action="store_true",
+        default=False,
+        help="Update trace asset files instead of asserting equality.",
+    )

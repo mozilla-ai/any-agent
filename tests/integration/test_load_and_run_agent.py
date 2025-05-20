@@ -33,7 +33,9 @@ def check_uvx_installed() -> bool:
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:
+def test_load_and_run_agent(
+    agent_framework: AgentFramework, tmp_path: Path, request: pytest.FixtureRequest
+) -> None:
     kwargs = {}
 
     tmp_file = "tmp.txt"
@@ -96,6 +98,15 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert content == str(datetime.now().year)
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
+        update_trace = request.config.getoption("--update-trace-assets")
+        if update_trace and _is_tracing_supported(agent_framework):
+            trace_path = (
+                Path(__file__).parent.parent
+                / "assets"
+                / f"{agent_framework.name}_trace.json"
+            )
+            with open(trace_path, "w", encoding="utf-8") as f:
+                f.write(agent_trace.model_dump_json(indent=2))
         if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
@@ -108,11 +119,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
             assert diff < 0.1, (
                 f"duration ({agent_trace.duration.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
             )
-            cost_sum = agent_trace.get_total_cost()
-            assert cost_sum.total_cost > 0
-            assert cost_sum.total_cost < 1.00
-            assert cost_sum.total_tokens > 0
-            assert cost_sum.total_tokens < 20000
+            assert agent_trace.cost.total_cost > 0
+            assert agent_trace.cost.total_cost < 1.00
+            assert agent_trace.usage.total_tokens > 0
+            assert agent_trace.usage.total_tokens < 20000
             case = EvaluationCase(
                 llm_judge="gpt-4.1-mini",
                 checkpoints=[
@@ -172,10 +182,9 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
             )
             assert result1.spans
             assert len(result1.spans) > 0
-            cost_sum = result1.get_total_cost()
-            assert cost_sum.total_cost > 0
-            assert cost_sum.total_cost < 1.00
-            assert cost_sum.total_tokens > 0
-            assert cost_sum.total_tokens < 20000
+            assert result1.cost.total_cost > 0
+            assert result1.cost.total_cost < 1.00
+            assert result1.usage.total_tokens > 0
+            assert result1.usage.total_tokens < 20000
     finally:
         agent.exit()
