@@ -22,8 +22,7 @@ def do_eval(
     with open(trace_path, encoding="utf-8") as f:
         spans = json.loads(f.read())
     spans = [AgentSpan.model_validate_json(span) for span in spans]
-    trace = AgentTrace()
-    trace.add_spans(spans)
+    trace = AgentTrace(spans=spans)
     result = evaluate(
         evaluation_case=evaluation_case,
         trace=trace,

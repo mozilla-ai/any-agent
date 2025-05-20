@@ -24,8 +24,7 @@ def test_agent_trace_duration_simple() -> None:
         events=[],
         resource=Resource(),
     )
-    trace = AgentTrace()
-    trace.add_span(agent_span)
+    trace = AgentTrace(spans=[agent_span])
     expected = datetime.timedelta(seconds=(2000 - 1000) / 1_000_000_000)
     assert isinstance(trace.duration, datetime.timedelta)
     assert abs(trace.duration.total_seconds() - expected.total_seconds()) < 1e-9
