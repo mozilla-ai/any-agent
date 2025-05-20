@@ -1,5 +1,4 @@
 import json
-import os
 from pathlib import Path
 
 import pytest
@@ -8,9 +7,7 @@ from any_agent.tracing.trace import AgentTrace
 
 
 @pytest.fixture(
-    params=[
-        trace for trace in (Path(__file__).parent.parent / "assets").glob("*_trace.json")
-    ],
+    params=list((Path(__file__).parent.parent / "assets").glob("*_trace.json")),
     ids=lambda x: Path(x).stem,
 )
 def agent_trace(request: pytest.FixtureRequest) -> AgentTrace:
