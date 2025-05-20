@@ -38,9 +38,9 @@ jobs:
       - name: Run Unit tests
         run: pytest -v tests/unit
 
-      - name: Run Integration tests
+      - name: Run Integration tests (parallel with xdist)
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' }}
         env:
           ANY_AGENT_INTEGRATION_TESTS: TRUE
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: pytest -v tests/integration
+        run: pytest -v tests/integration -d --tx '4*popen//python=python'
