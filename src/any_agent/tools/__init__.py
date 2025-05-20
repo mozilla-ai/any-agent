@@ -19,6 +19,8 @@ from .user_interaction import (
 )
 from .web_browsing import search_tavily, search_web, visit_webpage
 
+from .a2a_tool import a2a_query
+
 __all__ = [
     "AgnoMCPServer",
     "GoogleMCPServer",
@@ -38,4 +40,5 @@ __all__ = [
     "show_final_output",
     "show_plan",
     "visit_webpage",
+    "a2a_query"
 ]

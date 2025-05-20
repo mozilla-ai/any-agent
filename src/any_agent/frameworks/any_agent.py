@@ -23,6 +23,7 @@ from any_agent.tracing.exporter import (
     get_instrumenter_by_framework,
 )
 from any_agent.tracing.trace import _is_tracing_supported
+from any_agent.serving import A2AServer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -48,6 +49,8 @@ class AnyAgent(ABC):
 
         self._mcp_servers: list[_MCPServerBase[Any]] = []
         self._main_agent_tools: list[Any] = []
+
+        self.server: A2AServer
 
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
@@ -174,8 +177,8 @@ class AnyAgent(ABC):
             msg = "You need to `pip install 'git+https://github.com/google/A2A#subdirectory=samples/python' to use this method."
             raise ImportError(msg) from e
 
-        server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())
-        server.start()
+        self._server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())
+        self._server.start()
 
     @abstractmethod
     async def _load_agent(self) -> None:
