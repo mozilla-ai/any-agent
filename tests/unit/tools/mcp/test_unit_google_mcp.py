@@ -1,14 +1,20 @@
-from collections.abc import Generator, Sequence
-from unittest.mock import AsyncMock, patch
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
-from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
-    SseServerParams as GoogleSseServerParameters,
-)
 
-from any_agent.config import AgentFramework, MCPSse, Tool
+from any_agent.config import AgentFramework, MCPSse, MCPStdio, Tool
 from any_agent.tools import _get_mcp_server
+
+if TYPE_CHECKING:
+    from collections.abc import Generator, Sequence
+
+    from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset as GoogleMCPToolset
+    from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
+        SseServerParams as GoogleSseServerParameters,
+    )
 
 
 @pytest.fixture
@@ -49,3 +55,20 @@ async def test_google_mcp_sse_integration(
     )
 
     google_toolset().load_tools.assert_called_once()  # type: ignore[operator]
+
+
+@pytest.mark.asyncio
+async def test_google_mcp_env() -> None:
+    mcp_server = _get_mcp_server(
+        MCPStdio(command="print('Hello MCP')", args=[], env={"FOO": "BAR"}),
+        AgentFramework.GOOGLE,
+    )
+    mocked_class = MagicMock()
+    mocked_cm = AsyncMock()
+    mocked_class.return_value = mocked_cm
+
+    with patch("any_agent.tools.mcp.frameworks.google.GoogleMCPToolset", mocked_class):
+        await mcp_server._setup_tools()
+        assert mocked_class.call_args_list[0][1]["connection_params"].env == {
+            "FOO": "BAR"
+        }

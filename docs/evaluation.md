@@ -54,7 +54,7 @@ agent_trace = agent.run("How many seconds would it take for a leopard at full sp
     ```python
     from any_agent.evaluation.evaluation_case import EvaluationCase
     evaluation_case = EvaluationCase(
-            ground_truth=[{"name": "Seconds", "value": "9", "points": 1.0}],
+            ground_truth={ "value": "9", "points": 1.0},
             checkpoints=[
                 {"criteria": "Did the agent run a calculation", "points": 1},
                 {"criteria": "Did the agent use fewer than 5 steps", "points": 4},
@@ -68,8 +68,8 @@ agent_trace = agent.run("How many seconds would it take for a leopard at full sp
 ```python
 from any_agent.evaluation import evaluate, EvaluationCase
 evaluation_case = EvaluationCase(
-    ground_truth=[{"name": "Test Case 1", "value": 1.0, "points": 1.0}],
-    checkpoints=[{"criteria": "Check if value is 1.0", "points": 1}],
+    ground_truth={"value": 9, "points": 1.0},
+    checkpoints=[{"criteria": "Did the agent run a calculation", "points": 1}],
     llm_judge="gpt-4o-mini",
 )
 eval_result = evaluate(

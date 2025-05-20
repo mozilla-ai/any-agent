@@ -1,27 +1,29 @@
+<p align="center">
+  <picture>
+    <img src="docs/images/any-agent-logo-mark.png" width="20%" alt="Project logo"/>
+  </picture>
+</p>
+
 <div align="center">
 
-# 🎨any-agent
-
-</div>
-
-<div align="center">
+# any-agent
 
 [![Docs](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/)
 [![Tests](https://github.com/mozilla-ai/any-agent/actions/workflows/tests.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/tests.yaml/)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
-[Documentation](https://mozilla-ai.github.io/any-agent/)
-
-
-[Blog Post Introduction and Motivation](https://blog.mozilla.ai/introducing-any-agent-an-abstraction-layer-between-your-code-and-the-many-agentic-frameworks/)
+A single interface to use and evaluate different agent frameworks.
 
 </div>
 
-`any-agent` is a Python library designed to provide a single interface to access many different agent frameworks.
+## [Documentation](https://mozilla-ai.github.io/any-agent/)
 
-Using `any-agent`, you can more easily switch to a new or different agent framework without needing to worry about the underlying API changes.
+- [Agents](https://mozilla-ai.github.io/any-agent/agents/)
+- [Tools](https://mozilla-ai.github.io/any-agent/tools/)
+- [Tracing](https://mozilla-ai.github.io/any-agent/tracing/)
+- [Serving](https://mozilla-ai.github.io/any-agent/serving/)
+- [Evaluation](https://mozilla-ai.github.io/any-agent/evaluation/)
 
-any-agent also provides a 'trace-first' [llm-as-a-judge powered evaluation tool](https://mozilla-ai.github.io/any-agent/evaluation/) for flexible evaluation of agent execution traces.
 
 ## [Supported Frameworks](https://mozilla-ai.github.io/any-agent/)
 
@@ -37,7 +39,6 @@ any-agent also provides a 'trace-first' [llm-as-a-judge powered evaluation tool]
 - Python 3.11 or newer
 
 ## Quickstart
-
 
 Refer to [pyproject.toml](./pyproject.toml) for a list of the options available.
 Update your pip install command to include the frameworks that you plan on using (or use `all` to install all the currently supported):
@@ -73,7 +74,7 @@ agent = AnyAgent.create(
 )
 
 agent_trace = agent.run("Which Agent Framework is the best??")
-print(agent_trace.final_output)
+print(agent_trace)
 ```
 
 ### Multi-agent
@@ -104,22 +105,8 @@ agent = AnyAgent.create(
 )
 
 agent_trace = agent.run("Which Agent Framework is the best??")
-print(agent_trace.final_output)
+print(agent_trace)
 ```
-
-## Features
-
-`any-agent` supports the use of Model Context Protocol (MCP) servers, and if the agent framework allows,
-any LLM and provider using [LiteLLM](https://docs.litellm.ai/docs/) syntax.
-
-Learn more in the docs:
-
-- [Models](https://mozilla-ai.github.io/any-agent/agents/#model-id)
-- [Tools](https://mozilla-ai.github.io/any-agent/tools/)
-- [Instructions](https://mozilla-ai.github.io/any-agent/instructions/)
-- [Tracing](https://mozilla-ai.github.io/any-agent/tracing/)
-- [Evaluation](https://mozilla-ai.github.io/any-agent/evaluation/)
-
 
 ## Contributions
 

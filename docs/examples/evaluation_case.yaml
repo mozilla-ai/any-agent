@@ -13,6 +13,5 @@ checkpoints:
 
 # Optionally, you can check whether the final answer is what was expected. Checking this value does not use an LLM
 ground_truth:
-  - name: Time
-    points: 5
-    value: 9.63
+  value: 9.63
+  points: 5

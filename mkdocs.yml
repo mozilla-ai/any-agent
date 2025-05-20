@@ -1,4 +1,4 @@
-site_name: Any Agent
+site_name: any-agent
 
 repo_url: https://github.com/mozilla-ai/any-agent
 repo_name: any-agent
@@ -16,6 +16,7 @@ nav:
     - TinyAgent: frameworks/tinyagent.md
   - Instructions: instructions.md
   - Tools: tools.md
+  - Logging: logging.md
   - Tracing: tracing.md
   - Evaluation: evaluation.md
   - Serving (A2A): serving.md
@@ -24,6 +25,7 @@ nav:
     - Config: api/config.md
     - Tools: api/tools.md
     - Tracing: api/tracing.md
+    - Logging: api/logging.md
 
 theme:
   name: material
@@ -38,8 +40,8 @@ theme:
       toggle:
         icon: material/lightbulb-outline
         name: Switch to light mode
-  logo: images/mozilla.ai_white.png
-  favicon: images/mozilla.ai_black.png
+  logo: images/any-agent-logo-mark.png
+  favicon: images/any-agent_favicon.png
   extra_css:
     - assets/custom.css
   features:

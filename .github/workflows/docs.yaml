@@ -38,7 +38,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          uv sync --extra docs
+          uv sync --group docs
           uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'
 
       - name: Build docs

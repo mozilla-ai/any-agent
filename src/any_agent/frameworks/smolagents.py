@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING, Any
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.tools import search_web, visit_webpage
 
 try:
     from smolagents import LiteLLMModel, ToolCallingAgent
@@ -52,11 +51,6 @@ class SmolagentsAgent(AnyAgent):
         if not smolagents_available:
             msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
             raise ImportError(msg)
-        if not self.managed_agents and not self.config.tools:
-            self.config.tools = [
-                search_web,
-                visit_webpage,
-            ]
 
         tools, _ = await self._load_tools(self.config.tools)
 

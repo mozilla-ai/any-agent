@@ -1,7 +1,8 @@
 import asyncio
 import os
 import subprocess
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -10,6 +11,8 @@ from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
+from any_agent.evaluation import EvaluationCase, evaluate
+from any_agent.evaluation.schemas import CheckpointCriteria, TraceEvaluationResult
 from any_agent.tracing.agent_trace import AgentTrace
 
 
@@ -81,9 +84,12 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
     agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
 
     try:
+        start_ns = time.time_ns()
         agent_trace = agent.run(
             "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
         )
+        end_ns = time.time_ns()
+        wall_time_ns = end_ns - start_ns
         assert os.path.exists(os.path.join(tmp_path, tmp_file))
         with open(os.path.join(tmp_path, tmp_file)) as f:
             content = f.read()
@@ -92,12 +98,44 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert agent_trace.final_output
         assert agent_trace.spans
         assert len(agent_trace.spans) > 0
+        assert agent_trace.duration is not None
+        assert isinstance(agent_trace.duration, timedelta)
+        assert agent_trace.duration.total_seconds() > 0
+        # Compare duration to measured wall time (allow 0.1s difference)
+        wall_time_s = wall_time_ns / 1_000_000_000
+        diff = abs(agent_trace.duration.total_seconds() - wall_time_s)
+        assert diff < 0.1, (
+            f"duration ({agent_trace.duration.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
+        )
         cost_sum = agent_trace.get_total_cost()
-        if agent_framework is not AgentFramework.GOOGLE:
-            assert cost_sum.total_cost > 0
-            assert cost_sum.total_cost < 1.00
-            assert cost_sum.total_tokens > 0
-            assert cost_sum.total_tokens < 20000
+        assert cost_sum.total_cost > 0
+        assert cost_sum.total_cost < 1.00
+        assert cost_sum.total_tokens > 0
+        assert cost_sum.total_tokens < 20000
+        case = EvaluationCase(
+            llm_judge="gpt-4.1-mini",
+            checkpoints=[
+                CheckpointCriteria(
+                    criteria="Check if the agent called the write_file tool and it succeeded",
+                    points=1,
+                ),
+                CheckpointCriteria(
+                    criteria="Check if the agent wrote the year to the file.",
+                    points=1,
+                ),
+                CheckpointCriteria(
+                    criteria="Check if the year was 1990",
+                    points=1,
+                ),
+            ],
+        )
+        result: TraceEvaluationResult = evaluate(
+            evaluation_case=case,
+            trace=agent_trace,
+            agent_framework=agent_framework,
+        )
+        assert result
+        assert result.score == float(2 / 3)
     finally:
         agent.exit()
 
@@ -110,16 +148,11 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
-    model_args: dict[str, Any] = (
-        {"parallel_tool_calls": False}
-        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
-        else {}
-    )
-    model_args["temperature"] = 0.0
+    model_args = {"temperature": 0.0}
     try:
         agent = await AnyAgent.create_async(
             agent_framework,
-            AgentConfig(model_id=model_id, model_args=model_args),
+            AgentConfig(model_id=model_id, model_args=model_args, tools=[]),
         )
         results = await asyncio.gather(
             agent.run_async("What is the capital of France?"),

@@ -22,10 +22,6 @@ def llm_evaluate_with_criterion(
     model: str,
     criteria: str,
     points: int,
-    ground_truth_output: Sequence[CheckpointCriteria]
-    | Sequence[GroundTruthAnswer]
-    | None = None,
-    hypothesis_final_output: str | None = None,
     evidence: str | None = None,
 ) -> EvaluationResult:
     """Evaluate a single criterion using LLM."""
@@ -34,15 +30,6 @@ def llm_evaluate_with_criterion(
 
     Criterion: {criteria}
     """)
-
-    if ground_truth_output:
-        prompt += dedent(f"""
-        Expected output: {json.dumps(ground_truth_output)}
-        """)
-    if hypothesis_final_output:
-        prompt += dedent(f"""
-        Agent's answer: {hypothesis_final_output}
-        """)
 
     if evidence:
         prompt += dedent(f"""
@@ -125,7 +112,7 @@ def evaluate_checkpoint(
 
     for checkpoint in checkpoints:
         evaluation = llm_evaluate_with_criterion(
-            model,
+            model=model,
             criteria=checkpoint.criteria,
             points=checkpoint.points,
             evidence=evidence,
@@ -135,59 +122,35 @@ def evaluate_checkpoint(
     return results
 
 
-def evaluate_hypothesis(
-    model: str,
-    hypothesis_final_output: str,
-    ground_truth_answer_dict: Sequence[GroundTruthAnswer],
-    ground_truth_checkpoints: Sequence[CheckpointCriteria],
-) -> list[EvaluationResult]:
-    """Verify if the final answer meets all specified criteria."""
-    results = []
-
-    for criterion in ground_truth_checkpoints:
-        evaluation = llm_evaluate_with_criterion(
-            model=model,
-            criteria=criterion.criteria,
-            points=criterion.points,
-            ground_truth_output=ground_truth_answer_dict,
-            hypothesis_final_output=hypothesis_final_output,
-        )
-
-        results.append(evaluation)
-
-    return results
-
-
 def evaluate_qa_squad(
-    hypothesis_answer: str,
-    ground_truth_answer: Sequence[GroundTruthAnswer],
-) -> list[EvaluationResult]:
+    final_output: str,
+    ground_truth_answer: GroundTruthAnswer,
+) -> EvaluationResult:
     """Directly compare answers using simple matching."""
     metric = evaluate.loading.load("squad")
     # format the answers so that they're dicts with 'id' and 'prediction' keys for hypo
     # and the ref has id and answers keys
-    hypothesis_answers = [{"id": "1", "prediction_text": hypothesis_answer}]
+    predictions = [{"id": "1", "prediction_text": final_output}]
     ground_truth_answers: list[GroundTruthAnswers] = [
         {
             "id": "1",
             "answers": {
                 "answer_start": [0],
-                "text": [str(ground_truth_answer[0]["value"])],
+                "text": [str(ground_truth_answer["value"])],
             },
         },
     ]
     # Use the SQuAD metric to compare answers
     result = metric.compute(
-        predictions=hypothesis_answers,
+        predictions=predictions,
         references=ground_truth_answers,
     )
 
     assert result, "The result of the evaluation is empty"
 
-    match = EvaluationResult(
+    return EvaluationResult(
         passed=int(result["exact_match"]) == 1,
         reason=f"Partial Match (F1) score is {round(result['f1'], 2)}",
         criteria="Is the answer a direct match?",
         points=1,
     )
-    return [match]
