@@ -4,7 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
-from pydantic import BaseModel, ConfigDict, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.config import AgentFramework
 from any_agent.logging import logger
@@ -140,7 +140,7 @@ class AgentSpan(BaseModel):
 class AgentTrace(BaseModel):
     """A trace that can be exported to JSON or printed to the console."""
 
-    __spans: list[AgentSpan] = PrivateAttr(default_factory=list)
+    spans: list[AgentSpan] = Field(default_factory=list)
     """A private list of [`AgentSpan`][any_agent.tracing.trace.AgentSpan] that form the trace."""
 
     final_output: str | None = None
@@ -156,12 +156,12 @@ class AgentTrace(BaseModel):
 
     def add_span(self, span: AgentSpan) -> None:
         """Add an AgentSpan to the trace and clear the usage_and_cost cache if present."""
-        self.__spans.append(span)
+        self.spans.append(span)
         self._invalidate_usage_and_cost_cache()
 
     def add_spans(self, spans: list[AgentSpan]) -> None:
         """Add a list of AgentSpans to the trace and clear the usage_and_cost cache if present."""
-        self.__spans.extend(spans)
+        self.spans.extend(spans)
         self._invalidate_usage_and_cost_cache()
 
     @property
@@ -174,10 +174,10 @@ class AgentTrace(BaseModel):
 
         Raises ValueError if there are no spans, if the AGENT span is not found, or if start/end times are missing.
         """
-        if not self.__spans:
+        if not self.spans:
             msg = "No spans found in trace"
             raise ValueError(msg)
-        for span in self.__spans:
+        for span in self.spans:
             if span.attributes.get("any_agent.run_id"):
                 if span.start_time is not None and span.end_time is not None:
                     duration_ns = span.end_time - span.start_time
@@ -192,7 +192,7 @@ class AgentTrace(BaseModel):
         """The current total cost and token usage statistics for this trace. Cached after first computation."""
         counts: list[CountInfo] = []
         costs: list[CostInfo] = []
-        for span in self.__spans:
+        for span in self.spans:
             if span.attributes and "cost_prompt" in span.attributes:
                 count = CountInfo(
                     token_count_prompt=span.attributes["llm.token_count.prompt"],
@@ -225,11 +225,6 @@ class AgentTrace(BaseModel):
             total_cost_prompt=total_cost_prompt,
             total_cost_completion=total_cost_completion,
         )
-
-    @property
-    def spans(self) -> tuple[AgentSpan, ...]:
-        """Read-only access to the spans in the trace."""
-        return tuple(self.__spans)
 
 
 def _is_tracing_supported(agent_framework: AgentFramework) -> bool:

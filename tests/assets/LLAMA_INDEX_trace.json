@@ -1,0 +1,1354 @@
+{
+  "spans": [
+    {
+      "name": "AgentWorkflow.init_run",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702477008697000,
+      "end_time": 1747702477009383000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 11315413920094495153,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentWorkflowStartEvent()\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"input\":[{\"role\":\"user\",\"blocks\":[{\"text\":\"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}],\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.setup_agent",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702477009613000,
+      "end_time": 1747702477009854000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 2765678390149232171,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentInput(input=[ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])], current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"input\":[{\"role\":\"system\",\"blocks\":[{\"text\":\"Search the web to answer\"}]},{\"role\":\"user\",\"blocks\":[{\"text\":\"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}],\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLM.astream_chat",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 1648299808746599085,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702477010504000,
+      "end_time": 1747702477011143000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 4229907878581732718,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.invocation_parameters": "{\"context_window\":32768,\"num_output\":-1,\"is_chat_model\":true,\"is_function_calling_model\":true,\"model_name\":\"gpt-4.1-mini\"}",
+        "input.value": "{\"messages\": [\"ChatMessage(role=<MessageRole.SYSTEM: 'system'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='You are designed to help with a variety of tasks, from answering questions to providing summaries to other types of analyses.\\\\n\\\\n## Tools\\\\n\\\\nYou have access to a wide variety of tools. You are responsible for using the tools in any sequence you deem appropriate to complete the task at hand.\\\\nThis may require breaking the task into subtasks and using different tools to complete each subtask.\\\\n\\\\nYou have access to the following tools:\\\\n> Tool Name: write_file\\\\nTool Description: write_file(text: str) -> None\\\\nwrite the text to a file in the tmp_path directory\\\\n\\\\n        Args:\\\\n            text (str): The text to write to the file.\\\\n\\\\n        Returns:\\\\n            None\\\\n        \\\\nTool Args: {\\\"properties\\\": {\\\"text\\\": {\\\"title\\\": \\\"Text\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"text\\\"], \\\"type\\\": \\\"object\\\"}\\\\n\\\\n> Tool Name: get_current_time\\\\nTool Description: Get current time in a specific timezones\\\\nTool Args: {\\\"properties\\\": {\\\"timezone\\\": {\\\"description\\\": \\\"IANA timezone name (e.g., \\\\'America/New_York\\\\', \\\\'Europe/London\\\\'). Use \\\\'America/New_York\\\\' as local timezone if no timezone provided by the user.\\\", \\\"title\\\": \\\"Timezone\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"timezone\\\"], \\\"type\\\": \\\"object\\\"}\\\\n\\\\n\\\\n\\\\n## Output Format\\\\n\\\\nPlease answer in the same language as the question and use the following format:\\\\n\\\\n```\\\\nThought: The current language of the user is: (user\\\\'s language). I need to use a tool to help me answer the question.\\\\nAction: tool name (one of write_file, get_current_time) if using a tool.\\\\nAction Input: the input to the tool, in a JSON format representing the kwargs (e.g. {\\\"input\\\": \\\"hello world\\\", \\\"num_beams\\\": 5})\\\\n```\\\\n\\\\nPlease ALWAYS start with a Thought.\\\\n\\\\nNEVER surround your response with markdown code markers. You may use code markers within your response if you need to.\\\\n\\\\nPlease use a valid JSON format for the Action Input. Do NOT do this {\\\\'input\\\\': \\\\'hello world\\\\', \\\\'num_beams\\\\': 5}.\\\\n\\\\nIf this format is used, the tool will respond in the following format:\\\\n\\\\n```\\\\nObservation: tool response\\\\n```\\\\n\\\\nYou should keep repeating the above format till you have enough information to answer the question without using any more tools. At that point, you MUST respond in one of the following two formats:\\\\n\\\\n```\\\\nThought: I can answer without using any more tools. I\\\\'ll use the user\\\\'s language to answer\\\\nAnswer: [your answer here (In the same language as the user\\\\'s question)]\\\\n```\\\\n\\\\n```\\\\nThought: I cannot answer the question with the provided tools.\\\\nAnswer: [your answer here (In the same language as the user\\\\'s question)]\\\\n```\\\\n\\\\n## Current Conversation\\\\n\\\\nBelow is the current conversation consisting of interleaving human and assistant messages.\\\\n')])\", \"ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])\"]}",
+        "input.mime_type": "application/json",
+        "llm.input_messages.0.message.role": "system",
+        "llm.input_messages.0.message.content": "You are designed to help with a variety of tasks, from answering questions to providing summaries to other types of analyses.\n\n## Tools\n\nYou have access to a wide variety of tools. You are responsible for using the tools in any sequence you deem appropriate to complete the task at hand.\nThis may require breaking the task into subtasks and using different tools to complete each subtask.\n\nYou have access to the following tools:\n> Tool Name: write_file\nTool Description: write_file(text: str) -> None\nwrite the text to a file in the tmp_path directory\n\n        Args:\n            text (str): The text to write to the file.\n\n        Returns:\n            None\n        \nTool Args: {\"properties\": {\"text\": {\"title\": \"Text\", \"type\": \"string\"}}, \"required\": [\"text\"], \"type\": \"object\"}\n\n> Tool Name: get_current_time\nTool Description: Get current time in a specific timezones\nTool Args: {\"properties\": {\"timezone\": {\"description\": \"IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'America/New_York' as local timezone if no timezone provided by the user.\", \"title\": \"Timezone\", \"type\": \"string\"}}, \"required\": [\"timezone\"], \"type\": \"object\"}\n\n\n\n## Output Format\n\nPlease answer in the same language as the question and use the following format:\n\n```\nThought: The current language of the user is: (user's language). I need to use a tool to help me answer the question.\nAction: tool name (one of write_file, get_current_time) if using a tool.\nAction Input: the input to the tool, in a JSON format representing the kwargs (e.g. {\"input\": \"hello world\", \"num_beams\": 5})\n```\n\nPlease ALWAYS start with a Thought.\n\nNEVER surround your response with markdown code markers. You may use code markers within your response if you need to.\n\nPlease use a valid JSON format for the Action Input. Do NOT do this {'input': 'hello world', 'num_beams': 5}.\n\nIf this format is used, the tool will respond in the following format:\n\n```\nObservation: tool response\n```\n\nYou should keep repeating the above format till you have enough information to answer the question without using any more tools. At that point, you MUST respond in one of the following two formats:\n\n```\nThought: I can answer without using any more tools. I'll use the user's language to answer\nAnswer: [your answer here (In the same language as the user's question)]\n```\n\n```\nThought: I cannot answer the question with the provided tools.\nAnswer: [your answer here (In the same language as the user's question)]\n```\n\n## Current Conversation\n\nBelow is the current conversation consisting of interleaving human and assistant messages.\n",
+        "llm.input_messages.1.message.role": "user",
+        "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
+        "output.value": "assistant: Thought: I need to get the current time in the America/New_York timezone to find out the year.\nAction: get_current_time\nAction Input: {\"timezone\":\"America/New_York\"}",
+        "llm.token_count.prompt": 621,
+        "llm.token_count.prompt_details.cache_read": 0,
+        "llm.token_count.prompt_details.audio": 0,
+        "llm.token_count.completion": 39,
+        "llm.token_count.completion_details.reasoning": 0,
+        "llm.token_count.completion_details.audio": 0,
+        "llm.token_count.total": 660,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.content": "Thought: I need to get the current time in the America/New_York timezone to find out the year.\nAction: get_current_time\nAction Input: {\"timezone\":\"America/New_York\"}",
+        "openinference.span.kind": "LLM",
+        "service.name": "llama_index",
+        "cost_prompt": 0.00024839999999999997,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [
+        {
+          "name": "First Token Stream Event",
+          "timestamp": 1747702477679227000,
+          "attributes": {}
+        }
+      ],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "ReActOutputParser.parse",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 1648299808746599085,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702478162729000,
+      "end_time": 1747702478166885000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 10354038049662303785,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"output\": \"Thought: I need to get the current time in the America/New_York timezone to find out the year.\\nAction: get_current_time\\nAction Input: {\\\"timezone\\\":\\\"America/New_York\\\"}\", \"is_streaming\": false}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"thought\":\"I need to get the current time in the America/New_York timezone to find out the year.\",\"action\":\"get_current_time\",\"action_input\":{\"timezone\":\"America/New_York\"}}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.run_agent_step",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702477009975000,
+      "end_time": 1747702478167269000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 1648299808746599085,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentSetup(input=[ChatMessage(role=<MessageRole.SYSTEM: 'system'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Search the web to answer')]), ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])], current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"response\":{\"role\":\"assistant\",\"additional_kwargs\":{},\"blocks\":[{\"text\":\"Thought: I need to get the current time in the America/New_York timezone to find out the year.\\nAction: get_current_time\\nAction Input: {\\\"timezone\\\":\\\"America/New_York\\\"}\"}]},\"tool_calls\":[{\"tool_id\":\"bf84cbea-b954-4edf-9379-c803c6ffaac2\",\"tool_name\":\"get_current_time\",\"tool_kwargs\":{\"timezone\":\"America/New_York\"}}],\"raw\":{\"id\":\"chatcmpl-370b2a26-14c6-46b6-a5f6-34e287b5e583\",\"created\":1747702478,\"model\":\"gpt-4.1-mini\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_38647f5e19\",\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"provider_specific_fields\":null,\"content\":null,\"role\":null,\"function_call\":null,\"tool_calls\":null,\"audio\":null},\"logprobs\":null}],\"provider_specific_fields\":null,\"stream_options\":{\"include_usage\":true},\"usage\":{\"completion_tokens\":39,\"prompt_tokens\":621,\"total_tokens\":660,\"completion_tokens_details\":{\"accepted_prediction_tokens\":0,\"audio_tokens\":0,\"reasoning_tokens\":0,\"rejected_prediction_tokens\":0},\"prompt_tokens_details\":{\"audio_tokens\":0,\"cached_tokens\":0}}},\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.parse_agent_output",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702478168035000,
+      "end_time": 1747702478168309000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 10889530234314388731,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentOutput(response=ChatMessage(role=<MessageRole.ASSISTANT: 'assistant'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Thought: I need to get the current time in the America/New_York timezone to find out the year.\\\\nAction: get_current_time\\\\nAction Input: {\\\"timezone\\\":\\\"America/New_York\\\"}')]), tool_calls=[ToolSelection(tool_id='bf84cbea-b954-4edf-9379-c803c6ffaac2', tool_name='get_current_time', tool_kwargs={'timezone': 'America/New_York'})], raw={'id': 'chatcmpl-370b2a26-14c6-46b6-a5f6-34e287b5e583', 'created': 1747702478, 'model': 'gpt-4.1-mini', 'object': 'chat.completion.chunk', 'system_fingerprint': 'fp_38647f5e19', 'choices': [{'finish_reason': None, 'index': 0, 'delta': {'provider_specific_fields': None, 'content': None, 'role': None, 'function_call': None, 'tool_calls': None, 'audio': None}, 'logprobs': None}], 'provider_specific_fields': None, 'stream_options': {'include_usage': True}, 'usage': {'completion_tokens': 39, 'prompt_tokens': 621, 'total_tokens': 660, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}}, current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "FunctionTool.acall",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 3395173239332016346,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702478168722000,
+      "end_time": 1747702478346210000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 11340840315358998650,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "tool.description": "Get current time in a specific timezones",
+        "tool.name": "get_current_time",
+        "tool.parameters": "{\"properties\": {\"timezone\": {\"description\": \"IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'America/New_York' as local timezone if no timezone provided by the user.\", \"title\": \"Timezone\", \"type\": \"string\"}}, \"required\": [\"timezone\"], \"type\": \"object\"}",
+        "input.value": "{\"kwargs\": {\"timezone\": \"America/New_York\"}}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"content\":\"meta=None content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:38-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None)] isError=False\",\"tool_name\":\"get_current_time\",\"raw_input\":{\"args\":[],\"kwargs\":{\"timezone\":\"America/New_York\"}},\"raw_output\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:38-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\"}],\"isError\":false}}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "TOOL",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.call_tool",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702478168498000,
+      "end_time": 1747702478347923000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 3395173239332016346,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"ToolCall(tool_name='get_current_time', tool_kwargs={'timezone': 'America/New_York'}, tool_id='bf84cbea-b954-4edf-9379-c803c6ffaac2')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"tool_name\":\"get_current_time\",\"tool_kwargs\":{\"timezone\":\"America/New_York\"},\"tool_id\":\"bf84cbea-b954-4edf-9379-c803c6ffaac2\",\"tool_output\":{\"content\":\"meta=None content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:38-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None)] isError=False\",\"tool_name\":\"get_current_time\",\"raw_input\":{\"args\":[],\"kwargs\":{\"timezone\":\"America/New_York\"}},\"raw_output\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:38-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\"}],\"isError\":false}},\"return_direct\":false}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.aggregate_tool_results",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702478348117000,
+      "end_time": 1747702478348513000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 9663021527121793426,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"ToolCallResult(tool_name='get_current_time', tool_kwargs={'timezone': 'America/New_York'}, tool_id='bf84cbea-b954-4edf-9379-c803c6ffaac2', tool_output=ToolOutput(content='meta=None content=[TextContent(type=\\\\'text\\\\', text=\\\\'{\\\\\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\\\\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:38-04:00\\\",\\\\\\\\n  \\\"is_dst\\\": true\\\\\\\\n}\\\\', annotations=None)] isError=False', tool_name='get_current_time', raw_input={'args': (), 'kwargs': {'timezone': 'America/New_York'}}, raw_output=CallToolResult(meta=None, content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:38-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None)], isError=False), is_error=False), return_direct=False)\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"input\":[{\"role\":\"user\",\"blocks\":[{\"text\":\"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}],\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.setup_agent",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702478348649000,
+      "end_time": 1747702478348804000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 9680802022219471269,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentInput(input=[ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])], current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"input\":[{\"role\":\"system\",\"blocks\":[{\"text\":\"Search the web to answer\"}]},{\"role\":\"user\",\"blocks\":[{\"text\":\"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}],\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLM.astream_chat",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 16721221889273471933,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702478349324000,
+      "end_time": 1747702478349662000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 18032661861393105310,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.invocation_parameters": "{\"context_window\":32768,\"num_output\":-1,\"is_chat_model\":true,\"is_function_calling_model\":true,\"model_name\":\"gpt-4.1-mini\"}",
+        "input.value": "{\"messages\": [\"ChatMessage(role=<MessageRole.SYSTEM: 'system'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='You are designed to help with a variety of tasks, from answering questions to providing summaries to other types of analyses.\\\\n\\\\n## Tools\\\\n\\\\nYou have access to a wide variety of tools. You are responsible for using the tools in any sequence you deem appropriate to complete the task at hand.\\\\nThis may require breaking the task into subtasks and using different tools to complete each subtask.\\\\n\\\\nYou have access to the following tools:\\\\n> Tool Name: write_file\\\\nTool Description: write_file(text: str) -> None\\\\nwrite the text to a file in the tmp_path directory\\\\n\\\\n        Args:\\\\n            text (str): The text to write to the file.\\\\n\\\\n        Returns:\\\\n            None\\\\n        \\\\nTool Args: {\\\"properties\\\": {\\\"text\\\": {\\\"title\\\": \\\"Text\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"text\\\"], \\\"type\\\": \\\"object\\\"}\\\\n\\\\n> Tool Name: get_current_time\\\\nTool Description: Get current time in a specific timezones\\\\nTool Args: {\\\"properties\\\": {\\\"timezone\\\": {\\\"description\\\": \\\"IANA timezone name (e.g., \\\\'America/New_York\\\\', \\\\'Europe/London\\\\'). Use \\\\'America/New_York\\\\' as local timezone if no timezone provided by the user.\\\", \\\"title\\\": \\\"Timezone\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"timezone\\\"], \\\"type\\\": \\\"object\\\"}\\\\n\\\\n\\\\n\\\\n## Output Format\\\\n\\\\nPlease answer in the same language as the question and use the following format:\\\\n\\\\n```\\\\nThought: The current language of the user is: (user\\\\'s language). I need to use a tool to help me answer the question.\\\\nAction: tool name (one of write_file, get_current_time) if using a tool.\\\\nAction Input: the input to the tool, in a JSON format representing the kwargs (e.g. {\\\"input\\\": \\\"hello world\\\", \\\"num_beams\\\": 5})\\\\n```\\\\n\\\\nPlease ALWAYS start with a Thought.\\\\n\\\\nNEVER surround your response with markdown code markers. You may use code markers within your response if you need to.\\\\n\\\\nPlease use a valid JSON format for the Action Input. Do NOT do this {\\\\'input\\\\': \\\\'hello world\\\\', \\\\'num_beams\\\\': 5}.\\\\n\\\\nIf this format is used, the tool will respond in the following format:\\\\n\\\\n```\\\\nObservation: tool response\\\\n```\\\\n\\\\nYou should keep repeating the above format till you have enough information to answer the question without using any more tools. At that point, you MUST respond in one of the following two formats:\\\\n\\\\n```\\\\nThought: I can answer without using any more tools. I\\\\'ll use the user\\\\'s language to answer\\\\nAnswer: [your answer here (In the same language as the user\\\\'s question)]\\\\n```\\\\n\\\\n```\\\\nThought: I cannot answer the question with the provided tools.\\\\nAnswer: [your answer here (In the same language as the user\\\\'s question)]\\\\n```\\\\n\\\\n## Current Conversation\\\\n\\\\nBelow is the current conversation consisting of interleaving human and assistant messages.\\\\n')])\", \"ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])\", \"ChatMessage(role=<MessageRole.ASSISTANT: 'assistant'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text=\\\"Thought: I need to get the current time in the America/New_York timezone to find out the year.\\\\nAction: get_current_time\\\\nAction Input: {'timezone': 'America/New_York'}\\\")])\", \"ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Observation: meta=None content=[TextContent(type=\\\\'text\\\\', text=\\\\'{\\\\\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\\\\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:38-04:00\\\",\\\\\\\\n  \\\"is_dst\\\": true\\\\\\\\n}\\\\', annotations=None)] isError=False')])\"]}",
+        "input.mime_type": "application/json",
+        "llm.input_messages.0.message.role": "system",
+        "llm.input_messages.0.message.content": "You are designed to help with a variety of tasks, from answering questions to providing summaries to other types of analyses.\n\n## Tools\n\nYou have access to a wide variety of tools. You are responsible for using the tools in any sequence you deem appropriate to complete the task at hand.\nThis may require breaking the task into subtasks and using different tools to complete each subtask.\n\nYou have access to the following tools:\n> Tool Name: write_file\nTool Description: write_file(text: str) -> None\nwrite the text to a file in the tmp_path directory\n\n        Args:\n            text (str): The text to write to the file.\n\n        Returns:\n            None\n        \nTool Args: {\"properties\": {\"text\": {\"title\": \"Text\", \"type\": \"string\"}}, \"required\": [\"text\"], \"type\": \"object\"}\n\n> Tool Name: get_current_time\nTool Description: Get current time in a specific timezones\nTool Args: {\"properties\": {\"timezone\": {\"description\": \"IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'America/New_York' as local timezone if no timezone provided by the user.\", \"title\": \"Timezone\", \"type\": \"string\"}}, \"required\": [\"timezone\"], \"type\": \"object\"}\n\n\n\n## Output Format\n\nPlease answer in the same language as the question and use the following format:\n\n```\nThought: The current language of the user is: (user's language). I need to use a tool to help me answer the question.\nAction: tool name (one of write_file, get_current_time) if using a tool.\nAction Input: the input to the tool, in a JSON format representing the kwargs (e.g. {\"input\": \"hello world\", \"num_beams\": 5})\n```\n\nPlease ALWAYS start with a Thought.\n\nNEVER surround your response with markdown code markers. You may use code markers within your response if you need to.\n\nPlease use a valid JSON format for the Action Input. Do NOT do this {'input': 'hello world', 'num_beams': 5}.\n\nIf this format is used, the tool will respond in the following format:\n\n```\nObservation: tool response\n```\n\nYou should keep repeating the above format till you have enough information to answer the question without using any more tools. At that point, you MUST respond in one of the following two formats:\n\n```\nThought: I can answer without using any more tools. I'll use the user's language to answer\nAnswer: [your answer here (In the same language as the user's question)]\n```\n\n```\nThought: I cannot answer the question with the provided tools.\nAnswer: [your answer here (In the same language as the user's question)]\n```\n\n## Current Conversation\n\nBelow is the current conversation consisting of interleaving human and assistant messages.\n",
+        "llm.input_messages.1.message.role": "user",
+        "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
+        "llm.input_messages.2.message.role": "assistant",
+        "llm.input_messages.2.message.content": "Thought: I need to get the current time in the America/New_York timezone to find out the year.\nAction: get_current_time\nAction Input: {'timezone': 'America/New_York'}",
+        "llm.input_messages.3.message.role": "user",
+        "llm.input_messages.3.message.content": "Observation: meta=None content=[TextContent(type='text', text='{\\n  \"timezone\": \"America/New_York\",\\n  \"datetime\": \"2025-05-19T20:54:38-04:00\",\\n  \"is_dst\": true\\n}', annotations=None)] isError=False",
+        "output.value": "assistant: Thought: I have the current datetime in the America/New_York timezone, which is 2025-05-19T20:54:38-04:00. The year is 2025. I will write this value to a file.\nAction: write_file\nAction Input: {\"text\": \"2025\"}",
+        "llm.token_count.prompt": 735,
+        "llm.token_count.prompt_details.cache_read": 0,
+        "llm.token_count.prompt_details.audio": 0,
+        "llm.token_count.completion": 66,
+        "llm.token_count.completion_details.reasoning": 0,
+        "llm.token_count.completion_details.audio": 0,
+        "llm.token_count.total": 801,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.content": "Thought: I have the current datetime in the America/New_York timezone, which is 2025-05-19T20:54:38-04:00. The year is 2025. I will write this value to a file.\nAction: write_file\nAction Input: {\"text\": \"2025\"}",
+        "openinference.span.kind": "LLM",
+        "service.name": "llama_index",
+        "cost_prompt": 0.000294,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [
+        {
+          "name": "First Token Stream Event",
+          "timestamp": 1747702479040607000,
+          "attributes": {}
+        }
+      ],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "ReActOutputParser.parse",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 16721221889273471933,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702479931192000,
+      "end_time": 1747702479931585000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 6685121560223974972,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"output\": \"Thought: I have the current datetime in the America/New_York timezone, which is 2025-05-19T20:54:38-04:00. The year is 2025. I will write this value to a file.\\nAction: write_file\\nAction Input: {\\\"text\\\": \\\"2025\\\"}\", \"is_streaming\": false}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"thought\":\"I have the current datetime in the America/New_York timezone, which is 2025-05-19T20:54:38-04:00. The year is 2025. I will write this value to a file.\",\"action\":\"write_file\",\"action_input\":{\"text\":\"2025\"}}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.run_agent_step",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702478348908000,
+      "end_time": 1747702479931927000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 16721221889273471933,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentSetup(input=[ChatMessage(role=<MessageRole.SYSTEM: 'system'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Search the web to answer')]), ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])], current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"response\":{\"role\":\"assistant\",\"additional_kwargs\":{},\"blocks\":[{\"text\":\"Thought: I have the current datetime in the America/New_York timezone, which is 2025-05-19T20:54:38-04:00. The year is 2025. I will write this value to a file.\\nAction: write_file\\nAction Input: {\\\"text\\\": \\\"2025\\\"}\"}]},\"tool_calls\":[{\"tool_id\":\"0ff7348d-baaa-422f-9d00-4a023ada0163\",\"tool_name\":\"write_file\",\"tool_kwargs\":{\"text\":\"2025\"}}],\"raw\":{\"id\":\"chatcmpl-6544ca0e-fad9-42c3-b4ff-80fa844a43ae\",\"created\":1747702479,\"model\":\"gpt-4.1-mini\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_38647f5e19\",\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"provider_specific_fields\":null,\"content\":null,\"role\":null,\"function_call\":null,\"tool_calls\":null,\"audio\":null},\"logprobs\":null}],\"provider_specific_fields\":null,\"stream_options\":{\"include_usage\":true},\"usage\":{\"completion_tokens\":66,\"prompt_tokens\":735,\"total_tokens\":801,\"completion_tokens_details\":{\"accepted_prediction_tokens\":0,\"audio_tokens\":0,\"reasoning_tokens\":0,\"rejected_prediction_tokens\":0},\"prompt_tokens_details\":{\"audio_tokens\":0,\"cached_tokens\":0}}},\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.parse_agent_output",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702479932654000,
+      "end_time": 1747702479932931000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 10922928726805624622,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentOutput(response=ChatMessage(role=<MessageRole.ASSISTANT: 'assistant'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Thought: I have the current datetime in the America/New_York timezone, which is 2025-05-19T20:54:38-04:00. The year is 2025. I will write this value to a file.\\\\nAction: write_file\\\\nAction Input: {\\\"text\\\": \\\"2025\\\"}')]), tool_calls=[ToolSelection(tool_id='0ff7348d-baaa-422f-9d00-4a023ada0163', tool_name='write_file', tool_kwargs={'text': '2025'})], raw={'id': 'chatcmpl-6544ca0e-fad9-42c3-b4ff-80fa844a43ae', 'created': 1747702479, 'model': 'gpt-4.1-mini', 'object': 'chat.completion.chunk', 'system_fingerprint': 'fp_38647f5e19', 'choices': [{'finish_reason': None, 'index': 0, 'delta': {'provider_specific_fields': None, 'content': None, 'role': None, 'function_call': None, 'tool_calls': None, 'audio': None}, 'logprobs': None}], 'provider_specific_fields': None, 'stream_options': {'include_usage': True}, 'usage': {'completion_tokens': 66, 'prompt_tokens': 735, 'total_tokens': 801, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}}, current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "FunctionTool.acall",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 3452716808837994579,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702479933345000,
+      "end_time": 1747702479934401000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 6736338516052905682,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "tool.description": "write_file(text: str) -> None\nwrite the text to a file in the tmp_path directory\n\n        Args:\n            text (str): The text to write to the file.\n\n        Returns:\n            None\n        ",
+        "tool.name": "write_file",
+        "tool.parameters": "{\"properties\": {\"text\": {\"title\": \"Text\", \"type\": \"string\"}}, \"required\": [\"text\"], \"type\": \"object\"}",
+        "input.value": "{\"kwargs\": {\"text\": \"2025\"}}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"content\":\"None\",\"tool_name\":\"write_file\",\"raw_input\":{\"args\":[],\"kwargs\":{\"text\":\"2025\"}},\"raw_output\":null}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "TOOL",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.call_tool",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702479933136000,
+      "end_time": 1747702479935850000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 3452716808837994579,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"ToolCall(tool_name='write_file', tool_kwargs={'text': '2025'}, tool_id='0ff7348d-baaa-422f-9d00-4a023ada0163')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"tool_name\":\"write_file\",\"tool_kwargs\":{\"text\":\"2025\"},\"tool_id\":\"0ff7348d-baaa-422f-9d00-4a023ada0163\",\"tool_output\":{\"content\":\"None\",\"tool_name\":\"write_file\",\"raw_input\":{\"args\":[],\"kwargs\":{\"text\":\"2025\"}},\"raw_output\":null},\"return_direct\":false}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.aggregate_tool_results",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702479936050000,
+      "end_time": 1747702479936435000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 11202706307112363479,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"ToolCallResult(tool_name='write_file', tool_kwargs={'text': '2025'}, tool_id='0ff7348d-baaa-422f-9d00-4a023ada0163', tool_output=ToolOutput(content='None', tool_name='write_file', raw_input={'args': (), 'kwargs': {'text': '2025'}}, raw_output=None, is_error=False), return_direct=False)\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"input\":[{\"role\":\"user\",\"blocks\":[{\"text\":\"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}],\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.setup_agent",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702479936603000,
+      "end_time": 1747702479936802000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 10245257311449960889,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentInput(input=[ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])], current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"input\":[{\"role\":\"system\",\"blocks\":[{\"text\":\"Search the web to answer\"}]},{\"role\":\"user\",\"blocks\":[{\"text\":\"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}],\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLM.astream_chat",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 13823105567364192913,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702479937425000,
+      "end_time": 1747702479937801000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 7810504705691071062,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.invocation_parameters": "{\"context_window\":32768,\"num_output\":-1,\"is_chat_model\":true,\"is_function_calling_model\":true,\"model_name\":\"gpt-4.1-mini\"}",
+        "input.value": "{\"messages\": [\"ChatMessage(role=<MessageRole.SYSTEM: 'system'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='You are designed to help with a variety of tasks, from answering questions to providing summaries to other types of analyses.\\\\n\\\\n## Tools\\\\n\\\\nYou have access to a wide variety of tools. You are responsible for using the tools in any sequence you deem appropriate to complete the task at hand.\\\\nThis may require breaking the task into subtasks and using different tools to complete each subtask.\\\\n\\\\nYou have access to the following tools:\\\\n> Tool Name: write_file\\\\nTool Description: write_file(text: str) -> None\\\\nwrite the text to a file in the tmp_path directory\\\\n\\\\n        Args:\\\\n            text (str): The text to write to the file.\\\\n\\\\n        Returns:\\\\n            None\\\\n        \\\\nTool Args: {\\\"properties\\\": {\\\"text\\\": {\\\"title\\\": \\\"Text\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"text\\\"], \\\"type\\\": \\\"object\\\"}\\\\n\\\\n> Tool Name: get_current_time\\\\nTool Description: Get current time in a specific timezones\\\\nTool Args: {\\\"properties\\\": {\\\"timezone\\\": {\\\"description\\\": \\\"IANA timezone name (e.g., \\\\'America/New_York\\\\', \\\\'Europe/London\\\\'). Use \\\\'America/New_York\\\\' as local timezone if no timezone provided by the user.\\\", \\\"title\\\": \\\"Timezone\\\", \\\"type\\\": \\\"string\\\"}}, \\\"required\\\": [\\\"timezone\\\"], \\\"type\\\": \\\"object\\\"}\\\\n\\\\n\\\\n\\\\n## Output Format\\\\n\\\\nPlease answer in the same language as the question and use the following format:\\\\n\\\\n```\\\\nThought: The current language of the user is: (user\\\\'s language). I need to use a tool to help me answer the question.\\\\nAction: tool name (one of write_file, get_current_time) if using a tool.\\\\nAction Input: the input to the tool, in a JSON format representing the kwargs (e.g. {\\\"input\\\": \\\"hello world\\\", \\\"num_beams\\\": 5})\\\\n```\\\\n\\\\nPlease ALWAYS start with a Thought.\\\\n\\\\nNEVER surround your response with markdown code markers. You may use code markers within your response if you need to.\\\\n\\\\nPlease use a valid JSON format for the Action Input. Do NOT do this {\\\\'input\\\\': \\\\'hello world\\\\', \\\\'num_beams\\\\': 5}.\\\\n\\\\nIf this format is used, the tool will respond in the following format:\\\\n\\\\n```\\\\nObservation: tool response\\\\n```\\\\n\\\\nYou should keep repeating the above format till you have enough information to answer the question without using any more tools. At that point, you MUST respond in one of the following two formats:\\\\n\\\\n```\\\\nThought: I can answer without using any more tools. I\\\\'ll use the user\\\\'s language to answer\\\\nAnswer: [your answer here (In the same language as the user\\\\'s question)]\\\\n```\\\\n\\\\n```\\\\nThought: I cannot answer the question with the provided tools.\\\\nAnswer: [your answer here (In the same language as the user\\\\'s question)]\\\\n```\\\\n\\\\n## Current Conversation\\\\n\\\\nBelow is the current conversation consisting of interleaving human and assistant messages.\\\\n')])\", \"ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])\", \"ChatMessage(role=<MessageRole.ASSISTANT: 'assistant'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text=\\\"Thought: I need to get the current time in the America/New_York timezone to find out the year.\\\\nAction: get_current_time\\\\nAction Input: {'timezone': 'America/New_York'}\\\")])\", \"ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Observation: meta=None content=[TextContent(type=\\\\'text\\\\', text=\\\\'{\\\\\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\\\\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:38-04:00\\\",\\\\\\\\n  \\\"is_dst\\\": true\\\\\\\\n}\\\\', annotations=None)] isError=False')])\", \"ChatMessage(role=<MessageRole.ASSISTANT: 'assistant'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text=\\\"Thought: I have the current datetime in the America/New_York timezone, which is 2025-05-19T20:54:38-04:00. The year is 2025. I will write this value to a file.\\\\nAction: write_file\\\\nAction Input: {'text': '2025'}\\\")])\", \"ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Observation: None')])\"]}",
+        "input.mime_type": "application/json",
+        "llm.input_messages.0.message.role": "system",
+        "llm.input_messages.0.message.content": "You are designed to help with a variety of tasks, from answering questions to providing summaries to other types of analyses.\n\n## Tools\n\nYou have access to a wide variety of tools. You are responsible for using the tools in any sequence you deem appropriate to complete the task at hand.\nThis may require breaking the task into subtasks and using different tools to complete each subtask.\n\nYou have access to the following tools:\n> Tool Name: write_file\nTool Description: write_file(text: str) -> None\nwrite the text to a file in the tmp_path directory\n\n        Args:\n            text (str): The text to write to the file.\n\n        Returns:\n            None\n        \nTool Args: {\"properties\": {\"text\": {\"title\": \"Text\", \"type\": \"string\"}}, \"required\": [\"text\"], \"type\": \"object\"}\n\n> Tool Name: get_current_time\nTool Description: Get current time in a specific timezones\nTool Args: {\"properties\": {\"timezone\": {\"description\": \"IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'America/New_York' as local timezone if no timezone provided by the user.\", \"title\": \"Timezone\", \"type\": \"string\"}}, \"required\": [\"timezone\"], \"type\": \"object\"}\n\n\n\n## Output Format\n\nPlease answer in the same language as the question and use the following format:\n\n```\nThought: The current language of the user is: (user's language). I need to use a tool to help me answer the question.\nAction: tool name (one of write_file, get_current_time) if using a tool.\nAction Input: the input to the tool, in a JSON format representing the kwargs (e.g. {\"input\": \"hello world\", \"num_beams\": 5})\n```\n\nPlease ALWAYS start with a Thought.\n\nNEVER surround your response with markdown code markers. You may use code markers within your response if you need to.\n\nPlease use a valid JSON format for the Action Input. Do NOT do this {'input': 'hello world', 'num_beams': 5}.\n\nIf this format is used, the tool will respond in the following format:\n\n```\nObservation: tool response\n```\n\nYou should keep repeating the above format till you have enough information to answer the question without using any more tools. At that point, you MUST respond in one of the following two formats:\n\n```\nThought: I can answer without using any more tools. I'll use the user's language to answer\nAnswer: [your answer here (In the same language as the user's question)]\n```\n\n```\nThought: I cannot answer the question with the provided tools.\nAnswer: [your answer here (In the same language as the user's question)]\n```\n\n## Current Conversation\n\nBelow is the current conversation consisting of interleaving human and assistant messages.\n",
+        "llm.input_messages.1.message.role": "user",
+        "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
+        "llm.input_messages.2.message.role": "assistant",
+        "llm.input_messages.2.message.content": "Thought: I need to get the current time in the America/New_York timezone to find out the year.\nAction: get_current_time\nAction Input: {'timezone': 'America/New_York'}",
+        "llm.input_messages.3.message.role": "user",
+        "llm.input_messages.3.message.content": "Observation: meta=None content=[TextContent(type='text', text='{\\n  \"timezone\": \"America/New_York\",\\n  \"datetime\": \"2025-05-19T20:54:38-04:00\",\\n  \"is_dst\": true\\n}', annotations=None)] isError=False",
+        "llm.input_messages.4.message.role": "assistant",
+        "llm.input_messages.4.message.content": "Thought: I have the current datetime in the America/New_York timezone, which is 2025-05-19T20:54:38-04:00. The year is 2025. I will write this value to a file.\nAction: write_file\nAction Input: {'text': '2025'}",
+        "llm.input_messages.5.message.role": "user",
+        "llm.input_messages.5.message.content": "Observation: None",
+        "output.value": "assistant: Thought: I have written the year 2025 to the file as requested.\nAnswer: The year in the America/New_York timezone is 2025. The value has been written to a file.",
+        "llm.token_count.prompt": 812,
+        "llm.token_count.prompt_details.cache_read": 0,
+        "llm.token_count.prompt_details.audio": 0,
+        "llm.token_count.completion": 41,
+        "llm.token_count.completion_details.reasoning": 0,
+        "llm.token_count.completion_details.audio": 0,
+        "llm.token_count.total": 853,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.content": "Thought: I have written the year 2025 to the file as requested.\nAnswer: The year in the America/New_York timezone is 2025. The value has been written to a file.",
+        "openinference.span.kind": "LLM",
+        "service.name": "llama_index",
+        "cost_prompt": 0.0003248,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [
+        {
+          "name": "First Token Stream Event",
+          "timestamp": 1747702480589666000,
+          "attributes": {}
+        }
+      ],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "ReActOutputParser.parse",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 13823105567364192913,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481212004000,
+      "end_time": 1747702481212462000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 11399389295966610620,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"output\": \"Thought: I have written the year 2025 to the file as requested.\\nAnswer: The year in the America/New_York timezone is 2025. The value has been written to a file.\", \"is_streaming\": false}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"thought\":\"I have written the year 2025 to the file as requested.\",\"response\":\"The year in the America/New_York timezone is 2025. The value has been written to a file.\",\"is_streaming\":false}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.run_agent_step",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702479936951000,
+      "end_time": 1747702481212742000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 13823105567364192913,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentSetup(input=[ChatMessage(role=<MessageRole.SYSTEM: 'system'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Search the web to answer')]), ChatMessage(role=<MessageRole.USER: 'user'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file')])], current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"response\":{\"role\":\"assistant\",\"additional_kwargs\":{},\"blocks\":[{\"text\":\"Thought: I have written the year 2025 to the file as requested.\\nAnswer: The year in the America/New_York timezone is 2025. The value has been written to a file.\"}]},\"tool_calls\":[],\"raw\":{\"id\":\"chatcmpl-d55bb478-4d35-4eec-b98e-e2b23fa507ac\",\"created\":1747702481,\"model\":\"gpt-4.1-mini\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_38647f5e19\",\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"provider_specific_fields\":null,\"content\":null,\"role\":null,\"function_call\":null,\"tool_calls\":null,\"audio\":null},\"logprobs\":null}],\"provider_specific_fields\":null,\"stream_options\":{\"include_usage\":true},\"usage\":{\"completion_tokens\":41,\"prompt_tokens\":812,\"total_tokens\":853,\"completion_tokens_details\":{\"accepted_prediction_tokens\":0,\"audio_tokens\":0,\"reasoning_tokens\":0,\"rejected_prediction_tokens\":0},\"prompt_tokens_details\":{\"audio_tokens\":0,\"cached_tokens\":0}}},\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "AgentWorkflow.parse_agent_output",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481213409000,
+      "end_time": 1747702481213999000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 7222613015099076567,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"AgentOutput(response=ChatMessage(role=<MessageRole.ASSISTANT: 'assistant'>, additional_kwargs={}, blocks=[TextBlock(block_type='text', text='Thought: I have written the year 2025 to the file as requested.\\\\nAnswer: The year in the America/New_York timezone is 2025. The value has been written to a file.')]), tool_calls=[], raw={'id': 'chatcmpl-d55bb478-4d35-4eec-b98e-e2b23fa507ac', 'created': 1747702481, 'model': 'gpt-4.1-mini', 'object': 'chat.completion.chunk', 'system_fingerprint': 'fp_38647f5e19', 'choices': [{'finish_reason': None, 'index': 0, 'delta': {'provider_specific_fields': None, 'content': None, 'role': None, 'function_call': None, 'tool_calls': None, 'audio': None}, 'logprobs': None}], 'provider_specific_fields': None, 'stream_options': {'include_usage': True}, 'usage': {'completion_tokens': 41, 'prompt_tokens': 812, 'total_tokens': 853, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}}, current_agent_name='any_agent')\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "Workflow._done",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481214264000,
+      "end_time": 1747702481214526000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5294150871243352500,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": \"<llama_index.core.workflow.context.Context object at 0x15223c080>\", \"ev\": \"StopEvent()\"}",
+        "input.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "Workflow.run",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 8805866824594553940,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702477007949000,
+      "end_time": 1747702481215136000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 5034778495681417146,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"ctx\": null, \"stepwise\": false, \"checkpoint_callback\": null, \"start_event\": \"AgentWorkflowStartEvent()\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"response\":{\"role\":\"assistant\",\"additional_kwargs\":{},\"blocks\":[{\"text\":\"The year in the America/New_York timezone is 2025. The value has been written to a file.\"}]},\"tool_calls\":[{\"tool_name\":\"get_current_time\",\"tool_kwargs\":{\"timezone\":\"America/New_York\"},\"tool_id\":\"bf84cbea-b954-4edf-9379-c803c6ffaac2\"},{\"tool_name\":\"write_file\",\"tool_kwargs\":{\"text\":\"2025\"},\"tool_id\":\"0ff7348d-baaa-422f-9d00-4a023ada0163\"}],\"raw\":{\"id\":\"chatcmpl-d55bb478-4d35-4eec-b98e-e2b23fa507ac\",\"created\":1747702481,\"model\":\"gpt-4.1-mini\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_38647f5e19\",\"choices\":[{\"finish_reason\":null,\"index\":0,\"delta\":{\"provider_specific_fields\":null,\"content\":null,\"role\":null,\"function_call\":null,\"tool_calls\":null,\"audio\":null},\"logprobs\":null}],\"provider_specific_fields\":null,\"stream_options\":{\"include_usage\":true},\"usage\":{\"completion_tokens\":41,\"prompt_tokens\":812,\"total_tokens\":853,\"completion_tokens_details\":{\"accepted_prediction_tokens\":0,\"audio_tokens\":0,\"reasoning_tokens\":0,\"rejected_prediction_tokens\":0},\"prompt_tokens_details\":{\"audio_tokens\":0,\"cached_tokens\":0}}},\"current_agent_name\":\"any_agent\"}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "agent_run",
+      "kind": "internal",
+      "parent": {
+        "trace_id": null,
+        "span_id": null,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702477007670000,
+      "end_time": 1747702481215283000,
+      "status": {
+        "status_code": "unset",
+        "description": null
+      },
+      "context": {
+        "trace_id": 233636814891534486972128798527811476816,
+        "span_id": 8805866824594553940,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "any_agent.run_id": "094a25f0-8ef6-4917-a7c9-e7cc512cf8cb",
+        "service.name": "llama_index"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    }
+  ],
+  "final_output": "The year in the America/New_York timezone is 2025. The value has been written to a file."
+}

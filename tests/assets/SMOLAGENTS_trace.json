@@ -1,0 +1,815 @@
+{
+  "spans": [
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 8392552374873882041,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481053715000,
+      "end_time": 1747702481895349000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 8393504722456668689,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 312,
+        "llm.token_count.completion": 18,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 330,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_afrIyvo8EeiLDPr7padksFkn",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "get_current_time",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\", \"name\": \"get_current_time\", \"description\": null}, \"id\": \"call_afrIyvo8EeiLDPr7padksFkn\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.0001248,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 5522399320850375235,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481053672000,
+      "end_time": 1747702481901100000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 8392552374873882041,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 312,
+        "llm.token_count.completion": 18,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 330,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_afrIyvo8EeiLDPr7padksFkn",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "get_current_time",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\", \"name\": \"get_current_time\", \"description\": null}, \"id\": \"call_afrIyvo8EeiLDPr7padksFkn\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.0001248,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 9172895411477105140,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481053616000,
+      "end_time": 1747702481904111000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 5522399320850375235,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 312,
+        "llm.token_count.completion": 18,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 330,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_afrIyvo8EeiLDPr7padksFkn",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "get_current_time",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\", \"name\": \"get_current_time\", \"description\": null}, \"id\": \"call_afrIyvo8EeiLDPr7padksFkn\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.0001248,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "MCPAdaptTool",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 9172895411477105140,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481908750000,
+      "end_time": 1747702481912080000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 9242194028657965558,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"args\": [], \"sanitize_inputs_outputs\": true, \"kwargs\": {\"timezone\": \"America/New_York\"}}",
+        "tool.name": "get_current_time",
+        "tool.description": "Get current time in a specific timezones",
+        "tool.parameters": "{\"timezone\": {\"type\": \"string\", \"description\": \"IANA timezone name (e.g., 'America/New_York', 'Europe/London'). Use 'America/New_York' as local timezone if no timezone provided by the user.\"}}",
+        "output.value": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-05-19T20:54:41-04:00\",\n  \"is_dst\": true\n}",
+        "output.mime_type": "text/plain",
+        "openinference.span.kind": "TOOL",
+        "service.name": "smolagents"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 17924058486768959837,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481915400000,
+      "end_time": 1747702482982084000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 7389560639120185752,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'get_current_time' with arguments: {'timezone': 'America/New_York'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_afrIyvo8EeiLDPr7padksFkn', 'type': 'function', 'function': {'name': 'get_current_time', 'arguments': {'timezone': 'America/New_York'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\n{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:41-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 437,
+        "llm.token_count.completion": 15,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 452,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_9hXUUgENIkpb7GKlDLWWXqKc",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "write_file",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\", \"name\": \"write_file\", \"description\": null}, \"id\": \"call_9hXUUgENIkpb7GKlDLWWXqKc\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.0001748,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 7359641966883019736,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481915286000,
+      "end_time": 1747702482987107000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 17924058486768959837,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'get_current_time' with arguments: {'timezone': 'America/New_York'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_afrIyvo8EeiLDPr7padksFkn', 'type': 'function', 'function': {'name': 'get_current_time', 'arguments': {'timezone': 'America/New_York'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\n{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:41-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 437,
+        "llm.token_count.completion": 15,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 452,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_9hXUUgENIkpb7GKlDLWWXqKc",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "write_file",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\", \"name\": \"write_file\", \"description\": null}, \"id\": \"call_9hXUUgENIkpb7GKlDLWWXqKc\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.0001748,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 9172895411477105140,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481915141000,
+      "end_time": 1747702482988565000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 7359641966883019736,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'get_current_time' with arguments: {'timezone': 'America/New_York'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_afrIyvo8EeiLDPr7padksFkn', 'type': 'function', 'function': {'name': 'get_current_time', 'arguments': {'timezone': 'America/New_York'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\n{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:41-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 437,
+        "llm.token_count.completion": 15,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 452,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_9hXUUgENIkpb7GKlDLWWXqKc",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "write_file",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\", \"name\": \"write_file\", \"description\": null}, \"id\": \"call_9hXUUgENIkpb7GKlDLWWXqKc\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.0001748,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "SimpleTool",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 9172895411477105140,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702482990070000,
+      "end_time": 1747702482990513000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 10110480562811300238,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"args\": [], \"sanitize_inputs_outputs\": true, \"kwargs\": {\"text\": \"2025\"}}",
+        "tool.name": "write_file",
+        "tool.description": "write the text to a file in the tmp_path directory",
+        "tool.parameters": "{\"text\": {\"type\": \"string\", \"description\": \"The text to write to the file.\"}}",
+        "openinference.span.kind": "TOOL",
+        "service.name": "smolagents"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 3107531645499605845,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702482991642000,
+      "end_time": 1747702484005034000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 4568527300663470675,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'get_current_time' with arguments: {'timezone': 'America/New_York'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_afrIyvo8EeiLDPr7padksFkn', 'type': 'function', 'function': {'name': 'get_current_time', 'arguments': {'timezone': 'America/New_York'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\n{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:41-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'write_file' with arguments: {'text': '2025'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_9hXUUgENIkpb7GKlDLWWXqKc', 'type': 'function', 'function': {'name': 'write_file', 'arguments': {'text': '2025'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\nNone\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 520,
+        "llm.token_count.completion": 27,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 547,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_Z720QjnqDjQRtKEz6m1W0KN4",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "final_answer",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"answer\\\":\\\"The year in the America/New_York timezone is 2025.\\\"}\", \"name\": \"final_answer\", \"description\": null}, \"id\": \"call_Z720QjnqDjQRtKEz6m1W0KN4\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.000208,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 18260411928688137209,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702482991592000,
+      "end_time": 1747702484012641000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 3107531645499605845,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'get_current_time' with arguments: {'timezone': 'America/New_York'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_afrIyvo8EeiLDPr7padksFkn', 'type': 'function', 'function': {'name': 'get_current_time', 'arguments': {'timezone': 'America/New_York'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\n{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:41-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'write_file' with arguments: {'text': '2025'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_9hXUUgENIkpb7GKlDLWWXqKc', 'type': 'function', 'function': {'name': 'write_file', 'arguments': {'text': '2025'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\nNone\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 520,
+        "llm.token_count.completion": 27,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 547,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_Z720QjnqDjQRtKEz6m1W0KN4",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "final_answer",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"answer\\\":\\\"The year in the America/New_York timezone is 2025.\\\"}\", \"name\": \"final_answer\", \"description\": null}, \"id\": \"call_Z720QjnqDjQRtKEz6m1W0KN4\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.000208,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "LiteLLMModel.__call__",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 9172895411477105140,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702482991525000,
+      "end_time": 1747702484017605000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 18260411928688137209,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.mime_type": "application/json",
+        "input.value": "{\"args\": [[{\"role\": \"system\", \"content\": [{\"type\": \"text\", \"text\": \"Search the web to answer\"}]}, {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'get_current_time' with arguments: {'timezone': 'America/New_York'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_afrIyvo8EeiLDPr7padksFkn', 'type': 'function', 'function': {'name': 'get_current_time', 'arguments': {'timezone': 'America/New_York'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\n{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:41-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\"}]}, {\"role\": \"assistant\", \"content\": [{\"type\": \"text\", \"text\": \"Called Tool: 'write_file' with arguments: {'text': '2025'}\"}]}, {\"role\": \"tool-call\", \"content\": [{\"type\": \"text\", \"text\": \"Calling tools:\\n[{'id': 'call_9hXUUgENIkpb7GKlDLWWXqKc', 'type': 'function', 'function': {'name': 'write_file', 'arguments': {'text': '2025'}}}]\"}]}, {\"role\": \"tool-response\", \"content\": [{\"type\": \"text\", \"text\": \"Observation:\\nNone\"}]}]], \"kwargs\": {\"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}}",
+        "llm.invocation_parameters": "{\"parallel_tool_calls\": false, \"temperature\": 0.0, \"stop_sequences\": [\"Observation:\", \"Calling tools:\"], \"tools_to_call_from\": [\"<smolagents.tools.tool.<locals>.SimpleTool object at 0x15eb3be60>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb3bcb0>\", \"<mcpadapt.smolagents_adapter.SmolAgentsAdapter.adapt.<locals>.MCPAdaptTool object at 0x15eb8e8d0>\", \"<smolagents.default_tools.FinalAnswerTool object at 0x15b1d6ba0>\"]}",
+        "llm.token_count.prompt": 520,
+        "llm.token_count.completion": 27,
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.token_count.total": 547,
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_Z720QjnqDjQRtKEz6m1W0KN4",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "final_answer",
+        "output.mime_type": "application/json",
+        "output.value": "{\"role\": \"assistant\", \"content\": null, \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"answer\\\":\\\"The year in the America/New_York timezone is 2025.\\\"}\", \"name\": \"final_answer\", \"description\": null}, \"id\": \"call_Z720QjnqDjQRtKEz6m1W0KN4\", \"type\": \"function\"}]}",
+        "openinference.span.kind": "LLM",
+        "service.name": "smolagents",
+        "cost_prompt": 0.000208,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "FinalAnswerTool",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 9172895411477105140,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702484021491000,
+      "end_time": 1747702484021553000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 3049817400562156851,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"args\": [], \"sanitize_inputs_outputs\": true, \"kwargs\": {\"answer\": \"The year in the America/New_York timezone is 2025.\"}}",
+        "tool.name": "final_answer",
+        "tool.description": "Provides a final answer to the given problem.",
+        "tool.parameters": "{\"answer\": {\"type\": \"any\", \"description\": \"The final answer to the problem\"}}",
+        "openinference.span.kind": "TOOL",
+        "service.name": "smolagents"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "ToolCallingAgent.run",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 8656752870921133871,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481053313000,
+      "end_time": 1747702484023274000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 9172895411477105140,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "input.value": "{\"task\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\", \"stream\": false, \"reset\": true, \"images\": null, \"additional_args\": null, \"max_steps\": null}",
+        "smolagents.max_steps": 20,
+        "smolagents.tools_names": [
+          "write_file",
+          "get_current_time",
+          "convert_time",
+          "final_answer"
+        ],
+        "llm.token_count.prompt": 1269,
+        "llm.token_count.completion": 60,
+        "llm.token_count.total": 1329,
+        "output.value": "The year in the America/New_York timezone is 2025.",
+        "openinference.span.kind": "AGENT",
+        "service.name": "smolagents"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "agent_run",
+      "kind": "internal",
+      "parent": {
+        "trace_id": null,
+        "span_id": null,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747702481052865000,
+      "end_time": 1747702484023355000,
+      "status": {
+        "status_code": "unset",
+        "description": null
+      },
+      "context": {
+        "trace_id": 273083873276587825674691177876086644529,
+        "span_id": 8656752870921133871,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "any_agent.run_id": "dd219a73-f1d9-4f69-889e-92137b99af87",
+        "service.name": "smolagents"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    }
+  ],
+  "final_output": "The year in the America/New_York timezone is 2025."
+}

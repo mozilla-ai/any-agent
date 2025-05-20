@@ -33,7 +33,9 @@ def check_uvx_installed() -> bool:
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:
+def test_load_and_run_agent(
+    agent_framework: AgentFramework, tmp_path: Path, request: pytest.FixtureRequest
+) -> None:
     kwargs = {}
 
     tmp_file = "tmp.txt"
@@ -96,6 +98,15 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert content == str(datetime.now().year)
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
+        update_trace = request.config.getoption("--update-trace-assets")
+        if update_trace and _is_tracing_supported(agent_framework):
+            trace_path = (
+                Path(__file__).parent.parent
+                / "assets"
+                / f"{agent_framework.name}_trace.json"
+            )
+            with open(trace_path, "w", encoding="utf-8") as f:
+                f.write(agent_trace.model_dump_json(indent=2))
         if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0

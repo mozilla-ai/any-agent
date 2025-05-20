@@ -4,8 +4,8 @@
       "name": "mcp_tools",
       "kind": "internal",
       "parent": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1351128178870435741,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 3213266069223925819,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660964058813952,
-      "end_time": 1747660964059570176,
+      "start_time": 1747702487674256128,
+      "end_time": 1747702487675003136,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 13487556102999248805,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 1327634262611577706,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -54,8 +54,8 @@
       "name": "generation",
       "kind": "internal",
       "parent": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1351128178870435741,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 3213266069223925819,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -64,15 +64,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660964060802816,
-      "end_time": 1747660968844551936,
+      "start_time": 1747702487675329024,
+      "end_time": 1747702488452881152,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 4343523433967492499,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 10270308329731281672,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -91,10 +91,10 @@
         "llm.input_messages.0.message.content": "Search the web to answer",
         "llm.input_messages.1.message.role": "user",
         "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
-        "output.value": "[{\"content\": null, \"role\": \"assistant\", \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\", \"name\": \"get_current_time\"}, \"id\": \"call_7uZkRepA70GgAS5sT5mCHfNj\", \"type\": \"function\"}], \"function_call\": null, \"annotations\": []}]",
+        "output.value": "[{\"content\": null, \"role\": \"assistant\", \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\", \"name\": \"get_current_time\"}, \"id\": \"call_ahah2LelC4q0xNKsP01KzT2a\", \"type\": \"function\"}], \"function_call\": null, \"annotations\": []}]",
         "output.mime_type": "application/json",
         "llm.output_messages.0.message.role": "assistant",
-        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_7uZkRepA70GgAS5sT5mCHfNj",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_ahah2LelC4q0xNKsP01KzT2a",
         "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "get_current_time",
         "llm.output_messages.0.message.tool_calls.0.tool_call.function.arguments": "{\"timezone\":\"America/New_York\"}",
         "llm.token_count.prompt": 286,
@@ -120,8 +120,8 @@
       "name": "get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1351128178870435741,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 3213266069223925819,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -130,15 +130,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660968860654080,
-      "end_time": 1747660968863655168,
+      "start_time": 1747702488456732928,
+      "end_time": 1747702488459568896,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 6439485983011741764,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 13529367403190490216,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -152,7 +152,7 @@
         "tool.name": "get_current_time",
         "input.value": "{\"timezone\":\"America/New_York\"}",
         "input.mime_type": "application/json",
-        "output.value": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T09:22:48-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
+        "output.value": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:48-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
         "output.mime_type": "application/json",
         "openinference.span.kind": "TOOL",
         "service.name": "openai"
@@ -173,8 +173,8 @@
       "name": "generation",
       "kind": "internal",
       "parent": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1351128178870435741,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 3213266069223925819,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -183,15 +183,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660968868616960,
-      "end_time": 1747660969739481856,
+      "start_time": 1747702488462462976,
+      "end_time": 1747702489236733952,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 17098691010651300468,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 561842170070100727,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -204,23 +204,23 @@
         "llm.system": "openai",
         "llm.model_name": "gpt-4.1-mini",
         "llm.invocation_parameters": "{\"temperature\": 0.0, \"parallel_tool_calls\": false, \"base_url\": \"\", \"model_impl\": \"litellm\"}",
-        "input.value": "[{\"content\": \"Search the web to answer\", \"role\": \"system\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_7uZkRepA70GgAS5sT5mCHfNj\", \"type\": \"function\", \"function\": {\"name\": \"get_current_time\", \"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_7uZkRepA70GgAS5sT5mCHfNj\", \"content\": \"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"{\\\\n  \\\\\\\"timezone\\\\\\\": \\\\\\\"America/New_York\\\\\\\",\\\\n  \\\\\\\"datetime\\\\\\\": \\\\\\\"2025-05-19T09:22:48-04:00\\\\\\\",\\\\n  \\\\\\\"is_dst\\\\\\\": true\\\\n}\\\",\\\"annotations\\\":null}\"}]",
+        "input.value": "[{\"content\": \"Search the web to answer\", \"role\": \"system\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_ahah2LelC4q0xNKsP01KzT2a\", \"type\": \"function\", \"function\": {\"name\": \"get_current_time\", \"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_ahah2LelC4q0xNKsP01KzT2a\", \"content\": \"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"{\\\\n  \\\\\\\"timezone\\\\\\\": \\\\\\\"America/New_York\\\\\\\",\\\\n  \\\\\\\"datetime\\\\\\\": \\\\\\\"2025-05-19T20:54:48-04:00\\\\\\\",\\\\n  \\\\\\\"is_dst\\\\\\\": true\\\\n}\\\",\\\"annotations\\\":null}\"}]",
         "input.mime_type": "application/json",
         "llm.input_messages.0.message.role": "system",
         "llm.input_messages.0.message.content": "Search the web to answer",
         "llm.input_messages.1.message.role": "user",
         "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
         "llm.input_messages.2.message.role": "assistant",
-        "llm.input_messages.2.message.tool_calls.0.tool_call.id": "call_7uZkRepA70GgAS5sT5mCHfNj",
+        "llm.input_messages.2.message.tool_calls.0.tool_call.id": "call_ahah2LelC4q0xNKsP01KzT2a",
         "llm.input_messages.2.message.tool_calls.0.tool_call.function.name": "get_current_time",
         "llm.input_messages.2.message.tool_calls.0.tool_call.function.arguments": "{\"timezone\":\"America/New_York\"}",
         "llm.input_messages.3.message.role": "tool",
-        "llm.input_messages.3.message.content": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T09:22:48-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
-        "llm.input_messages.3.message.tool_call_id": "call_7uZkRepA70GgAS5sT5mCHfNj",
-        "output.value": "[{\"content\": null, \"role\": \"assistant\", \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\", \"name\": \"write_file\"}, \"id\": \"call_v6mRm3m24xfm3dftlRbkgoce\", \"type\": \"function\"}], \"function_call\": null, \"annotations\": []}]",
+        "llm.input_messages.3.message.content": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:48-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
+        "llm.input_messages.3.message.tool_call_id": "call_ahah2LelC4q0xNKsP01KzT2a",
+        "output.value": "[{\"content\": null, \"role\": \"assistant\", \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\", \"name\": \"write_file\"}, \"id\": \"call_jcis2d9yjcCsEEHqzBZxgW1m\", \"type\": \"function\"}], \"function_call\": null, \"annotations\": []}]",
         "output.mime_type": "application/json",
         "llm.output_messages.0.message.role": "assistant",
-        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_v6mRm3m24xfm3dftlRbkgoce",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_jcis2d9yjcCsEEHqzBZxgW1m",
         "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "write_file",
         "llm.output_messages.0.message.tool_calls.0.tool_call.function.arguments": "{\"text\":\"2025\"}",
         "llm.token_count.prompt": 369,
@@ -246,8 +246,8 @@
       "name": "write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1351128178870435741,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 3213266069223925819,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -256,15 +256,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660969745337088,
-      "end_time": 1747660969746458112,
+      "start_time": 1747702489241199872,
+      "end_time": 1747702489242801920,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 12723702095548437253,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 6019956147480374311,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -297,8 +297,8 @@
       "name": "generation",
       "kind": "internal",
       "parent": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1351128178870435741,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 3213266069223925819,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -307,15 +307,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660969748457984,
-      "end_time": 1747660970767698176,
+      "start_time": 1747702489249265920,
+      "end_time": 1747702490153193984,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 8789522812412071271,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 5190329154778424817,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -328,26 +328,26 @@
         "llm.system": "openai",
         "llm.model_name": "gpt-4.1-mini",
         "llm.invocation_parameters": "{\"temperature\": 0.0, \"parallel_tool_calls\": false, \"base_url\": \"\", \"model_impl\": \"litellm\"}",
-        "input.value": "[{\"content\": \"Search the web to answer\", \"role\": \"system\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_7uZkRepA70GgAS5sT5mCHfNj\", \"type\": \"function\", \"function\": {\"name\": \"get_current_time\", \"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_7uZkRepA70GgAS5sT5mCHfNj\", \"content\": \"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"{\\\\n  \\\\\\\"timezone\\\\\\\": \\\\\\\"America/New_York\\\\\\\",\\\\n  \\\\\\\"datetime\\\\\\\": \\\\\\\"2025-05-19T09:22:48-04:00\\\\\\\",\\\\n  \\\\\\\"is_dst\\\\\\\": true\\\\n}\\\",\\\"annotations\\\":null}\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_v6mRm3m24xfm3dftlRbkgoce\", \"type\": \"function\", \"function\": {\"name\": \"write_file\", \"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_v6mRm3m24xfm3dftlRbkgoce\", \"content\": \"None\"}]",
+        "input.value": "[{\"content\": \"Search the web to answer\", \"role\": \"system\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_ahah2LelC4q0xNKsP01KzT2a\", \"type\": \"function\", \"function\": {\"name\": \"get_current_time\", \"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_ahah2LelC4q0xNKsP01KzT2a\", \"content\": \"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"{\\\\n  \\\\\\\"timezone\\\\\\\": \\\\\\\"America/New_York\\\\\\\",\\\\n  \\\\\\\"datetime\\\\\\\": \\\\\\\"2025-05-19T20:54:48-04:00\\\\\\\",\\\\n  \\\\\\\"is_dst\\\\\\\": true\\\\n}\\\",\\\"annotations\\\":null}\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_jcis2d9yjcCsEEHqzBZxgW1m\", \"type\": \"function\", \"function\": {\"name\": \"write_file\", \"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_jcis2d9yjcCsEEHqzBZxgW1m\", \"content\": \"None\"}]",
         "input.mime_type": "application/json",
         "llm.input_messages.0.message.role": "system",
         "llm.input_messages.0.message.content": "Search the web to answer",
         "llm.input_messages.1.message.role": "user",
         "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
         "llm.input_messages.2.message.role": "assistant",
-        "llm.input_messages.2.message.tool_calls.0.tool_call.id": "call_7uZkRepA70GgAS5sT5mCHfNj",
+        "llm.input_messages.2.message.tool_calls.0.tool_call.id": "call_ahah2LelC4q0xNKsP01KzT2a",
         "llm.input_messages.2.message.tool_calls.0.tool_call.function.name": "get_current_time",
         "llm.input_messages.2.message.tool_calls.0.tool_call.function.arguments": "{\"timezone\":\"America/New_York\"}",
         "llm.input_messages.3.message.role": "tool",
-        "llm.input_messages.3.message.content": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T09:22:48-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
-        "llm.input_messages.3.message.tool_call_id": "call_7uZkRepA70GgAS5sT5mCHfNj",
+        "llm.input_messages.3.message.content": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T20:54:48-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
+        "llm.input_messages.3.message.tool_call_id": "call_ahah2LelC4q0xNKsP01KzT2a",
         "llm.input_messages.4.message.role": "assistant",
-        "llm.input_messages.4.message.tool_calls.1.tool_call.id": "call_v6mRm3m24xfm3dftlRbkgoce",
+        "llm.input_messages.4.message.tool_calls.1.tool_call.id": "call_jcis2d9yjcCsEEHqzBZxgW1m",
         "llm.input_messages.4.message.tool_calls.1.tool_call.function.name": "write_file",
         "llm.input_messages.4.message.tool_calls.1.tool_call.function.arguments": "{\"text\":\"2025\"}",
         "llm.input_messages.5.message.role": "tool",
         "llm.input_messages.5.message.content": "None",
-        "llm.input_messages.5.message.tool_call_id": "call_v6mRm3m24xfm3dftlRbkgoce",
+        "llm.input_messages.5.message.tool_call_id": "call_jcis2d9yjcCsEEHqzBZxgW1m",
         "output.value": "[{\"content\": \"The current year in the America/New_York timezone is 2025. I have written this value to a file.\", \"role\": \"assistant\", \"tool_calls\": null, \"function_call\": null, \"annotations\": []}]",
         "output.mime_type": "application/json",
         "llm.output_messages.0.message.role": "assistant",
@@ -375,8 +375,8 @@
       "name": "any_agent",
       "kind": "internal",
       "parent": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 701147585678663371,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 13069197647652191166,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -385,15 +385,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660964058574080,
-      "end_time": 1747660970773938944,
+      "start_time": 1747702487674041088,
+      "end_time": 1747702490159329792,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1351128178870435741,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 3213266069223925819,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -423,8 +423,8 @@
       "name": "Agent workflow",
       "kind": "internal",
       "parent": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1496043382881042842,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 16663984792262677191,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -433,15 +433,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660964058293000,
-      "end_time": 1747660970774269000,
+      "start_time": 1747702487673979000,
+      "end_time": 1747702490159592000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 701147585678663371,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 13069197647652191166,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -480,15 +480,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747660964057285000,
-      "end_time": 1747660970774416000,
+      "start_time": 1747702487673815000,
+      "end_time": 1747702490159741000,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 312240062924141420731563990691240884516,
-        "span_id": 1496043382881042842,
+        "trace_id": 50070360695569262247568108689042127666,
+        "span_id": 16663984792262677191,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -498,7 +498,7 @@
         }
       },
       "attributes": {
-        "any_agent.run_id": "e52f73a4-0d70-4182-b5a7-c60bff6ff428",
+        "any_agent.run_id": "856485f2-769a-4d01-8323-a292776294b9",
         "service.name": "openai"
       },
       "links": [],
