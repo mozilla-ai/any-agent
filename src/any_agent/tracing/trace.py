@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 from datetime import timedelta
+from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
@@ -36,21 +37,16 @@ class CostInfo(BaseModel):
 
     cost_prompt: float
     cost_completion: float
-
+    total_cost: float
     model_config = ConfigDict(extra="forbid")
 
 
-class TotalTokenUseAndCost(BaseModel):
-    """Total token use and cost information."""
+class UsageInfo(BaseModel):
+    """Token usage information."""
 
     total_token_count_prompt: int
     total_token_count_completion: int
-    total_cost_prompt: float
-    total_cost_completion: float
-
-    total_cost: float
     total_tokens: int
-
     model_config = ConfigDict(extra="forbid")
 
 
@@ -82,7 +78,7 @@ def extract_token_use_and_cost(
         logger.warning(msg)
         new_info["cost_prompt"] = 0.0
         new_info["cost_completion"] = 0.0
-
+    new_info["total_cost"] = new_info["cost_prompt"] + new_info["cost_completion"]
     return CostInfo.model_validate(new_info)
 
 
@@ -149,6 +145,23 @@ class AgentTrace(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    def _invalidate_usage_and_cost_cache(self) -> None:
+        """Clear the cached usage_and_cost property if it exists."""
+        if "usage" in self.__dict__:
+            del self.usage
+        if "cost" in self.__dict__:
+            del self.cost
+
+    def add_span(self, span: AgentSpan) -> None:
+        """Add an AgentSpan to the trace and clear the usage_and_cost cache if present."""
+        self.spans.append(span)
+        self._invalidate_usage_and_cost_cache()
+
+    def add_spans(self, spans: list[AgentSpan]) -> None:
+        """Add a list of AgentSpans to the trace and clear the usage_and_cost cache if present."""
+        self.spans.extend(spans)
+        self._invalidate_usage_and_cost_cache()
+
     @property
     def duration(self) -> timedelta:
         """Returns the duration of the AGENT span named 'any_agent' as a datetime.timedelta object.
@@ -172,10 +185,10 @@ class AgentTrace(BaseModel):
         msg = "Span with any_agent.run_id not found in trace"
         raise ValueError(msg)
 
-    def get_total_cost(self) -> TotalTokenUseAndCost:
-        """Return the current total cost and token usage statistics."""
+    @cached_property
+    def usage(self) -> UsageInfo:
+        """The current total token usage statistics for this trace. Cached after first computation."""
         counts: list[CountInfo] = []
-        costs: list[CostInfo] = []
         for span in self.spans:
             if span.attributes and "cost_prompt" in span.attributes:
                 count = CountInfo(
@@ -184,14 +197,7 @@ class AgentTrace(BaseModel):
                         "llm.token_count.completion"
                     ],
                 )
-                cost = CostInfo(
-                    cost_prompt=span.attributes["cost_prompt"],
-                    cost_completion=span.attributes["cost_completion"],
-                )
                 counts.append(count)
-                costs.append(cost)
-
-        total_cost = sum(cost.cost_prompt + cost.cost_completion for cost in costs)
         total_tokens = sum(
             count.token_count_prompt + count.token_count_completion for count in counts
         )
@@ -199,15 +205,33 @@ class AgentTrace(BaseModel):
         total_token_count_completion = sum(
             count.token_count_completion for count in counts
         )
-        total_cost_prompt = sum(cost.cost_prompt for cost in costs)
-        total_cost_completion = sum(cost.cost_completion for cost in costs)
-        return TotalTokenUseAndCost(
-            total_cost=total_cost,
+        return UsageInfo(
             total_tokens=total_tokens,
             total_token_count_prompt=total_token_count_prompt,
             total_token_count_completion=total_token_count_completion,
-            total_cost_prompt=total_cost_prompt,
-            total_cost_completion=total_cost_completion,
+        )
+
+    @cached_property
+    def cost(self) -> CostInfo:
+        """The current total cost statistics for this trace. Cached after first computation."""
+        costs: list[CostInfo] = []
+        for span in self.spans:
+            if span.attributes and "cost_prompt" in span.attributes:
+                total_cost = (
+                    span.attributes["cost_prompt"] + span.attributes["cost_completion"]
+                )
+                cost = CostInfo(
+                    cost_prompt=span.attributes["cost_prompt"],
+                    cost_completion=span.attributes["cost_completion"],
+                    total_cost=total_cost,
+                )
+                costs.append(cost)
+        total_cost_prompt = sum(cost.cost_prompt for cost in costs)
+        total_cost_completion = sum(cost.cost_completion for cost in costs)
+        return CostInfo(
+            cost_prompt=total_cost_prompt,
+            cost_completion=total_cost_completion,
+            total_cost=total_cost_prompt + total_cost_completion,
         )
 
 

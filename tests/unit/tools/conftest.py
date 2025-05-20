@@ -7,7 +7,7 @@ import pytest
 
 
 @pytest.fixture
-def local_logger(monkeypatch: Any) -> Generator[logging.Logger, None, None]:
+def local_logger(monkeypatch: Any) -> Generator[logging.Logger]:
     # Create a fresh logger instance for each test
     test_logger = logging.getLogger(f"test_logger_{id(object())}")
     # Remove all handlers
