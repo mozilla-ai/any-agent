@@ -1,6 +1,8 @@
+import json
 import logging
 import time
 from collections.abc import AsyncGenerator, Callable, Generator
+from pathlib import Path
 from textwrap import dedent
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -15,7 +17,7 @@ from opentelemetry.trace.status import Status, StatusCode
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
-from any_agent.tracing.trace import AgentSpan
+from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
 @pytest.fixture
@@ -258,3 +260,14 @@ def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any]]:
         }
 
     return _mock_streaming_response
+
+
+@pytest.fixture(
+    params=list((Path(__file__).parent / "assets").glob("*_trace.json")),
+    ids=lambda x: Path(x).stem,
+)
+def agent_trace(request: pytest.FixtureRequest) -> AgentTrace:
+    trace_path = request.param
+    with open(trace_path, encoding="utf-8") as f:
+        trace = json.load(f)
+    return AgentTrace.model_validate(trace)
