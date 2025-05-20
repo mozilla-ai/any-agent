@@ -6,7 +6,7 @@ from any_agent.logging import logger
 from any_agent.tracing.processors.base import TracingProcessor
 
 if TYPE_CHECKING:
-    from any_agent.tracing.trace import AgentTrace
+    from any_agent.tracing.agent_trace import AgentTrace
 
 import json
 import re

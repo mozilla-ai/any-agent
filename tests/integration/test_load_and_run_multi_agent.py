@@ -6,7 +6,7 @@ from litellm.utils import validate_environment
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
+from any_agent.tracing.agent_trace import AgentTrace
 
 
 @pytest.mark.skipif(
@@ -67,13 +67,12 @@ def test_load_and_run_multi_agent(agent_framework: AgentFramework) -> None:
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-        if _is_tracing_supported(agent_framework):
-            assert agent_trace.spans
-            assert len(agent_trace.spans) > 0
-            cost_sum = agent_trace.get_total_cost()
-            assert cost_sum.total_cost > 0
-            assert cost_sum.total_cost < 1.00
-            assert cost_sum.total_tokens > 0
-            assert cost_sum.total_tokens < 20000
+        assert agent_trace.spans
+        assert len(agent_trace.spans) > 0
+        cost_sum = agent_trace.get_total_cost()
+        assert cost_sum.total_cost > 0
+        assert cost_sum.total_cost < 1.00
+        assert cost_sum.total_tokens > 0
+        assert cost_sum.total_tokens < 20000
     finally:
         agent.exit()

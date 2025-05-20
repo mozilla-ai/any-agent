@@ -8,7 +8,7 @@ from any_agent.evaluation.evaluators import (
 from any_agent.evaluation.schemas import TraceEvaluationResult
 from any_agent.logging import logger
 from any_agent.tracing import TracingProcessor
-from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
 
 
 def evaluate(

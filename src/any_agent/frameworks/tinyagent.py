@@ -10,7 +10,6 @@ from litellm.types.utils import ChatCompletionMessageToolCall
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
-from any_agent.tracing.trace import AgentTrace
 
 from .any_agent import AnyAgent
 
@@ -201,17 +200,7 @@ class TinyAgent(AnyAgent):
             self.clients[tool_name] = ToolExecutor(tool)
             logger.debug("Registered tool: %s", tool_name)
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
-        """Run the agent asynchronously.
-
-        Args:
-            prompt: User input prompt
-            **kwargs: Additional parameters
-
-        Returns:
-            The final agent response
-
-        """
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
         logger.debug("Running agent with prompt: %s...", prompt[:500])
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
         self.messages = [
@@ -254,7 +243,7 @@ class TinyAgent(AnyAgent):
             except Exception as err:
                 logger.error("Error during turn %s: %s", num_of_turns + 1, err)
                 if isinstance(err, Exception) and str(err) == "AbortError":
-                    return AgentTrace(final_output=final_response or "Task aborted")
+                    return final_response or "Task aborted"
                 raise
 
             num_of_turns += 1
@@ -277,23 +266,22 @@ class TinyAgent(AnyAgent):
                 in [t["function"]["name"] for t in self.exit_loop_tools]
             ):
                 logger.debug(
-                    "Exiting because tool %s is an exit tool", current_last.get("name")
+                    "Exiting because tool %s is an exit tool",
+                    current_last.get("name"),
                 )
                 # If task is complete, return the last assistant message before this
                 for msg in reversed(self.messages[:-1]):
                     if msg.get("role") == "assistant" and msg.get("content"):
-                        return AgentTrace(final_output=msg.get("content"))
-                return AgentTrace(final_output=final_response or "Task completed")
+                        return str(msg.get("content"))
+                return final_response or "Task completed"
 
             if current_last.get("role") != "tool" and num_of_turns > max_turns:
                 logger.debug("Exiting because max turns (%s) reached", max_turns)
-                return AgentTrace(
-                    final_output=final_response or "Max turns reached",
-                )
+                return final_response or "Max turns reached"
 
             if current_last.get("role") != "tool" and next_turn_should_call_tools:
                 logger.debug("Exiting because no tools were called when expected")
-                return AgentTrace(final_output=final_response or "No tools called")
+                return final_response or "No tools called"
 
             if current_last.get("role") == "tool":
                 next_turn_should_call_tools = False
@@ -330,10 +318,11 @@ class TinyAgent(AnyAgent):
             completion_params["api_key"] = self.api_key
         if self.api_base:
             completion_params["api_base"] = self.api_base
+
         logger.debug("Sending new message to LLM: %s", self.messages[-1])
         response = await litellm.acompletion(**completion_params)
         message: LiteLLMMessage = response.choices[0].message
-        logger.debug("Response message: %s", message.model_dump())
+
         # if no tools were called, add the exit tool to the message and return
         if not message.tool_calls and options.get("exit_if_first_chunk_no_tool"):
             logger.debug("No tool calls found in response, adding exit tool")
@@ -342,6 +331,7 @@ class TinyAgent(AnyAgent):
                     function=task_completion_tool()["function"],
                 )
             ]
+
         self.messages.append(message.model_dump())
 
         # Process tool calls if any
@@ -387,11 +377,9 @@ class TinyAgent(AnyAgent):
                 else:
                     client = self.clients[tool_name]
                     try:
-                        logger.debug("Calling tool: %s", tool_name)
                         result = await client.call_tool(
                             {"name": tool_name, "arguments": tool_args}
                         )
-
                         if (
                             isinstance(result, dict)
                             and "content" in result

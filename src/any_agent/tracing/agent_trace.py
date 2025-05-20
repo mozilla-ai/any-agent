@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any
 from litellm.cost_calculator import cost_per_token
 from pydantic import BaseModel, ConfigDict, Field
 
-from any_agent.config import AgentFramework
 from any_agent.logging import logger
 
 from .otel_types import (
@@ -24,8 +23,8 @@ if TYPE_CHECKING:
 class CountInfo(BaseModel):
     """Token Count information."""
 
-    token_count_prompt: int
-    token_count_completion: int
+    input_tokens: int
+    output_tokens: int
 
     model_config = ConfigDict(extra="forbid")
 
@@ -33,8 +32,8 @@ class CountInfo(BaseModel):
 class CostInfo(BaseModel):
     """Cost information."""
 
-    cost_prompt: float
-    cost_completion: float
+    input_cost: float
+    output_cost: float
 
     model_config = ConfigDict(extra="forbid")
 
@@ -56,31 +55,27 @@ class TotalTokenUseAndCost(BaseModel):
 def extract_token_use_and_cost(
     attributes: Mapping[str, AttributeValue],
 ) -> CostInfo | None:
-    """Use litellm and openinference keys to extract token use and cost."""
-    span_info: dict[str, AttributeValue] = {}
-
-    for key in ["llm.token_count.prompt", "llm.token_count.completion"]:
-        if key in attributes:
-            name = key.split(".")[-1]
-            span_info[f"token_count_{name}"] = attributes[key]
-
-    if not span_info:
+    """Extract token counts and use litellm to compute cost."""
+    if not any(
+        key in attributes
+        for key in ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"]
+    ):
         return None
 
     new_info: dict[str, float] = {}
     try:
         cost_prompt, cost_completion = cost_per_token(
-            model=str(attributes.get("llm.model_name", "")),
-            prompt_tokens=int(attributes.get("llm.token_count.prompt", 0)),  # type: ignore[arg-type]
-            completion_tokens=int(span_info.get("llm.token_count.completion", 0)),  # type: ignore[arg-type]
+            model=str(attributes.get("gen_ai.request.model", "")),
+            prompt_tokens=int(attributes.get("gen_ai.usage.input_tokens", 0)),  # type: ignore[arg-type]
+            completion_tokens=int(attributes.get("gen_ai.usage.output_tokens", 0)),  # type: ignore[arg-type]
         )
-        new_info["cost_prompt"] = cost_prompt
-        new_info["cost_completion"] = cost_completion
+        new_info["input_cost"] = cost_prompt
+        new_info["output_cost"] = cost_completion
     except Exception as e:
         msg = f"Error computing cost_per_token: {e}"
         logger.warning(msg)
-        new_info["cost_prompt"] = 0.0
-        new_info["cost_completion"] = 0.0
+        new_info["input_cost"] = 0.0
+        new_info["output_cost"] = 0.0
 
     return CostInfo.model_validate(new_info)
 
@@ -121,6 +116,10 @@ class AgentSpan(BaseModel):
             resource=Resource.from_otel(readable_span.resource),
         )
 
+    @staticmethod
+    def is_panel_key(key: str) -> bool:
+        return key in ("input", "genai.output")
+
     def add_cost_info(self) -> None:
         """Extend attributes with `TokenUseAndCost`."""
         cost_info = extract_token_use_and_cost(self.attributes)
@@ -153,30 +152,26 @@ class AgentTrace(BaseModel):
         counts: list[CountInfo] = []
         costs: list[CostInfo] = []
         for span in self.spans:
-            if span.attributes and "cost_prompt" in span.attributes:
-                count = CountInfo(
-                    token_count_prompt=span.attributes["llm.token_count.prompt"],
-                    token_count_completion=span.attributes[
-                        "llm.token_count.completion"
-                    ],
-                )
-                cost = CostInfo(
-                    cost_prompt=span.attributes["cost_prompt"],
-                    cost_completion=span.attributes["cost_completion"],
-                )
-                counts.append(count)
-                costs.append(cost)
+            operation_name = span.attributes.get("gen_ai.operation.name")
+            if operation_name not in ("call_llm", "execute_tool"):
+                continue
+            count = CountInfo(
+                input_tokens=span.attributes.get("gen_ai.usage.input_tokens", 0),
+                output_tokens=span.attributes.get("gen_ai.usage.output", 0),
+            )
+            cost = CostInfo(
+                input_cost=span.attributes.get("input_cost", 0),
+                output_cost=span.attributes.get("output_cost", 0),
+            )
+            counts.append(count)
+            costs.append(cost)
 
-        total_cost = sum(cost.cost_prompt + cost.cost_completion for cost in costs)
-        total_tokens = sum(
-            count.token_count_prompt + count.token_count_completion for count in counts
-        )
-        total_token_count_prompt = sum(count.token_count_prompt for count in counts)
-        total_token_count_completion = sum(
-            count.token_count_completion for count in counts
-        )
-        total_cost_prompt = sum(cost.cost_prompt for cost in costs)
-        total_cost_completion = sum(cost.cost_completion for cost in costs)
+        total_cost = sum(cost.input_cost + cost.output_cost for cost in costs)
+        total_tokens = sum(count.input_tokens + count.output_tokens for count in counts)
+        total_token_count_prompt = sum(count.input_tokens for count in counts)
+        total_token_count_completion = sum(count.output_tokens for count in counts)
+        total_cost_prompt = sum(cost.input_cost for cost in costs)
+        total_cost_completion = sum(cost.output_cost for cost in costs)
         return TotalTokenUseAndCost(
             total_cost=total_cost,
             total_tokens=total_tokens,
@@ -185,16 +180,3 @@ class AgentTrace(BaseModel):
             total_cost_prompt=total_cost_prompt,
             total_cost_completion=total_cost_completion,
         )
-
-
-def _is_tracing_supported(agent_framework: AgentFramework) -> bool:
-    """Check if tracing is supported for the given agent framework."""
-    # Agno not yet supported https://github.com/Arize-ai/openinference/issues/1302
-    # Google ADK not yet supported https://github.com/Arize-ai/openinference/issues/1506
-    if agent_framework in (
-        AgentFramework.AGNO,
-        AgentFramework.GOOGLE,
-        AgentFramework.TINYAGENT,
-    ):
-        return False
-    return True

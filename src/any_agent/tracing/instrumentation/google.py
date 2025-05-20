@@ -1,0 +1,209 @@
+from __future__ import annotations
+
+import json
+from typing import TYPE_CHECKING, Any
+
+from opentelemetry.trace import StatusCode
+from wrapt import resolve_path, wrap_object_attribute
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from google.adk.agents.callback_context import CallbackContext
+    from google.adk.models.llm_request import LlmRequest
+    from google.adk.models.llm_response import LlmResponse
+    from google.adk.tools.base_tool import BaseTool
+    from google.adk.tools.tool_context import ToolContext
+    from opentelemetry.trace import Span, Tracer
+
+
+class _GoogleADKTracingCallbacks:
+    def __init__(self, tracer: Tracer) -> None:
+        self._original_value = None
+        self.tracer = tracer
+        self._current_spans: dict[str, dict[str, Span]] = {
+            "model": {},
+            "tool": {},
+        }
+        self._original_callbacks: dict[str, Callable | None] = {}
+
+    def before_model_callback(
+        self,
+        callback_context: CallbackContext,
+        llm_request: LlmRequest,
+    ) -> Any | None:
+        span: Span = self.tracer.start_span(
+            name=f"call_llm {llm_request.model}",
+        )
+        span.set_attributes(
+            {
+                "gen_ai.operation.name": "call_llm",
+                "gen_ai.request.model": llm_request.model,
+            }
+        )
+
+        self._current_spans["model"][callback_context.invocation_id] = span
+
+        if callable(self._original_callbacks["LlmAgent.before_model_callback"]):
+            return self._original_callbacks["LlmAgent.before_model_callback"](
+                callback_context, llm_request
+            )
+
+        return None
+
+    def before_tool_callback(
+        self,
+        tool: BaseTool,
+        args: dict[str, Any],
+        tool_context: ToolContext,
+    ) -> Any | None:
+        span: Span = self.tracer.start_span(
+            name=f"execute_tool {tool.name}",
+        )
+        span.set_attributes(
+            {
+                "gen_ai.operation.name": "execute_tool",
+                "gen_ai.tool.name": tool.name,
+                "gen_ai.tool.description": tool.description,
+                "gen_ai.tool.args": json.dumps(args),
+                "gen_ai.tool.call.id": tool_context.function_call_id,
+            }
+        )
+
+        self._current_spans["tool"][tool_context.invocation_id] = span
+
+        if callable(self._original_callbacks["LlmAgent.before_tool_callback"]):
+            return self._original_callbacks["LlmAgent.before_tool_callback"](
+                tool, args, tool_context
+            )
+
+        return None
+
+    def after_model_callback(
+        self,
+        callback_context: CallbackContext,
+        llm_response: LlmResponse,
+    ) -> Any | None:
+        span = self._current_spans["model"][callback_context.invocation_id]
+
+        # TODO:Add token count info. Need a release with https://github.com/google/adk-python/commit/1f0fd7bfce622459ef9dbc05ec96ffe6b613e4d1
+        if llm_response.content.parts[0].text:
+            span.set_attributes(
+                {
+                    "genai.output": llm_response.content.parts[0].text,
+                    "genai.output.type": "text",
+                }
+            )
+        else:
+            # Tool call
+            span.set_attributes(
+                {
+                    "genai.output": json.dumps(
+                        llm_response.content.model_dump(exclude_none=True),
+                        default=str,
+                        ensure_ascii=False,
+                    ),
+                    "genai.output.type": "json",
+                }
+            )
+        span.set_status(StatusCode.OK)
+        span.end()
+        del self._current_spans["model"][callback_context.invocation_id]
+
+        return None
+
+    def after_tool_callback(
+        self,
+        tool: BaseTool,
+        args: dict[str, Any],
+        tool_context: ToolContext,
+        tool_response: dict[Any, Any],
+    ) -> Any | None:
+        span = self._current_spans["tool"][tool_context.invocation_id]
+
+        if content := getattr(tool_response, "content", None):
+            span.set_attributes(
+                {
+                    "genai.output": json.dumps(
+                        content.model_dump(exclude_none=True),
+                        default=str,
+                        ensure_ascii=False,
+                    ),
+                    "genai.output.type": "json",
+                }
+            )
+        span.set_status(StatusCode.OK)
+        span.end()
+
+        del self._current_spans["tool"][tool_context.invocation_id]
+
+        if callable(self._original_callbacks["LlmAgent.before_tool_callback"]):
+            return self._original_callbacks["LlmAgent.before_tool_callback"](
+                tool, args, tool_context, tool_response
+            )
+
+        return None
+
+
+class _GoogleADKInstrumentor:
+    _original_callbacks = {}
+
+    def instrument(self, tracer: Tracer) -> None:
+        callbacks = _GoogleADKTracingCallbacks(tracer=tracer)
+
+        def callback_factory(value, *args, **kwargs):  # type: ignore[no-untyped-def]
+            # Honor any callback passed by the user
+            kwargs["callbacks"]._original_callbacks[kwargs["name"]] = value
+            self._original_callbacks[kwargs["name"]] = value
+            return kwargs["callback_wrapper"]
+
+        wrap_object_attribute(  #type: ignore[no-untyped-call]
+            module="google.adk.agents.llm_agent",
+            name="LlmAgent.before_model_callback",
+            factory=callback_factory,
+            kwargs={
+                "name": "LlmAgent.before_model_callback",
+                "callbacks": callbacks,
+                "callback_wrapper": callbacks.before_model_callback,
+            },
+        )
+
+        wrap_object_attribute(  #type: ignore[no-untyped-call]
+            module="google.adk.agents.llm_agent",
+            name="LlmAgent.before_tool_callback",
+            factory=callback_factory,
+            kwargs={
+                "name": "LlmAgent.before_tool_callback",
+                "callbacks": callbacks,
+                "callback_wrapper": callbacks.before_tool_callback,
+            },
+        )
+
+        wrap_object_attribute(  #type: ignore[no-untyped-call]
+            module="google.adk.agents.llm_agent",
+            name="LlmAgent.after_model_callback",
+            factory=callback_factory,
+            kwargs={
+                "name": "LlmAgent.after_model_callback",
+                "callbacks": callbacks,
+                "callback_wrapper": callbacks.after_model_callback,
+            },
+        )
+
+        wrap_object_attribute(  #type: ignore[no-untyped-call]
+            module="google.adk.agents.llm_agent",
+            name="LlmAgent.after_tool_callback",
+            factory=callback_factory,
+            kwargs={
+                "name": "LlmAgent.after_tool_callback",
+                "callbacks": callbacks,
+                "callback_wrapper": callbacks.after_tool_callback,
+            },
+        )
+
+    def uninstrument(self) -> None:
+        module = "google.adk.agents.llm_agent"
+        for name, original in self._original_callbacks.items():
+            path, attribute = name.rsplit(".", 1)
+            parent = resolve_path(module, path)[2]  # type: ignore[no-untyped-call]
+            setattr(parent, attribute, original)

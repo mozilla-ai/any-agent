@@ -3,9 +3,8 @@ from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
+from uuid import uuid4
 
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
 from any_agent.config import (
@@ -15,20 +14,19 @@ from any_agent.config import (
     Tool,
     TracingConfig,
 )
-from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing.exporter import (
-    AnyAgentExporter,
-    Instrumenter,
-    get_instrumenter_by_framework,
+from any_agent.tracing.exporter import AnyAgentExporter
+from any_agent.tracing.instrumentation import (
+    _get_instrumentor_by_framework,
+    _Instrumentor,
 )
-from any_agent.tracing.trace import _is_tracing_supported
+from any_agent.tracing.trace_provider import TRACE_PROVIDER
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
-    from any_agent.tracing.trace import AgentTrace
+    from any_agent.tracing.agent_trace import AgentTrace
 
 
 class AnyAgent(ABC):
@@ -51,7 +49,7 @@ class AnyAgent(ABC):
 
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
-        self._instrumenter: Instrumenter | None = None
+        self._instrumentor: _Instrumentor | None = None
         self._setup_tracing()
 
     @staticmethod
@@ -141,24 +139,38 @@ class AnyAgent(ABC):
 
     def _setup_tracing(self) -> None:
         """Initialize the tracing for the agent."""
-        self._tracer_provider = TracerProvider()
-        trace.set_tracer_provider(self._tracer_provider)
-        if not _is_tracing_supported(self.framework):
-            logger.warning(
-                "Tracing is not yet supported for AGNO and GOOGLE frameworks. "
-            )
-            self._instrumenter = None
-            return
+        self._trace_provider = TRACE_PROVIDER
+        self._tracer = self._trace_provider.get_tracer("any_agent")
         self._exporter = AnyAgentExporter(self.framework, self._tracing_config)
-        self._tracer_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
-        self._instrumenter = get_instrumenter_by_framework(self.framework)
-        self._instrumenter.instrument(tracer_provider=self._tracer_provider)
+        self._trace_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
+        self._instrumentor = _get_instrumentor_by_framework(self.framework)
+        self._instrumentor.instrument(tracer=self._tracer)
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
         return asyncio.get_event_loop().run_until_complete(
             self.run_async(prompt, **kwargs)
         )
+
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
+        """Run the agent asynchronously with the given prompt."""
+        run_id = str(uuid4())
+        with self._tracer.start_as_current_span(
+            f"invoke_agent [{self.config.name}]"
+        ) as invoke_span:
+            invoke_span.set_attributes(
+                {
+                    "gen_ai.agent.name": self.config.name,
+                    "gen_ai.agent.description": self.config.description
+                    or "No description.",
+                    "gen_ai.request.model": self.config.model_id,
+                    "gen_ai.request.id": run_id,
+                }
+            )
+            final_output = await self._run_async(prompt, **kwargs)
+        trace = self._exporter.pop_trace(run_id)
+        trace.final_output = final_output
+        return trace
 
     def serve(self, serving_config: ServingConfig | None = None) -> None:
         """Serve this agent using the Agent2Agent Protocol (A2A).
@@ -184,8 +196,8 @@ class AnyAgent(ABC):
         """Load the agent instance."""
 
     @abstractmethod
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
-        """Run the agent asynchronously with the given prompt."""
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
+        """To be implemented by each framework."""
 
     @property
     @abstractmethod
@@ -213,7 +225,7 @@ class AnyAgent(ABC):
 
     def exit(self) -> None:
         """Exit the agent and clean up resources."""
-        if self._instrumenter is not None:
-            self._instrumenter.uninstrument()  # otherwise, this gets called in the __del__ method of Tracer
-            self._instrumenter = None
+        if self._instrumentor is not None:
+            self._instrumentor.uninstrument()  # otherwise, this gets called in the __del__ method of Tracer
+            self._instrumentor = None
         self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected

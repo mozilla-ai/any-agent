@@ -7,7 +7,7 @@ from any_agent.evaluation import EvaluationCase, TraceEvaluationResult, evaluate
 from any_agent.evaluation.schemas import (
     EvaluationResult,
 )
-from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
 
 
 def test_evaluate_runs_all_evaluators(

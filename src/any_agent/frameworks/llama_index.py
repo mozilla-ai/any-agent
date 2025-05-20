@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
-from uuid import uuid4
 
 from any_agent import AgentConfig, AgentFramework
 from any_agent.config import TracingConfig
@@ -10,10 +9,10 @@ from any_agent.tools import search_web, visit_webpage
 from .any_agent import AnyAgent
 
 try:
-    from llama_index.core.agent.workflow import AgentWorkflow, ReActAgent
+    from llama_index.core.agent.workflow import AgentWorkflow, FunctionAgent
     from llama_index.llms.litellm import LiteLLM
 
-    DEFAULT_AGENT_TYPE = ReActAgent
+    DEFAULT_AGENT_TYPE = FunctionAgent
     DEFAULT_MODEL_TYPE = LiteLLM
     llama_index_available = True
 except ImportError:
@@ -23,8 +22,6 @@ except ImportError:
 if TYPE_CHECKING:
     from llama_index.core.agent.workflow.workflow_events import AgentOutput
     from llama_index.core.llms import LLM
-
-    from any_agent.tracing.trace import AgentTrace
 
 
 class LlamaIndexAgent(AnyAgent):
@@ -37,7 +34,7 @@ class LlamaIndexAgent(AnyAgent):
         tracing: TracingConfig | None = None,
     ):
         super().__init__(config, managed_agents, tracing)
-        self._agent: AgentWorkflow | ReActAgent | None = None
+        self._agent: AgentWorkflow | FunctionAgent | None = None
 
     @property
     def framework(self) -> AgentFramework:
@@ -121,19 +118,13 @@ class LlamaIndexAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        run_id = str(uuid4())
-        tracer = self._tracer_provider.get_tracer("any_agent")
-        with tracer.start_as_current_span("agent_run") as span:
-            span.set_attribute("any_agent.run_id", run_id)
-            result: AgentOutput = await self._agent.run(prompt, **kwargs)
+        result: AgentOutput = await self._agent.run(prompt, **kwargs)
         # assert that it's a TextBlock
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
             msg = f"Agent did not return a valid response: {result.response}"
             raise ValueError(msg)
-        trace = self._exporter.pop_trace(run_id)
-        trace.final_output = result.response.blocks[0].text
-        return trace
+        return result.response.blocks[0].text

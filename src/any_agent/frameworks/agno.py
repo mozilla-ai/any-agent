@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.logging import logger
 from any_agent.tools import search_web, visit_webpage
-from any_agent.tracing.trace import AgentTrace
 
 from .any_agent import AnyAgent
 
@@ -118,11 +117,9 @@ class AgnoAgent(AnyAgent):
                 **self.config.agent_args or {},
             )
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
         result: RunResponse = await self._agent.arun(prompt, **kwargs)
-        return AgentTrace(
-            final_output=result.content,
-        )
+        return str(result.content)

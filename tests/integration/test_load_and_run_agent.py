@@ -10,10 +10,10 @@ from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
-from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
+from any_agent.tracing.agent_trace import AgentTrace
 
 
-def check_uvx_installed() -> bool:
+def uvx_installed() -> bool:
     """The integration tests requires uvx"""
     try:
         result = subprocess.run(  # noqa: S603
@@ -35,7 +35,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
 
     tmp_file = "tmp.txt"
 
-    if not check_uvx_installed():
+    if not uvx_installed():
         msg = "uvx is not installed. Please install it to run this test."
         raise RuntimeError(msg)
 
@@ -90,10 +90,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert content == str(datetime.now().year)
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-        if _is_tracing_supported(agent_framework):
-            assert agent_trace.spans
-            assert len(agent_trace.spans) > 0
-            cost_sum = agent_trace.get_total_cost()
+        assert agent_trace.spans
+        assert len(agent_trace.spans) > 0
+        cost_sum = agent_trace.get_total_cost()
+        if agent_framework is not AgentFramework.GOOGLE:
             assert cost_sum.total_cost > 0
             assert cost_sum.total_cost < 1.00
             assert cost_sum.total_tokens > 0
@@ -130,18 +130,10 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
         assert result2.final_output is not None
         assert "Paris" in result1.final_output
         assert "Madrid" in result2.final_output
-        if _is_tracing_supported(agent_framework):
-            first_spans = result1.spans
-            second_spans = result2.spans
-            assert second_spans[: len(first_spans)] != first_spans, (
-                "Spans from the first run should not be in the second"
-            )
-            assert result1.spans
-            assert len(result1.spans) > 0
-            cost_sum = result1.get_total_cost()
-            assert cost_sum.total_cost > 0
-            assert cost_sum.total_cost < 1.00
-            assert cost_sum.total_tokens > 0
-            assert cost_sum.total_tokens < 20000
+        first_spans = result1.spans
+        second_spans = result2.spans
+        assert second_spans[: len(first_spans)] != first_spans, (
+            "Spans from the first run should not be in the second"
+        )
     finally:
         agent.exit()

@@ -1,8 +1,8 @@
-import json
-from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING, Any, Protocol, assert_never
+from __future__ import annotations
 
-from opentelemetry.sdk.trace import TracerProvider
+import json
+from typing import TYPE_CHECKING
+
 from opentelemetry.sdk.trace.export import (
     SpanExporter,
     SpanExportResult,
@@ -11,14 +11,16 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-from any_agent import AgentFramework, TracingConfig
 from any_agent.logging import logger
 
-from .processors import TracingProcessor
-from .trace import AgentSpan, AgentTrace
+from .agent_trace import AgentSpan, AgentTrace
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from opentelemetry.sdk.trace import ReadableSpan
+
+    from any_agent import AgentFramework, TracingConfig
 
 
 class AnyAgentExporter(SpanExporter):
@@ -32,32 +34,29 @@ class AnyAgentExporter(SpanExporter):
         self.agent_framework = agent_framework
         self.tracing_config = tracing_config
         self.traces: dict[int, AgentTrace] = {}
-        self.processor: TracingProcessor | None = TracingProcessor.create(
-            agent_framework
-        )
         self.console: Console | None = None
         self.run_trace_mapping: dict[str, int] = {}
 
         if self.tracing_config.console:
             self.console = Console()
 
-    def print_to_console(self, span_kind: str, interaction: Mapping[str, Any]) -> None:
+    def print_to_console(self, span: AgentSpan) -> None:
         """Print the span to the console."""
         if not self.console:
             msg = "Console is not initialized"
             raise RuntimeError(msg)
-        style = getattr(self.tracing_config, span_kind.lower(), None)
-        if not style or interaction == {}:
+        style = getattr(self.tracing_config, span.kind.lower(), None)
+        if not style:
             return
 
-        self.console.rule(span_kind, style=style)
+        self.console.rule(span.kind, style=style)
 
-        for key, value in interaction.items():
-            if key == "output":
+        for key, value in span.attributes.items():
+            if span.is_panel_key(key):
                 self.console.print(
                     Panel(
                         Markdown(str(value or "")),
-                        title="Output",
+                        title=key,
                     ),
                 )
             else:
@@ -65,15 +64,14 @@ class AnyAgentExporter(SpanExporter):
 
         self.console.rule(style=style)
 
-    def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:  # noqa: D102
-        if not self.processor:
-            return SpanExportResult.SUCCESS
-
+    def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:  # noqa: D102
         for readable_span in spans:
             # Check if this span belongs to our run
+            if readable_span.instrumentation_scope.name != "any_agent":
+                continue
             if not readable_span.attributes:
                 continue
-            agent_run_id = readable_span.attributes.get("any_agent.run_id")
+            agent_run_id = readable_span.attributes.get("gen_ai.request.id")
             trace_id = readable_span.context.trace_id
             if agent_run_id is not None:
                 assert isinstance(agent_run_id, str)
@@ -82,14 +80,13 @@ class AnyAgentExporter(SpanExporter):
             if not self.traces.get(trace_id):
                 self.traces[trace_id] = AgentTrace(spans=[])
             try:
-                span_kind, interaction = self.processor.extract_interaction(span)
-                if span_kind == "LLM" and self.tracing_config.cost_info:
+                if span.attributes.get("gen_ai.operation.name") == "call_llm":
                     span.add_cost_info()
 
                 self.traces[trace_id].spans.append(span)
 
                 if self.tracing_config.console and self.console:
-                    self.print_to_console(span_kind, interaction)
+                    self.print_to_console(span)
 
             except (json.JSONDecodeError, TypeError, AttributeError) as e:
                 logger.warning("Failed to parse span data, %s, %s", span, e)
@@ -110,44 +107,3 @@ class AnyAgentExporter(SpanExporter):
             msg = f"Trace not found for trace ID: {trace_id}"
             raise ValueError(msg)
         return trace
-
-
-class Instrumenter(Protocol):  # noqa: D101
-    def instrument(self, *, tracer_provider: TracerProvider) -> None: ...  # noqa: D102
-
-    def uninstrument(self) -> None: ...  # noqa: D102
-
-
-def get_instrumenter_by_framework(framework: AgentFramework) -> Instrumenter:
-    """Get the instrumenter for the given agent framework."""
-    if framework is AgentFramework.OPENAI:
-        from openinference.instrumentation.openai_agents import (
-            OpenAIAgentsInstrumentor,
-        )
-
-        return OpenAIAgentsInstrumentor()
-
-    if framework is AgentFramework.SMOLAGENTS:
-        from openinference.instrumentation.smolagents import SmolagentsInstrumentor
-
-        return SmolagentsInstrumentor()
-
-    if framework is AgentFramework.LANGCHAIN:
-        from openinference.instrumentation.langchain import LangChainInstrumentor
-
-        return LangChainInstrumentor()
-
-    if framework is AgentFramework.LLAMA_INDEX:
-        from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
-
-        return LlamaIndexInstrumentor()
-
-    if (
-        framework is AgentFramework.GOOGLE
-        or framework is AgentFramework.AGNO
-        or framework is AgentFramework.TINYAGENT
-    ):
-        msg = f"{framework} tracing is not supported."
-        raise NotImplementedError(msg)
-
-    assert_never(framework)

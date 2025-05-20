@@ -26,7 +26,7 @@ dependencies = [
 [project.optional-dependencies]
 
 google = [
-  "google-adk>=0.3.0"
+  "google-adk>=1.0.0"
 ]
 
 langchain = [
@@ -35,7 +35,6 @@ langchain = [
   "langchain-mcp-adapters>=0.0.3",
   "langgraph",
   "langgraph-swarm",
-  "openinference-instrumentation-langchain"
 ]
 
 llama_index = [
@@ -43,17 +42,14 @@ llama_index = [
   "llama-index-llms-litellm",
   "llama-index-tools-mcp",
   "platformdirs>=4.3.7",
-  "openinference-instrumentation-llama-index"
 ]
 
 smolagents = [
   "smolagents[mcp]>=1.14.0",
-  "openinference-instrumentation-smolagents"
 ]
 
 openai = [
   "openai-agents>=0.0.12",
-  "openinference-instrumentation-openai-agents>=0.1.5"
 ]
 
 agno = [

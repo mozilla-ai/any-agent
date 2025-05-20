@@ -4,7 +4,7 @@ import pytest
 
 from any_agent.evaluation.evaluation_case import EvaluationCase
 from any_agent.evaluation.schemas import CheckpointCriteria
-from any_agent.tracing.trace import AgentSpan, AgentTrace
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 
 
 @pytest.fixture
