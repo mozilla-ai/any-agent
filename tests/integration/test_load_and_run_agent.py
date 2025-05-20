@@ -110,7 +110,6 @@ def test_load_and_run_agent(
         if _is_tracing_supported(agent_framework):
             assert agent_trace.spans
             assert len(agent_trace.spans) > 0
-            cost_sum = agent_trace.usage_and_cost
             assert agent_trace.duration is not None
             assert isinstance(agent_trace.duration, timedelta)
             assert agent_trace.duration.total_seconds() > 0
@@ -120,11 +119,10 @@ def test_load_and_run_agent(
             assert diff < 0.1, (
                 f"duration ({agent_trace.duration.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
             )
-            cost_sum = agent_trace.usage_and_cost
-            assert cost_sum.total_cost > 0
-            assert cost_sum.total_cost < 1.00
-            assert cost_sum.total_tokens > 0
-            assert cost_sum.total_tokens < 20000
+            assert agent_trace.cost.total_cost > 0
+            assert agent_trace.cost.total_cost < 1.00
+            assert agent_trace.usage.total_tokens > 0
+            assert agent_trace.usage.total_tokens < 20000
             case = EvaluationCase(
                 llm_judge="gpt-4.1-mini",
                 checkpoints=[
@@ -184,10 +182,9 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
             )
             assert result1.spans
             assert len(result1.spans) > 0
-            cost_sum = result1.usage_and_cost
-            assert cost_sum.total_cost > 0
-            assert cost_sum.total_cost < 1.00
-            assert cost_sum.total_tokens > 0
-            assert cost_sum.total_tokens < 20000
+            assert result1.cost.total_cost > 0
+            assert result1.cost.total_cost < 1.00
+            assert result1.usage.total_tokens > 0
+            assert result1.usage.total_tokens < 20000
     finally:
         agent.exit()
