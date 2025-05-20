@@ -1,0 +1,557 @@
+# serializer version: 1
+# name: test_openai_agent_trace_snapshot
+  dict({
+    'final_output': 'The current year in the America/New_York timezone is 2025. I have written this value to a file.',
+    'spans': list([
+      dict({
+        'attributes': dict({
+          'llm.system': 'openai',
+          'openinference.span.kind': 'CHAIN',
+          'output.mime_type': 'application/json',
+          'output.value': '["get_current_time", "convert_time"]',
+          'service.name': 'openai',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 13487556102999248805,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660964059570176,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'mcp_tools',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 1351128178870435741,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660964058813952,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'cost_completion': 0.0,
+          'cost_prompt': 0.00011439999999999999,
+          'input.mime_type': 'application/json',
+          'input.value': '[{"content": "Search the web to answer", "role": "system"}, {"role": "user", "content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file"}]',
+          'llm.input_messages.0.message.content': 'Search the web to answer',
+          'llm.input_messages.0.message.role': 'system',
+          'llm.input_messages.1.message.content': 'Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file',
+          'llm.input_messages.1.message.role': 'user',
+          'llm.invocation_parameters': '{"temperature": 0.0, "parallel_tool_calls": false, "base_url": "", "model_impl": "litellm"}',
+          'llm.model_name': 'gpt-4.1-mini',
+          'llm.output_messages.0.message.role': 'assistant',
+          'llm.output_messages.0.message.tool_calls.0.tool_call.function.arguments': '{"timezone":"America/New_York"}',
+          'llm.output_messages.0.message.tool_calls.0.tool_call.function.name': 'get_current_time',
+          'llm.output_messages.0.message.tool_calls.0.tool_call.id': 'call_7uZkRepA70GgAS5sT5mCHfNj',
+          'llm.system': 'openai',
+          'llm.token_count.completion': 18,
+          'llm.token_count.prompt': 286,
+          'openinference.span.kind': 'LLM',
+          'output.mime_type': 'application/json',
+          'output.value': '[{"content": null, "role": "assistant", "tool_calls": [{"function": {"arguments": "{\\"timezone\\":\\"America/New_York\\"}", "name": "get_current_time"}, "id": "call_7uZkRepA70GgAS5sT5mCHfNj", "type": "function"}], "function_call": null, "annotations": []}]',
+          'service.name': 'openai',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 4343523433967492499,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660968844551936,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'generation',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 1351128178870435741,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660964060802816,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'input.mime_type': 'application/json',
+          'input.value': '{"timezone":"America/New_York"}',
+          'llm.system': 'openai',
+          'openinference.span.kind': 'TOOL',
+          'output.mime_type': 'application/json',
+          'output.value': '{"type":"text","text":"{\\n  \\"timezone\\": \\"America/New_York\\",\\n  \\"datetime\\": \\"2025-05-19T09:22:48-04:00\\",\\n  \\"is_dst\\": true\\n}","annotations":null}',
+          'service.name': 'openai',
+          'tool.name': 'get_current_time',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 6439485983011741764,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660968863655168,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'get_current_time',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 1351128178870435741,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660968860654080,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'cost_completion': 0.0,
+          'cost_prompt': 0.00014759999999999998,
+          'input.mime_type': 'application/json',
+          'input.value': '[{"content": "Search the web to answer", "role": "system"}, {"role": "user", "content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file"}, {"role": "assistant", "tool_calls": [{"id": "call_7uZkRepA70GgAS5sT5mCHfNj", "type": "function", "function": {"name": "get_current_time", "arguments": "{\\"timezone\\":\\"America/New_York\\"}"}}]}, {"role": "tool", "tool_call_id": "call_7uZkRepA70GgAS5sT5mCHfNj", "content": "{\\"type\\":\\"text\\",\\"text\\":\\"{\\\\n  \\\\\\"timezone\\\\\\": \\\\\\"America/New_York\\\\\\",\\\\n  \\\\\\"datetime\\\\\\": \\\\\\"2025-05-19T09:22:48-04:00\\\\\\",\\\\n  \\\\\\"is_dst\\\\\\": true\\\\n}\\",\\"annotations\\":null}"}]',
+          'llm.input_messages.0.message.content': 'Search the web to answer',
+          'llm.input_messages.0.message.role': 'system',
+          'llm.input_messages.1.message.content': 'Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file',
+          'llm.input_messages.1.message.role': 'user',
+          'llm.input_messages.2.message.role': 'assistant',
+          'llm.input_messages.2.message.tool_calls.0.tool_call.function.arguments': '{"timezone":"America/New_York"}',
+          'llm.input_messages.2.message.tool_calls.0.tool_call.function.name': 'get_current_time',
+          'llm.input_messages.2.message.tool_calls.0.tool_call.id': 'call_7uZkRepA70GgAS5sT5mCHfNj',
+          'llm.input_messages.3.message.content': '{"type":"text","text":"{\\n  \\"timezone\\": \\"America/New_York\\",\\n  \\"datetime\\": \\"2025-05-19T09:22:48-04:00\\",\\n  \\"is_dst\\": true\\n}","annotations":null}',
+          'llm.input_messages.3.message.role': 'tool',
+          'llm.input_messages.3.message.tool_call_id': 'call_7uZkRepA70GgAS5sT5mCHfNj',
+          'llm.invocation_parameters': '{"temperature": 0.0, "parallel_tool_calls": false, "base_url": "", "model_impl": "litellm"}',
+          'llm.model_name': 'gpt-4.1-mini',
+          'llm.output_messages.0.message.role': 'assistant',
+          'llm.output_messages.0.message.tool_calls.0.tool_call.function.arguments': '{"text":"2025"}',
+          'llm.output_messages.0.message.tool_calls.0.tool_call.function.name': 'write_file',
+          'llm.output_messages.0.message.tool_calls.0.tool_call.id': 'call_v6mRm3m24xfm3dftlRbkgoce',
+          'llm.system': 'openai',
+          'llm.token_count.completion': 15,
+          'llm.token_count.prompt': 369,
+          'openinference.span.kind': 'LLM',
+          'output.mime_type': 'application/json',
+          'output.value': '[{"content": null, "role": "assistant", "tool_calls": [{"function": {"arguments": "{\\"text\\":\\"2025\\"}", "name": "write_file"}, "id": "call_v6mRm3m24xfm3dftlRbkgoce", "type": "function"}], "function_call": null, "annotations": []}]',
+          'service.name': 'openai',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 17098691010651300468,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660969739481856,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'generation',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 1351128178870435741,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660968868616960,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'input.mime_type': 'application/json',
+          'input.value': '{"text":"2025"}',
+          'llm.system': 'openai',
+          'openinference.span.kind': 'TOOL',
+          'service.name': 'openai',
+          'tool.name': 'write_file',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 12723702095548437253,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660969746458112,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'write_file',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 1351128178870435741,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660969745337088,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'cost_completion': 0.0,
+          'cost_prompt': 0.0001572,
+          'input.mime_type': 'application/json',
+          'input.value': '[{"content": "Search the web to answer", "role": "system"}, {"role": "user", "content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file"}, {"role": "assistant", "tool_calls": [{"id": "call_7uZkRepA70GgAS5sT5mCHfNj", "type": "function", "function": {"name": "get_current_time", "arguments": "{\\"timezone\\":\\"America/New_York\\"}"}}]}, {"role": "tool", "tool_call_id": "call_7uZkRepA70GgAS5sT5mCHfNj", "content": "{\\"type\\":\\"text\\",\\"text\\":\\"{\\\\n  \\\\\\"timezone\\\\\\": \\\\\\"America/New_York\\\\\\",\\\\n  \\\\\\"datetime\\\\\\": \\\\\\"2025-05-19T09:22:48-04:00\\\\\\",\\\\n  \\\\\\"is_dst\\\\\\": true\\\\n}\\",\\"annotations\\":null}"}, {"role": "assistant", "tool_calls": [{"id": "call_v6mRm3m24xfm3dftlRbkgoce", "type": "function", "function": {"name": "write_file", "arguments": "{\\"text\\":\\"2025\\"}"}}]}, {"role": "tool", "tool_call_id": "call_v6mRm3m24xfm3dftlRbkgoce", "content": "None"}]',
+          'llm.input_messages.0.message.content': 'Search the web to answer',
+          'llm.input_messages.0.message.role': 'system',
+          'llm.input_messages.1.message.content': 'Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file',
+          'llm.input_messages.1.message.role': 'user',
+          'llm.input_messages.2.message.role': 'assistant',
+          'llm.input_messages.2.message.tool_calls.0.tool_call.function.arguments': '{"timezone":"America/New_York"}',
+          'llm.input_messages.2.message.tool_calls.0.tool_call.function.name': 'get_current_time',
+          'llm.input_messages.2.message.tool_calls.0.tool_call.id': 'call_7uZkRepA70GgAS5sT5mCHfNj',
+          'llm.input_messages.3.message.content': '{"type":"text","text":"{\\n  \\"timezone\\": \\"America/New_York\\",\\n  \\"datetime\\": \\"2025-05-19T09:22:48-04:00\\",\\n  \\"is_dst\\": true\\n}","annotations":null}',
+          'llm.input_messages.3.message.role': 'tool',
+          'llm.input_messages.3.message.tool_call_id': 'call_7uZkRepA70GgAS5sT5mCHfNj',
+          'llm.input_messages.4.message.role': 'assistant',
+          'llm.input_messages.4.message.tool_calls.1.tool_call.function.arguments': '{"text":"2025"}',
+          'llm.input_messages.4.message.tool_calls.1.tool_call.function.name': 'write_file',
+          'llm.input_messages.4.message.tool_calls.1.tool_call.id': 'call_v6mRm3m24xfm3dftlRbkgoce',
+          'llm.input_messages.5.message.content': 'None',
+          'llm.input_messages.5.message.role': 'tool',
+          'llm.input_messages.5.message.tool_call_id': 'call_v6mRm3m24xfm3dftlRbkgoce',
+          'llm.invocation_parameters': '{"temperature": 0.0, "parallel_tool_calls": false, "base_url": "", "model_impl": "litellm"}',
+          'llm.model_name': 'gpt-4.1-mini',
+          'llm.output_messages.0.message.content': 'The current year in the America/New_York timezone is 2025. I have written this value to a file.',
+          'llm.output_messages.0.message.role': 'assistant',
+          'llm.system': 'openai',
+          'llm.token_count.completion': 25,
+          'llm.token_count.prompt': 393,
+          'openinference.span.kind': 'LLM',
+          'output.mime_type': 'application/json',
+          'output.value': '[{"content": "The current year in the America/New_York timezone is 2025. I have written this value to a file.", "role": "assistant", "tool_calls": null, "function_call": null, "annotations": []}]',
+          'service.name': 'openai',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 8789522812412071271,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660970767698176,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'generation',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 1351128178870435741,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660969748457984,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'llm.system': 'openai',
+          'openinference.span.kind': 'AGENT',
+          'service.name': 'openai',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 1351128178870435741,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660970773938944,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'any_agent',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 701147585678663371,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660964058574080,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'openinference.span.kind': 'AGENT',
+          'service.name': 'openai',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 701147585678663371,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660970774269000,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'Agent workflow',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 1496043382881042842,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660964058293000,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'any_agent.run_id': 'e52f73a4-0d70-4182-b5a7-c60bff6ff428',
+          'service.name': 'openai',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 1496043382881042842,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 312240062924141420731563990691240884516,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1747660970774416000,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'agent_run',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': None,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': None,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.33.1',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1747660964057285000,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.UNSET: 'unset'>,
+        }),
+      }),
+    ]),
+  })
+# ---
