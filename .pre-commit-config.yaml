@@ -33,6 +33,7 @@ repos:
         additional_dependencies:
           - types-requests
           - types-pyyaml
+          - pytest
           - any-agent[dev, all]
 
   - repo: https://github.com/codespell-project/codespell
