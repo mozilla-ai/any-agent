@@ -9,9 +9,7 @@ from any_agent.tracing.trace import AgentTrace
 
 @pytest.fixture(
     params=[
-        str(Path(__file__).parent.parent / "assets" / fname)
-        for fname in os.listdir(Path(__file__).parent.parent / "assets")
-        if fname.endswith("_trace.json")
+        trace for trace in (Path(__file__).parent.parent / "assets").glob("*_trace.json")
     ],
     ids=lambda x: Path(x).stem,
 )
