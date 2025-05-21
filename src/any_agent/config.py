@@ -105,27 +105,21 @@ class TracingConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     console: bool = True
-    """Whether to show traces in the console."""
+    """Whether to show spans in the console."""
 
-    llm: str | None = "yellow"
-    """LLM color in console logs"""
+    call_llm: str | None = "yellow"
+    """Color used to display LLM call spans in the console."""
 
-    tool: str | None = "blue"
-    """Tool color in console logs"""
-
-    agent: str | None = None
-    """Agent color in console logs"""
-
-    chain: str | None = None
-    """Chain color in console logs"""
+    execute_tool: str | None = "blue"
+    """Color used to display tool execution spans in the console."""
 
     cost_info: bool = True
-    """Whether traces should include cost information"""
+    """Whether spans should include cost information"""
 
     @model_validator(mode="after")
     def validate_console_flags(self) -> Self:
-        if self.console and not any([self.llm, self.tool, self.agent, self.chain]):
-            msg = "At least one of `[self.llm, self.tool, self.agent, self.chain]` must be set"
+        if self.console and not any([self.call_llm, self.execute_tool]):
+            msg = "At least one of `[self.call_llm, self.execute_tool]` must be set"
             raise ValueError(msg)
         return self
 

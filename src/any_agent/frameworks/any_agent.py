@@ -15,7 +15,7 @@ from any_agent.config import (
     TracingConfig,
 )
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing.exporter import AnyAgentExporter
+from any_agent.tracing.exporter import _AnyAgentExporter
 from any_agent.tracing.instrumentation import (
     _get_instrumentor_by_framework,
     _Instrumentor,
@@ -141,7 +141,7 @@ class AnyAgent(ABC):
         """Initialize the tracing for the agent."""
         self._trace_provider = TRACE_PROVIDER
         self._tracer = self._trace_provider.get_tracer("any_agent")
-        self._exporter = AnyAgentExporter(self.framework, self._tracing_config)
+        self._exporter = _AnyAgentExporter(self._tracing_config)
         self._trace_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
         self._instrumentor = _get_instrumentor_by_framework(self.framework)
         self._instrumentor.instrument(tracer=self._tracer)

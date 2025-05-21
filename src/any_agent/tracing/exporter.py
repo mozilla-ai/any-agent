@@ -20,18 +20,14 @@ if TYPE_CHECKING:
 
     from opentelemetry.sdk.trace import ReadableSpan
 
-    from any_agent import AgentFramework, TracingConfig
+    from any_agent import TracingConfig
 
 
-class AnyAgentExporter(SpanExporter):
-    """Build an `AgentTrace` and export to the different outputs."""
-
-    def __init__(  # noqa: D107
+class _AnyAgentExporter(SpanExporter):
+    def __init__(
         self,
-        agent_framework: AgentFramework,
         tracing_config: TracingConfig,
     ):
-        self.agent_framework = agent_framework
         self.tracing_config = tracing_config
         self.traces: dict[int, AgentTrace] = {}
         self.console: Console | None = None
@@ -41,18 +37,21 @@ class AnyAgentExporter(SpanExporter):
             self.console = Console()
 
     def print_to_console(self, span: AgentSpan) -> None:
-        """Print the span to the console."""
         if not self.console:
             msg = "Console is not initialized"
             raise RuntimeError(msg)
-        style = getattr(self.tracing_config, span.kind.lower(), None)
+
+        style = getattr(
+            self.tracing_config, span.attributes.get("gen_ai.operation.name", ""), None
+        )
+
         if not style:
             return
 
         self.console.rule(span.kind, style=style)
 
         for key, value in span.attributes.items():
-            if key in ("genai.input", "genai.output"):
+            if key in ("gen_ai.input", "gen_ai.output"):
                 self.console.print(
                     Panel(
                         Markdown(str(value or "")),
@@ -64,7 +63,7 @@ class AnyAgentExporter(SpanExporter):
 
         self.console.rule(style=style)
 
-    def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:  # noqa: D102
+    def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
         for readable_span in spans:
             # Check if this span belongs to our run
             if scope := readable_span.instrumentation_scope:
@@ -81,7 +80,10 @@ class AnyAgentExporter(SpanExporter):
             if not self.traces.get(trace_id):
                 self.traces[trace_id] = AgentTrace()
             try:
-                if span.attributes.get("gen_ai.operation.name") == "call_llm":
+                if (
+                    self.tracing_config.cost_info
+                    and span.attributes.get("gen_ai.operation.name") == "call_llm"
+                ):
                     span.add_cost_info()
 
                 self.traces[trace_id].add_span(span)
@@ -98,7 +100,6 @@ class AnyAgentExporter(SpanExporter):
         self,
         agent_run_id: str,
     ) -> AgentTrace:
-        """Pop the trace for the given agent run ID."""
         trace_id = self.run_trace_mapping.pop(agent_run_id, None)
         if trace_id is None:
             msg = f"Trace ID not found for agent run ID: {agent_run_id}"

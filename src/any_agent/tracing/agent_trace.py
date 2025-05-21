@@ -1,9 +1,11 @@
+# mypy: disable-error-code="arg-type"
 from collections.abc import Mapping
 from datetime import timedelta
 from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from litellm.cost_calculator import cost_per_token
+from opentelemetry.sdk.trace import ReadableSpan
 from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.logging import logger
@@ -17,9 +19,6 @@ from .otel_types import (
     SpanKind,
     Status,
 )
-
-if TYPE_CHECKING:
-    from opentelemetry.sdk.trace import ReadableSpan
 
 
 class TokenInfo(BaseModel):
@@ -101,6 +100,22 @@ class AgentSpan(BaseModel):
             links=[Link.from_otel(link) for link in readable_span.links],
             events=[Event.from_otel(event) for event in readable_span.events],
             resource=Resource.from_otel(readable_span.resource),
+        )
+
+    def to_readable_span(self) -> ReadableSpan:
+        """Create an ReadableSpan from the AgentSpan."""
+        return ReadableSpan(
+            name=self.name,
+            kind=self.kind,
+            parent=self.parent,
+            start_time=self.start_time,
+            end_time=self.end_time,
+            status=self.status,
+            context=self.context,
+            attributes=self.attributes,
+            links=self.links,
+            events=self.events,
+            resource=self.resource,
         )
 
     def add_cost_info(self) -> None:
