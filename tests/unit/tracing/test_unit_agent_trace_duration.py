@@ -36,6 +36,11 @@ def test_agent_trace_duration_from_sample(agent_trace: AgentTrace) -> None:
     changes, this test will need to be updated
     (because it is using start and end times that were manually parsed from the trace)
     """
-    expected_seconds = (1747660970774416000 - 1747660964057285000) / 1_000_000_000
+    # grab the start and end times from the last span in the trace
+    start_time = agent_trace.spans[-1].start_time
+    end_time = agent_trace.spans[-1].end_time
+    assert start_time is not None
+    assert end_time is not None
+    expected_seconds = (end_time - start_time) / 1_000_000_000
     assert isinstance(agent_trace.duration, datetime.timedelta)
     assert abs(agent_trace.duration.total_seconds() - expected_seconds) < 1e-6

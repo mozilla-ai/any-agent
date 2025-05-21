@@ -90,6 +90,6 @@ It can be called like so
 ```bash
 any-agent-evaluate \
     --evaluation_case_path "docs/examples/evaluation_case.yaml" \
-    --trace_path "tests/unit/evaluation/sample_traces/OPENAI.json" \
+    --trace_path "tests/assets/OPENAI_trace.json" \
     --agent_framework 'OPENAI'
 ```

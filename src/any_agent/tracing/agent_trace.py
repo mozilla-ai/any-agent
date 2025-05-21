@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 from datetime import timedelta
+from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
@@ -21,7 +22,7 @@ if TYPE_CHECKING:
     from opentelemetry.sdk.trace import ReadableSpan
 
 
-class CountInfo(BaseModel):
+class TokenInfo(BaseModel):
     """Token Count information."""
 
     input_tokens: int
@@ -39,24 +40,10 @@ class CostInfo(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class TotalTokenUseAndCost(BaseModel):
-    """Total token use and cost information."""
-
-    total_token_count_prompt: int
-    total_token_count_completion: int
-    total_cost_prompt: float
-    total_cost_completion: float
-
-    total_cost: float
-    total_tokens: int
-
-    model_config = ConfigDict(extra="forbid")
-
-
-def extract_token_use_and_cost(
+def compute_cost_info(
     attributes: Mapping[str, AttributeValue],
 ) -> CostInfo | None:
-    """Extract token counts and use litellm to compute cost."""
+    """Use litellm to compute cost."""
     if not any(
         key in attributes
         for key in ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"]
@@ -77,7 +64,6 @@ def extract_token_use_and_cost(
         logger.warning(msg)
         new_info["input_cost"] = 0.0
         new_info["output_cost"] = 0.0
-
     return CostInfo.model_validate(new_info)
 
 
@@ -119,9 +105,14 @@ class AgentSpan(BaseModel):
 
     def add_cost_info(self) -> None:
         """Extend attributes with `TokenUseAndCost`."""
-        cost_info = extract_token_use_and_cost(self.attributes)
+        cost_info = compute_cost_info(self.attributes)
         if cost_info:
-            self.set_attributes(cost_info.model_dump(exclude_none=True))
+            self.set_attributes(
+                {
+                    f"gen_ai.usage.{k}": v
+                    for k, v in cost_info.model_dump().items()
+                }
+            )
 
     def set_attributes(self, attributes: Mapping[str, AttributeValue]) -> None:
         """Set attributes for the span."""
@@ -129,6 +120,10 @@ class AgentSpan(BaseModel):
             if key in self.attributes:
                 logger.warning("Overwriting attribute %s with %s", key, value)
             self.attributes[key] = value
+
+    def is_llm_call(self):
+        """Check whether this span is a call to an LLM."""
+        return self.attributes.get("gen_ai.operation.name") == "call_llm"
 
 
 class AgentTrace(BaseModel):
@@ -143,6 +138,23 @@ class AgentTrace(BaseModel):
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    def _invalidate_usage_and_cost_cache(self) -> None:
+        """Clear the cached usage_and_cost property if it exists."""
+        if "usage" in self.__dict__:
+            del self.usage
+        if "cost" in self.__dict__:
+            del self.cost
+
+    def add_span(self, span: AgentSpan) -> None:
+        """Add an AgentSpan to the trace and clear the usage_and_cost cache if present."""
+        self.spans.append(span)
+        self._invalidate_usage_and_cost_cache()
+
+    def add_spans(self, spans: list[AgentSpan]) -> None:
+        """Add a list of AgentSpans to the trace and clear the usage_and_cost cache if present."""
+        self.spans.extend(spans)
+        self._invalidate_usage_and_cost_cache()
 
     @property
     def duration(self) -> timedelta:
@@ -167,36 +179,24 @@ class AgentTrace(BaseModel):
         msg = "Span with any_agent.run_id not found in trace"
         raise ValueError(msg)
 
-    def get_total_cost(self) -> TotalTokenUseAndCost:
-        """Return the current total cost and token usage statistics."""
-        counts: list[CountInfo] = []
-        costs: list[CostInfo] = []
+    @cached_property
+    def usage(self) -> TokenInfo:
+        """The current total token usage statistics for this trace. Cached after first computation."""
+        sum_input_tokens = 0
+        sum_output_tokens = 0
         for span in self.spans:
-            operation_name = span.attributes.get("gen_ai.operation.name")
-            if operation_name not in ("call_llm", "execute_tool"):
-                continue
-            count = CountInfo(
-                input_tokens=span.attributes.get("gen_ai.usage.input_tokens", 0),
-                output_tokens=span.attributes.get("gen_ai.usage.output", 0),
-            )
-            cost = CostInfo(
-                input_cost=span.attributes.get("input_cost", 0),
-                output_cost=span.attributes.get("output_cost", 0),
-            )
-            counts.append(count)
-            costs.append(cost)
+            if span.is_llm_call():
+                sum_input_tokens += span.attributes.get("gen_ai.usage.input_tokens", 0)
+                sum_output_tokens += span.attributes.get("gen_ai.usage.output_tokens", 0)
+        return TokenInfo(input_tokens=sum_input_tokens, output_tokens=sum_output_tokens)
 
-        total_cost = sum(cost.input_cost + cost.output_cost for cost in costs)
-        total_tokens = sum(count.input_tokens + count.output_tokens for count in counts)
-        total_token_count_prompt = sum(count.input_tokens for count in counts)
-        total_token_count_completion = sum(count.output_tokens for count in counts)
-        total_cost_prompt = sum(cost.input_cost for cost in costs)
-        total_cost_completion = sum(cost.output_cost for cost in costs)
-        return TotalTokenUseAndCost(
-            total_cost=total_cost,
-            total_tokens=total_tokens,
-            total_token_count_prompt=total_token_count_prompt,
-            total_token_count_completion=total_token_count_completion,
-            total_cost_prompt=total_cost_prompt,
-            total_cost_completion=total_cost_completion,
-        )
+    @cached_property
+    def cost(self) -> CostInfo:
+        """The current total cost statistics for this trace. Cached after first computation."""
+        sum_input_cost = 0
+        sum_output_cost = 0
+        for span in self.spans:
+            if span.is_llm_call():
+                sum_input_cost += span.attributes.get("gen_ai.usage.input_cost", 0)
+                sum_output_cost += span.attributes.get("gen_ai.usage.output_cost", 0)
+        return CostInfo(input_cost=sum_input_cost, output_cost=sum_output_cost)

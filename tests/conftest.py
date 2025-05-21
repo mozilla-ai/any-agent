@@ -1,6 +1,8 @@
+import json
 import logging
 import time
 from collections.abc import AsyncGenerator, Callable, Generator
+from pathlib import Path
 from textwrap import dedent
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -14,7 +16,7 @@ from opentelemetry.trace.status import Status, StatusCode
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
-from any_agent.tracing.agent_trace import AgentSpan
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 
 
 @pytest.fixture
@@ -79,9 +81,7 @@ def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
 
 
 @pytest.fixture
-def _patch_stdio_client() -> Generator[
-    tuple[AsyncMock, tuple[AsyncMock, AsyncMock]], None
-]:
+def _patch_stdio_client() -> Generator[tuple[AsyncMock, tuple[AsyncMock, AsyncMock]]]:
     mock_cm = AsyncMock()
     mock_transport = (AsyncMock(), AsyncMock())
     mock_cm.__aenter__.return_value = mock_transport
@@ -201,7 +201,7 @@ def mock_litellm_response() -> ModelResponse:
 
 
 @pytest.fixture
-def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any, None]]:
+def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any]]:
     """
     Create a fixture that returns an async generator function to mock streaming responses.
     This returns a function that can be used as a side_effect.
@@ -209,7 +209,7 @@ def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any, None]]:
 
     async def _mock_streaming_response(
         *args: Any, **kwargs: Any
-    ) -> AsyncGenerator[Any, None]:
+    ) -> AsyncGenerator[Any]:
         # First chunk with role
         yield {
             "choices": [
@@ -250,3 +250,14 @@ def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any, None]]:
         }
 
     return _mock_streaming_response
+
+
+@pytest.fixture(
+    params=list((Path(__file__).parent / "assets").glob("*_trace.json")),
+    ids=lambda x: Path(x).stem,
+)
+def agent_trace(request: pytest.FixtureRequest) -> AgentTrace:
+    trace_path = request.param
+    with open(trace_path, encoding="utf-8") as f:
+        trace = json.load(f)
+    return AgentTrace.model_validate(trace)

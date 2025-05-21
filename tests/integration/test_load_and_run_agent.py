@@ -33,7 +33,9 @@ def uvx_installed() -> bool:
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> None:
+def test_load_and_run_agent(
+    agent_framework: AgentFramework, tmp_path: Path, request: pytest.FixtureRequest
+) -> None:
     kwargs = {}
 
     tmp_file = "tmp.txt"
@@ -96,10 +98,17 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert content == str(datetime.now().year)
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
+        update_trace = request.config.getoption("--update-trace-assets")
+        if update_trace:
+            trace_path = (
+                Path(__file__).parent.parent
+                / "assets"
+                / f"{agent_framework.name}_trace.json"
+            )
+            with open(trace_path, "w", encoding="utf-8") as f:
+                f.write(agent_trace.model_dump_json(indent=2))
         assert agent_trace.spans
         assert len(agent_trace.spans) > 0
-        with open("foo.json", "w") as f:
-            f.write(agent_trace.spans[0].model_dump_json())
         assert agent_trace.duration is not None
         assert isinstance(agent_trace.duration, timedelta)
         assert agent_trace.duration.total_seconds() > 0
@@ -109,11 +118,10 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert diff < 0.1, (
             f"duration ({agent_trace.duration.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
         )
-        cost_sum = agent_trace.get_total_cost()
-        assert cost_sum.total_cost > 0
-        assert cost_sum.total_cost < 1.00
-        assert cost_sum.total_tokens > 0
-        assert cost_sum.total_tokens < 20000
+        assert agent_trace.cost.total_cost > 0
+        assert agent_trace.cost.total_cost < 1.00
+        assert agent_trace.usage.total_tokens > 0
+        assert agent_trace.usage.total_tokens < 20000
         case = EvaluationCase(
             llm_judge="gpt-4.1-mini",
             checkpoints=[
@@ -134,6 +142,7 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         result: TraceEvaluationResult = evaluate(
             evaluation_case=case,
             trace=agent_trace,
+            agent_framework=agent_framework,
         )
         assert result
         assert result.score == float(2 / 3)
