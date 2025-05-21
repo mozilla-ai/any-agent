@@ -4,11 +4,9 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from opentelemetry.trace import StatusCode
-from wrapt import resolve_path, wrap_object_attribute
+from wrapt import resolve_path, wrap_object_attribute  # type: ignore[attr-defined]
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from google.adk.agents.callback_context import CallbackContext
     from google.adk.models.llm_request import LlmRequest
     from google.adk.models.llm_response import LlmResponse
@@ -25,7 +23,7 @@ class _GoogleADKTracingCallbacks:
             "model": {},
             "tool": {},
         }
-        self._original_callbacks: dict[str, Callable | None] = {}
+        self._original_callbacks: dict[str, Any] = {}
 
     def before_model_callback(
         self,
@@ -38,7 +36,7 @@ class _GoogleADKTracingCallbacks:
         span.set_attributes(
             {
                 "gen_ai.operation.name": "call_llm",
-                "gen_ai.request.model": llm_request.model,
+                "gen_ai.request.model": llm_request.model or "no_model",
             }
         )
 
@@ -66,7 +64,9 @@ class _GoogleADKTracingCallbacks:
                 "gen_ai.tool.name": tool.name,
                 "gen_ai.tool.description": tool.description,
                 "gen_ai.tool.args": json.dumps(args),
-                "gen_ai.tool.call.id": tool_context.function_call_id,
+                "gen_ai.tool.call.id": getattr(
+                    tool_context, "function_call_id", "no_id"
+                ),
             }
         )
 
@@ -86,26 +86,31 @@ class _GoogleADKTracingCallbacks:
     ) -> Any | None:
         span = self._current_spans["model"][callback_context.invocation_id]
 
-        # TODO:Add token count info. Need a release with https://github.com/google/adk-python/commit/1f0fd7bfce622459ef9dbc05ec96ffe6b613e4d1
-        if llm_response.content.parts[0].text:
-            span.set_attributes(
-                {
-                    "genai.output": llm_response.content.parts[0].text,
-                    "genai.output.type": "text",
-                }
-            )
-        else:
-            # Tool call
-            span.set_attributes(
-                {
-                    "genai.output": json.dumps(
-                        llm_response.content.model_dump(exclude_none=True),
-                        default=str,
-                        ensure_ascii=False,
-                    ),
-                    "genai.output.type": "json",
-                }
-            )
+        content = llm_response.content
+
+        if content:
+            if content.parts:
+                span.set_attributes(
+                    {
+                        "genai.output": getattr(content.parts[0], "text", "no_output"),
+                        "genai.output.type": "text",
+                    }
+                )
+            else:
+                # Tool call
+                span.set_attributes(
+                    {
+                        "genai.output": json.dumps(
+                            content.model_dump(exclude_none=True),
+                            default=str,
+                            ensure_ascii=False,
+                        ),
+                        "genai.output.type": "json",
+                    }
+                )
+
+        # TODO:Add token count info. Need to upgrade to google-adk>=1.0.0
+
         span.set_status(StatusCode.OK)
         span.end()
         del self._current_spans["model"][callback_context.invocation_id]
@@ -146,7 +151,8 @@ class _GoogleADKTracingCallbacks:
 
 
 class _GoogleADKInstrumentor:
-    _original_callbacks = {}
+    def __init__(self) -> None:
+        self._original_callbacks: dict[str, Any] = {}
 
     def instrument(self, tracer: Tracer) -> None:
         callbacks = _GoogleADKTracingCallbacks(tracer=tracer)
@@ -157,7 +163,7 @@ class _GoogleADKInstrumentor:
             self._original_callbacks[kwargs["name"]] = value
             return kwargs["callback_wrapper"]
 
-        wrap_object_attribute(  #type: ignore[no-untyped-call]
+        wrap_object_attribute(  # type: ignore[no-untyped-call]
             module="google.adk.agents.llm_agent",
             name="LlmAgent.before_model_callback",
             factory=callback_factory,
@@ -168,7 +174,7 @@ class _GoogleADKInstrumentor:
             },
         )
 
-        wrap_object_attribute(  #type: ignore[no-untyped-call]
+        wrap_object_attribute(  # type: ignore[no-untyped-call]
             module="google.adk.agents.llm_agent",
             name="LlmAgent.before_tool_callback",
             factory=callback_factory,
@@ -179,7 +185,7 @@ class _GoogleADKInstrumentor:
             },
         )
 
-        wrap_object_attribute(  #type: ignore[no-untyped-call]
+        wrap_object_attribute(  # type: ignore[no-untyped-call]
             module="google.adk.agents.llm_agent",
             name="LlmAgent.after_model_callback",
             factory=callback_factory,
@@ -190,7 +196,7 @@ class _GoogleADKInstrumentor:
             },
         )
 
-        wrap_object_attribute(  #type: ignore[no-untyped-call]
+        wrap_object_attribute(  # type: ignore[no-untyped-call]
             module="google.adk.agents.llm_agent",
             name="LlmAgent.after_tool_callback",
             factory=callback_factory,

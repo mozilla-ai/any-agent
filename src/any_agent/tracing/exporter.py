@@ -52,7 +52,7 @@ class AnyAgentExporter(SpanExporter):
         self.console.rule(span.kind, style=style)
 
         for key, value in span.attributes.items():
-            if span.is_panel_key(key):
+            if key in ("genai.input", "genai.output"):
                 self.console.print(
                     Panel(
                         Markdown(str(value or "")),
@@ -67,8 +67,9 @@ class AnyAgentExporter(SpanExporter):
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:  # noqa: D102
         for readable_span in spans:
             # Check if this span belongs to our run
-            if readable_span.instrumentation_scope.name != "any_agent":
-                continue
+            if scope := readable_span.instrumentation_scope:
+                if scope.name != "any_agent":
+                    continue
             if not readable_span.attributes:
                 continue
             agent_run_id = readable_span.attributes.get("gen_ai.request.id")

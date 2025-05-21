@@ -26,7 +26,7 @@ class _TinyAgentInstrumentor:
 
                 result: ModelResponse = await wrapped(*args, **kwargs)
 
-                span.set_attribute("gen_ai.response.model", result.model)
+                span.set_attribute("gen_ai.response.model", result.model)  # type: ignore[arg-type]
 
                 if message := getattr(result.choices[0], "message", None):
                     if message.content:

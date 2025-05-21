@@ -26,7 +26,6 @@ def do_eval(
     result = evaluate(
         evaluation_case=evaluation_case,
         trace=trace,
-        agent_framework=agent_framework,
     )
     logger.info(f"Final score: {result.score}")
 

@@ -4,7 +4,6 @@ from collections.abc import AsyncGenerator, Callable, Generator
 from textwrap import dedent
 from typing import Any
 from unittest.mock import AsyncMock, patch
-from uuid import uuid4
 
 import pytest
 from litellm.types.utils import ModelResponse
@@ -15,7 +14,7 @@ from opentelemetry.trace.status import Status, StatusCode
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
-from any_agent.tracing.trace import AgentSpan
+from any_agent.tracing.agent_trace import AgentSpan
 
 
 @pytest.fixture
@@ -59,23 +58,14 @@ def llm_span() -> ReadableSpan:
         end_time=int(time.time() + 1),
         status=Status(StatusCode.OK),
         attributes={
-            "any_agent.run_id": str(uuid4()),
-            "input.value": '{"messages": [[{"lc": 1, "type": "constructor", "id": ["langchain", "schema", "messages", "SystemMessage"], "kwargs": {"content": "Use the available tools to find the answer", "type": "system"}}, {"lc": 1, "type": "constructor", "id": ["langchain", "schema", "messages", "HumanMessage"], "kwargs": {"content": "Which agent framework is the best?", "type": "human", "id": "2aaf3de6-edf7-4cfa-9483-da348a6749da"}}]]}',
-            "input.mime_type": "application/json",
-            "output.value": '{"generations": [[{"text": "", "generation_info": {"finish_reason": "tool_calls"}, "type": "ChatGeneration", "message": {"lc": 1, "type": "constructor", "id": ["langchain", "schema", "messages", "AIMessage"], "kwargs": {"content": "", "additional_kwargs": {"tool_calls": [{"lc": 1, "type": "not_implemented", "id": ["litellm", "types", "utils", "ChatCompletionMessageToolCall"], "repr": "ChatCompletionMessageToolCall(function=Function(arguments=\'{\\"query\\":\\"best agent frameworks 2023\\"}\', name=\'search_web\'), id=\'call_hYPpXiyNNLiRRytLlJdNFpGN\', type=\'function\')"}]}, "response_metadata": {"token_usage": {"lc": 1, "type": "not_implemented", "id": ["litellm", "types", "utils", "Usage"], "repr": "Usage(completion_tokens=20, prompt_tokens=145, total_tokens=165, completion_tokens_details=CompletionTokensDetailsWrapper(accepted_prediction_tokens=0, audio_tokens=0, reasoning_tokens=0, rejected_prediction_tokens=0, text_tokens=None), prompt_tokens_details=PromptTokensDetailsWrapper(audio_tokens=0, cached_tokens=0, text_tokens=None, image_tokens=None))"}, "model": "gpt-4o-mini", "finish_reason": "tool_calls", "model_name": "gpt-4o-mini"}, "type": "ai", "id": "run-984943f2-6546-47fc-9b1d-81714109e374-0", "tool_calls": [{"name": "search_web", "args": {"query": "best agent frameworks 2023"}, "id": "call_hYPpXiyNNLiRRytLlJdNFpGN", "type": "tool_call"}], "usage_metadata": {"input_tokens": 145, "output_tokens": 20, "total_tokens": 165}, "invalid_tool_calls": []}}}]], "llm_output": {"token_usage": {"completion_tokens": 20, "prompt_tokens": 145, "total_tokens": 165, "completion_tokens_details": {"accepted_prediction_tokens": 0, "audio_tokens": 0, "reasoning_tokens": 0, "rejected_prediction_tokens": 0}, "prompt_tokens_details": {"audio_tokens": 0, "cached_tokens": 0}}, "model": "gpt-4o-mini"}, "run": null, "type": "LLMResult"}',
-            "output.mime_type": "application/json",
-            "llm.input_messages.0.message.role": "system",
-            "llm.input_messages.0.message.content": "Use the available tools to find the answer",
-            "llm.input_messages.1.message.role": "user",
-            "llm.input_messages.1.message.content": "Which agent framework is the best?",
-            "llm.output_messages.0.message.role": "assistant",
-            "llm.invocation_parameters": '{"model": "gpt-4o-mini", "temperature": null, "top_p": null, "top_k": null, "n": null, "_type": "litellm-chat", "stop": null, "tools": [{"type": "function", "function": {"name": "search_web", "description": "Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.\\n\\n    Args:\\n        query (str): The search query to perform.\\n\\n    Returns:\\n        The top search results.", "parameters": {"properties": {"query": {"type": "string"}}, "required": ["query"], "type": "object"}}}, {"type": "function", "function": {"name": "visit_webpage", "description": "Visits a webpage at the given url and reads its content as a markdown string. Use this to browse webpages.\\n\\n    Args:\\n        url: The url of the webpage to visit.", "parameters": {"properties": {"url": {"type": "string"}}, "required": ["url"], "type": "object"}}}], "tool_choice": null}',
-            "llm.model_name": "gpt-4o-mini",
-            "llm.token_count.prompt": 145,
-            "llm.token_count.completion": 20,
-            "llm.token_count.total": 165,
-            "metadata": '{"langgraph_step": 1, "langgraph_node": "agent", "langgraph_triggers": ["branch:to:agent", "start:agent", "tools"], "langgraph_path": ["__pregel_pull", "agent"], "langgraph_checkpoint_ns": "agent:b43d5300-228d-6e29-4b2f-7994f7924340", "checkpoint_ns": "agent:b43d5300-228d-6e29-4b2f-7994f7924340", "ls_provider": "litellm", "ls_model_type": "chat", "ls_model_name": "gpt-4o-mini"}',
-            "openinference.span.kind": "LLM",
+            "gen_ai.operation.name": "call_llm",
+            "gen_ai.request.model": "gpt-4.1-mini",
+            "genai.output": '[{"function": {"arguments": "{\\"timezone\\":\\"America/New_York\\"}", "name": "get_current_time"}, "id": "call_rL5jisCAFvjIaT8ijNPwTvZB", "type": "function"}]',
+            "genai.output.type": "json",
+            "gen_ai.usage.input_tokens": 286,
+            "gen_ai.usage.output_tokens": 18,
+            "input_cost": 0.00011439999999999999,
+            "output_cost": 0.0000288,
         },
         events=[],
         links=[],

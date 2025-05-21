@@ -170,17 +170,17 @@ class _LangChainInstrumentor:
             else:
                 kwargs["config"] = RunnableConfig(callbacks=[tracing_callback])
 
-            return await wrapped(*args, **kwargs)
+            return await wrapped(*args, **kwargs)  # type: ignore[func-returns-value]
 
         import langgraph
 
         self._original_ainvoke = langgraph.pregel.Pregel.ainvoke  # type: ignore[attr-defined]
-        wrap_function_wrapper(
+        wrap_function_wrapper(  # type: ignore[no-untyped-call]
             "langgraph.pregel", "Pregel.ainvoke", wrapper=wrap_ainvoke
         )
 
     def uninstrument(self) -> None:
         import langgraph
 
-        langgraph.pregel.Pregel.ainvoke = self._original_ainvoke  # type: ignore[no-untyped-call]
+        langgraph.pregel.Pregel.ainvoke = self._original_ainvoke  # type: ignore[attr-defined]
         self._original_ainvoke = None

@@ -1,12 +1,12 @@
 import datetime
 
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.otel_types import (
     Resource,
     SpanContext,
     SpanKind,
     Status,
 )
-from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
 def test_agent_trace_duration_simple() -> None:

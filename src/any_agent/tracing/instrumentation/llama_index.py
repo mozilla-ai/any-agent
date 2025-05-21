@@ -1,3 +1,4 @@
+# mypy: disable-error-code="no-untyped-call, no-untyped-def"
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -8,12 +9,12 @@ from llama_index.core.instrumentation.events.llm import (
     LLMChatEndEvent,
     LLMChatStartEvent,
 )
-from opentelemetry.trace import StatusCode
+from opentelemetry.trace import Span, StatusCode
 from pydantic import Field
 
 if TYPE_CHECKING:
     from llama_index.core.instrumentation.events import BaseEvent
-    from opentelemetry.trace import Span, Tracer
+    from opentelemetry.trace import Tracer
 
 
 class _LlamaIndexInstrumentor:
@@ -27,7 +28,7 @@ class _LlamaIndexInstrumentor:
 
             def handle(self, event: BaseEvent, **kwargs) -> Any:
                 if isinstance(event, LLMChatStartEvent):
-                    model = event.model_dict.get("model")
+                    model = event.model_dict["model"]
                     span: Span = tracer.start_span(
                         name=f"call_llm {model}",
                     )
@@ -38,26 +39,26 @@ class _LlamaIndexInstrumentor:
                         }
                     )
 
-                    self.current_spans[event.span_id] = span
+                    self.current_spans[str(event.span_id)] = span
                 elif isinstance(event, LLMChatEndEvent):
-                    response = event.response
-                    span = self.current_spans[event.span_id]
-                    span.set_attributes(
-                        {
-                            "genai.output": response.message.model_dump_json(
-                                exclude_none=True
-                            ),
-                            "genai.output.type": "json",
-                        }
-                    )
-                    token_usage = response.raw.get("usage")
-                    if token_usage:
+                    span = self.current_spans[str(event.span_id)]
+
+                    if response := event.response:
                         span.set_attributes(
                             {
-                                "gen_ai.usage.input_tokens": token_usage.prompt_tokens,
-                                "gen_ai.usage.output_tokens": token_usage.completion_tokens,
+                                "genai.output": response.message.model_dump_json(
+                                    exclude_none=True
+                                ),
+                                "genai.output.type": "json",
                             }
                         )
+                        if token_usage := getattr(response, "raw", {}).get("usage"):
+                            span.set_attributes(
+                                {
+                                    "gen_ai.usage.input_tokens": token_usage.prompt_tokens,
+                                    "gen_ai.usage.output_tokens": token_usage.completion_tokens,
+                                }
+                            )
                     span.set_status(StatusCode.OK)
                     span.end()
 

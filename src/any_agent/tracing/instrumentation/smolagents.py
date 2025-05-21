@@ -1,3 +1,4 @@
+# mypy: disable-error-code="no-untyped-call, no-untyped-def"
 from __future__ import annotations
 
 import json
@@ -99,12 +100,12 @@ class _SmolagentsInstrumentor:
 
         import smolagents
 
-        self._original_model_call = smolagents.models.Model.__call__  # type: ignore[no-untyped-call]
+        self._original_model_call = smolagents.models.Model.__call__
         wrap_function_wrapper(
             "smolagents.models", "Model.__call__", wrapper=model_call_wrap
         )
 
-        self._original_tool_call = smolagents.tools.Tool.__call__  # type: ignore[no-untyped-call]
+        self._original_tool_call = smolagents.tools.Tool.__call__
         wrap_function_wrapper(
             "smolagents.tools", "Tool.__call__", wrapper=tool_call_wrap
         )

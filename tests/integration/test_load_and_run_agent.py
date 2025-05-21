@@ -98,6 +98,8 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         assert agent_trace.final_output
         assert agent_trace.spans
         assert len(agent_trace.spans) > 0
+        with open("foo.json", "w") as f:
+            f.write(agent_trace.spans[0].model_dump_json())
         assert agent_trace.duration is not None
         assert isinstance(agent_trace.duration, timedelta)
         assert agent_trace.duration.total_seconds() > 0
@@ -132,7 +134,6 @@ def test_load_and_run_agent(agent_framework: AgentFramework, tmp_path: Path) -> 
         result: TraceEvaluationResult = evaluate(
             evaluation_case=case,
             trace=agent_trace,
-            agent_framework=agent_framework,
         )
         assert result
         assert result.score == float(2 / 3)

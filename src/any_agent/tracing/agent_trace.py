@@ -117,10 +117,6 @@ class AgentSpan(BaseModel):
             resource=Resource.from_otel(readable_span.resource),
         )
 
-    @staticmethod
-    def is_panel_key(key: str) -> bool:
-        return key in ("input", "genai.output")
-
     def add_cost_info(self) -> None:
         """Extend attributes with `TokenUseAndCost`."""
         cost_info = extract_token_use_and_cost(self.attributes)

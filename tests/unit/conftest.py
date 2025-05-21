@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from any_agent.tracing.trace import AgentTrace
+from any_agent import AgentTrace
 
 
 @pytest.fixture

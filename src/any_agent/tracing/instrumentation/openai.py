@@ -29,7 +29,7 @@ class _OpenAIAgentsInstrumentor:
             def on_span_start(self, span):  # type: ignore[no-untyped-def]
                 span_data = span.span_data
                 if isinstance(span_data, GenerationSpanData):
-                    model = span_data.model
+                    model = str(span_data.model)
                     otel_span = self.tracer.start_span(
                         name=f"call_llm {model}",
                     )
@@ -56,36 +56,35 @@ class _OpenAIAgentsInstrumentor:
                 span_data = span.span_data
                 if isinstance(span_data, GenerationSpanData):
                     otel_span = self.current_spans[span.span_id]
-                    output = span_data.output[0]
-                    if output.get("content"):
+                    if output := span_data.output:
+                        if content := output[0].get("content"):
+                            otel_span.set_attributes(
+                                {
+                                    "genai.output": content,
+                                    "genai.output.type": "text",
+                                }
+                            )
+                        elif tool_calls := output[0].get("tool_calls"):
+                            # Tool Call
+                            otel_span.set_attributes(
+                                {
+                                    "genai.output": json.dumps(
+                                        tool_calls,
+                                        default=str,
+                                        ensure_ascii=False,
+                                    ),
+                                    "genai.output.type": "json",
+                                }
+                            )
+                    if token_usage := span_data.usage:
                         otel_span.set_attributes(
                             {
-                                "genai.output": output.get("content"),
-                                "genai.output.type": "text",
-                            }
-                        )
-                    else:
-                        # Tool Call
-                        otel_span.set_attributes(
-                            {
-                                "genai.output": json.dumps(
-                                    output.get("tool_calls"),
-                                    default=str,
-                                    ensure_ascii=False,
-                                ),
-                                "genai.output.type": "json",
-                            }
-                        )
-                    token_usage = span_data.usage
-                    if token_usage:
-                        otel_span.set_attributes(
-                            {
-                                "gen_ai.usage.input_tokens": token_usage.get(
+                                "gen_ai.usage.input_tokens": token_usage[
                                     "input_tokens"
-                                ),
-                                "gen_ai.usage.output_tokens": token_usage.get(
+                                ],
+                                "gen_ai.usage.output_tokens": token_usage[
                                     "output_tokens"
-                                ),
+                                ],
                             }
                         )
                     otel_span.set_status(StatusCode.OK)
@@ -95,7 +94,7 @@ class _OpenAIAgentsInstrumentor:
                     otel_span = self.current_spans[span.span_id]
                     otel_span.set_attributes(
                         {
-                            "genai.output": span_data.output,
+                            "genai.output": span_data.output or "no_output",
                             "genai.output.type": "json",
                         }
                     )
