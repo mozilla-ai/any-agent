@@ -20,6 +20,8 @@ nav:
   - Tracing: tracing.md
   - Evaluation: evaluation.md
   - Serving (A2A): serving.md
+  - Cookbook:
+      - Your First Agent: cookbook/your_first_agent.ipynb
   - API Reference:
     - Agent: api/agent.md
     - Config: api/config.md
@@ -42,11 +44,13 @@ theme:
         name: Switch to light mode
   logo: images/any-agent-logo-mark.png
   favicon: images/any-agent_favicon.png
-  extra_css:
-    - assets/custom.css
   features:
     - content.code.copy
     - content.tabs.link
+    - content.action.edit
+
+extra_css:
+  - assets/custom.css
 
 markdown_extensions:
   - admonition
@@ -63,9 +67,14 @@ markdown_extensions:
 plugins:
 - search
 - include-markdown
+- mkdocs-jupyter:
+      no_input: false
+      show_input: true
 - mkdocstrings:
     handlers:
       python:
         options:
           show_root_heading: true
           heading_level: 3
+
+edit_uri: edit/main/docs/
