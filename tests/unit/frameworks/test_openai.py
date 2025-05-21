@@ -216,8 +216,8 @@ def test_load_openai_multiagent() -> None:
             name="any_agent",
             handoffs=[mock_agent.return_value],
             tools=[
-                mock_agent.return_value.as_tool.return_value,
-                mock_agent.return_value.as_tool.return_value,
+                mock_function_tool(mock_agent.return_value.as_tool.return_value),
+                mock_function_tool(mock_agent.return_value.as_tool.return_value),
             ],
             mcp_servers=[],
         )
