@@ -227,6 +227,6 @@ class AnyAgent(ABC):
     def exit(self) -> None:
         """Exit the agent and clean up resources."""
         if self._instrumentor is not None:
-            self._instrumentor.uninstrument()  # otherwise, this gets called in the __del__ method of Tracer
+            self._instrumentor.uninstrument()
             self._instrumentor = None
         self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected
