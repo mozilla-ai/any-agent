@@ -6,6 +6,7 @@ import pytest
 import time
 from litellm.utils import validate_environment
 from rich.logging import RichHandler
+import asyncio
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import TracingConfig, ServingConfig
@@ -51,12 +52,11 @@ def test_load_and_run_multi_agent(
     agent_framework: AgentFramework,
     check_multi_tool_usage: Callable[[list[AgentSpan]], None],
 ) -> None:
-    kwargs = {}
+    """Tests that an agent contacts another using A2A using the adapter tool.
 
-    if agent_framework is AgentFramework.TINYAGENT:
-        pytest.skip(
-            f"Skipping test for {agent_framework.name} because it does not support multi-agent"
-        )
+    Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
+    """
+    kwargs = {}
 
     kwargs["model_id"] = "gpt-4.1-nano"
     agent_model = kwargs["model_id"]
@@ -119,7 +119,8 @@ def test_load_and_run_multi_agent(
             "Which LLM agent framework is the most appropriate to execute SQL queries using grammar constrained decoding? I am working on a business environment on my own premises, and I would prefer hosting an open source model myself."
         )
 
-        print(agent_trace)
+        print(agent_trace.spans)
+        print(agent_trace.final_output)
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output

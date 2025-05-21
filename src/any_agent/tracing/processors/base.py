@@ -144,6 +144,28 @@ class TracingProcessor(ABC):
 
         return calls
 
+    def _is_tool(self, span: AgentSpan) -> bool:
+        if "tool.name" in span.attributes:
+            return True
+        if span.name.endswith("Tool"):
+            return True
+        # SmolAgents
+        if span.name.startswith("tool_call"):
+            return True
+        if span.name.startswith("tool_response"):
+            return True
+        return False
+
+    def _is_llm(self, span: AgentSpan) -> bool:
+        span_kind = span.attributes.get("openinference.span.kind", "")
+        if span_kind == "LLM":
+            return True
+        if "LiteLLMModel.__call__" in span.name:
+            return True
+        if span.name.startswith("call_llm"):
+            return True
+        return False
+
     def extract_interaction(
         self,
         span: AgentSpan,
@@ -151,9 +173,9 @@ class TracingProcessor(ABC):
         """Extract interaction details from a span."""
         span_kind = span.attributes.get("openinference.span.kind", "")
 
-        if span_kind == "LLM" or "LiteLLMModel.__call__" in span.name:
+        if self._is_llm(span):
             return "LLM", self._extract_llm_interaction(span)
-        if "tool.name" in span.attributes or span.name.endswith("Tool"):
+        if self._is_tool(span):
             return "TOOL", self._extract_tool_interaction(span)
         if span_kind == "CHAIN":
             return "CHAIN", self._extract_chain_interaction(span)
