@@ -71,14 +71,14 @@ def assert_cost(agent_trace: AgentTrace) -> None:
     assert agent_trace.cost.input_cost + agent_trace.cost.output_cost < 1.00
 
 
-def assert_tokens(agent_trace: AgentTrace):
+def assert_tokens(agent_trace: AgentTrace) -> None:
     assert isinstance(agent_trace.tokens, TokenInfo)
     assert agent_trace.tokens.input_tokens > 0
     assert agent_trace.tokens.output_tokens > 0
     assert (agent_trace.tokens.input_tokens + agent_trace.tokens.output_tokens) < 20000
 
 
-def assert_eval(agent_trace):
+def assert_eval(agent_trace: AgentTrace) -> None:
     case = EvaluationCase(
         llm_judge="gpt-4.1-mini",
         checkpoints=[
