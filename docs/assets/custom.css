@@ -28,7 +28,6 @@
 
 /* Add the text after the icon */
 .md-content__button.md-icon::after {
-  content: "edit on github";
   font-size: 1.1em;
   color: #24292f;
   font-family: inherit;
