@@ -4,7 +4,7 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from opentelemetry.trace import StatusCode
-from wrapt import resolve_path, wrap_object_attribute  # type: ignore[attr-defined]
+from wrapt.patches import resolve_path, wrap_object_attribute
 
 if TYPE_CHECKING:
     from google.adk.agents.callback_context import CallbackContext
@@ -152,7 +152,12 @@ class _GoogleADKTracingCallbacks:
 
 class _GoogleADKInstrumentor:
     def __init__(self) -> None:
-        self._original_callbacks: dict[str, Any] = {}
+        self._original_callbacks: dict[str, Any] = {
+            "LlmAgent.before_model_callback": None,
+            "LlmAgent.before_tool_callback": None,
+            "LlmAgent.after_model_callback": None,
+            "LlmAgent.after_tool_callback": None,
+        }
 
     def instrument(self, tracer: Tracer) -> None:
         callbacks = _GoogleADKTracingCallbacks(tracer=tracer)

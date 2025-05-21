@@ -65,4 +65,9 @@ class _LlamaIndexInstrumentor:
         get_dispatcher().add_event_handler(_AnyAgentEventHandler())
 
     def uninstrument(self):
-        pass
+        dispatcher = get_dispatcher()
+        dispatcher.event_handlers = [
+            handler
+            for handler in dispatcher.event_handlers
+            if handler.class_name() != "AnyAgentEventHandler"
+        ]

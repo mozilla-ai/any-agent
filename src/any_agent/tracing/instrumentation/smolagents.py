@@ -5,7 +5,7 @@ import json
 from typing import TYPE_CHECKING
 
 from opentelemetry.trace import StatusCode
-from wrapt.patches import wrap_function_wrapper
+from wrapt.patches import resolve_path, wrap_function_wrapper
 
 if TYPE_CHECKING:
     from opentelemetry.trace import Tracer
@@ -111,4 +111,7 @@ class _SmolagentsInstrumentor:
         )
 
     def uninstrument(self) -> None:
-        pass
+        model = resolve_path("smolagents.models", "Model")[2]
+        model.__call__ = self._original_model_call
+        tool = resolve_path("smolagents.tools", "Tool")[2]
+        tool.__call__ = self._original_tool_call

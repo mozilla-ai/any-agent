@@ -1,10 +1,11 @@
+# mypy: disable-error-code="no-untyped-call, no-untyped-def"
 from __future__ import annotations
 
 import json
 from typing import TYPE_CHECKING
 
 from opentelemetry.trace import StatusCode
-from wrapt.patches import wrap_function_wrapper
+from wrapt.patches import resolve_path, wrap_function_wrapper
 
 if TYPE_CHECKING:
     from opentelemetry.trace import Span, Tracer
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 
 class _AgnoInstrumentor:
     def instrument(self, tracer: Tracer) -> None:
-        async def wrap_aprocess_model_response(  # type: ignore[no-untyped-def]
+        async def wrap_aprocess_model_response(
             wrapped,
             instance,
             args,
@@ -60,7 +61,7 @@ class _AgnoInstrumentor:
 
             return assistant_message, has_tool_calls
 
-        async def wrap_arun_function_calls(  # type: ignore[no-untyped-def]
+        async def wrap_arun_function_calls(
             wrapped,
             instance,
             args,
@@ -104,18 +105,20 @@ class _AgnoInstrumentor:
         import agno
 
         self._original_aprocess_model = agno.models.base.Model._aprocess_model_response  # type: ignore[attr-defined]
-        wrap_function_wrapper(  # type: ignore[no-untyped-call]
+        wrap_function_wrapper(
             "agno.models.base",
             "Model._aprocess_model_response",
             wrapper=wrap_aprocess_model_response,
         )
 
         self._original_arun_function_calls = agno.models.base.Model.arun_function_calls  # type: ignore[attr-defined]
-        wrap_function_wrapper(  # type: ignore[no-untyped-call]
+        wrap_function_wrapper(
             "agno.models.base",
             "Model.arun_function_calls",
             wrapper=wrap_arun_function_calls,
         )
 
     def uninstrument(self) -> None:
-        pass
+        parent = resolve_path("agno.models.base", "Model")[2]
+        parent._aprocess_model_response = self._original_aprocess_model
+        parent.arun_function_calls = self._original_arun_function_calls

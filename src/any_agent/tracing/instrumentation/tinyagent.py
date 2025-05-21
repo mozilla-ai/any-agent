@@ -1,10 +1,11 @@
+# mypy: disable-error-code="no-untyped-call, no-untyped-def"
 from __future__ import annotations
 
 import json
 from typing import TYPE_CHECKING
 
 from opentelemetry.trace import StatusCode
-from wrapt.patches import wrap_function_wrapper
+from wrapt.patches import resolve_path, wrap_function_wrapper
 
 if TYPE_CHECKING:
     from litellm.types.utils import ModelResponse
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 
 class _TinyAgentInstrumentor:
     def instrument(self, tracer: Tracer) -> None:
-        async def model_call_wrap(wrapped, instance, args, kwargs):  # type: ignore[no-untyped-def]
+        async def model_call_wrap(wrapped, instance, args, kwargs):
             with tracer.start_as_current_span(
                 f"call_llm {kwargs.get('model')}"
             ) as span:
@@ -69,7 +70,7 @@ class _TinyAgentInstrumentor:
 
                 return result
 
-        async def tool_call_wrap(wrapped, instance, args, kwargs):  # type: ignore[no-untyped-def]
+        async def tool_call_wrap(wrapped, instance, args, kwargs):
             request = args[0]
             with tracer.start_as_current_span(
                 f"execute_tool {request.get('name')}"
@@ -108,14 +109,19 @@ class _TinyAgentInstrumentor:
         import any_agent
 
         self._original_model_call = litellm.acompletion
-        wrap_function_wrapper("litellm", "acompletion", wrapper=model_call_wrap)  # type: ignore[no-untyped-call]
+        wrap_function_wrapper("litellm", "acompletion", wrapper=model_call_wrap)
 
         self._original_tool_call = any_agent.frameworks.tinyagent.ToolExecutor.call_tool
-        wrap_function_wrapper(  # type: ignore[no-untyped-call]
+        wrap_function_wrapper(
             "any_agent.frameworks.tinyagent",
             "ToolExecutor.call_tool",
             wrapper=tool_call_wrap,
         )
 
     def uninstrument(self) -> None:
-        pass
+        import litellm
+
+        litellm.acompletion = self._original_model_call
+
+        parent = resolve_path("any_agent.frameworks.tinyagent", "ToolExecutor")[2]
+        parent.call_tool = self._original_tool_call

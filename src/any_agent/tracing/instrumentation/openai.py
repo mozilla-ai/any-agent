@@ -111,4 +111,6 @@ class _OpenAIAgentsInstrumentor:
         set_trace_processors([AnyAgentTracingProcessor(tracer)])
 
     def uninstrument(self) -> None:
-        pass
+        from agents.tracing.setup import GLOBAL_TRACE_PROVIDER
+
+        GLOBAL_TRACE_PROVIDER.set_processors([])
