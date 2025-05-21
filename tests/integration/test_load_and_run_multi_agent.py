@@ -20,9 +20,7 @@ def test_load_and_run_multi_agent(
         pytest.skip(
             "Skipping test for TINYAGENT because it does not support multi-agent"
         )
-    if (
-        agent_framework is AgentFramework.LLAMA_INDEX
-    ):
+    if agent_framework is AgentFramework.LLAMA_INDEX:
         pytest.skip(
             "Skipping test for LLAMA_INDEX because it does not generate tool spans."
             "See https://github.com/run-llama/llama_index/issues/18776."

@@ -149,26 +149,30 @@ class _LangChainInstrumentor:
     def instrument(self, tracer: Tracer) -> None:
         tracing_callback = _LangChainTracingCallback(tracer)
 
+        self._config_set = False
+
         async def wrap_ainvoke(  # type: ignore[no-untyped-def]
             wrapped: Callable[..., None],
             instance: Any,
             args: Any,
             kwargs: Any,
         ):
-            if "config" in kwargs:
-                if callbacks := kwargs["config"].get("callbacks"):
-                    if isinstance(callbacks, list):
-                        kwargs["config"]["callbacks"].append(tracing_callback)
+            if not self._config_set:
+                if "config" in kwargs:
+                    if callbacks := kwargs["config"].get("callbacks"):
+                        if isinstance(callbacks, list):
+                            kwargs["config"]["callbacks"].append(tracing_callback)
+                        else:
+                            original_callback = kwargs["config"]["callbacks"]
+                            kwargs["config"]["callbacks"] = [
+                                original_callback,
+                                tracing_callback,
+                            ]
                     else:
-                        original_callback = kwargs["config"]["callbacks"]
-                        kwargs["config"]["callbacks"] = [
-                            original_callback,
-                            tracing_callback,
-                        ]
+                        kwargs["config"]["callbacks"] = [tracing_callback]
                 else:
-                    kwargs["config"]["callbacks"] = [tracing_callback]
-            else:
-                kwargs["config"] = RunnableConfig(callbacks=[tracing_callback])
+                    kwargs["config"] = RunnableConfig(callbacks=[tracing_callback])
+                self._config_set = True
 
             return await wrapped(*args, **kwargs)  # type: ignore[func-returns-value]
 
