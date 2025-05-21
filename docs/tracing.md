@@ -4,7 +4,7 @@
 standardized [OpenTelemetry](https://opentelemetry.io/) traces for any of the supported `Frameworks`,
 based on the [Semantic conventions for generative AI systems](https://opentelemetry.io/docs/specs/semconv/gen-ai/).
 
-An [`AgentTrace`][any_agent.tracing.trace.AgentTrace] is returned when calling [`agent.run`][any_agent.AnyAgent.run] or [`agent.run_async`][any_agent.AnyAgent.run_async].
+An [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] is returned when calling [`agent.run`][any_agent.AnyAgent.run] or [`agent.run_async`][any_agent.AnyAgent.run_async].
 
 ## Example
 

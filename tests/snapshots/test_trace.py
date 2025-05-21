@@ -1,6 +1,6 @@
 from syrupy.assertion import SnapshotAssertion
 
-from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
 
 
 def test_agent_trace_snapshot(
