@@ -130,7 +130,7 @@ class _GoogleADKTracingCallbacks:
             span.set_attributes(
                 {
                     "genai.output": json.dumps(
-                        content.model_dump(exclude_none=True),
+                        content[0].model_dump(exclude_none=True),
                         default=str,
                         ensure_ascii=False,
                     ),

@@ -108,8 +108,8 @@ def test_load_and_run_multi_agent(
         assert len(agent_trace.spans) > 0
         assert agent_trace.cost.output_cost > 0
         assert agent_trace.cost.output_cost < 1.00
-        assert agent_trace.usage.output_tokens > 0
-        assert agent_trace.usage.output_tokens < 20000
+        assert agent_trace.tokens.output_tokens > 0
+        assert agent_trace.tokens.output_tokens < 20000
         traces = agent_trace.spans
         organize(traces)
         if agent_framework == AgentFramework.AGNO:

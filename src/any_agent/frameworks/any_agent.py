@@ -160,6 +160,7 @@ class AnyAgent(ABC):
         ) as invoke_span:
             invoke_span.set_attributes(
                 {
+                    "gen_ai.operation.name": "invoke_agent",
                     "gen_ai.agent.name": self.config.name,
                     "gen_ai.agent.description": self.config.description
                     or "No description.",

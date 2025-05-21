@@ -118,9 +118,17 @@ class AgentSpan(BaseModel):
                 logger.warning("Overwriting attribute %s with %s", key, value)
             self.attributes[key] = value
 
+    def is_agent_invocation(self) -> bool:
+        """Check whether this span is an agent invocation (the very first span)."""
+        return self.attributes.get("gen_ai.operation.name") == "invoke_agent"
+
     def is_llm_call(self) -> bool:
         """Check whether this span is a call to an LLM."""
         return self.attributes.get("gen_ai.operation.name") == "call_llm"
+
+    def is_tool_execution(self) -> bool:
+        """Check whether this span is an execution of a tool."""
+        return self.attributes.get("gen_ai.operation.name") == "execute_tool"
 
 
 class AgentTrace(BaseModel):
@@ -139,7 +147,7 @@ class AgentTrace(BaseModel):
     def _invalidate_usage_and_cost_cache(self) -> None:
         """Clear the cached usage_and_cost property if it exists."""
         if "usage" in self.__dict__:
-            del self.usage
+            del self.tokens
         if "cost" in self.__dict__:
             del self.cost
 
@@ -155,30 +163,31 @@ class AgentTrace(BaseModel):
 
     @property
     def duration(self) -> timedelta:
-        """Returns the duration of the AGENT span named 'any_agent' as a datetime.timedelta object.
+        """Duration of the parent `invoke_agent` span as a datetime.timedelta object.
 
         The duration is computed from the span's start and end time (in nanoseconds).
-        This functionality relies on the trace behavior where we create a span named 'any_agent' for each agent run,
-        which is defined in each agent framework's `run` function.
 
-        Raises ValueError if there are no spans, if the AGENT span is not found, or if start/end times are missing.
+        Raises ValueError if:
+            - There are no spans.
+            - The invoke_agent span is not the last span.
+            - Any of the start/end times are missing.
         """
         if not self.spans:
             msg = "No spans found in trace"
             raise ValueError(msg)
-        for span in self.spans:
-            if span.attributes.get("any_agent.run_id"):
-                if span.start_time is not None and span.end_time is not None:
-                    duration_ns = span.end_time - span.start_time
-                    return timedelta(seconds=duration_ns / 1_000_000_000)
-                msg = "Start or end time is missing for the AGENT span"
-                raise ValueError(msg)
-        msg = "Span with any_agent.run_id not found in trace"
+        span = self.spans[-1]
+        if not span.is_agent_invocation():
+            msg = "Last span is not `invoke_agent`"
+            raise ValueError(msg)
+        if span.start_time is not None and span.end_time is not None:
+            duration_ns = span.end_time - span.start_time
+            return timedelta(seconds=duration_ns / 1_000_000_000)
+        msg = "Start or end time is missing for the `invoke_agent` span"
         raise ValueError(msg)
 
     @cached_property
-    def usage(self) -> TokenInfo:
-        """The current total token usage statistics for this trace. Cached after first computation."""
+    def tokens(self) -> TokenInfo:
+        """The current total token count for this trace. Cached after first computation."""
         sum_input_tokens = 0
         sum_output_tokens = 0
         for span in self.spans:
@@ -191,7 +200,7 @@ class AgentTrace(BaseModel):
 
     @cached_property
     def cost(self) -> CostInfo:
-        """The current total cost statistics for this trace. Cached after first computation."""
+        """The current total cost for this trace. Cached after first computation."""
         sum_input_cost = 0
         sum_output_cost = 0
         for span in self.spans:
