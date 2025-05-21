@@ -150,7 +150,7 @@ class AgentTrace(BaseModel):
     """A trace that can be exported to JSON or printed to the console."""
 
     spans: list[AgentSpan] = Field(default_factory=list)
-    """A list of [`AgentSpan`][any_agent.tracing.trace.AgentSpan] that form the trace.
+    """A list of [`AgentSpan`][any_agent.tracing.agent_trace.AgentSpan] that form the trace.
     """
 
     final_output: str | None = None
