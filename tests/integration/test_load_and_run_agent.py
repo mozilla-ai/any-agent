@@ -142,7 +142,6 @@ def test_load_and_run_agent(
         result: TraceEvaluationResult = evaluate(
             evaluation_case=case,
             trace=agent_trace,
-            agent_framework=agent_framework,
         )
         assert result
         assert result.score == float(2 / 3)

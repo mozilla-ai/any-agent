@@ -118,7 +118,7 @@ class AgentSpan(BaseModel):
                 logger.warning("Overwriting attribute %s with %s", key, value)
             self.attributes[key] = value
 
-    def is_llm_call(self):
+    def is_llm_call(self) -> bool:
         """Check whether this span is a call to an LLM."""
         return self.attributes.get("gen_ai.operation.name") == "call_llm"
 
