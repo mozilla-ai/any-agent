@@ -1,0 +1,518 @@
+{
+  "spans": [
+    {
+      "name": "mcp_tools",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 4027014764254572619,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703776883974912,
+      "end_time": 1747703776884804864,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 17571840300537932390,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.system": "openai",
+        "output.value": "[\"get_current_time\", \"convert_time\"]",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "CHAIN",
+        "service.name": "openai"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "generation",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 4027014764254572619,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703776885172992,
+      "end_time": 1747703778351859968,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 2354968399456182861,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.system": "openai",
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.invocation_parameters": "{\"temperature\": 0.0, \"parallel_tool_calls\": false, \"base_url\": \"\", \"model_impl\": \"litellm\"}",
+        "input.value": "[{\"content\": \"Search the web to answer\", \"role\": \"system\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]",
+        "input.mime_type": "application/json",
+        "llm.input_messages.0.message.role": "system",
+        "llm.input_messages.0.message.content": "Search the web to answer",
+        "llm.input_messages.1.message.role": "user",
+        "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
+        "output.value": "[{\"content\": null, \"role\": \"assistant\", \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\", \"name\": \"get_current_time\"}, \"id\": \"call_sODhXQeZzcyeUGUqU5t4XwcS\", \"type\": \"function\"}], \"function_call\": null, \"annotations\": []}]",
+        "output.mime_type": "application/json",
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_sODhXQeZzcyeUGUqU5t4XwcS",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "get_current_time",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.arguments": "{\"timezone\":\"America/New_York\"}",
+        "llm.token_count.prompt": 286,
+        "llm.token_count.completion": 18,
+        "openinference.span.kind": "LLM",
+        "service.name": "openai",
+        "cost_prompt": 0.00011439999999999999,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "get_current_time",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 4027014764254572619,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703778353416960,
+      "end_time": 1747703778355171840,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 6924183169858077663,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.system": "openai",
+        "tool.name": "get_current_time",
+        "input.value": "{\"timezone\":\"America/New_York\"}",
+        "input.mime_type": "application/json",
+        "output.value": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T21:16:18-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
+        "output.mime_type": "application/json",
+        "openinference.span.kind": "TOOL",
+        "service.name": "openai"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "generation",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 4027014764254572619,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703778356619008,
+      "end_time": 1747703779785732864,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 15048815751618262242,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.system": "openai",
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.invocation_parameters": "{\"temperature\": 0.0, \"parallel_tool_calls\": false, \"base_url\": \"\", \"model_impl\": \"litellm\"}",
+        "input.value": "[{\"content\": \"Search the web to answer\", \"role\": \"system\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_sODhXQeZzcyeUGUqU5t4XwcS\", \"type\": \"function\", \"function\": {\"name\": \"get_current_time\", \"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_sODhXQeZzcyeUGUqU5t4XwcS\", \"content\": \"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"{\\\\n  \\\\\\\"timezone\\\\\\\": \\\\\\\"America/New_York\\\\\\\",\\\\n  \\\\\\\"datetime\\\\\\\": \\\\\\\"2025-05-19T21:16:18-04:00\\\\\\\",\\\\n  \\\\\\\"is_dst\\\\\\\": true\\\\n}\\\",\\\"annotations\\\":null}\"}]",
+        "input.mime_type": "application/json",
+        "llm.input_messages.0.message.role": "system",
+        "llm.input_messages.0.message.content": "Search the web to answer",
+        "llm.input_messages.1.message.role": "user",
+        "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
+        "llm.input_messages.2.message.role": "assistant",
+        "llm.input_messages.2.message.tool_calls.0.tool_call.id": "call_sODhXQeZzcyeUGUqU5t4XwcS",
+        "llm.input_messages.2.message.tool_calls.0.tool_call.function.name": "get_current_time",
+        "llm.input_messages.2.message.tool_calls.0.tool_call.function.arguments": "{\"timezone\":\"America/New_York\"}",
+        "llm.input_messages.3.message.role": "tool",
+        "llm.input_messages.3.message.content": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T21:16:18-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
+        "llm.input_messages.3.message.tool_call_id": "call_sODhXQeZzcyeUGUqU5t4XwcS",
+        "output.value": "[{\"content\": null, \"role\": \"assistant\", \"tool_calls\": [{\"function\": {\"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\", \"name\": \"write_file\"}, \"id\": \"call_FssHClGcaCPzmR9cTnXAnrLY\", \"type\": \"function\"}], \"function_call\": null, \"annotations\": []}]",
+        "output.mime_type": "application/json",
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.id": "call_FssHClGcaCPzmR9cTnXAnrLY",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.name": "write_file",
+        "llm.output_messages.0.message.tool_calls.0.tool_call.function.arguments": "{\"text\":\"2025\"}",
+        "llm.token_count.prompt": 369,
+        "llm.token_count.completion": 15,
+        "openinference.span.kind": "LLM",
+        "service.name": "openai",
+        "cost_prompt": 0.00014759999999999998,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "write_file",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 4027014764254572619,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703779790039040,
+      "end_time": 1747703779791441920,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 2965888732819264012,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.system": "openai",
+        "tool.name": "write_file",
+        "input.value": "{\"text\":\"2025\"}",
+        "input.mime_type": "application/json",
+        "openinference.span.kind": "TOOL",
+        "service.name": "openai"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "generation",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 4027014764254572619,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703779793998080,
+      "end_time": 1747703780698921984,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 14582906007277699820,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.system": "openai",
+        "llm.model_name": "gpt-4.1-mini",
+        "llm.invocation_parameters": "{\"temperature\": 0.0, \"parallel_tool_calls\": false, \"base_url\": \"\", \"model_impl\": \"litellm\"}",
+        "input.value": "[{\"content\": \"Search the web to answer\", \"role\": \"system\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_sODhXQeZzcyeUGUqU5t4XwcS\", \"type\": \"function\", \"function\": {\"name\": \"get_current_time\", \"arguments\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_sODhXQeZzcyeUGUqU5t4XwcS\", \"content\": \"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"{\\\\n  \\\\\\\"timezone\\\\\\\": \\\\\\\"America/New_York\\\\\\\",\\\\n  \\\\\\\"datetime\\\\\\\": \\\\\\\"2025-05-19T21:16:18-04:00\\\\\\\",\\\\n  \\\\\\\"is_dst\\\\\\\": true\\\\n}\\\",\\\"annotations\\\":null}\"}, {\"role\": \"assistant\", \"tool_calls\": [{\"id\": \"call_FssHClGcaCPzmR9cTnXAnrLY\", \"type\": \"function\", \"function\": {\"name\": \"write_file\", \"arguments\": \"{\\\"text\\\":\\\"2025\\\"}\"}}]}, {\"role\": \"tool\", \"tool_call_id\": \"call_FssHClGcaCPzmR9cTnXAnrLY\", \"content\": \"None\"}]",
+        "input.mime_type": "application/json",
+        "llm.input_messages.0.message.role": "system",
+        "llm.input_messages.0.message.content": "Search the web to answer",
+        "llm.input_messages.1.message.role": "user",
+        "llm.input_messages.1.message.content": "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
+        "llm.input_messages.2.message.role": "assistant",
+        "llm.input_messages.2.message.tool_calls.0.tool_call.id": "call_sODhXQeZzcyeUGUqU5t4XwcS",
+        "llm.input_messages.2.message.tool_calls.0.tool_call.function.name": "get_current_time",
+        "llm.input_messages.2.message.tool_calls.0.tool_call.function.arguments": "{\"timezone\":\"America/New_York\"}",
+        "llm.input_messages.3.message.role": "tool",
+        "llm.input_messages.3.message.content": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-05-19T21:16:18-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null}",
+        "llm.input_messages.3.message.tool_call_id": "call_sODhXQeZzcyeUGUqU5t4XwcS",
+        "llm.input_messages.4.message.role": "assistant",
+        "llm.input_messages.4.message.tool_calls.1.tool_call.id": "call_FssHClGcaCPzmR9cTnXAnrLY",
+        "llm.input_messages.4.message.tool_calls.1.tool_call.function.name": "write_file",
+        "llm.input_messages.4.message.tool_calls.1.tool_call.function.arguments": "{\"text\":\"2025\"}",
+        "llm.input_messages.5.message.role": "tool",
+        "llm.input_messages.5.message.content": "None",
+        "llm.input_messages.5.message.tool_call_id": "call_FssHClGcaCPzmR9cTnXAnrLY",
+        "output.value": "[{\"content\": \"The current year in the America/New_York timezone is 2025. I have written this value to a file.\", \"role\": \"assistant\", \"tool_calls\": null, \"function_call\": null, \"annotations\": []}]",
+        "output.mime_type": "application/json",
+        "llm.output_messages.0.message.role": "assistant",
+        "llm.output_messages.0.message.content": "The current year in the America/New_York timezone is 2025. I have written this value to a file.",
+        "llm.token_count.prompt": 393,
+        "llm.token_count.completion": 25,
+        "openinference.span.kind": "LLM",
+        "service.name": "openai",
+        "cost_prompt": 0.0001572,
+        "cost_completion": 0.0
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "any_agent",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 10721391478341357928,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703776883904000,
+      "end_time": 1747703780704185856,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 4027014764254572619,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "llm.system": "openai",
+        "openinference.span.kind": "AGENT",
+        "service.name": "openai"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "Agent workflow",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 6918154319248594771,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703776883854000,
+      "end_time": 1747703780704453000,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 10721391478341357928,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "openinference.span.kind": "AGENT",
+        "service.name": "openai"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "agent_run",
+      "kind": "internal",
+      "parent": {
+        "trace_id": null,
+        "span_id": null,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1747703776883696000,
+      "end_time": 1747703780704559000,
+      "status": {
+        "status_code": "unset",
+        "description": null
+      },
+      "context": {
+        "trace_id": 70503246895701876745630889114692149350,
+        "span_id": 6918154319248594771,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "any_agent.run_id": "92a596d7-2b0d-42ab-a431-a43eb1e9fe86",
+        "service.name": "openai"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    }
+  ],
+  "final_output": "The current year in the America/New_York timezone is 2025. I have written this value to a file."
+}

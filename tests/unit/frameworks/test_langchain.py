@@ -29,7 +29,7 @@ def test_load_langchain_agent_default() -> None:
         create_mock.assert_called_once_with(
             name="any_agent",
             model=model_mock.return_value,
-            tools=[tool_mock(search_web), tool_mock(visit_webpage)],
+            tools=[],
             prompt=None,
         )
 
