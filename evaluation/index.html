@@ -674,7 +674,7 @@
           <li class="md-nav__item">
   <a href="#run-the-evaluation-using-the-test-case-and-trace" class="md-nav__link">
     <span class="md-ellipsis">
-      Run the evaluation using the test case and trace.
+      Run the evaluation using the test case and trace
     </span>
   </a>
   
@@ -682,15 +682,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#command-line" class="md-nav__link">
-    <span class="md-ellipsis">
-      Command Line
-    </span>
-  </a>
   
 </li>
       
@@ -1032,7 +1023,7 @@
           <li class="md-nav__item">
   <a href="#run-the-evaluation-using-the-test-case-and-trace" class="md-nav__link">
     <span class="md-ellipsis">
-      Run the evaluation using the test case and trace.
+      Run the evaluation using the test case and trace
     </span>
   </a>
   
@@ -1040,15 +1031,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#command-line" class="md-nav__link">
-    <span class="md-ellipsis">
-      Command Line
-    </span>
-  </a>
   
 </li>
       
@@ -1147,7 +1129,10 @@ Then in python
 </div>
 </div>
 </div>
-<h3 id="run-the-evaluation-using-the-test-case-and-trace">Run the evaluation using the test case and trace.</h3>
+<h3 id="run-the-evaluation-using-the-test-case-and-trace">Run the evaluation using the test case and trace</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Python</label><label for="__tabbed_2_2">CLI</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.evaluation.evaluate</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">eval_result</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">evaluation_case</span><span class="o">=</span><span class="n">evaluation_case</span><span class="p">,</span>
@@ -1157,14 +1142,16 @@ Then in python
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Final score: </span><span class="si">{</span><span class="n">eval_result</span><span class="o">.</span><span class="n">score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checkpoint scores: </span><span class="si">{</span><span class="n">eval_result</span><span class="o">.</span><span class="n">checkpoint_results</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<h2 id="command-line">Command Line</h2>
-<p>If you have the file and test case prepared, a command line tools is provided for convenience called <code>any-agent-evaluate</code>.</p>
-<p>It can be called like so</p>
+</div>
+<div class="tabbed-block">
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>any-agent-evaluate<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span>--evaluation_case_path<span class="w"> </span><span class="s2">&quot;docs/examples/evaluation_case.yaml&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span>--trace_path<span class="w"> </span><span class="s2">&quot;tests/assets/OPENAI_trace.json&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span>--agent_framework<span class="w"> </span><span class="s1">&#39;OPENAI&#39;</span>
 </span></code></pre></div>
+</div>
+</div>
+</div>
 
 
 
