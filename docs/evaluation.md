@@ -66,18 +66,14 @@ agent_trace = agent.run("How many seconds would it take for a leopard at full sp
 ### Run the evaluation using the test case and trace.
 
 ```python
-from any_agent.evaluation import evaluate, EvaluationCase
-evaluation_case = EvaluationCase(
-    ground_truth={"value": 9, "points": 1.0},
-    checkpoints=[{"criteria": "Did the agent run a calculation", "points": 1}],
-    llm_judge="gpt-4o-mini",
-)
+from any_agent.evaluation.evaluate import evaluate
 eval_result = evaluate(
     evaluation_case=evaluation_case,
     trace=agent_trace,
-    agent_framework="OPENAI",
+    agent_framework="openai",
 )
 print(f"Final score: {eval_result.score}")
+print(f"Checkpoint scores: {eval_result.checkpoint_results}")
 ```
 
 
