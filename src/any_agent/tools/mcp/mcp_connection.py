@@ -44,20 +44,20 @@ class _MCPConnection(BaseModel, ABC, Generic[T]):
         if not requested_tools:
             return tools
 
-        tool_names = [
-            tool.name if isinstance(tool, HasName) else tool for tool in tools
-        ]
+        # Map tool names to tool objects
+        name_to_tool = {tool.name if isinstance(tool, HasName) else tool: tool for tool in tools}
 
-        found_tools = [tool for tool in tool_names if tool in requested_tools]
-
-        if len(found_tools) != len(requested_tools):
-            error_message = (
-                dedent(
-                    f"""Could not find all requested tools in the MCP server:
-                    Requested ({len(requested_tools)}): {requested_tools}
-                    Set ({len(tool_names)}):   {tool_names}
-                """
-                ),
+        # Check all requested tools are present
+        missing_tools = [name for name in requested_tools if name not in name_to_tool]
+        if missing_tools:
+            error_message = dedent(
+                f"""Could not find all requested tools in the MCP server:
+                Requested ({len(requested_tools)}): {requested_tools}
+                Set ({len(name_to_tool)}):   {list(name_to_tool.keys())}
+                Missing: {missing_tools}
+            """
             )
             raise ValueError(error_message)
-        return tools
+
+        # Return only the requested tools, in the order specified
+        return [name_to_tool[name] for name in requested_tools]
