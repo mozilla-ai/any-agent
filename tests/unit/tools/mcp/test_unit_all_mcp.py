@@ -14,13 +14,15 @@ async def test_sse_tool_filtering(
     sse_params_echo_server: MCPSse,
     tools: Sequence[str],
 ) -> None:
-    server = _get_mcp_server(sse_params_echo_server, agent_framework)
+    reduced_tools = tools[:-1]
+    new_params = sse_params_echo_server.model_copy(update={"tools": reduced_tools})
+    server = _get_mcp_server(new_params, agent_framework)
     await server._setup_tools()
     if agent_framework is AgentFramework.AGNO:
         # Check that only the specified tools are included
-        assert set(server.tools[0].functions.keys()) == set(tools)  # type: ignore[union-attr]
+        assert set(server.tools[0].functions.keys()) == set(reduced_tools)  # type: ignore[union-attr]
     else:
-        assert len(server.tools) == len(tools)  # ignore[arg-type]
+        assert len(server.tools) == len(reduced_tools)  # ignore[arg-type]
 
 
 @pytest.mark.asyncio
