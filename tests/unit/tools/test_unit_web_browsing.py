@@ -7,7 +7,7 @@ from any_agent.tools import search_tavily
 
 
 def test_search_tavily_unavailable(monkeypatch: Any) -> None:
-    monkeypatch.setattr("any_agent.tools.web_browsing.talivy_available", False)
+    monkeypatch.setattr("any_agent.tools.web_browsing.tavily_available", False)
     with pytest.raises(ImportError, match="pip install 'tavily-python'"):
         search_tavily("test")
 
