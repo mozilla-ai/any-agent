@@ -67,6 +67,6 @@ def test_filter_tools(
     mcp_connection.mcp_tool = mcp_params.model_copy(
         update={"tools": ["tool1", "nonexistent"]}
     )
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError) as excinfo:  # noqa: PT011
         mcp_connection._filter_tools(all_tools)
     assert "Missing: ['nonexistent']" in str(excinfo.value)
