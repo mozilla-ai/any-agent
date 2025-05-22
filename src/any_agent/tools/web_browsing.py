@@ -9,9 +9,9 @@ from requests.exceptions import RequestException
 try:
     from tavily.tavily import TavilyClient
 
-    talivy_available = True
+    tavily_available = True
 except ImportError:
-    talivy_available = False
+    tavily_available = False
 
 
 def _truncate_content(content: str, max_length: int) -> str:
@@ -76,7 +76,7 @@ def search_tavily(query: str, include_images: bool = False) -> str:
         The top search results as a formatted string.
 
     """
-    if not talivy_available:
+    if not tavily_available:
         msg = "You need to `pip install 'tavily-python'` to use this tool"
         raise ImportError(msg)
     api_key = os.getenv("TAVILY_API_KEY")
