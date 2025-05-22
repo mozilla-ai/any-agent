@@ -38,16 +38,16 @@ class _MCPConnection(BaseModel, ABC, Generic[T]):
         return None
 
     def _filter_tools(self, tools: Sequence[T]) -> Sequence[T]:
-        # Only add the tools listed in mcp_tool['tools'] if specified
+        """Filter the tools to only include the ones listed in mcp_tool['tools']."""
         requested_tools = list(self.mcp_tool.tools or [])
 
         if not requested_tools:
             return tools
 
-        # Map tool names to tool objects
-        name_to_tool = {tool.name if isinstance(tool, HasName) else tool: tool for tool in tools}
+        name_to_tool = {
+            tool.name if isinstance(tool, HasName) else tool: tool for tool in tools
+        }
 
-        # Check all requested tools are present
         missing_tools = [name for name in requested_tools if name not in name_to_tool]
         if missing_tools:
             error_message = dedent(
@@ -59,5 +59,4 @@ class _MCPConnection(BaseModel, ABC, Generic[T]):
             )
             raise ValueError(error_message)
 
-        # Return only the requested tools, in the order specified
         return [name_to_tool[name] for name in requested_tools]
