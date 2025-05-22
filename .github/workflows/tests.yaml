@@ -6,10 +6,12 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'docs/**'
   pull_request:
     paths:
       - 'src/**'
       - 'tests/**'
+      - 'docs/**'
   workflow_dispatch:
 
 jobs:
