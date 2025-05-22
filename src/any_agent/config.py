@@ -98,7 +98,7 @@ class ServingConfig(BaseModel):
     endpoint: str = "/"
     """Will be pass as argument to `Starlette().add_route`"""
 
-    version: str = "0.1.0"
+    version: str = "1.0.0"
 
 
 class TracingConfig(BaseModel):
