@@ -15,9 +15,6 @@ See [SuperGateway](https://github.com/supercorp-ai/supergateway) for an easy way
 Within `MCPStdio` or `MCPSse` , you may explicitly specify a list of valid `tools`, if you would like to restrict the agent to access only a subset of available tools offered by that MCP server.
 If none is specified, the default behavior is that the agent will have access to all tools under that MCP server.
 
-!!! warning
-
-    Explicit filtering of MCP tools may not be supported in all frameworks (e.g. OpenAI)
 
 === "Callable"
 
