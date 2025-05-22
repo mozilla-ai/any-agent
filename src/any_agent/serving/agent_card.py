@@ -29,6 +29,7 @@ def _get_agent_card(agent: AnyAgent, serving_config: ServingConfig) -> AgentCard
                 id=f"{agent.config.name}-{tool_name}",
                 name=tool_name,
                 description=tool_description,
+                tags=[],
             )
         )
     return AgentCard(

@@ -17,12 +17,12 @@ except ImportError:
 @pytest.mark.skipif(_get_agent_card is None, reason="a2a_samples is not installed")
 def test_get_agent_card(agent_framework: AgentFramework) -> None:
     agent = MagicMock()
-    agent.config = AgentConfig(model_id="foo")
+    agent.config = AgentConfig(model_id="foo", description="test agent")
     agent.framework = agent_framework
     agent._main_agent_tools = [WRAPPERS[agent_framework](search_web)]
     agent_card = _get_agent_card(agent, ServingConfig())
     assert agent_card.name == "any_agent"
-    assert agent_card.description is None
+    assert agent_card.description == "test agent"
     assert len(agent_card.skills) == 1
     assert agent_card.skills[0].id == "any_agent-search_web"
     assert agent_card.skills[0].name == "search_web"
@@ -39,7 +39,7 @@ async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
     agent_framework: AgentFramework, echo_sse_server
 ) -> None:
     agent = MagicMock()
-    agent.config = AgentConfig(model_id="foo")
+    agent.config = AgentConfig(model_id="foo", description="test agent")
     agent.framework = agent_framework
     server = _get_mcp_server(MCPSse(url=echo_sse_server["url"]), agent_framework)
     await server._setup_tools()
@@ -50,7 +50,7 @@ async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
 
     agent_card = _get_agent_card(agent, ServingConfig())
     assert agent_card.name == "any_agent"
-    assert agent_card.description is None
+    assert agent_card.description == "test agent"
     assert len(agent_card.skills) == 3
     assert agent_card.skills[0].id == "any_agent-write_file"
     assert agent_card.skills[0].name == "write_file"
