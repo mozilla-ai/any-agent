@@ -1,17 +1,16 @@
 import logging
 import os
+import time
 from collections.abc import Callable
 
 import pytest
-import time
 from litellm.utils import validate_environment
 from rich.logging import RichHandler
-import asyncio
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import TracingConfig, ServingConfig
-from any_agent.tools import search_web, visit_webpage, a2a_query
-from any_agent.tracing.trace import AgentSpan, AgentTrace, _is_tracing_supported
+from any_agent.config import ServingConfig, TracingConfig
+from any_agent.tools import a2a_query, search_web
+from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -70,53 +69,87 @@ def test_load_and_run_multi_agent(
         else None
     )
 
-    search_agent_port = 5800
-    search_agent_endpoint = "search_agent"
-    search_agent_description = "Agent that can search the web. It can find answers on the web if the query cannot be answered."
+    main_agent = None
+    served_agent = None
 
-    search_agent_cfg = AgentConfig(
-        instructions="Use the available tools to complete the task to obtain additional information to answer the query.",
-        name="search_web_agent",
-        model_id=agent_model,
-        description=search_agent_description,
-        tools=[search_web],
-        model_args=model_args,
-    )
-
-    main_agent_cfg = AgentConfig(
-        instructions="Use the available tools to complete the task to obtain additional information to answer the query.",
-        description="The orchestrator that can use other agents via tools using the A2A protocol.",
-        tools=[a2a_query(f"http://localhost:{search_agent_port}/{search_agent_endpoint}", search_agent_cfg.description)],
-        model_args=model_args,
-        **kwargs,  # type: ignore[arg-type]
-    )
-
-    search_agent = AnyAgent.create(
-        agent_framework=agent_framework,
-        agent_config=search_agent_cfg,
-        tracing=TracingConfig(console=False, cost_info=True),
-    )
-
-    main_agent = AnyAgent.create(
-        agent_framework=agent_framework,
-        agent_config=main_agent_cfg,
-        tracing=TracingConfig(console=False, cost_info=True),
-    )
-
-    serving_config = ServingConfig(
-        port = search_agent_port,
-        endpoint = f"/{search_agent_endpoint}"
-    )
-    thread = Thread(target=lambda: search_agent.serve(serving_config))
-    thread.setDaemon(True)
     try:
+        tool_agent_port = 5800
+        tool_agent_endpoint = "tool_agent"
+
+        search_agent_description = "Agent that can search the web. It can find answers on the web if the query cannot be answered."
+        search_agent_cfg = AgentConfig(
+            instructions="Use the available tools to complete the task to obtain additional information to answer the query.",
+            name="search_web_agent",
+            model_id=agent_model,
+            description=search_agent_description,
+            tools=[search_web],
+            model_args=model_args,
+        )
+        search_agent = AnyAgent.create(
+            agent_framework=agent_framework,
+            agent_config=search_agent_cfg,
+            tracing=TracingConfig(console=False, cost_info=True),
+        )
+
+        import datetime
+        def get_datetime() -> str:
+            """Return the current date and time"""
+            return str(datetime.datetime.now())
+        date_agent_description = "Agent that can return the current date."
+        date_agent_cfg = AgentConfig(
+            instructions="Use the available tools to obtain additional information to answer the query.",
+            name="date_agent",
+            model_id=agent_model,
+            description=date_agent_description,
+            tools=[get_datetime],
+            model_args=model_args,
+        )
+        date_agent = AnyAgent.create(
+            agent_framework=agent_framework,
+            agent_config=date_agent_cfg,
+            tracing=TracingConfig(console=False, cost_info=True),
+        )
+        
+
+        served_agent = date_agent
+        serving_config = ServingConfig(
+            port=tool_agent_port, endpoint=f"/{tool_agent_endpoint}"
+        )
+        thread = Thread(target=lambda: served_agent.serve(serving_config))
+        thread.setDaemon(True)
         thread.start()
-        while not search_agent._server or not search_agent._server.get_uvicorn() or not search_agent._server.get_uvicorn().started:
+        while (
+            not served_agent._server
+            or not served_agent._server.get_uvicorn()
+            or not served_agent._server.get_uvicorn().started
+        ):
             print("-- waiting for server to start --")
             time.sleep(0.5)
 
+        # Search agent is ready for card resolution
+
+        logger.info("setting up agent in" + f"http://localhost:{tool_agent_port}/{tool_agent_endpoint}")
+        main_agent_cfg = AgentConfig(
+            instructions="Use the available tools to obtain additional information to answer the query.",
+            description="The orchestrator that can use other agents via tools using the A2A protocol.",
+            tools=[
+                a2a_query(
+                    f"http://localhost:{tool_agent_port}/{tool_agent_endpoint}"
+                )
+            ],
+            model_args=model_args,
+            **kwargs,  # type: ignore[arg-type]
+        )
+
+        main_agent = AnyAgent.create(
+            agent_framework=agent_framework,
+            agent_config=main_agent_cfg,
+            tracing=TracingConfig(console=False, cost_info=True),
+        )
+
         agent_trace = main_agent.run(
-            "Which LLM agent framework is the most appropriate to execute SQL queries using grammar constrained decoding? I am working on a business environment on my own premises, and I would prefer hosting an open source model myself."
+            # "Which LLM agent framework is the most appropriate to execute SQL queries using grammar constrained decoding? I am working on a business environment on my own premises, and I would prefer hosting an open source model myself."
+            "What time is it right now?"
         )
 
         print(agent_trace.spans)
@@ -124,7 +157,6 @@ def test_load_and_run_multi_agent(
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
-
 
         """
         if _is_tracing_supported(agent_framework):
@@ -145,7 +177,8 @@ def test_load_and_run_multi_agent(
                 )
         """
     finally:
-        if search_agent._server and search_agent._server.get_uvicorn():
-            search_agent._server.get_uvicorn().should_exit = True
-        main_agent.exit()
+        if served_agent and served_agent._server and served_agent._server.get_uvicorn():
+            served_agent._server.get_uvicorn().should_exit = True
+        if main_agent:
+            main_agent.exit()
         thread.join()

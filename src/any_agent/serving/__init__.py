@@ -1,3 +1,10 @@
-from .server import _get_a2a_server, A2AServer
+try:
+    from .server import A2AServer, _get_a2a_server
 
-__all__ = ["_get_a2a_server", "A2AServer"]
+    __all__ = ["A2AServer", "_get_a2a_server"]
+
+    a2a_serving_available = True
+except ImportError:
+    __all__ = []
+
+    a2a_serving_available = False

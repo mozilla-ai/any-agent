@@ -35,7 +35,7 @@ def _get_agent_card(agent: AnyAgent, serving_config: ServingConfig) -> AgentCard
         name=agent.config.name,
         description=agent.config.description,
         version=serving_config.version,
-        url=f"http://{serving_config.host}:{serving_config.port}/",
+        url=f"http://{serving_config.host}:{serving_config.port}/{serving_config.endpoint.lstrip("/")}",
         capabilities=AgentCapabilities(
             streaming=False, pushNotifications=False, stateTransitionHistory=False
         ),

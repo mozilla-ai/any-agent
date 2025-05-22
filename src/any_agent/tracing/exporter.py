@@ -70,6 +70,7 @@ class AnyAgentExporter(SpanExporter):
             return SpanExportResult.SUCCESS
 
         for readable_span in spans:
+            logger.info(f"--> Next span: {readable_span}")
             # Check if this span belongs to our run
             if not readable_span.attributes:
                 continue
