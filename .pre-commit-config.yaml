@@ -37,7 +37,7 @@ repos:
         name: mypy
         entry: "./scripts/run-mypy.sh"
         language: python
-        language_version: python3.12
+        language_version: python3.13
         additional_dependencies:
           - mypy==1.15.0
           - pip
