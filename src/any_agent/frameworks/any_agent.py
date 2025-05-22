@@ -172,7 +172,7 @@ class AnyAgent(ABC):
         try:
             from any_agent.serving import _get_a2a_server
         except ImportError as e:
-            msg = "You need to `pip install 'git+https://github.com/google/A2A#subdirectory=samples/python' to use this method."
+            msg = "You need to `pip install 'any-agent[serve]'` to use this method."
             raise ImportError(msg) from e
 
         server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())

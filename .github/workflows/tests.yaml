@@ -30,7 +30,6 @@ jobs:
       - name: Install
         run: |
           uv sync --group tests --extra all
-          uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'
 
       - name: Run Documentation tests
         run: pytest -v tests/docs

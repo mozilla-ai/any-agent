@@ -12,15 +12,6 @@ You can configuring and serve an agent using the [`ServingConfig`][any_agent.con
 
 ## Example
 
-!!! info
-
-    Until an official SDK is released ([see this issue](https://github.com/google/A2A/issues/423)),
-    you need to install the A2A dependencies as follows:
-
-    ```bash
-    pip install "git+https://github.com/google/A2A#subdirectory=samples/python"
-    ```
-
 For illustrative purposes, we are going to define 2 separate scripts, each defining an agent to answer questions about a specific agent framework (either OpenAI Agents SDK or Google ADK):
 
 
