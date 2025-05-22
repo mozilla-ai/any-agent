@@ -1,5 +1,4 @@
-from typing import TYPE_CHECKING
-from typing_extensions import override
+from typing import TYPE_CHECKING, override
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
@@ -13,6 +12,7 @@ class AnyAgentExecutor(AgentExecutor):
     """Test AgentProxy Implementation."""
 
     def __init__(self, agent: "AnyAgent"):
+        """Initialize the AnyAgentExecutor."""
         self.agent = agent
 
     @override
@@ -26,7 +26,6 @@ class AnyAgentExecutor(AgentExecutor):
         event_queue.enqueue_event(new_agent_text_message(agent_trace.final_output))
 
     @override
-    async def cancel(
-        self, context: RequestContext, event_queue: EventQueue
-    ) -> None:
-        raise Exception('cancel not supported')
+    async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:
+        msg = "cancel not supported"
+        raise ValueError(msg)

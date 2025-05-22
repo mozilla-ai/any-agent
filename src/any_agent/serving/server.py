@@ -14,7 +14,9 @@ if TYPE_CHECKING:
     from any_agent.config import ServingConfig
 
 
-def _get_a2a_server(agent: AnyAgent, serving_config: ServingConfig) -> A2AStarletteApplication:
+def _get_a2a_server(
+    agent: AnyAgent, serving_config: ServingConfig
+) -> A2AStarletteApplication:
     agent_card = _get_agent_card(agent, serving_config)
 
     request_handler = DefaultRequestHandler(
@@ -22,9 +24,8 @@ def _get_a2a_server(agent: AnyAgent, serving_config: ServingConfig) -> A2AStarle
         task_store=InMemoryTaskStore(),
     )
 
-    return A2AStarletteApplication(
-        agent_card=agent_card, http_handler=request_handler
-    )
+    return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
+
 
 def serve_a2a(server: A2AStarletteApplication, host: str, port: int) -> None:
     """Serve the A2A server."""
