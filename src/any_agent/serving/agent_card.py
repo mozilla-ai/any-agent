@@ -3,7 +3,7 @@ from __future__ import annotations
 import inspect
 from typing import TYPE_CHECKING
 
-from common.types import AgentCapabilities, AgentCard, AgentSkill
+from a2a.types import AgentCapabilities, AgentCard, AgentSkill
 
 from any_agent import AgentFramework
 
@@ -35,6 +35,8 @@ def _get_agent_card(agent: AnyAgent, serving_config: ServingConfig) -> AgentCard
         name=agent.config.name,
         description=agent.config.description,
         version=serving_config.version,
+        defaultInputModes=["text"],
+        defaultOutputModes=["text"],
         url=f"http://{serving_config.host}:{serving_config.port}/",
         capabilities=AgentCapabilities(
             streaming=False, pushNotifications=False, stateTransitionHistory=False

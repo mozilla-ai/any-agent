@@ -1,3 +1,3 @@
-from .server import _get_a2a_server
+from .server import _get_a2a_server, serve_a2a
 
-__all__ = ["_get_a2a_server"]
+__all__ = ["_get_a2a_server", "serve_a2a"]

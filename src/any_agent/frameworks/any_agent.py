@@ -16,6 +16,7 @@ from any_agent.config import (
     TracingConfig,
 )
 from any_agent.logging import logger
+from any_agent.serving.server import serve_a2a
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.exporter import (
     AnyAgentExporter,
@@ -175,7 +176,7 @@ class AnyAgent(ABC):
             raise ImportError(msg) from e
 
         server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())
-        server.start()
+        serve_a2a(server, host=serving_config.host, port=serving_config.port)
 
     @abstractmethod
     async def _load_agent(self) -> None:
