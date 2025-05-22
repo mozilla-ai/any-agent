@@ -32,6 +32,9 @@ def _get_agent_card(agent: AnyAgent, serving_config: ServingConfig) -> AgentCard
                 tags=[],
             )
         )
+    if agent.config.description is None:
+        msg = "Agent description is not set. Please set the `description` field in the `AgentConfig`."
+        raise ValueError(msg)
     return AgentCard(
         name=agent.config.name,
         description=agent.config.description,

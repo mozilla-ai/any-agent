@@ -174,8 +174,10 @@ class AnyAgent(ABC):
         except ImportError as e:
             msg = "You need to `pip install 'any-agent[serve]'` to use this method."
             raise ImportError(msg) from e
+        if serving_config is None:
+            serving_config = ServingConfig()
+        server = _get_a2a_server(self, serving_config=serving_config)
 
-        server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())
         serve_a2a(server, host=serving_config.host, port=serving_config.port)
 
     @abstractmethod

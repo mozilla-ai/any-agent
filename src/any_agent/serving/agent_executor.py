@@ -23,6 +23,7 @@ class AnyAgentExecutor(AgentExecutor):
     ) -> None:
         query = context.get_user_input()
         agent_trace = await self.agent.run_async(query)
+        assert agent_trace.final_output is not None
         event_queue.enqueue_event(new_agent_text_message(agent_trace.final_output))
 
     @override
