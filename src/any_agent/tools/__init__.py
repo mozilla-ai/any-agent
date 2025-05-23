@@ -1,3 +1,4 @@
+from .a2a_tool import a2a_query
 from .mcp import (
     AgnoMCPServer,
     GoogleMCPServer,
@@ -31,6 +32,7 @@ __all__ = [
     "_MCPConnection",
     "_MCPServerBase",
     "_get_mcp_server",
+    "a2a_query",
     "ask_user_verification",
     "search_tavily",
     "search_web",
