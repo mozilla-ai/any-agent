@@ -150,7 +150,7 @@ class _AgnoInstrumentor:
                         )
 
                     span.set_status(StatusCode.OK)
-
+                    span.end()
                 yield function_call_response
 
         import agno
