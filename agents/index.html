@@ -1224,7 +1224,7 @@ agent as follows:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which Agent Framework is the best??&quot;</span><span class="p">)</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Check <a class="autorefs autorefs-internal" title="any_agent.tracing.trace.AgentTrace" href="../api/tracing/#any_agent.tracing.trace.AgentTrace"><code>AgentTrace</code></a> for more info on the return type.</p>
+<p>Check <a class="autorefs autorefs-internal" title="any_agent.tracing.agent_trace.AgentTrace" href="../api/tracing/#any_agent.tracing.agent_trace.AgentTrace"><code>AgentTrace</code></a> for more info on the return type.</p>
 <h3 id="async">Async</h3>
 <p>If you are running in <code>async</code> context, you should use the equivalent <a class="autorefs autorefs-internal" title="create_async(agent_framework, agent_config, managed_agents=None, tracing=None)
 
@@ -1234,7 +1234,6 @@ agent as follows:</p>
   " href="../api/agent/#any_agent.AnyAgent.create_async"><code>create_async</code></a> and <a class="autorefs autorefs-internal" title="run_async(prompt, **kwargs)
 
   
-      abstractmethod
       async
   " href="../api/agent/#any_agent.AnyAgent.run_async"><code>run_async</code></a> methods:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
