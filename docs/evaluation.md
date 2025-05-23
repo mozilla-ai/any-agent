@@ -63,33 +63,24 @@ agent_trace = agent.run("How many seconds would it take for a leopard at full sp
     )
     ```
 
-### Run the evaluation using the test case and trace.
+### Run the evaluation using the test case and trace
 
-```python
-from any_agent.evaluation import evaluate, EvaluationCase
-evaluation_case = EvaluationCase(
-    ground_truth={"value": 9, "points": 1.0},
-    checkpoints=[{"criteria": "Did the agent run a calculation", "points": 1}],
-    llm_judge="gpt-4o-mini",
-)
-eval_result = evaluate(
-    evaluation_case=evaluation_case,
-    trace=agent_trace,
-    agent_framework="OPENAI",
-)
-print(f"Final score: {eval_result.score}")
-```
+=== "Python"
+    ```python
+    from any_agent.evaluation.evaluate import evaluate
+    eval_result = evaluate(
+        evaluation_case=evaluation_case,
+        trace=agent_trace,
+        agent_framework="openai",
+    )
+    print(f"Final score: {eval_result.score}")
+    print(f"Checkpoint scores: {eval_result.checkpoint_results}")
+    ```
 
-
-## Command Line
-
-If you have the file and test case prepared, a command line tools is provided for convenience called `any-agent-evaluate`.
-
-It can be called like so
-
-```bash
-any-agent-evaluate \
-    --evaluation_case_path "docs/examples/evaluation_case.yaml" \
-    --trace_path "tests/assets/OPENAI_trace.json" \
-    --agent_framework 'OPENAI'
-```
+=== "CLI"
+    ```bash
+    any-agent-evaluate \
+        --evaluation_case_path "docs/examples/evaluation_case.yaml" \
+        --trace_path "tests/assets/OPENAI_trace.json" \
+        --agent_framework 'OPENAI'
+    ```

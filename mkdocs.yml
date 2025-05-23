@@ -22,6 +22,7 @@ nav:
   - Serving (A2A): serving.md
   - Cookbook:
       - Your First Agent: cookbook/your_first_agent.ipynb
+      - MCP Agent: cookbook/mcp_agent.ipynb
   - API Reference:
     - Agent: api/agent.md
     - Config: api/config.md
