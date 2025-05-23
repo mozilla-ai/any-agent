@@ -1,20 +1,6 @@
 name: 'Setup Python and Dependencies'
 description: 'Setup uv with Python 3.13 and install dependencies'
 
-inputs:
-  dependency-groups:
-    description: 'Space-separated list of dependency groups to sync (e.g., "tests" or "docs lint")'
-    required: false
-    default: 'tests'
-  extras:
-    description: 'Extras to install (e.g., "all")'
-    required: false
-    default: ''
-  install-a2a:
-    description: 'Whether to install the A2A package'
-    required: false
-    default: 'true'
-
 runs:
   using: 'composite'
   steps:
@@ -27,33 +13,5 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        # Parse inputs
-        GROUPS="${{ inputs.dependency-groups }}"
-        EXTRAS="${{ inputs.extras }}"
-        
-        echo "Dependency groups: $GROUPS"
-        echo "Extras: $EXTRAS"
-        
-        # Start with base command
-        uv_args="sync"
-        
-        # Add each dependency group
-        if [ -n "$GROUPS" ]; then
-          for group in $GROUPS; do
-            uv_args="$uv_args --group $group"
-          done
-        fi
-        
-        # Add extras
-        if [ -n "$EXTRAS" ]; then
-          uv_args="$uv_args --extra $EXTRAS"
-        fi
-        
-        echo "Running: uv $uv_args"
-        uv $uv_args
-        
-        # Install A2A if requested
-        if [ "${{ inputs.install-a2a }}" = "true" ]; then
-          echo "Installing A2A package"
-          uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'
-        fi 
+        uv sync --group all
+        uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'

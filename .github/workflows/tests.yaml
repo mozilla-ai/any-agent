@@ -40,9 +40,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
-        with:
-          dependency-groups: 'tests'
-          extras: 'all'
       - name: Run Documentation tests
         run: pytest -v tests/docs
 
@@ -55,9 +52,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
-        with:
-          dependency-groups: 'tests'
-          extras: 'all'
       - name: Run Unit tests
         run: pytest -v tests/unit
 
@@ -70,9 +64,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
-        with:
-          dependency-groups: 'tests'
-          extras: 'all'
       - name: Run Snapshot tests
         run: pytest -v tests/snapshots
 
@@ -88,8 +79,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
-        with:
-          dependency-groups: 'tests'
-          extras: 'all'
       - name: Run Integration tests (parallel with xdist)
         run: pytest -v tests/integration -d --tx '4*popen//python=python'

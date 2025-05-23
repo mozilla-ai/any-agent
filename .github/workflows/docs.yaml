@@ -26,8 +26,6 @@ jobs:
           fetch-depth: 0
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
-        with:
-          dependency-groups: 'docs'
 
       - name: Configure git
         run: |

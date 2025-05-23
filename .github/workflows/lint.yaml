@@ -16,9 +16,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
-        with:
-          dependency-groups: 'lint'
-          install-a2a: 'false'
 
       # In case of considering adding caching, check the following PR first:
       # https://github.com/mozilla-ai/any-agent/pull/186
