@@ -1,9 +1,5 @@
 import sys
 
-if sys.version_info < (3, 13):
-    msg = "Serving with A2A requires Python 3.13 or higher! 🐍✨"
-    raise RuntimeError(msg)
-
 try:
     from .server import _get_a2a_server, serve_a2a
 except ImportError as e:
