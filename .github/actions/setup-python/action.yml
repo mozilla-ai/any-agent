@@ -27,20 +27,30 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
+        # Parse inputs
         GROUPS="${{ inputs.dependency-groups }}"
         EXTRAS="${{ inputs.extras }}"
         
-        # Build the uv sync command
-        CMD="uv sync"
-        for group in $GROUPS; do
-          CMD="$CMD --group $group"
-        done
-        if [ -n "$EXTRAS" ]; then
-          CMD="$CMD --extra $EXTRAS"
+        echo "Dependency groups: $GROUPS"
+        echo "Extras: $EXTRAS"
+        
+        # Start with base command
+        uv_args="sync"
+        
+        # Add each dependency group
+        if [ -n "$GROUPS" ]; then
+          for group in $GROUPS; do
+            uv_args="$uv_args --group $group"
+          done
         fi
         
-        echo "Running: $CMD"
-        $CMD
+        # Add extras
+        if [ -n "$EXTRAS" ]; then
+          uv_args="$uv_args --extra $EXTRAS"
+        fi
+        
+        echo "Running: uv $uv_args"
+        uv $uv_args
         
         # Install A2A if requested
         if [ "${{ inputs.install-a2a }}" = "true" ]; then
