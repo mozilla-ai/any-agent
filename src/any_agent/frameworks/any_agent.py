@@ -168,7 +168,8 @@ class AnyAgent(ABC):
             ImportError: If the `serving` dependencies are not installed.
 
         """
-        from any_agent.serving import _get_a2a_serve, serve_a2a
+        from any_agent.serving import _get_a2a_server, serve_a2a
+
         if serving_config is None:
             serving_config = ServingConfig()
         server = _get_a2a_server(self, serving_config=serving_config)

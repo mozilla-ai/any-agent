@@ -1,6 +1,5 @@
+import asyncio
 import multiprocessing
-import time
-from typing import Any
 from uuid import uuid4
 
 import httpx
@@ -28,10 +27,11 @@ def run_agent():
 
 @pytest.mark.asyncio
 async def test_agent_serving_and_communication():
+    """This test can be refactored to remove the need for multiproc, once we have support for control of the uvicorn server."""
     # Start the agent in a subprocess
     proc = multiprocessing.Process(target=run_agent, daemon=True)
     proc.start()
-    time.sleep(5)
+    await asyncio.sleep(5)
 
     try:
         async with httpx.AsyncClient() as httpx_client:
@@ -48,7 +48,6 @@ async def test_agent_serving_and_communication():
             request = SendMessageRequest(
                 params=MessageSendParams(**send_message_payload)
             )
-            print("Sending message")
             response = await client.send_message(request)
             assert response is not None
     finally:
