@@ -1,0 +1,58 @@
+name: 'Setup Python and Dependencies'
+description: 'Checkout repository, setup uv with Python 3.13, and install dependencies'
+
+inputs:
+  dependency-groups:
+    description: 'Space-separated list of dependency groups to sync (e.g., "tests" or "docs lint")'
+    required: false
+    default: 'tests'
+  extras:
+    description: 'Extras to install (e.g., "all")'
+    required: false
+    default: ''
+  install-a2a:
+    description: 'Whether to install the A2A package'
+    required: false
+    default: 'true'
+  fetch-depth:
+    description: 'Number of commits to fetch. 0 indicates all history for all branches and tags'
+    required: false
+    default: '1'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check out the repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+
+    - name: Install the latest version of uv and set the python version to 3.13
+      uses: astral-sh/setup-uv@v6
+      with:
+        python-version: 3.13
+        activate-environment: true
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        GROUPS="${{ inputs.dependency-groups }}"
+        EXTRAS="${{ inputs.extras }}"
+        
+        # Build the uv sync command
+        CMD="uv sync"
+        for group in $GROUPS; do
+          CMD="$CMD --group $group"
+        done
+        if [ -n "$EXTRAS" ]; then
+          CMD="$CMD --extra $EXTRAS"
+        fi
+        
+        echo "Running: $CMD"
+        $CMD
+        
+        # Install A2A if requested
+        if [ "${{ inputs.install-a2a }}" = "true" ]; then
+          echo "Installing A2A package"
+          uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'
+        fi 

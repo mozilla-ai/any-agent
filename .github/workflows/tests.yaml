@@ -15,10 +15,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-tests:
-    timeout-minutes: 30
+  setup:
     runs-on: ubuntu-latest
-
+    outputs:
+      docs_only: ${{ steps.docs_only.outputs.docs_only }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -32,31 +32,56 @@ jobs:
             echo "docs_only=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Install the latest version of uv and set the python version to 3.11
-        uses: astral-sh/setup-uv@v6
+  docs:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python and Dependencies
+        uses: ./.github/actions/setup-python
         with:
-          python-version: 3.13
-          activate-environment: true
-
-      - name: Install
-        run: |
-          uv sync --group tests --extra all
-          uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'
-
+          dependency-groups: 'tests'
+          extras: 'all'
       - name: Run Documentation tests
         run: pytest -v tests/docs
 
+  unit:
+    needs: setup
+    runs-on: ubuntu-latest
+    if: needs.setup.outputs.docs_only == 'false'
+    steps:
+      - name: Setup Python and Dependencies
+        uses: ./.github/actions/setup-python
+        with:
+          dependency-groups: 'tests'
+          extras: 'all'
       - name: Run Unit tests
-        if: steps.docs_only.outputs.docs_only == 'false'
         run: pytest -v tests/unit
 
+  snapshot:
+    needs: setup
+    runs-on: ubuntu-latest
+    if: needs.setup.outputs.docs_only == 'false'
+    steps:
+      - name: Setup Python and Dependencies
+        uses: ./.github/actions/setup-python
+        with:
+          dependency-groups: 'tests'
+          extras: 'all'
       - name: Run Snapshot tests
-        if: steps.docs_only.outputs.docs_only == 'false'
         run: pytest -v tests/snapshots
 
+  integration:
+    needs: setup
+    runs-on: ubuntu-latest
+    if: needs.setup.outputs.docs_only == 'false' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    env:
+      ANY_AGENT_INTEGRATION_TESTS: TRUE
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - name: Setup Python and Dependencies
+        uses: ./.github/actions/setup-python
+        with:
+          dependency-groups: 'tests'
+          extras: 'all'
       - name: Run Integration tests (parallel with xdist)
-        if: steps.docs_only.outputs.docs_only == 'false' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
-        env:
-          ANY_AGENT_INTEGRATION_TESTS: TRUE
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: pytest -v tests/integration -d --tx '4*popen//python=python'

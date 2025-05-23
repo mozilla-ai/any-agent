@@ -20,26 +20,16 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4
+      - name: Setup Python and Dependencies
+        uses: ./.github/actions/setup-python
         with:
-          fetch-depth: 0
-
-      - name: Install the latest version of uv and set the python version to 3.13
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: 3.13
-          activate-environment: true
+          dependency-groups: 'docs'
+          fetch-depth: '0'
 
       - name: Configure git
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-
-      - name: Install requirements
-        run: |
-          uv sync --group docs
-          uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'
 
       - name: Build docs
         if: github.event_name == 'pull_request'
