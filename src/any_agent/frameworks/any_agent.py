@@ -16,7 +16,6 @@ from any_agent.config import (
     TracingConfig,
 )
 from any_agent.logging import logger
-from any_agent.serving.server import serve_a2a
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.exporter import (
     AnyAgentExporter,
@@ -169,11 +168,7 @@ class AnyAgent(ABC):
             ImportError: If the `serving` dependencies are not installed.
 
         """
-        try:
-            from any_agent.serving import _get_a2a_server
-        except ImportError as e:
-            msg = "You need to `pip install 'any-agent[serve]'` to use this method."
-            raise ImportError(msg) from e
+        from any_agent.serving import _get_a2a_serve, serve_a2a
         if serving_config is None:
             serving_config = ServingConfig()
         server = _get_a2a_server(self, serving_config=serving_config)

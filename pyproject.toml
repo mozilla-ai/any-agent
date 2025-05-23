@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "any-agent"
 readme = "README.md"
 license = {text = "Apache-2.0"}
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
   "duckduckgo_search",
@@ -64,7 +64,7 @@ serve = [
 ]
 
 all = [
-  "any-agent[agno,google,langchain,llama_index,openai,smolagents,serve]",
+  "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
 ]
 
 [project.urls]
