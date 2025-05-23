@@ -21,6 +21,7 @@ dependencies = [
   "requests",
   "rich",
   "tavily-python",
+  "httpx",
 ]
 
 [project.optional-dependencies]
