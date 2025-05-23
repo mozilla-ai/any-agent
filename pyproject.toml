@@ -59,6 +59,10 @@ smolagents = [
   "smolagents[mcp]>=1.14.0",
 ]
 
+serve = [
+  "a2a-sdk",
+]
+
 all = [
   "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
 ]

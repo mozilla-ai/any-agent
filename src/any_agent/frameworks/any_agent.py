@@ -168,14 +168,13 @@ class AnyAgent(ABC):
             ImportError: If the `serving` dependencies are not installed.
 
         """
-        try:
-            from any_agent.serving import _get_a2a_server
-        except ImportError as e:
-            msg = "You need to `pip install 'git+https://github.com/google/A2A#subdirectory=samples/python' to use this method."
-            raise ImportError(msg) from e
+        from any_agent.serving import _get_a2a_server, serve_a2a
 
-        server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())
-        server.start()
+        if serving_config is None:
+            serving_config = ServingConfig()
+        server = _get_a2a_server(self, serving_config=serving_config)
+
+        serve_a2a(server, host=serving_config.host, port=serving_config.port)
 
     @abstractmethod
     async def _load_agent(self) -> None:

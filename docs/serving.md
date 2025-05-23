@@ -8,18 +8,15 @@ the protocol, as explaining it is out of the scope of this page.
 
     The A2A protocol is in early stages of development and so is the functionality provided by `any-agent` here.
 
+In order to use A2A serving, you must first install the 'serve' extra: `pip install 'any-agent[serve]'`
+
+!!! warning
+
+    Use of A2A serving is currently only supported on Python 3.13 or higher.
+
 You can configuring and serve an agent using the [`ServingConfig`][any_agent.config.ServingConfig] and the [`AnyAgent.serve`][any_agent.AnyAgent.serve] method.
 
 ## Example
-
-!!! info
-
-    Until an official SDK is released ([see this issue](https://github.com/google/A2A/issues/423)),
-    you need to install the A2A dependencies as follows:
-
-    ```bash
-    pip install "git+https://github.com/google/A2A#subdirectory=samples/python"
-    ```
 
 For illustrative purposes, we are going to define 2 separate scripts, each defining an agent to answer questions about a specific agent framework (either OpenAI Agents SDK or Google ADK):
 
