@@ -17,8 +17,6 @@ on:
 jobs:
   setup:
     runs-on: ubuntu-latest
-    outputs:
-      docs_only: ${{ steps.docs_only.outputs.docs_only }}
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -37,7 +35,6 @@ jobs:
   unit:
     needs: setup
     runs-on: ubuntu-latest
-    if: needs.setup.outputs.docs_only == 'false'
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -49,7 +46,6 @@ jobs:
   snapshot:
     needs: setup
     runs-on: ubuntu-latest
-    if: needs.setup.outputs.docs_only == 'false'
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -61,7 +57,7 @@ jobs:
   integration:
     needs: setup
     runs-on: ubuntu-latest
-    if: needs.setup.outputs.docs_only == 'false' && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     env:
       ANY_AGENT_INTEGRATION_TESTS: TRUE
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
