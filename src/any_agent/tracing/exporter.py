@@ -7,8 +7,8 @@ from opentelemetry.sdk.trace.export import (
     SpanExporter,
     SpanExportResult,
 )
-from rich.console import Console
-from rich.markdown import Markdown
+from rich.console import Console, Group
+from rich.json import JSON
 from rich.panel import Panel
 
 from any_agent.logging import logger
@@ -41,27 +41,68 @@ class _AnyAgentExporter(SpanExporter):
             msg = "Console is not initialized"
             raise RuntimeError(msg)
 
-        style = getattr(
-            self.tracing_config, span.attributes.get("gen_ai.operation.name", ""), None
-        )
+        operation_name = span.attributes.get("gen_ai.operation.name", "")
+
+        style = getattr(self.tracing_config, operation_name, None)
 
         if not style:
             return
 
-        self.console.rule(span.kind, style=style)
-
-        for key, value in span.attributes.items():
-            if key in ("gen_ai.input", "gen_ai.output"):
-                self.console.print(
+        if span.is_llm_call():
+            panels = []
+            if messages := span.attributes.get("gen_ai.input.messages"):
+                panels.append(
                     Panel(
-                        Markdown(str(value or "")),
-                        title=key,
-                    ),
+                        JSON(messages), title="INPUT", style="white", title_align="left"
+                    )
                 )
-            else:
-                self.console.print(f"{key}: {value}")
-
-        self.console.rule(style=style)
+            if output := span.attributes.get("gen_ai.output"):
+                panels.append(
+                    Panel(
+                        JSON(output), title="OUTPUT", style="white", title_align="left"
+                    )
+                )
+            if usage := {
+                k.replace("gen_ai.usage.", ""): v
+                for k, v in span.attributes.items()
+                if "usage" in k
+            }:
+                panels.append(
+                    Panel(
+                        JSON(json.dumps(usage)),
+                        title="USAGE",
+                        style="white",
+                        title_align="left",
+                    )
+                )
+            self.console.print(
+                Panel(
+                    Group(*panels),
+                    title=f"{operation_name.upper()}: {span.attributes.get('gen_ai.request.model')}",
+                    style=style,
+                )
+            )
+        elif span.is_tool_execution():
+            self.console.print(
+                Panel(
+                    Group(
+                        Panel(
+                            JSON(span.attributes.get("gen_ai.tool.args", "{}")),
+                            title="Input",
+                            style="white",
+                            title_align="left",
+                        ),
+                        Panel(
+                            JSON(span.attributes.get("gen_ai.output", "{}")),
+                            title="Output",
+                            style="white",
+                            title_align="left",
+                        ),
+                    ),
+                    title=f"{operation_name.upper()}: {span.attributes.get('gen_ai.tool.name')}",
+                    style=style,
+                )
+            )
 
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
         for readable_span in spans:

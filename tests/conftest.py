@@ -1,6 +1,5 @@
 import json
 import logging
-import time
 from collections.abc import AsyncGenerator, Callable, Generator
 from pathlib import Path
 from textwrap import dedent
@@ -9,70 +8,10 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from litellm.types.utils import ModelResponse
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import ReadableSpan
-from opentelemetry.trace import SpanContext, SpanKind, TraceFlags, TraceState
-from opentelemetry.trace.status import Status, StatusCode
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 from any_agent.tracing.agent_trace import AgentTrace
-
-
-@pytest.fixture
-def llm_span() -> ReadableSpan:
-    # Convert hex trace and span IDs to integers
-    trace_id = int("69ea1b41a9bc5724381993def669c803", 16)
-    span_id = int("3817abcfb97cc40c", 16)
-    parent_span_id = int("68ff5f13e03ac3fd", 16)
-
-    context = SpanContext(
-        trace_id=trace_id,
-        span_id=span_id,
-        is_remote=False,
-        trace_flags=TraceFlags(TraceFlags.SAMPLED),
-        trace_state=TraceState(),
-    )
-
-    parent = SpanContext(
-        trace_id=trace_id,
-        span_id=parent_span_id,
-        is_remote=False,
-        trace_flags=TraceFlags(TraceFlags.SAMPLED),
-        trace_state=TraceState(),
-    )
-
-    resource = Resource.create(
-        {
-            "telemetry.sdk.language": "python",
-            "telemetry.sdk.name": "opentelemetry",
-            "telemetry.sdk.version": "1.32.0",
-            "service.name": "unknown_service",
-        }
-    )
-    # Create a ReadableSpan
-    return ReadableSpan(
-        name="ChatLiteLLM",
-        context=context,
-        kind=SpanKind.INTERNAL,
-        parent=parent,
-        start_time=int(time.time()),
-        end_time=int(time.time() + 1),
-        status=Status(StatusCode.OK),
-        attributes={
-            "gen_ai.operation.name": "call_llm",
-            "gen_ai.request.model": "gpt-4.1-mini",
-            "genai.output": '[{"function": {"arguments": "{\\"timezone\\":\\"America/New_York\\"}", "name": "get_current_time"}, "id": "call_rL5jisCAFvjIaT8ijNPwTvZB", "type": "function"}]',
-            "genai.output.type": "json",
-            "gen_ai.usage.input_tokens": 286,
-            "gen_ai.usage.output_tokens": 18,
-            "input_cost": 0.00011439999999999999,
-            "output_cost": 0.0000288,
-        },
-        events=[],
-        links=[],
-        resource=resource,
-    )
 
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)

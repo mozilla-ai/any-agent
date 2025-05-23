@@ -3,16 +3,64 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
+from agents.tracing import TracingProcessor, set_trace_processors
+from agents.tracing.span_data import FunctionSpanData, GenerationSpanData
 from opentelemetry.trace import StatusCode
 
 if TYPE_CHECKING:
     from opentelemetry.trace import Span, Tracer
 
 
+def _set_llm_input(span_data: GenerationSpanData, span: Span) -> None:
+    # TODO: needs https://github.com/openai/openai-agents-python/pull/742
+    pass
+
+
+def _set_llm_output(span_data: GenerationSpanData, span: Span) -> None:
+    if not span_data.output:
+        return
+    output = span_data.output[0]
+    if content := output.get("content"):
+        span.set_attributes(
+            {
+                "gen_ai.output": content,
+                "gen_ai.output.type": "text",
+            }
+        )
+    if tool_calls := output.get("tool_calls"):
+        span.set_attributes(
+            {
+                "gen_ai.output": json.dumps(
+                    [
+                        {
+                            "tool.name": tool_call.get("function", {}).get(
+                                "name", "No name"
+                            ),
+                            "tool.args": tool_call.get("function", {}).get(
+                                "arguments", "No args"
+                            ),
+                        }
+                        for tool_call in tool_calls
+                    ]
+                ),
+                "gen_ai.output.type": "json",
+            }
+        )
+    if token_usage := span_data.usage:
+        span.set_attributes(
+            {
+                "gen_ai.usage.input_tokens": token_usage["input_tokens"],
+                "gen_ai.usage.output_tokens": token_usage["output_tokens"],
+            }
+        )
+
+
 class _OpenAIAgentsInstrumentor:
+    def __init__(self) -> None:
+        self.first_llm_calls: set[str] = set()
+
     def instrument(self, tracer: Tracer) -> None:
-        from agents.tracing import TracingProcessor, set_trace_processors
-        from agents.tracing.span_data import FunctionSpanData, GenerationSpanData
+        first_llm_calls = self.first_llm_calls
 
         class AnyAgentTracingProcessor(TracingProcessor):
             def __init__(self, tracer: Tracer):
@@ -39,6 +87,10 @@ class _OpenAIAgentsInstrumentor:
                             "gen_ai.request.model": model,
                         }
                     )
+                    trace_id = span.trace_id
+                    if trace_id not in first_llm_calls:
+                        first_llm_calls.add(trace_id)
+                        _set_llm_input(span_data, span)
                     self.current_spans[span.span_id] = otel_span
                 elif isinstance(span_data, FunctionSpanData):
                     otel_span = self.tracer.start_span(
@@ -56,37 +108,7 @@ class _OpenAIAgentsInstrumentor:
                 span_data = span.span_data
                 if isinstance(span_data, GenerationSpanData):
                     otel_span = self.current_spans[span.span_id]
-                    if output := span_data.output:
-                        if content := output[0].get("content"):
-                            otel_span.set_attributes(
-                                {
-                                    "genai.output": content,
-                                    "genai.output.type": "text",
-                                }
-                            )
-                        elif tool_calls := output[0].get("tool_calls"):
-                            # Tool Call
-                            otel_span.set_attributes(
-                                {
-                                    "genai.output": json.dumps(
-                                        tool_calls,
-                                        default=str,
-                                        ensure_ascii=False,
-                                    ),
-                                    "genai.output.type": "json",
-                                }
-                            )
-                    if token_usage := span_data.usage:
-                        otel_span.set_attributes(
-                            {
-                                "gen_ai.usage.input_tokens": token_usage[
-                                    "input_tokens"
-                                ],
-                                "gen_ai.usage.output_tokens": token_usage[
-                                    "output_tokens"
-                                ],
-                            }
-                        )
+                    _set_llm_output(span_data, otel_span)
                     otel_span.set_status(StatusCode.OK)
                     otel_span.end()
                     del self.current_spans[span.span_id]
@@ -94,8 +116,8 @@ class _OpenAIAgentsInstrumentor:
                     otel_span = self.current_spans[span.span_id]
                     otel_span.set_attributes(
                         {
-                            "genai.output": span_data.output or "no_output",
-                            "genai.output.type": "json",
+                            "gen_ai.output": span_data.output or "no_output",
+                            "gen_ai.output.type": "json",
                         }
                     )
                     otel_span.set_status(StatusCode.OK)

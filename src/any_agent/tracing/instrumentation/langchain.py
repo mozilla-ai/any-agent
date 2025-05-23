@@ -17,6 +17,72 @@ if TYPE_CHECKING:
     from opentelemetry.trace import Span, Tracer
 
 
+def _set_llm_input(messages: list[list[BaseMessage]], span: Span) -> None:
+    if not messages:
+        return
+    if not messages[0]:
+        return
+
+    span.set_attribute(
+        "gen_ai.input.messages",
+        json.dumps(
+            [
+                {
+                    "role": message.type.replace("human", "user"),
+                    "content": message.content,
+                }
+                for message in messages[0]
+            ],
+            default=str,
+            ensure_ascii=False,
+        ),
+    )
+
+
+def _set_llm_output(response: LLMResult, span: Span) -> None:
+    if not response.generations:
+        return
+    if not response.generations[0]:
+        return
+
+    generation = response.generations[0][0]
+
+    if text := generation.text:
+        span.set_attributes(
+            {
+                "gen_ai.output": text,
+                "gen_ai.output.type": "text",
+            }
+        )
+    if message := getattr(generation, "message", None):
+        if tool_calls := getattr(message, "tool_calls", None):
+            span.set_attributes(
+                {
+                    "gen_ai.output": json.dumps(
+                        [
+                            {
+                                "tool.name": tool.get("name", "No name"),
+                                "tool.args": tool.get("args", "No args"),
+                            }
+                            for tool in tool_calls
+                        ],
+                        default=str,
+                        ensure_ascii=False,
+                    ),
+                    "gen_ai.output.type": "json",
+                }
+            )
+
+    if llm_output := getattr(response, "llm_output", None):
+        if token_usage := llm_output.get("token_usage", None):
+            span.set_attributes(
+                {
+                    "gen_ai.usage.input_tokens": token_usage.prompt_tokens,
+                    "gen_ai.usage.output_tokens": token_usage.completion_tokens,
+                }
+            )
+
+
 class _LangChainTracingCallback(BaseCallbackHandler):
     def __init__(self, tracer: Tracer) -> None:
         self.tracer = tracer
@@ -24,6 +90,7 @@ class _LangChainTracingCallback(BaseCallbackHandler):
             "model": {},
             "tool": {},
         }
+        self.first_llm_calls: set[int] = set()
         super().__init__()
 
     def on_chat_model_start(
@@ -37,7 +104,7 @@ class _LangChainTracingCallback(BaseCallbackHandler):
         metadata: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> Any:
-        model = kwargs.get("invocation_params", {}).get("model")
+        model = kwargs.get("invocation_params", {}).get("model", "No model")
         span: Span = self.tracer.start_span(
             name=f"call_llm {model}",
         )
@@ -47,6 +114,11 @@ class _LangChainTracingCallback(BaseCallbackHandler):
                 "gen_ai.request.model": model,
             }
         )
+
+        trace_id = span.get_span_context().trace_id
+        if trace_id not in self.first_llm_calls:
+            self.first_llm_calls.add(trace_id)
+            _set_llm_input(messages, span)
 
         self._current_spans["model"][str(run_id)] = span
 
@@ -72,7 +144,7 @@ class _LangChainTracingCallback(BaseCallbackHandler):
                 "gen_ai.tool.description": serialized.get(
                     "description", "No description"
                 ),
-                "gen_ai.tool.args": input_str,
+                "gen_ai.tool.args": json.dumps(inputs, default=str, ensure_ascii=False),
             }
         )
 
@@ -87,30 +159,7 @@ class _LangChainTracingCallback(BaseCallbackHandler):
         **kwargs: Any,
     ) -> Any:
         span = self._current_spans["model"][str(run_id)]
-        generation = response.generations[0][0]
-
-        if generation.text:
-            span.set_attributes(
-                {
-                    "genai.output": generation.text,
-                    "genai.output.type": "text",
-                }
-            )
-        else:
-            # Tool Call
-            span.set_attributes(
-                {
-                    "genai.output": generation.model_dump_json(exclude_none=True),
-                    "genai.output.type": "json",
-                }
-            )
-        if token_usage := getattr(response, "llm_output", {}).get("token_usage"):
-            span.set_attributes(
-                {
-                    "gen_ai.usage.input_tokens": token_usage.prompt_tokens,
-                    "gen_ai.usage.output_tokens": token_usage.completion_tokens,
-                }
-            )
+        _set_llm_output(response, span)
         span.set_status(StatusCode.OK)
         span.end()
 
@@ -129,13 +178,9 @@ class _LangChainTracingCallback(BaseCallbackHandler):
         if output.content:
             span.set_attributes(
                 {
-                    "genai.output": json.dumps(
-                        output.content,
-                        default=str,
-                        ensure_ascii=False,
-                    ),
-                    "genai.output.type": "json",
-                    "gen_ai.tool.call.id": output.tool_call_id,
+                    "gen_ai.output": getattr(output, "content", "{}"),
+                    "gen_ai.output.type": "json",
+                    "gen_ai.tool.call.id": getattr(output, "tool_call_id", "No id"),
                 }
             )
 
@@ -146,6 +191,9 @@ class _LangChainTracingCallback(BaseCallbackHandler):
 
 
 class _LangChainInstrumentor:
+    def __init__(self) -> None:
+        self._original_ainvoke = None
+
     def instrument(self, tracer: Tracer) -> None:
         tracing_callback = _LangChainTracingCallback(tracer)
 
@@ -184,7 +232,8 @@ class _LangChainInstrumentor:
         )
 
     def uninstrument(self) -> None:
-        import langgraph
+        if self._original_ainvoke is not None:
+            import langgraph
 
-        langgraph.pregel.Pregel.ainvoke = self._original_ainvoke  # type: ignore[attr-defined]
-        self._original_ainvoke = None
+            langgraph.pregel.Pregel.ainvoke = self._original_ainvoke
+            self._original_ainvoke = None

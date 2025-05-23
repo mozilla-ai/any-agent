@@ -159,6 +159,9 @@ def test_load_and_run_agent(
         **kwargs,  # type: ignore[arg-type]
     )
     agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
+    update_trace = request.config.getoption("--update-trace-assets")
+    if update_trace:
+        agent._exporter.console.record = True  # type: ignore[union-attr]
 
     try:
         start_ns = time.time_ns()
@@ -178,15 +181,12 @@ def test_load_and_run_agent(
             assert_tokens(agent_trace)
         assert_eval(agent_trace)
 
-        update_trace = request.config.getoption("--update-trace-assets")
         if update_trace:
-            trace_path = (
-                Path(__file__).parent.parent
-                / "assets"
-                / f"{agent_framework.name}_trace.json"
-            )
-            with open(trace_path, "w", encoding="utf-8") as f:
+            trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
+            with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
                 f.write(agent_trace.model_dump_json(indent=2))
-
+            html_output = agent._exporter.console.export_html(inline_styles=True)  # type: ignore[union-attr]
+            with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
+                f.write(html_output.replace("<!DOCTYPE html>", ""))
     finally:
         agent.exit()

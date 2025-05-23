@@ -18,7 +18,7 @@ def test_rich_console_span_exporter_default(readable_spans: list[ReadableSpan]) 
     with patch("any_agent.tracing.exporter.Console", console_mock):
         exporter = _AnyAgentExporter(TracingConfig())
         exporter.export(readable_spans)
-        console_mock.return_value.rule.assert_called()
+        console_mock.return_value.print.assert_called()
 
 
 def test_rich_console_span_exporter_disable(readable_spans: list[ReadableSpan]) -> None:
@@ -26,7 +26,7 @@ def test_rich_console_span_exporter_disable(readable_spans: list[ReadableSpan]) 
     with patch("any_agent.tracing.exporter.Console", console_mock):
         exporter = _AnyAgentExporter(TracingConfig(console=False))
         exporter.export(readable_spans)
-        console_mock.return_value.rule.assert_not_called()
+        console_mock.return_value.print.assert_not_called()
 
 
 def test_cost_info_span_exporter_disable(readable_spans: list[ReadableSpan]) -> None:

@@ -15,6 +15,64 @@ if TYPE_CHECKING:
     from opentelemetry.trace import Span, Tracer
 
 
+def _set_llm_output(llm_response: LlmResponse, span: Span) -> None:
+    content = llm_response.content
+    if not content:
+        return
+    if not content.parts:
+        return
+
+    if content.parts[0].text:
+        span.set_attributes(
+            {
+                "gen_ai.output": content.parts[0].text,
+                "gen_ai.output.type": "text",
+            }
+        )
+    else:
+        span.set_attributes(
+            {
+                "gen_ai.output": json.dumps(
+                    [
+                        {
+                            "tool.name": getattr(part.function_call, "name", "No name"),
+                            "tool.args": getattr(part.function_call, "args", "No args"),
+                        }
+                        for part in content.parts
+                        if part.function_call
+                    ],
+                    default=str,
+                    ensure_ascii=False,
+                ),
+                "gen_ai.output.type": "json",
+            }
+        )
+
+
+def _set_llm_input(llm_request: LlmRequest, span: Span) -> None:
+    if not llm_request.contents:
+        return
+    messages = []
+    if config := llm_request.config:
+        messages.append(
+            {
+                "role": "system",
+                "content": getattr(config, "system_instruction", "No instructions"),
+            }
+        )
+    if parts := llm_request.contents[0].parts:
+        messages.append(
+            {
+                "role": getattr(llm_request.contents[0], "role", "No role"),
+                "content": getattr(parts[0], "text", "No content"),
+            }
+        )
+    span.set_attribute(
+        "gen_ai.input.messages",
+        json.dumps(messages, default=str, ensure_ascii=False),
+    )
+
+
 class _GoogleADKTracingCallbacks:
     def __init__(self, tracer: Tracer) -> None:
         self._original_value = None
@@ -24,6 +82,7 @@ class _GoogleADKTracingCallbacks:
             "tool": {},
         }
         self._original_callbacks: dict[str, Any] = {}
+        self.first_llm_calls: set[int] = set()
 
     def before_model_callback(
         self,
@@ -39,7 +98,10 @@ class _GoogleADKTracingCallbacks:
                 "gen_ai.request.model": llm_request.model or "no_model",
             }
         )
-
+        trace_id = span.get_span_context().trace_id
+        if trace_id not in self.first_llm_calls:
+            self.first_llm_calls.add(trace_id)
+            _set_llm_input(llm_request, span)
         self._current_spans["model"][callback_context.invocation_id] = span
 
         if callable(self._original_callbacks["LlmAgent.before_model_callback"]):
@@ -86,30 +148,8 @@ class _GoogleADKTracingCallbacks:
     ) -> Any | None:
         span = self._current_spans["model"][callback_context.invocation_id]
 
-        content = llm_response.content
-
-        if content:
-            if content.parts:
-                span.set_attributes(
-                    {
-                        "genai.output": getattr(content.parts[0], "text", "no_output"),
-                        "genai.output.type": "text",
-                    }
-                )
-            else:
-                # Tool call
-                span.set_attributes(
-                    {
-                        "genai.output": json.dumps(
-                            content.model_dump(exclude_none=True),
-                            default=str,
-                            ensure_ascii=False,
-                        ),
-                        "genai.output.type": "json",
-                    }
-                )
-
         # TODO:Add token count info. Need to upgrade to google-adk>=1.0.0
+        _set_llm_output(llm_response, span)
 
         span.set_status(StatusCode.OK)
         span.end()
@@ -129,12 +169,8 @@ class _GoogleADKTracingCallbacks:
         if content := getattr(tool_response, "content", None):
             span.set_attributes(
                 {
-                    "genai.output": json.dumps(
-                        content[0].model_dump(exclude_none=True),
-                        default=str,
-                        ensure_ascii=False,
-                    ),
-                    "genai.output.type": "json",
+                    "gen_ai.output": content[0].text,
+                    "gen_ai.output.type": "json",
                 }
             )
         span.set_status(StatusCode.OK)
