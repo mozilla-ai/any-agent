@@ -100,7 +100,6 @@ class _AgnoInstrumentor:
                 _set_llm_output(assistant_message, span)
 
                 span.set_status(StatusCode.OK)
-                span.end()
 
             return assistant_message, has_tool_calls
 
@@ -151,7 +150,6 @@ class _AgnoInstrumentor:
                         )
 
                     span.set_status(StatusCode.OK)
-                    span.end()
 
                 yield function_call_response
 

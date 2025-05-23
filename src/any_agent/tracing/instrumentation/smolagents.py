@@ -100,7 +100,6 @@ class _SmolagentsInstrumentor:
                 _set_llm_output(response, span)
 
                 span.set_status(StatusCode.OK)
-                span.end()
 
                 return response
 
@@ -129,7 +128,6 @@ class _SmolagentsInstrumentor:
                         }
                     )
                 span.set_status(StatusCode.OK)
-                span.end()
 
                 return result
 

@@ -95,7 +95,6 @@ class _TinyAgentInstrumentor:
                 _set_llm_output(response, span)
 
                 span.set_status(StatusCode.OK)
-                span.end()
 
                 return response
 
@@ -129,7 +128,6 @@ class _TinyAgentInstrumentor:
                 )
 
                 span.set_status(StatusCode.OK)
-                span.end()
 
                 return result
 
