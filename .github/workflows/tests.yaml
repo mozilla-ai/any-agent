@@ -36,6 +36,8 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
         with:
@@ -49,6 +51,8 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.setup.outputs.docs_only == 'false'
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
         with:
@@ -62,6 +66,8 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.setup.outputs.docs_only == 'false'
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
         with:
@@ -78,6 +84,8 @@ jobs:
       ANY_AGENT_INTEGRATION_TESTS: TRUE
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
       - name: Setup Python and Dependencies
         uses: ./.github/actions/setup-python
         with:
