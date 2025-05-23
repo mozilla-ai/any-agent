@@ -27,8 +27,12 @@ from any_agent.tracing.trace import _is_tracing_supported
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    import any_agent.serving
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
     from any_agent.tracing.trace import AgentTrace
+
+    if any_agent.serving.serving_available:
+        from any_agent.serving import A2AServerAsync
 
 
 class AnyAgent(ABC):
@@ -166,16 +170,42 @@ class AnyAgent(ABC):
 
         Raises:
             ImportError: If the `serving` dependencies are not installed.
+            ServerNotStartingError: If the uvicorn server didn't start in the maximum time
 
         """
         try:
             from any_agent.serving import _get_a2a_server
         except ImportError as e:
-            msg = "You need to `pip install 'git+https://github.com/google/A2A#subdirectory=samples/python' to use this method."
+            msg = "You need to `pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'` to use this method."
             raise ImportError(msg) from e
-
         server = _get_a2a_server(self, serving_config=serving_config or ServingConfig())
         server.start()
+
+    async def serve_async(
+        self, serving_config: ServingConfig | None = None
+    ) -> A2AServerAsync:
+        """Serve this agent using the Agent2Agent Protocol (A2A).
+
+        Args:
+            serving_config: See [ServingConfig][any_agent.config.ServingConfig].
+
+        Raises:
+            ImportError: If the `serving` dependencies are not installed.
+            ServerNotStartingError: If the uvicorn server didn't start in the maximum time
+
+        """
+        try:
+            from any_agent.serving import _get_a2a_server_async
+
+            server = _get_a2a_server_async(
+                self, serving_config=serving_config or ServingConfig()
+            )
+            await server.serve()
+        except ImportError as e:
+            msg = "You need to `pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'` to use this method."
+            raise ImportError(msg) from e
+        else:
+            return server
 
     @abstractmethod
     async def _load_agent(self) -> None:

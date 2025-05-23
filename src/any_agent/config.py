@@ -3,6 +3,7 @@ from enum import StrEnum, auto
 from typing import Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from opentelemetry.sdk.trace.export import SpanExporter
 
 
 class AgentFramework(StrEnum):
@@ -102,7 +103,7 @@ class ServingConfig(BaseModel):
 
 
 class TracingConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
     console: bool = True
     """Whether to show traces in the console."""
@@ -121,6 +122,8 @@ class TracingConfig(BaseModel):
 
     cost_info: bool = True
     """Whether traces should include cost information"""
+
+    additional_exporters: list[SpanExporter] = Field(exclude=True, default=[], repr=False)
 
     @model_validator(mode="after")
     def validate_console_flags(self) -> Self:
