@@ -98,6 +98,9 @@ class ServingConfig(BaseModel):
     endpoint: str = "/"
     """Will be pass as argument to `Starlette().add_route`"""
 
+    log_level: str = "warning"
+    """Will be passed as argument to the `uvicorn` server."""
+
     version: str = "0.1.0"
 
 

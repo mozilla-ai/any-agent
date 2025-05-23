@@ -27,6 +27,8 @@ from any_agent.tracing.trace import _is_tracing_supported
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    import uvicorn
+
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
     from any_agent.tracing.trace import AgentTrace
 
@@ -168,13 +170,43 @@ class AnyAgent(ABC):
             ImportError: If the `serving` dependencies are not installed.
 
         """
-        from any_agent.serving import _get_a2a_server, serve_a2a
+        from any_agent.serving import _get_a2a_app, serve_a2a
 
         if serving_config is None:
             serving_config = ServingConfig()
-        server = _get_a2a_server(self, serving_config=serving_config)
+        app = _get_a2a_app(self, serving_config=serving_config)
 
-        serve_a2a(server, host=serving_config.host, port=serving_config.port)
+        serve_a2a(
+            app,
+            host=serving_config.host,
+            port=serving_config.port,
+            log_level=serving_config.log_level,
+        )
+
+    async def serve_async(
+        self, serving_config: ServingConfig | None = None
+    ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+        """Serve this agent using the Agent2Agent Protocol (A2A).
+
+        Args:
+            serving_config: See [ServingConfig][any_agent.config.ServingConfig].
+
+        Raises:
+            ImportError: If the `serving` dependencies are not installed.
+
+        """
+        from any_agent.serving import _get_a2a_app, serve_a2a_async
+
+        if serving_config is None:
+            serving_config = ServingConfig()
+        app = _get_a2a_app(self, serving_config=serving_config)
+
+        return await serve_a2a_async(
+            app,
+            host=serving_config.host,
+            port=serving_config.port,
+            log_level=serving_config.log_level,
+        )
 
     @abstractmethod
     async def _load_agent(self) -> None:

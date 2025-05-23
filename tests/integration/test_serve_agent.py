@@ -25,6 +25,17 @@ def run_agent():
     agent.serve(serving_config=ServingConfig(port=SERVER_PORT))
 
 
+async def run_agent_async():
+    agent = await AnyAgent.create_async(
+        "openai",
+        AgentConfig(
+            model_id="gpt-4.1-mini",
+            description="I'm an agent to help with booking airbnbs",
+        ),
+    )
+    return await agent.serve_async(serving_config=ServingConfig(port=SERVER_PORT))
+
+
 @pytest.mark.asyncio
 async def test_agent_serving_and_communication():
     """This test can be refactored to remove the need for multiproc, once we have support for control of the uvicorn server."""
@@ -41,7 +52,7 @@ async def test_agent_serving_and_communication():
             send_message_payload = {
                 "message": {
                     "role": "user",
-                    "parts": [{"kind": "text", "text": "how much is 10 USD in INR?"}],
+                    "parts": [{"kind": "text", "text": "how much is 10 USD in EUR?"}],
                     "messageId": uuid4().hex,
                 },
             }
@@ -53,3 +64,29 @@ async def test_agent_serving_and_communication():
     finally:
         proc.kill()
         proc.join()
+
+
+@pytest.mark.asyncio
+async def test_agent_serving_and_communication_async():
+    # Start the agent in a subprocess
+    (task, server) = await run_agent_async()
+    try:
+        async with httpx.AsyncClient() as httpx_client:
+            client = await A2AClient.get_client_from_agent_card_url(
+                httpx_client, f"http://localhost:{SERVER_PORT}"
+            )
+            send_message_payload = {
+                "message": {
+                    "role": "user",
+                    "parts": [{"kind": "text", "text": "how much is 10 USD in EUR?"}],
+                    "messageId": uuid4().hex,
+                },
+            }
+            request = SendMessageRequest(
+                params=MessageSendParams(**send_message_payload)
+            )
+            response = await client.send_message(request)
+            assert response is not None
+    finally:
+        await server.shutdown()
+        task.cancel()
