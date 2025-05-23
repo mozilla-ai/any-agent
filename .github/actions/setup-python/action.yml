@@ -13,5 +13,5 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        uv sync --group all
+        uv sync --all-extras -U
         uv pip install 'git+https://github.com/google/A2A#subdirectory=samples/python'
