@@ -1615,7 +1615,7 @@ nest_asyncio.apply()</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="configure-the-agent">Configure the Agent<a class="anchor-link" href="#configure-the-agent">¶</a></h2><p>Now it's time to configure the agent! At this stage you have a few choices:</p>
-<h3 id="pick-the-framework">Pick the framework<a class="anchor-link" href="#pick-the-framework">¶</a></h3><p>We support a variety of underlying agent frameworks (OpenAI, Smolagents, Langchain, etc), which all have their own particular agentic AI implementations. For this tutorial's simple use case, any of the frameworks should work just fine, but any-agent makes it easy to try out a different framework later, if we so choose. For this example, we will use the "openai" agent framework.</p>
+<h3 id="pick-the-framework">Pick the framework<a class="anchor-link" href="#pick-the-framework">¶</a></h3><p>We support a variety of underlying agent frameworks (OpenAI, Smolagents, Langchain, TinyAgent, etc), which all have their own particular agentic AI implementations. For this tutorial's simple use case, any of the frameworks should work just fine, but any-agent makes it easy to try out a different framework later, if we so choose. For this example, we will use the <a href="frameworks/tinyagent.md">TinyAgent</a> framework.</p>
 <h3 id="pick-an-llm">Pick an LLM<a class="anchor-link" href="#pick-an-llm">¶</a></h3><p>Regardless of which agent framework you choose, each framework supports LiteLLM, which is a proxy that allows us to use whichever LLM inside the framework, hosted on by any provider. For example, we could use a local model via llama.cpp or llamafile, a google hosted gemini model, or a AWS bedrock hosted Llama model. For this example, let's use OpenAI's gpt-4.1-mini.</p>
 <h3 id="pick-which-tools-to-use">Pick which tools to use<a class="anchor-link" href="#pick-which-tools-to-use">¶</a></h3><p>In this example, we'll add a few MCP servers that we host locally, which means we'll use a Stdio MCP server. If an MCP Server is already running and hosted elsewhere, you can use an SSE connection to access it. You can browse some of the officially supported MCP servers <a href="https://github.com/modelcontextprotocol/servers/tree/main?tab=readme-ov-file">here</a>.</p>
 <p>Lets give use two MCP servers:</p>
@@ -1627,13 +1627,13 @@ nest_asyncio.apply()</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -1671,14 +1671,27 @@ else:
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>OPENAI_API_KEY found in environment.
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -1726,7 +1739,7 @@ else:
 
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="s2">"openai"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
+    <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
     <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"gpt-4.1-mini"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">airbnb_tool</span><span class="p">,</span> <span class="n">time_tool</span><span class="p">,</span> <span class="n">send_message</span><span class="p">]),</span>
 <span class="p">)</span>
 </pre></div>
@@ -1765,23 +1778,9 @@ def send_message(message: str) -&gt; str:
 
 
 agent = AnyAgent.create(
-    "openai",  # See all options in https://mozilla-ai.github.io/any-agent/
+    "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(model_id="gpt-4.1-mini", tools=[airbnb_tool, time_tool, send_message]),
 )</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>/Users/nbrake/scm/any-agent/.venv/lib/python3.13/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
-  from .autonotebook import tqdm as notebook_tqdm
-</pre>
 </div>
 </div>
 </div>
@@ -1818,13 +1817,13 @@ agent = AnyAgent.create(
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2">I am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this? Figure out the time, then ask me some questions and lets figure this out together.</span>
+<span class="s2">I am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this? Figure out the time, then ask me some questions and lets figure this out together. Once I tell you what you need to know, find and return some options for me.</span>
 <span class="s2">"""</span>
 
 <span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">prompt = """
-I am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this? Figure out the time, then ask me some questions and lets figure this out together.
+I am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this? Figure out the time, then ask me some questions and lets figure this out together. Once I tell you what you need to know, find and return some options for me.
 """
 
 agent_trace = agent.run(prompt)</div>
@@ -1839,808 +1838,222 @@ agent_trace = agent.run(prompt)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────────────────── </span>TOOL<span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────────────────</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"system"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"You are an agent - please keep going until the user's query is completely resolved, before </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"user"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"\nI am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this?</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"get_current_time"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"timezone\":\"America/New_York\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">641</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">18</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0002564</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2.88e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">tool_name: get_current_time
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭────────────────────────────────────────</span> EXECUTE_TOOL: get_current_time <span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────╮</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"timezone"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"America/New_York"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"meta=None content=[TextContent(type='text', text='{\\n  \"timezone\": \"America/New_York\",\\n  \"datetime</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">input: <span style="font-weight: bold">{</span><span style="color: #008000; text-decoration-color: #008000">'timezone'</span>: <span style="color: #008000; text-decoration-color: #008000">'America/New_York'</span><span style="font-weight: bold">}</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"send_message"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                            │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"message\":\"Today is May 23, 2025, and you are looking to book an Airbnb next weekend </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">732</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">194</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.00029279999999999996</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0003104</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────────────── Output ─────────────────────────────────────────────────────╮
-│ {"type":"text","text":"{\n  "timezone": "America/New_York",\n  "datetime": "2025-05-21T16:01:19-04:00",\n       │
-│ "is_dst": true\n}","annotations":null}                                                                          │
-╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭──────────────────────────────────────────</span> EXECUTE_TOOL: send_message <span style="color: #000080; text-decoration-color: #000080">───────────────────────────────────────────╮</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"message"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"Today is May 23, 2025, and you are looking to book an Airbnb next weekend near Ohiopyle, PA. </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"Let's do Friday through Sunday, 2 adults, whole home, maybe some place near the woods! No specific require</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">───────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"airbnb_search"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"location\":\"Ohiopyle, PA\",\"checkin\":\"2025-05-30\",\"checkout\":\"2025-06-01\",\"a</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">968</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">49</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0003872</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">7.84e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────────────────── </span>TOOL<span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────────────────</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭──────────────────────────────────────────</span> EXECUTE_TOOL: airbnb_search <span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────╮</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"location"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"Ohiopyle, PA"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkin"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-05-30"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkout"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-01"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"adults"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                              │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"minPrice"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"meta=None content=[TextContent(type='text', text='{\\n  \"searchUrl\": \"https://www.airbnb.com/s/Ohiopyle</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">tool_name: send_message
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"airbnb_listing_details"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"id\":\"53007015\",\"checkin\":\"2025-05-30\",\"checkout\":\"2025-06-01\",\"adults\":2}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">7887</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">42</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0031547999999999997</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">6.72e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">input: <span style="font-weight: bold">{</span><span style="color: #008000; text-decoration-color: #008000">'message'</span>: <span style="color: #008000; text-decoration-color: #008000">'Today is May 21, 2025, and you are looking to book an Airbnb near Ohiopyle, PA for next </span>
-<span style="color: #008000; text-decoration-color: #008000">weekend. That means your check-in date would likely be Friday, May 30, 2025, and check-out could be Sunday, June 1,</span>
-<span style="color: #008000; text-decoration-color: #008000">2025 (or another day if you prefer).\n\nTo help narrow down the options, could you please answer a few </span>
-<span style="color: #008000; text-decoration-color: #008000">questions?\n1. How many guests will be staying?\n2. Do you have a preferred price range per night?\n3. Are there </span>
-<span style="color: #008000; text-decoration-color: #008000">any specific amenities or features you want (e.g., pet-friendly, hot tub, kitchen)?\n4. Would you prefer a cabin, </span>
-<span style="color: #008000; text-decoration-color: #008000">house, or another type of accommodation?\n5. Any other preferences or requirements?'</span><span style="font-weight: bold">}</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭─────────────────────────────────────</span> EXECUTE_TOOL: airbnb_listing_details <span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────╮</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"id"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"53007015"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkin"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-05-30"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkout"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-01"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"adults"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"meta=None content=[TextContent(type='text', text='{\\n  \"listingUrl\": \"https://www.airbnb.com/rooms/530</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────────────── Output ─────────────────────────────────────────────────────╮
-│ Those days sound great. It'll be 2 adults, 1 infant, and 1 dog. I don't have a specific budget but would be     │
-│ interested in a few options for each budget. I want someplace woodsy.                                           │
-╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"airbnb_listing_details"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"id\":\"52684053\",\"checkin\":\"2025-05-30\",\"checkout\":\"2025-06-01\",\"adults\":2}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8872</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">42</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0035488</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">6.72e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">───────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────────────────── </span>TOOL<span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────────────────</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">tool_name: airbnb_search
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">input: <span style="font-weight: bold">{</span><span style="color: #008000; text-decoration-color: #008000">'location'</span>: <span style="color: #008000; text-decoration-color: #008000">'Ohiopyle, PA'</span>, <span style="color: #008000; text-decoration-color: #008000">'checkin'</span>: <span style="color: #008000; text-decoration-color: #008000">'2025-05-30'</span>, <span style="color: #008000; text-decoration-color: #008000">'checkout'</span>: <span style="color: #008000; text-decoration-color: #008000">'2025-06-01'</span>, <span style="color: #008000; text-decoration-color: #008000">'adults'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>, <span style="color: #008000; text-decoration-color: #008000">'children'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>, 
-<span style="color: #008000; text-decoration-color: #008000">'infants'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span>, <span style="color: #008000; text-decoration-color: #008000">'pets'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span>, <span style="color: #008000; text-decoration-color: #008000">'maxPrice'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">150</span><span style="font-weight: bold">}</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────────────── Output ─────────────────────────────────────────────────────╮
-│ {"type":"text","text":"{\n  "searchUrl":                                                                        │
-│ "https://www.airbnb.com/s/Ohiopyle%2C%20PA/homes?checkin=2025-05-30&amp;checkout=2025-06-01&amp;adults=2&amp;children=0&amp;inf │
-│ ants=1&amp;pets=1&amp;price_max=150",\n  "searchResults": [\n    {\n      "id": "878385397115028668",\n      "url":     │
-│ "https://www.airbnb.com/rooms/878385397115028668",\n      "demandStayListing": {\n        "id":                 │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6ODc4Mzg1Mzk3MTE1MDI4NjY4",\n        "description": {\n          "name": {\n            │
-│ "localizedStringWithTranslationPreference": "Log Cabin 5"\n          }\n        },\n        "location": {\n     │
-│ "coordinate": {\n            "latitude": 39.76693,\n            "longitude": -79.46796\n          }\n           │
-│ }\n      },\n      "badges": "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "Free  │
-│ cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free     │
-│ cancellation"\n      },\n      "avgRatingA11yLabel": "4.91 out of 5 average rating,  11 reviews",\n             │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$211 for 2 nights"\n    │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$106 x 2      │
-│ nights: $211"\n        }\n      }\n    },\n    {\n      "id": "1224643624417572953",\n      "url":              │
-│ "https://www.airbnb.com/rooms/1224643624417572953",\n      "demandStayListing": {\n        "id":                │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6MTIyNDY0MzYyNDQxNzU3Mjk1Mw==",\n        "description": {\n          "name": {\n        │
-│ "localizedStringWithTranslationPreference": "Glamping Pod"\n          }\n        },\n        "location": {\n    │
-│ "coordinate": {\n            "latitude": 40.03029,\n            "longitude": -78.95041\n          }\n           │
-│ }\n      },\n      "badges": "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "Free  │
-│ cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free     │
-│ cancellation"\n      },\n      "avgRatingA11yLabel": "4.97 out of 5 average rating,  31 reviews",\n             │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$274 for 2 nights,      │
-│ originally $502"\n        },\n        "explanationData": {\n          "title": "Price details",\n               │
-│ "priceDetails": "$137 x 2 nights: $274, "\n        }\n      }\n    },\n    {\n      "id":                       │
-│ "1132527402869122725",\n      "url": "https://www.airbnb.com/rooms/1132527402869122725",\n                      │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTEzMjUyNzQwMjg2OTEyMjcyNQ==",\n                 │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Eagles Nest @   │
-│ Sleepy Hollow"\n          }\n        },\n        "location": {\n          "coordinate": {\n                     │
-│ "latitude": 39.63791,\n            "longitude": -79.11291\n          }\n        }\n      },\n      "badges":    │
-│ "",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n            │
-│ "primaryLine": "3 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "5.0 out of 5      │
-│ average rating,  15 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                    │
-│ "accessibilityLabel": "$228 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$114 x 2 nights: $228"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "658658760148288301",\n      "url": "https://www.airbnb.com/rooms/658658760148288301",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NjU4NjU4NzYwMTQ4Mjg4MzAx",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Valley View     │
-│ Sunrise Site @TheGreat48Escape"\n          }\n        },\n        "location": {\n          "coordinate": {\n    │
-│ "latitude": 40.09503,\n            "longitude": -79.08348\n          }\n        }\n      },\n      "badges":    │
-│ "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n              │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "avgRatingA11yLabel": "5.0 out of 5 average rating,  25 reviews",\n      "structuredDisplayPrice": {\n          │
-│ "primaryLine": {\n          "accessibilityLabel": "$74 for 2 nights"\n        },\n        "explanationData":    │
-│ {\n          "title": "Price details",\n          "priceDetails": "$37 x 2 nights: $74"\n        }\n      }\n   │
-│ },\n    {\n      "id": "955289529577335421",\n      "url": "https://www.airbnb.com/rooms/955289529577335421",\n │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6OTU1Mjg5NTI5NTc3MzM1NDIx",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Nanny’s Rustic  │
-│ Retreat: Lil’ Red’s Nest"\n          }\n        },\n        "location": {\n          "coordinate": {\n          │
-│ "latitude": 40.15143,\n            "longitude": -79.6988\n          }\n        }\n      },\n      "badges":     │
-│ "Superhost",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n                   │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "avgRatingA11yLabel": "4.83 out of 5 average rating,  6 reviews",\n      "structuredDisplayPrice": {\n          │
-│ "primaryLine": {\n          "accessibilityLabel": "$160 for 2 nights"\n        },\n        "explanationData":   │
-│ {\n          "title": "Price details",\n          "priceDetails": "$80 x 2 nights: $160"\n        }\n      }\n  │
-│ },\n    {\n      "id": "882156783252661245",\n      "url": "https://www.airbnb.com/rooms/882156783252661245",\n │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6ODgyMTU2NzgzMjUyNjYxMjQ1",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Deer Dwelling @ │
-│ Sleepy Hollow"\n          }\n        },\n        "location": {\n          "coordinate": {\n                     │
-│ "latitude": 39.63903,\n            "longitude": -79.11564\n          }\n        }\n      },\n      "badges":    │
-│ "",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n            │
-│ "primaryLine": "1 king bed",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.89 out of 5 │
-│ average rating,  19 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                    │
-│ "accessibilityLabel": "$183 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$92 x 2 nights: $183"\n        }\n      }\n    },\n    {\n      "id":     │
-│ "903073081726508145",\n      "url": "https://www.airbnb.com/rooms/903073081726508145",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6OTAzMDczMDgxNzI2NTA4MTQ1",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Nanny’s Rustic  │
-│ Retreat: Big Foot Bungalow"\n          }\n        },\n        "location": {\n          "coordinate": {\n        │
-│ "latitude": 40.15459,\n            "longitude": -79.69988\n          }\n        }\n      },\n      "badges":    │
-│ "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n              │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "avgRatingA11yLabel": "5.0 out of 5 average rating,  24 reviews",\n      "structuredDisplayPrice": {\n          │
-│ "primaryLine": {\n          "accessibilityLabel": "$183 for 2 nights"\n        },\n        "explanationData":   │
-│ {\n          "title": "Price details",\n          "priceDetails": "$92 x 2 nights: $183"\n        }\n      }\n  │
-│ },\n    {\n      "id": "695884438251648673",\n      "url": "https://www.airbnb.com/rooms/695884438251648673",\n │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6Njk1ODg0NDM4MjUxNjQ4Njcz",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Private Room at │
-│ the Knit Inn (W)"\n          }\n        },\n        "location": {\n          "coordinate": {\n                  │
-│ "latitude": 39.6561,\n            "longitude": -78.9262\n          }\n        }\n      },\n      "badges":      │
-│ "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine":    │
-│ "",\n        "primaryLine": "2 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.8  │
-│ out of 5 average rating,  30 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n           │
-│ "accessibilityLabel": "$277 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$139 x 2 nights: $277"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "24850770",\n      "url": "https://www.airbnb.com/rooms/24850770",\n      "demandStayListing": {\n        "id": │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6MjQ4NTA3NzA=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Edison Room - GAP Trail Hotel at Morguen Toole Co"\n          }\n  │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.814388,\n                      │
-│ "longitude": -79.025269\n          }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n  │
-│ "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n          │
-│ "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.67 out of 5 average rating,  122 │
-│ reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$173   │
-│ for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price details",\n                  │
-│ "priceDetails": "$87 x 2 nights: $173"\n        }\n      }\n    },\n    {\n      "id": "1132497326301272807",\n │
-│ "url": "https://www.airbnb.com/rooms/1132497326301272807",\n      "demandStayListing": {\n        "id":         │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6MTEzMjQ5NzMyNjMwMTI3MjgwNw==",\n        "description": {\n          "name": {\n        │
-│ "localizedStringWithTranslationPreference": "Highland Haven @ Sleepy Hollow"\n          }\n        },\n         │
-│ "location": {\n          "coordinate": {\n            "latitude": 39.63978,\n            "longitude":           │
-│ -79.11291\n          }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n                │
-│ "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": "3 beds",\n                     │
-│ "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "5.0 out of 5 average rating,  4 reviews",\n         │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$228 for 2 nights"\n    │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$114 x 2      │
-│ nights: $228"\n        }\n      }\n    },\n    {\n      "id": "1280728160260382893",\n      "url":              │
-│ "https://www.airbnb.com/rooms/1280728160260382893",\n      "demandStayListing": {\n        "id":                │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6MTI4MDcyODE2MDI2MDM4Mjg5Mw==",\n        "description": {\n          "name": {\n        │
-│ "localizedStringWithTranslationPreference": "Super 8"\n          }\n        },\n        "location": {\n         │
-│ "coordinate": {\n            "latitude": 39.91311439855424,\n            "longitude": -79.75029245143713\n      │
-│ }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n        "mapCategoryInfo": "Free     │
-│ cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free     │
-│ cancellation"\n      },\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                          │
-│ "accessibilityLabel": "$203 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$102 x 2 nights: $203"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "751376184064151185",\n      "url": "https://www.airbnb.com/rooms/751376184064151185",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NzUxMzc2MTg0MDY0MTUxMTg1",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Private Bedroom │
-│ in the Knit Inn (Y)"\n          }\n        },\n        "location": {\n          "coordinate": {\n               │
-│ "latitude": 39.65733,\n            "longitude": -78.92731\n          }\n        }\n      },\n      "badges":    │
-│ "Superhost",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n   │
-│ "primaryLine": "2 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.94 out of 5     │
-│ average rating,  17 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                    │
-│ "accessibilityLabel": "$277 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$139 x 2 nights: $277"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "751362830237380520",\n      "url": "https://www.airbnb.com/rooms/751362830237380520",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NzUxMzYyODMwMjM3MzgwNTIw",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "King bedroom at │
-│ the Knit Inn"\n          }\n        },\n        "location": {\n          "coordinate": {\n                      │
-│ "latitude": 39.6558,\n            "longitude": -78.92518\n          }\n        }\n      },\n      "badges":     │
-│ "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine":    │
-│ "",\n        "primaryLine": "1 bed",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.96  │
-│ out of 5 average rating,  23 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n           │
-│ "accessibilityLabel": "$277 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$139 x 2 nights: $277"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "912472384178866401",\n      "url": "https://www.airbnb.com/rooms/912472384178866401",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6OTEyNDcyMzg0MTc4ODY2NDAx",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Nanny’s Rustic  │
-│ Retreat: Your tent/ my farm"\n          }\n        },\n        "location": {\n          "coordinate": {\n       │
-│ "latitude": 40.15299,\n            "longitude": -79.6996\n          }\n        }\n      },\n      "badges":     │
-│ "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n              │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "avgRatingA11yLabel": "5.0 out of 5 average rating,  6 reviews",\n      "structuredDisplayPrice": {\n           │
-│ "primaryLine": {\n          "accessibilityLabel": "$121 for 2 nights"\n        },\n        "explanationData":   │
-│ {\n          "title": "Price details",\n          "priceDetails": "$63 x 2 nights: $125, Long stay discount:    │
-│ -$4, Price after discount: $121"\n        }\n      }\n    },\n    {\n      "id": "24851215",\n      "url":      │
-│ "https://www.airbnb.com/rooms/24851215",\n      "demandStayListing": {\n        "id":                           │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6MjQ4NTEyMTU=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "FOE Taproom - GAP Trail Hotel at Morguen Toole Co"\n          }\n  │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.814388,\n                      │
-│ "longitude": -79.025269\n          }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n  │
-│ "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n          │
-│ "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.69 out of 5 average rating,  77  │
-│ reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$258   │
-│ for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price details",\n                  │
-│ "priceDetails": "$129 x 2 nights: $258"\n        }\n      }\n    },\n    {\n      "id": "880377723329687968",\n │
-│ "url": "https://www.airbnb.com/rooms/880377723329687968",\n      "demandStayListing": {\n        "id":          │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6ODgwMzc3NzIzMzI5Njg3OTY4",\n        "description": {\n          "name": {\n            │
-│ "localizedStringWithTranslationPreference": "Log Cabin 3"\n          }\n        },\n        "location": {\n     │
-│ "coordinate": {\n            "latitude": 39.76823,\n            "longitude": -79.46899\n          }\n           │
-│ }\n      },\n      "badges": "Superhost",\n      "structuredContent": {\n        "mapCategoryInfo": "Free       │
-│ cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free     │
-│ cancellation"\n      },\n      "avgRatingA11yLabel": "4.67 out of 5 average rating,  3 reviews",\n              │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$211 for 2 nights"\n    │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$106 x 2      │
-│ nights: $211"\n        }\n      }\n    },\n    {\n      "id": "948847019313497482",\n      "url":               │
-│ "https://www.airbnb.com/rooms/948847019313497482",\n      "demandStayListing": {\n        "id":                 │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6OTQ4ODQ3MDE5MzEzNDk3NDgy",\n        "description": {\n          "name": {\n            │
-│ "localizedStringWithTranslationPreference": "Nanny’s Rustic Retreat :Casper’s Chalet"\n          }\n            │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 40.15386,\n                       │
-│ "longitude": -79.69973\n          }\n        }\n      },\n      "badges": "Guest favorite",\n                   │
-│ "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n      │
-│ "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.89   │
-│ out of 5 average rating,  18 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n           │
-│ "accessibilityLabel": "$183 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$92 x 2 nights: $183"\n        }\n      }\n    },\n    {\n      "id":     │
-│ "970495379185696454",\n      "url": "https://www.airbnb.com/rooms/970495379185696454",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6OTcwNDk1Mzc5MTg1Njk2NDU0",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Nanny’s Rustic  │
-│ Retreat: Wagon Wheel Tent Site"\n          }\n        },\n        "location": {\n          "coordinate": {\n    │
-│ "latitude": 40.15289,\n            "longitude": -79.70061\n          }\n        }\n      },\n      "badges":    │
-│ "Superhost",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n                   │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$112 for 2 nights"\n    │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$56 x 2       │
-│ nights: $112"\n        }\n      }\n    }\n  ],\n  "paginationInfo": {\n    "pageCursors": [\n                   │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjowLCJ2ZXJzaW9uIjoxfQ==",\n                                       │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0="\n    ],\n    "nextPageCursor":           │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0="\n  }\n}","annotations":null}             │
-╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">───────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────────────────── </span>TOOL<span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────────────────</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">tool_name: airbnb_search
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">input: <span style="font-weight: bold">{</span><span style="color: #008000; text-decoration-color: #008000">'location'</span>: <span style="color: #008000; text-decoration-color: #008000">'Ohiopyle, PA'</span>, <span style="color: #008000; text-decoration-color: #008000">'checkin'</span>: <span style="color: #008000; text-decoration-color: #008000">'2025-05-30'</span>, <span style="color: #008000; text-decoration-color: #008000">'checkout'</span>: <span style="color: #008000; text-decoration-color: #008000">'2025-06-01'</span>, <span style="color: #008000; text-decoration-color: #008000">'adults'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>, <span style="color: #008000; text-decoration-color: #008000">'children'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>, 
-<span style="color: #008000; text-decoration-color: #008000">'infants'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span>, <span style="color: #008000; text-decoration-color: #008000">'pets'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span>, <span style="color: #008000; text-decoration-color: #008000">'minPrice'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">151</span>, <span style="color: #008000; text-decoration-color: #008000">'maxPrice'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">300</span><span style="font-weight: bold">}</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────────────── Output ─────────────────────────────────────────────────────╮
-│ {"type":"text","text":"{\n  "searchUrl":                                                                        │
-│ "https://www.airbnb.com/s/Ohiopyle%2C%20PA/homes?checkin=2025-05-30&amp;checkout=2025-06-01&amp;adults=2&amp;children=0&amp;inf │
-│ ants=1&amp;pets=1&amp;price_min=151&amp;price_max=300",\n  "searchResults": [\n    {\n      "id": "661417855562950090",\n   │
-│ "url": "https://www.airbnb.com/rooms/661417855562950090",\n      "demandStayListing": {\n        "id":          │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NjYxNDE3ODU1NTYyOTUwMDkw",\n        "description": {\n          "name": {\n            │
-│ "localizedStringWithTranslationPreference": "Pet-friendly Quiet Cabin in the Laurel Highlands"\n          }\n   │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 40.06686,\n                       │
-│ "longitude": -79.22168\n          }\n        }\n      },\n      "badges": "Guest favorite",\n                   │
-│ "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": │
-│ "2 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.94 out of 5 average rating,    │
-│ 144 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel":     │
-│ "$516 for 2 nights, originally $635"\n        },\n        "explanationData": {\n          "title": "Price       │
-│ details",\n          "priceDetails": "$258 x 2 nights: $516, "\n        }\n      }\n    },\n    {\n      "id":  │
-│ "1141244290312390121",\n      "url": "https://www.airbnb.com/rooms/1141244290312390121",\n                      │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTE0MTI0NDI5MDMxMjM5MDEyMQ==",\n                 │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Tall Pines"\n   │
-│ }\n        },\n        "location": {\n          "coordinate": {\n            "latitude": 39.8466,\n             │
-│ "longitude": -79.3739\n          }\n        }\n      },\n      "badges": "Guest favorite",\n                    │
-│ "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n      │
-│ "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.9    │
-│ out of 5 average rating,  20 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n           │
-│ "accessibilityLabel": "$363 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$182 x 2 nights: $363"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "1424817568323644591",\n      "url": "https://www.airbnb.com/rooms/1424817568323644591",\n                      │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTQyNDgxNzU2ODMyMzY0NDU5MQ==",\n                 │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "The Half        │
-│ Glass"\n          }\n        },\n        "location": {\n          "coordinate": {\n            "latitude":      │
-│ 40.1221,\n            "longitude": -79.3953\n          }\n        }\n      },\n      "badges": "Superhost",\n   │
-│ "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n      │
-│ "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "New    │
-│ place to stay",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel":   │
-│ "$396 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price details",\n            │
-│ "priceDetails": "$198 x 2 nights: $396"\n        }\n      }\n    },\n    {\n      "id": "43060311",\n           │
-│ "url": "https://www.airbnb.com/rooms/43060311",\n      "demandStayListing": {\n        "id":                    │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NDMwNjAzMTE=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Rustic Confluence Cabin with Private Stream."\n          }\n       │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.81736,\n                       │
-│ "longitude": -79.393\n          }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n     │
-│ "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n          │
-│ "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.64 out of 5 average rating,  104 │
-│ reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$365   │
-│ for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price details",\n                  │
-│ "priceDetails": "$183 x 2 nights: $365"\n        }\n      }\n    },\n    {\n      "id": "548490389500055551",\n │
-│ "url": "https://www.airbnb.com/rooms/548490389500055551",\n      "demandStayListing": {\n        "id":          │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NTQ4NDkwMzg5NTAwMDU1NTUx",\n        "description": {\n          "name": {\n            │
-│ "localizedStringWithTranslationPreference": "Jones'Inn Confluence"\n          }\n        },\n                   │
-│ "location": {\n          "coordinate": {\n            "latitude": 39.81134,\n            "longitude":           │
-│ -79.36223\n          }\n        }\n      },\n      "badges": "Guest favorite",\n      "structuredContent": {\n  │
-│ "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": "5 beds",\n                     │
-│ "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.96 out of 5 average rating,  54 reviews",\n       │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$508 for 2 nights"\n    │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$254 x 2      │
-│ nights: $508"\n        }\n      }\n    },\n    {\n      "id": "46254216",\n      "url":                         │
-│ "https://www.airbnb.com/rooms/46254216",\n      "demandStayListing": {\n        "id":                           │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NDYyNTQyMTY=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Mountain &amp; Valley Views | Pet Friendly | Fireplace"\n          }\n │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 40.04978,\n                       │
-│ "longitude": -79.25629\n          }\n        }\n      },\n      "badges": "Guest favorite",\n                   │
-│ "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n      │
-│ "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.87   │
-│ out of 5 average rating,  83 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n           │
-│ "accessibilityLabel": "$398 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$199 x 2 nights: $398"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "1274094336877328878",\n      "url": "https://www.airbnb.com/rooms/1274094336877328878",\n                      │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTI3NDA5NDMzNjg3NzMyODg3OA==",\n                 │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Escape To       │
-│ Turning Back Log Cabin"\n          }\n        },\n        "location": {\n          "coordinate": {\n            │
-│ "latitude": 39.70333814431143,\n            "longitude": -79.25927136332274\n          }\n        }\n      },\n │
-│ "badges": "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n    │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "avgRatingA11yLabel": "4.92 out of 5 average rating,  12 reviews",\n      "structuredDisplayPrice": {\n         │
-│ "primaryLine": {\n          "accessibilityLabel": "$580 for 2 nights"\n        },\n        "explanationData":   │
-│ {\n          "title": "Price details",\n          "priceDetails": "$290 x 2 nights: $580"\n        }\n      }\n │
-│ },\n    {\n      "id": "954991273167112498",\n      "url": "https://www.airbnb.com/rooms/954991273167112498",\n │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6OTU0OTkxMjczMTY3MTEyNDk4",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Benner's        │
-│ \"Hummingbird House\""\n          }\n        },\n        "location": {\n          "coordinate": {\n             │
-│ "latitude": 39.8404,\n            "longitude": -79.5644\n          }\n        }\n      },\n      "badges":      │
-│ "",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n            │
-│ "primaryLine": "1 double bed",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.85 out of │
-│ 5 average rating,  20 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                  │
-│ "accessibilityLabel": "$452 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$226 x 2 nights: $452"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "955165257738075368",\n      "url": "https://www.airbnb.com/rooms/955165257738075368",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6OTU1MTY1MjU3NzM4MDc1MzY4",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Benner's \"Hawk │
-│ House\""\n          }\n        },\n        "location": {\n          "coordinate": {\n            "latitude":    │
-│ 39.8337,\n            "longitude": -79.5635\n          }\n        }\n      },\n      "badges": "Guest           │
-│ favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n     │
-│ "primaryLine": "3 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "5.0 out of 5      │
-│ average rating,  11 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                    │
-│ "accessibilityLabel": "$536 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$268 x 2 nights: $536"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "878385731204870228",\n      "url": "https://www.airbnb.com/rooms/878385731204870228",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6ODc4Mzg1NzMxMjA0ODcwMjI4",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Log Cabin 8"\n  │
-│ }\n        },\n        "location": {\n          "coordinate": {\n            "latitude": 39.76847,\n            │
-│ "longitude": -79.468\n          }\n        }\n      },\n      "badges": "Superhost",\n                          │
-│ "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n      │
-│ "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.5    │
-│ out of 5 average rating,  6 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n            │
-│ "accessibilityLabel": "$314 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$157 x 2 nights: $314"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "1013710155812233643",\n      "url": "https://www.airbnb.com/rooms/1013710155812233643",\n                      │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTAxMzcxMDE1NTgxMjIzMzY0Mw==",\n                 │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Benner's        │
-│ \"Pheasant Cabin\""\n          }\n        },\n        "location": {\n          "coordinate": {\n                │
-│ "latitude": 39.8404,\n            "longitude": -79.5644\n          }\n        }\n      },\n      "badges":      │
-│ "",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n            │
-│ "primaryLine": "3 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.5 out of 5      │
-│ average rating,  6 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                     │
-│ "accessibilityLabel": "$536 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$268 x 2 nights: $536"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "48678810",\n      "url": "https://www.airbnb.com/rooms/48678810",\n      "demandStayListing": {\n        "id": │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NDg2Nzg4MTA=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "The Country Roads' Cottage near Cooper's Rock/WVU"\n          }\n  │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.66631,\n                       │
-│ "longitude": -79.61781\n          }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n   │
-│ "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": "3 beds",\n                     │
-│ "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.75 out of 5 average rating,  79 reviews",\n       │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$333 for 2 nights,      │
-│ originally $420"\n        },\n        "explanationData": {\n          "title": "Price details",\n               │
-│ "priceDetails": "$210 x 2 nights: $420, Special offer: -$87, Price after discount: $333"\n        }\n      }\n  │
-│ },\n    {\n      "id": "10823697",\n      "url": "https://www.airbnb.com/rooms/10823697",\n                     │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTA4MjM2OTc=",\n        "description": {\n       │
-│ "name": {\n            "localizedStringWithTranslationPreference": "Broken Tractor Cabins: Rustic and Cozy."\n  │
-│ }\n        },\n        "location": {\n          "coordinate": {\n            "latitude": 39.63458,\n            │
-│ "longitude": -79.55514\n          }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n   │
-│ "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": "4 beds",\n                     │
-│ "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.81 out of 5 average rating,  197 reviews",\n      │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$365 for 2 nights"\n    │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$183 x 2      │
-│ nights: $365"\n        }\n      }\n    },\n    {\n      "id": "668093317943857385",\n      "url":               │
-│ "https://www.airbnb.com/rooms/668093317943857385",\n      "demandStayListing": {\n        "id":                 │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NjY4MDkzMzE3OTQzODU3Mzg1",\n        "description": {\n          "name": {\n            │
-│ "localizedStringWithTranslationPreference": "Cute 30foot camper nestled in the Laurel Highlands"\n          }\n │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.7906,\n                        │
-│ "longitude": -79.5621\n          }\n        }\n      },\n      "badges": "Guest favorite",\n                    │
-│ "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": │
-│ "3 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.81 out of 5 average rating,    │
-│ 47 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel":      │
-│ "$304 for 2 nights, originally $340"\n        },\n        "explanationData": {\n          "title": "Price       │
-│ details",\n          "priceDetails": "$152 x 2 nights: $304, "\n        }\n      }\n    },\n    {\n      "id":  │
-│ "878385497407880073",\n      "url": "https://www.airbnb.com/rooms/878385497407880073",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6ODc4Mzg1NDk3NDA3ODgwMDcz",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Log Cabin 6"\n  │
-│ }\n        },\n        "location": {\n          "coordinate": {\n            "latitude": 39.76652,\n            │
-│ "longitude": -79.46796\n          }\n        }\n      },\n      "badges": "Superhost",\n                        │
-│ "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n      │
-│ "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.25   │
-│ out of 5 average rating,  4 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n            │
-│ "accessibilityLabel": "$314 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$157 x 2 nights: $314"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "644290648933852532",\n      "url": "https://www.airbnb.com/rooms/644290648933852532",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NjQ0MjkwNjQ4OTMzODUyNTMy",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Riverview       │
-│ Suite"\n          }\n        },\n        "location": {\n          "coordinate": {\n            "latitude":      │
-│ 39.6638,\n            "longitude": -79.4066\n          }\n        }\n      },\n      "badges": "Guest           │
-│ favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n                     │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "avgRatingA11yLabel": "4.94 out of 5 average rating,  149 reviews",\n      "structuredDisplayPrice": {\n        │
-│ "primaryLine": {\n          "accessibilityLabel": "$446 for 2 nights"\n        },\n        "explanationData":   │
-│ {\n          "title": "Price details",\n          "priceDetails": "$223 x 2 nights: $446"\n        }\n      }\n │
-│ },\n    {\n      "id": "1234855068183659998",\n      "url":                                                     │
-│ "https://www.airbnb.com/rooms/1234855068183659998",\n      "demandStayListing": {\n        "id":                │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6MTIzNDg1NTA2ODE4MzY1OTk5OA==",\n        "description": {\n          "name": {\n        │
-│ "localizedStringWithTranslationPreference": "Continental Condo at Hidden Valley"\n          }\n        },\n     │
-│ "location": {\n          "coordinate": {\n            "latitude": 40.05174,\n            "longitude":           │
-│ -79.25627\n          }\n        }\n      },\n      "badges": "Guest favorite",\n      "structuredContent": {\n  │
-│ "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n          │
-│ "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.94 out of 5 average rating,  33  │
-│ reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$405   │
-│ for 2 nights, originally $459"\n        },\n        "explanationData": {\n          "title": "Price details",\n │
-│ "priceDetails": "$203 x 2 nights: $405, "\n        }\n      }\n    },\n    {\n      "id":                       │
-│ "549117545780330524",\n      "url": "https://www.airbnb.com/rooms/549117545780330524",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NTQ5MTE3NTQ1NzgwMzMwNTI0",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Need a nest?    │
-│ Nestle in at the HEN HOUSE!"\n          }\n        },\n        "location": {\n          "coordinate": {\n       │
-│ "latitude": 39.94792,\n            "longitude": -79.19854\n          }\n        }\n      },\n      "badges":    │
-│ "Superhost",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n                   │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "avgRatingA11yLabel": "4.76 out of 5 average rating,  49 reviews",\n      "structuredDisplayPrice": {\n         │
-│ "primaryLine": {\n          "accessibilityLabel": "$599 for 2 nights"\n        },\n        "explanationData":   │
-│ {\n          "title": "Price details",\n          "priceDetails": "$300 x 2 nights: $599"\n        }\n      }\n │
-│ }\n  ],\n  "paginationInfo": {\n    "pageCursors": [\n                                                          │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjowLCJ2ZXJzaW9uIjoxfQ==",\n                                       │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0=",\n                                       │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjozNiwidmVyc2lvbiI6MX0=",\n                                       │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0Ijo1NCwidmVyc2lvbiI6MX0="\n    ],\n    "nextPageCursor":           │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0="\n  }\n}","annotations":null}             │
-╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">───────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────────────────── </span>TOOL<span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────────────────</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">tool_name: airbnb_search
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">input: <span style="font-weight: bold">{</span><span style="color: #008000; text-decoration-color: #008000">'location'</span>: <span style="color: #008000; text-decoration-color: #008000">'Ohiopyle, PA'</span>, <span style="color: #008000; text-decoration-color: #008000">'checkin'</span>: <span style="color: #008000; text-decoration-color: #008000">'2025-05-30'</span>, <span style="color: #008000; text-decoration-color: #008000">'checkout'</span>: <span style="color: #008000; text-decoration-color: #008000">'2025-06-01'</span>, <span style="color: #008000; text-decoration-color: #008000">'adults'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>, <span style="color: #008000; text-decoration-color: #008000">'children'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span>, 
-<span style="color: #008000; text-decoration-color: #008000">'infants'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span>, <span style="color: #008000; text-decoration-color: #008000">'pets'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span>, <span style="color: #008000; text-decoration-color: #008000">'minPrice'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">301</span><span style="font-weight: bold">}</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────────────── Output ─────────────────────────────────────────────────────╮
-│ {"type":"text","text":"{\n  "searchUrl":                                                                        │
-│ "https://www.airbnb.com/s/Ohiopyle%2C%20PA/homes?checkin=2025-05-30&amp;checkout=2025-06-01&amp;adults=2&amp;children=0&amp;inf │
-│ ants=1&amp;pets=1&amp;price_min=301",\n  "searchResults": [\n    {\n      "id": "847793719180100758",\n      "url":     │
-│ "https://www.airbnb.com/rooms/847793719180100758",\n      "demandStayListing": {\n        "id":                 │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6ODQ3NzkzNzE5MTgwMTAwNzU4",\n        "description": {\n          "name": {\n            │
-│ "localizedStringWithTranslationPreference": "KLAE House - nestled among the trees"\n          }\n        },\n   │
-│ "location": {\n          "coordinate": {\n            "latitude": 39.82369,\n            "longitude":           │
-│ -79.28165\n          }\n        }\n      },\n      "badges": "Guest favorite",\n      "structuredContent": {\n  │
-│ "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": "3 beds",\n                     │
-│ "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.98 out of 5 average rating,  99 reviews",\n       │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$708 for 2 nights"\n    │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$354 x 2      │
-│ nights: $708"\n        }\n      }\n    },\n    {\n      "id": "1365942289098981112",\n      "url":              │
-│ "https://www.airbnb.com/rooms/1365942289098981112",\n      "demandStayListing": {\n        "id":                │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6MTM2NTk0MjI4OTA5ODk4MTExMg==",\n        "description": {\n          "name": {\n        │
-│ "localizedStringWithTranslationPreference": "Romantic Riverside Getaway! Riverview Hot Tub!"\n          }\n     │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.695286787565834,\n             │
-│ "longitude": -79.13466864620202\n          }\n        }\n      },\n      "badges": "Superhost",\n               │
-│ "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n      │
-│ "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.82   │
-│ out of 5 average rating,  11 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n           │
-│ "accessibilityLabel": "$928 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$464 x 2 nights: $928"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "47866422",\n      "url": "https://www.airbnb.com/rooms/47866422",\n      "demandStayListing": {\n        "id": │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NDc4NjY0MjI=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Luxury Cabin w/ Hot Tub adjacent to 16,000 Acres"\n          }\n   │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.8935,\n                        │
-│ "longitude": -79.56163\n          }\n        }\n      },\n      "badges": "Superhost",\n                        │
-│ "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": │
-│ "4 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.87 out of 5 average rating,    │
-│ 39 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel":      │
-│ "$819 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price details",\n            │
-│ "priceDetails": "$410 x 2 nights: $819"\n        }\n      }\n    },\n    {\n      "id": "53218067",\n           │
-│ "url": "https://www.airbnb.com/rooms/53218067",\n      "demandStayListing": {\n        "id":                    │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NTMyMTgwNjc=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Mountain Lakeside Fall Paradise Hot Tub, Fire Pit"\n          }\n  │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.91328,\n                       │
-│ "longitude": -79.37375\n          }\n        }\n      },\n      "badges": "Superhost",\n                        │
-│ "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": │
-│ "3 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.67 out of 5 average rating,    │
-│ 106 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel":     │
-│ "$1,016 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price details",\n          │
-│ "priceDetails": "$508 x 2 nights: $1,016"\n        }\n      }\n    },\n    {\n      "id": "53569111",\n         │
-│ "url": "https://www.airbnb.com/rooms/53569111",\n      "demandStayListing": {\n        "id":                    │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NTM1NjkxMTE=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Bright &amp; Clean Chalet"\n          }\n        },\n                  │
-│ "location": {\n          "coordinate": {\n            "latitude": 40.0984,\n            "longitude": -79.3878\n │
-│ }\n        }\n      },\n      "badges": "Guest favorite",\n      "structuredContent": {\n                       │
-│ "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": "4 beds",\n                     │
-│ "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "5.0 out of 5 average rating,  101 reviews",\n       │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$859 for 2 nights"\n    │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$430 x 2      │
-│ nights: $859"\n        }\n      }\n    },\n    {\n      "id": "568972763465162606",\n      "url":               │
-│ "https://www.airbnb.com/rooms/568972763465162606",\n      "demandStayListing": {\n        "id":                 │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NTY4OTcyNzYzNDY1MTYyNjA2",\n        "description": {\n          "name": {\n            │
-│ "localizedStringWithTranslationPreference": "Summer Fun! Pool, Hot Tub, FirePit, Game Room!"\n          }\n     │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.99524,\n                       │
-│ "longitude": -79.44634\n          }\n        }\n      },\n      "badges": "Superhost",\n                        │
-│ "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": │
-│ "4 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.91 out of 5 average rating,    │
-│ 74 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel":      │
-│ "$1,066 for 2 nights, originally $1,250"\n        },\n        "explanationData": {\n          "title": "Price   │
-│ details",\n          "priceDetails": "$625 x 2 nights: $1,250, Special offer: -$184, Price after discount:      │
-│ $1,066"\n        }\n      }\n    },\n    {\n      "id": "46827304",\n      "url":                               │
-│ "https://www.airbnb.com/rooms/46827304",\n      "demandStayListing": {\n        "id":                           │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NDY4MjczMDQ=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Uber Private, Luxury Cabin minutes from Ohiopyle"\n          }\n   │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.83243,\n                       │
-│ "longitude": -79.63453\n          }\n        }\n      },\n      "badges": "Superhost",\n                        │
-│ "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": │
-│ "3 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.92 out of 5 average rating,    │
-│ 37 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel":      │
-│ "$631 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price details",\n            │
-│ "priceDetails": "$316 x 2 nights: $631"\n        }\n      }\n    },\n    {\n      "id": "23433189",\n           │
-│ "url": "https://www.airbnb.com/rooms/23433189",\n      "demandStayListing": {\n        "id":                    │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6MjM0MzMxODk=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "4BR Seven Springs Cabin + BIG Hot Tub"\n          }\n        },\n  │
-│ "location": {\n          "coordinate": {\n            "latitude": 40.07499,\n            "longitude":           │
-│ -79.35085\n          }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n                │
-│ "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": "7 beds",\n                     │
-│ "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.66 out of 5 average rating,  178 reviews",\n      │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$679 for 2 nights,      │
-│ originally $1,162"\n        },\n        "explanationData": {\n          "title": "Price details",\n             │
-│ "priceDetails": "$581 x 2 nights: $1,162, Special offer: -$483, Price after discount: $679"\n        }\n        │
-│ }\n    },\n    {\n      "id": "5481479",\n      "url": "https://www.airbnb.com/rooms/5481479",\n                │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NTQ4MTQ3OQ==",\n        "description": {\n       │
-│ "name": {\n            "localizedStringWithTranslationPreference": "In the ❤ of Ohiopyle. Large yard with       │
-│ firepit"\n          }\n        },\n        "location": {\n          "coordinate": {\n            "latitude":    │
-│ 39.86934,\n            "longitude": -79.49007\n          }\n        }\n      },\n      "badges": "Guest         │
-│ favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n     │
-│ "primaryLine": "4 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.91 out of 5     │
-│ average rating,  266 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                   │
-│ "accessibilityLabel": "$816 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$408 x 2 nights: $816"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "1294182529824847255",\n      "url": "https://www.airbnb.com/rooms/1294182529824847255",\n                      │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTI5NDE4MjUyOTgyNDg0NzI1NQ==",\n                 │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Ohiopyle,       │
-│ Sleeps 14 / 8 Bed, 4BR, FirePit, HotTub"\n          }\n        },\n        "location": {\n                      │
-│ "coordinate": {\n            "latitude": 39.8716,\n            "longitude": -79.5448\n          }\n        }\n  │
-│ },\n      "badges": "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n           │
-│ "mapSecondaryLine": "",\n        "primaryLine": "8 beds",\n        "secondaryLine": ""\n      },\n              │
-│ "avgRatingA11yLabel": "5.0 out of 5 average rating,  6 reviews",\n      "structuredDisplayPrice": {\n           │
-│ "primaryLine": {\n          "accessibilityLabel": "$1,107 for 2 nights, originally $1,283"\n        },\n        │
-│ "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$642 x 2 nights: $1,283,  │
-│ Special offer: -$176, Price after discount: $1,107"\n        }\n      }\n    },\n    {\n      "id":             │
-│ "917065370474534078",\n      "url": "https://www.airbnb.com/rooms/917065370474534078",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6OTE3MDY1MzcwNDc0NTM0MDc4",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "ADventure       │
-│ Lodge"\n          }\n        },\n        "location": {\n          "coordinate": {\n            "latitude":      │
-│ 39.8099,\n            "longitude": -79.3557\n          }\n        }\n      },\n      "badges": "Guest           │
-│ favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n     │
-│ "primaryLine": "4 queen beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.93 out of │
-│ 5 average rating,  61 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                  │
-│ "accessibilityLabel": "$628 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$314 x 2 nights: $628"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "847241807980593269",\n      "url": "https://www.airbnb.com/rooms/847241807980593269",\n                        │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6ODQ3MjQxODA3OTgwNTkzMjY5",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Bern's Summit   │
-│ Solitude: Stream-Front Serenity"\n          }\n        },\n        "location": {\n          "coordinate": {\n   │
-│ "latitude": 39.76251,\n            "longitude": -79.43551\n          }\n        }\n      },\n      "badges":    │
-│ "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "Free cancellation",\n              │
-│ "mapSecondaryLine": "",\n        "primaryLine": "",\n        "secondaryLine": "Free cancellation"\n      },\n   │
-│ "avgRatingA11yLabel": "4.9 out of 5 average rating,  49 reviews",\n      "structuredDisplayPrice": {\n          │
-│ "primaryLine": {\n          "accessibilityLabel": "$645 for 2 nights"\n        },\n        "explanationData":   │
-│ {\n          "title": "Price details",\n          "priceDetails": "$323 x 2 nights: $645"\n        }\n      }\n │
-│ },\n    {\n      "id": "33338656",\n      "url": "https://www.airbnb.com/rooms/33338656",\n                     │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MzMzMzg2NTY=",\n        "description": {\n       │
-│ "name": {\n            "localizedStringWithTranslationPreference": "Stony Creek | 5BR, 3.5BA, Hot Tub,          │
-│ Creekside Cabin"\n          }\n        },\n        "location": {\n          "coordinate": {\n                   │
-│ "latitude": 39.77173,\n            "longitude": -79.59944\n          }\n        }\n      },\n      "badges":    │
-│ "",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n            │
-│ "primaryLine": "7 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.89 out of 5     │
-│ average rating,  55 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n                    │
-│ "accessibilityLabel": "$991 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$496 x 2 nights: $991"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "43970203",\n      "url": "https://www.airbnb.com/rooms/43970203",\n      "demandStayListing": {\n        "id": │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NDM5NzAyMDM=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Pool, Hot Tub, Pavilion, FirePit 6mi to Ohiopyle"\n          }\n   │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.9506,\n                        │
-│ "longitude": -79.45431\n          }\n        }\n      },\n      "badges": "Guest favorite",\n                   │
-│ "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": │
-│ "7 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.87 out of 5 average rating,    │
-│ 70 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel":      │
-│ "$1,481 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price details",\n          │
-│ "priceDetails": "$741 x 2 nights: $1,481"\n        }\n      }\n    },\n    {\n      "id":                       │
-│ "1210731658825222578",\n      "url": "https://www.airbnb.com/rooms/1210731658825222578",\n                      │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6MTIxMDczMTY1ODgyNTIyMjU3OA==",\n                 │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Sleeps 13, 4BR, │
-│ 8BED, HotTub, Pond, Hidden Valley"\n          }\n        },\n        "location": {\n          "coordinate": {\n │
-│ "latitude": 40.0877,\n            "longitude": -79.2259\n          }\n        }\n      },\n      "badges":      │
-│ "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine":    │
-│ "",\n        "primaryLine": "8 beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "5.0  │
-│ out of 5 average rating,  36 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n           │
-│ "accessibilityLabel": "$1,258 for 2 nights, originally $1,677"\n        },\n        "explanationData": {\n      │
-│ "title": "Price details",\n          "priceDetails": "$839 x 2 nights: $1,677, Special offer: -$419, Price      │
-│ after discount: $1,258"\n        }\n      }\n    },\n    {\n      "id": "8207436",\n      "url":                │
-│ "https://www.airbnb.com/rooms/8207436",\n      "demandStayListing": {\n        "id":                            │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6ODIwNzQzNg==",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Smiling Mountain Lodge"\n          }\n        },\n                 │
-│ "location": {\n          "coordinate": {\n            "latitude": 40.04243,\n            "longitude":           │
-│ -79.34564\n          }\n        }\n      },\n      "badges": "Guest favorite",\n      "structuredContent": {\n  │
-│ "mapCategoryInfo": "Free cancellation",\n        "mapSecondaryLine": "",\n        "primaryLine": "",\n          │
-│ "secondaryLine": "Free cancellation"\n      },\n      "avgRatingA11yLabel": "4.83 out of 5 average rating,  189 │
-│ reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$1,082 │
-│ for 2 nights, originally $1,482"\n        },\n        "explanationData": {\n          "title": "Price           │
-│ details",\n          "priceDetails": "$541 x 2 nights: $1,082, "\n        }\n      }\n    },\n    {\n           │
-│ "id": "637856009387316779",\n      "url": "https://www.airbnb.com/rooms/637856009387316779",\n                  │
-│ "demandStayListing": {\n        "id": "RGVtYW5kU3RheUxpc3Rpbmc6NjM3ODU2MDA5Mzg3MzE2Nzc5",\n                     │
-│ "description": {\n          "name": {\n            "localizedStringWithTranslationPreference": "Snowmobile      │
-│ riding at its finest"\n          }\n        },\n        "location": {\n          "coordinate": {\n              │
-│ "latitude": 39.93658,\n            "longitude": -79.43684\n          }\n        }\n      },\n      "badges":    │
-│ "Guest favorite",\n      "structuredContent": {\n        "mapCategoryInfo": "",\n        "mapSecondaryLine":    │
-│ "",\n        "primaryLine": "3 queen beds",\n        "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": │
-│ "5.0 out of 5 average rating,  33 reviews",\n      "structuredDisplayPrice": {\n        "primaryLine": {\n      │
-│ "accessibilityLabel": "$969 for 2 nights"\n        },\n        "explanationData": {\n          "title": "Price  │
-│ details",\n          "priceDetails": "$485 x 2 nights: $969"\n        }\n      }\n    },\n    {\n      "id":    │
-│ "50635235",\n      "url": "https://www.airbnb.com/rooms/50635235",\n      "demandStayListing": {\n        "id": │
-│ "RGVtYW5kU3RheUxpc3Rpbmc6NTA2MzUyMzU=",\n        "description": {\n          "name": {\n                        │
-│ "localizedStringWithTranslationPreference": "Marietta's River Retreat | 3BR,2BA,in Ohiopyle!"\n          }\n    │
-│ },\n        "location": {\n          "coordinate": {\n            "latitude": 39.8672,\n                        │
-│ "longitude": -79.49218\n          }\n        }\n      },\n      "badges": "",\n      "structuredContent": {\n   │
-│ "mapCategoryInfo": "",\n        "mapSecondaryLine": "",\n        "primaryLine": "5 beds",\n                     │
-│ "secondaryLine": ""\n      },\n      "avgRatingA11yLabel": "4.75 out of 5 average rating,  55 reviews",\n       │
-│ "structuredDisplayPrice": {\n        "primaryLine": {\n          "accessibilityLabel": "$1,321 for 2 nights"\n  │
-│ },\n        "explanationData": {\n          "title": "Price details",\n          "priceDetails": "$661 x 2      │
-│ nights: $1,321"\n        }\n      }\n    }\n  ],\n  "paginationInfo": {\n    "pageCursors": [\n                 │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjowLCJ2ZXJzaW9uIjoxfQ==",\n                                       │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0=",\n                                       │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjozNiwidmVyc2lvbiI6MX0=",\n                                       │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0Ijo1NCwidmVyc2lvbiI6MX0=",\n                                       │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0Ijo3MiwidmVyc2lvbiI6MX0="\n    ],\n    "nextPageCursor":           │
-│ "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0="\n  }\n}","annotations":null}             │
-╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">───────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────────────── </span>LLM<span style="color: #808000; text-decoration-color: #808000"> ───────────────────────────────────────────────────────</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">╭──────────────────────────────────────────────────── Output ─────────────────────────────────────────────────────╮
-│ I've found a range of woodsy Airbnb cabins near Ohiopyle, PA for your stay from May 30 to June 1, 2025,         │
-│ suitable for 2 adults, 1 infant, and 1 dog. Here are some options categorized by budget:                        │
-│                                                                                                                 │
-│ Budget up to $150 for 2 nights:                                                                                 │
-│                                                                                                                 │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Log Cabin 5 (Guest favorite, $211) <a href="https://www.airbnb.com/rooms/878385397115028668" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                                                      │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Glamping Pod (Guest favorite, $274) <a href="https://www.airbnb.com/rooms/1224643624417572953" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                                                     │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Valley View Sunrise Site @TheGreat48Escape (Guest favorite, $74) <a href="https://www.airbnb.com/rooms/658658760148288301" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                        │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Nanny’s Rustic Retreat: Lil’ Red’s Nest (Superhost, $160) <a href="https://www.airbnb.com/rooms/955289529577335421" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                               │
-│                                                                                                                 │
-│ Moderate budget $151 - $300 for 2 nights:                                                                       │
-│                                                                                                                 │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Pet-friendly Quiet Cabin in the Laurel Highlands (Guest favorite, $516) <a href="https://www.airbnb.com/rooms/661417855562950090" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                 │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Tall Pines (Guest favorite, $363) <a href="https://www.airbnb.com/rooms/1141244290312390121" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                                                       │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Rustic Confluence Cabin with Private Stream (Rating 4.64, $365) <a href="https://www.airbnb.com/rooms/43060311" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                         │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Log Cabin 8 (Superhost, $314) <a href="https://www.airbnb.com/rooms/878385731204870228" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                                                           │
-│                                                                                                                 │
-│ Higher budget over $300 for 2 nights:                                                                           │
-│                                                                                                                 │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>KLAE House - nestled among the trees (Guest favorite, $708) <a href="https://www.airbnb.com/rooms/847793719180100758" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                             │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Romantic Riverside Getaway! Riverview Hot Tub! (Superhost, $928) <a href="https://www.airbnb.com/rooms/1365942289098981112" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                        │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Luxury Cabin w/ Hot Tub adjacent to 16,000 Acres (Superhost, $819) <a href="https://www.airbnb.com/rooms/47866422" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                      │
-│ <span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span>Bright &amp; Clean Chalet (Guest favorite, $859) <a href="https://www.airbnb.com/rooms/53569111" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Link</span></a>                                                            │
-│                                                                                                                 │
-│ Do any of these options catch your eye? Or would you like more options or details on any specific ones? Also,   │
-│ do you have any additional preferences like number of beds, specific amenities, or proximity to certain sites?  │
-╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">───────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭─────────────────────────────────────</span> EXECUTE_TOOL: airbnb_listing_details <span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────╮</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"id"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"52684053"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkin"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-05-30"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkout"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-01"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"adults"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"meta=None content=[TextContent(type='text', text='{\\n  \"listingUrl\": \"https://www.airbnb.com/rooms/526</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
@@ -2675,7 +2088,7 @@ agent_trace = agent.run(prompt)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -2690,13 +2103,13 @@ agent_trace = agent.run(prompt)</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>  <span class="c1"># Final answer</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duration: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Usage: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">usage</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cost (USD): </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">total_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Tokens: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">total_tokens</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Cost (USD): </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">total_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">print(agent_trace.final_output)  # Final answer
 print(f"Duration: {agent_trace.duration.total_seconds():.2f} seconds")
-print(f"Usage: {agent_trace.usage}")
-print(f"Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
+print(f"Total Tokens: {agent_trace.tokens.total_tokens:,}")
+print(f"Total Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
 </div>
 </div>
 </div>
@@ -2708,30 +2121,25 @@ print(f"Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>I've found a range of woodsy Airbnb cabins near Ohiopyle, PA for your stay from May 30 to June 1, 2025, suitable for 2 adults, 1 infant, and 1 dog. Here are some options categorized by budget:
+<pre>I found some Airbnb options near Ohiopyle, PA for next weekend (May 30 to June 1) for 2 adults looking for a whole home, preferably near the woods and ideally with a hot tub. Here are a couple of highlighted listings:
 
-Budget up to $150 for 2 nights:
-- Log Cabin 5 (Guest favorite, $211) [Link](https://www.airbnb.com/rooms/878385397115028668)
-- Glamping Pod (Guest favorite, $274) [Link](https://www.airbnb.com/rooms/1224643624417572953)
-- Valley View Sunrise Site @TheGreat48Escape (Guest favorite, $74) [Link](https://www.airbnb.com/rooms/658658760148288301)
-- Nanny’s Rustic Retreat: Lil’ Red’s Nest (Superhost, $160) [Link](https://www.airbnb.com/rooms/955289529577335421)
+1. Yoder School Guest House (Grantsville, MD)  
+- Private hot tub  
+- Entire home  
+- Good for outdoor activities (mountain biking, hiking, rafting)  
+- $297 for 2 nights  
+- [Link to listing](https://www.airbnb.com/rooms/53007015?check_in=2025-05-30&amp;check_out=2025-06-01&amp;adults=2)
 
-Moderate budget $151 - $300 for 2 nights:
-- Pet-friendly Quiet Cabin in the Laurel Highlands (Guest favorite, $516) [Link](https://www.airbnb.com/rooms/661417855562950090)
-- Tall Pines (Guest favorite, $363) [Link](https://www.airbnb.com/rooms/1141244290312390121)
-- Rustic Confluence Cabin with Private Stream (Rating 4.64, $365) [Link](https://www.airbnb.com/rooms/43060311)
-- Log Cabin 8 (Superhost, $314) [Link](https://www.airbnb.com/rooms/878385731204870228)
+2. Flanigan Farmhouse (Confluence, PA)  
+- Cozy modern 3-bedroom farmhouse on 4 acres  
+- Mountain views, private patio, fire pit, hammock  
+- $356 for 2 nights  
+- [Link to listing](https://www.airbnb.com/rooms/52684053?check_in=2025-05-30&amp;check_out=2025-06-01&amp;adults=2)
 
-Higher budget over $300 for 2 nights:
-- KLAE House - nestled among the trees (Guest favorite, $708) [Link](https://www.airbnb.com/rooms/847793719180100758)
-- Romantic Riverside Getaway! Riverview Hot Tub! (Superhost, $928) [Link](https://www.airbnb.com/rooms/1365942289098981112)
-- Luxury Cabin w/ Hot Tub adjacent to 16,000 Acres (Superhost, $819) [Link](https://www.airbnb.com/rooms/47866422)
-- Bright &amp; Clean Chalet (Guest favorite, $859) [Link](https://www.airbnb.com/rooms/53569111)
-
-Do any of these options catch your eye? Or would you like more options or details on any specific ones? Also, do you have any additional preferences like number of beds, specific amenities, or proximity to certain sites?
-Duration: 109.33 seconds
-Usage: total_token_count_prompt=22071 total_token_count_completion=937 total_tokens=23008
-Cost (USD): 0.008828
+Would you like me to show more listings or focus on any particular features?
+Duration: 72.20 seconds
+Usage: 50577
+Total Cost (USD): 0.021473
 </pre>
 </div>
 </div>
