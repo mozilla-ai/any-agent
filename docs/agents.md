@@ -123,7 +123,7 @@ agent_trace = agent.run("Which Agent Framework is the best??")
 print(agent_trace.final_output)
 ```
 
-Check [`AgentTrace`][any_agent.tracing.trace.AgentTrace] for more info on the return type.
+Check [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] for more info on the return type.
 
 ### Async
 

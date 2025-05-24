@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from pydantic import BaseModel, ConfigDict
 from typing_extensions import TypedDict
 
-from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
 
 
 class EvaluationResult(BaseModel):

@@ -1,76 +1,37 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
 from opentelemetry.sdk.trace import ReadableSpan
 
-from any_agent.config import AgentFramework, TracingConfig
-from any_agent.tracing.exporter import AnyAgentExporter
+from any_agent import AgentTrace
+from any_agent.config import TracingConfig
+from any_agent.tracing.exporter import _AnyAgentExporter
 
 
-def test_exporter_initialization(agent_framework: AgentFramework) -> None:
-    exporter = AnyAgentExporter(
-        agent_framework=agent_framework,
-        tracing_config=TracingConfig(),
-    )
-
-    assert exporter.console is not None
+@pytest.fixture
+def readable_spans(agent_trace: AgentTrace) -> list[ReadableSpan]:
+    return [span.to_readable_span() for span in agent_trace.spans]
 
 
-def test_rich_console_span_exporter_default(llm_span: ReadableSpan):  # type: ignore[no-untyped-def]
+def test_rich_console_span_exporter_default(readable_spans: list[ReadableSpan]) -> None:
     console_mock = MagicMock()
     with patch("any_agent.tracing.exporter.Console", console_mock):
-        exporter = AnyAgentExporter(AgentFramework.LANGCHAIN, TracingConfig())
-        exporter.export([llm_span])
-        console_mock.return_value.rule.assert_called()
+        exporter = _AnyAgentExporter(TracingConfig())
+        exporter.export(readable_spans)
+        console_mock.return_value.print.assert_called()
 
 
-def test_rich_console_span_exporter_disable(llm_span: ReadableSpan):  # type: ignore[no-untyped-def]
+def test_rich_console_span_exporter_disable(readable_spans: list[ReadableSpan]) -> None:
     console_mock = MagicMock()
     with patch("any_agent.tracing.exporter.Console", console_mock):
-        exporter = AnyAgentExporter(
-            AgentFramework.LANGCHAIN,
-            TracingConfig(llm=None),
-        )
-        exporter.export([llm_span])
-        console_mock.return_value.rule.assert_not_called()
+        exporter = _AnyAgentExporter(TracingConfig(console=False))
+        exporter.export(readable_spans)
+        console_mock.return_value.print.assert_not_called()
 
 
-def test_cost_info_default(llm_span: ReadableSpan):  # type: ignore[no-untyped-def]
-    console_mock = MagicMock()
-    with patch("any_agent.tracing.exporter.Console", console_mock):
-        exporter = AnyAgentExporter(
-            AgentFramework.LANGCHAIN,
-            TracingConfig(
-                console=False,
-            ),
-        )
-        exporter.export([llm_span])
-        attributes = (
-            exporter.pop_trace(str(llm_span.attributes["any_agent.run_id"]))  # type: ignore[index]
-            .spans[0]
-            .attributes
-        )
-        for key in (
-            "cost_prompt",
-            "cost_completion",
-        ):
-            assert key in attributes
-
-
-def test_rich_console_cost_info_disabled(llm_span: ReadableSpan):  # type: ignore[no-untyped-def]
-    console_mock = MagicMock()
-    with patch("any_agent.tracing.exporter.Console", console_mock):
-        exporter = AnyAgentExporter(
-            AgentFramework.LANGCHAIN,
-            TracingConfig(console=False, cost_info=False),
-        )
-        exporter.export([llm_span])
-        attributes = (
-            exporter.pop_trace(str(llm_span.attributes["any_agent.run_id"]))  # type: ignore[index]
-            .spans[0]
-            .attributes
-        )
-        for key in (
-            "cost_prompt",
-            "cost_completion",
-        ):
-            assert key not in attributes
+def test_cost_info_span_exporter_disable(readable_spans: list[ReadableSpan]) -> None:
+    add_cost_info = MagicMock()
+    with patch("any_agent.tracing.exporter.AgentSpan.add_cost_info", add_cost_info):
+        exporter = _AnyAgentExporter(TracingConfig(cost_info=False))
+        exporter.export(readable_spans)
+        add_cost_info.assert_not_called()

@@ -2,12 +2,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from any_agent.config import AgentFramework
 from any_agent.evaluation import EvaluationCase, TraceEvaluationResult, evaluate
 from any_agent.evaluation.schemas import (
     EvaluationResult,
 )
-from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
 
 
 def test_evaluate_runs_all_evaluators(
@@ -34,12 +33,11 @@ def test_evaluate_runs_all_evaluators(
             mock_checkpoint_evaluate,
         ),
         patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
-        patch("any_agent.evaluation.evaluate.TracingProcessor.create"),
+        patch("any_agent.evaluation.evaluators._construct_evidence"),
     ):
         evaluate(
             evaluation_case=evaluation_case,
             trace=agent_trace,
-            agent_framework=AgentFramework.OPENAI,
         )
 
         assert mock_checkpoint_evaluate.call_count == 1
@@ -76,12 +74,11 @@ def test_evaluate_when_no_final_output(
             mock_checkpoint_evaluate,
         ),
         patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
-        patch("any_agent.evaluation.evaluate.TracingProcessor.create"),
+        patch("any_agent.evaluation.evaluators._construct_evidence"),
     ):
         evaluate(
             evaluation_case=evaluation_case,
             trace=agent_trace,
-            agent_framework=AgentFramework.OPENAI,
         )
 
         assert mock_checkpoint_evaluate.call_count == 1

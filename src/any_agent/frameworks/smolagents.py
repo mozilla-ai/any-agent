@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING, Any
-from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AnyAgent
@@ -13,8 +12,6 @@ except ImportError:
 
 if TYPE_CHECKING:
     from smolagents import MultiStepAgent
-
-    from any_agent.tracing.trace import AgentTrace
 
 
 DEFAULT_AGENT_TYPE = ToolCallingAgent
@@ -93,16 +90,9 @@ class SmolagentsAgent(AnyAgent):
         if self.config.instructions:
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> "AgentTrace":
-        """Run the Smolagents agent with the given prompt."""
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        run_id = str(uuid4())
-        tracer = self._tracer_provider.get_tracer("any_agent")
-        with tracer.start_as_current_span("agent_run") as span:
-            span.set_attribute("any_agent.run_id", run_id)
-            result = self._agent.run(prompt, **kwargs)
-        trace = self._exporter.pop_trace(run_id)
-        trace.final_output = result
-        return trace
+        result = self._agent.run(prompt, **kwargs)
+        return str(result)

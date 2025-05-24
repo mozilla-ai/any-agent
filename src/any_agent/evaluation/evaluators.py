@@ -1,12 +1,14 @@
-from collections.abc import Sequence
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from any_agent.evaluation.schemas import CheckpointCriteria, EvaluationResult
 from any_agent.logging import logger
-from any_agent.tracing.processors.base import TracingProcessor
 
 if TYPE_CHECKING:
-    from any_agent.tracing.trace import AgentTrace
+    from collections.abc import Sequence
+
+    from any_agent.tracing.agent_trace import AgentTrace
 
 import json
 import re
@@ -16,6 +18,8 @@ import evaluate.loading
 from litellm import completion
 
 from any_agent.evaluation.schemas import GroundTruthAnswer, GroundTruthAnswers
+
+MAX_EVIDENCE_LENGTH: int = 400
 
 
 def llm_evaluate_with_criterion(
@@ -87,11 +91,31 @@ def llm_evaluate_with_criterion(
     return EvaluationResult.model_validate(evaluation)
 
 
+def _construct_evidence(trace: AgentTrace) -> str:
+    evidence = "## Agent Execution\n\n"
+
+    for idx, span in enumerate(trace.spans):
+        evidence += f"### Call {idx}\n"
+
+        call = {
+            k: (
+                v[:MAX_EVIDENCE_LENGTH] + "..."
+                if isinstance(v, str) and len(v) > MAX_EVIDENCE_LENGTH
+                else v
+            )
+            for k, v in span.attributes.items()
+        }
+
+        # Use ensure_ascii=False to prevent escaping Unicode characters
+        evidence += json.dumps(call, indent=2, ensure_ascii=False) + "\n\n"
+
+    return evidence
+
+
 def evaluate_checkpoint(
     model: str,
-    trace: "AgentTrace",
+    trace: AgentTrace,
     checkpoints: Sequence[CheckpointCriteria],
-    processor: TracingProcessor,
 ) -> list[EvaluationResult]:
     """Verify each checkpoint against the trace data using LLM.
 
@@ -105,7 +129,7 @@ def evaluate_checkpoint(
         List of evaluation results
 
     """
-    evidence = processor.extract_evidence(trace)
+    evidence = _construct_evidence(trace)
     evidence = evidence.replace("<", "\\<").replace(">", "\\>")
     logger.debug(f"""Evidence\n{evidence}\n""")
     results = []

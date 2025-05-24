@@ -1,4 +1,3 @@
-import asyncio
 import os
 import subprocess
 import time
@@ -13,11 +12,10 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
 from any_agent.evaluation import EvaluationCase, evaluate
 from any_agent.evaluation.schemas import CheckpointCriteria, TraceEvaluationResult
-from any_agent.tracing.trace import AgentTrace, _is_tracing_supported
+from any_agent.tracing.agent_trace import AgentTrace, CostInfo, TokenInfo
 
 
-def check_uvx_installed() -> bool:
-    """The integration tests requires uvx"""
+def uvx_installed() -> bool:
     try:
         result = subprocess.run(  # noqa: S603
             ["uvx", "--version"],  # noqa: S607
@@ -27,6 +25,83 @@ def check_uvx_installed() -> bool:
         return True if result.returncode == 0 else False  # noqa: TRY300
     except Exception:
         return False
+
+
+def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> None:
+    assert isinstance(agent_trace, AgentTrace)
+    assert agent_trace.final_output
+
+    agent_invocations = []
+    llm_calls = []
+    tool_executions = []
+    for span in agent_trace.spans:
+        if span.is_agent_invocation():
+            agent_invocations.append(span)
+        elif span.is_llm_call():
+            llm_calls.append(span)
+        elif span.is_tool_execution():
+            tool_executions.append(span)
+        else:
+            msg = f"Unexpected span: {span}"
+            raise AssertionError(msg)
+
+    assert len(agent_invocations) == 1
+    assert len(llm_calls) >= 2
+    if (
+        agent_framework is not AgentFramework.LLAMA_INDEX
+    ):  # https://github.com/run-llama/llama_index/issues/18776
+        assert len(tool_executions) >= 2
+
+
+def assert_duration(agent_trace: AgentTrace, wall_time_s: float) -> None:
+    assert agent_trace.duration is not None
+    assert isinstance(agent_trace.duration, timedelta)
+    assert agent_trace.duration.total_seconds() > 0
+
+    diff = abs(agent_trace.duration.total_seconds() - wall_time_s)
+    assert diff < 0.1, (
+        f"duration ({agent_trace.duration.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
+    )
+
+
+def assert_cost(agent_trace: AgentTrace) -> None:
+    assert isinstance(agent_trace.cost, CostInfo)
+    assert agent_trace.cost.input_cost > 0
+    assert agent_trace.cost.output_cost > 0
+    assert agent_trace.cost.input_cost + agent_trace.cost.output_cost < 1.00
+
+
+def assert_tokens(agent_trace: AgentTrace) -> None:
+    assert isinstance(agent_trace.tokens, TokenInfo)
+    assert agent_trace.tokens.input_tokens > 0
+    assert agent_trace.tokens.output_tokens > 0
+    assert (agent_trace.tokens.input_tokens + agent_trace.tokens.output_tokens) < 20000
+
+
+def assert_eval(agent_trace: AgentTrace) -> None:
+    case = EvaluationCase(
+        llm_judge="gpt-4.1-mini",
+        checkpoints=[
+            CheckpointCriteria(
+                criteria="Check if the agent called the write_file tool and it succeeded",
+                points=1,
+            ),
+            CheckpointCriteria(
+                criteria="Check if the agent wrote the year to the file.",
+                points=1,
+            ),
+            CheckpointCriteria(
+                criteria="Check if the year was 1990",
+                points=1,
+            ),
+        ],
+    )
+    result: TraceEvaluationResult = evaluate(
+        evaluation_case=case,
+        trace=agent_trace,
+    )
+    assert result
+    assert result.score == float(2 / 3)
 
 
 @pytest.mark.skipif(
@@ -40,7 +115,7 @@ def test_load_and_run_agent(
 
     tmp_file = "tmp.txt"
 
-    if not check_uvx_installed():
+    if not uvx_installed():
         msg = "uvx is not installed. Please install it to run this test."
         raise RuntimeError(msg)
 
@@ -84,6 +159,9 @@ def test_load_and_run_agent(
         **kwargs,  # type: ignore[arg-type]
     )
     agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
+    update_trace = request.config.getoption("--update-trace-assets")
+    if update_trace:
+        agent._exporter.console.record = True  # type: ignore[union-attr]
 
     try:
         start_ns = time.time_ns()
@@ -91,100 +169,24 @@ def test_load_and_run_agent(
             "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
         )
         end_ns = time.time_ns()
-        wall_time_ns = end_ns - start_ns
-        assert os.path.exists(os.path.join(tmp_path, tmp_file))
-        with open(os.path.join(tmp_path, tmp_file)) as f:
-            content = f.read()
-        assert content == str(datetime.now().year)
-        assert isinstance(agent_trace, AgentTrace)
-        assert agent_trace.final_output
-        update_trace = request.config.getoption("--update-trace-assets")
-        if update_trace and _is_tracing_supported(agent_framework):
-            trace_path = (
-                Path(__file__).parent.parent
-                / "assets"
-                / f"{agent_framework.name}_trace.json"
-            )
-            with open(trace_path, "w", encoding="utf-8") as f:
+
+        assert (tmp_path / tmp_file).read_text() == str(datetime.now().year)
+
+        assert_trace(agent_trace, agent_framework)
+        assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
+        if (
+            agent_framework is not AgentFramework.GOOGLE
+        ):  # https://github.com/mozilla-ai/any-agent/issues/287
+            assert_cost(agent_trace)
+            assert_tokens(agent_trace)
+        assert_eval(agent_trace)
+
+        if update_trace:
+            trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
+            with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
                 f.write(agent_trace.model_dump_json(indent=2))
-        if _is_tracing_supported(agent_framework):
-            assert agent_trace.spans
-            assert len(agent_trace.spans) > 0
-            assert agent_trace.duration is not None
-            assert isinstance(agent_trace.duration, timedelta)
-            assert agent_trace.duration.total_seconds() > 0
-            # Compare duration to measured wall time (allow 0.1s difference)
-            wall_time_s = wall_time_ns / 1_000_000_000
-            diff = abs(agent_trace.duration.total_seconds() - wall_time_s)
-            assert diff < 0.1, (
-                f"duration ({agent_trace.duration.total_seconds()}s) and wall_time ({wall_time_s}s) differ by more than 0.1s: {diff}s"
-            )
-            assert agent_trace.cost.total_cost > 0
-            assert agent_trace.cost.total_cost < 1.00
-            assert agent_trace.usage.total_tokens > 0
-            assert agent_trace.usage.total_tokens < 20000
-            case = EvaluationCase(
-                llm_judge="gpt-4.1-mini",
-                checkpoints=[
-                    CheckpointCriteria(
-                        criteria="Check if the agent called the write_file tool and it succeeded",
-                        points=1,
-                    ),
-                    CheckpointCriteria(
-                        criteria="Check if the agent wrote the year to the file.",
-                        points=1,
-                    ),
-                    CheckpointCriteria(
-                        criteria="Check if the year was 1990",
-                        points=1,
-                    ),
-                ],
-            )
-            result: TraceEvaluationResult = evaluate(
-                evaluation_case=case,
-                trace=agent_trace,
-                agent_framework=agent_framework,
-            )
-            assert result
-            assert result.score == float(2 / 3)
-    finally:
-        agent.exit()
-
-
-@pytest.mark.asyncio
-async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
-    """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
-    model_id = "gpt-4.1-nano"
-    env_check = validate_environment(model_id)
-    if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
-
-    model_args = {"temperature": 0.0}
-    try:
-        agent = await AnyAgent.create_async(
-            agent_framework,
-            AgentConfig(model_id=model_id, model_args=model_args, tools=[]),
-        )
-        results = await asyncio.gather(
-            agent.run_async("What is the capital of France?"),
-            agent.run_async("What is the capital of Spain?"),
-        )
-        result1, result2 = results
-        assert result1.final_output is not None
-        assert result2.final_output is not None
-        assert "Paris" in result1.final_output
-        assert "Madrid" in result2.final_output
-        if _is_tracing_supported(agent_framework):
-            first_spans = result1.spans
-            second_spans = result2.spans
-            assert second_spans[: len(first_spans)] != first_spans, (
-                "Spans from the first run should not be in the second"
-            )
-            assert result1.spans
-            assert len(result1.spans) > 0
-            assert result1.cost.total_cost > 0
-            assert result1.cost.total_cost < 1.00
-            assert result1.usage.total_tokens > 0
-            assert result1.usage.total_tokens < 20000
+            html_output = agent._exporter.console.export_html(inline_styles=True)  # type: ignore[union-attr]
+            with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
+                f.write(html_output.replace("<!DOCTYPE html>", ""))
     finally:
         agent.exit()

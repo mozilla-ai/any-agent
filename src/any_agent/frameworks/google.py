@@ -3,8 +3,6 @@ from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.logging import logger
-from any_agent.tracing.trace import AgentTrace
 
 from .any_agent import AnyAgent
 
@@ -92,14 +90,13 @@ class GoogleAgent(AnyAgent):
             output_key="response",
         )
 
-    async def run_async(  # type: ignore[no-untyped-def]
+    async def _run_async(  # type: ignore[no-untyped-def]
         self,
         prompt: str,
         user_id: str | None = None,
         session_id: str | None = None,
         **kwargs,
-    ) -> "AgentTrace":
-        """Run the Google agent with the given prompt."""
+    ) -> str:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
@@ -111,17 +108,14 @@ class GoogleAgent(AnyAgent):
             user_id=user_id,
             session_id=session_id,
         )
-        events = runner.run_async(
+
+        async for _ in runner.run_async(
             user_id=user_id,
             session_id=session_id,
             new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
             **kwargs,
-        )
-
-        async for event in events:
-            logger.debug(event)
-            if event.is_final_response():
-                break
+        ):
+            pass
 
         session = runner.session_service.get_session(
             app_name=runner.app_name,
@@ -129,7 +123,4 @@ class GoogleAgent(AnyAgent):
             session_id=session_id,
         )
         assert session, "Session should not be None"
-        response = session.state.get("response", None)
-        return AgentTrace(
-            final_output=response,
-        )
+        return str(session.state.get("response"))

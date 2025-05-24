@@ -1,5 +1,5 @@
 # Tracing
 
-::: any_agent.tracing.trace.AgentTrace
+::: any_agent.tracing.agent_trace.AgentTrace
 
-::: any_agent.tracing.trace.AgentSpan
+::: any_agent.tracing.agent_trace.AgentSpan

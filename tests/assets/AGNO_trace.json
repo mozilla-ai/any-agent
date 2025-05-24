@@ -1,0 +1,317 @@
+{
+  "spans": [
+    {
+      "name": "call_llm gpt-4.1-mini",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 2875610782938054437,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1748017314553691041,
+      "end_time": 1748017315783858830,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 11751042686753155466,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "gen_ai.operation.name": "call_llm",
+        "gen_ai.request.model": "gpt-4.1-mini",
+        "gen_ai.input.messages": "[{\"role\": \"system\", \"content\": \"<instructions>\\nSearch the web to answer\\n</instructions>\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]",
+        "gen_ai.output": "[{\"tool.name\": \"get_current_time\", \"tool.args\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\"}]",
+        "gen_ai.output.type": "json",
+        "gen_ai.usage.input_tokens": 162,
+        "gen_ai.usage.output_tokens": 18,
+        "gen_ai.usage.input_cost": 0.0000648,
+        "gen_ai.usage.output_cost": 0.0000288
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "execute_tool get_current_time",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 2875610782938054437,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1748017315786996616,
+      "end_time": 1748017315790114695,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 12280161047077558919,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "gen_ai.operation.name": "execute_tool",
+        "gen_ai.tool.name": "get_current_time",
+        "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
+        "gen_ai.tool.call.id": "call_CcPv9SQWgipfoV2LjZYFcwGt",
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-05-23T12:21:55-04:00\",\n  \"is_dst\": true\n}",
+        "gen_ai.output.type": "json"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "call_llm gpt-4.1-mini",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 2875610782938054437,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1748017315791442695,
+      "end_time": 1748017316730237649,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 8299476656446673082,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "gen_ai.operation.name": "call_llm",
+        "gen_ai.request.model": "gpt-4.1-mini",
+        "gen_ai.output": "[{\"tool.name\": \"write_file\", \"tool.args\": \"{\\\"text\\\":\\\"2025\\\"}\"}]",
+        "gen_ai.output.type": "json",
+        "gen_ai.usage.input_tokens": 230,
+        "gen_ai.usage.output_tokens": 15,
+        "gen_ai.usage.input_cost": 0.000092,
+        "gen_ai.usage.output_cost": 0.000024
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "execute_tool write_file",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 2875610782938054437,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1748017316732411601,
+      "end_time": 1748017316733892333,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 18396111017701552013,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "gen_ai.operation.name": "execute_tool",
+        "gen_ai.tool.name": "write_file",
+        "gen_ai.tool.args": "{\"text\": \"2025\"}",
+        "gen_ai.tool.call.id": "call_ZEmqpxmxnyBXuETm96uQQgF6",
+        "gen_ai.output": "None",
+        "gen_ai.output.type": "json"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "call_llm gpt-4.1-mini",
+      "kind": "internal",
+      "parent": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 2875610782938054437,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1748017316738746204,
+      "end_time": 1748017317848963020,
+      "status": {
+        "status_code": "ok",
+        "description": null
+      },
+      "context": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 8215259236248644056,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "gen_ai.operation.name": "call_llm",
+        "gen_ai.request.model": "gpt-4.1-mini",
+        "gen_ai.output": "The current year in the America/New_York timezone is 2025. I have written this value to a file.",
+        "gen_ai.output.type": "text",
+        "gen_ai.usage.input_tokens": 254,
+        "gen_ai.usage.output_tokens": 25,
+        "gen_ai.usage.input_cost": 0.00010159999999999999,
+        "gen_ai.usage.output_cost": 0.000039999999999999996
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    },
+    {
+      "name": "invoke_agent [any_agent]",
+      "kind": "internal",
+      "parent": {
+        "trace_id": null,
+        "span_id": null,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "start_time": 1748017314550216423,
+      "end_time": 1748017318392789223,
+      "status": {
+        "status_code": "unset",
+        "description": null
+      },
+      "context": {
+        "trace_id": 121632221196637177843379169697936613240,
+        "span_id": 2875610782938054437,
+        "is_remote": false,
+        "trace_flags": {
+          "value": 0
+        },
+        "trace_state": {
+          "entries": {}
+        }
+      },
+      "attributes": {
+        "gen_ai.operation.name": "invoke_agent",
+        "gen_ai.agent.name": "any_agent",
+        "gen_ai.agent.description": "No description.",
+        "gen_ai.request.model": "gpt-4.1-mini",
+        "gen_ai.request.id": "14a644da-31d2-4818-89b7-2e7844e4a534"
+      },
+      "links": [],
+      "events": [],
+      "resource": {
+        "attributes": {
+          "telemetry.sdk.language": "python",
+          "telemetry.sdk.name": "opentelemetry",
+          "telemetry.sdk.version": "1.33.1",
+          "service.name": "unknown_service"
+        },
+        "schema_url": ""
+      }
+    }
+  ],
+  "final_output": "The current year in the America/New_York timezone is 2025. I have written this value to a file."
+}

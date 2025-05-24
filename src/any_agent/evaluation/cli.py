@@ -6,7 +6,7 @@ from fire import Fire
 from any_agent.config import AgentFramework
 from any_agent.evaluation import EvaluationCase, evaluate
 from any_agent.logging import logger
-from any_agent.tracing.trace import AgentSpan, AgentTrace
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 
 
 def do_eval(
@@ -26,7 +26,6 @@ def do_eval(
     result = evaluate(
         evaluation_case=evaluation_case,
         trace=trace,
-        agent_framework=agent_framework,
     )
     logger.info(f"Final score: {result.score}")
 
