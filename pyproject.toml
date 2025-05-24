@@ -57,7 +57,7 @@ smolagents = [
 ]
 
 serve = [
-  "a2a-sdk",
+  "a2a-sdk>=0.2.5",
 ]
 
 all = [
