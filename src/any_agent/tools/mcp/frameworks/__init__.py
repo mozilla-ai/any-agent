@@ -22,7 +22,19 @@ MCPServer = (
 
 
 def _get_mcp_server(mcp_tool: MCPParams, agent_framework: AgentFramework) -> MCPServer:
-    return TypeAdapter[MCPServer](MCPServer).validate_python(
+    mapping = {
+        AgentFramework.GOOGLE: GoogleMCPServer,
+        AgentFramework.LANGCHAIN: LangchainMCPServer,
+        AgentFramework.LLAMA_INDEX: LlamaIndexMCPServer,
+        AgentFramework.OPENAI: OpenAIMCPServer,
+        AgentFramework.AGNO: AgnoMCPServer,
+        AgentFramework.SMOLAGENTS: SmolagentsMCPServer,
+        AgentFramework.TINYAGENT: TinyAgentMCPServer,
+    }
+    cls = mapping.get(agent_framework)
+    if cls is None:
+        raise ValueError(f"Unsupported agent framework: {agent_framework}")
+    return TypeAdapter[cls](cls).validate_python(
         {"mcp_tool": mcp_tool, "framework": agent_framework}
     )
 
