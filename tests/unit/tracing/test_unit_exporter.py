@@ -13,12 +13,26 @@ def readable_spans(agent_trace: AgentTrace) -> list[ReadableSpan]:
     return [span.to_readable_span() for span in agent_trace.spans]
 
 
-def test_rich_console_span_exporter_default(readable_spans: list[ReadableSpan]) -> None:
+def test_rich_console_span_exporter_default(
+    agent_trace: AgentTrace, request: pytest.FixtureRequest
+) -> None:
     console_mock = MagicMock()
-    with patch("any_agent.tracing.exporter.Console", console_mock):
+    panel_mock = MagicMock()
+    readable_spans = [span.to_readable_span() for span in agent_trace.spans]
+    with (
+        patch("any_agent.tracing.exporter.Console", console_mock),
+        patch("any_agent.tracing.exporter.Panel", panel_mock),
+    ):
         exporter = _AnyAgentExporter(TracingConfig())
         exporter.export(readable_spans)
         console_mock.return_value.print.assert_called()
+        if request.node.callspec.id not in ("TINYAGENT_trace", "SMOLAGENTS_trace"):
+            panel_mock.assert_any_call(
+                agent_trace.final_output,
+                title="OUTPUT",
+                style="white",
+                title_align="left",
+            )
 
 
 def test_rich_console_span_exporter_disable(readable_spans: list[ReadableSpan]) -> None:

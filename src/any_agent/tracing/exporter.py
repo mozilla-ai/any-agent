@@ -57,11 +57,19 @@ class _AnyAgentExporter(SpanExporter):
                     )
                 )
             if output := span.attributes.get("gen_ai.output"):
-                panels.append(
-                    Panel(
-                        JSON(output), title="OUTPUT", style="white", title_align="left"
+                output_type = span.attributes.get("gen_ai.output.type", "text")
+                if output_type == "json":
+                    output_content = JSON(output)
+                else:
+                    output_content = output
+                    panels.append(
+                        Panel(
+                            output_content,
+                            title="OUTPUT",
+                            style="white",
+                            title_align="left",
+                        )
                     )
-                )
             if usage := {
                 k.replace("gen_ai.usage.", ""): v
                 for k, v in span.attributes.items()
