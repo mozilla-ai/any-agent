@@ -942,6 +942,8 @@
 tool so it becomes usable by the selected framework.</p>
 <p>MCP can either be run locally (MCPStdio) or you can connect to an MCP that is running elsewhere (MCPSse).
 See <a href="https://github.com/supercorp-ai/supergateway">SuperGateway</a> for an easy way to turn a Stdio server into an SSE server.</p>
+<p>Within <code>MCPStdio</code> or <code>MCPSse</code> , you may explicitly specify a list of valid <code>tools</code>, if you would like to restrict the agent to access only a subset of available tools offered by that MCP server.
+If none is specified, the default behavior is that the agent will have access to all tools under that MCP server.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Callable</label><label for="__tabbed_1_2">MCP (Stdio)</label><label for="__tabbed_1_3">MCP (SSE)</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
