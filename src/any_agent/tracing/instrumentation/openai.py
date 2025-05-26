@@ -12,14 +12,15 @@ if TYPE_CHECKING:
 
 
 def _set_llm_input(span_data: GenerationSpanData, span: Span) -> None:
-    span.set_attribute(
-        "gen_ai.input.messages",
-        json.dumps(
-            span_data.input,
-            default=str,
-            ensure_ascii=False,
-        ),
-    )
+    if input_messages := span_data.input:
+        span.set_attribute(
+            "gen_ai.input.messages",
+            json.dumps(
+                input_messages,
+                default=str,
+                ensure_ascii=False,
+            ),
+        )
 
 
 def _set_llm_output(span_data: GenerationSpanData, span: Span) -> None:
