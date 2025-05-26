@@ -118,7 +118,7 @@ class _SmolagentsInstrumentor:
                     }
                 )
 
-                result: AgentType | None = wrapped(*args, **kwargs)
+                result: AgentType | Any | None = wrapped(*args, **kwargs)
 
                 if result:
                     span.set_attributes(
