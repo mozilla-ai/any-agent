@@ -100,7 +100,6 @@ class _SmolagentsInstrumentor:
                 _set_llm_output(response, span)
 
                 span.set_status(StatusCode.OK)
-                span.end()
 
                 return response
 
@@ -119,17 +118,16 @@ class _SmolagentsInstrumentor:
                     }
                 )
 
-                result: AgentType | None = wrapped(*args, **kwargs)
+                result: AgentType | Any | None = wrapped(*args, **kwargs)
 
                 if result:
                     span.set_attributes(
                         {
-                            "gen_ai.output": result.to_string(),
+                            "gen_ai.output": str(result),
                             "gen_ai.output.type": "text",
                         }
                     )
                 span.set_status(StatusCode.OK)
-                span.end()
 
                 return result
 

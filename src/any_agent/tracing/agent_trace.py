@@ -27,6 +27,11 @@ class TokenInfo(BaseModel):
     input_tokens: int
     output_tokens: int
 
+    @property
+    def total_tokens(self) -> int:
+        """Total number of tokens."""
+        return self.input_tokens + self.output_tokens
+
     model_config = ConfigDict(extra="forbid")
 
 
@@ -35,6 +40,11 @@ class CostInfo(BaseModel):
 
     input_cost: float
     output_cost: float
+
+    @property
+    def total_cost(self) -> float:
+        """Total cost."""
+        return self.input_cost + self.output_cost
 
     model_config = ConfigDict(extra="forbid")
 

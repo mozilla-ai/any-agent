@@ -52,6 +52,8 @@ class MCPStdio(BaseModel):
     Use it to limit the tools accessible by the agent.
     For example, if you use [`mcp/filesystem`](https://hub.docker.com/r/mcp/filesystem),
     you can pass `tools=["read_file", "list_directory"]` to limit the agent to read-only operations.
+
+    If none is specified, the default behavior is that the agent will have access to all tools under that MCP server.
     """
 
     client_session_timeout_seconds: float | None = 5

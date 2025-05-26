@@ -28,7 +28,7 @@ You can install the bare bones library as follows (only [`TinyAgent`](./framewor
 pip install any-agent
 ```
 
-Or you can install it with the required dependencies for one of more frameworks:
+Or you can install it with the required dependencies for different frameworks:
 
 ```bash
 pip install any-agent[agno,openai]

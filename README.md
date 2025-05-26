@@ -41,10 +41,10 @@ A single interface to use and evaluate different agent frameworks.
 ## Quickstart
 
 Refer to [pyproject.toml](./pyproject.toml) for a list of the options available.
-Update your pip install command to include the frameworks that you plan on using (or use `all` to install all the currently supported):
+Update your pip install command to include the frameworks that you plan on using:
 
 ```bash
-pip install 'any-agent[all]'
+pip install 'any-agent'
 ```
 
 To define any agent system you will always use the same imports:
@@ -65,7 +65,7 @@ export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "openai",  # See all options in https://mozilla-ai.github.io/any-agent/
+    "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
