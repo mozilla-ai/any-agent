@@ -14,6 +14,9 @@ if TYPE_CHECKING:
     from smolagents.models import ChatMessage, Model
 
 
+from .common import _set_tool_output
+
+
 def _set_llm_input(messages: list[dict[str, Any]], span: Span) -> None:
     if not messages:
         return
@@ -120,13 +123,8 @@ class _SmolagentsInstrumentor:
 
                 result: AgentType | Any | None = wrapped(*args, **kwargs)
 
-                if result:
-                    span.set_attributes(
-                        {
-                            "gen_ai.output": str(result),
-                            "gen_ai.output.type": "text",
-                        }
-                    )
+                _set_tool_output(result, span)
+
                 span.set_status(StatusCode.OK)
 
                 return result

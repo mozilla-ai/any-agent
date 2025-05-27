@@ -5,7 +5,7 @@ from opentelemetry.sdk.trace import ReadableSpan
 
 from any_agent import AgentTrace
 from any_agent.config import TracingConfig
-from any_agent.tracing.exporter import _AnyAgentExporter
+from any_agent.tracing.exporter import _AnyAgentExporter, _get_output_panel
 
 
 @pytest.fixture
@@ -49,3 +49,53 @@ def test_cost_info_span_exporter_disable(readable_spans: list[ReadableSpan]) -> 
         exporter = _AnyAgentExporter(TracingConfig(cost_info=False))
         exporter.export(readable_spans)
         add_cost_info.assert_not_called()
+
+
+def test_get_output_panel(
+    readable_spans: list[ReadableSpan], request: pytest.FixtureRequest
+) -> None:
+    # First LLM call returns JSON
+    panel_mock = MagicMock()
+    json_mock = MagicMock()
+    with (
+        patch("any_agent.tracing.exporter.Panel", panel_mock),
+        patch("any_agent.tracing.exporter.JSON", json_mock),
+    ):
+        _get_output_panel(readable_spans[0])
+        json_mock.assert_called_once()
+        panel_mock.assert_called_once()
+
+    if request.node.callspec.id not in ("LLAMA_INDEX_trace",):
+        # First TOOL execution returns JSON
+        panel_mock = MagicMock()
+        json_mock = MagicMock()
+        with (
+            patch("any_agent.tracing.exporter.Panel", panel_mock),
+            patch("any_agent.tracing.exporter.JSON", json_mock),
+        ):
+            _get_output_panel(readable_spans[1])
+            json_mock.assert_called_once()
+            panel_mock.assert_called_once()
+
+    if request.node.callspec.id not in ("TINYAGENT_trace",):
+        # Final LLM call returns string
+        panel_mock = MagicMock()
+        json_mock = MagicMock()
+        with (
+            patch("any_agent.tracing.exporter.Panel", panel_mock),
+            patch("any_agent.tracing.exporter.JSON", json_mock),
+        ):
+            _get_output_panel(readable_spans[-2])
+            json_mock.assert_not_called()
+            panel_mock.assert_called_once()
+
+    # AGENT invocation has no output
+    panel_mock = MagicMock()
+    json_mock = MagicMock()
+    with (
+        patch("any_agent.tracing.exporter.Panel", panel_mock),
+        patch("any_agent.tracing.exporter.JSON", json_mock),
+    ):
+        _get_output_panel(readable_spans[-1])
+        json_mock.assert_not_called()
+        panel_mock.assert_not_called()
