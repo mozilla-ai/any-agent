@@ -7,6 +7,8 @@ from agents.tracing import TracingProcessor, set_trace_processors
 from agents.tracing.span_data import FunctionSpanData, GenerationSpanData
 from opentelemetry.trace import StatusCode
 
+from .common import _set_tool_output
+
 if TYPE_CHECKING:
     from opentelemetry.trace import Span, Tracer
 
@@ -124,10 +126,9 @@ class _OpenAIAgentsInstrumentor:
                     otel_span.set_attributes(
                         {
                             "gen_ai.tool.args": span_data.input or "{}",
-                            "gen_ai.output": span_data.output or "{}",
-                            "gen_ai.output.type": "json",
                         }
                     )
+                    _set_tool_output(span_data.output, otel_span)
                     otel_span.set_status(StatusCode.OK)
                     otel_span.end()
                     del self.current_spans[span.span_id]

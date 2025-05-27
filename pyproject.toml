@@ -53,7 +53,7 @@ openai = [
 ]
 
 smolagents = [
-  "smolagents[mcp]>=1.14.0",
+  "smolagents[mcp]>=1.17.0",
 ]
 
 serve = [
