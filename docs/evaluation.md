@@ -70,8 +70,7 @@ agent_trace = agent.run("How many seconds would it take for a leopard at full sp
     from any_agent.evaluation.evaluate import evaluate
     eval_result = evaluate(
         evaluation_case=evaluation_case,
-        trace=agent_trace,
-        agent_framework="openai",
+        trace=agent_trace
     )
     print(f"Final score: {eval_result.score}")
     print(f"Checkpoint scores: {eval_result.checkpoint_results}")
@@ -81,6 +80,5 @@ agent_trace = agent.run("How many seconds would it take for a leopard at full sp
     ```bash
     any-agent-evaluate \
         --evaluation_case_path "docs/examples/evaluation_case.yaml" \
-        --trace_path "tests/assets/OPENAI_trace.json" \
-        --agent_framework 'OPENAI'
+        --trace_path "tests/assets/OPENAI_trace.json"
     ```
