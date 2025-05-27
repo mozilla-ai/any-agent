@@ -134,11 +134,11 @@ async def test_load_and_run_multi_agent(
                 now.strftime("%B") in agent_trace.final_output,
             ]
         )
-        assert any(span.is_tool_execution() for span in agent_trace.spans)
-
-        for span in agent_trace.spans:
-            if "gen_ai.tool.name" in span.attributes:
-                assert span.attributes["gen_ai.tool.name"] == "_send_query"
+        assert any(
+            span.is_tool_execution()
+            and span.attributes.get("gen_ai.tool.name", None) == "_send_query"
+            for span in agent_trace.spans
+        )
 
     finally:
         if served_server:

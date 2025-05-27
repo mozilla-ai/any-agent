@@ -8,7 +8,7 @@ the protocol, as explaining it is out of the scope of this page.
 
     The A2A protocol is in early stages of development and so is the functionality provided by `any-agent` here.
 
-In order to use A2A serving, you must first install the 'serve' extra: `pip install 'any-agent[serve]'`
+In order to use A2A serving, you must first install the 'serve' extra: `pip install 'any-agent[a2a]'`
 
 !!! warning
 
