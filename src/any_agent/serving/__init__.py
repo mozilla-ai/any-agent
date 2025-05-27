@@ -1,5 +1,3 @@
-import sys
-
 try:
     from .server import _get_a2a_app, serve_a2a, serve_a2a_async
 except ImportError as e:
