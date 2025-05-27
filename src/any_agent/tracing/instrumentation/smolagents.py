@@ -138,7 +138,7 @@ class _SmolagentsInstrumentor:
         ]
         for model_subclass in exported_model_subclasses:
             self._original_model_calls[model_subclass.__name__] = (
-                smolagents.models.Model.generate
+                model_subclass.generate
             )
             wrap_function_wrapper(  # type: ignore[no-untyped-call]
                 "smolagents.models",
