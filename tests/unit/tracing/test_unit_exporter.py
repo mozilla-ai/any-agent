@@ -18,17 +18,20 @@ def test_rich_console_span_exporter_default(
 ) -> None:
     console_mock = MagicMock()
     panel_mock = MagicMock()
+    markdown_mock = MagicMock()
     readable_spans = [span.to_readable_span() for span in agent_trace.spans]
     with (
         patch("any_agent.tracing.exporter.Console", console_mock),
+        patch("any_agent.tracing.exporter.Markdown", markdown_mock),
         patch("any_agent.tracing.exporter.Panel", panel_mock),
     ):
         exporter = _AnyAgentExporter(TracingConfig())
         exporter.export(readable_spans)
         console_mock.return_value.print.assert_called()
-        if request.node.callspec.id not in ("TINYAGENT_trace", "SMOLAGENTS_trace"):
+        # TINYAGENT ends with a `task_completed` tool call
+        if request.node.callspec.id not in ("TINYAGENT_trace",):
             panel_mock.assert_any_call(
-                agent_trace.final_output,
+                markdown_mock(agent_trace.final_output),
                 title="OUTPUT",
                 style="white",
                 title_align="left",

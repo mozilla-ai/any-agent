@@ -9,6 +9,7 @@ from opentelemetry.sdk.trace.export import (
 )
 from rich.console import Console, Group
 from rich.json import JSON
+from rich.markdown import Markdown
 from rich.panel import Panel
 
 from any_agent.logging import logger
@@ -27,7 +28,7 @@ def _get_output_panel(span: AgentSpan) -> Panel | None:
     if output := span.attributes.get("gen_ai.output", None):
         output_type = span.attributes.get("gen_ai.output.type", "text")
         return Panel(
-            str(output) if output_type != "json" else JSON(output),
+            Markdown(output) if output_type != "json" else JSON(output),
             title="OUTPUT",
             style="white",
             title_align="left",

@@ -185,7 +185,7 @@ def test_load_and_run_agent(
     try:
         start_ns = time.time_ns()
         agent_trace = agent.run(
-            "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
+            "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.",
         )
         end_ns = time.time_ns()
 
