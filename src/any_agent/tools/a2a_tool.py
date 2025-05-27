@@ -1,22 +1,27 @@
 # adapted from https://github.com/google/a2a-python/blob/main/examples/helloworld/test_client.py
 
 from collections.abc import Callable, Coroutine
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-import httpx
-from a2a.client import A2ACardResolver, A2AClient
-from a2a.types import (
-    Message,
-    MessageSendParams,
-    Part,
-    Role,
-    SendMessageRequest,
-    TextPart,
-)
-
 if TYPE_CHECKING:
     from a2a.types import AgentCard
+
+a2a_tool_available = False
+with suppress(ImportError):
+    import httpx
+    from a2a.client import A2ACardResolver, A2AClient
+    from a2a.types import (
+        Message,
+        MessageSendParams,
+        Part,
+        Role,
+        SendMessageRequest,
+        TextPart,
+    )
+
+    a2a_tool_available = True
 
 
 async def a2a_query(url: str) -> Callable[[str], Coroutine[Any, Any, str]]:

@@ -21,7 +21,6 @@ dependencies = [
   "requests",
   "rich",
   "tavily-python",
-  "httpx",
 ]
 
 [project.optional-dependencies]
@@ -57,8 +56,9 @@ smolagents = [
   "smolagents[mcp]>=1.14.0",
 ]
 
-serve = [
+a2a = [
   "a2a-sdk",
+  "httpx",
 ]
 
 all = [

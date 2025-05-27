@@ -31,7 +31,7 @@ jobs:
 
       - name: Install
         run: |
-          uv sync --group tests --extra all --extra serve
+          uv sync --group tests --extra all --extra a2a
 
       - name: Run Documentation tests
         run: pytest -v tests/docs

@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import os
 
@@ -9,7 +8,8 @@ from rich.logging import RichHandler
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import ServingConfig, TracingConfig
 from any_agent.tools import a2a_query
-from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
+from tests.conftest import build_tree
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -20,24 +20,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("any_agent_test")
 logger.setLevel(logging.DEBUG)
-
-CHILD_TAG = "any_agent.children"
-
-
-def organize(items: list[AgentSpan]) -> None:
-    traces = {}
-    for trace in items:
-        k = trace.context.span_id
-        trace.attributes[CHILD_TAG] = {}
-        traces[k] = trace
-    for trace in items:
-        if trace.parent:
-            parent_k = trace.parent.span_id
-            if parent_k:
-                traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = trace
-            else:
-                traces[None] = trace
-    logger.info(traces[None].model_dump_json(indent=2))
 
 
 @pytest.mark.skipif(
@@ -73,25 +55,6 @@ async def test_load_and_run_multi_agent(
     try:
         tool_agent_port = 5800
         tool_agent_endpoint = "tool_agent"
-
-        # SEARCH AGENT
-
-        """
-        search_agent_description = "Agent that can search the web. It can find answers on the web if the query cannot be answered."
-        search_agent_cfg = AgentConfig(
-            instructions="Use the available tools to complete the task to obtain additional information to answer the query.",
-            name="search_web_agent",
-            model_id=agent_model,
-            description=search_agent_description,
-            tools=[search_web],
-            model_args=model_args,
-        )
-        search_agent = await AnyAgent.create_async(
-            agent_framework=agent_framework,
-            agent_config=search_agent_cfg,
-            tracing=TracingConfig(console=False, cost_info=True),
-        )
-        """
 
         # DATE AGENT
 
@@ -154,18 +117,13 @@ async def test_load_and_run_multi_agent(
             tracing=TracingConfig(console=False, cost_info=True),
         )
 
-        agent_trace = await main_agent.run_async(
-            # "Which LLM agent framework is the most appropriate to execute SQL queries using grammar constrained decoding? I am working on a business environment on my own premises, and I would prefer hosting an open source model myself."
-            "What date and time is it right now?"
-        )
-
-        await asyncio.sleep(5)
+        agent_trace = await main_agent.run_async("What date and time is it right now?")
 
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
 
         logger.info("spans:")
-        logger.info(agent_trace.spans)
+        logger.info(build_tree(agent_trace.spans).model_dump_json(indent=2))
 
         logger.info(agent_trace.final_output)
         now = datetime.datetime.now()
@@ -176,29 +134,12 @@ async def test_load_and_run_multi_agent(
                 now.strftime("%B") in agent_trace.final_output,
             ]
         )
-        assert any(
-            span.attributes["gen_ai.operation.name"] == "execute_tool"
-            for span in agent_trace.spans
-        )
+        assert any(span.is_tool_execution() for span in agent_trace.spans)
 
-        """
-        if _is_tracing_supported(agent_framework):
-            assert agent_trace.spans
-            assert len(agent_trace.spans) > 0
-            cost_sum = agent_trace.get_total_cost()
-            assert cost_sum.total_cost > 0
-            assert cost_sum.total_cost < 1.00
-            assert cost_sum.total_tokens > 0
-            assert cost_sum.total_tokens < 20000
-            traces = agent_trace.spans
-            organize(traces)
-            if agent_framework == AgentFramework.AGNO:
-                check_multi_tool_usage(traces)
-            else:
-                logger.warning(
-                    "See https://github.com/mozilla-ai/any-agent/issues/256, multi-agent trace checks not working"
-                )
-        """
+        for span in agent_trace.spans:
+            if "gen_ai.tool.name" in span.attributes:
+                assert span.attributes["gen_ai.tool.name"] == "_send_query"
+
     finally:
         if served_server:
             await served_server.shutdown()
