@@ -1,5 +1,5 @@
 from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -111,7 +111,10 @@ def test_run_google_custom_args() -> None:
 
     mock_agent = MagicMock()
     mock_runner = MagicMock()
+    mock_runner.get_tools = AsyncMock()
     mock_session = MagicMock()
+    mock_runner.return_value.session_service.create_session = AsyncMock()
+    mock_runner.return_value.session_service.get_session = AsyncMock()
 
     # More explicit mock setup
     mock_state = MagicMock()

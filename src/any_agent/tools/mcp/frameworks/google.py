@@ -41,8 +41,7 @@ class GoogleMCPConnection(_MCPConnection["GoogleMCPTool"], ABC):
             raise ValueError(msg)
 
         server = GoogleMCPToolset(connection_params=self._params)
-        await self._exit_stack.enter_async_context(server)
-        tools = await server.load_tools()
+        tools = await server.get_tools()
         return self._filter_tools(tools)  # type: ignore[return-value]
 
 
