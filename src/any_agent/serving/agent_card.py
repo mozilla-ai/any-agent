@@ -35,13 +35,14 @@ def _get_agent_card(agent: AnyAgent, serving_config: ServingConfig) -> AgentCard
     if agent.config.description is None:
         msg = "Agent description is not set. Please set the `description` field in the `AgentConfig`."
         raise ValueError(msg)
+    endpoint = serving_config.endpoint.lstrip("/")
     return AgentCard(
         name=agent.config.name,
         description=agent.config.description,
         version=serving_config.version,
         defaultInputModes=["text"],
         defaultOutputModes=["text"],
-        url=f"http://{serving_config.host}:{serving_config.port}/",
+        url=f"http://{serving_config.host}:{serving_config.port}/{endpoint}",
         capabilities=AgentCapabilities(
             streaming=False, pushNotifications=False, stateTransitionHistory=False
         ),

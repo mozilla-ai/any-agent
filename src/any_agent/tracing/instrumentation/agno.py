@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any
 from opentelemetry.trace import StatusCode
 from wrapt.patches import resolve_path, wrap_function_wrapper
 
+from .common import _set_tool_output
+
 if TYPE_CHECKING:
     from agno.models.base import Model
     from agno.models.message import Message, MessageMetrics
@@ -140,13 +142,8 @@ class _AgnoInstrumentor:
                             tool_executions[0], "tool_call_id", "No id"
                         )
                         span = tool_call_spans[tool_call_id]
-                        span.set_attributes(
-                            {
-                                "gen_ai.output": getattr(
-                                    tool_executions[0], "result", "null"
-                                ),
-                                "gen_ai.output.type": "json",
-                            }
+                        _set_tool_output(
+                            getattr(tool_executions[0], "result", "{}"), span
                         )
 
                     span.set_status(StatusCode.OK)

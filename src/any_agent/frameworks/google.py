@@ -103,7 +103,7 @@ class GoogleAgent(AnyAgent):
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())
-        runner.session_service.create_session(
+        await runner.session_service.create_session(
             app_name=runner.app_name,
             user_id=user_id,
             session_id=session_id,
@@ -117,7 +117,7 @@ class GoogleAgent(AnyAgent):
         ):
             pass
 
-        session = runner.session_service.get_session(
+        session = await runner.session_service.get_session(
             app_name=runner.app_name,
             user_id=user_id,
             session_id=session_id,

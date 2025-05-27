@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any
 from opentelemetry.trace import StatusCode
 from wrapt.patches import resolve_path, wrap_function_wrapper
 
+from .common import _set_tool_output
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -116,16 +118,8 @@ class _TinyAgentInstrumentor:
                 )
 
                 result = await wrapped(*args, **kwargs)
-                span.set_attributes(
-                    {
-                        "gen_ai.output": json.dumps(
-                            result["content"][0]["text"],
-                            default=str,
-                            ensure_ascii=False,
-                        ),
-                        "gen_ai.output.type": "json",
-                    }
-                )
+
+                _set_tool_output(result, span)
 
                 span.set_status(StatusCode.OK)
 

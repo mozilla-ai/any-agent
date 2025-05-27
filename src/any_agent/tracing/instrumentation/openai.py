@@ -7,13 +7,22 @@ from agents.tracing import TracingProcessor, set_trace_processors
 from agents.tracing.span_data import FunctionSpanData, GenerationSpanData
 from opentelemetry.trace import StatusCode
 
+from .common import _set_tool_output
+
 if TYPE_CHECKING:
     from opentelemetry.trace import Span, Tracer
 
 
 def _set_llm_input(span_data: GenerationSpanData, span: Span) -> None:
-    # TODO: needs https://github.com/openai/openai-agents-python/pull/742
-    pass
+    if input_messages := span_data.input:
+        span.set_attribute(
+            "gen_ai.input.messages",
+            json.dumps(
+                input_messages,
+                default=str,
+                ensure_ascii=False,
+            ),
+        )
 
 
 def _set_llm_output(span_data: GenerationSpanData, span: Span) -> None:
@@ -87,10 +96,6 @@ class _OpenAIAgentsInstrumentor:
                             "gen_ai.request.model": model,
                         }
                     )
-                    trace_id = span.trace_id
-                    if trace_id not in first_llm_calls:
-                        first_llm_calls.add(trace_id)
-                        _set_llm_input(span_data, span)
                     self.current_spans[span.span_id] = otel_span
                 elif isinstance(span_data, FunctionSpanData):
                     otel_span = self.tracer.start_span(
@@ -108,6 +113,10 @@ class _OpenAIAgentsInstrumentor:
                 span_data = span.span_data
                 if isinstance(span_data, GenerationSpanData):
                     otel_span = self.current_spans[span.span_id]
+                    trace_id = span.trace_id
+                    if trace_id not in first_llm_calls:
+                        first_llm_calls.add(trace_id)
+                        _set_llm_input(span_data, otel_span)
                     _set_llm_output(span_data, otel_span)
                     otel_span.set_status(StatusCode.OK)
                     otel_span.end()
@@ -116,10 +125,10 @@ class _OpenAIAgentsInstrumentor:
                     otel_span = self.current_spans[span.span_id]
                     otel_span.set_attributes(
                         {
-                            "gen_ai.output": span_data.output or "no_output",
-                            "gen_ai.output.type": "json",
+                            "gen_ai.tool.args": span_data.input or "{}",
                         }
                     )
+                    _set_tool_output(span_data.output, otel_span)
                     otel_span.set_status(StatusCode.OK)
                     otel_span.end()
                     del self.current_spans[span.span_id]

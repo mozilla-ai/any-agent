@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any
 from opentelemetry.trace import StatusCode
 from wrapt.patches import resolve_path, wrap_object_attribute
 
+from .common import _set_tool_output
+
 if TYPE_CHECKING:
     from google.adk.agents.callback_context import CallbackContext
     from google.adk.models.llm_request import LlmRequest
@@ -166,13 +168,8 @@ class _GoogleADKTracingCallbacks:
     ) -> Any | None:
         span = self._current_spans["tool"][tool_context.invocation_id]
 
-        if content := getattr(tool_response, "content", None):
-            span.set_attributes(
-                {
-                    "gen_ai.output": content[0].text,
-                    "gen_ai.output.type": "json",
-                }
-            )
+        _set_tool_output(tool_response, span)
+
         span.set_status(StatusCode.OK)
         span.end()
 

@@ -8,6 +8,8 @@ from langchain_core.runnables import RunnableConfig
 from opentelemetry.trace import StatusCode
 from wrapt.patches import wrap_function_wrapper
 
+from .common import _set_tool_output
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from uuid import UUID
@@ -175,14 +177,10 @@ class _LangChainTracingCallback(BaseCallbackHandler):
     ) -> Any:
         span = self._current_spans["tool"][str(run_id)]
 
-        if output.content:
-            span.set_attributes(
-                {
-                    "gen_ai.output": getattr(output, "content", "{}"),
-                    "gen_ai.output.type": "json",
-                    "gen_ai.tool.call.id": getattr(output, "tool_call_id", "No id"),
-                }
-            )
+        if content := getattr(output, "content", None):
+            _set_tool_output(content, span)
+            if tool_call_id := getattr(output, "tool_call_id", None):
+                span.set_attribute("gen_ai.tool.call.id", tool_call_id)
 
         span.set_status(StatusCode.OK)
         span.end()

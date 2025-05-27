@@ -29,7 +29,7 @@ agno = [
 ]
 
 google = [
-  "google-adk==0.5.0" # until https://github.com/mozilla-ai/any-agent/issues/287 is resolved
+  "google-adk>=1.0.0, <2"
 ]
 
 langchain = [
@@ -53,11 +53,12 @@ openai = [
 ]
 
 smolagents = [
-  "smolagents[mcp]>=1.14.0",
+  "smolagents[mcp]>=1.17.0",
 ]
 
-serve = [
+a2a = [
   "a2a-sdk>=0.2.5",
+  "httpx",
 ]
 
 all = [

@@ -9,6 +9,7 @@ from opentelemetry.sdk.trace.export import (
 )
 from rich.console import Console, Group
 from rich.json import JSON
+from rich.markdown import Markdown
 from rich.panel import Panel
 
 from any_agent.logging import logger
@@ -21,6 +22,18 @@ if TYPE_CHECKING:
     from opentelemetry.sdk.trace import ReadableSpan
 
     from any_agent import TracingConfig
+
+
+def _get_output_panel(span: AgentSpan) -> Panel | None:
+    if output := span.attributes.get("gen_ai.output", None):
+        output_type = span.attributes.get("gen_ai.output.type", "text")
+        return Panel(
+            Markdown(output) if output_type != "json" else JSON(output),
+            title="OUTPUT",
+            style="white",
+            title_align="left",
+        )
+    return None
 
 
 class _AnyAgentExporter(SpanExporter):
@@ -56,12 +69,8 @@ class _AnyAgentExporter(SpanExporter):
                         JSON(messages), title="INPUT", style="white", title_align="left"
                     )
                 )
-            if output := span.attributes.get("gen_ai.output"):
-                panels.append(
-                    Panel(
-                        JSON(output), title="OUTPUT", style="white", title_align="left"
-                    )
-                )
+            if output_panel := _get_output_panel(span):
+                panels.append(output_panel)
             if usage := {
                 k.replace("gen_ai.usage.", ""): v
                 for k, v in span.attributes.items()
@@ -83,22 +92,19 @@ class _AnyAgentExporter(SpanExporter):
                 )
             )
         elif span.is_tool_execution():
+            panels = [
+                Panel(
+                    JSON(span.attributes.get("gen_ai.tool.args", "{}")),
+                    title="Input",
+                    style="white",
+                    title_align="left",
+                )
+            ]
+            if output_panel := _get_output_panel(span):
+                panels.append(output_panel)
             self.console.print(
                 Panel(
-                    Group(
-                        Panel(
-                            JSON(span.attributes.get("gen_ai.tool.args", "{}")),
-                            title="Input",
-                            style="white",
-                            title_align="left",
-                        ),
-                        Panel(
-                            JSON(span.attributes.get("gen_ai.output", "{}")),
-                            title="Output",
-                            style="white",
-                            title_align="left",
-                        ),
-                    ),
+                    Group(*panels),
                     title=f"{operation_name.upper()}: {span.attributes.get('gen_ai.tool.name')}",
                     style=style,
                 )
