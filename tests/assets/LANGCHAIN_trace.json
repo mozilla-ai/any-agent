@@ -4,8 +4,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 3003602202154139199,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 5531887392136335441,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1748269060525210654,
-      "end_time": 1748269061290773685,
+      "start_time": 1748345634005577978,
+      "end_time": 1748345635302979866,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 2310909531399923758,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 11955708800474321134,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -58,8 +58,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 3003602202154139199,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 5531887392136335441,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -68,15 +68,15 @@
           "entries": {}
         }
       },
-      "start_time": 1748269061299240926,
-      "end_time": 1748269061302339471,
+      "start_time": 1748345635315072875,
+      "end_time": 1748345635318532671,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 14703215015449311126,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 14022132931904570405,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -90,9 +90,9 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-05-26T10:17:41-04:00\",\n  \"is_dst\": true\n}",
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-05-27T07:33:55-04:00\",\n  \"is_dst\": true\n}",
         "gen_ai.output.type": "json",
-        "gen_ai.tool.call.id": "call_vu8Li0KnCEdCrJfXAnYTrdua"
+        "gen_ai.tool.call.id": "call_UA7cEClrZTRF10ht5UhbxudU"
       },
       "links": [],
       "events": [],
@@ -110,8 +110,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 3003602202154139199,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 5531887392136335441,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -120,15 +120,15 @@
           "entries": {}
         }
       },
-      "start_time": 1748269061308386764,
-      "end_time": 1748269062155146629,
+      "start_time": 1748345635324081479,
+      "end_time": 1748345636095278376,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 544055404228244675,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 5010929599241808637,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -163,8 +163,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 3003602202154139199,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 5531887392136335441,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -173,15 +173,15 @@
           "entries": {}
         }
       },
-      "start_time": 1748269062161529968,
-      "end_time": 1748269062162173793,
+      "start_time": 1748345636111641154,
+      "end_time": 1748345636112393897,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 14681135018041707223,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 16789407617654338068,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -197,7 +197,7 @@
         "gen_ai.tool.args": "{\"text\": \"2025\"}",
         "gen_ai.output": "null",
         "gen_ai.output.type": "json",
-        "gen_ai.tool.call.id": "call_nSDacm3W3uHY5wS3Dcl2JJjf"
+        "gen_ai.tool.call.id": "call_YfRLVWql0jd9MKe3Rmv884kd"
       },
       "links": [],
       "events": [],
@@ -215,8 +215,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 3003602202154139199,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 5531887392136335441,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -225,15 +225,15 @@
           "entries": {}
         }
       },
-      "start_time": 1748269062166593393,
-      "end_time": 1748269063125027837,
+      "start_time": 1748345636120220944,
+      "end_time": 1748345637376881476,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 4510282956296865739,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 16406925170881575469,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -278,15 +278,15 @@
           "entries": {}
         }
       },
-      "start_time": 1748269060518836998,
-      "end_time": 1748269063133398955,
+      "start_time": 1748345633994933146,
+      "end_time": 1748345637398752722,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 265768675770349248958819527139129564357,
-        "span_id": 3003602202154139199,
+        "trace_id": 253795831081886612594431182563751307730,
+        "span_id": 5531887392136335441,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -300,7 +300,7 @@
         "gen_ai.agent.name": "any_agent",
         "gen_ai.agent.description": "No description.",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.request.id": "c12d81a8-c1da-4521-a2e8-a3340d04d8f6"
+        "gen_ai.request.id": "e5374371-8b3c-4d32-b876-d3df73dbba77"
       },
       "links": [],
       "events": [],

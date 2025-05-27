@@ -14,6 +14,9 @@ if TYPE_CHECKING:
     from smolagents.models import ChatMessage, Model
 
 
+from .common import _set_tool_output
+
+
 def _set_llm_input(messages: list[dict[str, Any]], span: Span) -> None:
     if not messages:
         return
@@ -75,7 +78,7 @@ def _set_llm_output(response: ChatMessage, span: Span) -> None:
 class _SmolagentsInstrumentor:
     def __init__(self) -> None:
         self.first_llm_calls: set[int] = set()
-        self._original_model_call: Callable[..., Any] | None = None
+        self._original_model_calls: dict[str, Callable[..., Any]] = {}
         self._original_tool_call: Callable[..., Any] | None = None
 
     def instrument(self, tracer: Tracer) -> None:
@@ -120,23 +123,28 @@ class _SmolagentsInstrumentor:
 
                 result: AgentType | Any | None = wrapped(*args, **kwargs)
 
-                if result:
-                    span.set_attributes(
-                        {
-                            "gen_ai.output": str(result),
-                            "gen_ai.output.type": "text",
-                        }
-                    )
+                _set_tool_output(result, span)
+
                 span.set_status(StatusCode.OK)
 
                 return result
 
         import smolagents
 
-        self._original_model_call = smolagents.models.Model.__call__
-        wrap_function_wrapper(  # type: ignore[no-untyped-call]
-            "smolagents.models", "Model.__call__", wrapper=model_call_wrap
-        )
+        exported_model_subclasses = [
+            attr
+            for _, attr in vars(smolagents).items()
+            if isinstance(attr, type) and issubclass(attr, smolagents.models.Model)
+        ]
+        for model_subclass in exported_model_subclasses:
+            self._original_model_calls[model_subclass.__name__] = (
+                model_subclass.generate
+            )
+            wrap_function_wrapper(  # type: ignore[no-untyped-call]
+                "smolagents.models",
+                f"{model_subclass.__name__}.generate",
+                wrapper=model_call_wrap,
+            )
 
         self._original_tool_call = smolagents.tools.Tool.__call__
         wrap_function_wrapper(  # type: ignore[no-untyped-call]
@@ -144,9 +152,9 @@ class _SmolagentsInstrumentor:
         )
 
     def uninstrument(self) -> None:
-        if self._original_model_call is not None:
-            model = resolve_path("smolagents.models", "Model")[2]  # type: ignore[no-untyped-call]
-            model.__call__ = self._original_model_call
+        for model_subclass, original_model_call in self._original_model_calls.items():
+            model = resolve_path("smolagents.models", model_subclass)[2]  # type: ignore[no-untyped-call]
+            model.generate = original_model_call
         if self._original_tool_call is not None:
             tool = resolve_path("smolagents.tools", "Tool")[2]  # type: ignore[no-untyped-call]
             tool.__call__ = self._original_tool_call
