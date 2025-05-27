@@ -55,9 +55,7 @@ def _get_stdio_mcp_server(
     assert_never(agent_framework)
 
 
-def _get_sse_mcp_server(
-    mcp_tool: MCPSse, agent_framework: AgentFramework
-) -> MCPServer:
+def _get_sse_mcp_server(mcp_tool: MCPSse, agent_framework: AgentFramework) -> MCPServer:
     if agent_framework is AgentFramework.AGNO:
         from .agno import AgnoMCPServerSse
 
@@ -88,10 +86,11 @@ def _get_sse_mcp_server(
         return TinyAgentMCPServerSse(mcp_tool=mcp_tool)
     assert_never(agent_framework)
 
+
 def _get_mcp_server(mcp_tool: MCPParams, agent_framework: AgentFramework) -> MCPServer:
     if isinstance(mcp_tool, MCPStdio):
         return _get_stdio_mcp_server(mcp_tool, agent_framework)
-    elif isinstance(mcp_tool, MCPSse):
+    if isinstance(mcp_tool, MCPSse):
         return _get_sse_mcp_server(mcp_tool, agent_framework)
     assert_never(mcp_tool)
 
