@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from any_agent import AnyAgent
 
 
-class AnyAgentExecutor(AgentExecutor):
+class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
     """Test AgentProxy Implementation."""
 
     def __init__(self, agent: "AnyAgent"):
@@ -16,7 +16,7 @@ class AnyAgentExecutor(AgentExecutor):
         self.agent = agent
 
     @override
-    async def execute(
+    async def execute(  # type: ignore[misc]
         self,
         context: RequestContext,
         event_queue: EventQueue,
@@ -27,6 +27,6 @@ class AnyAgentExecutor(AgentExecutor):
         event_queue.enqueue_event(new_agent_text_message(agent_trace.final_output))
 
     @override
-    async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:
+    async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:  # type: ignore[misc]
         msg = "cancel not supported"
         raise ValueError(msg)
