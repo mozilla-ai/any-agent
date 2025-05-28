@@ -29,11 +29,10 @@ def test_evaluate_runs_all_evaluators(
 
     with (
         patch(
-            "any_agent.evaluation.evaluate.evaluate_checkpoint",
+            "any_agent.evaluation.evaluate.evaluate_checkpoints",
             mock_checkpoint_evaluate,
         ),
         patch("any_agent.evaluation.evaluate.evaluate_final_output", mock_qa_evaluate),
-        patch("any_agent.evaluation.evaluators._construct_evidence"),
     ):
         evaluate(
             evaluation_case=evaluation_case,
@@ -70,11 +69,10 @@ def test_evaluate_when_no_final_output(
 
     with (
         patch(
-            "any_agent.evaluation.evaluate.evaluate_checkpoint",
+            "any_agent.evaluation.evaluate.evaluate_checkpoints",
             mock_checkpoint_evaluate,
         ),
         patch("any_agent.evaluation.evaluate.evaluate_final_output", mock_qa_evaluate),
-        patch("any_agent.evaluation.evaluators._construct_evidence"),
     ):
         evaluate(
             evaluation_case=evaluation_case,
