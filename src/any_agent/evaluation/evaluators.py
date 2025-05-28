@@ -101,7 +101,7 @@ def _construct_evidence(trace: AgentTrace) -> str:
         evidence += f"### Step {idx}\n"
         if idx == 0:
             input_val = span.attributes.get("gen_ai.input.messages")
-            # messsages whould always be json
+            # messages should always be json
             if input_val:
                 input_json = json.loads(input_val)
                 evidence += f"Input: {json.dumps(input_json, indent=2)}\n\n"
