@@ -1,4 +1,4 @@
-# Serving (A2A)
+# Serving
 
 `any-agent` provides a simple way of serving agents from any of the supported frameworks using the
 [Agent2Agent Protocol (A2A)](https://google.github.io/A2A/). You can refer to the link for more information on

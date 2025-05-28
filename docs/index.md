@@ -22,7 +22,7 @@
 
 ## Installation
 
-You can install the bare bones library as follows (only [`TinyAgent`](./frameworks/tinyagent.md) will be available):
+You can install the bare bones library as follows (only [`TinyAgent`](./agents/frameworks/tinyagent.md) will be available):
 
 ```bash
 pip install any-agent
