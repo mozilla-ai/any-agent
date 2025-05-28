@@ -1,6 +1,6 @@
 from any_agent.evaluation.evaluation_case import EvaluationCase
 from any_agent.evaluation.evaluators import (
-    evaluate_checkpoint,
+    evaluate_checkpoints,
     evaluate_final_output,
 )
 from any_agent.evaluation.schemas import TraceEvaluationResult
@@ -12,7 +12,7 @@ def evaluate(
     evaluation_case: EvaluationCase,
     trace: AgentTrace,
 ) -> TraceEvaluationResult:
-    checkpoint_results = evaluate_checkpoint(
+    checkpoint_results = evaluate_checkpoints(
         model=evaluation_case.llm_judge,
         trace=trace,
         checkpoints=evaluation_case.checkpoints,
