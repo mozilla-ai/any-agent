@@ -88,7 +88,7 @@ def get_agent(trace: AgentTrace, model: str) -> AnyAgent:
 
     Answer with:
     1. "passed": true or false
-    2. "reason": Brief explanation for your decision
+    2. "reasoning": Brief explanation for your decision
 
     Your final answer should be the following valid JSON:
 
