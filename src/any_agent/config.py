@@ -161,7 +161,7 @@ class AgentConfig(BaseModel):
     tools: Sequence[Tool] = Field(default_factory=list)
     """List of tools to be used by the agent.
 
-    See more info at [Tools](../tools.md).
+    See more info at [Tools](../agents/tools.md).
     """
 
     agent_type: Callable[..., Any] | None = None
