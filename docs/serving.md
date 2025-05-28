@@ -111,7 +111,7 @@ if __name__ == "__main__":
 ```
 
 You will see that the first agent answered the question, but the second agent did not answer the question.
-This isbecause the question was about Google ADK,
+This is because the question was about Google ADK,
 but the agent was told it could only answer questions about the OpenAI Agents SDK.
 
 
