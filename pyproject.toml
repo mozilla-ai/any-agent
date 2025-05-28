@@ -44,7 +44,6 @@ llama_index = [
   "llama-index",
   "llama-index-llms-litellm",
   "llama-index-tools-mcp",
-  "openinference-instrumentation-llama-index",
   "platformdirs>=4.3.7",
 ]
 
