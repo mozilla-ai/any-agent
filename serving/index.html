@@ -678,6 +678,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#more-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      More Examples
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -760,6 +769,29 @@
   
   <span class="md-ellipsis">
     Creating an agent with MCP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cookbook/serve_a2a/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Serve an Agent with A2A
     
   </span>
   
@@ -972,6 +1004,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#more-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      More Examples
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -998,14 +1039,18 @@
 
 <h1 id="serving">Serving</h1>
 <p><code>any-agent</code> provides a simple way of serving agents from any of the supported frameworks using the
-<a href="https://google.github.io/A2A/">Agent2Agent Protocol (A2A)</a>. You can refer to the link for more information on
+<a href="https://google.github.io/A2A/">Agent2Agent Protocol (A2A)</a>, via the <a href="https://github.com/google-a2a/a2a-python">A2A Python SDK</a>. You can refer to the link for more information on
 the protocol, as explaining it is out of the scope of this page.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The A2A protocol is in early stages of development and so is the functionality provided by <code>any-agent</code> here.</p>
 </div>
-<p>In order to use A2A serving, you must first install the 'serve' extra: <code>pip install 'any-agent[a2a]'</code></p>
-<p>You can configuring and serve an agent using the <a class="autorefs autorefs-internal" title="any_agent.config.ServingConfig" href="../api/config/#any_agent.config.ServingConfig"><code>ServingConfig</code></a> and the <a class="autorefs autorefs-internal" title="serve(serving_config=None)" href="../api/agent/#any_agent.AnyAgent.serve"><code>AnyAgent.serve</code></a> method.</p>
+<p>In order to use A2A serving, you must first install the 'a2a' extra: <code>pip install 'any-agent[a2a]'</code></p>
+<p>You can configure and serve an agent using the <a class="autorefs autorefs-internal" title="any_agent.config.ServingConfig" href="../api/config/#any_agent.config.ServingConfig"><code>ServingConfig</code></a> and the <a class="autorefs autorefs-internal" title="serve(serving_config=None)" href="../api/agent/#any_agent.AnyAgent.serve"><code>AnyAgent.serve</code></a> or <a class="autorefs autorefs-internal" title="serve_async(serving_config=None)
+
+  
+      async
+  " href="../api/agent/#any_agent.AnyAgent.serve_async"><code>AnyAgent.serve_async</code></a> method.</p>
 <h2 id="example">Example</h2>
 <p>For illustrative purposes, we are going to define 2 separate scripts, each defining an agent to answer questions about a specific agent framework (either OpenAI Agents SDK or Google ADK):</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Google Expert</label><label for="__tabbed_1_2">OpenAI Expert</label></div>
@@ -1020,14 +1065,13 @@ the protocol, as explaining it is out of the scope of this page.</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;google&quot;</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">AgentConfig</span><span class="p">(</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;google_expert&quot;</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4.1-nano&quot;</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;You must use the available tools to find an answer&quot;</span><span class="p">,</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;An agent that can answer questions specifically about the Google Agents Development Kit (ADK).&quot;</span><span class="p">,</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">]</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="p">)</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">)</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="n">agent</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="n">ServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">5001</span><span class="p">))</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4.1-mini&quot;</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.&quot;</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">]</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">)</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">agent</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="n">ServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">5001</span><span class="p">))</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1041,7 +1085,7 @@ the protocol, as explaining it is out of the scope of this page.</p>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">AgentConfig</span><span class="p">(</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;openai-expert&quot;</span><span class="p">,</span>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4.1-nano&quot;</span><span class="p">,</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;You must use the available tools to find an answer&quot;</span><span class="p">,</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;You can answer questions about the OpenAI Agents SDK but nothing else.&quot;</span><span class="p">,</span>
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;An agent that can answer questions specifically about the OpenAI Agents SDK.&quot;</span><span class="p">,</span>
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">]</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="p">)</span>
@@ -1053,22 +1097,56 @@ the protocol, as explaining it is out of the scope of this page.</p>
 </div>
 </div>
 <p>We can then run each of the scripts in a separate terminal and leave them running in the background.</p>
-<p>There are multiple options to interact with these agents.
-We are going to use the <a href="https://github.com/google/A2A/blob/main/demo/README.md">example demo UI</a> and follow the instructions to get it running.</p>
-<p>With the UI running, we can register the 2 new that are being served using their corresponding URLs:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Google Expert</label><label for="__tabbed_2_2">OpenAI Expert</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p><img alt="Google Expert Card" src="../images/google_expert_card.png" /></p>
-</div>
-<div class="tabbed-block">
-<p><img alt="OpenAI Expert Card" src="../images/openai_expert_card.png" /></p>
-</div>
-</div>
-</div>
-<p>Now that the agents are registered, we can interact with the "host" agent that will (hopefully) redirect the request
-to the appropriate expert:</p>
-<p><img alt="Host Agent Conversation" src="../images/host_agent_conversation.png" /></p>
+<p>Now, using a simple python script that implements the A2A client, we can communicate with these agents! For this example,
+we use the <a href="https://github.com/google-a2a/a2a-python">A2A Python SDK</a></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">a2a.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2ACardResolver</span><span class="p">,</span> <span class="n">A2AClient</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">a2a.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentCard</span><span class="p">,</span> <span class="n">MessageSendParams</span><span class="p">,</span> <span class="n">SendMessageRequest</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">httpx_client</span><span class="p">:</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">agent_card</span><span class="p">:</span> <span class="n">AgentCard</span> <span class="o">=</span> <span class="k">await</span> <span class="n">A2ACardResolver</span><span class="p">(</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="n">httpx_client</span><span class="p">,</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://localhost:5001&quot;</span><span class="p">,</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="p">)</span><span class="o">.</span><span class="n">get_agent_card</span><span class="p">(</span><span class="n">http_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="n">client</span> <span class="o">=</span> <span class="n">A2AClient</span><span class="p">(</span><span class="n">httpx_client</span><span class="o">=</span><span class="n">httpx_client</span><span class="p">,</span> <span class="n">agent_card</span><span class="o">=</span><span class="n">agent_card</span><span class="p">)</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="n">send_message_payload</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>                <span class="s2">&quot;parts&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;What do you know about the Google ADK?&quot;</span><span class="p">}],</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>                <span class="s2">&quot;messageId&quot;</span><span class="p">:</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>            <span class="p">},</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>        <span class="p">}</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>        <span class="n">request</span> <span class="o">=</span> <span class="n">SendMessageRequest</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">MessageSendParams</span><span class="p">(</span><span class="o">**</span><span class="n">send_message_payload</span><span class="p">))</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">http_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">})</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Response from first agent: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>        <span class="n">agent_card</span><span class="p">:</span> <span class="n">AgentCard</span> <span class="o">=</span> <span class="k">await</span> <span class="n">A2ACardResolver</span><span class="p">(</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>            <span class="n">httpx_client</span><span class="p">,</span>
+</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>            <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://localhost:5002&quot;</span><span class="p">,</span>
+</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>        <span class="p">)</span><span class="o">.</span><span class="n">get_agent_card</span><span class="p">(</span><span class="n">http_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>        <span class="n">client</span> <span class="o">=</span> <span class="n">A2AClient</span><span class="p">(</span><span class="n">httpx_client</span><span class="o">=</span><span class="n">httpx_client</span><span class="p">,</span> <span class="n">agent_card</span><span class="o">=</span><span class="n">agent_card</span><span class="p">)</span>
+</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>        <span class="n">send_message_payload</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>                <span class="s2">&quot;parts&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;What do you know about the Google ADK?&quot;</span><span class="p">}],</span>
+</span><span id="__span-2-34"><a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a>                <span class="s2">&quot;messageId&quot;</span><span class="p">:</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+</span><span id="__span-2-35"><a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>            <span class="p">},</span>
+</span><span id="__span-2-36"><a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a>        <span class="p">}</span>
+</span><span id="__span-2-37"><a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>        <span class="n">request</span> <span class="o">=</span> <span class="n">SendMessageRequest</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">MessageSendParams</span><span class="p">(</span><span class="o">**</span><span class="n">send_message_payload</span><span class="p">))</span>
+</span><span id="__span-2-38"><a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a>        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">http_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">})</span>
+</span><span id="__span-2-39"><a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Response from second agent: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-40"><a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-2-41"><a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span></code></pre></div>
+<p>You will see that the first agent answered the question, but the second agent did not answer the question.
+This is because the question was about Google ADK,
+but the agent was told it could only answer questions about the OpenAI Agents SDK.</p>
+<h2 id="more-examples">More Examples</h2>
+<p>Check out our cookbook example for building and serving an agent via A2A:</p>
+<p>👉 <a href="../cookbook/serve_a2a">Serve an Agent with A2A (Jupyter Notebook)</a></p>
 
 
 

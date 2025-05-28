@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../your_first_agent/">
+        <link rel="prev" href="../mcp_agent/">
       
       
-        <link rel="next" href="../serve_a2a/">
+        <link rel="next" href="../../api/agent/">
       
       
       <link rel="icon" href="../../images/any-agent_favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Creating an agent with MCP - any-agent</title>
+        <title>Serve an Agent with A2A - any-agent</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#creating-an-agent-with-mcp" class="md-skip">
+        <a href="#serve-an-agent-with-a2a" class="md-skip">
           Skip to content
         </a>
       
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Creating an agent with MCP
+              Serve an Agent with A2A
             
           </span>
         </div>
@@ -702,6 +702,29 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp_agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Creating an agent with MCP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -719,7 +742,7 @@
   
   
   <span class="md-ellipsis">
-    Creating an agent with MCP
+    Serve an Agent with A2A
     
   </span>
   
@@ -732,7 +755,7 @@
   
   
   <span class="md-ellipsis">
-    Creating an agent with MCP
+    Serve an Agent with A2A
     
   </span>
   
@@ -764,37 +787,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configure-the-agent" class="md-nav__link">
+  <a href="#configure-and-run-the-server" class="md-nav__link">
     <span class="md-ellipsis">
-      Configure the Agent
+      Configure and run the server
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configure the Agent">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#call-the-agent-using-a2aclient" class="md-nav__link">
+    <span class="md-ellipsis">
+      Call the agent using A2AClient
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Call the agent using A2AClient">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pick-the-framework" class="md-nav__link">
+  <a href="#a2a-agent-card" class="md-nav__link">
     <span class="md-ellipsis">
-      Pick the framework
+      A2A Agent Card
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#pick-an-llm" class="md-nav__link">
+  <a href="#make-a-request-of-the-agent" class="md-nav__link">
     <span class="md-ellipsis">
-      Pick an LLM
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pick-which-tools-to-use" class="md-nav__link">
-    <span class="md-ellipsis">
-      Pick which tools to use
+      Make a request of the agent
     </span>
   </a>
   
@@ -806,18 +829,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-the-agent" class="md-nav__link">
+  <a href="#cleanup" class="md-nav__link">
     <span class="md-ellipsis">
-      Run the Agent
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#view-the-results" class="md-nav__link">
-    <span class="md-ellipsis">
-      View the results
+      Cleanup
     </span>
   </a>
   
@@ -827,29 +841,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../serve_a2a/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Serve an Agent with A2A
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1058,37 +1049,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configure-the-agent" class="md-nav__link">
+  <a href="#configure-and-run-the-server" class="md-nav__link">
     <span class="md-ellipsis">
-      Configure the Agent
+      Configure and run the server
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configure the Agent">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#call-the-agent-using-a2aclient" class="md-nav__link">
+    <span class="md-ellipsis">
+      Call the agent using A2AClient
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Call the agent using A2AClient">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pick-the-framework" class="md-nav__link">
+  <a href="#a2a-agent-card" class="md-nav__link">
     <span class="md-ellipsis">
-      Pick the framework
+      A2A Agent Card
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#pick-an-llm" class="md-nav__link">
+  <a href="#make-a-request-of-the-agent" class="md-nav__link">
     <span class="md-ellipsis">
-      Pick an LLM
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pick-which-tools-to-use" class="md-nav__link">
-    <span class="md-ellipsis">
-      Pick which tools to use
+      Make a request of the agent
     </span>
   </a>
   
@@ -1100,18 +1091,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-the-agent" class="md-nav__link">
+  <a href="#cleanup" class="md-nav__link">
     <span class="md-ellipsis">
-      Run the Agent
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#view-the-results" class="md-nav__link">
-    <span class="md-ellipsis">
-      View the results
+      Cleanup
     </span>
   </a>
   
@@ -1133,7 +1115,7 @@
 
 
   
-    <a href="https://github.com/mozilla-ai/any-agent/edit/main/docs/cookbook/mcp_agent.ipynb" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/mozilla-ai/any-agent/edit/main/docs/cookbook/serve_a2a.ipynb" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1583,7 +1565,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="creating-an-agent-with-mcp">Creating an agent with MCP<a class="anchor-link" href="#creating-an-agent-with-mcp">¶</a></h1><p>The <a href="https://www.anthropic.com/news/model-context-protocol">Model Context Protocol</a> (MCP) introduced by Anthropic has proven to be a popular method for providing an AI agent with access to a variety of tools. <a href="https://huggingface.co/blog/Kseniase/mcp">This Huggingface blog post </a> has a nice explanation of MCP.  In this tutorial, we'll build an agent that is able to leverage MCP server provided tools.</p>
+<h1 id="serve-an-agent-with-a2a">Serve an Agent with A2A<a class="anchor-link" href="#serve-an-agent-with-a2a">¶</a></h1><p>Once you've built an agent, a common question might be: "how do I let other developers/applications access it?". Enter the <a href="https://github.com/google-a2a/A2A">A2A</a> protocol by Google! A2A is "An open protocol enabling communication and interoperability between opaque agentic applications". Any-Agent provides support for serving an agent over A2A, as simple as calling <code>agent.serve()</code>. In this tutorial, we'll build and serve an agent using any-agent, and show how you can serve and interact with it via the A2A protocol.</p>
+<img alt="" src="/images/serve_a2a.png" style="max-width: 500px; height: auto;"/>
+<p>This tutorial assumes basic familiarity with any-agent: if you haven't used any-agent before you may also find the <a href="./../your_first_agent">Creating your first agent</a> cookbook to be useful.</p>
 <p>Note: because this tutorial relies upon advanced stdio/stderr communication using the MCP Server, it cannot be run on Google Colab.</p>
 </div>
 </div>
@@ -1618,39 +1602,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent[a2a]'</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
 
 <span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent'
+<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent[a2a]'
 
 import nest_asyncio
 
 nest_asyncio.apply()</div>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="configure-the-agent">Configure the Agent<a class="anchor-link" href="#configure-the-agent">¶</a></h2><p>Now it's time to configure the agent! At this stage you have a few choices:</p>
-<h3 id="pick-the-framework">Pick the framework<a class="anchor-link" href="#pick-the-framework">¶</a></h3><p>We support a variety of underlying agent frameworks (OpenAI, Smolagents, Langchain, TinyAgent, etc), which all have their own particular agentic AI implementations. For this tutorial's simple use case, any of the frameworks should work just fine, but any-agent makes it easy to try out a different framework later, if we so choose. For this example, we will use the <a href="frameworks/tinyagent.md">TinyAgent</a> framework.</p>
-<h3 id="pick-an-llm">Pick an LLM<a class="anchor-link" href="#pick-an-llm">¶</a></h3><p>Regardless of which agent framework you choose, each framework supports LiteLLM, which is a proxy that allows us to use whichever LLM inside the framework, hosted on by any provider. For example, we could use a local model via llama.cpp or llamafile, a google hosted gemini model, or a AWS bedrock hosted Llama model. For this example, let's use OpenAI's gpt-4.1-mini.</p>
-<h3 id="pick-which-tools-to-use">Pick which tools to use<a class="anchor-link" href="#pick-which-tools-to-use">¶</a></h3><p>In this example, we'll add a few MCP servers that we host locally, which means we'll use a Stdio MCP server. If an MCP Server is already running and hosted elsewhere, you can use an SSE connection to access it. You can browse some of the officially supported MCP servers <a href="https://github.com/modelcontextprotocol/servers/tree/main?tab=readme-ov-file">here</a>.</p>
-<p>Lets give use two MCP servers:</p>
-<ul>
-<li><a href="https://github.com/modelcontextprotocol/servers/tree/main/src/time">Time</a>: so the agent can know what time/day it is.</li>
-<li><a href="https://github.com/openbnb-org/mcp-server-airbnb">Airbnb</a>: so the agent can browse airbnb listings</li>
-</ul>
-<p>I will also add a custom send_message tool, that way it can ask us additional questions before getting its final answer!</p>
 </div>
 </div>
 </div>
@@ -1676,6 +1640,7 @@ nest_asyncio.apply()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getpass</span>
 
+<span class="c1"># This notebook communicates with OpenAI GPT models using the OpenAI API.</span>
 <span class="k">if</span> <span class="s2">"OPENAI_API_KEY"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"OPENAI_API_KEY not found in environment!"</span><span class="p">)</span>
     <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">"Please enter your OPENAI_API_KEY: "</span><span class="p">)</span>
@@ -1687,6 +1652,7 @@ nest_asyncio.apply()</div>
 <div class="clipboard-copy-txt" id="cell-2">import os
 from getpass import getpass
 
+# This notebook communicates with OpenAI GPT models using the OpenAI API.
 if "OPENAI_API_KEY" not in os.environ:
     print("OPENAI_API_KEY not found in environment!")
     api_key = getpass("Please enter your OPENAI_API_KEY: ")
@@ -1712,6 +1678,17 @@ else:
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="configure-and-run-the-server">Configure and run the server<a class="anchor-link" href="#configure-and-run-the-server">¶</a></h2><p>Let's give our agent the very simple capability to access the current time through a Model Context Protocol (MCP) server. For this demo, we'll use the async method <code>agent.serve_async</code> so that we can easily run both the server and client from inside the notebook.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -1732,7 +1709,7 @@ else:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span><span class="p">,</span> <span class="n">ServingConfig</span><span class="p">,</span> <span class="n">TracingConfig</span>
 
 <span class="c1"># This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/</span>
 <span class="n">time_tool</span> <span class="o">=</span> <span class="n">MCPStdio</span><span class="p">(</span>
@@ -1743,35 +1720,19 @@ else:
     <span class="p">],</span>
 <span class="p">)</span>
 
-<span class="c1"># This MCP tool relies upon npx https://docs.npmjs.com/cli/v8/commands/npx which comes standard with npm</span>
-<span class="n">airbnb_tool</span> <span class="o">=</span> <span class="n">MCPStdio</span><span class="p">(</span>
-    <span class="n">command</span><span class="o">=</span><span class="s2">"npx"</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-y"</span><span class="p">,</span> <span class="s2">"@openbnb/mcp-server-airbnb"</span><span class="p">,</span> <span class="s2">"--ignore-robots-txt"</span><span class="p">]</span>
-<span class="p">)</span>
-
-
-<span class="c1"># This is a custom tool that we will provide to the agent. For the agent to use the tool, we must provide a docstring</span>
-<span class="c1"># and also have proper python typing for input and output parameters</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">send_message</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Display a message to the user and wait for their response.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        message: str</span>
-<span class="sd">            The message to be displayed to the user.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: The response from the user.</span>
-
-<span class="sd">    """</span>
-    <span class="k">return</span> <span class="nb">input</span><span class="p">(</span><span class="n">message</span> <span class="o">+</span> <span class="s2">" "</span><span class="p">)</span>
-
-
-<span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="n">time</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
-    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"gpt-4.1-mini"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">airbnb_tool</span><span class="p">,</span> <span class="n">time_tool</span><span class="p">,</span> <span class="n">send_message</span><span class="p">]),</span>
+    <span class="n">AgentConfig</span><span class="p">(</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"gpt-4.1-mini"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"I'm an agent to help with getting the time"</span><span class="p">,</span>
+        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">],</span>
+    <span class="p">),</span>
+    <span class="n">tracing</span><span class="o">=</span><span class="n">TracingConfig</span><span class="p">(</span><span class="n">console</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
 <span class="p">)</span>
+<span class="p">(</span><span class="n">time_task</span><span class="p">,</span> <span class="n">time_server</span><span class="p">)</span> <span class="o">=</span> <span class="k">await</span> <span class="n">time</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span><span class="n">ServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
-from any_agent.config import MCPStdio
+from any_agent.config import MCPStdio, ServingConfig, TracingConfig
 
 # This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/
 time_tool = MCPStdio(
@@ -1782,32 +1743,16 @@ time_tool = MCPStdio(
     ],
 )
 
-# This MCP tool relies upon npx https://docs.npmjs.com/cli/v8/commands/npx which comes standard with npm
-airbnb_tool = MCPStdio(
-    command="npx", args=["-y", "@openbnb/mcp-server-airbnb", "--ignore-robots-txt"]
-)
-
-
-# This is a custom tool that we will provide to the agent. For the agent to use the tool, we must provide a docstring
-# and also have proper python typing for input and output parameters
-def send_message(message: str) -&gt; str:
-    """Display a message to the user and wait for their response.
-
-    Args:
-        message: str
-            The message to be displayed to the user.
-
-    Returns:
-        str: The response from the user.
-
-    """
-    return input(message + " ")
-
-
-agent = AnyAgent.create(
+time = AnyAgent.create(
     "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
-    AgentConfig(model_id="gpt-4.1-mini", tools=[airbnb_tool, time_tool, send_message]),
-)</div>
+    AgentConfig(
+        model_id="gpt-4.1-mini",
+        description="I'm an agent to help with getting the time",
+        tools=[time_tool],
+    ),
+    tracing=TracingConfig(console=False),
+)
+(time_task, time_server) = await time.serve_async(ServingConfig(port=5000))</div>
 </div>
 </div>
 </div>
@@ -1820,7 +1765,18 @@ agent = AnyAgent.create(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="run-the-agent">Run the Agent<a class="anchor-link" href="#run-the-agent">¶</a></h2><p>Now we've configured our agent, so it's time to run it! Since it has access to airbnb listings as well as the current time, it's a perfect fit for helping me find a nice airbnb for the weekend.</p>
+<h2 id="call-the-agent-using-a2aclient">Call the agent using A2AClient<a class="anchor-link" href="#call-the-agent-using-a2aclient">¶</a></h2><p>Now that the agent is listening on <a href="http://localhost:5000">http://localhost:5000</a>, we can communicate with it from any other application that supports A2A. For this tutorial we'll use the a2a python SDK, but any client that implements the <a href="https://github.com/google-a2a/A2A">A2A Protocol</a> would also work.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="a2a-agent-card">A2A Agent Card<a class="anchor-link" href="#a2a-agent-card">¶</a></h3><p>Before giving the agent a task, we first retrieve the agent's model card, which is a description of the agents capabilities. This helps the client understand what the agent can do, and what A2A features are available.</p>
 </div>
 </div>
 </div>
@@ -1843,17 +1799,35 @@ agent = AnyAgent.create(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2">I am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this? Figure out the time, then ask me some questions and lets figure this out together. Once I tell you what you need to know, find and return some options for me.</span>
-<span class="s2">"""</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">a2a.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2ACardResolver</span><span class="p">,</span> <span class="n">A2AClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">a2a.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentCard</span>
 
-<span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+<span class="c1"># Create the httpx client</span>
+<span class="n">httpx_client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
+
+<span class="n">agent_card</span><span class="p">:</span> <span class="n">AgentCard</span> <span class="o">=</span> <span class="k">await</span> <span class="n">A2ACardResolver</span><span class="p">(</span>
+    <span class="n">httpx_client</span><span class="p">,</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="s2">"http://localhost:5000"</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">get_agent_card</span><span class="p">(</span><span class="n">http_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">agent_card</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">A2AClient</span><span class="p">(</span><span class="n">httpx_client</span><span class="o">=</span><span class="n">httpx_client</span><span class="p">,</span> <span class="n">agent_card</span><span class="o">=</span><span class="n">agent_card</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">prompt = """
-I am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this? Figure out the time, then ask me some questions and lets figure this out together. Once I tell you what you need to know, find and return some options for me.
-"""
+<div class="clipboard-copy-txt" id="cell-4">import httpx
+from a2a.client import A2ACardResolver, A2AClient
+from a2a.types import AgentCard
 
-agent_trace = agent.run(prompt)</div>
+# Create the httpx client
+httpx_client = httpx.AsyncClient()
+
+agent_card: AgentCard = await A2ACardResolver(
+    httpx_client,
+    base_url="http://localhost:5000",
+).get_agent_card(http_kwargs=None)
+print(agent_card.model_dump_json(indent=2))
+
+client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
 </div>
 </div>
 </div>
@@ -1864,223 +1838,40 @@ agent_trace = agent.run(prompt)</div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"system"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"You are an agent - please keep going until the user's query is completely resolved, before </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"user"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"\nI am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this?</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"get_current_time"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"timezone\":\"America/New_York\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">641</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">18</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0002564</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2.88e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭────────────────────────────────────────</span> EXECUTE_TOOL: get_current_time <span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────╮</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"timezone"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"America/New_York"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"meta=None content=[TextContent(type='text', text='{\\n  \"timezone\": \"America/New_York\",\\n  \"datetime</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"send_message"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                            │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"message\":\"Today is May 23, 2025, and you are looking to book an Airbnb next weekend </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">732</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">194</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.00029279999999999996</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0003104</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭──────────────────────────────────────────</span> EXECUTE_TOOL: send_message <span style="color: #000080; text-decoration-color: #000080">───────────────────────────────────────────╮</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"message"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"Today is May 23, 2025, and you are looking to book an Airbnb next weekend near Ohiopyle, PA. </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"Let's do Friday through Sunday, 2 adults, whole home, maybe some place near the woods! No specific require</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"airbnb_search"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"location\":\"Ohiopyle, PA\",\"checkin\":\"2025-05-30\",\"checkout\":\"2025-06-01\",\"a</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">968</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">49</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0003872</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">7.84e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭──────────────────────────────────────────</span> EXECUTE_TOOL: airbnb_search <span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────╮</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"location"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"Ohiopyle, PA"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkin"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-05-30"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkout"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-01"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"adults"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                              │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"minPrice"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"meta=None content=[TextContent(type='text', text='{\\n  \"searchUrl\": \"https://www.airbnb.com/s/Ohiopyle</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"airbnb_listing_details"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"id\":\"53007015\",\"checkin\":\"2025-05-30\",\"checkout\":\"2025-06-01\",\"adults\":2}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">7887</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">42</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0031547999999999997</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">6.72e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭─────────────────────────────────────</span> EXECUTE_TOOL: airbnb_listing_details <span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────╮</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"id"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"53007015"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkin"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-05-30"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkout"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-01"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"adults"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"meta=None content=[TextContent(type='text', text='{\\n  \"listingUrl\": \"https://www.airbnb.com/rooms/530</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"airbnb_listing_details"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"id\":\"52684053\",\"checkin\":\"2025-05-30\",\"checkout\":\"2025-06-01\",\"adults\":2}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8872</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">42</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0035488</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">6.72e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭─────────────────────────────────────</span> EXECUTE_TOOL: airbnb_listing_details <span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────╮</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"id"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"52684053"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkin"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-05-30"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"checkout"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-01"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"adults"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Output </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #008000; text-decoration-color: #008000">"meta=None content=[TextContent(type='text', text='{\\n  \"listingUrl\": \"https://www.airbnb.com/rooms/526</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>{
+  "capabilities": {
+    "pushNotifications": false,
+    "stateTransitionHistory": false,
+    "streaming": false
+  },
+  "defaultInputModes": [
+    "text"
+  ],
+  "defaultOutputModes": [
+    "text"
+  ],
+  "description": "I'm an agent to help with getting the time",
+  "documentationUrl": null,
+  "name": "any_agent",
+  "provider": null,
+  "security": null,
+  "securitySchemes": null,
+  "skills": [
+    {
+      "description": "Get current time in a specific timezones",
+      "examples": null,
+      "id": "any_agent-get_current_time",
+      "inputModes": null,
+      "name": "get_current_time",
+      "outputModes": null,
+      "tags": []
+    }
+  ],
+  "supportsAuthenticatedExtendedCard": null,
+  "url": "http://localhost:5000/",
+  "version": "0.1.0"
+}
 </pre>
 </div>
 </div>
@@ -2094,28 +1885,17 @@ agent_trace = agent.run(prompt)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="view-the-results">View the results<a class="anchor-link" href="#view-the-results">¶</a></h2>
+<h3 id="make-a-request-of-the-agent">Make a request of the agent<a class="anchor-link" href="#make-a-request-of-the-agent">¶</a></h3><p>Now that we've connected to the agent with the A2AClient, we're ready to make a request of the agent!</p>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The <code>agent.run</code> method returns an AgentTrace object, which has a few convenient attributes for displaying some interesting information about the run.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -2128,15 +1908,64 @@ agent_trace = agent.run(prompt)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>  <span class="c1"># Final answer</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duration: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Tokens: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">total_tokens</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Cost (USD): </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">total_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">a2a.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageSendParams</span><span class="p">,</span> <span class="n">SendMessageRequest</span>
+
+<span class="n">send_message_payload</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"message"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span>
+        <span class="s2">"parts"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"text"</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"What time is it?"</span><span class="p">}],</span>
+        <span class="s2">"messageId"</span><span class="p">:</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+<span class="n">request</span> <span class="o">=</span> <span class="n">SendMessageRequest</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">MessageSendParams</span><span class="p">(</span><span class="o">**</span><span class="n">send_message_payload</span><span class="p">))</span>
+<span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<span class="c1"># Close the httpx client when done</span>
+<span class="k">await</span> <span class="n">httpx_client</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">print(agent_trace.final_output)  # Final answer
-print(f"Duration: {agent_trace.duration.total_seconds():.2f} seconds")
-print(f"Total Tokens: {agent_trace.tokens.total_tokens:,}")
-print(f"Total Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
+<div class="clipboard-copy-txt" id="cell-5">from uuid import uuid4
+
+from a2a.types import MessageSendParams, SendMessageRequest
+
+send_message_payload = {
+    "message": {
+        "role": "user",
+        "parts": [{"kind": "text", "text": "What time is it?"}],
+        "messageId": uuid4().hex,
+    },
+}
+request = SendMessageRequest(params=MessageSendParams(**send_message_payload))
+response = await client.send_message(request)
+# Close the httpx client when done
+await httpx_client.aclose()</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-6">print(response.model_dump_json(indent=2))</div>
 </div>
 </div>
 </div>
@@ -2148,25 +1977,96 @@ print(f"Total Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>I found some Airbnb options near Ohiopyle, PA for next weekend (May 30 to June 1) for 2 adults looking for a whole home, preferably near the woods and ideally with a hot tub. Here are a couple of highlighted listings:
+<pre>{
+  "id": "8c8d295b-1ef4-4ce4-9b9a-7edf65da27f1",
+  "jsonrpc": "2.0",
+  "result": {
+    "contextId": null,
+    "kind": "message",
+    "messageId": "05c929d8-f009-4a59-a0a0-a1035a3e2099",
+    "metadata": null,
+    "parts": [
+      {
+        "kind": "text",
+        "metadata": null,
+        "text": "The current time in New York (Eastern Time) is 6:20 AM on May 28, 2025. If you want the time for another timezone, please tell me which one."
+      }
+    ],
+    "referenceTaskIds": null,
+    "role": "agent",
+    "taskId": null
+  }
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="cleanup">Cleanup<a class="anchor-link" href="#cleanup">¶</a></h2><p>In order to shut down the A2A server, we can set the <code>should_exit</code> property of the server, which will cause the server to shutdown and the asyncio task to complete.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-1. Yoder School Guest House (Grantsville, MD)  
-- Private hot tub  
-- Entire home  
-- Good for outdoor activities (mountain biking, hiking, rafting)  
-- $297 for 2 nights  
-- [Link to listing](https://www.airbnb.com/rooms/53007015?check_in=2025-05-30&amp;check_out=2025-06-01&amp;adults=2)
+<span class="n">time_server</span><span class="o">.</span><span class="n">should_exit</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">time_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Agent server task has completed!"</span><span class="p">)</span>
+        <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Waiting for server to exit"</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-7">import asyncio
 
-2. Flanigan Farmhouse (Confluence, PA)  
-- Cozy modern 3-bedroom farmhouse on 4 acres  
-- Mountain views, private patio, fire pit, hammock  
-- $356 for 2 nights  
-- [Link to listing](https://www.airbnb.com/rooms/52684053?check_in=2025-05-30&amp;check_out=2025-06-01&amp;adults=2)
-
-Would you like me to show more listings or focus on any particular features?
-Duration: 72.20 seconds
-Usage: 50577
-Total Cost (USD): 0.021473
+time_server.should_exit = True
+while True:
+    if time_task.done():
+        print("Agent server task has completed!")
+        break
+    else:
+        print("Waiting for server to exit")
+        await asyncio.sleep(1)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Waiting for server to exit
+Agent server task has completed!
 </pre>
 </div>
 </div>
