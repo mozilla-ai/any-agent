@@ -118,4 +118,5 @@ but the agent was told it could only answer questions about the OpenAI Agents SD
 ## More Examples
 
 Check out our cookbook example for building and serving an agent via A2A:
-👉 [Serve an Agent with A2A (Jupyter Notebook)](cookbook/serve_a2a.ipynb)
+
+👉 [Serve an Agent with A2A (Jupyter Notebook)](../cookbook/serve_a2a)
