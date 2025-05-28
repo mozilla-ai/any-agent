@@ -17,7 +17,7 @@ dependencies = [
   "mcp>=1.5.0",
   "opentelemetry-exporter-otlp",
   "opentelemetry-sdk",
-  "pydantic==2.11.4",
+  "pydantic",
   "requests",
   "rich",
   "tavily-python",
