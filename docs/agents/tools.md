@@ -1,6 +1,6 @@
 # Agent Tools
 
-`any-agent` provides 2 options to specify what `tools` are available to your agent: `Callables` and `MCP` ([Model Context Protocol](https://modelcontextprotocol.io/introduction)).
+`any-agent` provides 2 options to specify what `tools` are available to your agent: `Callables` and `MCP` ([Model Context Protocol](https://modelcontextprotocol.io/introduction)). Additionally, existing agents reachable via A2A can be contacted using a `Callable` tool.
 
 You can use any combination of options within the same agent.
 
@@ -70,3 +70,23 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
         ]
     )
     ```
+
+## A2A tools
+
+`any-agent` provides a tool to wrap a connection to another another agent served over the A2A protocol, by invoking the `any_agent.tools.a2a_query` function, as shown in the following example:
+
+```python
+agent_cfg = AgentConfig(
+    instructions="Use the available tools to obtain additional information to answer the query.",
+    description="A sample agent.",
+    tools=[
+        await a2a_query(
+            "http://example.net:10000/some_agent"
+        )
+    ],
+    model_args=model_args,
+    **kwargs,
+)
+```
+
+The tool description is derived from the agent card, which is retrieved when this function is invoked.

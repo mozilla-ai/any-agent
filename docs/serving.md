@@ -120,3 +120,8 @@ but the agent was told it could only answer questions about the OpenAI Agents SD
 Check out our cookbook example for building and serving an agent via A2A:
 
 👉 [Serve an Agent with A2A (Jupyter Notebook)](../cookbook/serve_a2a)
+![Host Agent Conversation](./images/host_agent_conversation.png)
+
+## Accessing an A2A agent using tools
+
+As described in the [tools section](./agents/tools.md), an agent can request actions from other agents by using the `a2a_query` function. It retrieves the agent card, and builds another function that relays the request via the A2A protocol and unpacks the result.
