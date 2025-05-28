@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 from any_agent.evaluation.agent import get_agent
 from any_agent.evaluation.schemas import GroundTruthAnswer
 
-MAX_EVIDENCE_LENGTH: int = 400
-
 
 class AgentOutput(BaseModel):
     passed: bool
