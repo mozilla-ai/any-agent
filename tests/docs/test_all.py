@@ -10,6 +10,10 @@ from any_agent.evaluation import TraceEvaluationResult
 # Note the use of `str`, makes for pretty output
 @pytest.mark.parametrize("fpath", pathlib.Path("docs").glob("**/*.md"), ids=str)
 def test_files_all(fpath: pathlib.Path) -> None:
+    if fpath.name == "serving.md":
+        # the serving markdown runs multiple servers in different processes
+        # which is not supported by this testing.
+        pytest.skip("Serving.md not supported by docs tester")
     mock_agent = MagicMock()
     mock_create = MagicMock(return_value=mock_agent)
     mock_eval = MagicMock()
