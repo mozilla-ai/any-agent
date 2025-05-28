@@ -113,5 +113,5 @@ def get_agent(trace: AgentTrace, model: str) -> AnyAgent:
     return AnyAgent.create(
         "tinyagent",
         agent_config=agent_config,
-        tracing=TracingConfig(console=True),
+        tracing=TracingConfig(console=False),
     )

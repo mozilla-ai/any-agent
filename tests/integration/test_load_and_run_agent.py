@@ -102,7 +102,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
         llm_judge="gpt-4.1-mini",
         checkpoints=[
             CheckpointCriteria(
-                criteria="Check if the agent called the write_file tool and it succeeded",
+                criteria="Check if the agent called the write_file tool and no errors were raised",
                 points=1,
             ),
             CheckpointCriteria(
