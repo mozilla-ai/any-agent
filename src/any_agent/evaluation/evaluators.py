@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 import json
 import re
+from json import JSONDecodeError
 from textwrap import dedent
 
 import evaluate.loading
@@ -19,7 +20,7 @@ from litellm import completion
 
 from any_agent.evaluation.schemas import GroundTruthAnswer, GroundTruthAnswers
 
-MAX_EVIDENCE_LENGTH: int = 400
+MAX_EVIDENCE_LENGTH: int = 500
 
 
 def llm_evaluate_with_criterion(
@@ -93,22 +94,40 @@ def llm_evaluate_with_criterion(
 
 def _construct_evidence(trace: AgentTrace) -> str:
     evidence = "## Agent Execution\n\n"
+    evidence = f"Number of steps taken: {len(trace.spans)}\n\n"
+    evidence = f"Number of tokens used: {trace.tokens.total_tokens}\n\n"
 
     for idx, span in enumerate(trace.spans):
-        evidence += f"### Call {idx}\n"
+        evidence += f"### Step {idx}\n"
+        if idx == 0:
+            input_val = span.attributes.get("gen_ai.input.messages")
+            # messsages whould always be json
+            if input_val:
+                input_json = json.loads(input_val)
+                evidence += f"Input: {json.dumps(input_json, indent=2)}\n\n"
 
-        call = {
-            k: (
-                v[:MAX_EVIDENCE_LENGTH] + "..."
-                if isinstance(v, str) and len(v) > MAX_EVIDENCE_LENGTH
-                else v
-            )
-            for k, v in span.attributes.items()
-        }
+        tool_args = span.attributes.get("gen_ai.tool.args")
+        if tool_args:
+            args_json = json.loads(tool_args)
+            tool_name = span.attributes.get("gen_ai.tool.name")
+            evidence += f"Tool called: {tool_name}\n\n"
+            evidence += f"Tool arguments: {json.dumps(args_json, indent=2)}\n\n"
 
-        # Use ensure_ascii=False to prevent escaping Unicode characters
-        evidence += json.dumps(call, indent=2, ensure_ascii=False) + "\n\n"
-
+        output = span.attributes.get("gen_ai.output")
+        if output:
+            try:
+                output_json = json.loads(output)
+                # the output can be quite long, truncate if needed
+                pretty_output = json.dumps(output_json, indent=2)
+                pretty_output = (
+                    pretty_output[:MAX_EVIDENCE_LENGTH] + "...[TRUNCATED]"
+                    if len(pretty_output) > MAX_EVIDENCE_LENGTH
+                    else pretty_output
+                )
+                evidence += f"Output: {pretty_output}\n\n"
+            except JSONDecodeError:
+                evidence += f"Output: {output}\n\n"
+    evidence += f"Final Output: {trace.final_output}"
     return evidence
 
 
@@ -130,7 +149,6 @@ def evaluate_checkpoint(
 
     """
     evidence = _construct_evidence(trace)
-    evidence = evidence.replace("<", "\\<").replace(">", "\\>")
     logger.debug(f"""Evidence\n{evidence}\n""")
     results = []
 
