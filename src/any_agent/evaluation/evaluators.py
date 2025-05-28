@@ -15,10 +15,9 @@ import re
 from json import JSONDecodeError
 from textwrap import dedent
 
-import evaluate.loading
 from litellm import completion
 
-from any_agent.evaluation.schemas import GroundTruthAnswer, GroundTruthAnswers
+from any_agent.evaluation.schemas import GroundTruthAnswer
 
 MAX_EVIDENCE_LENGTH: int = 500
 
@@ -164,35 +163,42 @@ def evaluate_checkpoint(
     return results
 
 
-def evaluate_qa_squad(
+def _calculate_f1_score(prediction: str, ground_truth: str) -> float:
+    """Calculate F1 score between prediction and ground truth strings."""
+    # Normalize strings: lowercase and roughly split into words
+    pred_tokens = set(prediction.lower().split())
+    truth_tokens = set(ground_truth.lower().split())
+
+    if not truth_tokens:
+        return 1.0 if not pred_tokens else 0.0
+
+    if not pred_tokens:
+        return 0.0
+
+    # Calculate precision and recall
+    common_tokens = pred_tokens.intersection(truth_tokens)
+    precision = len(common_tokens) / len(pred_tokens)
+    recall = len(common_tokens) / len(truth_tokens)
+
+    return 2 * (precision * recall) / (precision + recall)
+
+
+def evaluate_final_output(
     final_output: str,
     ground_truth_answer: GroundTruthAnswer,
 ) -> EvaluationResult:
-    """Directly compare answers using simple matching."""
-    metric = evaluate.loading.load("squad")
-    # format the answers so that they're dicts with 'id' and 'prediction' keys for hypo
-    # and the ref has id and answers keys
-    predictions = [{"id": "1", "prediction_text": final_output}]
-    ground_truth_answers: list[GroundTruthAnswers] = [
-        {
-            "id": "1",
-            "answers": {
-                "answer_start": [0],
-                "text": [str(ground_truth_answer["value"])],
-            },
-        },
-    ]
-    # Use the SQuAD metric to compare answers
-    result = metric.compute(
-        predictions=predictions,
-        references=ground_truth_answers,
-    )
+    """Compare answers using simple string matching and F1 score."""
+    ground_truth_text = str(ground_truth_answer["value"])
 
-    assert result, "The result of the evaluation is empty"
+    # Check for exact match (case-insensitive)
+    exact_match = final_output.strip().lower() == ground_truth_text.strip().lower()
+
+    # Calculate F1 score for partial matching
+    f1_score = _calculate_f1_score(final_output, ground_truth_text)
 
     return EvaluationResult(
-        passed=int(result["exact_match"]) == 1,
-        reason=f"Partial Match (F1) score is {round(result['f1'], 2)}",
+        passed=exact_match,
+        reason=f"Partial Match (F1) score is {round(f1_score, 2)}",
         criteria="Is the answer a direct match?",
         points=1,
     )

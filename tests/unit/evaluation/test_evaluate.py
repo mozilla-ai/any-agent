@@ -32,7 +32,7 @@ def test_evaluate_runs_all_evaluators(
             "any_agent.evaluation.evaluate.evaluate_checkpoint",
             mock_checkpoint_evaluate,
         ),
-        patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
+        patch("any_agent.evaluation.evaluate.evaluate_final_output", mock_qa_evaluate),
         patch("any_agent.evaluation.evaluators._construct_evidence"),
     ):
         evaluate(
@@ -73,7 +73,7 @@ def test_evaluate_when_no_final_output(
             "any_agent.evaluation.evaluate.evaluate_checkpoint",
             mock_checkpoint_evaluate,
         ),
-        patch("any_agent.evaluation.evaluate.evaluate_qa_squad", mock_qa_evaluate),
+        patch("any_agent.evaluation.evaluate.evaluate_final_output", mock_qa_evaluate),
         patch("any_agent.evaluation.evaluators._construct_evidence"),
     ):
         evaluate(
