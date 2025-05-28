@@ -193,11 +193,8 @@ def test_load_and_run_agent(
 
         assert_trace(agent_trace, agent_framework)
         assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
-        if (
-            agent_framework is not AgentFramework.GOOGLE
-        ):  # https://github.com/mozilla-ai/any-agent/issues/287
-            assert_cost(agent_trace)
-            assert_tokens(agent_trace)
+        assert_cost(agent_trace)
+        assert_tokens(agent_trace)
         assert_eval(agent_trace)
 
         if update_trace:
