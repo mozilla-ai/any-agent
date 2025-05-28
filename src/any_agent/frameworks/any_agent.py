@@ -195,6 +195,7 @@ class AnyAgent(ABC):
             app,
             host=serving_config.host,
             port=serving_config.port,
+            endpoint=serving_config.endpoint,
             log_level=serving_config.log_level,
         )
 
@@ -220,6 +221,7 @@ class AnyAgent(ABC):
             app,
             host=serving_config.host,
             port=serving_config.port,
+            endpoint=serving_config.endpoint,
             log_level=serving_config.log_level,
         )
 

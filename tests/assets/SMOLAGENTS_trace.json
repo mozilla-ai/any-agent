@@ -4,8 +4,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 13183491266286636008,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 8422125151711542905,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747991272742419982,
-      "end_time": 1747991275305797581,
+      "start_time": 1748365674693704035,
+      "end_time": 1748365675700905380,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 754210989416909809,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 4571058616609268698,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -34,13 +34,13 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.input.messages": "[{\"role\": \"system\", \"content\": \"Search the web to answer\"}, {\"role\": \"user\", \"content\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file\"}]",
+        "gen_ai.input.messages": "[{\"role\": \"system\", \"content\": \"Search the web to answer\"}, {\"role\": \"user\", \"content\": \"New task:\\nUse the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.\"}]",
         "gen_ai.output": "[{\"tool.name\": \"get_current_time\", \"tool.args\": \"{\\\"timezone\\\":\\\"America/New_York\\\"}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 312,
+        "gen_ai.usage.input_tokens": 200,
         "gen_ai.usage.output_tokens": 18,
         "gen_ai.response.model": "gpt-4.1-mini-2025-04-14",
-        "gen_ai.usage.input_cost": 0.0001248,
+        "gen_ai.usage.input_cost": 0.00007999999999999999,
         "gen_ai.usage.output_cost": 0.0000288
       },
       "links": [],
@@ -59,8 +59,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 13183491266286636008,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 8422125151711542905,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -69,15 +69,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747991275323394171,
-      "end_time": 1747991275326260932,
+      "start_time": 1748365675722953536,
+      "end_time": 1748365675725827065,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 6613576937591678063,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 9710820608079485968,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -91,8 +91,8 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\", \"sanitize_inputs_outputs\": true}",
         "gen_ai.tool.description": "Get current time in a specific timezones",
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-05-23T05:07:55-04:00\",\n  \"is_dst\": true\n}",
-        "gen_ai.output.type": "text"
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-05-27T13:07:55-04:00\",\n  \"is_dst\": true\n}",
+        "gen_ai.output.type": "json"
       },
       "links": [],
       "events": [],
@@ -110,8 +110,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 13183491266286636008,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 8422125151711542905,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -120,15 +120,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747991275334294354,
-      "end_time": 1747991276173770567,
+      "start_time": 1748365675735593346,
+      "end_time": 1748365676518608211,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 15567211083207318309,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 9858273502146310022,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -142,10 +142,10 @@
         "gen_ai.request.model": "gpt-4.1-mini",
         "gen_ai.output": "[{\"tool.name\": \"write_file\", \"tool.args\": \"{\\\"text\\\":\\\"2025\\\"}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 438,
+        "gen_ai.usage.input_tokens": 328,
         "gen_ai.usage.output_tokens": 15,
         "gen_ai.response.model": "gpt-4.1-mini-2025-04-14",
-        "gen_ai.usage.input_cost": 0.0001752,
+        "gen_ai.usage.input_cost": 0.0001312,
         "gen_ai.usage.output_cost": 0.000024
       },
       "links": [],
@@ -164,8 +164,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 13183491266286636008,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 8422125151711542905,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -174,15 +174,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747991276185051710,
-      "end_time": 1747991276185503431,
+      "start_time": 1748365676535209912,
+      "end_time": 1748365676535888387,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 9261286526032903138,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 1285692898097278132,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -195,7 +195,9 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "write_file",
         "gen_ai.tool.args": "{\"text\": \"2025\", \"sanitize_inputs_outputs\": true}",
-        "gen_ai.tool.description": "write the text to a file in the tmp_path directory"
+        "gen_ai.tool.description": "write the text to a file in the tmp_path directory",
+        "gen_ai.output": "{}",
+        "gen_ai.output.type": "json"
       },
       "links": [],
       "events": [],
@@ -213,8 +215,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 13183491266286636008,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 8422125151711542905,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -223,15 +225,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747991276191972862,
-      "end_time": 1747991276976378829,
+      "start_time": 1748365676543182288,
+      "end_time": 1748365678073813763,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 8272193139928082598,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 714963481464036856,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -243,13 +245,13 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.output": "[{\"tool.name\": \"final_answer\", \"tool.args\": \"{\\\"answer\\\":\\\"The year in the America/New_York timezone is 2025.\\\"}\"}]",
+        "gen_ai.output": "[{\"tool.name\": \"final_answer\", \"tool.args\": \"{\\\"answer\\\":\\\"Steps taken:\\\\n1. Retrieved the current date and time in the America/New_York timezone.\\\\n2. Extracted the year (2025) from the retrieved date and time.\\\\n3. Wrote the year (2025) to a file.\\\\n\\\\nThe year in the America/New_York timezone is 2025.\\\"}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 521,
-        "gen_ai.usage.output_tokens": 27,
+        "gen_ai.usage.input_tokens": 410,
+        "gen_ai.usage.output_tokens": 82,
         "gen_ai.response.model": "gpt-4.1-mini-2025-04-14",
-        "gen_ai.usage.input_cost": 0.0002084,
-        "gen_ai.usage.output_cost": 0.0000432
+        "gen_ai.usage.input_cost": 0.000164,
+        "gen_ai.usage.output_cost": 0.0001312
       },
       "links": [],
       "events": [],
@@ -267,8 +269,8 @@
       "name": "execute_tool final_answer",
       "kind": "internal",
       "parent": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 13183491266286636008,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 8422125151711542905,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -277,15 +279,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747991276995302847,
-      "end_time": 1747991276995353475,
+      "start_time": 1748365678095293762,
+      "end_time": 1748365678095380052,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 12821102185806441404,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 4679296598700836125,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -297,9 +299,9 @@
       "attributes": {
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "final_answer",
-        "gen_ai.tool.args": "{\"answer\": \"The year in the America/New_York timezone is 2025.\", \"sanitize_inputs_outputs\": true}",
+        "gen_ai.tool.args": "{\"answer\": \"Steps taken:\\n1. Retrieved the current date and time in the America/New_York timezone.\\n2. Extracted the year (2025) from the retrieved date and time.\\n3. Wrote the year (2025) to a file.\\n\\nThe year in the America/New_York timezone is 2025.\", \"sanitize_inputs_outputs\": true}",
         "gen_ai.tool.description": "Provides a final answer to the given problem.",
-        "gen_ai.output": "The year in the America/New_York timezone is 2025.",
+        "gen_ai.output": "Steps taken:\n1. Retrieved the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the retrieved date and time.\n3. Wrote the year (2025) to a file.\n\nThe year in the America/New_York timezone is 2025.",
         "gen_ai.output.type": "text"
       },
       "links": [],
@@ -328,15 +330,15 @@
           "entries": {}
         }
       },
-      "start_time": 1747991272741898445,
-      "end_time": 1747991277022649147,
+      "start_time": 1748365674693232580,
+      "end_time": 1748365678107675866,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 293543073089470190400644404600914487249,
-        "span_id": 13183491266286636008,
+        "trace_id": 109625046458324516017041965485036575723,
+        "span_id": 8422125151711542905,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -350,7 +352,7 @@
         "gen_ai.agent.name": "any_agent",
         "gen_ai.agent.description": "No description.",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.request.id": "9877711e-a971-43de-b30b-a687764cfbcd"
+        "gen_ai.request.id": "e19eb157-9c17-4c64-80f2-00c2d4972c93"
       },
       "links": [],
       "events": [],
@@ -365,5 +367,5 @@
       }
     }
   ],
-  "final_output": "The year in the America/New_York timezone is 2025."
+  "final_output": "Steps taken:\n1. Retrieved the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the retrieved date and time.\n3. Wrote the year (2025) to a file.\n\nThe year in the America/New_York timezone is 2025."
 }

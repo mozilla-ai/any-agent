@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import time
@@ -12,7 +13,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
 from any_agent.evaluation import EvaluationCase, evaluate
 from any_agent.evaluation.schemas import CheckpointCriteria, TraceEvaluationResult
-from any_agent.tracing.agent_trace import AgentTrace, CostInfo, TokenInfo
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 
 
 def uvx_installed() -> bool:
@@ -28,8 +29,22 @@ def uvx_installed() -> bool:
 
 
 def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> None:
-    assert isinstance(agent_trace, AgentTrace)
-    assert agent_trace.final_output
+    def assert_first_llm_call(llm_call: AgentSpan) -> None:
+        """Checks the `_set_llm_inputs` implemented by each framework's instrumentation."""
+        assert llm_call.attributes.get("gen_ai.input.messages", None) is not None
+        # input.messages should be a valid JSON string (list of dicts)
+        input_messages = json.loads(llm_call.attributes.get("gen_ai.input.messages"))
+        assert input_messages[0]["role"] == "system"
+        assert input_messages[1]["role"] == "user"
+
+    def assert_first_tool_execution(tool_execution: AgentSpan) -> None:
+        """Checks the tools setup implemented by each framework's instrumentation."""
+        assert tool_execution.attributes.get("gen_ai.tool.args", None) is not None
+        # tool.args should be a JSON string (dict)
+        args = json.loads(tool_execution.attributes.get("gen_ai.tool.args"))
+        assert "timezone" in args
+        assert isinstance(agent_trace, AgentTrace)
+        assert agent_trace.final_output
 
     agent_invocations = []
     llm_calls = []
@@ -46,11 +61,15 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
             raise AssertionError(msg)
 
     assert len(agent_invocations) == 1
+
     assert len(llm_calls) >= 2
+    assert_first_llm_call(llm_calls[0])
+
     if (
         agent_framework is not AgentFramework.LLAMA_INDEX
     ):  # https://github.com/run-llama/llama_index/issues/18776
         assert len(tool_executions) >= 2
+        assert_first_tool_execution(tool_executions[0])
 
 
 def assert_duration(agent_trace: AgentTrace, wall_time_s: float) -> None:
@@ -166,7 +185,7 @@ def test_load_and_run_agent(
     try:
         start_ns = time.time_ns()
         agent_trace = agent.run(
-            "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file",
+            "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.",
         )
         end_ns = time.time_ns()
 
@@ -185,6 +204,7 @@ def test_load_and_run_agent(
             trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
             with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
                 f.write(agent_trace.model_dump_json(indent=2))
+                f.write("\n")
             html_output = agent._exporter.console.export_html(inline_styles=True)  # type: ignore[union-attr]
             with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
                 f.write(html_output.replace("<!DOCTYPE html>", ""))

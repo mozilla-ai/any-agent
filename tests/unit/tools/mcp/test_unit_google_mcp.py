@@ -54,7 +54,7 @@ async def test_google_mcp_sse_integration(
         connection_params=google_sse_params.return_value  # type: ignore[attr-defined]
     )
 
-    google_toolset().load_tools.assert_called_once()  # type: ignore[operator]
+    google_toolset().get_tools.assert_called_once()  # type: ignore[operator]
 
 
 @pytest.mark.asyncio
