@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from contextlib import suppress
 from typing import Literal
 
-from pydantic import PrivateAttr
+from pydantic import Field, PrivateAttr
 
 from any_agent.config import AgentFramework, MCPSse, MCPStdio
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
@@ -62,6 +63,7 @@ class SmolagentsMCPSseConnection(SmolagentsMCPConnection):
 
 class SmolagentsMCPServerBase(_MCPServerBase["SmolagentsTool"], ABC):
     framework: Literal[AgentFramework.SMOLAGENTS] = AgentFramework.SMOLAGENTS
+    tools: Sequence["SmolagentsTool"] = Field(default_factory=list)
 
     def _check_dependencies(self) -> None:
         """Check if the required dependencies for the MCP server are available."""

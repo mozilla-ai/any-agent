@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from contextlib import suppress
 from typing import Literal
 
-from pydantic import PrivateAttr
+from pydantic import Field, PrivateAttr
 
 from any_agent.config import (
     AgentFramework,
@@ -72,6 +73,7 @@ class AgnoMCPSseConnection(AgnoMCPConnection):
 
 class AgnoMCPServerBase(_MCPServerBase["AgnoMCPTools"], ABC):
     framework: Literal[AgentFramework.AGNO] = AgentFramework.AGNO
+    tools: Sequence["AgnoMCPTools"] = Field(default_factory=list)
 
     def _check_dependencies(self) -> None:
         """Check if the required dependencies for the MCP server are available."""

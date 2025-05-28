@@ -2,12 +2,12 @@
 
 import os
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from contextlib import suppress
 from datetime import timedelta
 from typing import Any, Literal
 
-from pydantic import PrivateAttr
+from pydantic import Field, PrivateAttr
 
 from any_agent.config import AgentFramework, MCPSse, MCPStdio, Tool
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
@@ -140,6 +140,7 @@ class TinyAgentMCPSseConnection(TinyAgentMCPConnection):
 
 class TinyAgentMCPServerBase(_MCPServerBase["MCPTool"], ABC):
     framework: Literal[AgentFramework.TINYAGENT] = AgentFramework.TINYAGENT
+    tools: Sequence["MCPTool"] = Field(default_factory=list)
     libraries: str = "any-agent[mcp]"
 
     def _check_dependencies(self) -> None:

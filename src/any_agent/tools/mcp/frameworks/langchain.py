@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from contextlib import suppress
 from datetime import timedelta
 from typing import Any, Literal
 
-from pydantic import PrivateAttr
+from pydantic import Field, PrivateAttr
 
 from any_agent.config import AgentFramework, MCPSse, MCPStdio
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
@@ -79,6 +80,7 @@ class LangchainMCPSseConnection(LangchainMCPConnection):
 
 class LangchainMCPServerBase(_MCPServerBase["BaseTool"], ABC):
     framework: Literal[AgentFramework.LANGCHAIN] = AgentFramework.LANGCHAIN
+    tools: Sequence["BaseTool"] = Field(default_factory=list)
 
     def _check_dependencies(self) -> None:
         self.libraries = "any-agent[mcp,langchain]"

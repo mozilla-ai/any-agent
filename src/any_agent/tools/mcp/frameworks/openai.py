@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from contextlib import suppress
 from typing import TYPE_CHECKING, Literal
 
-from pydantic import PrivateAttr
+from pydantic import Field, PrivateAttr
 
 from any_agent.config import AgentFramework, MCPSse, MCPStdio
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
@@ -86,6 +87,7 @@ class OpenAIMCPSseConnection(OpenAIMCPConnection):
 
 class OpenAIMCPServerBase(_MCPServerBase["MCPTool"], ABC):
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
+    tools: Sequence["MCPTool"] = Field(default_factory=list)
 
     def _check_dependencies(self) -> None:
         """Check if the required dependencies for the MCP server are available."""
