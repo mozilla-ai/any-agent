@@ -34,7 +34,7 @@ agent = AnyAgent.create(
     As stated before, carefully consider whether you need to adopt this pattern to
     solve the task.
 
-See https://mozilla-ai.github.io/any-agent/agents/tools/#a2a
+Multi-agent an be implemented today using the A2A protocol (see [A2A docs](https://mozilla-ai.github.io/any-agent/serving/)) and will be also supported with Agent-As-Tools (follow progress at https://github.com/mozilla-ai/any-agent/issues/382).
 
 ### Framework Specific Arguments
 

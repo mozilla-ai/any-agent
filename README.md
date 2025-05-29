@@ -74,6 +74,11 @@ agent_trace = agent.run("Which Agent Framework is the best??")
 print(agent_trace)
 ```
 
+
+> [!TIP]
+> Multi-agent an be implemented today using the A2A protocol (see [A2A docs](https://mozilla-ai.github.io/any-agent/serving/)) 
+> and will be also supported with Agent-As-Tools (follow progress at https://github.com/mozilla-ai/any-agent/issues/382)
+
 ## Cookbooks
 
 Get started quickly with these practical examples:
