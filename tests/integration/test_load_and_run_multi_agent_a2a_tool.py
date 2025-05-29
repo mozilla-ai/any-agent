@@ -28,23 +28,12 @@ logger.setLevel(logging.DEBUG)
 )
 @pytest.mark.asyncio
 async def test_load_and_run_multi_agent(
-    agent_framework: AgentFramework,
+    agent_framework: AgentFramework, tool_agent_port: int
 ) -> None:
     """Tests that an agent contacts another using A2A using the adapter tool.
 
     Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
     """
-    if agent_framework in [
-        AgentFramework.GOOGLE,
-        AgentFramework.TINYAGENT,
-        AgentFramework.SMOLAGENTS,
-        AgentFramework.AGNO,
-        AgentFramework.OPENAI,
-        AgentFramework.LLAMA_INDEX,
-    ]:
-        pytest.skip(
-            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
-        )
     kwargs = {}
 
     kwargs["model_id"] = "gpt-4.1-nano"
@@ -64,7 +53,6 @@ async def test_load_and_run_multi_agent(
     served_task = None
 
     try:
-        tool_agent_port = 5800
         tool_agent_endpoint = "tool_agent"
 
         # DATE AGENT
