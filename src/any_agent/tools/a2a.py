@@ -67,12 +67,9 @@ async def a2a_tool(
             result: str = response.model_dump_json()
             return result
 
-    if toolname:
-        _send_query.__name__ = f"call_{re.sub(r'\s+', '_', toolname.strip())}"
-    else:
-        _send_query.__name__ = (
-            f"call_{re.sub(r'\s+', '_', a2a_agent_card.name.strip())}"
-        )
+    new_name = toolname or a2a_agent_card.name
+    new_name = re.sub(r"\s+", "_", new_name.strip())
+    _send_query.__name__ = f"call_{new_name}"
     _send_query.__doc__ = f"""{a2a_agent_card.description}
         Send a query to the agent named {a2a_agent_card.name}.
 
