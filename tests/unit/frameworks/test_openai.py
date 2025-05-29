@@ -30,7 +30,6 @@ def test_load_openai_default() -> None:
             name="any_agent",
             model=mock_litellm_model.return_value,
             instructions=None,
-            handoffs=[],
             tools=[],
             mcp_servers=[],
         )
@@ -120,7 +119,6 @@ def test_load_openai_with_mcp_server() -> None:
             name="any_agent",
             model=mock_litellm_model.return_value,
             instructions=None,
-            handoffs=[],
             tools=[mock_function_tool(search_web)],
             mcp_servers=[mock_mcp_server.server],
         )

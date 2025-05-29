@@ -28,7 +28,6 @@ def test_load_google_default() -> None:
             instruction="",
             model=mock_model(model="gpt-4o"),
             tools=[],
-            sub_agents=[],
             output_key="response",
         )
 
