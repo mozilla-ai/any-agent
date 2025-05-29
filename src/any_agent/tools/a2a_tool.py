@@ -1,5 +1,6 @@
 # adapted from https://github.com/google/a2a-python/blob/main/examples/helloworld/test_client.py
 
+import re
 from collections.abc import Callable, Coroutine
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any
@@ -24,11 +25,15 @@ with suppress(ImportError):
     a2a_tool_available = True
 
 
-async def a2a_query(url: str) -> Callable[[str], Coroutine[Any, Any, str]]:
+async def a2a_tool(
+    url: str, toolname: str | None = None
+) -> Callable[[str], Coroutine[Any, Any, str]]:
     """Perform a query using A2A to another agent.
 
     Args:
         url (str): The url in which the A2A agent is located.
+        toolname (str): The name for the created tool. Defaults to `call_{agent name in card}`.
+            Leading and trailing whitespace are removed. Whitespace in the middle is replaced by `_`.
 
     Returns:
         A Callable that takes a query and returns the agent response.
@@ -62,6 +67,12 @@ async def a2a_query(url: str) -> Callable[[str], Coroutine[Any, Any, str]]:
             result: str = response.model_dump_json()
             return result
 
+    if toolname:
+        _send_query.__name__ = f"call_{re.sub(r'\s+', '_', toolname.strip())}"
+    else:
+        _send_query.__name__ = (
+            f"call_{re.sub(r'\s+', '_', a2a_agent_card.name.strip())}"
+        )
     _send_query.__doc__ = f"""{a2a_agent_card.description}
         Send a query to the agent named {a2a_agent_card.name}.
 
