@@ -58,8 +58,6 @@ See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) 
 export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
 ```
 
-### Single agent
-
 ```python
 from any_agent.tools import search_web, visit_webpage
 
@@ -70,37 +68,6 @@ agent = AnyAgent.create(
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
     )
-)
-
-agent_trace = agent.run("Which Agent Framework is the best??")
-print(agent_trace)
-```
-
-### Multi-agent
-
-```python
-from any_agent.tools import search_web, visit_webpage
-
-agent = AnyAgent.create(
-    "openai", # See all options in https://mozilla-ai.github.io/any-agent/
-    AgentConfig(
-        model_id="gpt-4.1-mini",
-        instructions="You are the main agent. Use the other available agents to find an answer",
-    ),
-    managed_agents=[
-        AgentConfig(
-            name="search_web_agent",
-            description="An agent that can search the web",
-            model_id="gpt-4.1-nano",
-            tools=[search_web]
-        ),
-        AgentConfig(
-            name="visit_webpage_agent",
-            description="An agent that can visit webpages",
-            model_id="gpt-4.1-nano",
-            tools=[visit_webpage]
-        )
-    ]
 )
 
 agent_trace = agent.run("Which Agent Framework is the best??")

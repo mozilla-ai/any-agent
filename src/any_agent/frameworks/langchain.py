@@ -1,8 +1,6 @@
-from collections.abc import Sequence
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
-from any_agent.logging import logger
 
 from .any_agent import AnyAgent
 
@@ -10,7 +8,6 @@ try:
     from langchain_core.language_models import LanguageModelLike
     from langchain_litellm import ChatLiteLLM
     from langgraph.prebuilt import create_react_agent
-    from langgraph_swarm import create_handoff_tool, create_swarm
 
     DEFAULT_AGENT_TYPE = create_react_agent
     DEFAULT_MODEL_TYPE = ChatLiteLLM
@@ -20,6 +17,8 @@ except ImportError:
     langchain_available = False
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from langchain_core.language_models import LanguageModelLike
     from langchain_core.messages.base import BaseMessage
     from langgraph.graph.graph import CompiledGraph
@@ -31,10 +30,9 @@ class LangchainAgent(AnyAgent):
     def __init__(
         self,
         config: AgentConfig,
-        managed_agents: Sequence[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents, tracing)
+        super().__init__(config, tracing)
         self._agent: CompiledGraph | None = None
         self._tools: Sequence[Any] = []
 
@@ -64,58 +62,15 @@ class LangchainAgent(AnyAgent):
 
         imported_tools, _ = await self._load_tools(self.config.tools)
 
-        if self.managed_agents:
-            swarm = []
-            managed_names = []
-            for n, managed_agent in enumerate(self.managed_agents):
-                managed_tools, _ = await self._load_tools(managed_agent.tools)
-                name = managed_agent.name
-                if not name or name == "any_agent":
-                    logger.warning(
-                        "Overriding name for managed_agent. Can't use the default.",
-                    )
-                    name = f"managed_agent_{n}"
-                managed_names.append(name)
-
-                agent_type = managed_agent.agent_type or DEFAULT_AGENT_TYPE
-                instance = agent_type(
-                    name=name,
-                    model=self._get_model(managed_agent),
-                    tools=[
-                        *managed_tools,
-                        create_handoff_tool(agent_name=self.config.name),
-                    ],
-                    prompt=managed_agent.instructions,
-                    **managed_agent.agent_args or {},
-                )
-                swarm.append(instance)
-
-            imported_tools = [
-                create_handoff_tool(agent_name=managed_name)
-                for managed_name in managed_names
-            ]
-            agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
-            self._main_agent_tools = imported_tools
-            main_agent = agent_type(
-                name=self.config.name,
-                model=self._get_model(self.config),
-                tools=imported_tools,
-                prompt=self.config.instructions,
-                **self.config.agent_args or {},
-            )
-            swarm.append(main_agent)
-            workflow = create_swarm(swarm, default_active_agent=self.config.name)
-            self._agent = workflow.compile()
-        else:
-            self._main_agent_tools = imported_tools
-            agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
-            self._agent = agent_type(
-                name=self.config.name,
-                model=self._get_model(self.config),
-                tools=imported_tools,
-                prompt=self.config.instructions,
-                **self.config.agent_args or {},
-            )
+        self._main_agent_tools = imported_tools
+        agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+        self._agent = agent_type(
+            name=self.config.name,
+            model=self._get_model(self.config),
+            tools=imported_tools,
+            prompt=self.config.instructions,
+            **self.config.agent_args or {},
+        )
         # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph,
         # so we'll store a list of them in this class
         self._tools = imported_tools

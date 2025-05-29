@@ -38,39 +38,3 @@ agent.run(
     max_turns=3
 )
 ```
-
-### Using `handoff`
-
-```python
-from any_agent import AnyAgent, AgentConfig
-from any_agent.tools import search_web, show_final_output, visit_webpage
-
-main_agent = AgentConfig(
-    model_id="o3-mini",
-)
-
-managed_agents = [
-    AgentConfig(
-        model_id="gpt-4o",
-        name="search-web-agent",
-        tools=[
-            search_web,
-            visit_webpage,
-        ],
-    ),
-    AgentConfig(
-        model_id="gpt-4o-mini",
-        name="communication-agent",
-        tools=[show_final_output],
-        agent_args={
-            "handoff": True
-        }
-    ),
-]
-
-AnyAgent.create(
-    "openai",
-    main_agent,
-    managed_agents=managed_agents,
-)
-```

@@ -7,7 +7,6 @@ from .any_agent import AnyAgent
 try:
     from agents import (
         Agent,
-        Handoff,
         Model,
         ModelSettings,
         Runner,
@@ -31,10 +30,9 @@ class OpenAIAgent(AnyAgent):
     def __init__(
         self,
         config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents, tracing)
+        super().__init__(config, tracing)
         self._agent: Agent | None = None
 
     @property
@@ -65,39 +63,6 @@ class OpenAIAgent(AnyAgent):
         tools, mcp_servers = await self._load_tools(self.config.tools)
         tools = self._filter_mcp_tools(tools, mcp_servers)
 
-        handoffs = list[Agent[Any] | Handoff[Any]]()
-        if self.managed_agents:
-            for managed_agent in self.managed_agents:
-                managed_tools, managed_mcp_servers = await self._load_tools(
-                    managed_agent.tools
-                )
-                managed_tools = self._filter_mcp_tools(managed_tools, mcp_servers)
-                managed_agent_args = managed_agent.agent_args or {}
-                handoff = managed_agent_args.pop("handoff", None)
-                if managed_agent.model_args:
-                    managed_agent_args["model_settings"] = managed_agent.model_args
-                instance = Agent(
-                    name=managed_agent.name,
-                    instructions=managed_agent.instructions,
-                    model=self._get_model(managed_agent),
-                    tools=managed_tools,
-                    mcp_servers=[
-                        managed_mcp_server.server
-                        for managed_mcp_server in managed_mcp_servers
-                    ],
-                    **managed_agent_args,
-                )
-                if handoff:
-                    handoffs.append(instance)
-                else:
-                    tools.append(
-                        instance.as_tool(
-                            tool_name=instance.name,
-                            tool_description=managed_agent.description
-                            or f"Use the agent: {managed_agent.name}",
-                        ),
-                    )
-
         kwargs_ = self.config.agent_args or {}
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
@@ -107,7 +72,6 @@ class OpenAIAgent(AnyAgent):
             name=self.config.name,
             instructions=self.config.instructions,
             model=self._get_model(self.config),
-            handoffs=handoffs,
             tools=tools,
             mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
             **kwargs_,

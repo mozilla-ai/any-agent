@@ -25,7 +25,6 @@ def test_load_smolagent_default() -> None:
         mock_agent.assert_called_once_with(
             name="any_agent",
             model=mock_model.return_value,
-            managed_agents=[],
             verbosity_level=-1,
             tools=[],
         )
@@ -56,7 +55,6 @@ def test_load_smolagent_with_api_base() -> None:
         mock_agent.assert_called_once_with(
             name="any_agent",
             model=mock_model.return_value,
-            managed_agents=[],
             tools=[],
             verbosity_level=-1,
         )

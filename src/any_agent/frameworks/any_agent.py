@@ -40,11 +40,9 @@ class AnyAgent(ABC):
     def __init__(
         self,
         config: AgentConfig,
-        managed_agents: Sequence[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ):
         self.config = config
-        self.managed_agents = managed_agents
 
         self._mcp_servers: list[_MCPServerBase[Any]] = []
         self._main_agent_tools: list[Any] = []
@@ -102,7 +100,6 @@ class AnyAgent(ABC):
         cls,
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
@@ -110,7 +107,6 @@ class AnyAgent(ABC):
             cls.create_async(
                 agent_framework=agent_framework,
                 agent_config=agent_config,
-                managed_agents=managed_agents,
                 tracing=tracing,
             )
         )
@@ -120,12 +116,11 @@ class AnyAgent(ABC):
         cls,
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
-        agent = agent_cls(agent_config, managed_agents=managed_agents, tracing=tracing)
+        agent = agent_cls(agent_config, tracing=tracing)
         await agent._load_agent()
         return agent
 
