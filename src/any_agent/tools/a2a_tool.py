@@ -25,7 +25,7 @@ with suppress(ImportError):
     a2a_tool_available = True
 
 
-async def a2a_tool(url: str) -> Callable[[str], Coroutine[Any, Any, str]]:
+async def a2a_tool(url: str, toolname: str | None = None) -> Callable[[str], Coroutine[Any, Any, str]]:
     """Perform a query using A2A to another agent.
 
     Args:
@@ -63,7 +63,10 @@ async def a2a_tool(url: str) -> Callable[[str], Coroutine[Any, Any, str]]:
             result: str = response.model_dump_json()
             return result
 
-    _send_query.__name__ = f"call_{re.sub(r'\s+', '_', a2a_agent_card.name.strip())}"
+    if toolname:
+        _send_query.__name__ = f"call_{re.sub(r'\s+', '_', toolname.strip())}"
+    else:
+        _send_query.__name__ = f"call_{re.sub(r'\s+', '_', a2a_agent_card.name.strip())}"
     _send_query.__doc__ = f"""{a2a_agent_card.description}
         Send a query to the agent named {a2a_agent_card.name}.
 
