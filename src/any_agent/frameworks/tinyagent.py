@@ -106,22 +106,16 @@ class TinyAgent(AnyAgent):
     def __init__(
         self,
         config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ) -> None:
         """Initialize the TinyAgent.
 
         Args:
             config: Agent configuration
-            managed_agents: Optional list of managed agent configurations
             tracing: Optional tracing configuration
 
         """
-        # we don't yet support multi-agent in tinyagent
-        if managed_agents:
-            msg = "Managed agents are not supported in TinyAgent."
-            raise ValueError(msg)
-        super().__init__(config, managed_agents=managed_agents, tracing=tracing)
+        super().__init__(config, tracing=tracing)
         self.messages: list[dict[str, Any]] = []
         self.instructions = config.instructions or DEFAULT_SYSTEM_PROMPT
         self.api_key = config.api_key

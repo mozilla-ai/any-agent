@@ -1,9 +1,14 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 
 from pydantic import BaseModel, ConfigDict
 from typing_extensions import TypedDict
 
 from any_agent.tracing.agent_trace import AgentTrace
+
+
+class AgentOutput(BaseModel):
+    passed: bool
+    reasoning: str
 
 
 class EvaluationResult(BaseModel):
@@ -12,7 +17,7 @@ class EvaluationResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
     passed: bool
     reason: str
-    criteria: str
+    criteria: str | Callable[[AgentTrace], AgentOutput]
     points: int
 
 
@@ -30,7 +35,7 @@ class CheckpointCriteria(BaseModel):
     """Represents a checkpoint criteria with a description."""
 
     model_config = ConfigDict(extra="forbid")
-    criteria: str
+    criteria: str | Callable[[AgentTrace], AgentOutput]
     points: int
 
 

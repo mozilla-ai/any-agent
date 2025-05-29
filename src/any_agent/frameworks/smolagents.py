@@ -24,10 +24,9 @@ class SmolagentsAgent(AnyAgent):
     def __init__(
         self,
         config: AgentConfig,
-        managed_agents: list[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents, tracing)
+        super().__init__(config, tracing)
         self._agent: MultiStepAgent | None = None
 
     @property
@@ -54,25 +53,6 @@ class SmolagentsAgent(AnyAgent):
 
         tools, _ = await self._load_tools(self.config.tools)
 
-        managed_agents_instanced = []
-        if self.managed_agents:
-            for managed_agent in self.managed_agents:
-                agent_type = managed_agent.agent_type or DEFAULT_AGENT_TYPE
-                managed_tools, _ = await self._load_tools(managed_agent.tools)
-                managed_agent_instance = agent_type(
-                    name=managed_agent.name,
-                    model=self._get_model(managed_agent),
-                    tools=managed_tools,
-                    verbosity_level=-1,  # OFF
-                    description=managed_agent.description
-                    or f"Use the agent: {managed_agent.name}",
-                )
-                if managed_agent.instructions:
-                    managed_agent_instance.prompt_templates["system_prompt"] = (
-                        managed_agent.instructions
-                    )
-                managed_agents_instanced.append(managed_agent_instance)
-
         main_agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
 
         self._main_agent_tools = tools
@@ -81,7 +61,6 @@ class SmolagentsAgent(AnyAgent):
             model=self._get_model(self.config),
             tools=tools,
             verbosity_level=-1,  # OFF
-            managed_agents=managed_agents_instanced,
             **self.config.agent_args or {},
         )
 

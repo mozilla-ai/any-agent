@@ -34,29 +34,7 @@ agent = AnyAgent.create(
     As stated before, carefully consider whether you need to adopt this pattern to
     solve the task.
 
-```python
-agent = AnyAgent.create(
-    "openai",  # See other options under `Frameworks`
-    AgentConfig(
-        model_id="gpt-4.1-mini",
-        instructions="You are the main agent. Use the other available agents to find an answer",
-    ),
-    managed_agents=[
-        AgentConfig(
-            name="search_web_agent",
-            description="An agent that can search the web",
-            model_id="gpt-4.1-nano",
-            tools=[search_web]
-        ),
-        AgentConfig(
-            name="visit_webpage_agent",
-            description="An agent that can visit webpages",
-            model_id="gpt-4.1-nano",
-            tools=[visit_webpage]
-        )
-    ]
-)
-```
+Multi-agent can be implemented today using the A2A protocol (see [A2A docs](https://mozilla-ai.github.io/any-agent/serving/)) and will be also supported with Agent-As-Tools (follow progress at https://github.com/mozilla-ai/any-agent/issues/382).
 
 ### Framework Specific Arguments
 
@@ -115,9 +93,6 @@ agent = AnyAgent.create(
 
 ## Running Agents
 
-Regardless of the definition (single-agent or multi-agent), you can run the
-agent as follows:
-
 ```python
 agent_trace = agent.run("Which Agent Framework is the best??")
 print(agent_trace.final_output)
@@ -137,22 +112,9 @@ async def main():
         "openai",
         AgentConfig(
             model_id="gpt-4.1-mini",
-            instructions="You are the main agent. Use the other available agents to find an answer",
-        ),
-        managed_agents=[
-            AgentConfig(
-                name="search_web_agent",
-                description="An agent that can search the web",
-                model_id="gpt-4.1-nano",
-                tools=[search_web]
-            ),
-            AgentConfig(
-                name="visit_webpage_agent",
-                description="An agent that can visit webpages",
-                model_id="gpt-4.1-nano",
-                tools=[visit_webpage]
-            )
-        ]
+            instructions="Use the tools to find an answer",
+            tools=[search_web, visit_webpage]
+        )
     )
 
     agent_trace = await agent.run_async("Which Agent Framework is the best??")

@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
@@ -10,7 +9,6 @@ try:
     from google.adk.agents.llm_agent import LlmAgent
     from google.adk.models.lite_llm import LiteLlm
     from google.adk.runners import InMemoryRunner
-    from google.adk.tools.agent_tool import AgentTool
     from google.genai import types
 
     DEFAULT_MODEL_TYPE = LiteLlm
@@ -28,10 +26,9 @@ class GoogleAgent(AnyAgent):
     def __init__(
         self,
         config: AgentConfig,
-        managed_agents: Sequence[AgentConfig] | None = None,
         tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, managed_agents, tracing)
+        super().__init__(config, tracing)
         self._agent: LlmAgent | None = None
 
     @property
@@ -56,27 +53,6 @@ class GoogleAgent(AnyAgent):
 
         tools, _ = await self._load_tools(self.config.tools)
 
-        sub_agents_instanced = []
-        if self.managed_agents:
-            for managed_agent in self.managed_agents:
-                managed_tools, _ = await self._load_tools(managed_agent.tools)
-
-                agent_type = managed_agent.agent_type or LlmAgent
-
-                managed_agent_args = managed_agent.agent_args or {}
-                handoff = managed_agent_args.pop("handoff", None)
-                instance = agent_type(
-                    name=managed_agent.name,
-                    instruction=managed_agent.instructions or "",
-                    model=self._get_model(managed_agent),
-                    tools=managed_tools,
-                    **managed_agent_args or {},
-                )
-
-                if handoff:
-                    sub_agents_instanced.append(instance)
-                else:
-                    tools.append(AgentTool(instance))
         agent_type = self.config.agent_type or LlmAgent
 
         self._main_agent_tools = tools
@@ -85,7 +61,6 @@ class GoogleAgent(AnyAgent):
             instruction=self.config.instructions or "",
             model=self._get_model(self.config),
             tools=tools,
-            sub_agents=sub_agents_instanced,
             **self.config.agent_args or {},
             output_key="response",
         )

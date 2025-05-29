@@ -5,10 +5,7 @@ import pytest
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import MCPStdio
 from any_agent.tools import (
-    ask_user_verification,
     search_web,
-    show_final_output,
-    visit_webpage,
 )
 
 
@@ -33,7 +30,6 @@ def test_load_openai_default() -> None:
             name="any_agent",
             model=mock_litellm_model.return_value,
             instructions=None,
-            handoffs=[],
             tools=[],
             mcp_servers=[],
         )
@@ -123,96 +119,8 @@ def test_load_openai_with_mcp_server() -> None:
             name="any_agent",
             model=mock_litellm_model.return_value,
             instructions=None,
-            handoffs=[],
             tools=[mock_function_tool(search_web)],
             mcp_servers=[mock_mcp_server.server],
-        )
-
-
-def test_load_openai_multiagent() -> None:
-    mock_agent = MagicMock()
-    mock_function_tool = MagicMock()
-    mock_litellm_model = MagicMock()
-    mock_litellm_model.return_value = MagicMock()
-    with (
-        patch("any_agent.frameworks.openai.Agent", mock_agent),
-        patch("agents.function_tool", mock_function_tool),
-        patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_litellm_model),
-    ):
-        main_agent = AgentConfig(
-            model_id="o3-mini",
-        )
-
-        managed_agents = [
-            AgentConfig(
-                model_id="gpt-4o-mini",
-                name="user-verification-agent",
-                tools=[ask_user_verification],
-            ),
-            AgentConfig(
-                model_id="gpt-4o",
-                name="search-web-agent",
-                tools=[
-                    search_web,
-                    visit_webpage,
-                ],
-            ),
-            AgentConfig(
-                model_id="gpt-4o-mini",
-                name="communication-agent",
-                tools=[show_final_output],
-                agent_args={"handoff": True},
-            ),
-        ]
-
-        AnyAgent.create(
-            AgentFramework.OPENAI,
-            main_agent,
-            managed_agents=managed_agents,
-        )
-        mock_litellm_model.assert_any_call(
-            model="gpt-4o-mini", base_url=None, api_key=None
-        )
-        mock_agent.assert_any_call(
-            model=mock_litellm_model.return_value,
-            instructions=None,
-            name="user-verification-agent",
-            tools=[
-                mock_function_tool(ask_user_verification),
-            ],
-            mcp_servers=[],
-        )
-        mock_litellm_model.assert_any_call(model="gpt-4o", base_url=None, api_key=None)
-        mock_agent.assert_any_call(
-            model=mock_litellm_model.return_value,
-            instructions=None,
-            name="search-web-agent",
-            tools=[mock_function_tool(search_web), mock_function_tool(visit_webpage)],
-            mcp_servers=[],
-        )
-
-        mock_litellm_model.assert_any_call(
-            model="gpt-4o-mini", base_url=None, api_key=None
-        )
-        mock_agent.assert_any_call(
-            model=mock_litellm_model.return_value,
-            instructions=None,
-            name="communication-agent",
-            tools=[mock_function_tool(show_final_output)],
-            mcp_servers=[],
-        )
-
-        mock_litellm_model.assert_any_call(model="o3-mini", base_url=None, api_key=None)
-        mock_agent.assert_any_call(
-            model=mock_litellm_model.return_value,
-            instructions=None,
-            name="any_agent",
-            handoffs=[mock_agent.return_value],
-            tools=[
-                mock_agent.return_value.as_tool.return_value,
-                mock_agent.return_value.as_tool.return_value,
-            ],
-            mcp_servers=[],
         )
 
 
