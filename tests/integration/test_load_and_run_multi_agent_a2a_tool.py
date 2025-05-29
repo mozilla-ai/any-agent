@@ -7,7 +7,7 @@ from rich.logging import RichHandler
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import ServingConfig, TracingConfig
-from any_agent.tools import a2a_query
+from any_agent.tools import a2a_tool
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.conftest import build_tree
 
@@ -114,7 +114,7 @@ async def test_load_and_run_multi_agent(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
             tools=[
-                await a2a_query(
+                await a2a_tool(
                     f"http://localhost:{tool_agent_port}/{tool_agent_endpoint}"
                 )
             ],
@@ -147,7 +147,7 @@ async def test_load_and_run_multi_agent(
         )
         assert any(
             span.is_tool_execution()
-            and span.attributes.get("gen_ai.tool.name", None) == "_send_query"
+            and span.attributes.get("gen_ai.tool.name", None) == "call_date_agent"
             for span in agent_trace.spans
         )
 
