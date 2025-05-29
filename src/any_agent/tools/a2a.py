@@ -26,7 +26,7 @@ with suppress(ImportError):
 
 
 async def a2a_tool(
-    url: str, toolname: str | None = None
+    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
 ) -> Callable[[str], Coroutine[Any, Any, str]]:
     """Perform a query using A2A to another agent.
 
@@ -34,6 +34,7 @@ async def a2a_tool(
         url (str): The url in which the A2A agent is located.
         toolname (str): The name for the created tool. Defaults to `call_{agent name in card}`.
             Leading and trailing whitespace are removed. Whitespace in the middle is replaced by `_`.
+        http_kwargs (dict): Additional kwargs to pass to the httpx client.
 
     Returns:
         An async `Callable` that takes a query and returns the agent response.
@@ -63,7 +64,9 @@ async def a2a_tool(
                 id=str(uuid4().hex),
             )
             # TODO check how to capture exceptions and pass them on to the enclosing framework
-            response = await client.send_message(send_message_payload)
+            response = await client.send_message(
+                send_message_payload, http_kwargs=http_kwargs
+            )
             result: str = response.model_dump_json()
             return result
 
