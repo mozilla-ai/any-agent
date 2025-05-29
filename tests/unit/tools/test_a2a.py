@@ -3,14 +3,12 @@ from unittest.mock import patch
 
 from a2a.types import AgentCapabilities, AgentCard
 
-from any_agent.tools.a2a_tool import a2a_tool
+from any_agent.tools.a2a import a2a_tool
 
 
 def test_a2a_tool_name_default():
     fun_name = "some_name"
-    with patch(
-        "any_agent.tools.a2a_tool.A2ACardResolver.get_agent_card"
-    ) as agent_card_mock:
+    with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
         agent_card_mock.return_value = AgentCard(
             capabilities=AgentCapabilities(),
             defaultInputModes=[],
@@ -27,9 +25,7 @@ def test_a2a_tool_name_default():
 
 def test_a2a_tool_name_specific():
     other_name = "other_name"
-    with patch(
-        "any_agent.tools.a2a_tool.A2ACardResolver.get_agent_card"
-    ) as agent_card_mock:
+    with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
         agent_card_mock.return_value = AgentCard(
             capabilities=AgentCapabilities(),
             defaultInputModes=[],
@@ -47,9 +43,7 @@ def test_a2a_tool_name_specific():
 def test_a2a_tool_name_whitespace():
     fun_name = "  some_n  ame  "
     corrected_fun_name = "some_n_ame"
-    with patch(
-        "any_agent.tools.a2a_tool.A2ACardResolver.get_agent_card"
-    ) as agent_card_mock:
+    with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
         agent_card_mock.return_value = AgentCard(
             capabilities=AgentCapabilities(),
             defaultInputModes=[],
@@ -67,9 +61,7 @@ def test_a2a_tool_name_whitespace():
 def test_a2a_tool_name_exotic_whitespace():
     fun_name = " \n so \t me_n\t ame  \n"
     corrected_fun_name = "so_me_n_ame"
-    with patch(
-        "any_agent.tools.a2a_tool.A2ACardResolver.get_agent_card"
-    ) as agent_card_mock:
+    with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
         agent_card_mock.return_value = AgentCard(
             capabilities=AgentCapabilities(),
             defaultInputModes=[],
@@ -87,9 +79,7 @@ def test_a2a_tool_name_exotic_whitespace():
 def test_a2a_tool_name_specific_whitespace():
     other_name = " \n oth \t er_n\t ame  \n"
     corrected_other_name = "oth_er_n_ame"
-    with patch(
-        "any_agent.tools.a2a_tool.A2ACardResolver.get_agent_card"
-    ) as agent_card_mock:
+    with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
         agent_card_mock.return_value = AgentCard(
             capabilities=AgentCapabilities(),
             defaultInputModes=[],

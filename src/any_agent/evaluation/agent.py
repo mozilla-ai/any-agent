@@ -49,7 +49,9 @@ class AgentTooling:
         """
         evidence = ""
         for idx, span in enumerate(self.trace.spans):
-            evidence += f"### Step {idx}\n"
+            evidence += (
+                f"### Step {idx}: {span.attributes.get('gen_ai.operation.name')}\n"
+            )
             if idx == 0:
                 input_val = span.attributes.get("gen_ai.input.messages")
                 # messages should always be json

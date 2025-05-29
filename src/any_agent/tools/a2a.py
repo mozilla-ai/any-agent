@@ -36,7 +36,7 @@ async def a2a_tool(
             Leading and trailing whitespace are removed. Whitespace in the middle is replaced by `_`.
 
     Returns:
-        A Callable that takes a query and returns the agent response.
+        An async `Callable` that takes a query and returns the agent response.
 
     """
     if not a2a_tool_available:

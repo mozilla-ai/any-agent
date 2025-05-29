@@ -18,6 +18,7 @@ def test_files_all(fpath: pathlib.Path) -> None:
     mock_create = MagicMock(return_value=mock_agent)
     mock_eval = MagicMock()
     mock_eval.return_value = MagicMock(spec=TraceEvaluationResult)
+    mock_a2a_tool = AsyncMock()
 
     mock_create_async = AsyncMock()
     with (
@@ -25,5 +26,6 @@ def test_files_all(fpath: pathlib.Path) -> None:
         patch("any_agent.AnyAgent.create", mock_create),
         patch("any_agent.evaluation.evaluate", mock_eval),
         patch("any_agent.AnyAgent.create_async", mock_create_async),
+        patch("any_agent.tools.a2a_tool", mock_a2a_tool),
     ):
         check_md_file(fpath=fpath, memory=True)

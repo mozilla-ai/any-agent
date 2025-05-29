@@ -1,4 +1,4 @@
-from .a2a_tool import a2a_tool
+from .a2a import a2a_tool
 from .mcp import (
     MCPServer,
     _get_mcp_server,
