@@ -77,14 +77,14 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
 
     More information about serving agents over the A2A protocol can be found [here](../serving.md)
 
-`any-agent` provides a tool to wrap a connection to another another agent served over the A2A protocol, by invoking the `any_agent.tools.a2a_query` function, as shown in the following example:
+`any-agent` provides a tool to wrap a connection to another another agent served over the A2A protocol, by invoking the `any_agent.tools.a2a_tool` function, as shown in the following example:
 
 ```python
-from any_agent.tools import a2a_query
+from any_agent.tools import a2a_tool
 import asyncio
 
 loop = asyncio.new_event_loop()
-some_agent_tool = loop.run_until_complete(a2a_query("http://example.net:10000/some_agent"))
+some_agent_tool = loop.run_until_complete(a2a_tool("http://example.net:10000/some_agent"))
 
 agent_cfg = AgentConfig(
     instructions="Use the available tools to obtain additional information to answer the query.",
@@ -94,4 +94,4 @@ agent_cfg = AgentConfig(
 )
 ```
 
-The tool description is derived from the agent card, which is retrieved when this function is invoked. Note that this function is currently asynchronous. View the docstring in [a2a_query][any_agent.tools.a2a_query] for a description of the arguments available .
+The tool description is derived from the agent card, which is retrieved when this function is invoked. Note that this function is currently asynchronous. View the docstring in [a2a_tool][any_agent.tools.a2a_tool] for a description of the arguments available .
