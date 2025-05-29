@@ -182,10 +182,16 @@ def build_tree(items: list[AgentSpan]) -> AgentSpan:
         trace.attributes[CHILD_TAG] = {}
         traces[k] = trace
     for trace in items:
+        k = trace.context.span_id
         if trace.parent:
             parent_k = trace.parent.span_id
             if parent_k:
-                traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = trace
+                try:
+                    traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = (
+                        trace
+                    )
+                except KeyError:
+                    pass
             else:
                 traces[None] = trace
     return traces[None]

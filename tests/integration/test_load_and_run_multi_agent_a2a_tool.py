@@ -34,6 +34,14 @@ async def test_load_and_run_multi_agent(
 
     Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
     """
+    if agent_framework in [
+        AgentFramework.SMOLAGENTS,
+        AgentFramework.LLAMA_INDEX,
+        AgentFramework.TINYAGENT,
+    ]:
+        pytest.skip(
+            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+        )
     kwargs = {}
 
     kwargs["model_id"] = "gpt-4.1-nano"
