@@ -1,7 +1,7 @@
 from any_agent.evaluation.evaluation_case import EvaluationCase
 from any_agent.evaluation.evaluators import (
-    evaluate_checkpoint,
-    evaluate_qa_squad,
+    evaluate_checkpoints,
+    evaluate_final_output,
 )
 from any_agent.evaluation.schemas import TraceEvaluationResult
 from any_agent.logging import logger
@@ -12,14 +12,14 @@ def evaluate(
     evaluation_case: EvaluationCase,
     trace: AgentTrace,
 ) -> TraceEvaluationResult:
-    checkpoint_results = evaluate_checkpoint(
+    checkpoint_results = evaluate_checkpoints(
         model=evaluation_case.llm_judge,
         trace=trace,
         checkpoints=evaluation_case.checkpoints,
     )
 
     if evaluation_case.ground_truth and trace.final_output:
-        ground_truth_result = evaluate_qa_squad(
+        ground_truth_result = evaluate_final_output(
             final_output=trace.final_output,
             ground_truth_answer=evaluation_case.ground_truth,
         )

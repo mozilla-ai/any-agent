@@ -2,117 +2,25 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from pydantic import BaseModel
+
 from any_agent.evaluation.schemas import CheckpointCriteria, EvaluationResult
-from any_agent.logging import logger
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from any_agent import AnyAgent
     from any_agent.tracing.agent_trace import AgentTrace
-
-import json
-import re
-from textwrap import dedent
-
-import evaluate.loading
-from litellm import completion
-
-from any_agent.evaluation.schemas import GroundTruthAnswer, GroundTruthAnswers
-
-MAX_EVIDENCE_LENGTH: int = 400
+from any_agent.evaluation.agent import get_agent
+from any_agent.evaluation.schemas import GroundTruthAnswer
 
 
-def llm_evaluate_with_criterion(
-    model: str,
-    criteria: str,
-    points: int,
-    evidence: str | None = None,
-) -> EvaluationResult:
-    """Evaluate a single criterion using LLM."""
-    prompt = dedent(f"""
-    Evaluate if the following criterion was met {"based on the provided evidence" if evidence else "in the agent's answer"}.
-
-    Criterion: {criteria}
-    """)
-
-    if evidence:
-        prompt += dedent(f"""
-        Trace evidence:
-        {evidence}
-        """)
-
-    prompt += f"""
-
-    Based on the {"evidence" if evidence else "comparison between the expected output and the actual final answer"},
-    was this criterion satisfied? Answer with:
-    1. "passed": true or false
-    2. "reason": Brief explanation for your decision
-    """
-    prompt += """
-    Output valid JSON with these three fields only, in the format:
-    ```json
-    {
-        "passed": true,
-        "reason": "I have them"
-    }
-    ```
-    """
-
-    response = completion(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    content = response.choices[0].message.content
-
-    try:
-        # Extract JSON from the response - looks for patterns like ```json {...} ``` or just {...}
-        json_match = re.search(
-            r"```(?:json)?\s*(\{.*?\})\s*```|(\{.*?\})",
-            content,
-            re.DOTALL,
-        )
-
-        if json_match:
-            # Use the first matching group that captured content
-            json_str = next(group for group in json_match.groups() if group)
-            evaluation = json.loads(json_str)
-        else:
-            # Fallback: try parsing the whole content as JSON
-            evaluation = json.loads(content)
-
-        evaluation["criteria"] = criteria
-    except (json.JSONDecodeError, AttributeError, StopIteration) as e:
-        evaluation = {
-            "passed": False,
-            "reason": f"Failed to evaluate due to parsing: {e!s} \n Response: {content}",
-            "criteria": criteria,
-        }
-    evaluation["points"] = points
-    return EvaluationResult.model_validate(evaluation)
+class AgentOutput(BaseModel):
+    passed: bool
+    reasoning: str
 
 
-def _construct_evidence(trace: AgentTrace) -> str:
-    evidence = "## Agent Execution\n\n"
-
-    for idx, span in enumerate(trace.spans):
-        evidence += f"### Call {idx}\n"
-
-        call = {
-            k: (
-                v[:MAX_EVIDENCE_LENGTH] + "..."
-                if isinstance(v, str) and len(v) > MAX_EVIDENCE_LENGTH
-                else v
-            )
-            for k, v in span.attributes.items()
-        }
-
-        # Use ensure_ascii=False to prevent escaping Unicode characters
-        evidence += json.dumps(call, indent=2, ensure_ascii=False) + "\n\n"
-
-    return evidence
-
-
-def evaluate_checkpoint(
+def evaluate_checkpoints(
     model: str,
     trace: AgentTrace,
     checkpoints: Sequence[CheckpointCriteria],
@@ -129,52 +37,65 @@ def evaluate_checkpoint(
         List of evaluation results
 
     """
-    evidence = _construct_evidence(trace)
-    evidence = evidence.replace("<", "\\<").replace(">", "\\>")
-    logger.debug(f"""Evidence\n{evidence}\n""")
     results = []
 
+    checking_agent: AnyAgent = get_agent(trace, model)
+
     for checkpoint in checkpoints:
-        evaluation = llm_evaluate_with_criterion(
-            model=model,
+        evaluation = checking_agent.run(prompt=checkpoint.criteria)
+        # strip out the ```json and ``` from the final output if they exist
+        if not evaluation.final_output:
+            msg = "The evaluation result is empty"
+            raise ValueError(msg)
+        final_output = evaluation.final_output.replace("```json", "").replace("```", "")
+        eval_output = AgentOutput.model_validate_json(final_output)
+        result = EvaluationResult(
+            passed=eval_output.passed,
+            reason=eval_output.reasoning,
             criteria=checkpoint.criteria,
             points=checkpoint.points,
-            evidence=evidence,
         )
-        results.append(evaluation)
-
+        results.append(result)
+    checking_agent.exit()
     return results
 
 
-def evaluate_qa_squad(
+def _calculate_f1_score(prediction: str, ground_truth: str) -> float:
+    """Calculate F1 score between prediction and ground truth strings."""
+    # Normalize strings: lowercase and roughly split into words
+    pred_tokens = set(prediction.lower().split())
+    truth_tokens = set(ground_truth.lower().split())
+
+    if not truth_tokens:
+        return 1.0 if not pred_tokens else 0.0
+
+    if not pred_tokens:
+        return 0.0
+
+    # Calculate precision and recall
+    common_tokens = pred_tokens.intersection(truth_tokens)
+    precision = len(common_tokens) / len(pred_tokens)
+    recall = len(common_tokens) / len(truth_tokens)
+
+    return 2 * (precision * recall) / (precision + recall)
+
+
+def evaluate_final_output(
     final_output: str,
     ground_truth_answer: GroundTruthAnswer,
 ) -> EvaluationResult:
-    """Directly compare answers using simple matching."""
-    metric = evaluate.loading.load("squad")
-    # format the answers so that they're dicts with 'id' and 'prediction' keys for hypo
-    # and the ref has id and answers keys
-    predictions = [{"id": "1", "prediction_text": final_output}]
-    ground_truth_answers: list[GroundTruthAnswers] = [
-        {
-            "id": "1",
-            "answers": {
-                "answer_start": [0],
-                "text": [str(ground_truth_answer["value"])],
-            },
-        },
-    ]
-    # Use the SQuAD metric to compare answers
-    result = metric.compute(
-        predictions=predictions,
-        references=ground_truth_answers,
-    )
+    """Compare answers using simple string matching and F1 score."""
+    ground_truth_text = str(ground_truth_answer["value"])
 
-    assert result, "The result of the evaluation is empty"
+    # Check for exact match (case-insensitive)
+    exact_match = final_output.strip().lower() == ground_truth_text.strip().lower()
+
+    # Calculate F1 score for partial matching
+    f1_score = _calculate_f1_score(final_output, ground_truth_text)
 
     return EvaluationResult(
-        passed=int(result["exact_match"]) == 1,
-        reason=f"Partial Match (F1) score is {round(result['f1'], 2)}",
+        passed=exact_match,
+        reason=f"Partial Match (F1) score is {round(f1_score, 2)}",
         criteria="Is the answer a direct match?",
         points=1,
     )

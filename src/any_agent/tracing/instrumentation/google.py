@@ -150,9 +150,12 @@ class _GoogleADKTracingCallbacks:
     ) -> Any | None:
         span = self._current_spans["model"][callback_context.invocation_id]
 
-        # TODO:Add token count info. Need to upgrade to google-adk>=1.0.0
         _set_llm_output(llm_response, span)
-
+        if resp_meta := llm_response.usage_metadata:
+            if prompt_tokens := resp_meta.prompt_token_count:
+                span.set_attributes({"gen_ai.usage.input_tokens": prompt_tokens})
+            if output_tokens := resp_meta.candidates_token_count:
+                span.set_attributes({"gen_ai.usage.output_tokens": output_tokens})
         span.set_status(StatusCode.OK)
         span.end()
         del self._current_spans["model"][callback_context.invocation_id]
