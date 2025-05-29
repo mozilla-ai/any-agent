@@ -76,7 +76,7 @@ print(agent_trace)
 
 
 > [!TIP]
-> Multi-agent can be implemented today using the A2A protocol (see [A2A docs](https://mozilla-ai.github.io/any-agent/serving/)) 
+> Multi-agent can be implemented today using the A2A protocol (see [A2A docs](https://mozilla-ai.github.io/any-agent/serving/))
 > and will be also supported with Agent-As-Tools (follow progress at https://github.com/mozilla-ai/any-agent/issues/382)
 
 ## Cookbooks
