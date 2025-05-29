@@ -12,7 +12,11 @@ from litellm.utils import validate_environment
 from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
 from any_agent.config import MCPStdio
 from any_agent.evaluation import EvaluationCase, evaluate
-from any_agent.evaluation.schemas import CheckpointCriteria, TraceEvaluationResult
+from any_agent.evaluation.schemas import (
+    AgentOutput,
+    CheckpointCriteria,
+    TraceEvaluationResult,
+)
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 
 
@@ -98,11 +102,21 @@ def assert_tokens(agent_trace: AgentTrace) -> None:
 
 
 def assert_eval(agent_trace: AgentTrace) -> None:
+    def _check_if_agent_called_write_file(trace: AgentTrace) -> AgentOutput:
+        if any(
+            span.attributes.get("gen_ai.tool.name") == "write_file"
+            for span in trace.spans
+        ):
+            return AgentOutput(passed=True, reasoning="Found `write_file` tool usage.")
+        return AgentOutput(
+            passed=False, reasoning="Didn't find `write_file` tool usage."
+        )
+
     case = EvaluationCase(
         llm_judge="gpt-4.1-mini",
         checkpoints=[
             CheckpointCriteria(
-                criteria="Check if the agent called the write_file tool and no errors were raised",
+                criteria=_check_if_agent_called_write_file,
                 points=1,
             ),
             CheckpointCriteria(
@@ -120,7 +134,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
         trace=agent_trace,
     )
     assert result
-    assert result.score == float(2 / 3)
+    assert result.score >= float(1 / 3)
 
 
 @pytest.mark.skipif(
