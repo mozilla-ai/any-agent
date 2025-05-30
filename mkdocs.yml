@@ -23,6 +23,7 @@ nav:
       - Your First Agent: cookbook/your_first_agent.ipynb
       - MCP Agent: cookbook/mcp_agent.ipynb
       - Serve with A2A: cookbook/serve_a2a.ipynb
+      - Use an Agent as a tool for another agent (A2A): cookbook/a2a_as_tool.ipynb
   - API Reference:
     - Agent: api/agent.md
     - Config: api/config.md
