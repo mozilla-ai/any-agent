@@ -15,12 +15,15 @@ from any_agent.config import (
     TracingConfig,
 )
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing.exporter import _AnyAgentExporter
+from any_agent.tracing.exporter import _AnyAgentConsoleExporter, _AnyAgentExporter
 from any_agent.tracing.instrumentation import (
     _get_instrumentor_by_framework,
     _Instrumentor,
 )
-from any_agent.tracing.trace_provider import TRACE_PROVIDER
+from any_agent.tracing.trace_provider import (
+    _GLOBAL_CONSOLE_EXPORTER,
+    TRACE_PROVIDER,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -137,10 +140,21 @@ class AnyAgent(ABC):
 
     def _setup_tracing(self) -> None:
         """Initialize the tracing for the agent."""
+        global _GLOBAL_CONSOLE_EXPORTER, _GLOBAL_CONSOLE_PROCESSOR  # noqa: PLW0603
+
         self._trace_provider = TRACE_PROVIDER
         self._tracer = self._trace_provider.get_tracer("any_agent")
+
+        # Create exporter for this agent (handles trace collection only)
         self._exporter = _AnyAgentExporter(self._tracing_config)
         self._trace_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
+
+        # Set up global console exporter if needed and not already set
+        if self._tracing_config.console and _GLOBAL_CONSOLE_EXPORTER is None:
+            _GLOBAL_CONSOLE_EXPORTER = _AnyAgentConsoleExporter(self._tracing_config)  # type: ignore[assignment]
+            _GLOBAL_CONSOLE_PROCESSOR = SimpleSpanProcessor(_GLOBAL_CONSOLE_EXPORTER)  # type: ignore[name-defined,arg-type]
+            self._trace_provider.add_span_processor(_GLOBAL_CONSOLE_PROCESSOR)  # type: ignore[name-defined]
+
         self._instrumentor = _get_instrumentor_by_framework(self.framework)
         self._instrumentor.instrument(tracer=self._tracer)
 

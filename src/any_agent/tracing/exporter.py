@@ -36,18 +36,16 @@ def _get_output_panel(span: AgentSpan) -> Panel | None:
     return None
 
 
-class _AnyAgentExporter(SpanExporter):
-    def __init__(
-        self,
-        tracing_config: TracingConfig,
-    ):
-        self.tracing_config = tracing_config
-        self.traces: dict[int, AgentTrace] = {}
-        self.console: Console | None = None
-        self.run_trace_mapping: dict[str, int] = {}
+class _AnyAgentConsoleExporter(SpanExporter):
+    """Console-only exporter for printing spans to the console.
 
-        if self.tracing_config.console:
-            self.console = Console()
+    This exporter only handles console output and doesn't collect traces.
+    Used as a global singleton to prevent duplicate console output.
+    """
+
+    def __init__(self, tracing_config: TracingConfig):
+        self.tracing_config = tracing_config
+        self.console = Console() if tracing_config.console else None
 
     def print_to_console(self, span: AgentSpan) -> None:
         if not self.console:
@@ -55,7 +53,6 @@ class _AnyAgentExporter(SpanExporter):
             raise RuntimeError(msg)
 
         operation_name = span.attributes.get("gen_ai.operation.name", "")
-
         style = getattr(self.tracing_config, operation_name, None)
 
         if not style:
@@ -118,6 +115,39 @@ class _AnyAgentExporter(SpanExporter):
                     continue
             if not readable_span.attributes:
                 continue
+
+            try:
+                span = AgentSpan.from_readable_span(readable_span)
+                self.print_to_console(span)
+            except (json.JSONDecodeError, TypeError, AttributeError) as e:
+                logger.warning("Failed to parse span data for console output: %s", e)
+                continue
+        return SpanExportResult.SUCCESS
+
+
+class _AnyAgentExporter(SpanExporter):
+    """Main exporter for collecting traces without console output.
+
+    Each agent instance has its own exporter for trace collection.
+    Console output is handled by the global console exporter.
+    """
+
+    def __init__(
+        self,
+        tracing_config: TracingConfig,
+    ):
+        self.tracing_config = tracing_config
+        self.traces: dict[int, AgentTrace] = {}
+        self.run_trace_mapping: dict[str, int] = {}
+
+    def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
+        for readable_span in spans:
+            # Check if this span belongs to our run
+            if scope := readable_span.instrumentation_scope:
+                if scope.name != "any_agent":
+                    continue
+            if not readable_span.attributes:
+                continue
             agent_run_id = readable_span.attributes.get("gen_ai.request.id")
             trace_id = readable_span.context.trace_id
             if agent_run_id is not None:
@@ -134,9 +164,6 @@ class _AnyAgentExporter(SpanExporter):
                     span.add_cost_info()
 
                 self.traces[trace_id].add_span(span)
-
-                if self.tracing_config.console and self.console:
-                    self.print_to_console(span)
 
             except (json.JSONDecodeError, TypeError, AttributeError) as e:
                 logger.warning("Failed to parse span data, %s, %s", span, e)
