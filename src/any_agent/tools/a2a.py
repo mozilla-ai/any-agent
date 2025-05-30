@@ -28,7 +28,7 @@ with suppress(ImportError):
 
 
 async def a2a_tool(
-    url: str, toolname: str | None = None
+    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
 ) -> Callable[[str], Coroutine[Any, Any, str]]:
     """Perform a query using A2A to another agent.
 
@@ -36,6 +36,7 @@ async def a2a_tool(
         url (str): The url in which the A2A agent is located.
         toolname (str): The name for the created tool. Defaults to `call_{agent name in card}`.
             Leading and trailing whitespace are removed. Whitespace in the middle is replaced by `_`.
+        http_kwargs (dict): Additional kwargs to pass to the httpx client.
 
     Returns:
         An async `Callable` that takes a query and returns the agent response.
@@ -65,7 +66,9 @@ async def a2a_tool(
                 id=str(uuid4().hex),
             )
             # TODO check how to capture exceptions and pass them on to the enclosing framework
-            response = await client.send_message(send_message_payload)
+            response = await client.send_message(
+                send_message_payload, http_kwargs=http_kwargs
+            )
             result: str = response.model_dump_json()
             return result
 
@@ -77,12 +80,9 @@ async def a2a_tool(
 
     _send_query = _send_query_async
 
-    if toolname:
-        _send_query.__name__ = f"call_{re.sub(r'\s+', '_', toolname.strip())}"
-    else:
-        _send_query.__name__ = (
-            f"call_{re.sub(r'\s+', '_', a2a_agent_card.name.strip())}"
-        )
+    new_name = toolname or a2a_agent_card.name
+    new_name = re.sub(r"\s+", "_", new_name.strip())
+    _send_query.__name__ = f"call_{new_name}"
     _send_query.__doc__ = f"""{a2a_agent_card.description}
         Send a query to the agent named {a2a_agent_card.name}.
 
