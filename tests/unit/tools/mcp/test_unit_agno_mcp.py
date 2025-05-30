@@ -1,4 +1,5 @@
 from collections.abc import Generator, Sequence
+from datetime import timedelta
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -64,3 +65,59 @@ async def test_agno_mcp_env() -> None:
     with patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools", mocked_class):
         await mcp_server._setup_tools()
         assert mocked_class.call_args_list[0][1]["env"] == {"FOO": "BAR"}
+
+
+@pytest.mark.asyncio
+async def test_agno_client_session_timeout_passed():
+    """Test that client_session_timeout_seconds parameter is properly passed to AgnoMCPTools (STDIO only)."""
+    custom_timeout = 15
+    stdio_params = MCPStdio(
+        command="echo",
+        args=["test"],
+        client_session_timeout_seconds=custom_timeout,
+    )
+    sse_params = MCPSse(
+        url="http://localhost:8000",
+        client_session_timeout_seconds=custom_timeout,
+    )
+    # STDIO
+    server = _get_mcp_server(stdio_params, AgentFramework.AGNO)
+    with patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_agno_tools:
+        mock_tools_instance = AsyncMock()
+        mock_tools_instance.__aenter__ = AsyncMock(return_value=mock_tools_instance)
+        mock_tools_instance.__aexit__ = AsyncMock(return_value=None)
+        mock_agno_tools.return_value = mock_tools_instance
+        await server._setup_tools()
+        mock_agno_tools.assert_called_once()
+        call_args = mock_agno_tools.call_args
+        assert call_args.kwargs["timeout_seconds"] == custom_timeout
+    # SSE (check that timeout is passed to ClientSession)
+    server = _get_mcp_server(sse_params, AgentFramework.AGNO)
+    with (
+        patch("any_agent.tools.mcp.frameworks.agno.sse_client") as sse_client_patch,
+        patch("any_agent.tools.mcp.frameworks.agno.ClientSession") as mock_session,
+        patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_agno_tools,
+    ):
+        mock_sse_client = AsyncMock()
+        mock_sse_client.__aenter__ = AsyncMock(return_value=(MagicMock(), MagicMock()))
+        mock_sse_client.__aexit__ = AsyncMock(return_value=None)
+        sse_client_patch.return_value = mock_sse_client
+
+        mock_session_instance = AsyncMock()
+        mock_session_instance.__aenter__ = AsyncMock(return_value=mock_session_instance)
+        mock_session_instance.__aexit__ = AsyncMock(return_value=None)
+        mock_session_instance.initialize = AsyncMock()
+        mock_session.return_value = mock_session_instance
+
+        mock_tools_instance = AsyncMock()
+        mock_tools_instance.__aenter__ = AsyncMock(return_value=mock_tools_instance)
+        mock_tools_instance.__aexit__ = AsyncMock(return_value=None)
+        mock_agno_tools.return_value = mock_tools_instance
+
+        await server._setup_tools()
+        mock_session.assert_called_once()
+        # Check that the timeout was passed as read_timeout_seconds
+        call_args = mock_session.call_args
+        assert call_args.kwargs["read_timeout_seconds"] == timedelta(
+            seconds=custom_timeout
+        )

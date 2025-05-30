@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from contextlib import suppress
+from datetime import timedelta
 from typing import Literal
 
 from pydantic import Field, PrivateAttr
@@ -41,11 +42,23 @@ class AgnoMCPStdioConnection(AgnoMCPConnection):
 
     async def list_tools(self) -> list["AgnoMCPTools"]:
         """List tools from the MCP server."""
-        server_params = f"{self.mcp_tool.command} {' '.join(self.mcp_tool.args)}"
-        self._server = AgnoMCPTools(
-            command=server_params,
-            include_tools=list(self.mcp_tool.tools) if self.mcp_tool.tools else None,
+        from mcp import StdioServerParameters
+
+        server_params = StdioServerParameters(
+            command=self.mcp_tool.command,
+            args=list(self.mcp_tool.args),
             env=self.mcp_tool.env,
+        )
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["timeout_seconds"] = int(
+                self.mcp_tool.client_session_timeout_seconds
+            )
+        self._server = AgnoMCPTools(
+            server_params=server_params,
+            env=self.mcp_tool.env,
+            include_tools=list(self.mcp_tool.tools) if self.mcp_tool.tools else None,
+            **kwargs,  # type: ignore[arg-type]
         )
         return await super().list_tools()
 
@@ -61,7 +74,12 @@ class AgnoMCPSseConnection(AgnoMCPConnection):
         )
         sse_transport = await self._exit_stack.enter_async_context(client)
         stdio, write = sse_transport
-        client_session = ClientSession(stdio, write)
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["read_timeout_seconds"] = timedelta(
+                seconds=self.mcp_tool.client_session_timeout_seconds
+            )
+        client_session = ClientSession(stdio, write, **kwargs)  # type: ignore[arg-type]
         session = await self._exit_stack.enter_async_context(client_session)
         await session.initialize()
         self._server = AgnoMCPTools(

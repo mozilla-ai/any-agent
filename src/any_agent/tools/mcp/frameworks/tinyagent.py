@@ -130,9 +130,13 @@ class TinyAgentMCPSseConnection(TinyAgentMCPConnection):
 
     async def list_tools(self) -> list["MCPTool"]:
         """List tools from the MCP server."""
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["sse_read_timeout"] = self.mcp_tool.client_session_timeout_seconds
         self._client = sse_client(
             url=self.mcp_tool.url,
             headers=dict(self.mcp_tool.headers or {}),
+            **kwargs,  # type: ignore[arg-type]
         )
 
         return await super().list_tools()

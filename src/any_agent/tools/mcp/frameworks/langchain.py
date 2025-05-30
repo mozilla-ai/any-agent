@@ -34,13 +34,15 @@ class LangchainMCPConnection(_MCPConnection["BaseTool"], ABC):
             raise ValueError(msg)
 
         stdio, write = await self._exit_stack.enter_async_context(self._client)
-
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["read_timeout_seconds"] = timedelta(
+                seconds=self.mcp_tool.client_session_timeout_seconds
+            )
         client_session = ClientSession(
             stdio,
             write,
-            timedelta(seconds=self.mcp_tool.client_session_timeout_seconds)
-            if self.mcp_tool.client_session_timeout_seconds
-            else None,
+            **kwargs,  # type: ignore[arg-type]
         )
         session = await self._exit_stack.enter_async_context(client_session)
 
@@ -71,9 +73,13 @@ class LangchainMCPSseConnection(LangchainMCPConnection):
 
     async def list_tools(self) -> list["BaseTool"]:
         """List tools from the MCP server."""
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["sse_read_timeout"] = self.mcp_tool.client_session_timeout_seconds
         self._client = sse_client(
             url=self.mcp_tool.url,
             headers=dict(self.mcp_tool.headers or {}),
+            **kwargs,  # type: ignore[arg-type]
         )
         return await super().list_tools()
 

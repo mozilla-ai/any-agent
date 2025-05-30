@@ -62,3 +62,48 @@ async def test_openai_mcp_env() -> None:
     ):
         await mcp_server._setup_tools()
         assert mocked_class.call_args_list[0][1]["params"]["env"] == {"FOO": "BAR"}
+
+
+@pytest.mark.asyncio
+def test_openai_client_session_timeout_passed():
+    """Test that client_session_timeout_seconds parameter is properly passed to OpenAI MCPServerStdio and MCPServerSse."""
+    custom_timeout = 15.0
+    stdio_params = MCPStdio(
+        command="echo",
+        args=["test"],
+        client_session_timeout_seconds=custom_timeout,
+    )
+    sse_params = MCPSse(
+        url="http://localhost:8000",
+        client_session_timeout_seconds=custom_timeout,
+    )
+    # STDIO
+    server = _get_mcp_server(stdio_params, AgentFramework.OPENAI)
+    with patch(
+        "any_agent.tools.mcp.frameworks.openai.OpenAIInternalMCPServerStdio"
+    ) as mock_stdio:
+        mock_server_instance = AsyncMock()
+        mock_server_instance.__aenter__ = AsyncMock(return_value=mock_server_instance)
+        mock_server_instance.__aexit__ = AsyncMock(return_value=None)
+        mock_server_instance.list_tools = AsyncMock(return_value=[])
+        mock_stdio.return_value = mock_server_instance
+        import asyncio
+
+        asyncio.run(server._setup_tools())
+        mock_stdio.assert_called_once()
+        call_args = mock_stdio.call_args
+        assert call_args.kwargs["client_session_timeout_seconds"] == custom_timeout
+    # SSE
+    server = _get_mcp_server(sse_params, AgentFramework.OPENAI)
+    with patch(
+        "any_agent.tools.mcp.frameworks.openai.OpenAIInternalMCPServerSse"
+    ) as mock_sse:
+        mock_server_instance = AsyncMock()
+        mock_server_instance.__aenter__ = AsyncMock(return_value=mock_server_instance)
+        mock_server_instance.__aexit__ = AsyncMock(return_value=None)
+        mock_server_instance.list_tools = AsyncMock(return_value=[])
+        mock_sse.return_value = mock_server_instance
+        asyncio.run(server._setup_tools())
+        mock_sse.assert_called_once()
+        call_args = mock_sse.call_args
+        assert call_args.kwargs["client_session_timeout_seconds"] == custom_timeout
