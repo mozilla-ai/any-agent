@@ -209,7 +209,6 @@ def test_load_and_run_agent(
         assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
         assert_cost(agent_trace)
         assert_tokens(agent_trace)
-        assert_eval(agent_trace)
 
         if update_trace:
             trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
@@ -219,5 +218,8 @@ def test_load_and_run_agent(
             html_output = agent._exporter.console.export_html(inline_styles=True)  # type: ignore[union-attr]
             with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
                 f.write(html_output.replace("<!DOCTYPE html>", ""))
+
+        agent.exit()
+        assert_eval(agent_trace)
     finally:
         agent.exit()

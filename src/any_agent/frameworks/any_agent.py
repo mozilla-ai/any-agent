@@ -50,6 +50,7 @@ class AnyAgent(ABC):
         # Tracing is enabled by default
         self._tracing_config: TracingConfig = tracing or TracingConfig()
         self._instrumentor: _Instrumentor | None = None
+        self._exporter: _AnyAgentExporter | None = None
         self._setup_tracing()
 
     @staticmethod
@@ -166,7 +167,7 @@ class AnyAgent(ABC):
                 }
             )
             final_output = await self._run_async(prompt, **kwargs)
-        trace = self._exporter.pop_trace(run_id)
+        trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
         trace.final_output = final_output
         return trace
 
@@ -256,5 +257,6 @@ class AnyAgent(ABC):
         """Exit the agent and clean up resources."""
         if self._instrumentor is not None:
             self._instrumentor.uninstrument()
-            self._instrumentor = None
+        self._instrumentor = None
+        self._exporter = None
         self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected
