@@ -67,6 +67,7 @@ class OpenAIMCPStdioConnection(OpenAIMCPConnection):
         self._server = OpenAIInternalMCPServerStdio(
             name="OpenAI MCP Server",
             params=params,
+            client_session_timeout_seconds=self.mcp_tool.client_session_timeout_seconds,
         )
         return await super().list_tools()
 
@@ -79,7 +80,9 @@ class OpenAIMCPSseConnection(OpenAIMCPConnection):
         params = OpenAIInternalMCPServerSseParams(url=self.mcp_tool.url)
 
         self._server = OpenAIInternalMCPServerSse(
-            name="OpenAI MCP Server", params=params
+            name="OpenAI MCP Server",
+            params=params,
+            client_session_timeout_seconds=self.mcp_tool.client_session_timeout_seconds,
         )
 
         return await super().list_tools()
