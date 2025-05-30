@@ -32,7 +32,7 @@ async def test_tool_argument_casting() -> None:
     # Call the tool and get the result
     result = await agent.clients["sample_tool"].call_tool(request)
     # Check the result
-    assert result["content"][0]["text"] == "Received int: 42, str: 100"
+    assert result == "Received int: 42, str: 100"
 
 
 def test_run_tinyagent_agent_custom_args() -> None:
