@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from datetime import datetime
 from typing import TYPE_CHECKING, Any, assert_never
 from uuid import uuid4
 
@@ -140,10 +139,8 @@ class AnyAgent(ABC):
         """Initialize the tracing for the agent."""
         self._trace_provider = TRACE_PROVIDER
         self._tracer = self._trace_provider.get_tracer("any_agent")
-        timestamp = str(datetime.now().isoformat())
-        self._exporter = _AnyAgentExporter(self._tracing_config, timestamp)
-        self._span_processor = SimpleSpanProcessor(self._exporter)
-        self._trace_provider.add_span_processor(self._span_processor)
+        self._exporter = _AnyAgentExporter(self._tracing_config)
+        self._trace_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
         self._instrumentor = _get_instrumentor_by_framework(self.framework)
         self._instrumentor.instrument(tracer=self._tracer)
 
@@ -261,5 +258,7 @@ class AnyAgent(ABC):
         if self._instrumentor is not None:
             self._instrumentor.uninstrument()
         self._instrumentor = None
-        self._exporter.shutdown()
+        if self._exporter is not None:
+            self._exporter.shutdown()
+            self._exporter = None
         self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected

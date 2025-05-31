@@ -37,12 +37,11 @@ def _get_output_panel(span: AgentSpan) -> Panel | None:
 
 
 class _AnyAgentExporter(SpanExporter):
-    def __init__(self, tracing_config: TracingConfig, name: str):
+    def __init__(self, tracing_config: TracingConfig):
         self.tracing_config = tracing_config
         self.traces: dict[int, AgentTrace] = {}
         self.console: Console | None = None
         self.run_trace_mapping: dict[str, int] = {}
-        self.name = name
         self.stopped = False
 
         if self.tracing_config.console:
