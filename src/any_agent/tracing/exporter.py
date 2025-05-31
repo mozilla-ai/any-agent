@@ -37,14 +37,12 @@ def _get_output_panel(span: AgentSpan) -> Panel | None:
 
 
 class _AnyAgentExporter(SpanExporter):
-    def __init__(
-        self,
-        tracing_config: TracingConfig,
-    ):
+    def __init__(self, tracing_config: TracingConfig):
         self.tracing_config = tracing_config
         self.traces: dict[int, AgentTrace] = {}
         self.console: Console | None = None
         self.run_trace_mapping: dict[str, int] = {}
+        self.stopped = False
 
         if self.tracing_config.console:
             self.console = Console()
@@ -111,6 +109,8 @@ class _AnyAgentExporter(SpanExporter):
             )
 
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
+        if self.stopped:
+            return SpanExportResult.SUCCESS
         for readable_span in spans:
             # Check if this span belongs to our run
             if scope := readable_span.instrumentation_scope:
@@ -156,3 +156,6 @@ class _AnyAgentExporter(SpanExporter):
             msg = f"Trace not found for trace ID: {trace_id}"
             raise ValueError(msg)
         return trace
+
+    def shutdown(self) -> None:
+        self.stopped = True

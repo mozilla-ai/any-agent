@@ -258,5 +258,7 @@ class AnyAgent(ABC):
         if self._instrumentor is not None:
             self._instrumentor.uninstrument()
         self._instrumentor = None
-        self._exporter = None
+        if self._exporter is not None:
+            self._exporter.shutdown()
+            self._exporter = None
         self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected
