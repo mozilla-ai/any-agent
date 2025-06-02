@@ -120,7 +120,7 @@ class TinyAgent(AnyAgent):
             mcp_servers  # Store servers so that they don't get garbage collected
         )
 
-        self._main_agent_tools = wrapped_tools
+        self._tools = wrapped_tools
 
         for tool in wrapped_tools:
             tool_name = tool.__name__

@@ -17,8 +17,6 @@ except ImportError:
     langchain_available = False
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     from langchain_core.language_models import LanguageModelLike
     from langchain_core.messages.base import BaseMessage
     from langgraph.graph.graph import CompiledGraph
@@ -34,7 +32,6 @@ class LangchainAgent(AnyAgent):
     ):
         super().__init__(config, tracing)
         self._agent: CompiledGraph | None = None
-        self._tools: Sequence[Any] = []
 
     @property
     def framework(self) -> AgentFramework:
@@ -62,7 +59,7 @@ class LangchainAgent(AnyAgent):
 
         imported_tools, _ = await self._load_tools(self.config.tools)
 
-        self._main_agent_tools = imported_tools
+        self._tools = imported_tools
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         self._agent = agent_type(
             name=self.config.name,
@@ -71,9 +68,6 @@ class LangchainAgent(AnyAgent):
             prompt=self.config.instructions,
             **self.config.agent_args or {},
         )
-        # Langgraph doesn't let you easily access what tools are loaded from the CompiledGraph,
-        # so we'll store a list of them in this class
-        self._tools = imported_tools
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str:
         if not self._agent:

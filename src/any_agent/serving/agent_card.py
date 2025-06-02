@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 def _get_agent_card(agent: AnyAgent, serving_config: ServingConfig) -> AgentCard:
     skills = []
-    for tool in agent._main_agent_tools:
+    for tool in agent._tools:
         if hasattr(tool, "name"):
             tool_name = tool.name
             tool_description = tool.description
