@@ -63,7 +63,7 @@ class AgnoAgent(AnyAgent):
 
         tools, _ = await self._load_tools(self.config.tools)
 
-        self._main_agent_tools = self._unpack_tools(tools)
+        self._tools = self._unpack_tools(tools)
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,

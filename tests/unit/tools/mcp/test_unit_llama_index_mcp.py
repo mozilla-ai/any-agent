@@ -43,7 +43,10 @@ async def test_llamaindex_mcp_sse_integration(
     await server._setup_tools()
 
     llama_index_mcp_client.assert_called_once_with(  # type: ignore[attr-defined]
-        command_or_url=mcp_sse_params_with_tools.url
+        command_or_url=mcp_sse_params_with_tools.url,
+        timeout=int(mcp_sse_params_with_tools.client_session_timeout_seconds)
+        if mcp_sse_params_with_tools.client_session_timeout_seconds is not None
+        else 5,
     )
 
 
@@ -64,3 +67,52 @@ async def test_llama_index_mcp_env() -> None:
     ):
         await mcp_server._setup_tools()
         assert mocked_class.call_args_list[0][1]["client"].env == {"FOO": "BAR"}
+
+
+@pytest.mark.asyncio
+async def test_llamaindex_client_session_timeout_passed():
+    """Test that client_session_timeout_seconds parameter is properly passed to LlamaIndex BasicMCPClient (STDIO only)."""
+    custom_timeout = 15.0
+    stdio_params = MCPStdio(
+        command="echo",
+        args=["test"],
+        client_session_timeout_seconds=custom_timeout,
+    )
+    sse_params = MCPSse(
+        url="http://localhost:8000",
+        client_session_timeout_seconds=custom_timeout,
+    )
+    # STDIO
+    server = _get_mcp_server(stdio_params, AgentFramework.LLAMA_INDEX)
+    with patch(
+        "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMCPClient"
+    ) as mock_client:
+        mock_client_instance = MagicMock()
+        mock_client.return_value = mock_client_instance
+        with patch(
+            "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMcpToolSpec"
+        ) as mock_spec:
+            mock_spec_instance = MagicMock()
+            mock_spec_instance.to_tool_list_async = AsyncMock(return_value=[])
+            mock_spec.return_value = mock_spec_instance
+            await server._setup_tools()
+            mock_client.assert_called_once()
+            call_args = mock_client.call_args
+            assert call_args.kwargs["timeout"] == custom_timeout
+    # SSE (check that timeout is passed to LlamaIndexMCPClient)
+    server = _get_mcp_server(sse_params, AgentFramework.LLAMA_INDEX)
+    with patch(
+        "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMCPClient"
+    ) as mock_client:
+        mock_client_instance = MagicMock()
+        mock_client.return_value = mock_client_instance
+        with patch(
+            "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMcpToolSpec"
+        ) as mock_spec:
+            mock_spec_instance = MagicMock()
+            mock_spec_instance.to_tool_list_async = AsyncMock(return_value=[])
+            mock_spec.return_value = mock_spec_instance
+            await server._setup_tools()
+            mock_client.assert_called_once()
+            call_args = mock_client.call_args
+            assert call_args.kwargs["timeout"] == custom_timeout

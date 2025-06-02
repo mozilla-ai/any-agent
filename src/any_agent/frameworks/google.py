@@ -55,7 +55,7 @@ class GoogleAgent(AnyAgent):
 
         agent_type = self.config.agent_type or LlmAgent
 
-        self._main_agent_tools = tools
+        self._tools = tools
         self._agent = agent_type(
             name=self.config.name,
             instruction=self.config.instructions or "",

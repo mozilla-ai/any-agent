@@ -67,7 +67,7 @@ class OpenAIAgent(AnyAgent):
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
 
-        self._main_agent_tools = tools
+        self._tools = tools
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,

@@ -57,7 +57,7 @@ class LlamaIndexAgent(AnyAgent):
 
         imported_tools, _ = await self._load_tools(self.config.tools)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
-        self._main_agent_tools = imported_tools
+        self._tools = imported_tools
         self._agent = agent_type(
             name=self.config.name,
             tools=imported_tools,

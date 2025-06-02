@@ -19,7 +19,7 @@ def test_get_agent_card(agent_framework: AgentFramework) -> None:
     agent = MagicMock()
     agent.config = AgentConfig(model_id="foo", description="test agent")
     agent.framework = agent_framework
-    agent._main_agent_tools = [WRAPPERS[agent_framework](search_web)]
+    agent._tools = [WRAPPERS[agent_framework](search_web)]
     agent_card = _get_agent_card(agent, ServingConfig())
     assert agent_card.name == "any_agent"
     assert agent_card.description == "test agent"
@@ -44,9 +44,9 @@ async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
     server = _get_mcp_server(MCPSse(url=echo_sse_server["url"]), agent_framework)
     await server._setup_tools()
     if agent_framework is AgentFramework.AGNO:
-        agent._main_agent_tools = list(server.tools[0].functions.values())  # type: ignore[union-attr]
+        agent._tools = list(server.tools[0].functions.values())  # type: ignore[union-attr]
     else:
-        agent._main_agent_tools = server.tools
+        agent._tools = server.tools
 
     agent_card = _get_agent_card(agent, ServingConfig())
     assert agent_card.name == "any_agent"

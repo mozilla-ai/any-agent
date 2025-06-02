@@ -45,10 +45,14 @@ class LlamaIndexMCPStdioConnection(LlamaIndexMCPConnection):
 
     async def list_tools(self) -> list["LlamaIndexFunctionTool"]:
         """List tools from the MCP server."""
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["timeout"] = self.mcp_tool.client_session_timeout_seconds
         self._client = LlamaIndexMCPClient(
             command_or_url=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
             env=self.mcp_tool.env,
+            **kwargs,  # type: ignore[arg-type]
         )
         return await super().list_tools()
 
@@ -58,7 +62,13 @@ class LlamaIndexMCPSseConnection(LlamaIndexMCPConnection):
 
     async def list_tools(self) -> list["LlamaIndexFunctionTool"]:
         """List tools from the MCP server."""
-        self._client = LlamaIndexMCPClient(command_or_url=self.mcp_tool.url)
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["timeout"] = self.mcp_tool.client_session_timeout_seconds
+        self._client = LlamaIndexMCPClient(
+            command_or_url=self.mcp_tool.url,
+            **kwargs,  # type: ignore[arg-type]
+        )
         return await super().list_tools()
 
 
