@@ -1,9 +1,8 @@
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
+
+from a2a.types import AgentSkill
 
 from any_agent.config import ServingConfig
-
-if TYPE_CHECKING:
-    from a2a.types import AgentSkill
 
 
 class A2AServingConfig(ServingConfig):
@@ -24,7 +23,7 @@ class A2AServingConfig(ServingConfig):
 
     """
 
-    skills: list["AgentSkill"] | None = None
+    skills: list[AgentSkill] | None = None
     """List of skills to be used by the agent.
 
     If not provided, the skills will be inferred from the tools.
