@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Any
 
+from pydantic import BaseModel
+
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 
 from .any_agent import AnyAgent
@@ -86,7 +88,7 @@ class OpenAIAgent(AnyAgent):
             non_mcp_tools.append(tool)
         return non_mcp_tools
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)

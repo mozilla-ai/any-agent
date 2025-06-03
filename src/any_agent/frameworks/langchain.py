@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Any, cast
 
+from pydantic import BaseModel
+
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 
 from .any_agent import AnyAgent
@@ -69,7 +71,7 @@ class LangchainAgent(AnyAgent):
             **self.config.agent_args or {},
         )
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)

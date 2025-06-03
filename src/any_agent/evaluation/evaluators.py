@@ -44,6 +44,9 @@ def evaluate_checkpoints(
             if not evaluation.final_output:
                 msg = "The evaluation result is empty"
                 raise ValueError(msg)
+            assert isinstance(evaluation.final_output, str), (
+                "Final output should be a string"
+            )
             final_output = evaluation.final_output.replace("```json", "").replace(
                 "```", ""
             )

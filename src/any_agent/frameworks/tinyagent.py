@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from litellm.types.utils import Message as LiteLLMMessage
+    from pydantic import BaseModel
 
 
 DEFAULT_SYSTEM_PROMPT = """
@@ -168,7 +169,7 @@ class TinyAgent(AnyAgent):
             self.clients[tool_name] = ToolExecutor(tool)
             logger.debug("Registered tool: %s", tool_name)
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         self.messages = [
             {
                 "role": "system",

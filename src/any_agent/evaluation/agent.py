@@ -1,5 +1,6 @@
 import json
-from typing import Any
+
+from pydantic import BaseModel
 
 from any_agent import AgentConfig, AnyAgent, TracingConfig
 from any_agent.tracing.agent_trace import AgentTrace
@@ -11,11 +12,11 @@ class AgentTooling:
     def __init__(self, trace: AgentTrace):
         self.trace = trace
 
-    def get_final_output(self) -> str | None | dict[str, Any]:
+    def get_final_output(self) -> str | BaseModel | None:
         """Get the final output from the agent trace.
 
         Returns:
-            str | None | dict: The final output of the agent
+            str | BaseModel | None: The final output of the agent
 
         """
         return self.trace.final_output

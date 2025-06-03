@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     import uvicorn
+    from pydantic import BaseModel
 
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
     from any_agent.tracing.agent_trace import AgentTrace
@@ -226,7 +227,7 @@ class AnyAgent(ABC):
         """Load the agent instance."""
 
     @abstractmethod
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         """To be implemented by each framework."""
 
     @property

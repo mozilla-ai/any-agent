@@ -163,7 +163,7 @@ class AgentTrace(BaseModel):
     """A list of [`AgentSpan`][any_agent.tracing.agent_trace.AgentSpan] that form the trace.
     """
 
-    final_output: str | None = None
+    final_output: str | BaseModel | None = None
     """Contains the final output message returned by the agent.
     """
 
