@@ -66,12 +66,16 @@ class AgnoAgent(AnyAgent):
         tools, _ = await self._load_tools(self.config.tools)
 
         self._tools = self._unpack_tools(tools)
+
+        agent_args = self.config.agent_args or {}
+        if self.config.output_type:
+            agent_args["response_model"] = self.config.output_type
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
             model=self._get_model(self.config),
             tools=tools,
-            **self.config.agent_args or {},
+            **agent_args,
         )
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
@@ -79,4 +83,4 @@ class AgnoAgent(AnyAgent):
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
         result: RunResponse = await self._agent.arun(prompt, **kwargs)
-        return str(result.content)
+        return result.content  # type: ignore[return-value]

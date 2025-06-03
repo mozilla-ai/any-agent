@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AnyAgent
 
 try:
-    from smolagents import LiteLLMModel, ToolCallingAgent, FinalAnswerTool
+    from smolagents import FinalAnswerTool, LiteLLMModel, ToolCallingAgent
 
     smolagents_available = True
 except ImportError:
@@ -70,8 +70,8 @@ class SmolagentsAgent(AnyAgent):
         if self.config.output_type:
             output_type = self.config.output_type
 
-            class CustomFinalAnswerTool(FinalAnswerTool):
-                inputs = {
+            class CustomFinalAnswerTool(FinalAnswerTool):  # type: ignore[no-untyped-call]
+                inputs = {  # noqa: RUF012
                     "answer": {
                         "type": "string",
                         "description": f"The final answer to the problem. The input must be a string that conforms to the{output_type.__name__} object.",
@@ -82,7 +82,7 @@ class SmolagentsAgent(AnyAgent):
                     output_type.model_validate_json(answer)
                     return answer
 
-            self._agent.tools["final_answer"] = CustomFinalAnswerTool()
+            self._agent.tools["final_answer"] = CustomFinalAnswerTool()  # type: ignore[no-untyped-call]
 
         assert self._agent
 
@@ -104,4 +104,4 @@ class SmolagentsAgent(AnyAgent):
         result = self._agent.run(prompt, **kwargs)
         if self.config.output_type:
             return self.config.output_type.model_validate_json(result)
-        return result
+        return result  # type: ignore[no-any-return]
