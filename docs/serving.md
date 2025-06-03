@@ -22,7 +22,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
     ```python
     # google_expert.py
     from any_agent import AgentConfig, AnyAgent
-    from any_agent.config import ServingConfig
+    from any_agent.serving import ServingConfig
     from any_agent.tools import search_web
 
     agent = AnyAgent.create(
@@ -35,7 +35,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
         )
     )
 
-    agent.serve(ServingConfig(port=5001))
+    agent.serve(A2AServingConfig(port=5001))
     ```
 
 === "OpenAI Expert"
@@ -43,7 +43,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
     ```python
     # openai_expert.py
     from any_agent import AgentConfig, AnyAgent
-    from any_agent.config import ServingConfig
+    from any_agent.serving.config import ServingConfig
     from any_agent.tools import search_web
 
     agent = AnyAgent.create(
@@ -57,7 +57,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
         )
     )
 
-    agent.serve(ServingConfig(port=5002))
+    agent.serve(A2AServingConfig(port=5002))
     ```
 
 We can then run each of the scripts in a separate terminal and leave them running in the background.

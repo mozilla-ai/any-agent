@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import StrEnum, auto
 from typing import Any, Self
@@ -83,10 +84,11 @@ class MCPSse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class ServingConfig(BaseModel):
-    """Configuration for serving an agent using the Agent2Agent Protocol (A2A).
+class ServingConfig(BaseModel, ABC):
+    """Base configuration for serving an agent.
 
-    We use the example `A2ASever` from https://github.com/google/A2A/tree/main/samples/python.
+    This is an abstract base class that should not be instantiated directly.
+    Use one of the concrete implementations like A2AServingConfig instead.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -104,6 +106,13 @@ class ServingConfig(BaseModel):
     """Will be passed as argument to the `uvicorn` server."""
 
     version: str = "0.1.0"
+
+    @abstractmethod
+    def get_config_type(self) -> str:
+        """Abstract method that must be implemented by concrete serving config classes.
+
+        This ensures that ServingConfig cannot be instantiated directly.
+        """
 
 
 class TracingConfig(BaseModel):

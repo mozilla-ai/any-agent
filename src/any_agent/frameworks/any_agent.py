@@ -181,10 +181,13 @@ class AnyAgent(ABC):
             ImportError: If the `serving` dependencies are not installed.
 
         """
-        from any_agent.serving import _get_a2a_app, serve_a2a
+        from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a
 
         if serving_config is None:
-            serving_config = ServingConfig()
+            serving_config = A2AServingConfig()
+        if not isinstance(serving_config, A2AServingConfig):
+            msg = "serving_config must be an instance of A2AServingConfig"
+            raise ValueError(msg)
         app = _get_a2a_app(self, serving_config=serving_config)
 
         serve_a2a(
@@ -207,10 +210,13 @@ class AnyAgent(ABC):
             ImportError: If the `serving` dependencies are not installed.
 
         """
-        from any_agent.serving import _get_a2a_app, serve_a2a_async
+        from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a_async
 
         if serving_config is None:
-            serving_config = ServingConfig()
+            serving_config = A2AServingConfig()
+        if not isinstance(serving_config, A2AServingConfig):
+            msg = "serving_config must be an instance of A2AServingConfig"
+            raise ValueError(msg)
         app = _get_a2a_app(self, serving_config=serving_config)
 
         return await serve_a2a_async(

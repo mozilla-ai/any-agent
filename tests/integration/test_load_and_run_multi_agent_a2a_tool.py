@@ -6,7 +6,8 @@ from litellm.utils import validate_environment
 from rich.logging import RichHandler
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import ServingConfig, TracingConfig
+from any_agent.config import TracingConfig
+from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.conftest import build_tree
@@ -94,7 +95,7 @@ async def test_load_and_run_multi_agent_a2a(
 
         served_agent = date_agent
         (served_task, served_server) = await served_agent.serve_async(
-            serving_config=ServingConfig(
+            serving_config=A2AServingConfig(
                 port=tool_agent_port,
                 endpoint=f"/{tool_agent_endpoint}",
                 log_level="info",
