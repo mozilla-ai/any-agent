@@ -63,12 +63,15 @@ class LangchainAgent(AnyAgent):
 
         self._tools = imported_tools
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+        agent_args = self.config.agent_args or {}
+        if self.config.output_type is not None:
+            agent_args["response_format"] = self.config.output_type
         self._agent = agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
             tools=imported_tools,
             prompt=self.config.instructions,
-            **self.config.agent_args or {},
+            **agent_args,
         )
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
@@ -77,6 +80,15 @@ class LangchainAgent(AnyAgent):
             raise ValueError(error_message)
         inputs = {"messages": [("user", prompt)]}
         result = await self._agent.ainvoke(inputs, **kwargs)
+        if self.config.output_type is not None:
+            structured_response = result.get("structured_response")
+            if not structured_response:
+                msg = "No structured output returned from the agent."
+                raise ValueError(msg)
+            if not isinstance(structured_response, self.config.output_type):
+                msg = f"Structured output is not of type {self.config.output_type}"
+                raise ValueError(msg)
+            return structured_response
         if not result.get("messages"):
             msg = "No messages returned from the agent."
             raise ValueError(msg)
