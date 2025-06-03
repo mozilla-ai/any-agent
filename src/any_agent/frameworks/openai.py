@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any
 
+from agents import AgentOutputSchemaBase
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
@@ -69,6 +70,9 @@ class OpenAIAgent(AnyAgent):
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
 
+        if self.config.output_type:
+            kwargs_["output_type"] = self.config.output_type
+
         self._tools = tools
         self._agent = Agent(
             name=self.config.name,
@@ -93,4 +97,4 @@ class OpenAIAgent(AnyAgent):
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
         result = await Runner.run(self._agent, prompt, **kwargs)
-        return str(result.final_output)
+        return result.final_output

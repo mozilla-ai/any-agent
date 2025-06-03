@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from any_agent.config import AgentConfig, AgentFramework, TracingConfig
 from any_agent.frameworks.any_agent import AnyAgent
 
 try:
-    from smolagents import LiteLLMModel, ToolCallingAgent
+    from smolagents import LiteLLMModel, ToolCallingAgent, FinalAnswerTool
 
     smolagents_available = True
 except ImportError:
@@ -57,23 +57,51 @@ class SmolagentsAgent(AnyAgent):
 
         main_agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
 
+        agent_args = self.config.agent_args or {}
+
         self._tools = tools
         self._agent = main_agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
             tools=tools,
             verbosity_level=-1,  # OFF
-            **self.config.agent_args or {},
+            **agent_args,
         )
+        if self.config.output_type:
+            output_type = self.config.output_type
+
+            class CustomFinalAnswerTool(FinalAnswerTool):
+                inputs = {
+                    "answer": {
+                        "type": "string",
+                        "description": f"The final answer to the problem. The input must be a string that conforms to the{output_type.__name__} object.",
+                    }
+                }
+
+                def forward(self, answer: str) -> Any:
+                    output_type.model_validate_json(answer)
+                    return answer
+
+            self._agent.tools["final_answer"] = CustomFinalAnswerTool()
 
         assert self._agent
 
         if self.config.instructions:
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
+        if self.config.output_type:
+            self._agent.prompt_templates[
+                "system_prompt"
+            ] += f"""\n\nYour final answer must be a {self.config.output_type.__name__} object.
+            This object must match the following schema:
+            {self.config.output_type.model_json_schema()}
+            """
+
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
         result = self._agent.run(prompt, **kwargs)
-        return str(result)
+        if self.config.output_type:
+            return self.config.output_type.model_validate_json(result)
+        return result
