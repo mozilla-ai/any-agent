@@ -60,8 +60,8 @@ class LlamaIndexAgent(AnyAgent):
         imported_tools, _ = await self._load_tools(self.config.tools)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         self._tools = imported_tools
-
-        if self.config.output_type:
+        instructions = self.config.instructions
+        if self.config.output_type is not None:
             instructions = self.config.instructions or ""
             instructions += f"""
             You must return a {self.config.output_type.__name__} JSON string.
@@ -69,16 +69,16 @@ class LlamaIndexAgent(AnyAgent):
             {self.config.output_type.model_json_schema()}
             You can use the 'verify_final_answer' tool to help verify your output
             """
+
             def verify_final_answer(final_answer: str) -> bool:
                 """Verify that the output can be parsed as the specified Pydantic model."""
                 try:
-                    self.config.output_type.model_validate_json(final_answer)
-                    return True
+                    self.config.output_type.model_validate_json(final_answer)  # type: ignore[union-attr]
                 except ValidationError:
                     return False
+                return True
+
             imported_tools.append(verify_final_answer)
-        else:
-            instructions = self.config.instructions
         self._agent = agent_type(
             name=self.config.name,
             tools=imported_tools,
@@ -98,5 +98,7 @@ class LlamaIndexAgent(AnyAgent):
             msg = f"Agent did not return a valid response: {result.response}"
             raise ValueError(msg)
         if self.config.output_type:
-            return self.config.output_type.model_validate_json(result.response.blocks[0].text)
+            return self.config.output_type.model_validate_json(
+                result.response.blocks[0].text
+            )
         return result.response.blocks[0].text

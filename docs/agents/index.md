@@ -54,10 +54,10 @@ from agents import (
     output_guardrail,
 )
 
-class MessageOutput(BaseModel): 
+class MessageOutput(BaseModel):
     response: str
 
-class MathOutput(BaseModel): 
+class MathOutput(BaseModel):
     reasoning: str
     is_math: bool
 
@@ -68,7 +68,7 @@ guardrail_agent = Agent(
 )
 
 @output_guardrail
-async def math_guardrail(  
+async def math_guardrail(
     ctx: RunContextWrapper, agent: Agent, output: MessageOutput
 ) -> GuardrailFunctionOutput:
     result = await Runner.run(guardrail_agent, output.response, context=ctx.context)
