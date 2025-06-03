@@ -62,6 +62,7 @@ class GoogleAgent(AnyAgent):
 
         self._tools = tools
 
+        instructions = self.config.instructions or ""
         if self.config.output_type:
             # The design of structured output in the ADK is a little different from other frameworks.
             # There's a useful discussion here https://github.com/google/adk-python/discussions/322
@@ -70,7 +71,6 @@ class GoogleAgent(AnyAgent):
             # https://google.github.io/adk-docs/agents/llm-agents/#structuring-data-input_schema-output_schema-output_key
             # In order to work around this, we'll append instructions about the output schema to the instructions,
             # and we'll also use the validate_final_output tool to validate the output, with a few build in retries.
-            instructions = self.config.instructions or ""
             instructions += f"""\n\nYou must return a {self.config.output_type.__name__} object.
             This object must match the following schema:
             {self.config.output_type.model_json_schema()}
