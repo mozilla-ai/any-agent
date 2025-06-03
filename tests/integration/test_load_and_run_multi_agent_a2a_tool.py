@@ -37,7 +37,6 @@ async def test_load_and_run_multi_agent(
     if agent_framework in [
         AgentFramework.SMOLAGENTS,
         AgentFramework.LLAMA_INDEX,
-        AgentFramework.TINYAGENT,
     ]:
         pytest.skip(
             "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
@@ -130,6 +129,9 @@ async def test_load_and_run_multi_agent(
         assert agent_trace.final_output
 
         logger.info("spans:")
+        logger.info(agent_trace.spans)
+
+        logger.info("span tree:")
         logger.info(build_tree(agent_trace.spans).model_dump_json(indent=2))
 
         logger.info(agent_trace.final_output)

@@ -1,9 +1,7 @@
 # adapted from https://github.com/google/a2a-python/blob/main/examples/helloworld/test_client.py
 
-import asyncio
 import re
 from collections.abc import Callable, Coroutine
-from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
@@ -51,7 +49,7 @@ async def a2a_tool(
             A2ACardResolver(httpx_client=resolver_client, base_url=url)
         ).get_agent_card()
 
-    async def _send_query_async(query: str) -> str:
+    async def _send_query(query: str) -> str:
         async with httpx.AsyncClient(follow_redirects=True) as query_client:
             client = A2AClient(httpx_client=query_client, agent_card=a2a_agent_card)
             send_message_payload = SendMessageRequest(
@@ -71,14 +69,6 @@ async def a2a_tool(
             )
             result: str = response.model_dump_json()
             return result
-
-    def _send_query_sync(query: str) -> str:
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            return executor.submit(
-                lambda: asyncio.run(_send_query_async(query))
-            ).result()
-
-    _send_query = _send_query_async
 
     new_name = toolname or a2a_agent_card.name
     new_name = re.sub(r"\s+", "_", new_name.strip())
