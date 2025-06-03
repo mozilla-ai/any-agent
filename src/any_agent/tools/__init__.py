@@ -1,4 +1,4 @@
-from .a2a import a2a_tool
+from .a2a import a2a_tool, a2a_tool_sync
 from .mcp import (
     MCPServer,
     _get_mcp_server,
@@ -19,6 +19,7 @@ __all__ = [
     "_MCPServerBase",
     "_get_mcp_server",
     "a2a_tool",
+    "a2a_tool_sync",
     "ask_user_verification",
     "search_tavily",
     "search_web",

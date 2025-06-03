@@ -6,6 +6,7 @@ from textwrap import dedent
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
+import httpx
 import pytest
 from litellm.types.utils import ModelResponse
 
@@ -180,3 +181,15 @@ def build_tree(items: list[AgentSpan]) -> AgentSpan:
             else:
                 traces[None] = trace
     return traces[None]
+
+
+def probe(url: str) -> bool:
+    """Check that the URL returns something but doesn't time out"""
+    try:
+        with httpx.Client() as client:
+            client.get(url, timeout=1)
+            return True
+    except httpx.TimeoutException:
+        return False
+    except httpx.ConnectError:
+        return False

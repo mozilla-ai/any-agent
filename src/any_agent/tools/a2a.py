@@ -1,5 +1,6 @@
 # adapted from https://github.com/google/a2a-python/blob/main/examples/helloworld/test_client.py
 
+import asyncio
 import re
 from collections.abc import Callable, Coroutine
 from contextlib import suppress
@@ -28,7 +29,7 @@ with suppress(ImportError):
 async def a2a_tool(
     url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
 ) -> Callable[[str], Coroutine[Any, Any, str]]:
-    """Perform a query using A2A to another agent.
+    """Perform a query using A2A to another agent (async function).
 
     Args:
         url (str): The url in which the A2A agent is located.
@@ -85,3 +86,24 @@ async def a2a_tool(
             The result from the A2A agent, encoded in json.
     """
     return _send_query
+
+
+def a2a_tool_sync(
+    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
+) -> Callable[[str], Coroutine[Any, Any, str]]:
+    """Perform a query using A2A to another agent (sync function).
+    Note that the result is still an async function.
+
+    Args:
+        url (str): The url in which the A2A agent is located.
+        toolname (str): The name for the created tool. Defaults to `call_{agent name in card}`.
+            Leading and trailing whitespace are removed. Whitespace in the middle is replaced by `_`.
+        http_kwargs (dict): Additional kwargs to pass to the httpx client.
+
+    Returns:
+        An async `Callable` that takes a query and returns the agent response.
+
+    """
+    return asyncio.get_event_loop().run_until_complete(
+        a2a_tool(url, toolname, http_kwargs)
+    )

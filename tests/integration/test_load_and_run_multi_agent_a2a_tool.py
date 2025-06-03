@@ -1,5 +1,8 @@
+import datetime
 import logging
+import multiprocessing
 import os
+import time
 
 import pytest
 from litellm.utils import validate_environment
@@ -7,9 +10,9 @@ from rich.logging import RichHandler
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import ServingConfig, TracingConfig
-from any_agent.tools import a2a_tool
+from any_agent.tools import a2a_tool, a2a_tool_sync
 from any_agent.tracing.agent_trace import AgentTrace
-from tests.conftest import build_tree
+from tests.conftest import build_tree, probe
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -20,6 +23,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger("any_agent_test")
 logger.setLevel(logging.DEBUG)
+
+
+# defined here for pickling purposes
+def get_datetime() -> str:
+    """Return the current date and time"""
+    return str(datetime.datetime.now())
+
+
+def run_agent(agent_framework, date_agent_cfg, tool_agent_port, tool_agent_endpoint):
+    date_agent = AnyAgent.create(
+        agent_framework=agent_framework,
+        agent_config=date_agent_cfg,
+        tracing=TracingConfig(console=False, cost_info=True),
+    )
+    date_agent.serve(
+        serving_config=ServingConfig(
+            port=tool_agent_port,
+            endpoint=f"/{tool_agent_endpoint}",
+            log_level="info",
+        )
+    )
 
 
 @pytest.mark.skipif(
@@ -156,3 +180,121 @@ async def test_load_and_run_multi_agent_a2a(
             await served_server.shutdown()
         if served_task:
             served_task.cancel()
+
+
+@pytest.mark.skipif(
+    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
+    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
+)
+@pytest.mark.asyncio
+def test_load_and_run_multi_agent_a2a_sync(
+    agent_framework: AgentFramework,
+) -> None:
+    """Tests that an agent contacts another using A2A using the adapter tool.
+
+    Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
+    """
+    if agent_framework in [
+        AgentFramework.TINYAGENT,
+        AgentFramework.SMOLAGENTS,
+        AgentFramework.AGNO,
+        AgentFramework.GOOGLE,
+        AgentFramework.LLAMA_INDEX,
+    ]:
+        pytest.skip(
+            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+        )
+    kwargs = {}
+
+    kwargs["model_id"] = "gpt-4.1-nano"
+    agent_model = kwargs["model_id"]
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
+    model_args = (
+        {"parallel_tool_calls": False}
+        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
+        else None
+    )
+
+    main_agent = None
+
+    tool_agent_port = 5800
+    tool_agent_endpoint = "tool_agent"
+    tool_agent_url = f"http://localhost:{tool_agent_port}/{tool_agent_endpoint}"
+
+    # DATE AGENT
+
+    date_agent_description = "Agent that can return the current date."
+    date_agent_cfg = AgentConfig(
+        instructions="Use the available tools to obtain additional information to answer the query.",
+        name="date_agent",
+        model_id=agent_model,
+        description=date_agent_description,
+        tools=[get_datetime],
+        model_args=model_args,
+    )
+    proc = multiprocessing.Process(
+        target=run_agent,
+        args=(agent_framework, date_agent_cfg, tool_agent_port, tool_agent_endpoint),
+        daemon=True,
+    )
+    proc.start()
+    while not probe(tool_agent_url):
+        time.sleep(1)
+        probe_log = f"probing <{tool_agent_url}> ..."
+        logger.info(probe_log)
+
+    try:
+        # Search agent is ready for card resolution
+
+        logger.info(
+            "Setting up agent",
+            extra={"endpoint": tool_agent_url},
+        )
+
+        main_agent_cfg = AgentConfig(
+            instructions="Use the available tools to obtain additional information to answer the query.",
+            description="The orchestrator that can use other agents via tools using the A2A protocol.",
+            tools=[
+                a2a_tool_sync(
+                    f"http://localhost:{tool_agent_port}/{tool_agent_endpoint}"
+                )
+            ],
+            model_args=model_args,
+            **kwargs,  # type: ignore[arg-type]
+        )
+
+        main_agent = AnyAgent.create(
+            agent_framework=agent_framework,
+            agent_config=main_agent_cfg,
+            tracing=TracingConfig(console=False, cost_info=True),
+        )
+
+        agent_trace = main_agent.run("What date and time is it right now?")
+
+        assert isinstance(agent_trace, AgentTrace)
+        assert agent_trace.final_output
+
+        logger.info("spans:")
+        logger.info(build_tree(agent_trace.spans).model_dump_json(indent=2))
+
+        logger.info(agent_trace.final_output)
+        now = datetime.datetime.now()
+        assert all(
+            [
+                str(now.year) in agent_trace.final_output,
+                str(now.day) in agent_trace.final_output,
+                now.strftime("%B") in agent_trace.final_output,
+            ]
+        )
+        assert any(
+            span.is_tool_execution()
+            and span.attributes.get("gen_ai.tool.name", None) == "call_date_agent"
+            for span in agent_trace.spans
+        )
+
+    finally:
+        proc.kill()
+        proc.join()
