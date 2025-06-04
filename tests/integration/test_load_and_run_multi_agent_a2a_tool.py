@@ -52,19 +52,18 @@ def run_agent(agent_framework, date_agent_cfg, tool_agent_port, tool_agent_endpo
 )
 @pytest.mark.asyncio
 async def test_load_and_run_multi_agent_a2a(
-    agent_framework: AgentFramework,
+    agent_framework: AgentFramework, tool_agent_port: int
 ) -> None:
     """Tests that an agent contacts another using A2A using the adapter tool.
 
     Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
     """
     if agent_framework in [
-        AgentFramework.GOOGLE,
-        AgentFramework.TINYAGENT,
+        # async a2a is not supported
         AgentFramework.SMOLAGENTS,
-        AgentFramework.AGNO,
-        AgentFramework.OPENAI,
+        # spans are not built correctly
         AgentFramework.LLAMA_INDEX,
+        # AgentFramework.GOOGLE,
     ]:
         pytest.skip(
             "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
@@ -88,7 +87,6 @@ async def test_load_and_run_multi_agent_a2a(
     served_task = None
 
     try:
-        tool_agent_port = 5800
         tool_agent_endpoint = "tool_agent"
 
         # DATE AGENT
@@ -157,10 +155,15 @@ async def test_load_and_run_multi_agent_a2a(
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
 
-        logger.info("spans:")
-        logger.info(build_tree(agent_trace.spans).model_dump_json(indent=2))
+        try:
+            span_tree = build_tree(agent_trace.spans).model_dump_json(indent=2)
+            logger.info("span tree:")
+            logger.info(span_tree)
+        except KeyError as e:
+            pytest.fail(f"The span tree was not built successfully: {e}")
 
-        logger.info(agent_trace.final_output)
+        final_output_log = f"Final output: {agent_trace.final_output}"
+        logger.info(final_output_log)
         now = datetime.datetime.now()
         assert all(
             [
