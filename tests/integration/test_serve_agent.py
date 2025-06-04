@@ -9,7 +9,7 @@ from a2a.types import MessageSendParams, SendMessageRequest
 
 # Import your agent and config
 from any_agent import AgentConfig, AnyAgent
-from any_agent.config import ServingConfig
+from any_agent.serving import A2AServingConfig
 
 SERVER_PORT = 5000
 
@@ -22,7 +22,7 @@ def run_agent():
             description="I'm an agent to help with booking airbnbs",
         ),
     )
-    agent.serve(serving_config=ServingConfig(port=SERVER_PORT))
+    agent.serve(serving_config=A2AServingConfig(port=SERVER_PORT))
 
 
 async def run_agent_async():
@@ -33,7 +33,7 @@ async def run_agent_async():
             description="I'm an agent to help with booking airbnbs",
         ),
     )
-    return await agent.serve_async(serving_config=ServingConfig(port=SERVER_PORT))
+    return await agent.serve_async(serving_config=A2AServingConfig(port=SERVER_PORT))
 
 
 @pytest.mark.asyncio
