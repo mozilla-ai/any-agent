@@ -141,7 +141,8 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
-def test_load_and_run_agent(
+@pytest.mark.asyncio
+async def test_load_and_run_agent(
     agent_framework: AgentFramework, tmp_path: Path, request: pytest.FixtureRequest
 ) -> None:
     kwargs = {}
@@ -191,14 +192,14 @@ def test_load_and_run_agent(
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
+    agent = await AnyAgent.create_async(agent_framework, agent_config, tracing=TracingConfig())
     update_trace = request.config.getoption("--update-trace-assets")
     if update_trace:
         agent._exporter.console.record = True  # type: ignore[union-attr]
 
     try:
         start_ns = time.time_ns()
-        agent_trace = agent.run(
+        agent_trace = await agent.run_async(
             "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.",
         )
         end_ns = time.time_ns()
@@ -219,7 +220,6 @@ def test_load_and_run_agent(
             with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
                 f.write(html_output.replace("<!DOCTYPE html>", ""))
 
-        agent.exit()
         assert_eval(agent_trace)
     finally:
         agent.exit()

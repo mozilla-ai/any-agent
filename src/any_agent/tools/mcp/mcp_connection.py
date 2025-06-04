@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from contextlib import AsyncExitStack
 from textwrap import dedent
-from typing import TYPE_CHECKING, Generic, Protocol, TypeVar, runtime_checkable
+from typing import TYPE_CHECKING, Generic, Protocol, Self, TypeVar, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 
@@ -36,6 +36,23 @@ class _MCPConnection(BaseModel, ABC, Generic[T]):
     def server(self) -> "MCPServer | None":
         """Return the MCP server instance."""
         return None
+
+    async def aclose(self) -> None:
+        """Close the MCP connection and clean up resources."""
+        if self._exit_stack:
+            try:
+                await self._exit_stack.aclose()
+            except Exception:
+                # Silently handle cleanup errors
+                pass
+
+    async def __aenter__(self) -> Self:
+        """Enter the async context manager."""
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Exit the async context manager and clean up resources."""
+        await self.aclose()
 
     def _filter_tools(self, tools: Sequence[T]) -> Sequence[T]:
         """Filter the tools to only include the ones listed in mcp_tool['tools']."""

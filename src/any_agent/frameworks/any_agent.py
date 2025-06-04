@@ -20,6 +20,7 @@ from any_agent.tracing.instrumentation import (
     _Instrumentor,
 )
 from any_agent.tracing.trace_provider import TRACE_PROVIDER
+from any_agent.utils.async_utils import run_async_in_sync_context
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -104,26 +105,23 @@ class AnyAgent(ABC):
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
-        try:
-            # Try to get existing event loop
-            loop = asyncio.get_running_loop()
-            # If we're here, there's a running loop, which means we can't use asyncio.run()
-            return loop.run_until_complete(
-                cls.create_async(
-                    agent_framework=agent_framework,
-                    agent_config=agent_config,
-                    tracing=tracing,
-                )
+        # Check for MCP tools and direct users to async API
+        from any_agent.config import MCPParams
+        if any(isinstance(tool, MCPParams) for tool in agent_config.tools):
+            msg = (
+                "MCP tools require the async API for proper lifecycle management. "
+                "Please use `await AnyAgent.create_async(...)` instead of `AnyAgent.create(...)` "
+                "when using MCP tools."
             )
-        except RuntimeError:
-            # No running event loop, we can use asyncio.run()
-            return asyncio.run(
-                cls.create_async(
-                    agent_framework=agent_framework,
-                    agent_config=agent_config,
-                    tracing=tracing,
-                )
+            raise RuntimeError(msg)
+        
+        return run_async_in_sync_context(
+            cls.create_async(
+                agent_framework=agent_framework,
+                agent_config=agent_config,
+                tracing=tracing,
             )
+        )
 
     @classmethod
     async def create_async(
@@ -136,6 +134,13 @@ class AnyAgent(ABC):
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config, tracing=tracing)
         await agent._load_agent()
+        
+        # Initialize MCP servers and keep them alive for the agent's lifetime
+        if agent._mcp_servers:
+            for server in agent._mcp_servers:
+                # Enter each MCP server's context to keep it alive
+                await server.__aenter__()
+        
         return agent
 
     async def _load_tools(
@@ -144,8 +149,6 @@ class AnyAgent(ABC):
         tools, mcp_servers = await _wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
         self._mcp_servers.extend(mcp_servers)
-        for mcp_server in mcp_servers:
-            tools.extend(mcp_server.tools)
         return tools, mcp_servers
 
     def _setup_tracing(self) -> None:
@@ -159,14 +162,16 @@ class AnyAgent(ABC):
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
-        try:
-            # Try to get existing event loop
-            loop = asyncio.get_running_loop()
-            # If we're here, there's a running loop, which means we can't use asyncio.run()
-            return loop.run_until_complete(self.run_async(prompt, **kwargs))
-        except RuntimeError:
-            # No running event loop, we can use asyncio.run()
-            return asyncio.run(self.run_async(prompt, **kwargs))
+        # Check for MCP servers and recommend async API
+        if self._mcp_servers:
+            msg = (
+                "MCP tools require the async API to avoid cross-context cleanup issues. "
+                "Please use `await agent.run_async(prompt)` instead of `agent.run(prompt)` "
+                "when using MCP tools."
+            )
+            raise RuntimeError(msg)
+        
+        return run_async_in_sync_context(self.run_async(prompt, **kwargs))
 
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent asynchronously with the given prompt."""
@@ -184,6 +189,7 @@ class AnyAgent(ABC):
                     "gen_ai.request.id": run_id,
                 }
             )
+
             final_output = await self._run_async(prompt, **kwargs)
         trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
         trace.final_output = final_output
