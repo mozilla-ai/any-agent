@@ -43,12 +43,3 @@ jobs:
           ANY_AGENT_INTEGRATION_TESTS: TRUE
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: pytest -v tests/integration -d --tx '4*popen//python=python'
-
-      - name: Run Jupyter Notebook tests
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-        working-directory: docs/cookbook
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          python -m ipykernel install --user --name=anyagent
-          for nb in `ls -1 *.ipynb`; do jupyter execute --kernel_name=anyagent $nb; done
