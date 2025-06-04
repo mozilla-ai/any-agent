@@ -10,7 +10,6 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from any_agent.config import (
     AgentConfig,
     AgentFramework,
-    ServingConfig,
     Tool,
     TracingConfig,
 )
@@ -27,6 +26,7 @@ if TYPE_CHECKING:
 
     import uvicorn
 
+    from any_agent.serving.config import A2AServingConfig
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
     from any_agent.tracing.agent_trace import AgentTrace
 
@@ -171,20 +171,27 @@ class AnyAgent(ABC):
         trace.final_output = final_output
         return trace
 
-    def serve(self, serving_config: ServingConfig | None = None) -> None:
-        """Serve this agent using the Agent2Agent Protocol (A2A).
+    def serve(self, serving_config: A2AServingConfig | None = None) -> None:
+        """Serve this agent using the protocol defined in the serving_config.
 
         Args:
-            serving_config: See [ServingConfig][any_agent.config.ServingConfig].
+            serving_config: Configuration for serving the agent. If None, uses default A2AServingConfig.
+                          Must be an instance of A2AServingConfig.
 
         Raises:
             ImportError: If the `serving` dependencies are not installed.
 
+        Example:
+            agent = AnyAgent.create("tinyagent", AgentConfig(...))
+            config = A2AServingConfig(port=8080, endpoint="/my-agent")
+            agent.serve(config)
+
         """
-        from any_agent.serving import _get_a2a_app, serve_a2a
+        from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a
 
         if serving_config is None:
-            serving_config = ServingConfig()
+            serving_config = A2AServingConfig()
+
         app = _get_a2a_app(self, serving_config=serving_config)
 
         serve_a2a(
@@ -196,21 +203,46 @@ class AnyAgent(ABC):
         )
 
     async def serve_async(
-        self, serving_config: ServingConfig | None = None
+        self, serving_config: A2AServingConfig | None = None
     ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
-        """Serve this agent using the Agent2Agent Protocol (A2A).
+        """Serve this agent asynchronously using the protocol defined in the serving_config.
 
         Args:
-            serving_config: See [ServingConfig][any_agent.config.ServingConfig].
+            serving_config: Configuration for serving the agent. If None, uses default A2AServingConfig.
+                          Must be an instance of A2AServingConfig.
+
+        Returns:
+            A tuple containing:
+            - asyncio.Task: The server task (keep a reference to prevent garbage collection)
+            - uvicorn.Server: The server instance for controlling the server lifecycle
 
         Raises:
             ImportError: If the `serving` dependencies are not installed.
 
+        Example:
+            >>> agent = await AnyAgent.create_async("tinyagent", AgentConfig(...))
+            >>> config = A2AServingConfig(port=8080)
+            >>> task, server = await agent.serve_async(config)
+            >>> try:
+            ...     # Server is running
+            ...     await asyncio.sleep(10)
+            >>> finally:
+            ...     server.should_exit = True
+            ...     await task
+
         """
-        from any_agent.serving import _get_a2a_app, serve_a2a_async
+        from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a_async
 
         if serving_config is None:
-            serving_config = ServingConfig()
+            serving_config = A2AServingConfig()
+
+        if not isinstance(serving_config, A2AServingConfig):
+            msg = (
+                f"serving_config must be an instance of A2AServingConfig, "
+                f"got {serving_config.type}. "
+                f"Currently only A2A serving is supported."
+            )
+            raise ValueError(msg)
         app = _get_a2a_app(self, serving_config=serving_config)
 
         return await serve_a2a_async(

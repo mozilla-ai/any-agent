@@ -14,13 +14,13 @@ from .agent_executor import AnyAgentExecutor
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
-    from any_agent.config import ServingConfig
+    from any_agent.serving import A2AServingConfig
 
 import asyncio
 
 
 def _get_a2a_app(
-    agent: AnyAgent, serving_config: ServingConfig
+    agent: AnyAgent, serving_config: A2AServingConfig
 ) -> A2AStarletteApplication:
     agent_card = _get_agent_card(agent, serving_config)
 
