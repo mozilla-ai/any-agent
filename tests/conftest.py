@@ -13,7 +13,6 @@ from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 
-# TODO use several base ports, one per suite/test
 BASE_PORT = 5800
 PORT_PER_FRAMEWORK = {fw: BASE_PORT + index for index, fw in enumerate(AgentFramework)}
 
