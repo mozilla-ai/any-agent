@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -39,21 +39,6 @@ class _MCPServerBase(BaseModel, ABC, Generic[T_co]):
 
         self.mcp_connection = mcp_connection
         self.tools = await mcp_connection.list_tools()
-
-    async def aclose(self) -> None:
-        """Close the MCP server and clean up resources."""
-        if self.mcp_connection:
-            await self.mcp_connection.aclose()
-            self.mcp_connection = None
-        self.tools = []
-
-    async def __aenter__(self) -> Self:
-        """Enter the async context manager."""
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
-        """Exit the async context manager and clean up resources."""
-        await self.aclose()
 
     @property
     def server(self) -> "MCPServer":

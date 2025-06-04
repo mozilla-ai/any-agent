@@ -136,8 +136,6 @@ async def _wrap_tools(
             mcp_server = _get_mcp_server(tool, agent_framework)
             await mcp_server._setup_tools()
             mcp_servers.append(mcp_server)  # type: ignore[arg-type]
-            # Add the tools from the MCP server to the wrapped tools
-            wrapped_tools.extend(mcp_server.tools)
         elif callable(tool):
             verify_callable(tool)
             wrapped_tools.append(wrapper(tool))
