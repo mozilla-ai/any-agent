@@ -154,4 +154,4 @@ Check out our cookbook example for building and serving an agent via A2A:
 
 ## Accessing an A2A agent using tools
 
-As described in the [tools section](./agents/tools.md#a2a-tools), an agent can request actions from other agents by using the `a2a_tool` function. It retrieves the agent card, and builds another function that relays the request via the A2A protocol and unpacks the result.
+As described in the [tools section](./agents/tools.md#a2a-tools), an agent can request actions from other agents by using the `a2a_tool`  or `a2a_tool_async` function. It retrieves the agent card, and builds another function that relays the request via the A2A protocol and unpacks the result.

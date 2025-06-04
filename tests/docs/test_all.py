@@ -26,6 +26,6 @@ def test_files_all(fpath: pathlib.Path) -> None:
         patch("any_agent.AnyAgent.create", mock_create),
         patch("any_agent.evaluation.evaluate", mock_eval),
         patch("any_agent.AnyAgent.create_async", mock_create_async),
-        patch("any_agent.tools.a2a_tool", mock_a2a_tool),
+        patch("any_agent.tools.a2a_tool_async", mock_a2a_tool),
     ):
         check_md_file(fpath=fpath, memory=True)

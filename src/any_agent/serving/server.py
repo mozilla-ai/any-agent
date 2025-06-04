@@ -78,4 +78,11 @@ def serve_a2a(
         (task, _) = await serve_a2a_async(server, host, port, endpoint, log_level)
         await task
 
-    return asyncio.get_event_loop().run_until_complete(run())
+    try:
+        # Try to get existing event loop
+        loop = asyncio.get_running_loop()
+        # If we're here, there's a running loop, which means we can't use asyncio.run()
+        return loop.run_until_complete(run())
+    except RuntimeError:
+        # No running event loop, we can use asyncio.run()
+        return asyncio.run(run())

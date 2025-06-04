@@ -104,13 +104,26 @@ class AnyAgent(ABC):
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
-        return asyncio.get_event_loop().run_until_complete(
-            cls.create_async(
-                agent_framework=agent_framework,
-                agent_config=agent_config,
-                tracing=tracing,
+        try:
+            # Try to get existing event loop
+            loop = asyncio.get_running_loop()
+            # If we're here, there's a running loop, which means we can't use asyncio.run()
+            return loop.run_until_complete(
+                cls.create_async(
+                    agent_framework=agent_framework,
+                    agent_config=agent_config,
+                    tracing=tracing,
+                )
             )
-        )
+        except RuntimeError:
+            # No running event loop, we can use asyncio.run()
+            return asyncio.run(
+                cls.create_async(
+                    agent_framework=agent_framework,
+                    agent_config=agent_config,
+                    tracing=tracing,
+                )
+            )
 
     @classmethod
     async def create_async(
@@ -146,9 +159,14 @@ class AnyAgent(ABC):
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
-        return asyncio.get_event_loop().run_until_complete(
-            self.run_async(prompt, **kwargs)
-        )
+        try:
+            # Try to get existing event loop
+            loop = asyncio.get_running_loop()
+            # If we're here, there's a running loop, which means we can't use asyncio.run()
+            return loop.run_until_complete(self.run_async(prompt, **kwargs))
+        except RuntimeError:
+            # No running event loop, we can use asyncio.run()
+            return asyncio.run(self.run_async(prompt, **kwargs))
 
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent asynchronously with the given prompt."""
