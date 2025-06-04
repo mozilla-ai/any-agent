@@ -1,11 +1,17 @@
 import asyncio
 from unittest.mock import patch
 
-from a2a.types import AgentCapabilities, AgentCard
+import pytest
 
-from any_agent.tools.a2a import a2a_tool
+try:
+    from a2a.types import AgentCapabilities, AgentCard
+
+    from any_agent.tools.a2a import a2a_tool
+except ImportError:
+    a2a_tool = None
 
 
+@pytest.mark.skipif(a2a_tool is None, reason="a2a is not installed")
 def test_a2a_tool_name_default():
     fun_name = "some_name"
     with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
@@ -23,6 +29,7 @@ def test_a2a_tool_name_default():
         assert created_fun.__name__ == f"call_{fun_name}"
 
 
+@pytest.mark.skipif(a2a_tool is None, reason="a2a is not installed")
 def test_a2a_tool_name_specific():
     other_name = "other_name"
     with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
@@ -40,6 +47,7 @@ def test_a2a_tool_name_specific():
         assert created_fun.__name__ == f"call_{other_name}"
 
 
+@pytest.mark.skipif(a2a_tool is None, reason="a2a is not installed")
 def test_a2a_tool_name_whitespace():
     fun_name = "  some_n  ame  "
     corrected_fun_name = "some_n_ame"
@@ -58,6 +66,7 @@ def test_a2a_tool_name_whitespace():
         assert created_fun.__name__ == f"call_{corrected_fun_name}"
 
 
+@pytest.mark.skipif(a2a_tool is None, reason="a2a is not installed")
 def test_a2a_tool_name_exotic_whitespace():
     fun_name = " \n so \t me_n\t ame  \n"
     corrected_fun_name = "so_me_n_ame"
@@ -76,6 +85,7 @@ def test_a2a_tool_name_exotic_whitespace():
         assert created_fun.__name__ == f"call_{corrected_fun_name}"
 
 
+@pytest.mark.skipif(a2a_tool is None, reason="a2a is not installed")
 def test_a2a_tool_name_specific_whitespace():
     other_name = " \n oth \t er_n\t ame  \n"
     corrected_other_name = "oth_er_n_ame"

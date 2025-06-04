@@ -8,6 +8,6 @@
 
 ::: any_agent.config.MCPSse
 
-::: any_agent.config.ServingConfig
+::: any_agent.serving.config.A2AServingConfig
 
 ::: any_agent.config.AgentFramework

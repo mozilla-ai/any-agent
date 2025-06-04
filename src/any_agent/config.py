@@ -83,39 +83,6 @@ class MCPSse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class ServingConfig(BaseModel):
-    """Base configuration for serving an agent.
-
-    This abstract base class defines the common interface and validation
-    for serving agents over different protocols. It cannot be instantiated
-    directly - use concrete implementations like A2AServingConfig.
-
-    Note:
-        This is an abstract base class. Use A2AServingConfig or other
-        concrete implementations instead of instantiating this directly.
-
-    """
-
-    model_config = ConfigDict(extra="forbid")
-
-    host: str = "localhost"
-    """Will be passed as argument to `uvicorn.run`."""
-
-    port: int = 5000
-    """Will be passed as argument to `uvicorn.run`."""
-
-    endpoint: str = "/"
-    """Will be pass as argument to `Starlette().add_route`"""
-
-    log_level: str = "warning"
-    """Will be passed as argument to the `uvicorn` server."""
-
-    type: str
-    """The type of serving config (e.g. "a2a")"""
-
-    version: str = "0.1.0"
-
-
 class TracingConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

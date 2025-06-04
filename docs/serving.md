@@ -10,7 +10,7 @@ the protocol, as explaining it is out of the scope of this page.
 
 In order to use A2A serving, you must first install the 'a2a' extra: `pip install 'any-agent[a2a]'`
 
-You can configure and serve an agent using the [`ServingConfig`][any_agent.config.ServingConfig] and the [`AnyAgent.serve`][any_agent.AnyAgent.serve] or [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
+You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] and the [`AnyAgent.serve`][any_agent.AnyAgent.serve] or [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
 
 ## Example
 

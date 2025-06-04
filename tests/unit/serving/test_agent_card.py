@@ -4,7 +4,6 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework
 from any_agent.config import MCPSse
-from any_agent.serving import A2AServingConfig
 from any_agent.tools import search_web
 from any_agent.tools.mcp import _get_mcp_server
 from any_agent.tools.wrappers import WRAPPERS
@@ -12,6 +11,7 @@ from any_agent.tools.wrappers import WRAPPERS
 try:
     from a2a.types import AgentSkill
 
+    from any_agent.serving import A2AServingConfig
     from any_agent.serving.agent_card import _get_agent_card
 except ImportError:
     _get_agent_card = None  # type: ignore[assignment]
@@ -62,7 +62,7 @@ async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
 
 @pytest.mark.skipif(_get_agent_card is None, reason="a2a_samples is not installed")
 def test_get_agent_card_with_explicit_skills(agent_framework: AgentFramework) -> None:
-    """Test that when skills are explicitly provided in ServingConfig, they are used instead of inferring from tools."""
+    """Test that when skills are explicitly provided in A2AServingConfig, they are used instead of inferring from tools."""
     agent = MagicMock()
     agent.config = AgentConfig(model_id="foo", description="test agent")
     agent.framework = agent_framework
