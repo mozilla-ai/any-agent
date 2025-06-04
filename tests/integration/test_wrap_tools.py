@@ -19,9 +19,13 @@ def wrap_sync(
     tools: Sequence[Tool],
     framework: AgentFramework,
 ) -> list[Tool]:
-    wrapped_tools, _ = asyncio.get_event_loop().run_until_complete(
-        _wrap_tools(tools, framework)
-    )
+    try:
+        wrapped_tools, _ = asyncio.get_event_loop().run_until_complete(
+            _wrap_tools(tools, framework)
+        )
+    except RuntimeError:
+        # No running event loop, we can use asyncio.run()
+        wrapped_tools, _ = asyncio.run(_wrap_tools(tools, framework))
     return wrapped_tools
 
 
@@ -35,6 +39,7 @@ def wrap_sync(
         (AgentFramework.SMOLAGENTS, SmolagentsClass),
     ],
 )
+@pytest.mark.asyncio
 def test_wrap_tools(framework: AgentFramework, expected_class: Any) -> None:
     wrapped_tools = wrap_sync([search_web, visit_webpage], framework)
     assert all(isinstance(tool, expected_class) for tool in wrapped_tools)

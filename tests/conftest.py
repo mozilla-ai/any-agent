@@ -1,5 +1,6 @@
 import json
 import logging
+import socket
 from collections.abc import AsyncGenerator, Callable, Generator
 from pathlib import Path
 from textwrap import dedent
@@ -13,8 +14,18 @@ from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 
-BASE_PORT = 5800
-PORT_PER_FRAMEWORK = {fw: BASE_PORT + index for index, fw in enumerate(AgentFramework)}
+
+def find_free_port() -> int:
+    """Find and return a free port number."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('', 0))
+        s.listen(1)
+        port = s.getsockname()[1]
+    return port
+
+
+# Cache to store assigned ports for each framework to ensure consistency within a test session
+_FRAMEWORK_PORTS: dict[AgentFramework, int] = {}
 
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
@@ -23,8 +34,11 @@ def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
 
 
 @pytest.fixture
-def tool_agent_port(agent_framework):
-    return PORT_PER_FRAMEWORK[agent_framework]
+def tool_agent_port(agent_framework: AgentFramework) -> int:
+    """Get a free port for the given agent framework, caching it for consistency."""
+    if agent_framework not in _FRAMEWORK_PORTS:
+        _FRAMEWORK_PORTS[agent_framework] = find_free_port()
+    return _FRAMEWORK_PORTS[agent_framework]
 
 
 @pytest.fixture
