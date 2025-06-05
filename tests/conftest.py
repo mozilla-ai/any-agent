@@ -7,17 +7,32 @@ from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from litellm.types.utils import ModelResponse
+from litellm.types.utils import ModelResponse as LLMModelResponse
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from tests.integration.helpers import wait_for_server_async
 
+PATCH_PER_FRAMEWORK = {
+    AgentFramework.AGNO: "agno.tools.function.FunctionCall.execute",
+    AgentFramework.GOOGLE: "google.adk.tools.function_tool.FunctionTool.run_async",
+    AgentFramework.LANGCHAIN: "langchain_core.tools.structured.StructuredTool._run",
+    AgentFramework.LLAMA_INDEX: "llama_index.core.tools.function_tool.sync_to_async",
+    AgentFramework.OPENAI: "langchain_core.tools.structured.StructuredTool._run",
+    AgentFramework.SMOLAGENTS: "smolagents.agents.ToolCallingAgent.execute_tool_call",
+    AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.ToolExecutor.call_tool",
+}
+
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
 def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
     return request.param  # type: ignore[no-any-return]
+
+
+@pytest.fixture
+def patched_function(agent_framework):
+    return PATCH_PER_FRAMEWORK[agent_framework]
 
 
 @pytest.fixture
@@ -95,9 +110,9 @@ def configure_logging(pytestconfig: pytest.Config) -> None:
 
 
 @pytest.fixture
-def mock_litellm_response() -> ModelResponse:
+def mock_litellm_response() -> LLMModelResponse:
     """Fixture to create a standard mock LiteLLM response"""
-    return ModelResponse.model_validate_json(
+    return LLMModelResponse.model_validate_json(
         '{"id":"chatcmpl-BWnfbHWPsQp05roQ06LAD1mZ9tOjT","created":1747157127,"model":"gpt-4o-2024-08-06","object":"chat.completion","system_fingerprint":"fp_f5bdcc3276","choices":[{"finish_reason":"stop","index":0,"message":{"content":"The state capital of Pennsylvania is Harrisburg.","role":"assistant","tool_calls":null,"function_call":null,"annotations":[]}}],"usage":{"completion_tokens":11,"prompt_tokens":138,"total_tokens":149,"completion_tokens_details":{"accepted_prediction_tokens":0,"audio_tokens":0,"reasoning_tokens":0,"rejected_prediction_tokens":0},"prompt_tokens_details":{"audio_tokens":0,"cached_tokens":0}},"service_tier":"default"}'
     )
 
