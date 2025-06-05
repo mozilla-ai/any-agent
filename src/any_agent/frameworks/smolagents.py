@@ -5,7 +5,6 @@ from pydantic import BaseModel
 from any_agent.config import (
     AgentConfig,
     AgentFramework,
-    DefaultAgentOutput,
     TracingConfig,
 )
 from any_agent.frameworks.any_agent import AnyAgent
@@ -72,40 +71,40 @@ class SmolagentsAgent(AnyAgent):
             verbosity_level=-1,  # OFF
             **agent_args,
         )
-        output_type = self.config.output_type
-
-        class CustomFinalAnswerTool(FinalAnswerTool):  # type: ignore[no-untyped-call]
-            inputs = {  # noqa: RUF012
-                "answer": {
-                    "type": "string",
-                    "description": f"The final answer to the problem. The input must be a string that conforms to the{output_type.__name__} object.",
-                }
-            }
-
-            def forward(self, answer: str) -> Any:
-                output_type.model_validate_json(answer)
-                return answer
-
-        self._agent.tools["final_answer"] = CustomFinalAnswerTool()  # type: ignore[no-untyped-call]
-
-        assert self._agent
 
         if self.config.instructions:
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
-        self._agent.prompt_templates[
-            "system_prompt"
-        ] += f"""\n\nYour final answer must be a {self.config.output_type.__name__} object.
-        This object must match the following schema:
-        {self.config.output_type.model_json_schema()}
-        """
+        if self.config.output_type:
+            output_type = self.config.output_type
+
+            class CustomFinalAnswerTool(FinalAnswerTool):  # type: ignore[no-untyped-call]
+                inputs = {  # noqa: RUF012
+                    "answer": {
+                        "type": "string",
+                        "description": f"The final answer to the problem. The input must be a string that conforms to the{output_type.__name__} object.",
+                    }
+                }
+
+                def forward(self, answer: str) -> Any:
+                    output_type.model_validate_json(answer)
+                    return answer
+
+            self._agent.tools["final_answer"] = CustomFinalAnswerTool()  # type: ignore[no-untyped-call]
+
+            self._agent.prompt_templates[
+                "system_prompt"
+            ] += f"""\n\nYour final answer must be a {self.config.output_type.__name__} object.
+            This object must match the following schema:
+            {self.config.output_type.model_json_schema()}
+            """
+        assert self._agent
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        run_result = self._agent.run(prompt, **kwargs)
-        result = self.config.output_type.model_validate_json(run_result)
-        if isinstance(result, DefaultAgentOutput):
-            return result.answer
-        return result
+        result = self._agent.run(prompt, **kwargs)
+        if self.config.output_type is not None:
+            return self.config.output_type.model_validate_json(result)
+        return str(result)

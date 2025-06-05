@@ -40,7 +40,7 @@ def test_run_tinyagent_agent_custom_args() -> None:
     agent_mock = AsyncMock()
     agent_mock.ainvoke.return_value = MagicMock()
     create_mock.return_value = agent_mock
-    output = '{"answer":"{\\"answer\\":\\"Harrisburg\\"}"}'
+    output = "The state capital of Pennsylvania is Harrisburg."
 
     agent = AnyAgent.create(AgentFramework.TINYAGENT, AgentConfig(model_id="gpt-4o"))
     with patch(

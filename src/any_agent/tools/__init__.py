@@ -1,4 +1,5 @@
 from .a2a import a2a_tool
+from .final_output import _create_final_output_tool
 from .mcp import (
     MCPServer,
     _get_mcp_server,
@@ -17,6 +18,7 @@ __all__ = [
     "MCPServer",
     "_MCPConnection",
     "_MCPServerBase",
+    "_create_final_output_tool",
     "_get_mcp_server",
     "a2a_tool",
     "ask_user_verification",

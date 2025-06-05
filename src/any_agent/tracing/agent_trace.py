@@ -8,7 +8,6 @@ from litellm.cost_calculator import cost_per_token
 from opentelemetry.sdk.trace import ReadableSpan
 from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
-from any_agent.config import DefaultAgentOutput
 from any_agent.logging import logger
 
 from .otel_types import (
@@ -164,7 +163,7 @@ class AgentTrace(BaseModel):
     """A list of [`AgentSpan`][any_agent.tracing.agent_trace.AgentSpan] that form the trace.
     """
 
-    final_output: str | BaseModel | DefaultAgentOutput | None = Field(default=None)
+    final_output: str | BaseModel | None = Field(default=None)
     """Contains the final output message returned by the agent.
     """
 

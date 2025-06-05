@@ -9,12 +9,10 @@ from typing import TYPE_CHECKING, Any
 
 import litellm
 from mcp.types import CallToolResult, TextContent
-from pydantic import ValidationError
 
 from any_agent.config import (
     AgentConfig,
     AgentFramework,
-    DefaultAgentOutput,
     TracingConfig,
 )
 from any_agent.logging import logger
@@ -180,52 +178,14 @@ class TinyAgent(AnyAgent):
     def _get_system_prompt(self) -> str:
         """Get the system prompt, including structured output instructions if needed."""
         base_prompt = self.config.instructions or DEFAULT_SYSTEM_PROMPT
-        structured_output_prompt = dedent(f"""You must return a {self.config.output_type.__name__} object.
-            This object must match the following schema:
-            {self.config.output_type.model_json_schema()}
-            Your final response should be a valid JSON object that conforms to this schema.""")
-        base_prompt += structured_output_prompt
+        if self.config.output_type:
+            structured_output_prompt = dedent(f"""You must return a {self.config.output_type.__name__} object.
+                This object must match the following schema:
+                {self.config.output_type.model_json_schema()}
+                Your final response should be a valid JSON object that conforms to this schema.""")
+            base_prompt += structured_output_prompt
 
         return base_prompt
-
-    async def _validate_and_retry_output(
-        self, response: str, attempt: int = 0
-    ) -> str | BaseModel:
-        """Validate structured output and retry if needed."""
-        try:
-            result = self.config.output_type.model_validate_json(response)
-            if isinstance(result, DefaultAgentOutput):
-                return result.answer
-            return result  # noqa: TRY300
-        except ValidationError as e:
-            if attempt >= DEFAULT_MAX_SCHEMA_VALIDATION_ATTEMPTS:
-                msg = f"Failed to generate appropriate final answer schema after {DEFAULT_MAX_SCHEMA_VALIDATION_ATTEMPTS} attempts"
-                raise ValueError(msg) from e
-
-            # Retry with error correction
-            output_type_schema = self.config.output_type.model_json_schema()
-            fix_prompt = dedent(f"""
-                The response is invalid. Please fix it. The error is: {e}
-                The output type schema is: {output_type_schema}
-                The response was: {response}.
-                Do not return anything else other than the fixed JSON object.
-            """)
-
-            self.messages.append(
-                {
-                    "role": "user",
-                    "content": fix_prompt,
-                }
-            )
-
-            # Run another completion cycle
-            self.completion_params["messages"] = self.messages
-            response = await litellm.acompletion(**self.completion_params)
-            message: LiteLLMMessage = response.choices[0].message  # type: ignore[attr-defined]
-            self.messages.append(message.model_dump())
-
-            new_response = str(message.content) if message.content else ""
-            return await self._validate_and_retry_output(new_response, attempt + 1)
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         self.messages = [
@@ -278,8 +238,11 @@ class TinyAgent(AnyAgent):
             num_of_turns += 1
             current_last = self.messages[-1]
             if current_last.get("role") == "assistant" and current_last.get("content"):
-                final_response = str(current_last["content"])
-                return await self._validate_and_retry_output(final_response)
+                if self.config.output_type is not None:
+                    return self.config.output_type.model_validate_json(
+                        str(current_last["content"])
+                    )
+                return str(current_last["content"])
 
         return "Max turns reached"
 

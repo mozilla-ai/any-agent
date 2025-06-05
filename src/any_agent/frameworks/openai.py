@@ -5,7 +5,6 @@ from pydantic import BaseModel
 from any_agent.config import (
     AgentConfig,
     AgentFramework,
-    DefaultAgentOutput,
     TracingConfig,
 )
 
@@ -73,8 +72,8 @@ class OpenAIAgent(AnyAgent):
         kwargs_ = self.config.agent_args or {}
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
-
-        kwargs_["output_type"] = self.config.output_type
+        if self.config.output_type is not None:
+            kwargs_["output_type"] = self.config.output_type
 
         self._tools = tools
         self._agent = Agent(
@@ -100,6 +99,4 @@ class OpenAIAgent(AnyAgent):
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
         result = await Runner.run(self._agent, prompt, **kwargs)
-        if isinstance(result.final_output, DefaultAgentOutput):
-            return result.final_output.answer
         return result.final_output  # type: ignore[no-any-return]

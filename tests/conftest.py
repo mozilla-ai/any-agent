@@ -108,60 +108,6 @@ def mock_litellm_response() -> ModelResponse:
 
 
 @pytest.fixture
-def mock_litellm_tool_call() -> ModelResponse:
-    """Fixture to create a standard mock LiteLLM response"""
-    return ModelResponse.model_validate(
-        {
-            "id": "chatcmpl-Bf8QyY4CdZd0SWOBusbF4enWIHSTe",
-            "choices": [
-                {
-                    "finish_reason": "tool_calls",
-                    "index": 0,
-                    "logprobs": None,
-                    "message": {
-                        "content": None,
-                        "refusal": None,
-                        "role": "assistant",
-                        "annotations": [],
-                        "audio": None,
-                        "function_call": None,
-                        "tool_calls": [
-                            {
-                                "id": "call_3nsDymtWJ6k8VdcaBGf4tAB1",
-                                "function": {
-                                    "arguments": {
-                                        "answer": '{ "answer": "Harrisburg"}'
-                                    },
-                                    "name": "final_output",
-                                },
-                                "type": "function",
-                            }
-                        ],
-                    },
-                }
-            ],
-            "created": 1749143568,
-            "model": "gpt-4.1-mini-2025-04-14",
-            "object": "chat.completion",
-            "service_tier": "default",
-            "system_fingerprint": "fp_658b958c37",
-            "usage": {
-                "completion_tokens": 20,
-                "prompt_tokens": 940,
-                "total_tokens": 960,
-                "completion_tokens_details": {
-                    "accepted_prediction_tokens": 0,
-                    "audio_tokens": 0,
-                    "reasoning_tokens": 0,
-                    "rejected_prediction_tokens": 0,
-                },
-                "prompt_tokens_details": {"audio_tokens": 0, "cached_tokens": 0},
-            },
-        }
-    )
-
-
-@pytest.fixture
 def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any]]:
     """
     Create a fixture that returns an async generator function to mock streaming responses.
