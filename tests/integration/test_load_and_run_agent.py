@@ -235,7 +235,7 @@ def test_output_type(agent_framework: AgentFramework) -> None:
     agent = AnyAgent.create(
         agent_framework,
         AgentConfig(
-            model_id="gpt-4o-mini",  # Can't use 4.1 until https://github.com/Akshay-Dongare/langchain-litellm/issues/7 is fixed
+            model_id="gpt-4.1-mini",
             output_type=TestOutput,
         ),
         tracing=TracingConfig(console=True),

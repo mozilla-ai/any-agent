@@ -11,7 +11,12 @@ import litellm
 from mcp.types import CallToolResult, TextContent
 from pydantic import ValidationError
 
-from any_agent.config import AgentConfig, AgentFramework, TracingConfig
+from any_agent.config import (
+    AgentConfig,
+    AgentFramework,
+    DefaultAgentOutput,
+    TracingConfig,
+)
 from any_agent.logging import logger
 
 from .any_agent import AnyAgent
@@ -175,16 +180,11 @@ class TinyAgent(AnyAgent):
     def _get_system_prompt(self) -> str:
         """Get the system prompt, including structured output instructions if needed."""
         base_prompt = self.config.instructions or DEFAULT_SYSTEM_PROMPT
-
-        if self.config.output_type:
-            structured_output_prompt = f"""
-
-You must return a {self.config.output_type.__name__} object.
-This object must match the following schema:
-{self.config.output_type.model_json_schema()}
-
-Your final response should be a valid JSON object that conforms to this schema."""
-            base_prompt += structured_output_prompt
+        structured_output_prompt = dedent(f"""You must return a {self.config.output_type.__name__} object.
+            This object must match the following schema:
+            {self.config.output_type.model_json_schema()}
+            Your final response should be a valid JSON object that conforms to this schema.""")
+        base_prompt += structured_output_prompt
 
         return base_prompt
 
@@ -192,11 +192,11 @@ Your final response should be a valid JSON object that conforms to this schema."
         self, response: str, attempt: int = 0
     ) -> str | BaseModel:
         """Validate structured output and retry if needed."""
-        if not self.config.output_type:
-            return response
-
         try:
-            return self.config.output_type.model_validate_json(response)
+            result = self.config.output_type.model_validate_json(response)
+            if isinstance(result, DefaultAgentOutput):
+                return result.answer
+            return result  # noqa: TRY300
         except ValidationError as e:
             if attempt >= DEFAULT_MAX_SCHEMA_VALIDATION_ATTEMPTS:
                 msg = f"Failed to generate appropriate final answer schema after {DEFAULT_MAX_SCHEMA_VALIDATION_ATTEMPTS} attempts"

@@ -3,6 +3,7 @@ import json
 from pydantic import BaseModel
 
 from any_agent import AgentConfig, AnyAgent, TracingConfig
+from any_agent.evaluation.schemas import AgentOutput
 from any_agent.tracing.agent_trace import AgentTrace
 
 MAX_EVIDENCE_LENGTH: int = 500
@@ -111,6 +112,7 @@ def get_agent(trace: AgentTrace, model: str) -> AnyAgent:
             tooling.get_number_of_steps,
             tooling.get_evidence_from_spans,
         ],
+        output_type=AgentOutput,
     )
 
     return AnyAgent.create(

@@ -3,7 +3,12 @@ from uuid import uuid4
 
 from pydantic import BaseModel, ValidationError
 
-from any_agent.config import AgentConfig, AgentFramework, TracingConfig
+from any_agent.config import (
+    AgentConfig,
+    AgentFramework,
+    DefaultAgentOutput,
+    TracingConfig,
+)
 
 from .any_agent import AnyAgent
 
@@ -11,7 +16,6 @@ try:
     from google.adk.agents.llm_agent import LlmAgent
     from google.adk.models.lite_llm import LiteLlm
     from google.adk.runners import InMemoryRunner
-    from google.adk.sessions.session import Session
     from google.genai import types
 
     DEFAULT_MODEL_TYPE = LiteLlm
@@ -43,11 +47,13 @@ class GoogleAgent(AnyAgent):
     def _get_model(self, agent_config: AgentConfig) -> "BaseLlm":
         """Get the model configuration for a Google agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        model_args = agent_config.model_args or {}
+        model_args["tool_choice"] = "required"
         return model_type(
             model=agent_config.model_id,
             api_key=agent_config.api_key,
             api_base=agent_config.api_base,
-            **agent_config.model_args or {},
+            **model_args,
         )
 
     async def _load_agent(self) -> None:
@@ -63,22 +69,41 @@ class GoogleAgent(AnyAgent):
         self._tools = tools
 
         instructions = self.config.instructions or ""
-        if self.config.output_type:
-            # The design of structured output in the ADK is a little different from other frameworks.
-            # There's a useful discussion here https://github.com/google/adk-python/discussions/322
-            # The main difference is that in the ADK, if you want an agent to return a specific schema, it is not
-            # allowed to use any tools.
-            # https://google.github.io/adk-docs/agents/llm-agents/#structuring-data-input_schema-output_schema-output_key
-            # In order to work around this, we'll append instructions about the output schema to the instructions,
-            # and we'll also use the validate_final_output tool to validate the output, with a few build in retries.
-            instructions += f"""\n\nYou must return a {self.config.output_type.__name__} object.
-            This object must match the following schema:
-            {self.config.output_type.model_json_schema()}
+        instructions += (
+            "You must call the final_output tool when finished. "
+            "The argument passed to the final_output tool must be a JSON string that matches the following schema:\n"
+            f"{self.config.output_type.model_json_schema()}"
+        )
+
+        def final_output(final_output: str) -> dict:  # type: ignore[type-arg]
+            try:
+                self.config.output_type.model_validate_json(final_output)
+            except ValidationError as e:
+                return {
+                    "success": False,
+                    "result": f"Please fix this validation error: {e}. The format must conform to {self.config.output_type.model_json_schema()}",
+                }
+            else:
+                return {"success": True, "result": final_output}
+
+        final_output.__doc__ = f"""You must call this tool in order to return the final answer.
+
+            Args:
+                final_output: The final output that can be loaded as a Pydantic model. This must be a JSON compatible string that matches the following schema:
+                    {self.config.output_type.model_json_schema()}
+
+            Returns:
+                A dictionary with the following keys:
+                    - success: True if the output is valid, False otherwise.
+                    - result: The final output if success is True, otherwise an error message.
+
             """
+        tools.append(final_output)
 
         self._agent = agent_type(
             name=self.config.name,
             instruction=instructions,
+            global_instruction=instructions,
             model=self._get_model(self.config),
             tools=tools,
             **self.config.agent_args or {},
@@ -103,59 +128,38 @@ class GoogleAgent(AnyAgent):
             user_id=user_id,
             session_id=session_id,
         )
-
-        async for _ in runner.run_async(
+        final_output = None
+        async for event in runner.run_async(
             user_id=user_id,
             session_id=session_id,
             new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
             **kwargs,
         ):
-            pass
+            if not event.content or not event.content.parts:
+                continue
+            if any(
+                part.function_response
+                and part.function_response.name == "final_output"
+                and part.function_response.response
+                and part.function_response.response.get("success")
+                for part in event.content.parts
+            ):
+                # Extract the final output from the successful function response
+                for part in event.content.parts:
+                    if (
+                        part.function_response
+                        and part.function_response.name == "final_output"
+                        and part.function_response.response
+                        and part.function_response.response.get("success")
+                    ):
+                        final_output = part.function_response.response.get("result")
+                        break
+                break
 
-        session = await runner.session_service.get_session(
-            app_name=runner.app_name,
-            user_id=user_id,
-            session_id=session_id,
-        )
-        assert session, "Session should not be None"
-        return await self._validate_final_output(runner, session)
-
-    async def _validate_final_output(
-        self,
-        runner: InMemoryRunner,
-        session: Session,
-        attempt: int = 0,
-    ) -> str | BaseModel:
-        response = str(session.state.get("response"))
-        if self.config.output_type:
-            try:
-                return self.config.output_type.model_validate_json(response)
-            except ValidationError as e:
-                if attempt >= DEFAULT_MAX_SCHEMA_VALIDATION_ATTEMPTS:
-                    msg = f"Failed to generate appropriate final answer schema after {DEFAULT_MAX_SCHEMA_VALIDATION_ATTEMPTS} attempts"
-                    raise ValueError(msg) from e
-                output_type_schema = self.config.output_type.model_json_schema()
-                fix_prompt = f"""
-                The response is invalid. Please fix it. The error is: {e}
-                The output type schema is: {output_type_schema}
-                The response was: {response}.
-                Do not return anything else other than the fixed JSON object.
-                """
-                async for _ in runner.run_async(
-                    user_id=session.user_id,
-                    session_id=session.id,
-                    new_message=types.Content(
-                        role="user", parts=[types.Part(text=fix_prompt)]
-                    ),
-                ):
-                    pass
-                new_session = await runner.session_service.get_session(
-                    app_name=runner.app_name,
-                    user_id=session.user_id,
-                    session_id=session.id,
-                )
-                assert new_session, "Session should not be None"
-                return await self._validate_final_output(
-                    runner, new_session, attempt + 1
-                )
-        return response
+        if not final_output:
+            msg = "No final response found"
+            raise ValueError(msg)
+        result = self.config.output_type.model_validate_json(final_output)
+        if isinstance(result, DefaultAgentOutput):
+            return result.answer
+        return result

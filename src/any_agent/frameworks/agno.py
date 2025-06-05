@@ -68,8 +68,7 @@ class AgnoAgent(AnyAgent):
         self._tools = self._unpack_tools(tools)
 
         agent_args = self.config.agent_args or {}
-        if self.config.output_type:
-            agent_args["response_model"] = self.config.output_type
+        agent_args["response_model"] = self.config.output_type
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,

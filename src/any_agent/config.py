@@ -111,6 +111,10 @@ MCPParams = MCPStdio | MCPSse
 Tool = str | MCPParams | Callable[..., Any]
 
 
+class DefaultAgentOutput(BaseModel):
+    answer: str
+
+
 class AgentConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -184,7 +188,7 @@ class AgentConfig(BaseModel):
     Refer to LiteLLM Completion API Docs for more info.
     """
 
-    output_type: type[BaseModel] | None = None
+    output_type: type[BaseModel] = DefaultAgentOutput
     """Control the output schema from calling `run`. By default, the agent will return a type str.
 
     Using this parameter you can define a Pydantic model that will be returned by the agent run methods.

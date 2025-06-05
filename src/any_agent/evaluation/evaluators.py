@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from any_agent import AnyAgent
     from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.evaluation.agent import get_agent
-from any_agent.evaluation.schemas import AgentOutput, GroundTruthAnswer
+from any_agent.evaluation.schemas import GroundTruthAnswer
 
 
 def evaluate_checkpoints(
@@ -40,17 +40,7 @@ def evaluate_checkpoints(
         else:
             # Agent as a Judge
             evaluation = checking_agent.run(prompt=checkpoint.criteria)
-            # strip out the ```json and ``` from the final output if they exist
-            if not evaluation.final_output:
-                msg = "The evaluation result is empty"
-                raise ValueError(msg)
-            assert isinstance(evaluation.final_output, str), (
-                "Final output should be a string"
-            )
-            final_output = evaluation.final_output.replace("```json", "").replace(
-                "```", ""
-            )
-            eval_output = AgentOutput.model_validate_json(final_output)
+            eval_output = evaluation.final_output  # type: ignore[assignment]
         result = EvaluationResult(
             passed=eval_output.passed,
             reason=eval_output.reasoning,
