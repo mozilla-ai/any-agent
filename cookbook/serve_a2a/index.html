@@ -1744,7 +1744,7 @@ else:
     <span class="p">],</span>
 <span class="p">)</span>
 
-<span class="n">time</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="n">time</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
         <span class="n">model_id</span><span class="o">=</span><span class="s2">"gpt-4.1-mini"</span><span class="p">,</span>
@@ -1768,7 +1768,7 @@ time_tool = MCPStdio(
     ],
 )
 
-time = AnyAgent.create(
+time = await AnyAgent.create_async(
     "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
         model_id="gpt-4.1-mini",

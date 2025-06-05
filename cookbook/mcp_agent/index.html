@@ -1764,11 +1764,14 @@ else:
     <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
         <span class="s2">"get_current_time"</span><span class="p">,</span>
     <span class="p">],</span>
+    <span class="n">client_session_timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># This MCP tool relies upon npx https://docs.npmjs.com/cli/v8/commands/npx which comes standard with npm</span>
 <span class="n">airbnb_tool</span> <span class="o">=</span> <span class="n">MCPStdio</span><span class="p">(</span>
-    <span class="n">command</span><span class="o">=</span><span class="s2">"npx"</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-y"</span><span class="p">,</span> <span class="s2">"@openbnb/mcp-server-airbnb"</span><span class="p">,</span> <span class="s2">"--ignore-robots-txt"</span><span class="p">]</span>
+    <span class="n">command</span><span class="o">=</span><span class="s2">"npx"</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-y"</span><span class="p">,</span> <span class="s2">"@openbnb/mcp-server-airbnb"</span><span class="p">,</span> <span class="s2">"--ignore-robots-txt"</span><span class="p">],</span>
+    <span class="n">client_session_timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -1803,11 +1806,14 @@ time_tool = MCPStdio(
     tools=[
         "get_current_time",
     ],
+    client_session_timeout_seconds=30,
 )
 
 # This MCP tool relies upon npx https://docs.npmjs.com/cli/v8/commands/npx which comes standard with npm
 airbnb_tool = MCPStdio(
-    command="npx", args=["-y", "@openbnb/mcp-server-airbnb", "--ignore-robots-txt"]
+    command="npx",
+    args=["-y", "@openbnb/mcp-server-airbnb", "--ignore-robots-txt"],
+    client_session_timeout_seconds=30,
 )
 
 
