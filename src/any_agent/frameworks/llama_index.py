@@ -67,7 +67,7 @@ class LlamaIndexAgent(AnyAgent):
             You must return a {self.config.output_type.__name__} JSON string.
             This object must match the following schema:
             {self.config.output_type.model_json_schema()}
-            You can use the 'verify_final_answer' tool to help verify your output
+            You can use the 'final_output' tool to help verify your output
             """
             imported_tools.append(_create_final_output_tool(self.config.output_type))
         self._agent = agent_type(
