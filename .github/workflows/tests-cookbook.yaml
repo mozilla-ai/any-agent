@@ -1,0 +1,36 @@
+name: Tests for Cookbooks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'docs/cookbook/**'
+  workflow_dispatch:
+
+jobs:
+  cookbook-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install the latest version of uv and set the python version to 3.13
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: 3.13
+          activate-environment: true
+
+      - name: Install
+        run: |
+          uv sync --group tests --extra all --extra a2a
+
+      - name: Run Jupyter Notebook tests
+        working-directory: docs/cookbook
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python -m ipykernel install --user --name=anyagent
+          for nb in `ls -1 *.ipynb`; do jupyter execute --kernel_name=anyagent $nb; done
