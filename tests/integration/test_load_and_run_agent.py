@@ -13,7 +13,7 @@ from litellm.utils import validate_environment
 from any_agent import (
     AgentConfig,
     AgentFramework,
-    AgentRunException,
+    AgentRunError,
     AnyAgent,
     TracingConfig,
 )
@@ -246,10 +246,8 @@ def test_exception_trace(
     if agent_framework in (
         # LangChain does not trigger the tool
         AgentFramework.LANGCHAIN,
-        # Llama Index wraps the function, so patching it becomes more difficult
-        AgentFramework.LLAMA_INDEX,
         # OPENAI wraps the function, so patching it becomes more difficult
-        AgentFramework.OPENAI,
+        # AgentFramework.OPENAI,
     ):
         pytest.skip(f"Framework {agent_framework.value} not currently passing the test")
 
@@ -286,7 +284,7 @@ def test_exception_trace(
         if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
         else {}
     )
-    model_args["temperature"] = 0.5
+    model_args["temperature"] = 0.0
     tools = [
         fail_tool,
     ]
@@ -305,20 +303,16 @@ def test_exception_trace(
         with patch(patched_function) as fw_agent_runtool:
             fw_agent_runtool.side_effect = RuntimeError(exc_reason)
             spans = []
-            start_ns = time.time_ns()
             try:
                 agent.run(
                     "Write a four-line poem and use the tools to write it to a file.",
                 )
-            except AgentRunException as are:
+            except AgentRunError as are:
                 spans = are.spans
-            end_ns = time.time_ns()
             assert any(
-                [
-                    span.status.status_code == StatusCode.ERROR
-                    and exc_reason in span.status.description
-                    for span in spans
-                ]
+                span.status.status_code == StatusCode.ERROR
+                and exc_reason in span.status.description
+                for span in spans
             )
     finally:
         agent.exit()

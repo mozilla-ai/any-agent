@@ -13,7 +13,6 @@ from any_agent.config import (
     TracingConfig,
 )
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing.agent_trace import AgentSpan
 from any_agent.tracing.exporter import _AnyAgentExporter
 from any_agent.tracing.instrumentation import (
     _get_instrumentor_by_framework,
@@ -31,17 +30,19 @@ if TYPE_CHECKING:
 
     from any_agent.serving.config import A2AServingConfig
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
-    from any_agent.tracing.agent_trace import AgentTrace
+    from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 
 
-class AgentRunException(Exception):
+class AgentRunError(Exception):
+    """Error that wraps underlying framework specific errors and carries spans."""
+
     _spans: list[AgentSpan]
 
     def __init__(self, spans: list[AgentSpan]):
         self._spans = spans
 
     @property
-    def spans(self):
+    def spans(self) -> list[AgentSpan]:
         return self._spans
 
 
@@ -180,12 +181,13 @@ class AnyAgent(ABC):
                     }
                 )
                 final_output = await self._run_async(prompt, **kwargs)
+        except Exception as e:
+            trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
+            raise AgentRunError(trace.spans) from e
+        else:
             trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
             trace.final_output = final_output
             return trace
-        except Exception as e:
-            trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
-            raise AgentRunException(trace.spans) from e
 
     def serve(self, serving_config: A2AServingConfig | None = None) -> None:
         """Serve this agent using the protocol defined in the serving_config.

@@ -18,8 +18,8 @@ PATCH_PER_FRAMEWORK = {
     AgentFramework.AGNO: "agno.tools.function.FunctionCall.execute",
     AgentFramework.GOOGLE: "google.adk.tools.function_tool.FunctionTool.run_async",
     AgentFramework.LANGCHAIN: "langchain_core.tools.structured.StructuredTool._run",
-    AgentFramework.LLAMA_INDEX: "llama_index.core.tools.function_tool.sync_to_async",
-    AgentFramework.OPENAI: "langchain_core.tools.structured.StructuredTool._run",
+    AgentFramework.LLAMA_INDEX: "llama_index.core.agent.workflow.multi_agent_workflow.AgentWorkflow._call_tool",
+    AgentFramework.OPENAI: "agents.lifecycle.RunHooks.on_tool_start",
     AgentFramework.SMOLAGENTS: "smolagents.agents.ToolCallingAgent.execute_tool_call",
     AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.ToolExecutor.call_tool",
 }
