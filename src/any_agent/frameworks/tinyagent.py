@@ -36,7 +36,6 @@ You MUST plan extensively before each function call, and reflect extensively on 
 
 
 DEFAULT_MAX_NUM_TURNS = 10
-DEFAULT_MAX_SCHEMA_VALIDATION_ATTEMPTS = 3
 
 
 class ToolExecutor:
