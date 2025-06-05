@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.config import DefaultAgentOutput
 
 
 def test_load_agno_default() -> None:
@@ -18,6 +19,7 @@ def test_load_agno_default() -> None:
             name="any_agent",
             instructions=None,
             model=mock_model(model="gpt-4o"),
+            response_model=DefaultAgentOutput,
             tools=[],
         )
 

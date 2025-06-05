@@ -75,16 +75,16 @@ class GoogleAgent(AnyAgent):
             f"{self.config.output_type.model_json_schema()}"
         )
 
-        def final_output(final_output: str) -> dict:  # type: ignore[type-arg]
+        def final_output(answer: str) -> dict:  # type: ignore[type-arg]
             try:
-                self.config.output_type.model_validate_json(final_output)
+                self.config.output_type.model_validate_json(answer)
             except ValidationError as e:
                 return {
                     "success": False,
                     "result": f"Please fix this validation error: {e}. The format must conform to {self.config.output_type.model_json_schema()}",
                 }
             else:
-                return {"success": True, "result": final_output}
+                return {"success": True, "result": answer}
 
         final_output.__doc__ = f"""You must call this tool in order to return the final answer.
 

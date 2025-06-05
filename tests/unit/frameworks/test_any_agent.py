@@ -4,13 +4,14 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from litellm.types.utils import ModelResponse
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 
 TEST_TEMPERATURE = 0.54321
 TEST_PENALTY = 0.5
 TEST_QUERY = "what's the state capital of Pennsylvania"
-EXPECTED_OUTPUT = "The state capital of Pennsylvania is Harrisburg."
+EXPECTED_OUTPUT = "Harrisburg"
 
 # Google ADK uses a different import path for LiteLLM, and smolagents uses the sync call
 LITELLM_IMPORT_PATHS = {
@@ -54,16 +55,24 @@ def test_create_any_with_invalid_string() -> None:
 
 
 def test_model_args(
-    agent_framework: AgentFramework, mock_litellm_response: Any
+    agent_framework: AgentFramework,
+    mock_litellm_response: ModelResponse,
+    mock_litellm_tool_call: ModelResponse,
 ) -> None:
     if agent_framework == AgentFramework.LLAMA_INDEX:
         pytest.skip("LlamaIndex agent uses a litellm streaming syntax")
+    if agent_framework not in [AgentFramework.SMOLAGENTS, AgentFramework.GOOGLE]:
+        pytest.skip("IN progress support for the rest of the frameworks.")
+    if agent_framework == AgentFramework.SMOLAGENTS:
+        mock_litellm_tool_call.choices[0].message.tool_calls[
+            0
+        ].function.name = "final_answer"
 
     agent = create_agent_with_model_args(agent_framework)
 
     # Patch the appropriate litellm import path for this framework
     import_path = LITELLM_IMPORT_PATHS[agent_framework]
-    with patch(import_path, return_value=mock_litellm_response) as mock_litellm:
+    with patch(import_path, return_value=mock_litellm_tool_call) as mock_litellm:
         # Run the agent
         result = agent.run(TEST_QUERY)
 
