@@ -55,6 +55,13 @@ def _assert_has_date_agent_tool_call(agent_trace: AgentTrace) -> None:
     )
 
 
+DATE_PROMPT = (
+    "What date and time is it right now? "
+    "In your answer please include the year, month, day, and time. "
+    "Example answer could be something like 'Today is December 15, 2024'"
+)
+
+
 @pytest.mark.skipif(
     os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
@@ -132,7 +139,7 @@ async def test_load_and_run_multi_agent_a2a(
                 log_level="info",
             )
         )
-        await asyncio.sleep(1)
+        await asyncio.sleep(3)
 
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
 
@@ -157,7 +164,7 @@ async def test_load_and_run_multi_agent_a2a(
             tracing=TracingConfig(console=False, cost_info=True),
         )
 
-        agent_trace = await main_agent.run_async("What date and time is it right now?")
+        agent_trace = await main_agent.run_async(DATE_PROMPT)
 
         _assert_valid_agent_trace(agent_trace)
         _assert_contains_current_date_info(agent_trace.final_output)
@@ -282,7 +289,7 @@ def test_load_and_run_multi_agent_a2a_sync(
             tracing=TracingConfig(console=False, cost_info=True),
         )
 
-        agent_trace = main_agent.run("What date and time is it right now?")
+        agent_trace = main_agent.run(DATE_PROMPT)
 
         _assert_valid_agent_trace(agent_trace)
         _assert_contains_current_date_info(agent_trace.final_output)
