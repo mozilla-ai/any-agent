@@ -23,6 +23,7 @@ def mock_search_web(query: str) -> str:
         "Llama Index offers robust features, but some users prefer Agno for its extensibility."
     )
 
+
 def wait_for_a2a_server(server_url: str):
     max_attempts = 10
     poll_interval = 0.5
@@ -31,14 +32,13 @@ def wait_for_a2a_server(server_url: str):
     while True:
         try:
             # Try to make a basic GET request to check if server is responding
-            print(f"Attempt {attempts} to connect to {server_url}")
             response = requests.get(server_url, timeout=1.0)
             if response.status_code in [200, 404, 405]:  # Server is responding
                 break
-        except (requests.RequestException, ConnectionError) as e:
+        except (requests.RequestException, ConnectionError):
             # Server not ready yet, continue polling
-            print(f"Error: {e}")
-            
+            pass
+
         time.sleep(poll_interval)
         attempts += 1
         if attempts >= max_attempts:

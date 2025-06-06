@@ -1,10 +1,11 @@
 import asyncio
-from typing import Any, Callable
+from typing import Any
 
 import pytest
 from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+
 from .helpers import mock_search_web
 
 

@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 import os
@@ -131,6 +132,7 @@ async def test_load_and_run_multi_agent_a2a(
                 log_level="info",
             )
         )
+        await asyncio.sleep(1)
 
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
 
