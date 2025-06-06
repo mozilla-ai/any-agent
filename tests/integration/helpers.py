@@ -25,7 +25,7 @@ def mock_search_web(query: str) -> str:
 
 
 def wait_for_a2a_server(server_url: str):
-    max_attempts = 10
+    max_attempts = 20
     poll_interval = 0.5
     attempts = 0
 

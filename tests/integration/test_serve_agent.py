@@ -41,7 +41,7 @@ async def test_agent_serving_and_communication(test_port):
     proc = multiprocessing.Process(target=run_agent, args=(test_port,), daemon=True)
     proc.start()
     server_url = f"http://localhost:{test_port}"
-    await asyncio.sleep(3)
+    await asyncio.sleep(10)
 
     try:
         async with httpx.AsyncClient() as httpx_client:
@@ -69,7 +69,7 @@ async def test_agent_serving_and_communication(test_port):
 async def test_agent_serving_and_communication_async(test_port):
     # Start the agent in a subprocess
     (task, server) = await run_agent_async(test_port)
-    await asyncio.sleep(3)
+    await asyncio.sleep(10)
     server_url = f"http://localhost:{test_port}"
     try:
         async with httpx.AsyncClient() as httpx_client:

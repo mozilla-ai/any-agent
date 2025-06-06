@@ -58,19 +58,24 @@ class LlamaIndexAgent(AnyAgent):
             msg = "You need to `pip install 'any-agent[llama_index]'` to use this agent"
             raise ImportError(msg)
 
-        imported_tools, _ = await self._load_tools(self.config.tools)
-        agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
-        self._tools = imported_tools
         instructions = self.config.instructions
+        tools_to_load = list(self.config.tools)
         if self.config.output_type:
             instructions = instructions or ""
-            instructions += f"""
-            You must return a {self.config.output_type.__name__} JSON string.
+            instructions += f"""You must return a {self.config.output_type.__name__} JSON string.
             This object must match the following schema:
             {self.config.output_type.model_json_schema()}
             You can use the 'final_output' tool to help verify your output
             """
-            imported_tools.append(_create_final_output_tool(self.config.output_type))
+
+            tools_to_load.append(_create_final_output_tool(self.config.output_type))
+        imported_tools, _ = await self._load_tools(tools_to_load)
+        agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+        # if agent type is FunctionAgent but there are no tools, throw an error
+        if agent_type == FunctionAgent and not imported_tools:
+            msg = "FunctionAgent requires tools. Please add tools or use a different agent type."
+            raise ValueError(msg)
+        self._tools = imported_tools
 
         self._agent = agent_type(
             name=self.config.name,
