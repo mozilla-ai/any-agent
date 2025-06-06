@@ -1,5 +1,5 @@
 from .a2a import a2a_tool, a2a_tool_async
-from .final_output import _create_final_output_tool
+from .final_output import FinalOutputTool
 from .mcp import (
     MCPServer,
     _get_mcp_server,
@@ -15,10 +15,10 @@ from .user_interaction import (
 from .web_browsing import search_tavily, search_web, visit_webpage
 
 __all__ = [
+    "FinalOutputTool",
     "MCPServer",
     "_MCPConnection",
     "_MCPServerBase",
-    "_create_final_output_tool",
     "_get_mcp_server",
     "a2a_tool",
     "a2a_tool_async",

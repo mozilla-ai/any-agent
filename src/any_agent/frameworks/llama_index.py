@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from any_agent import AgentConfig, AgentFramework
 from any_agent.config import TracingConfig
 from any_agent.logging import logger
-from any_agent.tools.final_output import _create_final_output_tool
+from any_agent.tools.final_output import FinalOutputTool
 
 from .any_agent import AnyAgent
 
@@ -64,7 +64,7 @@ class LlamaIndexAgent(AnyAgent):
             raise ImportError(msg)
 
         instructions = self.config.instructions
-        tools_to_load = list(self.config.tools)
+        new_tools = list(self.config.tools)
         if self.config.output_type:
             instructions = instructions or ""
             instructions += f"""You must return a {self.config.output_type.__name__} JSON string.
@@ -72,8 +72,8 @@ class LlamaIndexAgent(AnyAgent):
             {self.config.output_type.model_json_schema()}
             You can use the 'final_output' tool to help verify your output
             """
-            tools_to_load.append(_create_final_output_tool(self.config.output_type))
-        imported_tools, _ = await self._load_tools(tools_to_load)
+            new_tools.append(FinalOutputTool(self.config.output_type))
+        imported_tools, _ = await self._load_tools(new_tools)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         # if agent type is FunctionAgent but there are no tools, throw an error
         if agent_type == FunctionAgent and not imported_tools:

@@ -8,7 +8,7 @@ from any_agent.config import (
     AgentFramework,
     TracingConfig,
 )
-from any_agent.tools.final_output import _create_final_output_tool
+from any_agent.tools.final_output import FinalOutputTool
 
 from .any_agent import AnyAgent
 
@@ -74,7 +74,7 @@ class GoogleAgent(AnyAgent):
                 "The 'answer' argument passed to the final_output tool must be a JSON string that matches the following schema:\n"
                 f"{self.config.output_type.model_json_schema()}"
             )
-            output_fn = _create_final_output_tool(self.config.output_type)
+            output_fn = FinalOutputTool(self.config.output_type)
             tools.append(output_fn)
 
         self._agent = agent_type(

@@ -34,14 +34,3 @@ class FinalOutputTool:
             }
         else:
             return {"success": True, "result": answer}
-
-
-def _create_final_output_tool(
-    output_type: type[BaseModel],
-) -> FinalOutputTool:
-    """Create a final output tool for the given output type.
-
-    This returns a callable class instance that avoids closure serialization issues
-    with pytest-xdist.
-    """
-    return FinalOutputTool(output_type)
