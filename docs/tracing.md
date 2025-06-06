@@ -91,6 +91,17 @@ Here's what the returned [`agent_trace.spans`][any_agent.AgentTrace.spans] look 
 The AgentTrace object is a pydantic model and can be saved to disk via standard pydantic practices:
 
 ```python
-with open("output.json", "w", encoding="utf-8") as f:
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tools import search_web
+
+agent = AnyAgent.create(
+    "openai",
+    agent_config=AgentConfig(
+            model_id="gpt-4o",
+            tools=[search_web],
+    )
+)
+agent_trace = agent.run("Which agent framework is the best?")
+with open("agent_trace.json", "w", encoding="utf-8") as f:
   f.write(agent_trace.model_dump_json(indent=2))
 ```
