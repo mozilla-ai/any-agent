@@ -10,7 +10,7 @@ the protocol, as explaining it is out of the scope of this page.
 
 In order to use A2A serving, you must first install the 'a2a' extra: `pip install 'any-agent[a2a]'`
 
-You can configure and serve an agent using the [`ServingConfig`][any_agent.config.ServingConfig] and the [`AnyAgent.serve`][any_agent.AnyAgent.serve] or [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
+You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] and the [`AnyAgent.serve`][any_agent.AnyAgent.serve] or [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
 
 ## Example
 
@@ -22,7 +22,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
     ```python
     # google_expert.py
     from any_agent import AgentConfig, AnyAgent
-    from any_agent.config import ServingConfig
+    from any_agent.serving import A2AServingConfig
     from any_agent.tools import search_web
 
     agent = AnyAgent.create(
@@ -35,7 +35,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
         )
     )
 
-    agent.serve(ServingConfig(port=5001))
+    agent.serve(A2AServingConfig(port=5001))
     ```
 
 === "OpenAI Expert"
@@ -43,13 +43,13 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
     ```python
     # openai_expert.py
     from any_agent import AgentConfig, AnyAgent
-    from any_agent.config import ServingConfig
+    from any_agent.serving import A2AServingConfig
     from any_agent.tools import search_web
 
     agent = AnyAgent.create(
         "openai",
         AgentConfig(
-            name="openai-expert",
+            name="openai_expert",
             model_id="gpt-4.1-nano",
             instructions="You can answer questions about the OpenAI Agents SDK but nothing else.",
             description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
@@ -57,7 +57,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
         )
     )
 
-    agent.serve(ServingConfig(port=5002))
+    agent.serve(A2AServingConfig(port=5002))
     ```
 
 We can then run each of the scripts in a separate terminal and leave them running in the background.
@@ -114,6 +114,37 @@ You will see that the first agent answered the question, but the second agent di
 This is because the question was about Google ADK,
 but the agent was told it could only answer questions about the OpenAI Agents SDK.
 
+## Advanced Configuration
+
+### Custom Skills
+
+By default, an agent's skills are automatically inferred from its tools. However, you can explicitly define skills for more control over the agent card:
+
+```python
+from a2a.types import AgentSkill
+from any_agent.serving import A2AServingConfig
+
+# Define custom skills
+custom_skills = [
+    AgentSkill(
+        id="web-search",
+        name="search_web",
+        description="Search the web for current information",
+        tags=["search", "web", "information"]
+    ),
+    AgentSkill(
+        id="data-analysis",
+        name="analyze_data",
+        description="Analyze datasets and provide insights",
+        tags=["analysis", "data", "insights"]
+    )
+]
+
+config = A2AServingConfig(
+    port=8080,
+    skills=custom_skills
+)
+```
 
 ## More Examples
 
