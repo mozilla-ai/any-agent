@@ -4,12 +4,17 @@ from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework
 from any_agent.config import TracingConfig
+from any_agent.logging import logger
 from any_agent.tools.final_output import _create_final_output_tool
 
 from .any_agent import AnyAgent
 
 try:
-    from llama_index.core.agent.workflow import BaseWorkflowAgent, FunctionAgent
+    from llama_index.core.agent.workflow import (
+        BaseWorkflowAgent,
+        FunctionAgent,
+        ReActAgent,
+    )
     from llama_index.llms.litellm import LiteLLM
 
     DEFAULT_AGENT_TYPE = FunctionAgent
@@ -73,8 +78,10 @@ class LlamaIndexAgent(AnyAgent):
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         # if agent type is FunctionAgent but there are no tools, throw an error
         if agent_type == FunctionAgent and not imported_tools:
-            msg = "FunctionAgent requires tools. Please add tools or use a different agent type."
-            raise ValueError(msg)
+            logger.warning(
+                "FunctionAgent requires tools and none were provided. Using ReActAgent instead."
+            )
+            agent_type = ReActAgent
         self._tools = imported_tools
 
         self._agent = agent_type(
