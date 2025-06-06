@@ -72,7 +72,6 @@ class LlamaIndexAgent(AnyAgent):
             {self.config.output_type.model_json_schema()}
             You can use the 'final_output' tool to help verify your output
             """
-
             tools_to_load.append(_create_final_output_tool(self.config.output_type))
         imported_tools, _ = await self._load_tools(tools_to_load)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE

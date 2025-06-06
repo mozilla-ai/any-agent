@@ -1,26 +1,16 @@
-from collections.abc import Callable
-
 from pydantic import BaseModel, ValidationError
 
 
-def _create_final_output_tool(
-    output_type: type[BaseModel],
-) -> Callable[[str], dict]:  # type: ignore[type-arg]
-    def final_output(answer: str) -> dict:  # type: ignore[type-arg]
-        try:
-            output_type.model_validate_json(answer)
-        except ValidationError as e:
-            return {
-                "success": False,
-                "result": f"Please fix this validation error: {e}. The format must conform to {output_type.model_json_schema()}",
-            }
-        else:
-            return {"success": True, "result": answer}
+class FinalOutputTool:
+    """A serializable final output tool that avoids closure issues."""
 
-    final_output.__doc__ = f"""You must call this tool in order to return the final answer.
+    def __init__(self, output_type: type[BaseModel]):
+        self.output_type = output_type
+        # Set docstring for the callable object
+        self.__doc__ = f"""You must call this tool in order to return the final answer.
 
         Args:
-            final_output: The final output that can be loaded as a Pydantic model. This must be a JSON compatible string that matches the following schema:
+            answer: The final output that can be loaded as a Pydantic model. This must be a JSON compatible string that matches the following schema:
                 {output_type.model_json_schema()}
 
         Returns:
@@ -29,4 +19,27 @@ def _create_final_output_tool(
                 - result: The final output if success is True, otherwise an error message.
 
         """
-    return final_output
+        # Set function name for tool frameworks that expect it
+        self.__name__ = "final_output"
+
+    def __call__(self, answer: str) -> dict:  # type: ignore[type-arg]
+        try:
+            self.output_type.model_validate_json(answer)
+        except ValidationError as e:
+            return {
+                "success": False,
+                "result": f"Please fix this validation error: {e}. The format must conform to {self.output_type.model_json_schema()}",
+            }
+        else:
+            return {"success": True, "result": answer}
+
+
+def _create_final_output_tool(
+    output_type: type[BaseModel],
+) -> FinalOutputTool:
+    """Create a final output tool for the given output type.
+
+    This returns a callable class instance that avoids closure serialization issues
+    with pytest-xdist.
+    """
+    return FinalOutputTool(output_type)
