@@ -1,4 +1,3 @@
-import asyncio
 import multiprocessing
 from uuid import uuid4
 
@@ -10,6 +9,8 @@ from a2a.types import MessageSendParams, SendMessageRequest
 # Import your agent and config
 from any_agent import AgentConfig, AnyAgent
 from any_agent.serving import A2AServingConfig
+
+from .helpers import wait_for_server_async
 
 
 def run_agent(port: int):
@@ -41,7 +42,7 @@ async def test_agent_serving_and_communication(test_port):
     proc = multiprocessing.Process(target=run_agent, args=(test_port,), daemon=True)
     proc.start()
     server_url = f"http://localhost:{test_port}"
-    await asyncio.sleep(10)
+    await wait_for_server_async(server_url)
 
     try:
         async with httpx.AsyncClient() as httpx_client:
@@ -69,8 +70,9 @@ async def test_agent_serving_and_communication(test_port):
 async def test_agent_serving_and_communication_async(test_port):
     # Start the agent in a subprocess
     (task, server) = await run_agent_async(test_port)
-    await asyncio.sleep(10)
     server_url = f"http://localhost:{test_port}"
+    await wait_for_server_async(server_url)
+
     try:
         async with httpx.AsyncClient() as httpx_client:
             client = await A2AClient.get_client_from_agent_card_url(

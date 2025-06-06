@@ -14,7 +14,6 @@ from any_agent.tools import search_tavily
 def test_uninstrument(
     agent_framework: AgentFramework,
 ) -> None:
-    pytest.skip("Skipping this test for now")
     model_id = "gpt-4.1-nano"
     env_check = validate_environment("model_id")
     if not env_check["keys_in_environment"]:

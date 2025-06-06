@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import logging
 import os
@@ -15,7 +14,7 @@ from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.conftest import build_tree
 
-from .helpers import wait_for_a2a_server
+from .helpers import wait_for_server, wait_for_server_async
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -139,9 +138,8 @@ async def test_load_and_run_multi_agent_a2a(
                 log_level="info",
             )
         )
-        await asyncio.sleep(3)
-
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
+        await wait_for_server_async(server_url)
 
         # Search agent is ready for card resolution
 
@@ -268,7 +266,7 @@ def test_load_and_run_multi_agent_a2a_sync(
         server_process.start()
 
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
-        wait_for_a2a_server(server_url)
+        wait_for_server(server_url)
 
         logger.info(
             "Setting up sync agent",
