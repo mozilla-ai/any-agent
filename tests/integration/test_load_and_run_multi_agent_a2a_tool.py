@@ -133,7 +133,6 @@ async def test_load_and_run_multi_agent_a2a(
         )
 
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
-        wait_for_a2a_server(server_url)
 
         # Search agent is ready for card resolution
 
