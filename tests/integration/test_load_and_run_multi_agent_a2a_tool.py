@@ -1,12 +1,9 @@
 import datetime
 import logging
 import os
-import socket
-import time
 from multiprocessing import Process
 
 import pytest
-import requests
 from litellm.utils import validate_environment
 from rich.logging import RichHandler
 
@@ -16,6 +13,8 @@ from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.conftest import build_tree
+
+from .helpers import wait_for_a2a_server
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -28,46 +27,31 @@ logger = logging.getLogger("any_agent_test")
 logger.setLevel(logging.DEBUG)
 
 
-# These need to be two separate ranges because when running pytest in parallel, the two tests may run at the same time
-# and try to bind to the same ports if we use the same range.
-BASE_PORT = 5800
-PORT_PER_FRAMEWORK = {fw: BASE_PORT + index for index, fw in enumerate(AgentFramework)}
-BASE_PORT_SYNC = 6800
-PORT_PER_FRAMEWORK_SYNC = {
-    fw: BASE_PORT_SYNC + index for index, fw in enumerate(AgentFramework)
-}
+def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
+    """Assert that agent_trace is valid and has final output."""
+    assert isinstance(agent_trace, AgentTrace)
+    assert agent_trace.final_output
 
 
-def _is_port_available(port: int, host: str = "localhost") -> bool:
-    """Check if a port is available for binding.
-
-    This isn't a perfect check but it at least tells us if there is absolutely no chance of binding to the port.
-
-    """
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        try:
-            sock.bind((host, port))
-        except OSError:
-            return False
-        return True
+def _assert_contains_current_date_info(final_output: str) -> None:
+    """Assert that the final output contains current date and time information."""
+    now = datetime.datetime.now()
+    assert all(
+        [
+            str(now.year) in final_output,
+            str(now.day) in final_output,
+            now.strftime("%B") in final_output,
+        ]
+    )
 
 
-@pytest.fixture
-def tool_agent_port(agent_framework):
-    port = PORT_PER_FRAMEWORK[agent_framework]
-    if not _is_port_available(port):
-        msg = f"Port {port} is not available for binding"
-        raise RuntimeError(msg)
-    return port
-
-
-@pytest.fixture
-def tool_agent_port_sync(agent_framework):
-    port = PORT_PER_FRAMEWORK_SYNC[agent_framework]
-    if not _is_port_available(port):
-        msg = f"Port {port} is not available for binding"
-        raise RuntimeError(msg)
-    return port
+def _assert_has_date_agent_tool_call(agent_trace: AgentTrace) -> None:
+    """Assert that the agent trace contains a tool execution span for the date agent."""
+    assert any(
+        span.is_tool_execution()
+        and span.attributes.get("gen_ai.tool.name", None) == "call_date_agent"
+        for span in agent_trace.spans
+    )
 
 
 @pytest.mark.skipif(
@@ -76,7 +60,7 @@ def tool_agent_port_sync(agent_framework):
 )
 @pytest.mark.asyncio
 async def test_load_and_run_multi_agent_a2a(
-    agent_framework: AgentFramework, tool_agent_port: int
+    agent_framework: AgentFramework, test_port: int
 ) -> None:
     """Tests that an agent contacts another using A2A using the adapter tool.
 
@@ -142,29 +126,26 @@ async def test_load_and_run_multi_agent_a2a(
         served_agent = date_agent
         (served_task, served_server) = await served_agent.serve_async(
             serving_config=A2AServingConfig(
-                port=tool_agent_port,
+                port=test_port,
                 endpoint=f"/{tool_agent_endpoint}",
                 log_level="info",
             )
         )
 
+        server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
+        wait_for_a2a_server(server_url)
+
         # Search agent is ready for card resolution
 
         logger.info(
             "Setting up agent",
-            extra={
-                "endpoint": f"http://localhost:{tool_agent_port}/{tool_agent_endpoint}"
-            },
+            extra={"endpoint": server_url},
         )
 
         main_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
-            tools=[
-                await a2a_tool_async(
-                    f"http://localhost:{tool_agent_port}/{tool_agent_endpoint}"
-                )
-            ],
+            tools=[await a2a_tool_async(server_url)],
             model_args=model_args,
             **kwargs,  # type: ignore[arg-type]
         )
@@ -177,8 +158,9 @@ async def test_load_and_run_multi_agent_a2a(
 
         agent_trace = await main_agent.run_async("What date and time is it right now?")
 
-        assert isinstance(agent_trace, AgentTrace)
-        assert agent_trace.final_output
+        _assert_valid_agent_trace(agent_trace)
+        _assert_contains_current_date_info(agent_trace.final_output)
+        _assert_has_date_agent_tool_call(agent_trace)
 
         try:
             span_tree = build_tree(agent_trace.spans).model_dump_json(indent=2)
@@ -189,19 +171,6 @@ async def test_load_and_run_multi_agent_a2a(
 
         final_output_log = f"Final output: {agent_trace.final_output}"
         logger.info(final_output_log)
-        now = datetime.datetime.now()
-        assert all(
-            [
-                str(now.year) in agent_trace.final_output,
-                str(now.day) in agent_trace.final_output,
-                now.strftime("%B") in agent_trace.final_output,
-            ]
-        )
-        assert any(
-            span.is_tool_execution()
-            and span.attributes.get("gen_ai.tool.name", None) == "call_date_agent"
-            for span in agent_trace.spans
-        )
 
     finally:
         if served_server:
@@ -249,7 +218,7 @@ def _run_server(agent_framework_str: str, port: int, endpoint: str, model_id: st
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
 def test_load_and_run_multi_agent_a2a_sync(
-    agent_framework: AgentFramework, tool_agent_port_sync: int
+    agent_framework: AgentFramework, test_port: int
 ) -> None:
     """Tests that an agent contacts another using A2A using the sync adapter tool.
 
@@ -283,51 +252,26 @@ def test_load_and_run_multi_agent_a2a_sync(
             target=_run_server,
             args=(
                 agent_framework.value,
-                tool_agent_port_sync,
+                test_port,
                 tool_agent_endpoint,
                 agent_model,
             ),
         )
         server_process.start()
 
-        # Poll until server is ready (max 5 seconds)
-        server_url = f"http://localhost:{tool_agent_port_sync}/{tool_agent_endpoint}"
-        max_attempts = 10
-        poll_interval = 0.5
-        attempts = 0
-
-        while True:
-            try:
-                # Try to make a basic GET request to check if server is responding
-                response = requests.get(server_url, timeout=1.0)
-                if response.status_code in [200, 404, 405]:  # Server is responding
-                    logger.info("Server is ready", extra={"url": server_url})
-                    break
-            except (requests.RequestException, ConnectionError):
-                # Server not ready yet, continue polling
-                pass
-            time.sleep(poll_interval)
-            attempts += 1
-            if attempts >= max_attempts:
-                msg = f"Server did not start in time. Tried {max_attempts} times with {poll_interval} second interval."
-                raise ConnectionError(msg)
+        server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
+        wait_for_a2a_server(server_url)
 
         logger.info(
             "Setting up sync agent",
-            extra={
-                "endpoint": f"http://localhost:{tool_agent_port_sync}/{tool_agent_endpoint}"
-            },
+            extra={"endpoint": f"http://localhost:{test_port}/{tool_agent_endpoint}"},
         )
 
         # Create main agent using sync methods
         main_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol (sync version).",
-            tools=[
-                a2a_tool(
-                    f"http://localhost:{tool_agent_port_sync}/{tool_agent_endpoint}"
-                )
-            ],
+            tools=[a2a_tool(f"http://localhost:{test_port}/{tool_agent_endpoint}")],
             **kwargs,  # type: ignore[arg-type]
         )
 
@@ -339,29 +283,11 @@ def test_load_and_run_multi_agent_a2a_sync(
 
         agent_trace = main_agent.run("What date and time is it right now?")
 
-        assert isinstance(agent_trace, AgentTrace)
-        assert agent_trace.final_output
-
-        now = datetime.datetime.now()
-        assert all(
-            [
-                str(now.year) in agent_trace.final_output,
-                str(now.day) in agent_trace.final_output,
-                now.strftime("%B") in agent_trace.final_output,
-            ]
-        )
-        assert any(
-            span.is_tool_execution()
-            and span.attributes.get("gen_ai.tool.name", None) == "call_date_agent"
-            for span in agent_trace.spans
-        )
+        _assert_valid_agent_trace(agent_trace)
+        _assert_contains_current_date_info(agent_trace.final_output)
+        _assert_has_date_agent_tool_call(agent_trace)
 
     finally:
         if server_process and server_process.is_alive():
-            # Send SIGTERM for graceful shutdown
             server_process.terminate()
-            server_process.join(timeout=10)
-            if server_process.is_alive():
-                # Force kill if graceful shutdown failed
-                server_process.kill()
-                server_process.join()
+            server_process.join()
