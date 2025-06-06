@@ -46,7 +46,7 @@ def _set_llm_output(output: AgentOutput, span: Span) -> None:
                 }
             )
     tool_calls: list[ToolSelection]
-    if tool_calls := getattr(response, "tool_calls", []):
+    if tool_calls := output.tool_calls:
         span.set_attributes(
             {
                 "gen_ai.output": json.dumps(
