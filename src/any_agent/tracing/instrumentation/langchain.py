@@ -234,4 +234,5 @@ class _LangChainInstrumentor:
     def uninstrument(self, agent: LangchainAgent) -> None:
         if len(agent._running_traces) > 1:
             return
-        agent._agent.ainvoke = self._original_ainvoke
+        if self._original_ainvoke is not None:
+            agent._agent.ainvoke = self._original_ainvoke

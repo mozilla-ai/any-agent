@@ -27,4 +27,4 @@ def test_set_llm_output_missing_fields() -> None:
 
 
 def test_uninstrument_before_instrument() -> None:
-    _GoogleADKInstrumentor().uninstrument()
+    _GoogleADKInstrumentor().uninstrument(MagicMock())

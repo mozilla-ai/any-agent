@@ -81,7 +81,7 @@ class _SmolagentsInstrumentor:
     def __init__(self) -> None:
         self.first_llm_calls: set[int] = set()
         self._original_generate: Callable[..., Any] | None = None
-        self._original_tool_call: Callable[..., Any] | None = None
+        self._original_tools: Any | None = None
 
     def instrument(self, agent: SmolagentsAgent) -> None:
         if len(agent._running_traces) > 1:
@@ -166,6 +166,7 @@ class _SmolagentsInstrumentor:
     def uninstrument(self, agent: SmolagentsAgent) -> None:
         if len(agent._running_traces) > 1:
             return
-
-        agent._agent.model.generate = self._original_generate  # type: ignore[method-assign]
-        agent._agent.tools = self._original_tools
+        if self._original_generate is not None:
+            agent._agent.model.generate = self._original_generate  # type: ignore[method-assign]
+        if self._original_tools is not None:
+            agent._agent.tools = self._original_tools

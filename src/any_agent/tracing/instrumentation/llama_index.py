@@ -81,7 +81,7 @@ class _LlamaIndexInstrumentor:
     def __init__(self) -> None:
         self.first_llm_calls: set[int] = set()
         self._original_take_step: Any | None = None
-        self._original_tool_acall: Any | None = None
+        self._original_acalls: dict[str, Any] = {}
 
     def instrument(self, agent: LlamaIndexAgent) -> None:
         if len(agent._running_traces) > 1:
@@ -151,9 +151,8 @@ class _LlamaIndexInstrumentor:
                     agent._running_traces[trace_id].add_span(span)
                     return output
 
-        self._original_acalls = {}
         for tool in agent._agent.tools:
-            self._original_acalls[tool.metadata.name] = tool.acall
+            self._original_acalls[str(tool.metadata.name)] = tool.acall
             wrapped = WrappedAcall(tool.metadata, tool.acall)
             tool.acall = wrapped.acall
 
@@ -169,4 +168,4 @@ class _LlamaIndexInstrumentor:
             agent._agent.take_step = self._original_take_step
         if self._original_acalls:
             for tool in agent._agent.tools:
-                tool.acall = self._original_acalls[tool.metadata.name]
+                tool.acall = self._original_acalls[str(tool.metadata.name)]

@@ -169,5 +169,7 @@ class _AgnoInstrumentor:
         if len(agent._running_traces) > 1:
             return
         model = agent._agent.model
-        model._aprocess_model_response = self._original_aprocess_model
-        model.arun_function_calls = self._original_arun_function_calls
+        if self._original_aprocess_model is not None:
+            model._aprocess_model_response = self._original_aprocess_model
+        if self._original_arun_function_calls is not None:
+            model.arun_function_calls = self._original_arun_function_calls

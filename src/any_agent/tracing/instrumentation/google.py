@@ -216,7 +216,11 @@ class _GoogleADKInstrumentor:
     def uninstrument(self, agent: GoogleAgent) -> None:
         if len(agent._running_traces) > 1:
             return
-        agent._agent.before_model_callback = self._original["before_model"]
-        agent._agent.before_tool_callback = self._original["before_tool"]
-        agent._agent.after_model_callback = self._original["after_model"]
-        agent._agent.after_tool_callback = self._original["after_tool"]
+        if self._original["before_model"] is not None:
+            agent._agent.before_model_callback = self._original["before_model"]
+        if self._original["before_tool"] is not None:
+            agent._agent.before_tool_callback = self._original["before_tool"]
+        if self._original["after_model"] is not None:
+            agent._agent.after_model_callback = self._original["after_model"]
+        if self._original["after_tool"] is not None:
+            agent._agent.after_tool_callback = self._original["after_tool"]
