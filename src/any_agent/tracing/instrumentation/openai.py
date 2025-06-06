@@ -128,7 +128,8 @@ class _OpenAIAgentsInstrumentor:
                     _set_llm_output(span_data, otel_span)
                     otel_span.set_status(StatusCode.OK)
                     otel_span.end()
-                    agent._running_traces[trace_id].add_span(otel_span)
+                    if trace_id in agent._running_traces:
+                        agent._running_traces[trace_id].add_span(otel_span)
                     del current_spans[span.span_id]
                 elif isinstance(span_data, FunctionSpanData):
                     otel_span = current_spans[span.span_id]
@@ -141,7 +142,8 @@ class _OpenAIAgentsInstrumentor:
                     otel_span.set_status(StatusCode.OK)
                     otel_span.end()
                     trace_id = otel_span.get_span_context().trace_id
-                    agent._running_traces[trace_id].add_span(otel_span)
+                    if trace_id in agent._running_traces:
+                        agent._running_traces[trace_id].add_span(otel_span)
                     del current_spans[span.span_id]
 
             def force_flush(self):
