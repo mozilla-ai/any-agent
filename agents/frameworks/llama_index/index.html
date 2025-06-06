@@ -1115,7 +1115,8 @@
 <h1 id="llamaindex">LlamaIndex</h1>
 <p><a href="https://github.com/run-llama/llama_index">https://github.com/run-llama/llama_index</a></p>
 <h2 id="default-agent-type">Default Agent Type</h2>
-<p>We use <a href="https://docs.llamaindex.ai/en/stable/api_reference/agent/#llama_index.core.agent.workflow.ReActAgent"><code>llama_index.core.agent.workflow.react_agent.ReActAgent</code></a> as default.
+<p>We use <a href="https://docs.llamaindex.ai/en/stable/api_reference/agent/#llama_index.core.agent.workflow.FunctionAgent"><code>llama_index.core.agent.workflow.react_agent.FunctionAgent</code></a> as default.
+However, this agent requires that tools are used. If no tools are used, any-agent will default to <a href="https://docs.llamaindex.ai/en/stable/api_reference/agent/#llama_index.core.agent.workflow.ReActAgent"><code>llama_index.core.agent.workflow.react_agent.ReActAgent</code></a>.
 Check the reference to find additional supported <code>agent_args</code>.</p>
 <h2 id="default-model-type">Default Model Type</h2>
 <p>We use <a href="https://docs.llamaindex.ai/en/stable/examples/llm/litellm/"><code>llama_index.llms.litellm.LiteLLM</code></a> as default.
