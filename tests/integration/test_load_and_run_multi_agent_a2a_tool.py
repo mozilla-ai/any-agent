@@ -289,5 +289,10 @@ def test_load_and_run_multi_agent_a2a_sync(
 
     finally:
         if server_process and server_process.is_alive():
+            # Send SIGTERM for graceful shutdown
             server_process.terminate()
-            server_process.join()
+            server_process.join(timeout=10)
+            if server_process.is_alive():
+                # Force kill if graceful shutdown failed
+                server_process.kill()
+                server_process.join()
