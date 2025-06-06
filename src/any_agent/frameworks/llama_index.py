@@ -64,7 +64,7 @@ class LlamaIndexAgent(AnyAgent):
             raise ImportError(msg)
 
         instructions = self.config.instructions
-        new_tools = list(self.config.tools)
+        tools_to_use = list(self.config.tools)
         if self.config.output_type:
             instructions = instructions or ""
             instructions += f"""You must return a {self.config.output_type.__name__} JSON string.
@@ -72,8 +72,8 @@ class LlamaIndexAgent(AnyAgent):
             {self.config.output_type.model_json_schema()}
             You can use the 'final_output' tool to help verify your output
             """
-            new_tools.append(FinalOutputTool(self.config.output_type))
-        imported_tools, _ = await self._load_tools(new_tools)
+            tools_to_use.append(FinalOutputTool(self.config.output_type))
+        imported_tools, _ = await self._load_tools(tools_to_use)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         # if agent type is FunctionAgent but there are no tools, throw an error
         if agent_type == FunctionAgent and not imported_tools:
