@@ -15,6 +15,15 @@ from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 
 BASE_PORT = 5800
 PORT_PER_FRAMEWORK = {fw: BASE_PORT + index for index, fw in enumerate(AgentFramework)}
+PATCH_PER_FRAMEWORK = {
+    AgentFramework.AGNO: "agno.tools.function.FunctionCall.execute",
+    AgentFramework.GOOGLE: "google.adk.tools.function_tool.FunctionTool.run_async",
+    AgentFramework.LANGCHAIN: "langchain_core.tools.structured.StructuredTool._run",
+    AgentFramework.LLAMA_INDEX: "llama_index.core.agent.workflow.multi_agent_workflow.AgentWorkflow._call_tool",
+    AgentFramework.OPENAI: "agents.lifecycle.RunHooks.on_tool_start",
+    AgentFramework.SMOLAGENTS: "smolagents.agents.ToolCallingAgent.execute_tool_call",
+    AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.ToolExecutor.call_tool",
+}
 
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
@@ -25,6 +34,11 @@ def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
 @pytest.fixture
 def tool_agent_port(agent_framework):
     return PORT_PER_FRAMEWORK[agent_framework]
+
+
+@pytest.fixture
+def patched_function(agent_framework):
+    return PATCH_PER_FRAMEWORK[agent_framework]
 
 
 @pytest.fixture

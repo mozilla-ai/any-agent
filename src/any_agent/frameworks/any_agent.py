@@ -28,7 +28,20 @@ if TYPE_CHECKING:
 
     from any_agent.serving.config import A2AServingConfig
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
-    from any_agent.tracing.agent_trace import AgentTrace
+    from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+
+
+class AgentRunError(Exception):
+    """Error that wraps underlying framework specific errors and carries spans."""
+
+    _spans: list[AgentSpan]
+
+    def __init__(self, spans: list[AgentSpan]):
+        self._spans = spans
+
+    @property
+    def spans(self) -> list[AgentSpan]:
+        return self._spans
 
 
 class AnyAgent(ABC):
@@ -153,23 +166,28 @@ class AnyAgent(ABC):
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent asynchronously with the given prompt."""
         run_id = str(uuid4())
-        with self._tracer.start_as_current_span(
-            f"invoke_agent [{self.config.name}]"
-        ) as invoke_span:
-            invoke_span.set_attributes(
-                {
-                    "gen_ai.operation.name": "invoke_agent",
-                    "gen_ai.agent.name": self.config.name,
-                    "gen_ai.agent.description": self.config.description
-                    or "No description.",
-                    "gen_ai.request.model": self.config.model_id,
-                    "gen_ai.request.id": run_id,
-                }
-            )
-            final_output = await self._run_async(prompt, **kwargs)
-        trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
-        trace.final_output = final_output
-        return trace
+        try:
+            with self._tracer.start_as_current_span(
+                f"invoke_agent [{self.config.name}]"
+            ) as invoke_span:
+                invoke_span.set_attributes(
+                    {
+                        "gen_ai.operation.name": "invoke_agent",
+                        "gen_ai.agent.name": self.config.name,
+                        "gen_ai.agent.description": self.config.description
+                        or "No description.",
+                        "gen_ai.request.model": self.config.model_id,
+                        "gen_ai.request.id": run_id,
+                    }
+                )
+                final_output = await self._run_async(prompt, **kwargs)
+        except Exception as e:
+            trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
+            raise AgentRunError(trace.spans) from e
+        else:
+            trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
+            trace.final_output = final_output
+            return trace
 
     def serve(self, serving_config: A2AServingConfig | None = None) -> None:
         """Serve this agent using the protocol defined in the serving_config.
