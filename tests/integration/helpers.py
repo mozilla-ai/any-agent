@@ -1,5 +1,5 @@
 import time
-import pytest
+
 import requests
 
 
@@ -22,4 +22,3 @@ def wait_for_a2a_server(server_url: str):
         if attempts >= max_attempts:
             msg = f"Server did not start in time. Tried {max_attempts} times with {poll_interval} second interval."
             raise ConnectionError(msg)
-
