@@ -52,6 +52,5 @@ def test_run_langchain_agent_custom_args() -> None:
         )
         agent.run("foo", debug=True)
         agent_mock.ainvoke.assert_called_once_with(
-            {"messages": [("user", "foo")]}, debug=True,
-            config={"callbacks": [ANY]}
+            {"messages": [("user", "foo")]}, debug=True, config={"callbacks": [ANY]}
         )

@@ -105,9 +105,11 @@ class ServingConfig(BaseModel):
 
     version: str = "0.1.0"
 
+
 MCPParams = MCPStdio | MCPSse
 
 Tool = str | MCPParams | Callable[..., Any]
+
 
 class AgentConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
