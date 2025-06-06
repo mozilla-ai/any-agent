@@ -6,25 +6,6 @@ based on the [Semantic conventions for generative AI systems](https://openteleme
 
 An [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] is returned when calling [`agent.run`][any_agent.AnyAgent.run] or [`agent.run_async`][any_agent.AnyAgent.run_async].
 
-## Configuration
-
-By default, tracing to console and cost tracking is enabled. To configure tracing, pass a TracingConfig object [`TracingConfig`][any_agent.config.TracingConfig] when creating an agent.
-
-```python
-from any_agent import AgentConfig, AnyAgent, TracingConfig
-from any_agent.tools import search_web
-
-agent = AnyAgent.create(
-        "openai",
-        agent_config=AgentConfig(
-                model_id="gpt-4o",
-                tools=[search_web],
-        ),
-        tracing=TracingConfig(console=False)
-      )
-agent_trace = agent.run("Which agent framework is the best?")
-```
-
 ## Tracing Outputs
 
 `any-agent` will generate standardized (regarding the structure) traces regardless of the framework used.

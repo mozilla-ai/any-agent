@@ -9,7 +9,7 @@ from typing import Any
 import pytest
 from litellm.utils import validate_environment
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import MCPStdio
 from any_agent.evaluation import EvaluationCase, evaluate
 from any_agent.evaluation.schemas import (
@@ -69,11 +69,8 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
     assert len(llm_calls) >= 2
     assert_first_llm_call(llm_calls[0])
 
-    if (
-        agent_framework is not AgentFramework.LLAMA_INDEX
-    ):  # https://github.com/run-llama/llama_index/issues/18776
-        assert len(tool_executions) >= 2
-        assert_first_tool_execution(tool_executions[0])
+    assert len(tool_executions) >= 2
+    assert_first_tool_execution(tool_executions[0])
 
 
 def assert_duration(agent_trace: AgentTrace, wall_time_s: float) -> None:
@@ -191,35 +188,37 @@ def test_load_and_run_agent(
         model_args=model_args,
         **kwargs,  # type: ignore[arg-type]
     )
-    agent = AnyAgent.create(agent_framework, agent_config, tracing=TracingConfig())
+    agent = AnyAgent.create(agent_framework, agent_config)
     update_trace = request.config.getoption("--update-trace-assets")
     if update_trace:
-        agent._exporter.console.record = True  # type: ignore[union-attr]
+        from any_agent.tracing import TRACE_PROVIDER, _ConsoleExporter
 
-    try:
-        start_ns = time.time_ns()
-        agent_trace = agent.run(
-            "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.",
-        )
-        end_ns = time.time_ns()
+        with TRACE_PROVIDER._active_span_processor._lock:
+            for p in TRACE_PROVIDER._active_span_processor._span_processors:
+                if isinstance(p.span_exporter, _ConsoleExporter):
+                    console = p.span_exporter.console
+                    console.record = True
 
-        assert (tmp_path / tmp_file).read_text() == str(datetime.now().year)
+    start_ns = time.time_ns()
+    agent_trace = agent.run(
+        "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.",
+    )
+    end_ns = time.time_ns()
 
-        assert_trace(agent_trace, agent_framework)
-        assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
-        assert_cost(agent_trace)
-        assert_tokens(agent_trace)
+    assert (tmp_path / tmp_file).read_text() == str(datetime.now().year)
 
-        if update_trace:
-            trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
-            with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
-                f.write(agent_trace.model_dump_json(indent=2))
-                f.write("\n")
-            html_output = agent._exporter.console.export_html(inline_styles=True)  # type: ignore[union-attr]
-            with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
-                f.write(html_output.replace("<!DOCTYPE html>", ""))
+    assert_trace(agent_trace, agent_framework)
+    assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
+    assert_cost(agent_trace)
+    assert_tokens(agent_trace)
 
-        agent.exit()
-        assert_eval(agent_trace)
-    finally:
-        agent.exit()
+    if update_trace:
+        trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
+        with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
+            f.write(agent_trace.model_dump_json(indent=2))
+            f.write("\n")
+        html_output = console.export_html(inline_styles=True)  # type: ignore[union-attr]
+        with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
+            f.write(html_output.replace("<!DOCTYPE html>", ""))
+
+    assert_eval(agent_trace)

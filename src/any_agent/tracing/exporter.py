@@ -1,3 +1,4 @@
+# mypy: disable-error-code="arg-type,union-attr"
 from __future__ import annotations
 
 import json
@@ -12,16 +13,12 @@ from rich.json import JSON
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-from any_agent.logging import logger
-
-from .agent_trace import AgentSpan, AgentTrace
-
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from opentelemetry.sdk.trace import ReadableSpan
 
-    from any_agent import TracingConfig
+    from .agent_trace import AgentSpan
 
 
 def _get_output_panel(span: AgentSpan) -> Panel | None:
@@ -36,32 +33,21 @@ def _get_output_panel(span: AgentSpan) -> Panel | None:
     return None
 
 
-class _AnyAgentExporter(SpanExporter):
-    def __init__(
-        self,
-        tracing_config: TracingConfig,
-    ):
-        self.tracing_config = tracing_config
-        self.traces: dict[int, AgentTrace] = {}
-        self.console: Console | None = None
-        self.run_trace_mapping: dict[str, int] = {}
+class _ConsoleExporter(SpanExporter):
+    def __init__(self) -> None:
+        self.console: Console = Console()
 
-        if self.tracing_config.console:
-            self.console = Console()
+    def print_to_console(self, span: ReadableSpan) -> None:
+        if scope := span.instrumentation_scope:
+            if scope.name != "any_agent":
+                return
 
-    def print_to_console(self, span: AgentSpan) -> None:
-        if not self.console:
-            msg = "Console is not initialized"
-            raise RuntimeError(msg)
+        if not span.attributes:
+            return
 
         operation_name = span.attributes.get("gen_ai.operation.name", "")
 
-        style = getattr(self.tracing_config, operation_name, None)
-
-        if not style:
-            return
-
-        if span.is_llm_call():
+        if operation_name == "call_llm":
             panels = []
             if messages := span.attributes.get("gen_ai.input.messages"):
                 panels.append(
@@ -88,10 +74,10 @@ class _AnyAgentExporter(SpanExporter):
                 Panel(
                     Group(*panels),
                     title=f"{operation_name.upper()}: {span.attributes.get('gen_ai.request.model')}",
-                    style=style,
+                    style="yellow",
                 )
             )
-        elif span.is_tool_execution():
+        elif operation_name == "execute_tool":
             panels = [
                 Panel(
                     JSON(span.attributes.get("gen_ai.tool.args", "{}")),
@@ -106,53 +92,11 @@ class _AnyAgentExporter(SpanExporter):
                 Panel(
                     Group(*panels),
                     title=f"{operation_name.upper()}: {span.attributes.get('gen_ai.tool.name')}",
-                    style=style,
+                    style="blue",
                 )
             )
 
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
         for readable_span in spans:
-            # Check if this span belongs to our run
-            if scope := readable_span.instrumentation_scope:
-                if scope.name != "any_agent":
-                    continue
-            if not readable_span.attributes:
-                continue
-            agent_run_id = readable_span.attributes.get("gen_ai.request.id")
-            trace_id = readable_span.context.trace_id
-            if agent_run_id is not None:
-                assert isinstance(agent_run_id, str)
-                self.run_trace_mapping[agent_run_id] = trace_id
-            span = AgentSpan.from_readable_span(readable_span)
-            if not self.traces.get(trace_id):
-                self.traces[trace_id] = AgentTrace()
-            try:
-                if (
-                    self.tracing_config.cost_info
-                    and span.attributes.get("gen_ai.operation.name") == "call_llm"
-                ):
-                    span.add_cost_info()
-
-                self.traces[trace_id].add_span(span)
-
-                if self.tracing_config.console and self.console:
-                    self.print_to_console(span)
-
-            except (json.JSONDecodeError, TypeError, AttributeError) as e:
-                logger.warning("Failed to parse span data, %s, %s", span, e)
-                continue
+            self.print_to_console(readable_span)
         return SpanExportResult.SUCCESS
-
-    def pop_trace(
-        self,
-        agent_run_id: str,
-    ) -> AgentTrace:
-        trace_id = self.run_trace_mapping.pop(agent_run_id, None)
-        if trace_id is None:
-            msg = f"Trace ID not found for agent run ID: {agent_run_id}"
-            raise ValueError(msg)
-        trace = self.traces.pop(trace_id, None)
-        if trace is None:
-            msg = f"Trace not found for trace ID: {trace_id}"
-            raise ValueError(msg)
-        return trace

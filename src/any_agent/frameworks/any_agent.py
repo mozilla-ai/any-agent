@@ -3,32 +3,27 @@ from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
-from uuid import uuid4
-
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
 from any_agent.config import (
     AgentConfig,
     AgentFramework,
     ServingConfig,
     Tool,
-    TracingConfig,
 )
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing.exporter import _AnyAgentExporter
+from any_agent.tracing import TRACE_PROVIDER
+from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.instrumentation import (
     _get_instrumentor_by_framework,
-    _Instrumentor,
 )
-from any_agent.tracing.trace_provider import TRACE_PROVIDER
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     import uvicorn
+    from opentelemetry.trace import Tracer
 
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
-    from any_agent.tracing.agent_trace import AgentTrace
 
 
 class AnyAgent(ABC):
@@ -37,21 +32,17 @@ class AnyAgent(ABC):
     This provides a unified interface for different agent frameworks.
     """
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        tracing: TracingConfig | None = None,
-    ):
+    def __init__(self, config: AgentConfig):
         self.config = config
 
         self._mcp_servers: list[_MCPServerBase[Any]] = []
         self._tools: list[Any] = []
 
-        # Tracing is enabled by default
-        self._tracing_config: TracingConfig = tracing or TracingConfig()
-        self._instrumentor: _Instrumentor | None = None
-        self._exporter: _AnyAgentExporter | None = None
-        self._setup_tracing()
+        self._instrumentor = _get_instrumentor_by_framework(self.framework)
+        self._tracer: Tracer = TRACE_PROVIDER.get_tracer("any_agent")
+
+        self._lock = asyncio.Lock()
+        self._running_traces: dict[int, AgentTrace] = {}
 
     @staticmethod
     def _get_agent_type_by_framework(
@@ -101,14 +92,12 @@ class AnyAgent(ABC):
         cls,
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
-        tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
         return asyncio.get_event_loop().run_until_complete(
             cls.create_async(
                 agent_framework=agent_framework,
                 agent_config=agent_config,
-                tracing=tracing,
             )
         )
 
@@ -117,11 +106,10 @@ class AnyAgent(ABC):
         cls,
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
-        tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
-        agent = agent_cls(agent_config, tracing=tracing)
+        agent = agent_cls(agent_config)
         await agent._load_agent()
         return agent
 
@@ -135,27 +123,26 @@ class AnyAgent(ABC):
             tools.extend(mcp_server.tools)
         return tools, mcp_servers
 
-    def _setup_tracing(self) -> None:
-        """Initialize the tracing for the agent."""
-        self._trace_provider = TRACE_PROVIDER
-        self._tracer = self._trace_provider.get_tracer("any_agent")
-        self._exporter = _AnyAgentExporter(self._tracing_config)
-        self._trace_provider.add_span_processor(SimpleSpanProcessor(self._exporter))
-        self._instrumentor = _get_instrumentor_by_framework(self.framework)
-        self._instrumentor.instrument(tracer=self._tracer)
-
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
         return asyncio.get_event_loop().run_until_complete(
             self.run_async(prompt, **kwargs)
         )
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
+    async def run_async(
+        self, prompt: str, instrument: bool = True, **kwargs: Any
+    ) -> AgentTrace:
         """Run the agent asynchronously with the given prompt."""
-        run_id = str(uuid4())
         with self._tracer.start_as_current_span(
             f"invoke_agent [{self.config.name}]"
         ) as invoke_span:
+            if instrument and self._instrumentor:
+                trace_id = invoke_span.get_span_context().trace_id
+                async with self._lock:
+                    self._running_traces[trace_id] = AgentTrace()
+                    self._instrumentor.instrument(
+                        agent=self,  # type: ignore[arg-type]
+                    )
             invoke_span.set_attributes(
                 {
                     "gen_ai.operation.name": "invoke_agent",
@@ -163,12 +150,19 @@ class AnyAgent(ABC):
                     "gen_ai.agent.description": self.config.description
                     or "No description.",
                     "gen_ai.request.model": self.config.model_id,
-                    "gen_ai.request.id": run_id,
                 }
             )
             final_output = await self._run_async(prompt, **kwargs)
-        trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
+
+            trace = AgentTrace()
+            if instrument and self._instrumentor:
+                async with self._lock:
+                    self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
+                    trace = self._running_traces.pop(trace_id)
+
+        trace.add_span(invoke_span)
         trace.final_output = final_output
+
         return trace
 
     def serve(self, serving_config: ServingConfig | None = None) -> None:
@@ -252,11 +246,3 @@ class AnyAgent(ABC):
         """
         msg = "Cannot access the 'agent' property of AnyAgent, if you need to use functionality that relies on the underlying agent framework, please file a Github Issue or we welcome a PR to add the functionality to the AnyAgent class"
         raise NotImplementedError(msg)
-
-    def exit(self) -> None:
-        """Exit the agent and clean up resources."""
-        if self._instrumentor is not None:
-            self._instrumentor.uninstrument()
-        self._instrumentor = None
-        self._exporter = None
-        self._mcp_servers = []  # drop references to mcp servers so that they get garbage collected

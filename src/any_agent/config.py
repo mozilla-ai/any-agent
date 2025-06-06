@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import StrEnum, auto
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AgentFramework(StrEnum):
@@ -104,29 +104,6 @@ class ServingConfig(BaseModel):
     """Will be passed as argument to the `uvicorn` server."""
 
     version: str = "0.1.0"
-
-
-class TracingConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    console: bool = True
-    """Whether to show spans in the console."""
-
-    call_llm: str | None = "yellow"
-    """Color used to display LLM call spans in the console."""
-
-    execute_tool: str | None = "blue"
-    """Color used to display tool execution spans in the console."""
-
-    cost_info: bool = True
-    """Whether spans should include cost information"""
-
-    @model_validator(mode="after")
-    def validate_console_flags(self) -> Self:
-        if self.console and not any([self.call_llm, self.execute_tool]):
-            msg = "At least one of `[self.call_llm, self.execute_tool]` must be set"
-            raise ValueError(msg)
-        return self
 
 
 MCPParams = MCPStdio | MCPSse

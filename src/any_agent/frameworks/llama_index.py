@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING, Any, cast
 
 from any_agent import AgentConfig, AgentFramework
-from any_agent.config import TracingConfig
 
 from .any_agent import AnyAgent
 
@@ -24,12 +23,8 @@ if TYPE_CHECKING:
 class LlamaIndexAgent(AnyAgent):
     """LLamaIndex agent implementation that handles both loading and running."""
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        tracing: TracingConfig | None = None,
-    ):
-        super().__init__(config, tracing)
+    def __init__(self, config: AgentConfig):
+        super().__init__(config)
         self._agent: BaseWorkflowAgent | None = None
 
     @property
