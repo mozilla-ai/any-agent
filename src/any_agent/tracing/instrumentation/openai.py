@@ -118,6 +118,8 @@ class _OpenAIAgentsInstrumentor:
                     current_spans[span.span_id] = otel_span
 
             def on_span_end(self, span):
+                if span.span_id not in current_spans:
+                    return
                 span_data = span.span_data
                 if isinstance(span_data, GenerationSpanData):
                     otel_span = current_spans[span.span_id]
