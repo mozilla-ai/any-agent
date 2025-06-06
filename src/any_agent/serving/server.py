@@ -9,6 +9,8 @@ from a2a.server.tasks import InMemoryTaskStore
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
+from any_agent.utils import run_async_in_sync
+
 from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
 
@@ -78,4 +80,4 @@ def serve_a2a(
         (task, _) = await serve_a2a_async(server, host, port, endpoint, log_level)
         await task
 
-    return asyncio.get_event_loop().run_until_complete(run())
+    return run_async_in_sync(run())

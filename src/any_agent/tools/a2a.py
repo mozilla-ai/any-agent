@@ -6,6 +6,8 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
+from any_agent.utils.asyncio_sync import run_async_in_sync
+
 if TYPE_CHECKING:
     from a2a.types import AgentCard
 
@@ -25,7 +27,7 @@ with suppress(ImportError):
     a2a_tool_available = True
 
 
-async def a2a_tool(
+async def a2a_tool_async(
     url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
 ) -> Callable[[str], Coroutine[Any, Any, str]]:
     """Perform a query using A2A to another agent.
@@ -85,3 +87,36 @@ async def a2a_tool(
             The result from the A2A agent, encoded in json.
     """
     return _send_query
+
+
+def a2a_tool(
+    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
+) -> Callable[[str], str]:
+    """Perform a query using A2A to another agent (synchronous version).
+
+    Args:
+        url (str): The url in which the A2A agent is located.
+        toolname (str): The name for the created tool. Defaults to `call_{agent name in card}`.
+            Leading and trailing whitespace are removed. Whitespace in the middle is replaced by `_`.
+        http_kwargs (dict): Additional kwargs to pass to the httpx client.
+
+    Returns:
+        A sync `Callable` that takes a query and returns the agent response.
+
+    """
+    if not a2a_tool_available:
+        msg = "You need to `pip install 'any-agent[a2a]'` to use this tool"
+        raise ImportError(msg)
+
+    # Fetch the async tool upfront to get proper name and documentation (otherwise the tool doesn't have the right name and documentation)
+    async_tool = run_async_in_sync(a2a_tool_async(url, toolname, http_kwargs))
+
+    def sync_wrapper(query: str) -> Any:
+        """Execute the A2A tool query synchronously."""
+        return run_async_in_sync(async_tool(query))
+
+    # Copy essential metadata from the async tool
+    sync_wrapper.__name__ = async_tool.__name__
+    sync_wrapper.__doc__ = async_tool.__doc__
+
+    return sync_wrapper

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
 from uuid import uuid4
@@ -20,8 +19,10 @@ from any_agent.tracing.instrumentation import (
     _Instrumentor,
 )
 from any_agent.tracing.trace_provider import TRACE_PROVIDER
+from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
+    import asyncio
     from collections.abc import Sequence
 
     import uvicorn
@@ -105,7 +106,7 @@ class AnyAgent(ABC):
         tracing: TracingConfig | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
-        return asyncio.get_event_loop().run_until_complete(
+        return run_async_in_sync(
             cls.create_async(
                 agent_framework=agent_framework,
                 agent_config=agent_config,
@@ -147,9 +148,7 @@ class AnyAgent(ABC):
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
-        return asyncio.get_event_loop().run_until_complete(
-            self.run_async(prompt, **kwargs)
-        )
+        return run_async_in_sync(self.run_async(prompt, **kwargs))
 
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent asynchronously with the given prompt."""

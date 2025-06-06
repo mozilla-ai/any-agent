@@ -11,10 +11,8 @@ from a2a.types import MessageSendParams, SendMessageRequest
 from any_agent import AgentConfig, AnyAgent
 from any_agent.serving import A2AServingConfig
 
-SERVER_PORT = 5000
 
-
-def run_agent():
+def run_agent(port: int):
     agent = AnyAgent.create(
         "openai",
         AgentConfig(
@@ -22,10 +20,10 @@ def run_agent():
             description="I'm an agent to help with booking airbnbs",
         ),
     )
-    agent.serve(serving_config=A2AServingConfig(port=SERVER_PORT))
+    agent.serve(serving_config=A2AServingConfig(port=port))
 
 
-async def run_agent_async():
+async def run_agent_async(port: int):
     agent = await AnyAgent.create_async(
         "openai",
         AgentConfig(
@@ -33,21 +31,22 @@ async def run_agent_async():
             description="I'm an agent to help with booking airbnbs",
         ),
     )
-    return await agent.serve_async(serving_config=A2AServingConfig(port=SERVER_PORT))
+    return await agent.serve_async(serving_config=A2AServingConfig(port=port))
 
 
 @pytest.mark.asyncio
-async def test_agent_serving_and_communication():
+async def test_agent_serving_and_communication(test_port):
     """This test can be refactored to remove the need for multiproc, once we have support for control of the uvicorn server."""
     # Start the agent in a subprocess
-    proc = multiprocessing.Process(target=run_agent, daemon=True)
+    proc = multiprocessing.Process(target=run_agent, args=(test_port,), daemon=True)
     proc.start()
-    await asyncio.sleep(5)
+    server_url = f"http://localhost:{test_port}"
+    await asyncio.sleep(3)
 
     try:
         async with httpx.AsyncClient() as httpx_client:
             client = await A2AClient.get_client_from_agent_card_url(
-                httpx_client, f"http://localhost:{SERVER_PORT}"
+                httpx_client, server_url
             )
             send_message_payload = {
                 "message": {
@@ -67,13 +66,15 @@ async def test_agent_serving_and_communication():
 
 
 @pytest.mark.asyncio
-async def test_agent_serving_and_communication_async():
+async def test_agent_serving_and_communication_async(test_port):
     # Start the agent in a subprocess
-    (task, server) = await run_agent_async()
+    (task, server) = await run_agent_async(test_port)
+    await asyncio.sleep(3)
+    server_url = f"http://localhost:{test_port}"
     try:
         async with httpx.AsyncClient() as httpx_client:
             client = await A2AClient.get_client_from_agent_card_url(
-                httpx_client, f"http://localhost:{SERVER_PORT}"
+                httpx_client, server_url
             )
             send_message_payload = {
                 "message": {

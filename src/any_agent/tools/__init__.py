@@ -1,4 +1,4 @@
-from .a2a import a2a_tool
+from .a2a import a2a_tool, a2a_tool_async
 from .final_output import _create_final_output_tool
 from .mcp import (
     MCPServer,
@@ -21,6 +21,7 @@ __all__ = [
     "_create_final_output_tool",
     "_get_mcp_server",
     "a2a_tool",
+    "a2a_tool_async",
     "ask_user_verification",
     "search_tavily",
     "search_web",

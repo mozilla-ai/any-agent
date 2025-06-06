@@ -13,18 +13,10 @@ from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 
-BASE_PORT = 5800
-PORT_PER_FRAMEWORK = {fw: BASE_PORT + index for index, fw in enumerate(AgentFramework)}
-
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
 def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
     return request.param  # type: ignore[no-any-return]
-
-
-@pytest.fixture
-def tool_agent_port(agent_framework):
-    return PORT_PER_FRAMEWORK[agent_framework]
 
 
 @pytest.fixture
