@@ -177,13 +177,6 @@ class TinyAgent(AnyAgent):
     def _get_system_prompt(self) -> str:
         """Get the system prompt, including structured output instructions if needed."""
         base_prompt = self.config.instructions or DEFAULT_SYSTEM_PROMPT
-        if self.config.output_type:
-            structured_output_prompt = dedent(f"""You must return a {self.config.output_type.__name__} object.
-                This object must match the following schema:
-                {self.config.output_type.model_json_schema()}
-                Your final response should be a valid JSON object that conforms to this schema.""")
-            base_prompt += structured_output_prompt
-
         return base_prompt
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
@@ -200,6 +193,7 @@ class TinyAgent(AnyAgent):
 
         num_of_turns = 0
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
+
         while num_of_turns < max_turns:
             self.completion_params["messages"] = self.messages
             response = await litellm.acompletion(**self.completion_params)
@@ -238,8 +232,16 @@ class TinyAgent(AnyAgent):
             current_last = self.messages[-1]
             if current_last.get("role") == "assistant" and current_last.get("content"):
                 if self.config.output_type is not None:
+                    structured_output_message = {
+                        "role": "user",
+                        "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
+                    }
+                    self.messages.append(structured_output_message)
+                    self.completion_params["messages"] = self.messages
+                    response = await litellm.acompletion(**self.completion_params)
+                    message: LiteLLMMessage = response.choices[0].message
                     return self.config.output_type.model_validate_json(
-                        str(current_last["content"])
+                        message["content"]
                     )
                 return str(current_last["content"])
 
