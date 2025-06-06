@@ -7,7 +7,7 @@ from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from litellm.types.utils import ModelResponse as LLMModelResponse
+from litellm.types.utils import ModelResponse
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
@@ -110,9 +110,9 @@ def configure_logging(pytestconfig: pytest.Config) -> None:
 
 
 @pytest.fixture
-def mock_litellm_response() -> LLMModelResponse:
+def mock_litellm_response() -> ModelResponse:
     """Fixture to create a standard mock LiteLLM response"""
-    return LLMModelResponse.model_validate_json(
+    return ModelResponse.model_validate_json(
         '{"id":"chatcmpl-BWnfbHWPsQp05roQ06LAD1mZ9tOjT","created":1747157127,"model":"gpt-4o-2024-08-06","object":"chat.completion","system_fingerprint":"fp_f5bdcc3276","choices":[{"finish_reason":"stop","index":0,"message":{"content":"The state capital of Pennsylvania is Harrisburg.","role":"assistant","tool_calls":null,"function_call":null,"annotations":[]}}],"usage":{"completion_tokens":11,"prompt_tokens":138,"total_tokens":149,"completion_tokens_details":{"accepted_prediction_tokens":0,"audio_tokens":0,"reasoning_tokens":0,"rejected_prediction_tokens":0},"prompt_tokens_details":{"audio_tokens":0,"cached_tokens":0}},"service_tier":"default"}'
     )
 
