@@ -21,7 +21,7 @@ with user defined criteria. The steps for evaluating an agent are as follows:
 ### Run an agent using any-agent, which will produce a trace. For example
 
 ```python
-from any_agent import AgentConfig, AnyAgent, TracingConfig
+from any_agent import AgentConfig, AnyAgent
 from any_agent.tools import search_web
 
 agent = AnyAgent.create(
@@ -30,11 +30,9 @@ agent = AnyAgent.create(
         model_id="gpt-4o-mini",
         tools=[search_web]
     ),
-    tracing=TracingConfig(console=True, cost_info=False)
 )
 
 agent_trace = agent.run("How many seconds would it take for a leopard at full speed to run through Pont des Arts?")
-
 ```
 
 

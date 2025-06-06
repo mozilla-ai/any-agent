@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -52,5 +52,5 @@ def test_run_langchain_agent_custom_args() -> None:
         )
         agent.run("foo", debug=True)
         agent_mock.ainvoke.assert_called_once_with(
-            {"messages": [("user", "foo")]}, debug=True
+            {"messages": [("user", "foo")]}, debug=True, config={"callbacks": [ANY]}
         )

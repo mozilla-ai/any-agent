@@ -1,17 +1,19 @@
+# mypy: disable-error-code="no-untyped-def,union-attr"
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from opentelemetry.trace import StatusCode
-from wrapt.patches import resolve_path, wrap_function_wrapper
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from opentelemetry.trace import Span, Tracer
-    from smolagents.agent_types import AgentType
-    from smolagents.models import ChatMessage, Model
+    from opentelemetry.trace import Span
+    from smolagents.models import ChatMessage
+
+    from any_agent.frameworks.smolagents import SmolagentsAgent
 
 
 from .common import _set_tool_output
@@ -78,83 +80,93 @@ def _set_llm_output(response: ChatMessage, span: Span) -> None:
 class _SmolagentsInstrumentor:
     def __init__(self) -> None:
         self.first_llm_calls: set[int] = set()
-        self._original_model_calls: dict[str, Callable[..., Any]] = {}
-        self._original_tool_call: Callable[..., Any] | None = None
+        self._original_generate: Callable[..., Any] | None = None
+        self._original_tools: Any | None = None
 
-    def instrument(self, tracer: Tracer) -> None:
-        def model_call_wrap(wrapped, instance: Model, args, kwargs):  # type: ignore[no-untyped-def]
-            with tracer.start_as_current_span(f"call_llm {instance.model_id}") as span:
+    def instrument(self, agent: SmolagentsAgent) -> None:
+        if len(agent._running_traces) > 1:
+            return
+
+        tracer = agent._tracer
+
+        self._original_generate = agent._agent.model.generate
+
+        def wrap_generate(
+            messages,
+            stop_sequences=None,
+            response_format=None,
+            tools_to_call_from=None,
+            **kwargs,
+        ):
+            model_id = str(agent._agent.model.model_id)
+            with tracer.start_as_current_span(f"call_llm {model_id}") as span:
                 span.set_attributes(
                     {
                         "gen_ai.operation.name": "call_llm",
-                        "gen_ai.request.model": getattr(
-                            instance, "model_id", "No model_id"
-                        ),
+                        "gen_ai.request.model": model_id,
                     }
                 )
-
                 trace_id = span.get_span_context().trace_id
                 if trace_id not in self.first_llm_calls:
                     self.first_llm_calls.add(trace_id)
-                    _set_llm_input(args[0], span)
+                    _set_llm_input(messages, span)
 
-                response: ChatMessage = wrapped(*args, **kwargs)
+                response: ChatMessage = self._original_generate(  # type: ignore[misc]
+                    messages,
+                    stop_sequences,
+                    response_format,
+                    tools_to_call_from,
+                    **kwargs,
+                )
 
                 _set_llm_output(response, span)
 
                 span.set_status(StatusCode.OK)
+                agent._running_traces[trace_id].add_span(span)
 
                 return response
 
-        def tool_call_wrap(wrapped, instance, args, kwargs):  # type: ignore[no-untyped-def]
-            with tracer.start_as_current_span(f"execute_tool {instance.name}") as span:
-                span.set_attributes(
-                    {
-                        "gen_ai.operation.name": "execute_tool",
-                        "gen_ai.tool.name": instance.name,
-                        "gen_ai.tool.args": json.dumps(
-                            kwargs,
-                            default=str,
-                            ensure_ascii=False,
-                        ),
-                        "gen_ai.tool.description": instance.description,
-                    }
-                )
+        agent._agent.model.generate = wrap_generate  # type: ignore[method-assign]
 
-                result: AgentType | Any | None = wrapped(*args, **kwargs)
+        class WrappedToolCall:
+            def __init__(self, name, description, original_forward):
+                self.name = name
+                self.description = description
+                self.original_forward = original_forward
 
-                _set_tool_output(result, span)
+            def forward(self, *args, **kwargs):
+                with tracer.start_as_current_span(f"execute_tool {self.name}") as span:
+                    span.set_attributes(
+                        {
+                            "gen_ai.operation.name": "execute_tool",
+                            "gen_ai.tool.name": self.name,
+                            "gen_ai.tool.description": self.description,
+                            "gen_ai.tool.args": json.dumps(
+                                kwargs, default=str, ensure_ascii=False
+                            ),
+                        }
+                    )
 
-                span.set_status(StatusCode.OK)
+                    output = self.original_forward(*args, **kwargs)
+                    _set_tool_output(output, span)
 
-                return result
+                    span.set_status(StatusCode.OK)
+                    trace_id = span.get_span_context().trace_id
+                    agent._running_traces[trace_id].add_span(span)
+                    return output
 
-        import smolagents
+        self._original_tools = deepcopy(agent._agent.tools)
+        wrapped_tools = {}
+        for key, tool in agent._agent.tools.items():
+            wrapped = WrappedToolCall(tool.name, tool.description, tool.forward)  # type: ignore[no-untyped-call]
+            tool.forward = wrapped.forward
+            wrapped_tools[key] = tool
+        agent._agent.tools = wrapped_tools
 
-        exported_model_subclasses = [
-            attr
-            for _, attr in vars(smolagents).items()
-            if isinstance(attr, type) and issubclass(attr, smolagents.models.Model)
-        ]
-        for model_subclass in exported_model_subclasses:
-            self._original_model_calls[model_subclass.__name__] = (
-                model_subclass.generate
-            )
-            wrap_function_wrapper(  # type: ignore[no-untyped-call]
-                "smolagents.models",
-                f"{model_subclass.__name__}.generate",
-                wrapper=model_call_wrap,
-            )
-
-        self._original_tool_call = smolagents.tools.Tool.__call__
-        wrap_function_wrapper(  # type: ignore[no-untyped-call]
-            "smolagents.tools", "Tool.__call__", wrapper=tool_call_wrap
-        )
-
-    def uninstrument(self) -> None:
-        for model_subclass, original_model_call in self._original_model_calls.items():
-            model = resolve_path("smolagents.models", model_subclass)[2]  # type: ignore[no-untyped-call]
-            model.generate = original_model_call
-        if self._original_tool_call is not None:
-            tool = resolve_path("smolagents.tools", "Tool")[2]  # type: ignore[no-untyped-call]
-            tool.__call__ = self._original_tool_call
+    def uninstrument(self, agent: SmolagentsAgent) -> None:
+        if len(agent._running_traces) > 1:
+            return
+        if self._original_generate is not None:
+            agent._agent.model.generate = self._original_generate  # type: ignore[method-assign]
+        if self._original_tools is not None:
+            agent._agent.tools = self._original_tools

@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Any
 
-from any_agent.config import AgentConfig, AgentFramework, TracingConfig
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 
 try:
@@ -24,9 +24,8 @@ class SmolagentsAgent(AnyAgent):
     def __init__(
         self,
         config: AgentConfig,
-        tracing: TracingConfig | None = None,
     ):
-        super().__init__(config, tracing)
+        super().__init__(config)
         self._agent: MultiStepAgent | None = None
 
     @property

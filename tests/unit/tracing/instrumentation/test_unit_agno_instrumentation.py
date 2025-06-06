@@ -30,4 +30,4 @@ def test_set_llm_output_missing_fields() -> None:
 
 
 def test_uninstrument_before_instrument() -> None:
-    _AgnoInstrumentor().uninstrument()
+    _AgnoInstrumentor().uninstrument(MagicMock())

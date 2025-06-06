@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import StrEnum, auto
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AgentFramework(StrEnum):
@@ -83,27 +83,27 @@ class MCPSse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class TracingConfig(BaseModel):
+class ServingConfig(BaseModel):
+    """Configuration for serving an agent using the Agent2Agent Protocol (A2A).
+
+    We use the example `A2ASever` from https://github.com/google/A2A/tree/main/samples/python.
+    """
+
     model_config = ConfigDict(extra="forbid")
 
-    console: bool = True
-    """Whether to show spans in the console."""
+    host: str = "localhost"
+    """Will be passed as argument to `uvicorn.run`."""
 
-    call_llm: str | None = "yellow"
-    """Color used to display LLM call spans in the console."""
+    port: int = 5000
+    """Will be passed as argument to `uvicorn.run`."""
 
-    execute_tool: str | None = "blue"
-    """Color used to display tool execution spans in the console."""
+    endpoint: str = "/"
+    """Will be pass as argument to `Starlette().add_route`"""
 
-    cost_info: bool = True
-    """Whether spans should include cost information"""
+    log_level: str = "warning"
+    """Will be passed as argument to the `uvicorn` server."""
 
-    @model_validator(mode="after")
-    def validate_console_flags(self) -> Self:
-        if self.console and not any([self.call_llm, self.execute_tool]):
-            msg = "At least one of `[self.call_llm, self.execute_tool]` must be set"
-            raise ValueError(msg)
-        return self
+    version: str = "0.1.0"
 
 
 MCPParams = MCPStdio | MCPSse

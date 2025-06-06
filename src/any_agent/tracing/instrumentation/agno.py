@@ -1,18 +1,19 @@
+# mypy: disable-error-code="method-assign,no-untyped-def,union-attr"
 from __future__ import annotations
 
 import json
 from typing import TYPE_CHECKING, Any
 
 from opentelemetry.trace import StatusCode
-from wrapt.patches import resolve_path, wrap_function_wrapper
 
 from .common import _set_tool_output
 
 if TYPE_CHECKING:
-    from agno.models.base import Model
     from agno.models.message import Message, MessageMetrics
     from agno.models.response import ModelResponse
-    from opentelemetry.trace import Span, Tracer
+    from opentelemetry.trace import Span
+
+    from any_agent.frameworks.agno import AgnoAgent
 
 
 def _set_llm_input(messages: list[Message], span: Span) -> None:
@@ -76,18 +77,24 @@ class _AgnoInstrumentor:
         self._original_arun_function_calls: Any = None
         self.first_llm_calls: set[int] = set()
 
-    def instrument(self, tracer: Tracer) -> None:
-        async def wrap_aprocess_model_response(  # type: ignore[no-untyped-def]
-            wrapped,
-            instance: Model,
-            args,
-            kwargs,
+    def instrument(self, agent: AgnoAgent) -> None:
+        if len(agent._running_traces) > 1:
+            return
+
+        model = agent._agent.model
+        tracer = agent._tracer
+
+        self._original_aprocess_model = model._aprocess_model_response
+
+        async def wrap_aprocess_model_response(
+            *args,
+            **kwargs,
         ) -> tuple[Message, bool]:
-            with tracer.start_as_current_span(f"call_llm {instance.id}") as span:
+            with tracer.start_as_current_span(f"call_llm {model.id}") as span:
                 span.set_attributes(
                     {
                         "gen_ai.operation.name": "call_llm",
-                        "gen_ai.request.model": instance.id,
+                        "gen_ai.request.model": model.id,
                     }
                 )
                 trace_id = span.get_span_context().trace_id
@@ -97,23 +104,27 @@ class _AgnoInstrumentor:
 
                 assistant_message: Message
                 has_tool_calls: bool
-                assistant_message, has_tool_calls = await wrapped(*args, **kwargs)
+                assistant_message, has_tool_calls = await self._original_aprocess_model(
+                    *args, **kwargs
+                )
 
                 _set_llm_output(assistant_message, span)
 
                 span.set_status(StatusCode.OK)
 
+            agent._running_traces[trace_id].add_span(span)
             return assistant_message, has_tool_calls
 
-        async def wrap_arun_function_calls(  # type: ignore[no-untyped-def]
-            wrapped,
-            instance,
-            args,
-            kwargs,
-        ):
+        model._aprocess_model_response = wrap_aprocess_model_response
+
+        self._original_arun_function_calls = model.arun_function_calls
+
+        async def wrap_arun_function_calls(*args, **kwargs):
             tool_call_spans = {}
             function_call_response: ModelResponse
-            async for function_call_response in wrapped(*args, **kwargs):
+            async for function_call_response in self._original_arun_function_calls(
+                *args, **kwargs
+            ):
                 if function_call_response.event == "ToolCallStarted":
                     if tool_executions := function_call_response.tool_executions:
                         tool = function_call_response.tool_executions[0]
@@ -148,27 +159,17 @@ class _AgnoInstrumentor:
 
                     span.set_status(StatusCode.OK)
                     span.end()
+                    trace_id = span.get_span_context().trace_id
+                    agent._running_traces[trace_id].add_span(span)
                 yield function_call_response
 
-        import agno
+        model.arun_function_calls = wrap_arun_function_calls
 
-        self._original_aprocess_model = agno.models.base.Model._aprocess_model_response
-        wrap_function_wrapper(  # type: ignore[no-untyped-call]
-            "agno.models.base",
-            "Model._aprocess_model_response",
-            wrapper=wrap_aprocess_model_response,
-        )
-
-        self._original_arun_function_calls = agno.models.base.Model.arun_function_calls
-        wrap_function_wrapper(  # type: ignore[no-untyped-call]
-            "agno.models.base",
-            "Model.arun_function_calls",
-            wrapper=wrap_arun_function_calls,
-        )
-
-    def uninstrument(self) -> None:
-        parent = resolve_path("agno.models.base", "Model")[2]  # type: ignore[no-untyped-call]
+    def uninstrument(self, agent: AgnoAgent):
+        if len(agent._running_traces) > 1:
+            return
+        model = agent._agent.model
         if self._original_aprocess_model is not None:
-            parent._aprocess_model_response = self._original_aprocess_model
+            model._aprocess_model_response = self._original_aprocess_model
         if self._original_arun_function_calls is not None:
-            parent.arun_function_calls = self._original_arun_function_calls
+            model.arun_function_calls = self._original_arun_function_calls

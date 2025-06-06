@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
-from llama_index.core.base.llms.types import ChatMessage, ChatResponse
+from llama_index.core.agent.workflow.workflow_events import AgentOutput
+from llama_index.core.base.llms.types import ChatMessage
 
 from any_agent.tracing.instrumentation.llama_index import (
     _LlamaIndexInstrumentor,
@@ -22,10 +23,15 @@ def test_set_llm_input_missing_fields() -> None:
 def test_set_llm_output_missing_fields() -> None:
     """It should not fail when missing fields."""
     span = MagicMock()
-    _set_llm_output(ChatResponse(message=ChatMessage()), span)
+    _set_llm_output(
+        AgentOutput(
+            response=ChatMessage(), tool_calls=[], raw=None, current_agent_name="foo"
+        ),
+        span,
+    )
 
     span.set_attributes.assert_not_called()
 
 
 def test_uninstrument_before_instrument() -> None:
-    _LlamaIndexInstrumentor().uninstrument()
+    _LlamaIndexInstrumentor().uninstrument(MagicMock())

@@ -39,7 +39,9 @@ def evaluate_checkpoints(
             eval_output = checkpoint.criteria(trace)
         else:
             # Agent as a Judge
-            evaluation = checking_agent.run(prompt=checkpoint.criteria)
+            evaluation = checking_agent.run(
+                prompt=checkpoint.criteria, instrument=False
+            )
             # strip out the ```json and ``` from the final output if they exist
             if not evaluation.final_output:
                 msg = "The evaluation result is empty"
@@ -55,7 +57,6 @@ def evaluate_checkpoints(
             points=checkpoint.points,
         )
         results.append(result)
-    checking_agent.exit()
     return results
 
 

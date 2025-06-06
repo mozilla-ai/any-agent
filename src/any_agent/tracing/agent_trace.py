@@ -1,8 +1,9 @@
-# mypy: disable-error-code="arg-type"
-from collections.abc import Mapping
+# mypy: disable-error-code="arg-type,attr-defined"
+from __future__ import annotations
+
 from datetime import timedelta
 from functools import cached_property
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from litellm.cost_calculator import cost_per_token
 from opentelemetry.sdk.trace import ReadableSpan
@@ -19,6 +20,11 @@ from .otel_types import (
     SpanKind,
     Status,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from opentelemetry.trace import Span
 
 
 class TokenInfo(BaseModel):
@@ -94,22 +100,20 @@ class AgentSpan(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=False)
 
     @classmethod
-    def from_readable_span(cls, readable_span: "ReadableSpan") -> "AgentSpan":
-        """Create an AgentSpan from a ReadableSpan."""
+    def from_otel(cls, otel_span: Span) -> AgentSpan:
+        """Create an AgentSpan from an OTEL Span."""
         return cls(
-            name=readable_span.name,
-            kind=SpanKind.from_otel(readable_span.kind),
-            parent=SpanContext.from_otel(readable_span.parent),
-            start_time=readable_span.start_time,
-            end_time=readable_span.end_time,
-            status=Status.from_otel(readable_span.status),
-            context=SpanContext.from_otel(readable_span.context),
-            attributes=dict(readable_span.attributes)
-            if readable_span.attributes
-            else {},
-            links=[Link.from_otel(link) for link in readable_span.links],
-            events=[Event.from_otel(event) for event in readable_span.events],
-            resource=Resource.from_otel(readable_span.resource),
+            name=otel_span.name,
+            kind=SpanKind.from_otel(otel_span.kind),
+            parent=SpanContext.from_otel(otel_span.parent),
+            start_time=otel_span.start_time,
+            end_time=otel_span.end_time,
+            status=Status.from_otel(otel_span.status),
+            context=SpanContext.from_otel(otel_span.context),
+            attributes=dict(otel_span.attributes) if otel_span.attributes else {},
+            links=[Link.from_otel(link) for link in otel_span.links],
+            events=[Event.from_otel(event) for event in otel_span.events],
+            resource=Resource.from_otel(otel_span.resource),
         )
 
     def to_readable_span(self) -> ReadableSpan:
@@ -127,14 +131,6 @@ class AgentSpan(BaseModel):
             events=self.events,
             resource=self.resource,
         )
-
-    def add_cost_info(self) -> None:
-        """Extend attributes with `TokenUseAndCost`."""
-        cost_info = compute_cost_info(self.attributes)
-        if cost_info:
-            self.set_attributes(
-                {f"gen_ai.usage.{k}": v for k, v in cost_info.model_dump().items()}
-            )
 
     def set_attributes(self, attributes: Mapping[str, AttributeValue]) -> None:
         """Set attributes for the span."""
@@ -176,8 +172,10 @@ class AgentTrace(BaseModel):
         if "cost" in self.__dict__:
             del self.cost
 
-    def add_span(self, span: AgentSpan) -> None:
+    def add_span(self, span: AgentSpan | Span) -> None:
         """Add an AgentSpan to the trace and clear the usage_and_cost cache if present."""
+        if not isinstance(span, AgentSpan):
+            span = AgentSpan.from_otel(span)
         self.spans.append(span)
         self._invalidate_usage_and_cost_cache()
 
@@ -226,10 +224,12 @@ class AgentTrace(BaseModel):
     @cached_property
     def cost(self) -> CostInfo:
         """The current total cost for this trace. Cached after first computation."""
-        sum_input_cost = 0
-        sum_output_cost = 0
+        sum_input_cost = 0.0
+        sum_output_cost = 0.0
         for span in self.spans:
             if span.is_llm_call():
-                sum_input_cost += span.attributes.get("gen_ai.usage.input_cost", 0)
-                sum_output_cost += span.attributes.get("gen_ai.usage.output_cost", 0)
+                cost_info = compute_cost_info(span.attributes)
+                if cost_info:
+                    sum_input_cost += cost_info.input_cost
+                    sum_output_cost += cost_info.output_cost
         return CostInfo(input_cost=sum_input_cost, output_cost=sum_output_cost)

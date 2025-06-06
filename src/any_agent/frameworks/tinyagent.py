@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 import litellm
 from mcp.types import CallToolResult, TextContent
 
-from any_agent.config import AgentConfig, AgentFramework, TracingConfig
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.logging import logger
 
 from .any_agent import AnyAgent
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from litellm.types.utils import Message as LiteLLMMessage
+    from litellm.types.utils import ModelResponse
 
 
 DEFAULT_SYSTEM_PROMPT = """
@@ -87,11 +88,7 @@ class TinyAgent(AnyAgent):
     Modeled after JS implementation https://huggingface.co/blog/tiny-agents.
     """
 
-    def __init__(
-        self,
-        config: AgentConfig,
-        tracing: TracingConfig | None = None,
-    ) -> None:
+    def __init__(self, config: AgentConfig) -> None:
         """Initialize the TinyAgent.
 
         Args:
@@ -99,7 +96,7 @@ class TinyAgent(AnyAgent):
             tracing: Optional tracing configuration
 
         """
-        super().__init__(config, tracing=tracing)
+        super().__init__(config)
         self.messages: list[dict[str, Any]] = []
         self.clients: dict[str, ToolExecutor] = {}
         self.completion_params = {
@@ -184,8 +181,9 @@ class TinyAgent(AnyAgent):
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
         while num_of_turns < max_turns:
             self.completion_params["messages"] = self.messages
-            response = await litellm.acompletion(**self.completion_params)
-            message: LiteLLMMessage = response.choices[0].message
+            response = await self.call_model(**self.completion_params)
+
+            message: LiteLLMMessage = response.choices[0].message  # type: ignore[union-attr]
 
             self.messages.append(message.model_dump())
 
@@ -222,6 +220,10 @@ class TinyAgent(AnyAgent):
                 return str(current_last["content"])
 
         return "Max turns reached"
+
+    async def call_model(self, **completion_params: dict[str, Any]) -> ModelResponse:
+        response: ModelResponse = await litellm.acompletion(**completion_params)
+        return response
 
     @property
     def framework(self) -> AgentFramework:

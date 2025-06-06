@@ -6,7 +6,6 @@ from litellm.utils import validate_environment
 from rich.logging import RichHandler
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import TracingConfig
 from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool
 from any_agent.tracing.agent_trace import AgentTrace
@@ -86,7 +85,6 @@ async def test_load_and_run_multi_agent_a2a(
         date_agent = await AnyAgent.create_async(
             agent_framework=agent_framework,
             agent_config=date_agent_cfg,
-            tracing=TracingConfig(console=False, cost_info=True),
         )
 
         # SERVING PROPER
@@ -124,7 +122,6 @@ async def test_load_and_run_multi_agent_a2a(
         main_agent = await AnyAgent.create_async(
             agent_framework=agent_framework,
             agent_config=main_agent_cfg,
-            tracing=TracingConfig(console=False, cost_info=True),
         )
 
         agent_trace = await main_agent.run_async("What date and time is it right now?")

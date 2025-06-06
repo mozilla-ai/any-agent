@@ -1,16 +1,21 @@
+# mypy: disable-error-code="no-untyped-def"
 from __future__ import annotations
 
 import json
 from typing import TYPE_CHECKING
 
-from agents.tracing import TracingProcessor, set_trace_processors
+from agents.tracing import TracingProcessor
+from agents.tracing.processors import BatchTraceProcessor
+from agents.tracing.setup import GLOBAL_TRACE_PROVIDER
 from agents.tracing.span_data import FunctionSpanData, GenerationSpanData
 from opentelemetry.trace import StatusCode
 
 from .common import _set_tool_output
 
 if TYPE_CHECKING:
-    from opentelemetry.trace import Span, Tracer
+    from opentelemetry.trace import Span
+
+    from any_agent.frameworks.openai import OpenAIAgent
 
 
 def _set_llm_input(span_data: GenerationSpanData, span: Span) -> None:
@@ -66,28 +71,31 @@ def _set_llm_output(span_data: GenerationSpanData, span: Span) -> None:
 
 class _OpenAIAgentsInstrumentor:
     def __init__(self) -> None:
-        self.first_llm_calls: set[str] = set()
+        self.first_llm_calls: set[int] = set()
+        self.current_spans: dict[str, Span] = {}
+        self._processor: TracingProcessor | None = None
 
-    def instrument(self, tracer: Tracer) -> None:
+    def instrument(self, agent: OpenAIAgent) -> None:
+        if len(agent._running_traces) > 1:
+            return
+
         first_llm_calls = self.first_llm_calls
+        current_spans = self.current_spans
+
+        tracer = agent._tracer
 
         class AnyAgentTracingProcessor(TracingProcessor):
-            def __init__(self, tracer: Tracer):
-                self.tracer = tracer
-                self.current_spans: dict[str, Span] = {}
-                super().__init__()
-
-            def on_trace_start(self, trace):  # type: ignore[no-untyped-def]
+            def on_trace_start(self, trace):
                 pass
 
-            def on_trace_end(self, trace):  # type: ignore[no-untyped-def]
+            def on_trace_end(self, trace):
                 pass
 
-            def on_span_start(self, span):  # type: ignore[no-untyped-def]
+            def on_span_start(self, span):
                 span_data = span.span_data
                 if isinstance(span_data, GenerationSpanData):
                     model = str(span_data.model)
-                    otel_span = self.tracer.start_span(
+                    otel_span = tracer.start_span(
                         name=f"call_llm {model}",
                     )
                     otel_span.set_attributes(
@@ -96,9 +104,9 @@ class _OpenAIAgentsInstrumentor:
                             "gen_ai.request.model": model,
                         }
                     )
-                    self.current_spans[span.span_id] = otel_span
+                    current_spans[span.span_id] = otel_span
                 elif isinstance(span_data, FunctionSpanData):
-                    otel_span = self.tracer.start_span(
+                    otel_span = tracer.start_span(
                         name=f"execute_tool {span_data.name}",
                     )
                     otel_span.set_attributes(
@@ -107,22 +115,26 @@ class _OpenAIAgentsInstrumentor:
                             "gen_ai.tool.name": span_data.name,
                         }
                     )
-                    self.current_spans[span.span_id] = otel_span
+                    current_spans[span.span_id] = otel_span
 
-            def on_span_end(self, span):  # type: ignore[no-untyped-def]
+            def on_span_end(self, span):
+                if span.span_id not in current_spans:
+                    return
                 span_data = span.span_data
                 if isinstance(span_data, GenerationSpanData):
-                    otel_span = self.current_spans[span.span_id]
-                    trace_id = span.trace_id
+                    otel_span = current_spans[span.span_id]
+                    trace_id = otel_span.get_span_context().trace_id
                     if trace_id not in first_llm_calls:
                         first_llm_calls.add(trace_id)
                         _set_llm_input(span_data, otel_span)
                     _set_llm_output(span_data, otel_span)
                     otel_span.set_status(StatusCode.OK)
                     otel_span.end()
-                    del self.current_spans[span.span_id]
+                    if trace_id in agent._running_traces:
+                        agent._running_traces[trace_id].add_span(otel_span)
+                    del current_spans[span.span_id]
                 elif isinstance(span_data, FunctionSpanData):
-                    otel_span = self.current_spans[span.span_id]
+                    otel_span = current_spans[span.span_id]
                     otel_span.set_attributes(
                         {
                             "gen_ai.tool.args": span_data.input or "{}",
@@ -131,17 +143,35 @@ class _OpenAIAgentsInstrumentor:
                     _set_tool_output(span_data.output, otel_span)
                     otel_span.set_status(StatusCode.OK)
                     otel_span.end()
-                    del self.current_spans[span.span_id]
+                    trace_id = otel_span.get_span_context().trace_id
+                    if trace_id in agent._running_traces:
+                        agent._running_traces[trace_id].add_span(otel_span)
+                    del current_spans[span.span_id]
 
-            def force_flush(self):  # type: ignore[no-untyped-def]
+            def force_flush(self):
                 pass
 
-            def shutdown(self):  # type: ignore[no-untyped-def]
+            def shutdown(self):
                 pass
 
-        set_trace_processors([AnyAgentTracingProcessor(tracer)])
+        self._processor = AnyAgentTracingProcessor()
 
-    def uninstrument(self) -> None:
-        from agents.tracing.setup import GLOBAL_TRACE_PROVIDER
+        with GLOBAL_TRACE_PROVIDER._multi_processor._lock:
+            GLOBAL_TRACE_PROVIDER._multi_processor._processors = tuple(
+                p
+                for p in GLOBAL_TRACE_PROVIDER._multi_processor._processors
+                if not isinstance(p, BatchTraceProcessor)
+            )
+            GLOBAL_TRACE_PROVIDER._multi_processor._processors += (self._processor,)
 
-        GLOBAL_TRACE_PROVIDER.set_processors([])
+    def uninstrument(self, agent: OpenAIAgent) -> None:
+        if len(agent._running_traces) > 1:
+            return
+
+        if self._processor:
+            with GLOBAL_TRACE_PROVIDER._multi_processor._lock:
+                GLOBAL_TRACE_PROVIDER._multi_processor._processors = tuple(
+                    p
+                    for p in GLOBAL_TRACE_PROVIDER._multi_processor._processors
+                    if p is not self._processor
+                )

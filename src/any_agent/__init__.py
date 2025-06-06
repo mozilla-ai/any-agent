@@ -1,4 +1,4 @@
-from .config import AgentConfig, AgentFramework, TracingConfig
+from .config import AgentConfig, AgentFramework
 from .frameworks.any_agent import AnyAgent
 from .tracing.agent_trace import AgentTrace
 
@@ -7,5 +7,4 @@ __all__ = [
     "AgentFramework",
     "AgentTrace",
     "AnyAgent",
-    "TracingConfig",
 ]

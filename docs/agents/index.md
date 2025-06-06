@@ -123,14 +123,3 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
-
-### Cleaning up the Agent
-
-When an AnyAgent object is deleted, the python garbage collector cleans up any resources owned by the object. However, when running or re-creating an agent in the same python process (for example, in test scripts) it may be necessary to forcefully shut down the agent to avoid unexpected side affects. For this purpose, `agent.exit` is available which will shut down all resources the agent was using.
-
-For example,
-
-```python
-agent.run("Which agent framework is the best?")
-agent.exit() # cleans up the agent synchronously
-```
