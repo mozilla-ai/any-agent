@@ -1,4 +1,3 @@
-import asyncio
 from collections.abc import Sequence
 from typing import Any
 
@@ -13,19 +12,14 @@ from any_agent import AgentFramework
 from any_agent.config import Tool
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.wrappers import _wrap_tools
+from any_agent.utils import run_async_in_sync
 
 
 def wrap_sync(
     tools: Sequence[Tool],
     framework: AgentFramework,
 ) -> list[Tool]:
-    try:
-        wrapped_tools, _ = asyncio.get_event_loop().run_until_complete(
-            _wrap_tools(tools, framework)
-        )
-    except RuntimeError:
-        # No running event loop, we can use asyncio.run()
-        wrapped_tools, _ = asyncio.run(_wrap_tools(tools, framework))
+    wrapped_tools, _ = run_async_in_sync(_wrap_tools(tools, framework))
     return wrapped_tools
 
 

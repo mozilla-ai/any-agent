@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import socket
 import time
 from multiprocessing import Process
 
@@ -25,6 +26,48 @@ logging.basicConfig(
 )
 logger = logging.getLogger("any_agent_test")
 logger.setLevel(logging.DEBUG)
+
+
+# These need to be two separate ranges because when running pytest in parallel, the two tests may run at the same time
+# and try to bind to the same ports if we use the same range.
+BASE_PORT = 5800
+PORT_PER_FRAMEWORK = {fw: BASE_PORT + index for index, fw in enumerate(AgentFramework)}
+BASE_PORT_SYNC = 6800
+PORT_PER_FRAMEWORK_SYNC = {
+    fw: BASE_PORT_SYNC + index for index, fw in enumerate(AgentFramework)
+}
+
+
+def _is_port_available(port: int, host: str = "localhost") -> bool:
+    """Check if a port is available for binding.
+
+    This isn't a perfect check but it at least tells us if there is absolutely no chance of binding to the port.
+
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        try:
+            sock.bind((host, port))
+        except OSError:
+            return False
+        return True
+
+
+@pytest.fixture
+def tool_agent_port(agent_framework):
+    port = PORT_PER_FRAMEWORK[agent_framework]
+    if not _is_port_available(port):
+        msg = f"Port {port} is not available for binding"
+        raise RuntimeError(msg)
+    return port
+
+
+@pytest.fixture
+def tool_agent_port_sync(agent_framework):
+    port = PORT_PER_FRAMEWORK_SYNC[agent_framework]
+    if not _is_port_available(port):
+        msg = f"Port {port} is not available for binding"
+        raise RuntimeError(msg)
+    return port
 
 
 @pytest.mark.skipif(
@@ -206,7 +249,7 @@ def _run_server(agent_framework_str: str, port: int, endpoint: str, model_id: st
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
 def test_load_and_run_multi_agent_a2a_sync(
-    agent_framework: AgentFramework, tool_agent_port: int
+    agent_framework: AgentFramework, tool_agent_port_sync: int
 ) -> None:
     """Tests that an agent contacts another using A2A using the sync adapter tool.
 
@@ -232,19 +275,23 @@ def test_load_and_run_multi_agent_a2a_sync(
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
     server_process = None
-    sync_port = tool_agent_port + 1  # Use different port to avoid conflicts
     tool_agent_endpoint = "tool_agent_sync"
 
     try:
         # Start the server in a separate process
         server_process = Process(
             target=_run_server,
-            args=(agent_framework.value, sync_port, tool_agent_endpoint, agent_model),
+            args=(
+                agent_framework.value,
+                tool_agent_port_sync,
+                tool_agent_endpoint,
+                agent_model,
+            ),
         )
         server_process.start()
 
         # Poll until server is ready (max 5 seconds)
-        server_url = f"http://localhost:{sync_port}/{tool_agent_endpoint}"
+        server_url = f"http://localhost:{tool_agent_port_sync}/{tool_agent_endpoint}"
         max_attempts = 10
         poll_interval = 0.5
         attempts = 0
@@ -267,14 +314,20 @@ def test_load_and_run_multi_agent_a2a_sync(
 
         logger.info(
             "Setting up sync agent",
-            extra={"endpoint": f"http://localhost:{sync_port}/{tool_agent_endpoint}"},
+            extra={
+                "endpoint": f"http://localhost:{tool_agent_port_sync}/{tool_agent_endpoint}"
+            },
         )
 
         # Create main agent using sync methods
         main_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol (sync version).",
-            tools=[a2a_tool(f"http://localhost:{sync_port}/{tool_agent_endpoint}")],
+            tools=[
+                a2a_tool(
+                    f"http://localhost:{tool_agent_port_sync}/{tool_agent_endpoint}"
+                )
+            ],
             **kwargs,  # type: ignore[arg-type]
         )
 
