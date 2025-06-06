@@ -1789,7 +1789,7 @@ weather_expert = await AnyAgent.create_async(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="configure-and-use-the-third-agent">Configure and use the Third Agent<a class="anchor-link" href="#configure-and-use-the-third-agent">¶</a></h3><p>Now that the first two agents are serving over A2A, our main agent can be given access to use it just like a tool! In order to do this you use the <code>a2a_tool</code> function which retrieves the info about the agent and allows you to call it.</p>
+<h3 id="configure-and-use-the-third-agent">Configure and use the Third Agent<a class="anchor-link" href="#configure-and-use-the-third-agent">¶</a></h3><p>Now that the first two agents are serving over A2A, our main agent can be given access to use it just like a tool! In order to do this you use the <code>a2a_tool_async</code> function which retrieves the info about the agent and allows you to call it.</p>
 </div>
 </div>
 </div>
@@ -1814,20 +1814,20 @@ weather_expert = await AnyAgent.create_async(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">TracingConfig</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">a2a_tool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">a2a_tool_async</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
     <span class="n">model_id</span><span class="o">=</span><span class="s2">"gpt-4.1-mini"</span><span class="p">,</span>
     <span class="n">instructions</span><span class="o">=</span><span class="s2">"Use the available tools to obtain additional information to answer the query."</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">"The orchestrator that can use other agents via tools using the A2A protocol."</span><span class="p">,</span>
     <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
-        <span class="k">await</span> <span class="n">a2a_tool</span><span class="p">(</span>
+        <span class="k">await</span> <span class="n">a2a_tool_async</span><span class="p">(</span>
             <span class="s2">"http://localhost:5000/time"</span><span class="p">,</span>
             <span class="n">http_kwargs</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">"timeout"</span><span class="p">:</span> <span class="mi">5</span>
             <span class="p">},</span>  <span class="c1"># This gives the time agent up to 5 seconds to respond to each request</span>
         <span class="p">),</span>
-        <span class="k">await</span> <span class="n">a2a_tool</span><span class="p">(</span>
+        <span class="k">await</span> <span class="n">a2a_tool_async</span><span class="p">(</span>
             <span class="s2">"http://localhost:5001/location_recommender"</span><span class="p">,</span>
             <span class="n">http_kwargs</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">"timeout"</span><span class="p">:</span> <span class="mi">5</span>
@@ -1848,20 +1848,20 @@ weather_expert = await AnyAgent.create_async(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">from any_agent import AgentConfig, AnyAgent
 from any_agent.config import TracingConfig
-from any_agent.tools import a2a_tool
+from any_agent.tools import a2a_tool_async
 
 config = AgentConfig(
     model_id="gpt-4.1-mini",
     instructions="Use the available tools to obtain additional information to answer the query.",
     description="The orchestrator that can use other agents via tools using the A2A protocol.",
     tools=[
-        await a2a_tool(
+        await a2a_tool_async(
             "http://localhost:5000/time",
             http_kwargs={
                 "timeout": 5
             },  # This gives the time agent up to 5 seconds to respond to each request
         ),
-        await a2a_tool(
+        await a2a_tool_async(
             "http://localhost:5001/location_recommender",
             http_kwargs={
                 "timeout": 5

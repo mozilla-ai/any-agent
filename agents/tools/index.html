@@ -1147,25 +1147,26 @@ tool so it becomes usable by the selected framework.</p>
 <p class="admonition-title">Tip</p>
 <p>More information about serving agents over the A2A protocol can be found <a href="../../serving/">here</a></p>
 </div>
-<p><code>any-agent</code> provides a tool to wrap a connection to another another agent served over the A2A protocol, by invoking the <code>any_agent.tools.a2a_tool</code> function, as shown in the following example:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">a2a_tool</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<p><code>any-agent</code> provides a tool to wrap a connection to another another agent served over the A2A protocol, by invoking the <code>any_agent.tools.a2a_tool</code> or <code>any_agent.tools.a2a_tool_async</code> function, for example:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">a2a_tool_async</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">new_event_loop</span><span class="p">()</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">some_agent_tool</span> <span class="o">=</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">a2a_tool</span><span class="p">(</span><span class="s2">&quot;http://example.net:10000/some_agent&quot;</span><span class="p">))</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">some_agent_tool</span> <span class="o">=</span> <span class="k">await</span> <span class="n">a2a_tool_async</span><span class="p">(</span><span class="s2">&quot;http://example.net:10000/some_agent&quot;</span><span class="p">)</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">agent_cfg</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;Use the available tools to obtain additional information to answer the query.&quot;</span><span class="p">,</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A sample agent.&quot;</span><span class="p">,</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">some_agent_tool</span><span class="p">],</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">agent_cfg</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;Use the available tools to obtain additional information to answer the query.&quot;</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A sample agent.&quot;</span><span class="p">,</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">some_agent_tool</span><span class="p">],</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="p">)</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </span></code></pre></div>
-<p>The tool description is derived from the agent card, which is retrieved when this function is invoked. Note that this function is currently asynchronous. View the docstring in <a class="autorefs autorefs-internal" title="a2a_tool(url, toolname=None, http_kwargs=None)
+<p>The tool description is derived from the agent card, which is retrieved when this function is invoked. View the docstring in <a class="autorefs autorefs-internal" title="a2a_tool_async(url, toolname=None, http_kwargs=None)
 
   
       async
-  " href="../../api/tools/#any_agent.tools.a2a_tool">a2a_tool</a> for a description of the arguments available .</p>
+  " href="../../api/tools/#any_agent.tools.a2a_tool_async">a2a_tool_async</a> or <a class="autorefs autorefs-internal" title="a2a_tool(url, toolname=None, http_kwargs=None)" href="../../api/tools/#any_agent.tools.a2a_tool">a2a_tool</a> for a description of the arguments available.</p>
 
 
 
