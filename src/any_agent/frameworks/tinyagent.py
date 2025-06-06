@@ -4,7 +4,6 @@ import asyncio
 import inspect
 import json
 from contextlib import suppress
-from textwrap import dedent
 from typing import TYPE_CHECKING, Any
 
 import litellm
@@ -174,16 +173,11 @@ class TinyAgent(AnyAgent):
             self.clients[tool_name] = ToolExecutor(tool)
             logger.debug("Registered tool: %s", tool_name)
 
-    def _get_system_prompt(self) -> str:
-        """Get the system prompt, including structured output instructions if needed."""
-        base_prompt = self.config.instructions or DEFAULT_SYSTEM_PROMPT
-        return base_prompt
-
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         self.messages = [
             {
                 "role": "system",
-                "content": self._get_system_prompt(),
+                "content": self.config.instructions or DEFAULT_SYSTEM_PROMPT,
             },
             {
                 "role": "user",
@@ -231,7 +225,7 @@ class TinyAgent(AnyAgent):
             num_of_turns += 1
             current_last = self.messages[-1]
             if current_last.get("role") == "assistant" and current_last.get("content"):
-                if self.config.output_type is not None:
+                if self.config.output_type:
                     structured_output_message = {
                         "role": "user",
                         "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
@@ -239,9 +233,8 @@ class TinyAgent(AnyAgent):
                     self.messages.append(structured_output_message)
                     self.completion_params["messages"] = self.messages
                     response = await litellm.acompletion(**self.completion_params)
-                    message: LiteLLMMessage = response.choices[0].message
                     return self.config.output_type.model_validate_json(
-                        message["content"]
+                        response.choices[0].message["content"]
                     )
                 return str(current_last["content"])
 

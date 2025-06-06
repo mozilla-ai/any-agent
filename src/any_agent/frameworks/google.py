@@ -46,7 +46,7 @@ class GoogleAgent(AnyAgent):
         """Get the model configuration for a Google agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
         model_args = agent_config.model_args or {}
-        if self.config.output_type is not None:
+        if self.config.output_type:
             model_args["tool_choice"] = "required"
         return model_type(
             model=agent_config.model_id,
@@ -68,7 +68,7 @@ class GoogleAgent(AnyAgent):
         self._tools = tools
 
         instructions = self.config.instructions or ""
-        if self.config.output_type is not None:
+        if self.config.output_type:
             instructions += (
                 "You must call the final_output tool when finished."
                 "The 'answer' argument passed to the final_output tool must be a JSON string that matches the following schema:\n"
@@ -105,7 +105,7 @@ class GoogleAgent(AnyAgent):
             session_id=session_id,
         )
 
-        if self.config.output_type is not None:
+        if self.config.output_type:
             final_output = None
             async for event in runner.run_async(
                 user_id=user_id,

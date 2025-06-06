@@ -61,8 +61,9 @@ class LlamaIndexAgent(AnyAgent):
         imported_tools, _ = await self._load_tools(self.config.tools)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         self._tools = imported_tools
-        if self.config.output_type is not None:
-            instructions = self.config.instructions or ""
+        instructions = self.config.instructions
+        if self.config.output_type:
+            instructions = instructions or ""
             instructions += f"""
             You must return a {self.config.output_type.__name__} JSON string.
             This object must match the following schema:
@@ -70,8 +71,7 @@ class LlamaIndexAgent(AnyAgent):
             You can use the 'final_output' tool to help verify your output
             """
             imported_tools.append(_create_final_output_tool(self.config.output_type))
-        else:
-            instructions = self.config.instructions
+
         self._agent = agent_type(
             name=self.config.name,
             tools=imported_tools,

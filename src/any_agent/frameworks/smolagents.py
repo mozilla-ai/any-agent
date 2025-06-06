@@ -105,6 +105,6 @@ class SmolagentsAgent(AnyAgent):
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
         result = self._agent.run(prompt, **kwargs)
-        if self.config.output_type is not None:
+        if self.config.output_type:
             return self.config.output_type.model_validate_json(result)
         return str(result)

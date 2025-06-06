@@ -72,7 +72,7 @@ class OpenAIAgent(AnyAgent):
         kwargs_ = self.config.agent_args or {}
         if self.config.model_args:
             kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
-        if self.config.output_type is not None:
+        if self.config.output_type:
             kwargs_["output_type"] = self.config.output_type
 
         self._tools = tools
