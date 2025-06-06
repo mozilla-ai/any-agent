@@ -61,6 +61,9 @@ async def serve_a2a_async(
     task = asyncio.create_task(uv_server.serve())
     while not uv_server.started:  # noqa: ASYNC110
         await asyncio.sleep(0.1)
+    if port == 0:
+        server_port = uv_server.servers[0].sockets[0].getsockname()[1]
+        server.agent_card.url = f"http://{host}:{server_port}/{endpoint.lstrip("/")}"
     return (task, uv_server)
 
 

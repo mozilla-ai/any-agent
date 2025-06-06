@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 from multiprocessing import Process
+import asyncio
 
 import pytest
 from litellm.utils import validate_environment
@@ -67,7 +68,7 @@ DATE_PROMPT = (
 )
 @pytest.mark.asyncio
 async def test_load_and_run_multi_agent_a2a(
-    agent_framework: AgentFramework, test_port: int
+    agent_framework: AgentFramework
 ) -> None:
     """Tests that an agent contacts another using A2A using the adapter tool.
 
@@ -133,12 +134,14 @@ async def test_load_and_run_multi_agent_a2a(
         served_agent = date_agent
         (served_task, served_server) = await served_agent.serve_async(
             serving_config=A2AServingConfig(
-                port=test_port,
+                port=0,
                 endpoint=f"/{tool_agent_endpoint}",
                 log_level="info",
             )
         )
+        test_port = served_server.servers[0].sockets[0].getsockname()[1]
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
+        print(f"--> Serving at {server_url}")
         await wait_for_server_async(server_url)
 
         # Search agent is ready for card resolution
