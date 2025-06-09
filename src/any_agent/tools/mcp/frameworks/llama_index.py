@@ -32,9 +32,12 @@ class LlamaIndexMCPConnection(_MCPConnection["LlamaIndexFunctionTool"], ABC):
             msg = "MCP client is not set up. Please call `list_tool` from a concrete class."
             raise ValueError(msg)
 
+        allowed_tools = self.mcp_tool.tools
+        if allowed_tools is not None:
+            allowed_tools = list(allowed_tools)
         mcp_tool_spec = LlamaIndexMcpToolSpec(
             client=self._client,
-            allowed_tools=list(self.mcp_tool.tools or []),
+            allowed_tools=allowed_tools,
         )
 
         return await mcp_tool_spec.to_tool_list_async()
