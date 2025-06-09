@@ -41,7 +41,7 @@ langchain = [
 llama_index = [
   "llama-index",
   "llama-index-llms-litellm",
-  "llama-index-tools-mcp==0.2.1",
+  "llama-index-tools-mcp>=0.2.5",
   "platformdirs>=4.3.7",
 ]
 
