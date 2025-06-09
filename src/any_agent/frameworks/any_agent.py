@@ -12,6 +12,7 @@ from any_agent.config import (
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentTrace
+from any_agent.tracing.exporter import SCOPE_NAME
 from any_agent.tracing.instrumentation import (
     _get_instrumentor_by_framework,
 )
@@ -41,7 +42,7 @@ class AnyAgent(ABC):
         self._tools: list[Any] = []
 
         self._instrumentor = _get_instrumentor_by_framework(self.framework)
-        self._tracer: Tracer = TRACE_PROVIDER.get_tracer("any_agent")
+        self._tracer: Tracer = TRACE_PROVIDER.get_tracer(SCOPE_NAME)
 
         self._lock = asyncio.Lock()
         self._running_traces: dict[int, AgentTrace] = {}

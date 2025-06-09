@@ -21,6 +21,9 @@ if TYPE_CHECKING:
     from .agent_trace import AgentSpan
 
 
+SCOPE_NAME = "any_agent"
+
+
 def _get_output_panel(span: AgentSpan) -> Panel | None:
     if output := span.attributes.get("gen_ai.output", None):
         output_type = span.attributes.get("gen_ai.output.type", "text")
@@ -39,7 +42,7 @@ class _ConsoleExporter(SpanExporter):
 
     def print_to_console(self, span: ReadableSpan) -> None:
         if scope := span.instrumentation_scope:
-            if scope.name != "any_agent":
+            if scope.name != SCOPE_NAME:
                 return
 
         if not span.attributes:
