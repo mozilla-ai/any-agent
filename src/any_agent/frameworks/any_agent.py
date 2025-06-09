@@ -15,12 +15,14 @@ from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.instrumentation import (
     _get_instrumentor_by_framework,
 )
+from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     import uvicorn
     from opentelemetry.trace import Tracer
+    from pydantic import BaseModel
 
     from any_agent.serving.config import A2AServingConfig
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
@@ -94,7 +96,7 @@ class AnyAgent(ABC):
         agent_config: AgentConfig,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
-        return asyncio.get_event_loop().run_until_complete(
+        return run_async_in_sync(
             cls.create_async(
                 agent_framework=agent_framework,
                 agent_config=agent_config,
@@ -125,9 +127,7 @@ class AnyAgent(ABC):
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
-        return asyncio.get_event_loop().run_until_complete(
-            self.run_async(prompt, **kwargs)
-        )
+        return run_async_in_sync(self.run_async(prompt, **kwargs))
 
     async def run_async(
         self, prompt: str, instrument: bool = True, **kwargs: Any
@@ -252,7 +252,7 @@ class AnyAgent(ABC):
         """Load the agent instance."""
 
     @abstractmethod
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         """To be implemented by each framework."""
 
     @property

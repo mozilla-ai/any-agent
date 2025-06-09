@@ -1,7 +1,9 @@
 import json
-from typing import Any
+
+from pydantic import BaseModel
 
 from any_agent import AgentConfig, AnyAgent
+from any_agent.evaluation.schemas import AgentOutput
 from any_agent.tracing.agent_trace import AgentTrace
 
 MAX_EVIDENCE_LENGTH: int = 500
@@ -11,11 +13,11 @@ class AgentTooling:
     def __init__(self, trace: AgentTrace):
         self.trace = trace
 
-    def get_final_output(self) -> str | None | dict[str, Any]:
+    def get_final_output(self) -> str | BaseModel | None:
         """Get the final output from the agent trace.
 
         Returns:
-            str | None | dict: The final output of the agent
+            str | BaseModel | None: The final output of the agent
 
         """
         return self.trace.final_output
@@ -110,6 +112,7 @@ def get_agent(trace: AgentTrace, model: str) -> AnyAgent:
             tooling.get_number_of_steps,
             tooling.get_evidence_from_spans,
         ],
+        output_type=AgentOutput,
     )
 
     return AnyAgent.create(

@@ -12,19 +12,12 @@ from litellm.types.utils import ModelResponse
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
-
-BASE_PORT = 5800
-PORT_PER_FRAMEWORK = {fw: BASE_PORT + index for index, fw in enumerate(AgentFramework)}
+from tests.integration.helpers import wait_for_server_async
 
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
 def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
     return request.param  # type: ignore[no-any-return]
-
-
-@pytest.fixture
-def tool_agent_port(agent_framework):
-    return PORT_PER_FRAMEWORK[agent_framework]
 
 
 @pytest.fixture
@@ -79,7 +72,9 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, str]]:
         "-c",
         SSE_MCP_SERVER_SCRIPT,
     )
-    await asyncio.sleep(3)
+
+    # Smart ping instead of hardcoded sleep
+    await wait_for_server_async("http://127.0.0.1:8000")
 
     try:
         yield {"url": "http://127.0.0.1:8000/sse"}

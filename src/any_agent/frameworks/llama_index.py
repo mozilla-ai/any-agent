@@ -1,11 +1,19 @@
 from typing import TYPE_CHECKING, Any, cast
 
+from pydantic import BaseModel
+
 from any_agent import AgentConfig, AgentFramework
+from any_agent.logging import logger
+from any_agent.tools.final_output import FinalOutputTool
 
 from .any_agent import AnyAgent
 
 try:
-    from llama_index.core.agent.workflow import BaseWorkflowAgent, FunctionAgent
+    from llama_index.core.agent.workflow import (
+        BaseWorkflowAgent,
+        FunctionAgent,
+        ReActAgent,
+    )
     from llama_index.llms.litellm import LiteLLM
 
     DEFAULT_AGENT_TYPE = FunctionAgent
@@ -50,19 +58,36 @@ class LlamaIndexAgent(AnyAgent):
             msg = "You need to `pip install 'any-agent[llama_index]'` to use this agent"
             raise ImportError(msg)
 
-        imported_tools, _ = await self._load_tools(self.config.tools)
+        instructions = self.config.instructions
+        tools_to_use = list(self.config.tools)
+        if self.config.output_type:
+            instructions = instructions or ""
+            instructions += f"""You must return a {self.config.output_type.__name__} JSON string.
+            This object must match the following schema:
+            {self.config.output_type.model_json_schema()}
+            You can use the 'final_output' tool to help verify your output
+            """
+            tools_to_use.append(FinalOutputTool(self.config.output_type))
+        imported_tools, _ = await self._load_tools(tools_to_use)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+        # if agent type is FunctionAgent but there are no tools, throw an error
+        if agent_type == FunctionAgent and not imported_tools:
+            logger.warning(
+                "FunctionAgent requires tools and none were provided. Using ReActAgent instead."
+            )
+            agent_type = ReActAgent
         self._tools = imported_tools
+
         self._agent = agent_type(
             name=self.config.name,
             tools=imported_tools,
             description=self.config.description or "The main agent",
             llm=self._get_model(self.config),
-            system_prompt=self.config.instructions,
+            system_prompt=instructions,
             **self.config.agent_args or {},
         )
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
@@ -71,4 +96,8 @@ class LlamaIndexAgent(AnyAgent):
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
             msg = f"Agent did not return a valid response: {result.response}"
             raise ValueError(msg)
+        if self.config.output_type:
+            return self.config.output_type.model_validate_json(
+                result.response.blocks[0].text
+            )
         return result.response.blocks[0].text

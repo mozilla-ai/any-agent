@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
     from litellm.types.utils import Message as LiteLLMMessage
     from litellm.types.utils import ModelResponse
+    from pydantic import BaseModel
 
 
 DEFAULT_SYSTEM_PROMPT = """
@@ -165,7 +166,7 @@ class TinyAgent(AnyAgent):
             self.clients[tool_name] = ToolExecutor(tool)
             logger.debug("Registered tool: %s", tool_name)
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         self.messages = [
             {
                 "role": "system",
@@ -179,6 +180,7 @@ class TinyAgent(AnyAgent):
 
         num_of_turns = 0
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
+
         while num_of_turns < max_turns:
             self.completion_params["messages"] = self.messages
             response = await self.call_model(**self.completion_params)
@@ -217,6 +219,17 @@ class TinyAgent(AnyAgent):
             num_of_turns += 1
             current_last = self.messages[-1]
             if current_last.get("role") == "assistant" and current_last.get("content"):
+                if self.config.output_type:
+                    structured_output_message = {
+                        "role": "user",
+                        "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
+                    }
+                    self.messages.append(structured_output_message)
+                    self.completion_params["messages"] = self.messages
+                    response = await litellm.acompletion(**self.completion_params)
+                    return self.config.output_type.model_validate_json(
+                        response.choices[0].message["content"]  # type: ignore[union-attr]
+                    )
                 return str(current_last["content"])
 
         return "Max turns reached"

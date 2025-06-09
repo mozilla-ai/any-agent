@@ -54,7 +54,8 @@ def test_create_any_with_invalid_string() -> None:
 
 
 def test_model_args(
-    agent_framework: AgentFramework, mock_litellm_response: Any
+    agent_framework: AgentFramework,
+    mock_litellm_response: Any,
 ) -> None:
     if agent_framework == AgentFramework.LLAMA_INDEX:
         pytest.skip("LlamaIndex agent uses a litellm streaming syntax")

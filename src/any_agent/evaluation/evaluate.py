@@ -1,3 +1,5 @@
+from pydantic import BaseModel
+
 from any_agent.evaluation.evaluation_case import EvaluationCase
 from any_agent.evaluation.evaluators import (
     evaluate_checkpoints,
@@ -19,8 +21,12 @@ def evaluate(
     )
 
     if evaluation_case.ground_truth and trace.final_output:
+        if isinstance(trace.final_output, BaseModel):
+            final_output = trace.final_output.model_dump_json()
+        else:
+            final_output = trace.final_output
         ground_truth_result = evaluate_final_output(
-            final_output=trace.final_output,
+            final_output=final_output,
             ground_truth_answer=evaluation_case.ground_truth,
         )
     else:

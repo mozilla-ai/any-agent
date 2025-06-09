@@ -38,18 +38,45 @@ Multi-agent can be implemented today using the A2A protocol (see [A2A docs](http
 
 ### Framework Specific Arguments
 
-The `agent_args` parameter in `AgentConfig` allows you to pass arguments specific to the underlying framework that the agent instance is built on.
+Sometimes, there may be a new feature in a framework that you want to use that isn't yet supported universally in any-agent. The `agent_args` parameter in `AgentConfig` allows you to pass arguments specific to the underlying framework that the agent instance is built on.
 
-**Example-1**: To pass the `output_type` parameter for structured output, when using the OpenAI Agents SDK:
+**Example-1**: To pass the `output_guardrails` parameter, when using the OpenAI Agents SDK:
 
 ```python
 from pydantic import BaseModel
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from agents import (
+    Agent,
+    GuardrailFunctionOutput,
+    OutputGuardrailTripwireTriggered,
+    RunContextWrapper,
+    Runner,
+    output_guardrail,
+)
 
-class BookInfo(BaseModel):
-    title: str
-    author: str
-    publication_year: int
+class MessageOutput(BaseModel):
+    response: str
+
+class MathOutput(BaseModel):
+    reasoning: str
+    is_math: bool
+
+guardrail_agent = Agent(
+    name="Guardrail check",
+    instructions="Check if the output includes any math.",
+    output_type=MathOutput,
+)
+
+@output_guardrail
+async def math_guardrail(
+    ctx: RunContextWrapper, agent: Agent, output: MessageOutput
+) -> GuardrailFunctionOutput:
+    result = await Runner.run(guardrail_agent, output.response, context=ctx.context)
+
+    return GuardrailFunctionOutput(
+        output_info=result.final_output,
+        tripwire_triggered=result.final_output.is_math,
+    )
 
 framework = AgentFramework.OPENAI
 
@@ -57,35 +84,9 @@ agent = AnyAgent.create(
     framework,
     AgentConfig(
         model_id="gpt-4.1-mini",
-        instructions="Extract book information from text",
+        instructions="Check if the output contains any math",
         agent_args={
-            "output_type": BookInfo
-        }
-    )
-)
-```
-
-**Example-2**: In smolagents, for structured output one needs to use the `grammar` parameter. Additionally, `planning_interval` defines the interval at which the agent will run a planning step.
-
-```python
-from pydantic import BaseModel
-from any_agent import AgentConfig, AgentFramework, AnyAgent
-
-
-framework = AgentFramework.SMOLAGENTS
-
-class WebPageInfo(BaseModel):
-    title: str
-    summary: str
-
-agent = AnyAgent.create(
-    framework,
-    AgentConfig(
-        model_id="gpt-4.1-mini",
-        instructions="Extract webpage title and summary from url",
-        agent_args={
-            "planning_interval": 1,
-            "grammar": WebPageInfo
+            "output_guardrails": [math_guardrail]
         }
     )
 )
