@@ -1,11 +1,14 @@
+# mypy: disable-error-code="attr-defined"
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 
 from .exporter import _ConsoleExporter
 
-TRACE_PROVIDER = TracerProvider()
-trace.set_tracer_provider(TRACE_PROVIDER)
+TRACE_PROVIDER = trace.get_tracer_provider()
+if isinstance(TRACE_PROVIDER, trace.ProxyTracerProvider):
+    TRACE_PROVIDER = TracerProvider()
+    trace.set_tracer_provider(TRACE_PROVIDER)
 
 
 def enable_console_traces() -> None:
