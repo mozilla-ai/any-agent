@@ -46,7 +46,7 @@ Here is what the console output looks like:
 
     Showing traces in the console is enabled by default.
     
-    You can disable the console traces as follows:
+    You can disable the console traces using [`disable_console_traces`][any_agent.tracing.disable_console_traces]:
 
     ```python
     from any_agent.tracing import disable_console_traces
