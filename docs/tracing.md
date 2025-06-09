@@ -44,6 +44,8 @@ Here is what the console output looks like:
 
 !!! tip
 
+    Showing traces in the console is enabled by default.
+    
     You can disable the console traces as follows:
 
     ```python
