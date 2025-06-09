@@ -1,8 +1,7 @@
 import datetime
 import logging
 import os
-from multiprocessing import Process
-import asyncio
+from multiprocessing import Process, Queue
 
 import pytest
 from litellm.utils import validate_environment
@@ -67,9 +66,7 @@ DATE_PROMPT = (
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
 @pytest.mark.asyncio
-async def test_load_and_run_multi_agent_a2a(
-    agent_framework: AgentFramework
-) -> None:
+async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> None:
     """Tests that an agent contacts another using A2A using the adapter tool.
 
     Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
@@ -141,7 +138,6 @@ async def test_load_and_run_multi_agent_a2a(
         )
         test_port = served_server.servers[0].sockets[0].getsockname()[1]
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
-        print(f"--> Serving at {server_url}")
         await wait_for_server_async(server_url)
 
         # Search agent is ready for card resolution
@@ -193,7 +189,7 @@ def get_datetime() -> str:
     return str(datetime.datetime.now())
 
 
-def _run_server(agent_framework_str: str, port: int, endpoint: str, model_id: str):
+def _run_server(agent_framework_str: str, port: int, endpoint: str, model_id: str, server_queue: Queue):
     """Run the server for the sync test. This needs to be defined outside the test function so that it can be run in a separate process."""
     date_agent_description = "Agent that can return the current date."
     date_agent_cfg = AgentConfig(
@@ -213,13 +209,25 @@ def _run_server(agent_framework_str: str, port: int, endpoint: str, model_id: st
         tracing=TracingConfig(console=False, cost_info=True),
     )
 
-    date_agent.serve(
-        serving_config=A2AServingConfig(
-            port=port,
-            endpoint=f"/{endpoint}",
-            log_level="info",
-        )
+    from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a
+
+    serving_config=A2AServingConfig(
+        port=port,
+        endpoint=f"/{endpoint}",
+        log_level="info",
     )
+
+    app = _get_a2a_app(date_agent, serving_config=serving_config)
+
+    serve_a2a(
+        app,
+        host=serving_config.host,
+        port=serving_config.port,
+        endpoint=serving_config.endpoint,
+        log_level=serving_config.log_level,
+        server_queue=server_queue
+    )
+
 
 
 @pytest.mark.skipif(
@@ -227,7 +235,7 @@ def _run_server(agent_framework_str: str, port: int, endpoint: str, model_id: st
     reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
 )
 def test_load_and_run_multi_agent_a2a_sync(
-    agent_framework: AgentFramework, test_port: int
+    agent_framework: AgentFramework
 ) -> None:
     """Tests that an agent contacts another using A2A using the sync adapter tool.
 
@@ -255,18 +263,23 @@ def test_load_and_run_multi_agent_a2a_sync(
     server_process = None
     tool_agent_endpoint = "tool_agent_sync"
 
+    server_queue = Queue()
+
     try:
         # Start the server in a separate process
         server_process = Process(
             target=_run_server,
             args=(
                 agent_framework.value,
-                test_port,
+                0,
                 tool_agent_endpoint,
                 agent_model,
+                server_queue
             ),
         )
         server_process.start()
+
+        test_port = server_queue.get()
 
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
         wait_for_server(server_url)
