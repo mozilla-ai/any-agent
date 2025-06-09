@@ -132,7 +132,24 @@ class AnyAgent(ABC):
     async def run_async(
         self, prompt: str, instrument: bool = True, **kwargs: Any
     ) -> AgentTrace:
-        """Run the agent asynchronously with the given prompt."""
+        """Run the agent asynchronously with the given prompt.
+
+        Args:
+            prompt: The user prompt to be passed to the agent.
+            instrument: Whether to instrument the underlying framework
+                to generate LLM Calls and Tool Execution Spans.
+
+                If `False` the returned `AgentTrace` will only
+                contain a single `invoke_agent` span.
+
+            kwargs: Will be passed to the underlying runner used
+                by the framework.
+
+        Returns:
+            The `AgentTrace` containing information about the
+                steps taken by the agent.
+
+        """
         with self._tracer.start_as_current_span(
             f"invoke_agent [{self.config.name}]"
         ) as invoke_span:
