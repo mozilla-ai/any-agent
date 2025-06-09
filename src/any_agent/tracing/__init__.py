@@ -6,10 +6,19 @@ from .exporter import _ConsoleExporter
 
 TRACE_PROVIDER = TracerProvider()
 trace.set_tracer_provider(TRACE_PROVIDER)
-TRACE_PROVIDER.add_span_processor(SimpleSpanProcessor(_ConsoleExporter()))
 
 
-def drop_console_exporter() -> None:
+def enable_console_traces() -> None:
+    """Enable printing traces to the console."""
+    has_console_exporter = any(
+        isinstance(getattr(p, "span_exporter", None), _ConsoleExporter)
+        for p in TRACE_PROVIDER._active_span_processor._span_processors
+    )
+    if not has_console_exporter:
+        TRACE_PROVIDER.add_span_processor(SimpleSpanProcessor(_ConsoleExporter()))
+
+
+def disable_console_traces() -> None:
     """Disable printing traces to the console."""
     with TRACE_PROVIDER._active_span_processor._lock:
         TRACE_PROVIDER._active_span_processor._span_processors = tuple(
@@ -17,3 +26,6 @@ def drop_console_exporter() -> None:
             for p in TRACE_PROVIDER._active_span_processor._span_processors
             if not isinstance(getattr(p, "span_exporter", None), _ConsoleExporter)
         )
+
+
+enable_console_traces()
