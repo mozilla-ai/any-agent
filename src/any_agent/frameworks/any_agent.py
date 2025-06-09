@@ -30,20 +30,20 @@ if TYPE_CHECKING:
 
     from any_agent.serving.config import A2AServingConfig
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
-    from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+    from any_agent.tracing.agent_trace import AgentTrace
 
 
 class AgentRunError(Exception):
     """Error that wraps underlying framework specific errors and carries spans."""
 
-    _spans: list[AgentSpan]
+    _trace: AgentTrace
 
-    def __init__(self, spans: list[AgentSpan]):
-        self._spans = spans
+    def __init__(self, trace: AgentTrace):
+        self._trace = trace
 
     @property
-    def spans(self) -> list[AgentSpan]:
-        return self._spans
+    def trace(self) -> AgentTrace:
+        return self._trace
 
 
 class AnyAgent(ABC):
@@ -183,7 +183,7 @@ class AnyAgent(ABC):
                 final_output = await self._run_async(prompt, **kwargs)
         except Exception as e:
             trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
-            raise AgentRunError(trace.spans) from e
+            raise AgentRunError(trace) from e
         else:
             trace = self._exporter.pop_trace(run_id)  # type: ignore[union-attr]
             trace.final_output = final_output

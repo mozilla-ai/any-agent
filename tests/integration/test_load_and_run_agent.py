@@ -308,7 +308,7 @@ def test_exception_trace(
                     "Write a four-line poem and use the tools to write it to a file.",
                 )
             except AgentRunError as are:
-                spans = are.spans
+                spans = are.trace.spans
             assert any(
                 span.status.status_code == StatusCode.ERROR
                 and exc_reason in span.status.description
