@@ -98,7 +98,6 @@ class TinyAgent(AnyAgent):
 
         """
         super().__init__(config)
-        self.messages: list[dict[str, Any]] = []
         self.clients: dict[str, ToolExecutor] = {}
         self.completion_params = {
             "model": self.config.model_id,
@@ -167,7 +166,7 @@ class TinyAgent(AnyAgent):
             logger.debug("Registered tool: %s", tool_name)
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
-        self.messages = [
+        messages = [
             {
                 "role": "system",
                 "content": self.config.instructions or DEFAULT_SYSTEM_PROMPT,
@@ -182,12 +181,12 @@ class TinyAgent(AnyAgent):
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
 
         while num_of_turns < max_turns:
-            self.completion_params["messages"] = self.messages
+            self.completion_params["messages"] = messages
             response = await self.call_model(**self.completion_params)
 
             message: LiteLLMMessage = response.choices[0].message  # type: ignore[union-attr]
 
-            self.messages.append(message.model_dump())
+            messages.append(message.model_dump())
 
             if message.tool_calls:
                 for tool_call in message.tool_calls:
@@ -214,18 +213,18 @@ class TinyAgent(AnyAgent):
                         {"name": tool_name, "arguments": tool_args}
                     )
                     tool_message["content"] = result
-                    self.messages.append(tool_message)
+                    messages.append(tool_message)  # type: ignore[arg-type]
 
             num_of_turns += 1
-            current_last = self.messages[-1]
+            current_last = messages[-1]
             if current_last.get("role") == "assistant" and current_last.get("content"):
                 if self.config.output_type:
                     structured_output_message = {
                         "role": "user",
                         "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
                     }
-                    self.messages.append(structured_output_message)
-                    self.completion_params["messages"] = self.messages
+                    messages.append(structured_output_message)
+                    self.completion_params["messages"] = messages
                     response = await litellm.acompletion(**self.completion_params)
                     return self.config.output_type.model_validate_json(
                         response.choices[0].message["content"]  # type: ignore[union-attr]

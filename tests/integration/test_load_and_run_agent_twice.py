@@ -6,7 +6,22 @@ from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 
-from .helpers import mock_search_web
+
+def mock_capital(query: str) -> str:
+    """Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results.
+
+    Args:
+        query (str): The search query to perform.
+
+    Returns:
+        The top search results.
+
+    """
+    if "France" in query:
+        return "The capital of France is Paris."
+    if "Spain" in query:
+        return "The capital of Spain is Madrid."
+    return "No info"
 
 
 @pytest.mark.asyncio
@@ -30,7 +45,7 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
             model_id=model_id,
             instructions="You must use the tools to find an answer",
             model_args=model_args,
-            tools=[mock_search_web],
+            tools=[mock_capital],
         ),
     )
     results = await asyncio.gather(
