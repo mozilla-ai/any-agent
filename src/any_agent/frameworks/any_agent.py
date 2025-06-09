@@ -157,6 +157,9 @@ class AnyAgent(ABC):
             if instrument and self._instrumentor:
                 trace_id = invoke_span.get_span_context().trace_id
                 async with self._lock:
+                    # We check the locked `_running_traces` inside `instrument`.
+                    # If there is more than 1 entry in `running_traces`, it means that the agent has
+                    # already being instrumented so me won't instrument it again.
                     self._running_traces[trace_id] = AgentTrace()
                     self._instrumentor.instrument(
                         agent=self,  # type: ignore[arg-type]

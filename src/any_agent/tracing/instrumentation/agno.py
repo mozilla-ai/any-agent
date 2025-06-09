@@ -79,8 +79,6 @@ class _AgnoInstrumentor:
 
     def instrument(self, agent: AgnoAgent) -> None:
         if len(agent._running_traces) > 1:
-            # If the agent is already instrumented, no need to re-instrument
-            # This relies upon the lock in any-agent to enforce that this happens one at a time in a running agent
             return
 
         model = agent._agent.model
