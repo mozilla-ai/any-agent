@@ -1918,7 +1918,7 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -1942,7 +1942,9 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
         <span class="s2">"messageId"</span><span class="p">:</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">}</span>
-<span class="n">request</span> <span class="o">=</span> <span class="n">SendMessageRequest</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">MessageSendParams</span><span class="p">(</span><span class="o">**</span><span class="n">send_message_payload</span><span class="p">))</span>
+<span class="n">request</span> <span class="o">=</span> <span class="n">SendMessageRequest</span><span class="p">(</span>
+    <span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()),</span> <span class="n">params</span><span class="o">=</span><span class="n">MessageSendParams</span><span class="p">(</span><span class="o">**</span><span class="n">send_message_payload</span><span class="p">)</span>
+<span class="p">)</span>
 <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
 <span class="c1"># Close the httpx client when done</span>
 <span class="k">await</span> <span class="n">httpx_client</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
@@ -1958,7 +1960,9 @@ send_message_payload = {
         "messageId": uuid4().hex,
     },
 }
-request = SendMessageRequest(params=MessageSendParams(**send_message_payload))
+request = SendMessageRequest(
+    id=str(uuid4()), params=MessageSendParams(**send_message_payload)
+)
 response = await client.send_message(request)
 # Close the httpx client when done
 await httpx_client.aclose()</div>
