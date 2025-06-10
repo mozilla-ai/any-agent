@@ -15,6 +15,8 @@ from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
 
 if TYPE_CHECKING:
+    from multiprocessing import Queue
+
     from any_agent import AnyAgent
     from any_agent.serving import A2AServingConfig
 
@@ -73,7 +75,7 @@ def serve_a2a(
     port: int,
     endpoint: str,
     log_level: str = "warning",
-    server_queue = None
+    server_queue: Queue[int] | None = None,
 ) -> None:
     """Serve the A2A server."""
 
@@ -81,7 +83,9 @@ def serve_a2a(
     # because the loop only keeps weak refs to tasks
     # https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
     async def run() -> None:
-        (task, uv_server) = await serve_a2a_async(server, host, port, endpoint, log_level)
+        (task, uv_server) = await serve_a2a_async(
+            server, host, port, endpoint, log_level
+        )
         if server_queue:
             server_queue.put(uv_server.servers[0].sockets[0].getsockname()[1])
         await task
