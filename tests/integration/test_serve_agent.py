@@ -86,8 +86,7 @@ async def test_agent_serving_and_communication_async(test_port):
                 },
             }
             request = SendMessageRequest(
-                id=str(uuid4()),
-                params=MessageSendParams(**send_message_payload)
+                id=str(uuid4()), params=MessageSendParams(**send_message_payload)
             )
             response = await client.send_message(request)
             assert response is not None
