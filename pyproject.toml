@@ -54,7 +54,7 @@ smolagents = [
 ]
 
 a2a = [
-  "a2a-sdk>=0.2.5",
+  "a2a-sdk>=0.2.6",
   "httpx",
 ]
 
