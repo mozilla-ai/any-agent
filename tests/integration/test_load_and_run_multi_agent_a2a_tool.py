@@ -148,7 +148,7 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
         main_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
-            tools=[await a2a_tool_async(server_url)],
+            tools=[await a2a_tool_async(server_url, http_kwargs={"timeout": 10.0})],
             model_args=model_args,
             **kwargs,  # type: ignore[arg-type]
         )
@@ -292,7 +292,12 @@ def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> N
         main_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol (sync version).",
-            tools=[a2a_tool(f"http://localhost:{test_port}/{tool_agent_endpoint}")],
+            tools=[
+                a2a_tool(
+                    f"http://localhost:{test_port}/{tool_agent_endpoint}",
+                    http_kwargs={"timeout": 10.0},
+                )
+            ],
             **kwargs,  # type: ignore[arg-type]
         )
 

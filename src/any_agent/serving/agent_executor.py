@@ -24,7 +24,9 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         query = context.get_user_input()
         agent_trace = await self.agent.run_async(query)
         assert agent_trace.final_output is not None
-        event_queue.enqueue_event(new_agent_text_message(agent_trace.final_output))
+        await event_queue.enqueue_event(
+            new_agent_text_message(agent_trace.final_output)
+        )
 
     @override
     async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:  # type: ignore[misc]
