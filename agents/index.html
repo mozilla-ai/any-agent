@@ -428,15 +428,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#cleaning-up-the-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cleaning up the Agent
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1138,15 +1129,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#cleaning-up-the-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cleaning up the Agent
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1259,12 +1241,12 @@ solve the task.</p>
 </span></code></pre></div>
 <p>Check <a class="autorefs autorefs-internal" title="any_agent.tracing.agent_trace.AgentTrace" href="../api/tracing/#any_agent.tracing.agent_trace.AgentTrace"><code>AgentTrace</code></a> for more info on the return type.</p>
 <h3 id="async">Async</h3>
-<p>If you are running in <code>async</code> context, you should use the equivalent <a class="autorefs autorefs-internal" title="create_async(agent_framework, agent_config, tracing=None)
+<p>If you are running in <code>async</code> context, you should use the equivalent <a class="autorefs autorefs-internal" title="create_async(agent_framework, agent_config)
 
   
       async
       classmethod
-  " href="../api/agent/#any_agent.AnyAgent.create_async"><code>create_async</code></a> and <a class="autorefs autorefs-internal" title="run_async(prompt, **kwargs)
+  " href="../api/agent/#any_agent.AnyAgent.create_async"><code>create_async</code></a> and <a class="autorefs autorefs-internal" title="run_async(prompt, instrument=True, **kwargs)
 
   
       async
@@ -1286,12 +1268,6 @@ solve the task.</p>
 </span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
 </span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 </span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-</span></code></pre></div>
-<h3 id="cleaning-up-the-agent">Cleaning up the Agent</h3>
-<p>When an AnyAgent object is deleted, the python garbage collector cleans up any resources owned by the object. However, when running or re-creating an agent in the same python process (for example, in test scripts) it may be necessary to forcefully shut down the agent to avoid unexpected side affects. For this purpose, <code>agent.exit</code> is available which will shut down all resources the agent was using.</p>
-<p>For example,</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which agent framework is the best?&quot;</span><span class="p">)</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">agent</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span> <span class="c1"># cleans up the agent synchronously</span>
 </span></code></pre></div>
 
 

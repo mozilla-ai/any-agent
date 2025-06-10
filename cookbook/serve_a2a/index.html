@@ -1732,7 +1732,7 @@ else:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span><span class="p">,</span> <span class="n">TracingConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.serving</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2AServingConfig</span>
 
 <span class="c1"># This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/</span>
@@ -1751,12 +1751,11 @@ else:
         <span class="n">description</span><span class="o">=</span><span class="s2">"I'm an agent to help with getting the time"</span><span class="p">,</span>
         <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">],</span>
     <span class="p">),</span>
-    <span class="n">tracing</span><span class="o">=</span><span class="n">TracingConfig</span><span class="p">(</span><span class="n">console</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="p">(</span><span class="n">time_task</span><span class="p">,</span> <span class="n">time_server</span><span class="p">)</span> <span class="o">=</span> <span class="k">await</span> <span class="n">time</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span><span class="n">A2AServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">))</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
-from any_agent.config import MCPStdio, TracingConfig
+from any_agent.config import MCPStdio
 from any_agent.serving import A2AServingConfig
 
 # This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/
@@ -1775,7 +1774,6 @@ time = await AnyAgent.create_async(
         description="I'm an agent to help with getting the time",
         tools=[time_tool],
     ),
-    tracing=TracingConfig(console=False),
 )
 (time_task, time_server) = await time.serve_async(A2AServingConfig(port=5000))</div>
 </div>
