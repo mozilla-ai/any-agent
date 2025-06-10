@@ -55,6 +55,7 @@ async def a2a_tool_async(
         async with httpx.AsyncClient(follow_redirects=True) as query_client:
             client = A2AClient(httpx_client=query_client, agent_card=a2a_agent_card)
             send_message_payload = SendMessageRequest(
+                id=str(uuid4),
                 params=MessageSendParams(
                     message=Message(
                         role=Role.user,
@@ -63,7 +64,6 @@ async def a2a_tool_async(
                         messageId=uuid4().hex,
                     )
                 ),
-                id=str(uuid4().hex),
             )
             # TODO check how to capture exceptions and pass them on to the enclosing framework
             response = await client.send_message(
