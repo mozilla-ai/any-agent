@@ -7,6 +7,7 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 import litellm
+from litellm.utils import supports_response_schema
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import (
@@ -232,6 +233,10 @@ class TinyAgent(AnyAgent):
                     }
                     self.messages.append(structured_output_message)
                     self.completion_params["messages"] = self.messages
+                    if supports_response_schema(model=self.config.model_id):
+                        self.completion_params["response_format"] = (
+                            self.config.output_type
+                        )
                     response = await litellm.acompletion(**self.completion_params)
                     return self.config.output_type.model_validate_json(
                         response.choices[0].message["content"]
