@@ -30,6 +30,19 @@ if TYPE_CHECKING:
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 
+class AgentRunError(Exception):
+    """Error that wraps underlying framework specific errors and carries spans."""
+
+    _trace: AgentTrace
+
+    def __init__(self, trace: AgentTrace):
+        self._trace = trace
+
+    @property
+    def trace(self) -> AgentTrace:
+        return self._trace
+
+
 class AnyAgent(ABC):
     """Base abstract class for all agent implementations.
 
@@ -152,40 +165,46 @@ class AnyAgent(ABC):
                 steps taken by the agent.
 
         """
-        with self._tracer.start_as_current_span(
-            f"invoke_agent [{self.config.name}]"
-        ) as invoke_span:
-            if instrument and self._instrumentor:
-                trace_id = invoke_span.get_span_context().trace_id
-                async with self._lock:
-                    # We check the locked `_running_traces` inside `instrument`.
-                    # If there is more than 1 entry in `running_traces`, it means that the agent has
-                    # already being instrumented so me won't instrument it again.
-                    self._running_traces[trace_id] = AgentTrace()
-                    self._instrumentor.instrument(
-                        agent=self,  # type: ignore[arg-type]
-                    )
-            invoke_span.set_attributes(
-                {
-                    "gen_ai.operation.name": "invoke_agent",
-                    "gen_ai.agent.name": self.config.name,
-                    "gen_ai.agent.description": self.config.description
-                    or "No description.",
-                    "gen_ai.request.model": self.config.model_id,
-                }
-            )
-            final_output = await self._run_async(prompt, **kwargs)
-
+        try:
             trace = AgentTrace()
-            if instrument and self._instrumentor:
+            with self._tracer.start_as_current_span(
+                f"invoke_agent [{self.config.name}]"
+            ) as invoke_span:
+                if instrument and self._instrumentor:
+                    trace_id = invoke_span.get_span_context().trace_id
+                    async with self._lock:
+                        # We check the locked `_running_traces` inside `instrument`.
+                        # If there is more than 1 entry in `running_traces`, it means that the agent has
+                        # already being instrumented so me won't instrument it again.
+                        self._running_traces[trace_id] = AgentTrace()
+                        self._instrumentor.instrument(
+                            agent=self,  # type: ignore[arg-type]
+                        )
+                invoke_span.set_attributes(
+                    {
+                        "gen_ai.operation.name": "invoke_agent",
+                        "gen_ai.agent.name": self.config.name,
+                        "gen_ai.agent.description": self.config.description
+                        or "No description.",
+                        "gen_ai.request.model": self.config.model_id,
+                    }
+                )
+                final_output = await self._run_async(prompt, **kwargs)
+
+                if instrument and self._instrumentor:
+                    async with self._lock:
+                        self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
+                        trace = self._running_traces.pop(trace_id)
+        except Exception as e:
+            if instrument:
                 async with self._lock:
-                    self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
                     trace = self._running_traces.pop(trace_id)
-
-        trace.add_span(invoke_span)
-        trace.final_output = final_output
-
-        return trace
+            trace.add_span(invoke_span)
+            raise AgentRunError(trace) from e
+        else:
+            trace.add_span(invoke_span)
+            trace.final_output = final_output
+            return trace
 
     def serve(self, serving_config: A2AServingConfig | None = None) -> None:
         """Serve this agent using the protocol defined in the serving_config.
