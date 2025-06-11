@@ -53,11 +53,11 @@ async def test_agent_serving_and_communication(test_port):
                 "message": {
                     "role": "user",
                     "parts": [{"kind": "text", "text": "how much is 10 USD in EUR?"}],
-                    "messageId": uuid4().hex,
+                    "messageId": str(uuid4()),
                 },
             }
             request = SendMessageRequest(
-                params=MessageSendParams(**send_message_payload)
+                id=str(uuid4()), params=MessageSendParams(**send_message_payload)
             )
             response = await client.send_message(request)
             assert response is not None
@@ -86,7 +86,7 @@ async def test_agent_serving_and_communication_async(test_port):
                 },
             }
             request = SendMessageRequest(
-                params=MessageSendParams(**send_message_payload)
+                id=str(uuid4()), params=MessageSendParams(**send_message_payload)
             )
             response = await client.send_message(request)
             assert response is not None
