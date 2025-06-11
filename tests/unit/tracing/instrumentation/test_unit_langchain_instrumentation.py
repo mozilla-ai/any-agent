@@ -24,7 +24,7 @@ def test_set_llm_input_missing_fields() -> None:
 def test_set_llm_output_missing_fields() -> None:
     """It should not fail when missing fields."""
     span = MagicMock()
-    _set_llm_output(LLMResult(generations=[[Generation()]]), span)
+    _set_llm_output(LLMResult(generations=[[Generation(text="")]]), span)
 
     span.set_attributes.assert_not_called()
 

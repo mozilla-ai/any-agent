@@ -39,7 +39,9 @@ def evaluate_checkpoints(
             eval_output = checkpoint.criteria(trace)
         else:
             # Agent as a Judge
-            evaluation = checking_agent.run(prompt=checkpoint.criteria)
+            evaluation = checking_agent.run(
+                prompt=checkpoint.criteria, instrument=False
+            )
             eval_output = evaluation.final_output  # type: ignore[assignment]
         result = EvaluationResult(
             passed=eval_output.passed,
