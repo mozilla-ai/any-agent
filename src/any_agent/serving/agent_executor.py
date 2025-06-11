@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Literal, Protocol, cast, override
+from typing import TYPE_CHECKING, Protocol, cast, override
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
@@ -28,13 +28,9 @@ class _DefaultBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-# Accepted task_status values for output envelopes
-SupportedTaskStatuses = Literal["complete", "input_required"]
-
-
 # Protocol to help static typing recognize envelope attributes
 class _OutputEnvelope(Protocol):
-    task_status: SupportedTaskStatuses
+    task_status: TaskState
     data: BaseModel
 
 
@@ -69,7 +65,7 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         class OutputContainer(BaseModel):
             """Output container for the agent."""
 
-            task_status: SupportedTaskStatuses
+            task_status: TaskState
             data: body_type  # type: ignore[valid-type]
 
             model_config = ConfigDict(extra="forbid")
@@ -121,27 +117,17 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         else:
             result_text = str(data_field)
 
-        if task_status == "input_required":
-            await updater.update_status(
-                TaskState.input_required,
-                new_agent_parts_message(
-                    [Part(root=TextPart(text=result_text))],
-                    task.contextId,
-                    task.id,
-                ),
-                final=True,
-            )
-        else:
-            # Same as calling updater.complete()
-            await updater.update_status(
-                TaskState.completed,
-                message=new_agent_parts_message(
-                    [Part(root=TextPart(text=result_text))],
-                    task.contextId,
-                    task.id,
-                ),
-                final=True,
-            )
+        # Right now all task states will mark the state as final. As we expand logic for multiturn tasks and streaming
+        # we may not want to always mark the state as final.
+        await updater.update_status(
+            task_status,
+            message=new_agent_parts_message(
+                [Part(root=TextPart(text=result_text))],
+                task.contextId,
+                task.id,
+            ),
+            final=True,
+        )
 
     @override
     async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:  # type: ignore[misc]
