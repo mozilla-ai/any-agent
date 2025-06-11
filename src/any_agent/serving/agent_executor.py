@@ -40,40 +40,6 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
     def __init__(self, agent: "AnyAgent"):
         """Initialize the AnyAgentExecutor."""
         self.agent = agent
-        self._setup_output_type()
-
-    def _setup_output_type(self) -> None:
-        """Create a single envelope model."""
-        body_type: type[BaseModel]
-
-        if self.agent.config.output_type is None:
-            body_type = _DefaultBody
-        else:
-            body_type = self.agent.config.output_type
-
-        # Ensure the body model itself forbids extra keys so that its schema
-        # carries `"additionalProperties": False`, a hard requirement for the
-        # OpenAI LLM `response_format` parameter.
-        if hasattr(body_type, "model_config"):
-            body_type.model_config["extra"] = "forbid"
-        else:
-            body_type.model_config = ConfigDict(extra="forbid")
-
-        # Build an envelope model dynamically so that its schema can still be
-        # surfaced to downstream frameworks (they read config.output_type).
-        # This makes the model give back the info we need in order to create the A2A status.
-        class OutputContainer(BaseModel):
-            """Output container for the agent."""
-
-            task_status: TaskState
-            data: body_type  # type: ignore[valid-type]
-
-            model_config = ConfigDict(extra="forbid")
-
-        OutputContainer.__name__ = f"{body_type.__name__}Return"
-        OutputContainer.__qualname__ = f"{body_type.__qualname__}Return"
-
-        self.agent.config.output_type = OutputContainer
 
     @override
     async def execute(  # type: ignore[misc]
@@ -96,8 +62,8 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         # Validate & interpret the envelope produced by the agent
         final_output = agent_trace.final_output
 
-        if not isinstance(final_output, BaseModel):  # pragma: no cover
-            msg = f"Expected BaseModel, got {type(final_output)}"
+        if not isinstance(final_output, BaseModel):
+            msg = f"Expected BaseModel, got {type(final_output)}, {final_output}"
             raise TypeError(msg)
 
         # Runtime attributes guaranteed by the dynamically created model.
@@ -110,9 +76,7 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         data_field = envelope.data
 
         # Convert payload to text we can stream to user
-        if isinstance(data_field, _DefaultBody):
-            result_text = data_field.result
-        elif isinstance(data_field, BaseModel):
+        if isinstance(data_field, BaseModel):
             result_text = data_field.model_dump_json()
         else:
             result_text = str(data_field)

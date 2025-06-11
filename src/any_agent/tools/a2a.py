@@ -70,7 +70,6 @@ async def a2a_tool_async(
                 send_message_payload, http_kwargs=http_kwargs
             )
 
-
             if not response.root:
                 msg = (
                     "The A2A agent did not return a root. Are you using an A2A agent not managed by any-agent? "
@@ -79,11 +78,11 @@ async def a2a_tool_async(
                 raise ValueError(msg)
 
             if hasattr(response.root, "error"):
-                result = response.root.error.model_dump_json(  # type: ignore[no-any-return]
+                result = response.root.error.model_dump_json(
                     exclude_none=True, exclude_unset=True, exclude_defaults=True
                 )
             elif hasattr(response.root, "result"):
-                result = response.root.result.model_dump_json(  # type: ignore[no-any-return]
+                result = response.root.result.model_dump_json(
                     exclude_none=True, exclude_unset=True, exclude_defaults=True
                 )
             else:
@@ -93,7 +92,7 @@ async def a2a_tool_async(
                 )
                 raise ValueError(msg)
 
-            return result
+            return result  # type: ignore[no-any-return]
 
     new_name = toolname or a2a_agent_card.name
     new_name = re.sub(r"\s+", "_", new_name.strip())
