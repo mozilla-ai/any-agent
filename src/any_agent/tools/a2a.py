@@ -69,8 +69,40 @@ async def a2a_tool_async(
             response = await client.send_message(
                 send_message_payload, http_kwargs=http_kwargs
             )
-            result: str = response.model_dump_json()
-            return result
+
+            if not response.root or not response.root.result:
+                msg = (
+                    "The A2A agent did not return a root or a result. Are you using an A2A agent not managed by any-agent? "
+                    "Please file an issue at https://github.com/mozilla-ai/any-agent/issues so we can help."
+                )
+                raise ValueError(msg)
+
+            # Extract the key information from the response
+            result = response.root.result
+            status = result.status
+            history = result.history
+
+            # Format the response with status, current message, and history
+            formatted_response = f"Status: {status.state}\n"
+
+            # Add current agent message if available
+            if status.message and status.message.parts:
+                current_message = ""
+                for part in status.message.parts:
+                    current_message += part.root.text + " " or ""
+                formatted_response += f"Current Message: {current_message}\n"
+
+            # Add conversation history
+            if history:
+                formatted_response += "\nConversation History:\n"
+                for i, msg in enumerate(history):
+                    role = msg.role
+                    message_text = ""
+                    for part in msg.parts:
+                        message_text += part.root.text + " " or ""
+                    formatted_response += f"{i + 1}. {role}: {message_text}\n"
+
+            return formatted_response
 
     new_name = toolname or a2a_agent_card.name
     new_name = re.sub(r"\s+", "_", new_name.strip())
