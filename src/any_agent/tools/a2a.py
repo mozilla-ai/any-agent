@@ -70,16 +70,30 @@ async def a2a_tool_async(
                 send_message_payload, http_kwargs=http_kwargs
             )
 
-            if not response.root or not response.root.result:
+
+            if not response.root:
                 msg = (
-                    "The A2A agent did not return a root or a result. Are you using an A2A agent not managed by any-agent? "
+                    "The A2A agent did not return a root. Are you using an A2A agent not managed by any-agent? "
                     "Please file an issue at https://github.com/mozilla-ai/any-agent/issues so we can help."
                 )
                 raise ValueError(msg)
 
-            return response.root.result.model_dump_json(  # type: ignore[no-any-return]
-                exclude_none=True, exclude_unset=True, exclude_defaults=True
-            )
+            if hasattr(response.root, "error"):
+                result = response.root.error.model_dump_json(  # type: ignore[no-any-return]
+                    exclude_none=True, exclude_unset=True, exclude_defaults=True
+                )
+            elif hasattr(response.root, "result"):
+                result = response.root.result.model_dump_json(  # type: ignore[no-any-return]
+                    exclude_none=True, exclude_unset=True, exclude_defaults=True
+                )
+            else:
+                msg = (
+                    "The A2A agent did not return a error or a result. Are you using an A2A agent not managed by any-agent? "
+                    "Please file an issue at https://github.com/mozilla-ai/any-agent/issues so we can help."
+                )
+                raise ValueError(msg)
+
+            return result
 
     new_name = toolname or a2a_agent_card.name
     new_name = re.sub(r"\s+", "_", new_name.strip())
