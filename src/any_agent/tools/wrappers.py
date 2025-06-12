@@ -16,6 +16,17 @@ if TYPE_CHECKING:
     from smolagents import Tool as SmolagentsTool
 
 
+def _wrap_no_exception(tool: Any) -> Any:
+    @wraps(tool)
+    def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+        try:
+            return tool(*args, **kwargs)
+        except Exception as e:
+            return f"Error calling tool: {e}"
+
+    return wrapped_function
+
+
 def _wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
     from agents import Tool as AgentTool
     from agents import function_tool
@@ -117,7 +128,7 @@ async def _wrap_tools(
     tools: Sequence[T_co],
     agent_framework: AgentFramework,
 ) -> tuple[list[T_co], list[_MCPServerBase[T_co]]]:
-    wrapper = WRAPPERS[agent_framework]
+    framework_wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = list[T_co]()
     mcp_servers: MutableSequence[_MCPServerBase[T_co]] = []
@@ -132,7 +143,7 @@ async def _wrap_tools(
             mcp_servers.append(mcp_server)  # type: ignore[arg-type]
         elif callable(tool):
             verify_callable(tool)
-            wrapped_tools.append(wrapper(tool))
+            wrapped_tools.append(framework_wrapper(_wrap_no_exception(tool)))
         else:
             msg = f"Tool {tool} needs to be of type `MCPStdio` or `callable` but is {type(tool)}"
             raise ValueError(msg)

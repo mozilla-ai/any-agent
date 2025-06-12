@@ -199,7 +199,6 @@ class _LangChainInstrumentor:
                     if tool_call_id := getattr(output, "tool_call_id", None):
                         span.set_attribute("gen_ai.tool.call.id", tool_call_id)
 
-                span.set_status(StatusCode.OK)
                 span.end()
                 trace_id = span.get_span_context().trace_id
                 self.running_traces[trace_id].add_span(span)

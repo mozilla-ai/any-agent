@@ -196,9 +196,8 @@ class _GoogleADKInstrumentor:
             span = self._current_spans["tool"][tool_context.invocation_id]
 
             _set_tool_output(tool_response, span)
-
-            span.set_status(StatusCode.OK)
             span.end()
+
             trace_id = span.get_span_context().trace_id
             agent._running_traces[trace_id].add_span(span)
 

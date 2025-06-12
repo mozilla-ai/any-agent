@@ -20,6 +20,12 @@ from any_agent.tracing.otel_types import StatusCode
 def test_runtime_error(
     agent_framework: AgentFramework,
 ) -> None:
+    """An exception not caught by the framework should be caught by us.
+
+    `AnyAgent.run_async` should catch and reraise an `AgentRunError`.
+
+    The `AgentRunError.trace` should be retrieved.
+    """
     kwargs = {}
 
     kwargs["model_id"] = "gpt-4.1-mini"
@@ -57,3 +63,58 @@ def test_runtime_error(
                 and exc_reason in span.status.description
                 for span in spans
             )
+
+
+def search_web(query: str) -> str:
+    """Perform a duckduckgo web search based on your query then returns the top search results.
+
+    Args:
+        query (str): The search query to perform.
+
+    Returns:
+        The top search results.
+
+    """
+    msg = "It's a trap!"
+    raise ValueError(msg)
+
+
+@pytest.mark.skipif(
+    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
+    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
+)
+def test_tool_error(
+    agent_framework: AgentFramework,
+) -> None:
+    """An exception raised inside a tool will be caught by us.
+
+    We make sure an appropriate Status is set to the tool execution span.
+    We allow the Agent to try to recover from the tool calling failure.
+    """
+    kwargs = {}
+
+    kwargs["model_id"] = "gpt-4.1-nano"
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
+    model_args = {"temperature": 0.0}
+
+    agent_config = AgentConfig(
+        instructions="You must use the available tools to answer questions.",
+        tools=[search_web],
+        model_args=model_args,
+        **kwargs,
+    )
+
+    agent = AnyAgent.create(agent_framework, agent_config)
+
+    agent_trace = agent.run(
+        "Check in the web which agent framework is the best.",
+    )
+    assert any(
+        span.is_tool_execution()
+        and span.status.status_code == StatusCode.ERROR
+        and "It's a trap!" in getattr(span.status, "description", "")
+        for span in agent_trace.spans
+    )

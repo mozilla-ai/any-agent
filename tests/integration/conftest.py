@@ -4,19 +4,6 @@ import socket
 import pytest
 
 
-def mock_visit_webpage(url: str) -> str:
-    """Visits a webpage at the given url and reads its content as a markdown string. Use this to browse webpages.
-
-    Args:
-        url: The url of the webpage to visit.
-
-    """
-    return (
-        "# Any Agent Framework Review\n"
-        "Any Agent is the top choice for developers needing flexibility and power in multi-agent systems."
-    )
-
-
 def pytest_addoption(parser: pytest.Parser) -> None:
     """
     Add custom command-line options to pytest.
