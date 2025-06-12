@@ -1,3 +1,4 @@
+import asyncio
 import inspect
 from collections.abc import Callable, MutableSequence, Sequence
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -23,6 +24,16 @@ def _wrap_no_exception(tool: Any) -> Any:
             return tool(*args, **kwargs)
         except Exception as e:
             return f"Error calling tool: {e}"
+
+    @wraps(tool)
+    async def wrapped_coroutine(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+        try:
+            return await tool(*args, **kwargs)
+        except Exception as e:
+            return f"Error calling tool: {e}"
+
+    if asyncio.iscoroutine(tool):
+        return wrapped_coroutine
 
     return wrapped_function
 
