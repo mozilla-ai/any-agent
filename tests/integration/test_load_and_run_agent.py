@@ -5,6 +5,7 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
+from pydantic import BaseModel
 from unittest.mock import patch
 
 import pytest
@@ -308,3 +309,33 @@ def test_exception_trace(
             and exc_reason in span.status.description
             for span in spans
         )
+
+
+def test_resume_from_feature(agent_framework: AgentFramework, tmp_path: Path) -> None:
+    """Test that the agent can resume from a previous trace using the resume_from argument."""
+    if agent_framework is AgentFramework.GOOGLE:
+        pytest.skip("Google infinite recursion bug: https://github.com/mozilla-ai/any-agent/issues/467 prevents this test from passing")
+    kwargs = {}
+    kwargs["model_id"] = "gpt-4.1-mini"
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
+    class YearOutput(BaseModel):
+        year: int
+
+    agent_config = AgentConfig(
+        output_type=YearOutput,
+        **kwargs,
+    )
+    agent = AnyAgent.create(agent_framework, agent_config)
+
+    trace1 = agent.run(
+        "What year was Y2K?",
+    )
+    assert trace1.final_output.year == 2000
+
+    trace2 = agent.run(
+        "Now increment the year by 5.", resume_from=trace1
+    )
+    assert trace2.final_output.year == 2005
