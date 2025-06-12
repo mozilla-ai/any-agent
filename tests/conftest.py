@@ -11,7 +11,7 @@ from litellm.types.utils import ModelResponse
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
-from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
 from tests.integration.helpers import wait_for_server_async
 
 PATCH_PER_FRAMEWORK = {
@@ -178,29 +178,3 @@ def agent_trace(request: pytest.FixtureRequest) -> AgentTrace:
     with open(trace_path, encoding="utf-8") as f:
         trace = json.load(f)
     return AgentTrace.model_validate(trace)
-
-
-CHILD_TAG = "any_agent.children"
-
-
-def build_tree(items: list[AgentSpan]) -> AgentSpan:
-    """Structures the spans into a tree."""
-    traces = {}
-    for trace in items:
-        k = trace.context.span_id
-        trace.attributes[CHILD_TAG] = {}
-        traces[k] = trace
-    for trace in items:
-        k = trace.context.span_id
-        if trace.parent:
-            parent_k = trace.parent.span_id
-            if parent_k:
-                try:
-                    traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = (
-                        trace
-                    )
-                except KeyError:
-                    pass
-            else:
-                traces[None] = trace
-    return traces[None]
