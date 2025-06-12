@@ -1,6 +1,5 @@
 import inspect
 from collections.abc import Callable, MutableSequence, Sequence
-from functools import wraps
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from any_agent.config import AgentFramework, MCPParams, Tool
@@ -44,12 +43,7 @@ def _wrap_tool_smolagents(tool: "Tool | SmolagentsTool") -> "SmolagentsTool":
     if isinstance(tool, SmolagentsTool):
         return tool
 
-    # this wrapping needed until https://github.com/huggingface/smolagents/pull/1203 is merged and released
-    @wraps(tool)  # type: ignore[arg-type]
-    def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
-        return tool(*args, **kwargs)  # type: ignore[operator]
-
-    return smolagents_tool(wrapped_function)
+    return smolagents_tool(tool)  # type: ignore[arg-type]
 
 
 def _wrap_tool_llama_index(tool: "Tool | LlamaIndexTool") -> "LlamaIndexTool":
