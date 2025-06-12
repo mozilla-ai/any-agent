@@ -8,16 +8,17 @@ from any_agent.tools import search_web
 from any_agent.tools.mcp import _get_mcp_server
 from any_agent.tools.wrappers import WRAPPERS
 
-try:
-    from a2a.types import AgentSkill
-
-    from any_agent.serving import A2AServingConfig
-    from any_agent.serving.agent_card import _get_agent_card
-except ImportError:
-    _get_agent_card = None  # type: ignore[assignment]
+# Skip entire module if a2a dependencies are not available
+pytest.importorskip("a2a.types")
+pytest.importorskip("any_agent.serving.agent_card")
 
 
-@pytest.mark.skipif(_get_agent_card is None, reason="a2a_samples is not installed")
+from a2a.types import AgentSkill
+
+from any_agent.serving import A2AServingConfig
+from any_agent.serving.agent_card import _get_agent_card
+
+
 def test_get_agent_card(agent_framework: AgentFramework) -> None:
     agent = MagicMock()
     agent.config = AgentConfig(model_id="foo", description="test agent")
@@ -36,7 +37,6 @@ def test_get_agent_card(agent_framework: AgentFramework) -> None:
     assert agent_card.url == "http://localhost:5000/"
 
 
-@pytest.mark.skipif(_get_agent_card is None, reason="a2a_samples is not installed")
 @pytest.mark.asyncio
 async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
     agent_framework: AgentFramework, echo_sse_server
@@ -60,7 +60,6 @@ async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
     assert agent_card.skills[0].description == "Say hi back with the input text"
 
 
-@pytest.mark.skipif(_get_agent_card is None, reason="a2a_samples is not installed")
 def test_get_agent_card_with_explicit_skills(agent_framework: AgentFramework) -> None:
     """Test that when skills are explicitly provided in A2AServingConfig, they are used instead of inferring from tools."""
     agent = MagicMock()
