@@ -1,5 +1,3 @@
-import os
-
 import pytest
 from litellm.utils import validate_environment
 
@@ -7,10 +5,6 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.tools import search_tavily
 
 
-@pytest.mark.skipif(
-    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
-    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
-)
 def test_no_instrument(
     agent_framework: AgentFramework,
 ) -> None:
