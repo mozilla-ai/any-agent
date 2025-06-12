@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-from abc import ABC, abstractmethod
 import json
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
 
 from opentelemetry import trace
@@ -141,12 +141,20 @@ class AnyAgent(ABC):
             tools.extend(mcp_server.tools)
         return tools, mcp_servers
 
-    def run(self, prompt: str, resume_from: AgentTrace | None = None, **kwargs: Any) -> AgentTrace:
+    def run(
+        self, prompt: str, resume_from: AgentTrace | None = None, **kwargs: Any
+    ) -> AgentTrace:
         """Run the agent with the given prompt."""
-        return run_async_in_sync(self.run_async(prompt=prompt, resume_from=resume_from, **kwargs))
+        return run_async_in_sync(
+            self.run_async(prompt=prompt, resume_from=resume_from, **kwargs)
+        )
 
     async def run_async(
-        self, prompt: str, instrument: bool = True, resume_from: AgentTrace | None = None, **kwargs: Any
+        self,
+        prompt: str,
+        instrument: bool = True,
+        resume_from: AgentTrace | None = None,
+        **kwargs: Any,
     ) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.
 
@@ -169,9 +177,14 @@ class AnyAgent(ABC):
         """
         if resume_from is not None:
             # Construct a "history" string that can be prepended to the prompt
-            history = "\n".join([json.dumps(span.attributes) for span in resume_from.spans if span.attributes is not None])
+            history = "\n".join(
+                [
+                    json.dumps(span.attributes)
+                    for span in resume_from.spans
+                    if span.attributes is not None
+                ]
+            )
             prompt = f"History:\n{history}\nPrompt:\n{prompt}"
-            print(f"Resuming from history: {history}")
 
         try:
             trace = AgentTrace()

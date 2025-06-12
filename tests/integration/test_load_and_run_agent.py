@@ -5,11 +5,11 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
-from pydantic import BaseModel
 from unittest.mock import patch
 
 import pytest
 from litellm.utils import validate_environment
+from pydantic import BaseModel
 
 from any_agent import (
     AgentConfig,
@@ -314,7 +314,9 @@ def test_exception_trace(
 def test_resume_from_feature(agent_framework: AgentFramework, tmp_path: Path) -> None:
     """Test that the agent can resume from a previous trace using the resume_from argument."""
     if agent_framework is AgentFramework.GOOGLE:
-        pytest.skip("Google infinite recursion bug: https://github.com/mozilla-ai/any-agent/issues/467 prevents this test from passing")
+        pytest.skip(
+            "Google infinite recursion bug: https://github.com/mozilla-ai/any-agent/issues/467 prevents this test from passing"
+        )
     kwargs = {}
     kwargs["model_id"] = "gpt-4.1-mini"
     env_check = validate_environment(kwargs["model_id"])
@@ -335,7 +337,5 @@ def test_resume_from_feature(agent_framework: AgentFramework, tmp_path: Path) ->
     )
     assert trace1.final_output.year == 2000
 
-    trace2 = agent.run(
-        "Now increment the year by 5.", resume_from=trace1
-    )
+    trace2 = agent.run("Now increment the year by 5.", resume_from=trace1)
     assert trace2.final_output.year == 2005
