@@ -1,80 +1,53 @@
-from __future__ import annotations
+from typing import Generic, TypeVar
 
-from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
-
+from a2a.types import TaskState
 from pydantic import BaseModel, ConfigDict
 
-from any_agent.serving.agent_executor import _DefaultBody
-
-if TYPE_CHECKING:
-    from a2a.types import TaskState
-
-    from any_agent import AnyAgent
+T = TypeVar("T", bound=BaseModel)
 
 
-def _is_a2a_envelope(typ: type[BaseModel] | None) -> bool:
-    if typ is None:
-        return False
-    fields: Any = getattr(typ, "__fields__", None)
+class A2AEnvelope(BaseModel, Generic[T]):
+    """Base envelope class that all served agents must use for their output_type.
 
-    # We only care about a mapping with the required keys.
-    if not isinstance(fields, Mapping):
-        return False
+    This class enforces the A2A protocol requirements for agent outputs.
+    Any agent that wants to be served must have an output_type that inherits from this class.
 
-    return "task_status" in fields and "data" in fields
+    Example:
+        ```python
+        class MyAgentOutput(BaseModel):
+            result: str
 
+        agent = AnyAgent.create(
+            "openai",
+            AgentConfig(
+                model_id="gpt-4",
+                output_type=A2AEnvelope[MyAgentOutput]
+            )
+        )
+        ```
 
-def _create_a2a_envelope(body_type: type[BaseModel]) -> type[BaseModel]:
-    """Return a *new* Pydantic model that wraps *body_type* with TaskState + data."""
-    # Ensure body forbids extra keys (OpenAI response_format requirement)
-    if hasattr(body_type, "model_config"):
-        body_type.model_config["extra"] = "forbid"
-    else:
-        body_type.model_config = ConfigDict(extra="forbid")
-
-    class OutputContainer(BaseModel):
-        task_status: TaskState
-        data: body_type  # type: ignore[valid-type]
-
-        model_config = ConfigDict(extra="forbid")
-
-    OutputContainer.__name__ = f"{body_type.__name__}Return"
-    OutputContainer.__qualname__ = f"{body_type.__qualname__}Return"
-    return OutputContainer
-
-
-def prepare_agent_for_a2a(agent: AnyAgent) -> AnyAgent:
-    """Return an agent whose ``config.output_type`` is A2A-ready.
-
-    If *agent* is already envelope-compatible we hand it back untouched.
-    Otherwise we clone its config, wrap the output type, and spin up a
-    *new* agent instance via `AnyAgent.create` so that framework-specific
-    initialisation sees the correct schema right from the start.
     """
-    if _is_a2a_envelope(agent.config.output_type):
-        return agent
 
-    body_type = agent.config.output_type or _DefaultBody
-    new_output_type = _create_a2a_envelope(body_type)
+    task_status: TaskState
+    data: T
 
-    new_config = agent.config.model_copy(deep=True)
-    new_config.output_type = new_output_type
-
-    # Use the concrete agent class to recreate with the wrapped config
-    return agent.__class__.create(agent.framework, new_config)
+    model_config = ConfigDict(extra="forbid")
 
 
-async def prepare_agent_for_a2a_async(agent: AnyAgent) -> AnyAgent:
-    """Async counterpart of :pyfunc:`prepare_agent_for_a2a`."""
-    if _is_a2a_envelope(agent.config.output_type):
-        return agent
+def validate_agent_envelope(output_type: type[BaseModel] | None) -> bool:
+    """Validate that an agent's output_type is a valid A2A envelope.
 
-    body_type = agent.config.output_type or _DefaultBody
-    new_output_type = _create_a2a_envelope(body_type)
+    Args:
+        output_type: The output_type from the agent's config
 
-    new_config = agent.config.model_copy(deep=True)
-    new_config.output_type = new_output_type
+    Returns:
+        bool: True if the output_type is a valid A2A envelope
 
-    # Use the concrete agent class to recreate with the wrapped config
-    return await agent.__class__.create_async(agent.framework, new_config)
+    """
+    if output_type is None:
+        return False
+
+    try:
+        return issubclass(output_type, A2AEnvelope)
+    except TypeError:
+        return False

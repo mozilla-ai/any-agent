@@ -1,37 +1,23 @@
-from typing import TYPE_CHECKING, Protocol, cast, override
+from typing import TYPE_CHECKING, override
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
 from a2a.server.tasks import TaskUpdater
 from a2a.types import (
     Part,
-    TaskState,
     TextPart,
 )
 from a2a.utils import (
     new_agent_parts_message,
     new_task,
 )
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 from any_agent.logging import logger
+from any_agent.serving.envelope import A2AEnvelope, validate_agent_envelope
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
-
-
-class _DefaultBody(BaseModel):
-    """Default payload when the user does not supply one."""
-
-    result: str
-
-    model_config = ConfigDict(extra="forbid")
-
-
-# Protocol to help static typing recognize envelope attributes
-class _OutputEnvelope(Protocol):
-    task_status: TaskState
-    data: BaseModel
 
 
 class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
@@ -39,6 +25,12 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
 
     def __init__(self, agent: "AnyAgent"):
         """Initialize the AnyAgentExecutor."""
+        if not validate_agent_envelope(agent.config.output_type):
+            msg = (
+                "Agent must have an output_type that inherits from A2AEnvelope to be served. "
+                "Please update your agent's output_type to inherit from A2AEnvelope."
+            )
+            raise TypeError(msg)
         self.agent = agent
 
     @override
@@ -51,31 +43,22 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         task = context.current_task
 
         # This agent always produces Task objects.
-        agent_trace = await self.agent.run_async(query)
         if not task:
             task = new_task(context.message)
             await event_queue.enqueue_event(task)
         else:
             logger.info("Task already exists: %s", task)
         updater = TaskUpdater(event_queue, task.id, task.contextId)
+        agent_trace = await self.agent.run_async(query)
 
-        # Validate & interpret the envelope produced by the agent
+        # Get the output from the agent
         final_output = agent_trace.final_output
-
-        if not isinstance(final_output, BaseModel):
-            msg = f"Expected BaseModel, got {type(final_output)}, {final_output}"
-            raise TypeError(msg)
-
-        # Runtime attributes guaranteed by the dynamically created model.
-        if not (hasattr(final_output, "task_status") and hasattr(final_output, "data")):
-            msg = "Final output must have `task_status` and `data` attributes"
-            raise AttributeError(msg)
-
-        envelope = cast("_OutputEnvelope", final_output)
-        task_status = envelope.task_status
-        data_field = envelope.data
+        if not isinstance(final_output, A2AEnvelope):
+            msg = "Final output is not an A2AEnvelope"
+            raise ValueError(msg)
 
         # Convert payload to text we can stream to user
+        data_field = final_output.data
         if isinstance(data_field, BaseModel):
             result_text = data_field.model_dump_json()
         else:
@@ -84,7 +67,7 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         # Right now all task states will mark the state as final. As we expand logic for multiturn tasks and streaming
         # we may not want to always mark the state as final.
         await updater.update_status(
-            task_status,
+            final_output.task_status,
             message=new_agent_parts_message(
                 [Part(root=TextPart(text=result_text))],
                 task.contextId,
