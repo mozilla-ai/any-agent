@@ -98,7 +98,7 @@ async def a2a_tool_async(
     new_name = re.sub(r"\s+", "_", new_name.strip())
     _send_query.__name__ = f"call_{new_name}"
     _send_query.__doc__ = f"""{a2a_agent_card.description}
-        Send a query to the A2Aagent named {a2a_agent_card.name}.
+        Send a query to the A2A hosted agent named {a2a_agent_card.name}.
 
         Agent description: {a2a_agent_card.description}
 
