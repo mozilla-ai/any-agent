@@ -13,8 +13,6 @@ from any_agent.utils import run_async_in_sync
 
 from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
-
-# A2A envelope preparation
 from .envelope import prepare_agent_for_a2a
 
 if TYPE_CHECKING:
@@ -29,7 +27,6 @@ import asyncio
 def _get_a2a_app(
     agent: AnyAgent, serving_config: A2AServingConfig
 ) -> A2AStarletteApplication:
-    # Ensure the agent is A2A-ready (task_status+data envelope)
     agent = prepare_agent_for_a2a(agent)
 
     agent_card = _get_agent_card(agent, serving_config)

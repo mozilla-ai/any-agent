@@ -1,37 +1,23 @@
-from typing import TYPE_CHECKING, Protocol, cast, override
+from typing import TYPE_CHECKING, override
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
 from a2a.server.tasks import TaskUpdater
 from a2a.types import (
     Part,
-    TaskState,
     TextPart,
 )
 from a2a.utils import (
     new_agent_parts_message,
     new_task,
 )
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 from any_agent.logging import logger
+from any_agent.serving.envelope import A2AEnvelope
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
-
-
-class _DefaultBody(BaseModel):
-    """Default payload when the user does not supply one."""
-
-    result: str
-
-    model_config = ConfigDict(extra="forbid")
-
-
-# Protocol to help static typing recognize envelope attributes
-class _OutputEnvelope(Protocol):
-    task_status: TaskState
-    data: BaseModel
 
 
 class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
@@ -67,13 +53,12 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
             raise TypeError(msg)
 
         # Runtime attributes guaranteed by the dynamically created model.
-        if not (hasattr(final_output, "task_status") and hasattr(final_output, "data")):
-            msg = "Final output must have `task_status` and `data` attributes"
-            raise AttributeError(msg)
+        if not isinstance(final_output, A2AEnvelope):
+            msg = "Final output must be an A2AEnvelope"
+            raise TypeError(msg)
 
-        envelope = cast("_OutputEnvelope", final_output)
-        task_status = envelope.task_status
-        data_field = envelope.data
+        task_status = final_output.task_status
+        data_field = final_output.data
 
         # Convert payload to text we can stream to user
         if isinstance(data_field, BaseModel):

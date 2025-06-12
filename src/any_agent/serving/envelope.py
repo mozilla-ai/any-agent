@@ -1,16 +1,34 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
+from a2a.types import TaskState  # noqa: TC002
 from pydantic import BaseModel, ConfigDict
 
-from any_agent.serving.agent_executor import _DefaultBody
-
 if TYPE_CHECKING:
-    from a2a.types import TaskState
-
     from any_agent import AnyAgent
+
+
+class _DefaultBody(BaseModel):
+    """Default payload when the user does not supply one."""
+
+    result: str
+
+    model_config = ConfigDict(extra="forbid")
+
+
+# Define a TypeVar for the body type
+BodyType = TypeVar("BodyType", bound=BaseModel)
+
+
+class A2AEnvelope(BaseModel, Generic[BodyType]):
+    """A2A envelope that wraps response data with task status."""
+
+    task_status: TaskState
+    data: BodyType
+
+    model_config = ConfigDict(extra="forbid")
 
 
 def _is_a2a_envelope(typ: type[BaseModel] | None) -> bool:
@@ -25,7 +43,7 @@ def _is_a2a_envelope(typ: type[BaseModel] | None) -> bool:
     return "task_status" in fields and "data" in fields
 
 
-def _create_a2a_envelope(body_type: type[BaseModel]) -> type[BaseModel]:
+def _create_a2a_envelope(body_type: type[BaseModel]) -> type[A2AEnvelope[Any]]:
     """Return a *new* Pydantic model that wraps *body_type* with TaskState + data."""
     # Ensure body forbids extra keys (OpenAI response_format requirement)
     if hasattr(body_type, "model_config"):
@@ -33,15 +51,12 @@ def _create_a2a_envelope(body_type: type[BaseModel]) -> type[BaseModel]:
     else:
         body_type.model_config = ConfigDict(extra="forbid")
 
-    class OutputContainer(BaseModel):
-        task_status: TaskState
-        data: body_type  # type: ignore[valid-type]
+    class EnvelopeInstance(A2AEnvelope[body_type]):  # type: ignore[valid-type]
+        pass
 
-        model_config = ConfigDict(extra="forbid")
-
-    OutputContainer.__name__ = f"{body_type.__name__}Return"
-    OutputContainer.__qualname__ = f"{body_type.__qualname__}Return"
-    return OutputContainer
+    EnvelopeInstance.__name__ = f"{body_type.__name__}Return"
+    EnvelopeInstance.__qualname__ = f"{body_type.__qualname__}Return"
+    return EnvelopeInstance
 
 
 def prepare_agent_for_a2a(agent: AnyAgent) -> AnyAgent:

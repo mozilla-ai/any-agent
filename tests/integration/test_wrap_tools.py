@@ -33,7 +33,6 @@ def wrap_sync(
         (AgentFramework.SMOLAGENTS, SmolagentsClass),
     ],
 )
-@pytest.mark.asyncio
 def test_wrap_tools(framework: AgentFramework, expected_class: Any) -> None:
     wrapped_tools = wrap_sync([search_web, visit_webpage], framework)
     assert all(isinstance(tool, expected_class) for tool in wrapped_tools)
