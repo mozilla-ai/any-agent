@@ -1,5 +1,4 @@
 import datetime
-import os
 from multiprocessing import Process, Queue
 
 import pytest
