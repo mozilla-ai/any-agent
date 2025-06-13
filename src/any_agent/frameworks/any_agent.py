@@ -303,7 +303,7 @@ class AnyAgent(ABC):
             log_level=serving_config.log_level,
         )
 
-    def recreate_with_config(self, new_config: AgentConfig) -> AnyAgent:
+    def _recreate_with_config(self, new_config: AgentConfig) -> AnyAgent:
         """Create a new agent instance with the given config, preserving MCP servers and tools.
 
         This method creates a new agent with the modified configuration while transferring
@@ -318,10 +318,10 @@ class AnyAgent(ABC):
             or a completely new agent (if tools changed).
 
         """
-        return run_async_in_sync(self.recreate_with_config_async(new_config))
+        return run_async_in_sync(self._recreate_with_config_async(new_config))
 
-    async def recreate_with_config_async(self, new_config: AgentConfig) -> AnyAgent:
-        """Async version of recreate_with_config.
+    async def _recreate_with_config_async(self, new_config: AgentConfig) -> AnyAgent:
+        """Async version of _recreate_with_config.
 
         This method creates a new agent with the modified configuration while transferring
         the MCP servers and tools from the current agent to avoid recreating them, but only

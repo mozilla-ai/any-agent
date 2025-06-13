@@ -80,7 +80,7 @@ def prepare_agent_for_a2a(agent: AnyAgent) -> AnyAgent:
     new_config.output_type = new_output_type
 
     # Create the new agent with the wrapped config, preserving MCP servers and tools
-    return agent.recreate_with_config(new_config)
+    return agent._recreate_with_config(new_config)
 
 
 async def prepare_agent_for_a2a_async(agent: AnyAgent) -> AnyAgent:
@@ -99,4 +99,4 @@ async def prepare_agent_for_a2a_async(agent: AnyAgent) -> AnyAgent:
     new_config.output_type = new_output_type
 
     # Create the new agent with the wrapped config, preserving MCP servers and tools
-    return await agent.recreate_with_config_async(new_config)
+    return await agent._recreate_with_config_async(new_config)
