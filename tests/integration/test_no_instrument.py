@@ -8,9 +8,6 @@ from any_agent.tools import search_tavily
 def test_no_instrument(
     agent_framework: AgentFramework,
 ) -> None:
-    pytest.skip(
-        "Skipping broken test suite until https://github.com/mozilla-ai/any-agent/pull/435 is merged"
-    )
     model_id = "gpt-4.1-nano"
     env_check = validate_environment("model_id")
     if not env_check["keys_in_environment"]:
