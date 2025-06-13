@@ -12,7 +12,7 @@ from any_agent.config import (
     Tool,
 )
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing.agent_trace import AgentTrace
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.exporter import SCOPE_NAME
 from any_agent.tracing.instrumentation import (
     _get_instrumentor_by_framework,
@@ -140,17 +140,26 @@ class AnyAgent(ABC):
             tools.extend(mcp_server.tools)
         return tools, mcp_servers
 
-    def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
+    def run(
+        self, prompt: str, history: list[AgentSpan] | None = None, **kwargs: Any
+    ) -> AgentTrace:
         """Run the agent with the given prompt."""
-        return run_async_in_sync(self.run_async(prompt, **kwargs))
+        return run_async_in_sync(
+            self.run_async(prompt=prompt, history=history, **kwargs)
+        )
 
     async def run_async(
-        self, prompt: str, instrument: bool = True, **kwargs: Any
+        self,
+        prompt: str,
+        instrument: bool = True,
+        history: list[AgentSpan] | None = None,
+        **kwargs: Any,
     ) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.
 
         Args:
             prompt: The user prompt to be passed to the agent.
+            history: A list of `AgentSpan` objects to resume from.
             instrument: Whether to instrument the underlying framework
                 to generate LLM Calls and Tool Execution Spans.
 
@@ -189,7 +198,7 @@ class AnyAgent(ABC):
                         "gen_ai.request.model": self.config.model_id,
                     }
                 )
-                final_output = await self._run_async(prompt, **kwargs)
+                final_output = await self._run_async(prompt, history, **kwargs)
 
                 if instrument and self._instrumentor:
                     async with self._lock:
@@ -293,7 +302,9 @@ class AnyAgent(ABC):
         """Load the agent instance."""
 
     @abstractmethod
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str, history: list[AgentSpan] | None, **kwargs: Any
+    ) -> str | BaseModel:
         """To be implemented by each framework."""
 
     @property

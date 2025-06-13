@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from any_agent import AgentConfig, AgentFramework
 from any_agent.logging import logger
 from any_agent.tools.final_output import FinalOutputTool
+from any_agent.tracing.agent_trace import spans_to_string
 
 from .any_agent import AnyAgent
 
@@ -26,6 +27,8 @@ except ImportError:
 if TYPE_CHECKING:
     from llama_index.core.agent.workflow.workflow_events import AgentOutput
     from llama_index.core.llms import LLM
+
+    from any_agent.tracing.agent_trace import AgentSpan
 
 
 class LlamaIndexAgent(AnyAgent):
@@ -87,14 +90,23 @@ class LlamaIndexAgent(AnyAgent):
             **self.config.agent_args or {},
         )
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str, history: list["AgentSpan"] | None, **kwargs: Any
+    ) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        result: AgentOutput = await self._agent.run(prompt, **kwargs)
+
+        # Prepare input for the agent
+        if history:
+            prompt_to_use = spans_to_string(history) + "\n" + prompt
+        else:
+            prompt_to_use = prompt
+
+        result: AgentOutput = await self._agent.run(prompt_to_use, **kwargs)
         # assert that it's a TextBlock
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):
-            msg = f"Agent did not return a valid response: {result.response}"
+            msg = f"Agent did not return a valid response: {result.response.model_dump_json()}"
             raise ValueError(msg)
         if self.config.output_type:
             return self.config.output_type.model_validate_json(

@@ -1,6 +1,7 @@
 # mypy: disable-error-code="arg-type,attr-defined"
 from __future__ import annotations
 
+import json
 from datetime import timedelta
 from functools import cached_property
 from typing import TYPE_CHECKING, Any
@@ -82,6 +83,92 @@ def compute_cost_info(
     return CostInfo.model_validate(new_info)
 
 
+def spans_to_messages(spans: list[AgentSpan]) -> list[dict[str, str]]:
+    """Convert spans to standard message format.
+
+    Args:
+        spans: List of AgentSpan objects to convert.
+
+    Returns:
+        List of message dicts with 'role' and 'content' keys.
+
+    """
+    messages: list[dict[str, str]] = []
+
+    # Process spans in chronological order (excluding the final invoke_agent span)
+    # Filter out any non-AgentSpan objects and agent invocation spans
+    filtered_spans: list[AgentSpan] = []
+    for span in spans:
+        if hasattr(span, "is_agent_invocation") and not span.is_agent_invocation():
+            filtered_spans.append(span)
+
+    for span in filtered_spans:
+        if span.is_llm_call():
+            # Extract input messages from the span
+            input_messages = span.get_input_messages()
+            if input_messages:
+                for msg in input_messages:
+                    # Deduplicate messages to avoid repeating context
+                    msg_dict = {
+                        "role": msg["role"],
+                        "content": msg["content"],
+                    }
+                    if not any(
+                        existing["role"] == msg_dict["role"]
+                        and existing["content"] == msg_dict["content"]
+                        for existing in messages
+                    ):
+                        messages.append(msg_dict)
+
+            # Add the assistant's response
+            output_content = span.get_output_content()
+            if output_content:
+                # Avoid duplicate assistant messages
+                if not (
+                    messages
+                    and messages[-1]["role"] == "assistant"
+                    and messages[-1]["content"] == output_content
+                ):
+                    messages.append({"role": "assistant", "content": output_content})
+
+        elif span.is_tool_execution():
+            # For tool executions, include the result in the conversation
+            output_content = span.get_output_content()
+            if output_content:
+                tool_name = span.attributes["gen_ai.tool.name"]
+                messages.append(
+                    {
+                        "role": "assistant",
+                        "content": f"[Tool {tool_name} executed: {output_content}]",
+                    }
+                )
+
+    return messages
+
+
+def spans_to_string(spans: list[AgentSpan]) -> str:
+    """Convert spans to a consolidated string.
+
+    This is a helper for frameworks that want to provide conversation history
+    context by prepending the history to the current prompt.
+
+    Args:
+        spans: List of AgentSpan objects representing conversation history.
+
+    Returns:
+        A formatted string prompt of the conversation history.
+
+    """
+    messages = spans_to_messages(spans)
+    conversation_context = ""
+    for msg in messages:
+        msg_role: str = msg["role"]
+        msg_content: str = msg["content"]
+        conversation_context += f"{msg_role}: {msg_content}\n"
+
+    return conversation_context
+
+
 class AgentSpan(BaseModel):
     """A span that can be exported to JSON or printed to the console."""
 
@@ -150,6 +237,51 @@ class AgentSpan(BaseModel):
     def is_tool_execution(self) -> bool:
         """Check whether this span is an execution of a tool."""
         return self.attributes.get("gen_ai.operation.name") == "execute_tool"
+
+    def get_input_messages(self) -> list[dict[str, Any]] | None:
+        """Extract input messages from an LLM call span.
+
+        Returns:
+            List of message dicts with 'role' and 'content' keys, or None if not available.
+
+        """
+        if not self.is_llm_call():
+            msg = "Span is not an LLM call"
+            raise ValueError(msg)
+
+        messages_json = self.attributes.get("gen_ai.input.messages")
+        if not messages_json:
+            logger.debug("No input messages found in span")
+            return None
+
+        try:
+            parsed_messages = json.loads(messages_json)
+            # Ensure it's a list of dicts
+        except (json.JSONDecodeError, TypeError) as e:
+            msg = "Failed to parse input messages from span"
+            logger.error(msg)
+            raise ValueError(msg) from e
+        if not isinstance(parsed_messages, list):
+            msg = "Input messages are not a list of messages"
+            raise ValueError(msg)
+        return parsed_messages
+
+    def get_output_content(self) -> str | None:
+        """Extract output content from an LLM call or tool execution span.
+
+        Returns:
+            The output content as a string, or None if not available.
+
+        """
+        if not self.is_llm_call() and not self.is_tool_execution():
+            msg = "Span is not an LLM call or tool execution"
+            raise ValueError(msg)
+
+        output = self.attributes.get("gen_ai.output")
+        if not output:
+            logger.debug("No output found in span")
+            return None
+        return str(output)
 
 
 class AgentTrace(BaseModel):
