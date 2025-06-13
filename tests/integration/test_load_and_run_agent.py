@@ -5,7 +5,6 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
 
 import pytest
 from litellm.utils import validate_environment
@@ -13,7 +12,6 @@ from litellm.utils import validate_environment
 from any_agent import (
     AgentConfig,
     AgentFramework,
-    AgentRunError,
     AnyAgent,
 )
 from any_agent.config import MCPStdio
@@ -24,7 +22,6 @@ from any_agent.evaluation.schemas import (
     TraceEvaluationResult,
 )
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
-from any_agent.tracing.otel_types import StatusCode
 
 
 def uvx_installed() -> bool:
@@ -225,78 +222,3 @@ def test_load_and_run_agent(
             f.write(html_output.replace("<!DOCTYPE html>", ""))
 
     assert_eval(agent_trace)
-
-
-def test_exception_trace(
-    agent_framework: AgentFramework,
-    patched_function: str,
-    tmp_path: Path,
-    request: pytest.FixtureRequest,
-) -> None:
-    if agent_framework in (
-        # LangChain does not trigger the tool
-        AgentFramework.LANGCHAIN,
-        # OPENAI wraps the function, so patching it becomes more difficult
-        # AgentFramework.OPENAI,
-    ):
-        pytest.skip(f"Framework {agent_framework.value} not currently passing the test")
-
-    kwargs = {}
-
-    tmp_file = "tmp.txt"
-    # FIXME patch some call so an exception is triggered
-    # An exception within a tool will be handled by the framework
-    exc_reason = "the tool broke!"
-
-    if not uvx_installed():
-        msg = "uvx is not installed. Please install it to run this test."
-        raise RuntimeError(msg)
-
-    def fail_tool(text: str) -> None:
-        """write the text to a file in the tmp_path directory
-
-        Args:
-            text (str): The text to write to the file.
-
-        Returns:
-            None
-        """
-        with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
-            f.write(text)
-
-    kwargs["model_id"] = "gpt-4.1-mini"
-    env_check = validate_environment(kwargs["model_id"])
-    if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
-
-    model_args: dict[str, Any] = (
-        {"parallel_tool_calls": False}
-        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
-        else {}
-    )
-    model_args["temperature"] = 0.0
-    tools = [
-        fail_tool,
-    ]
-    agent_config = AgentConfig(
-        tools=tools,  # type: ignore[arg-type]
-        instructions="Answer the query.",
-        model_args=model_args,
-        **kwargs,  # type: ignore[arg-type]
-    )
-    agent = AnyAgent.create(agent_framework, agent_config)
-
-    with patch(patched_function) as fw_agent_runtool:
-        fw_agent_runtool.side_effect = RuntimeError(exc_reason)
-        spans = []
-        try:
-            agent.run(
-                "Write a four-line poem and use the tools to write it to a file.",
-            )
-        except AgentRunError as are:
-            spans = are.trace.spans
-        assert any(
-            span.status.status_code == StatusCode.ERROR
-            and exc_reason in span.status.description
-            for span in spans
-        )

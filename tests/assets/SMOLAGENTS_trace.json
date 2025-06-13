@@ -4,8 +4,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 10801367410871246748,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 1643607755459745391,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749199586658991217,
+      "start_time": 1749740275415949948,
       "end_time": null,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 8003438528957586222,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 3732167753876359234,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -57,8 +57,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 10801367410871246748,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 1643607755459745391,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -67,15 +67,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749199587430511274,
+      "start_time": 1749740276189183506,
       "end_time": null,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 13994233856874702560,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 1390644363971369745,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -89,7 +89,7 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-06-06T04:46:27-04:00\",\n  \"is_dst\": true\n}",
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-06-12T10:57:56-04:00\",\n  \"is_dst\": true\n}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -108,8 +108,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 10801367410871246748,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 1643607755459745391,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -118,15 +118,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749199587434348423,
+      "start_time": 1749740276193612435,
       "end_time": null,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 12492241005632652490,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 15671295034670803449,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -140,7 +140,7 @@
         "gen_ai.request.model": "gpt-4.1-mini",
         "gen_ai.output": "[{\"tool.name\": \"write_file\", \"tool.args\": \"{\\\"text\\\":\\\"2025\\\"}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 331,
+        "gen_ai.usage.input_tokens": 327,
         "gen_ai.usage.output_tokens": 15,
         "gen_ai.response.model": "gpt-4.1-mini-2025-04-14"
       },
@@ -160,8 +160,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 10801367410871246748,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 1643607755459745391,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -170,15 +170,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749199588391209196,
+      "start_time": 1749740277017053784,
       "end_time": null,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 9479722815501152670,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 12106101360289320892,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -211,8 +211,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 10801367410871246748,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 1643607755459745391,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -221,15 +221,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749199588393804070,
+      "start_time": 1749740277018899820,
       "end_time": null,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 7261019113210097508,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 13367701856406234924,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -241,10 +241,10 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.output": "[{\"tool.name\": \"final_answer\", \"tool.args\": \"{\\\"answer\\\":\\\"Steps taken:\\\\n1. Retrieved the current date and time in the America/New_York timezone.\\\\n2. Extracted the year (2025) from the retrieved date and time.\\\\n3. Wrote the year (2025) to a file.\\\\n\\\\nThe year in the America/New_York timezone is 2025.\\\"}\"}]",
+        "gen_ai.output": "[{\"tool.name\": \"final_answer\", \"tool.args\": \"{\\\"answer\\\":\\\"Steps taken:\\\\n1. Used the 'get_current_time' function to get the current date and time in the America/New_York timezone.\\\\n2. Extracted the year (2025) from the returned datetime string.\\\\n3. Used the 'write_file' function to write the year (2025) to a file.\\\\n\\\\nThe year in the America/New_York timezone is 2025.\\\"}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 413,
-        "gen_ai.usage.output_tokens": 82,
+        "gen_ai.usage.input_tokens": 408,
+        "gen_ai.usage.output_tokens": 97,
         "gen_ai.response.model": "gpt-4.1-mini-2025-04-14"
       },
       "links": [],
@@ -263,8 +263,8 @@
       "name": "execute_tool final_answer",
       "kind": "internal",
       "parent": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 10801367410871246748,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 1643607755459745391,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -273,15 +273,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749199590852773510,
+      "start_time": 1749740278321926725,
       "end_time": null,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 17116462607947892967,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 644318594338074156,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -294,8 +294,8 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "final_answer",
         "gen_ai.tool.description": "Provides a final answer to the given problem.",
-        "gen_ai.tool.args": "{\"answer\": \"Steps taken:\\n1. Retrieved the current date and time in the America/New_York timezone.\\n2. Extracted the year (2025) from the retrieved date and time.\\n3. Wrote the year (2025) to a file.\\n\\nThe year in the America/New_York timezone is 2025.\"}",
-        "gen_ai.output": "Steps taken:\n1. Retrieved the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the retrieved date and time.\n3. Wrote the year (2025) to a file.\n\nThe year in the America/New_York timezone is 2025.",
+        "gen_ai.tool.args": "{\"answer\": \"Steps taken:\\n1. Used the 'get_current_time' function to get the current date and time in the America/New_York timezone.\\n2. Extracted the year (2025) from the returned datetime string.\\n3. Used the 'write_file' function to write the year (2025) to a file.\\n\\nThe year in the America/New_York timezone is 2025.\"}",
+        "gen_ai.output": "Steps taken:\n1. Used the 'get_current_time' function to get the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the returned datetime string.\n3. Used the 'write_file' function to write the year (2025) to a file.\n\nThe year in the America/New_York timezone is 2025.",
         "gen_ai.output.type": "text"
       },
       "links": [],
@@ -324,15 +324,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749199586658467397,
-      "end_time": 1749199590859952858,
+      "start_time": 1749740275415437143,
+      "end_time": 1749740278324619895,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 64468782018393155884855434231351406080,
-        "span_id": 10801367410871246748,
+        "trace_id": 227985647297485419423168017864855697957,
+        "span_id": 1643607755459745391,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -360,5 +360,5 @@
       }
     }
   ],
-  "final_output": "Steps taken:\n1. Retrieved the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the retrieved date and time.\n3. Wrote the year (2025) to a file.\n\nThe year in the America/New_York timezone is 2025."
+  "final_output": "Steps taken:\n1. Used the 'get_current_time' function to get the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the returned datetime string.\n3. Used the 'write_file' function to write the year (2025) to a file.\n\nThe year in the America/New_York timezone is 2025."
 }

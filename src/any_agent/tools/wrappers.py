@@ -1,5 +1,7 @@
+import asyncio
 import inspect
 from collections.abc import Callable, MutableSequence, Sequence
+from functools import wraps
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from any_agent.config import AgentFramework, MCPParams, Tool
@@ -14,6 +16,27 @@ if TYPE_CHECKING:
     from langchain_core.tools import BaseTool as LangchainTool
     from llama_index.core.tools import FunctionTool as LlamaIndexTool
     from smolagents import Tool as SmolagentsTool
+
+
+def _wrap_no_exception(tool: Any) -> Any:
+    @wraps(tool)
+    def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+        try:
+            return tool(*args, **kwargs)
+        except Exception as e:
+            return f"Error calling tool: {e}"
+
+    @wraps(tool)
+    async def wrapped_coroutine(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+        try:
+            return await tool(*args, **kwargs)
+        except Exception as e:
+            return f"Error calling tool: {e}"
+
+    if asyncio.iscoroutinefunction(tool):
+        return wrapped_coroutine
+
+    return wrapped_function
 
 
 def _wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
@@ -117,7 +140,7 @@ async def _wrap_tools(
     tools: Sequence[T_co],
     agent_framework: AgentFramework,
 ) -> tuple[list[T_co], list[_MCPServerBase[T_co]]]:
-    wrapper = WRAPPERS[agent_framework]
+    framework_wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = list[T_co]()
     mcp_servers: MutableSequence[_MCPServerBase[T_co]] = []
@@ -132,7 +155,7 @@ async def _wrap_tools(
             mcp_servers.append(mcp_server)  # type: ignore[arg-type]
         elif callable(tool):
             verify_callable(tool)
-            wrapped_tools.append(wrapper(tool))
+            wrapped_tools.append(framework_wrapper(_wrap_no_exception(tool)))
         else:
             msg = f"Tool {tool} needs to be of type `MCPStdio` or `callable` but is {type(tool)}"
             raise ValueError(msg)
