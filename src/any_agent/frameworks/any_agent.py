@@ -168,50 +168,44 @@ class AnyAgent(ABC):
         trace = AgentTrace()
         trace_id: int
         instrumentation_enabled = instrument and self._instrumentor is not None
-        exception_occurred = False
-        caught_exception = None
 
-        with self._tracer.start_as_current_span(
-            f"invoke_agent [{self.config.name}]"
-        ) as invoke_span:
-            if instrumentation_enabled:
-                trace_id = invoke_span.get_span_context().trace_id
-                async with self._lock:
-                    # We check the locked `_running_traces` inside `instrument`.
-                    # If there is more than 1 entry in `running_traces`, it means that the agent has
-                    # already being instrumented so we won't instrument it again.
-                    self._running_traces[trace_id] = AgentTrace()
-                    self._instrumentor.instrument(
-                        agent=self,  # type: ignore[arg-type]
-                    )
-
-            invoke_span.set_attributes(
-                {
-                    "gen_ai.operation.name": "invoke_agent",
-                    "gen_ai.agent.name": self.config.name,
-                    "gen_ai.agent.description": self.config.description
-                    or "No description.",
-                    "gen_ai.request.model": self.config.model_id,
-                }
-            )
-            try:
-                final_output = await self._run_async(prompt, **kwargs)
-            except Exception as e:
-                exception_occurred = True
-                caught_exception = e
-                # Clean up instrumentation if it was enabled
+        # This design is so that we only catch exceptions thrown by _run_async. All other exceptions will not be caught.
+        try:
+            with self._tracer.start_as_current_span(
+                f"invoke_agent [{self.config.name}]"
+            ) as invoke_span:
                 if instrumentation_enabled:
+                    trace_id = invoke_span.get_span_context().trace_id
                     async with self._lock:
-                        self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
-                        # Get the instrumented trace if available, otherwise use the original trace
-                        instrumented_trace = self._running_traces.pop(trace_id)
-                        if instrumented_trace is not None:
-                            trace = instrumented_trace
+                        # We check the locked `_running_traces` inside `instrument`.
+                        # If there is more than 1 entry in `running_traces`, it means that the agent has
+                        # already being instrumented so we won't instrument it again.
+                        self._running_traces[trace_id] = AgentTrace()
+                        self._instrumentor.instrument(
+                            agent=self,  # type: ignore[arg-type]
+                        )
 
-        # By setting it this way we still allow for the trace to leave the context manager before we add the final span.
-        if exception_occurred:
+                invoke_span.set_attributes(
+                    {
+                        "gen_ai.operation.name": "invoke_agent",
+                        "gen_ai.agent.name": self.config.name,
+                        "gen_ai.agent.description": self.config.description
+                        or "No description.",
+                        "gen_ai.request.model": self.config.model_id,
+                    }
+                )
+                final_output = await self._run_async(prompt, **kwargs)
+        except Exception as e:
+            # Clean up instrumentation if it was enabled
+            if instrumentation_enabled:
+                async with self._lock:
+                    self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
+                    # Get the instrumented trace if available, otherwise use the original trace
+                    instrumented_trace = self._running_traces.pop(trace_id)
+                    if instrumented_trace is not None:
+                        trace = instrumented_trace
             trace.add_span(invoke_span)
-            raise AgentRunError(trace) from caught_exception
+            raise AgentRunError(trace) from e
 
         if instrumentation_enabled:
             async with self._lock:
