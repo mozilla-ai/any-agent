@@ -69,14 +69,36 @@ async def a2a_tool_async(
             response = await client.send_message(
                 send_message_payload, http_kwargs=http_kwargs
             )
-            result: str = response.model_dump_json()
-            return result
+
+            if not response.root:
+                msg = (
+                    "The A2A agent did not return a root. Are you using an A2A agent not managed by any-agent? "
+                    "Please file an issue at https://github.com/mozilla-ai/any-agent/issues so we can help."
+                )
+                raise ValueError(msg)
+
+            if hasattr(response.root, "error"):
+                result = response.root.error.model_dump_json(
+                    exclude_none=True, exclude_unset=True, exclude_defaults=True
+                )
+            elif hasattr(response.root, "result"):
+                result = response.root.result.model_dump_json(
+                    exclude_none=True, exclude_unset=True, exclude_defaults=True
+                )
+            else:
+                msg = (
+                    "The A2A agent did not return a error or a result. Are you using an A2A agent not managed by any-agent? "
+                    "Please file an issue at https://github.com/mozilla-ai/any-agent/issues so we can help."
+                )
+                raise ValueError(msg)
+
+            return result  # type: ignore[no-any-return]
 
     new_name = toolname or a2a_agent_card.name
     new_name = re.sub(r"\s+", "_", new_name.strip())
     _send_query.__name__ = f"call_{new_name}"
     _send_query.__doc__ = f"""{a2a_agent_card.description}
-        Send a query to the agent named {a2a_agent_card.name}.
+        Send a query to the A2A hosted agent named {a2a_agent_card.name}.
 
         Agent description: {a2a_agent_card.description}
 
@@ -84,7 +106,7 @@ async def a2a_tool_async(
             query (str): The query to perform.
 
         Returns:
-            The result from the A2A agent, encoded in json.
+            The result from the A2A agent, encoded as a json string.
     """
     return _send_query
 

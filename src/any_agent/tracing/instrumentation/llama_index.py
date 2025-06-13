@@ -143,10 +143,11 @@ class _LlamaIndexInstrumentor:
                     if raw_output := getattr(output, "raw_output", None):
                         if content := getattr(raw_output, "content", None):
                             _set_tool_output(content[0].text, span)
+                        else:
+                            _set_tool_output(raw_output, span)
                     else:
                         _set_tool_output(output, span)
 
-                    span.set_status(StatusCode.OK)
                     trace_id = span.get_span_context().trace_id
                     agent._running_traces[trace_id].add_span(span)
                     return output
