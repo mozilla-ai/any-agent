@@ -217,6 +217,8 @@ class AnyAgent(ABC):
         trace.final_output = final_output
         return trace
 
+    # Subclass: ServedAnyAgent?
+
     def serve(self, serving_config: A2AServingConfig | None = None) -> None:
         """Serve this agent using the protocol defined in the serving_config.
 
@@ -360,6 +362,22 @@ class AnyAgent(ABC):
         await new_agent._load_agent()
 
         return new_agent
+    # FIXME: get a pydantic model, build a query
+    # def query(arguments: type[BaseModel]) -> str:
+    # by default: {query: str}
+
+    async def serve_mcp_async(
+        self, serving_config: A2AServingConfig | None = None
+    ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+        from any_agent.serving import serve_mcp_async
+
+        return await serve_mcp_async(
+            self,
+            host=serving_config.host,
+            port=serving_config.port,
+            endpoint=serving_config.endpoint,
+            log_level=serving_config.log_level,
+        )
 
     @abstractmethod
     async def _load_agent(self) -> None:
