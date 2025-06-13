@@ -9,13 +9,13 @@ from litellm.utils import validate_environment
 from rich.logging import RichHandler
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.config import TracingConfig
+from any_agent.config import MCPSse, TracingConfig
 from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.conftest import build_tree
 
-from .helpers import wait_for_a2a_server
+from .helpers import wait_for_a2a_server, wait_for_a2a_server_async
 
 FORMAT = "%(message)s"
 logging.basicConfig(
@@ -24,8 +24,11 @@ logging.basicConfig(
     datefmt="[%X]",
     handlers=[RichHandler(rich_tracebacks=True)],
 )
+
 logger = logging.getLogger("any_agent_test")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.ERROR)
+mcp_logger = logging.getLogger("mcp.server.sse")
+mcp_logger.setLevel(logging.ERROR)
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
@@ -51,6 +54,15 @@ def _assert_has_date_agent_tool_call(agent_trace: AgentTrace) -> None:
     assert any(
         span.is_tool_execution()
         and span.attributes.get("gen_ai.tool.name", None) == "call_date_agent"
+        for span in agent_trace.spans
+    )
+
+
+def _assert_has_tool_date_agent_call(agent_trace: AgentTrace) -> None:
+    """Assert that the agent trace contains a tool execution span for the date agent."""
+    assert any(
+        span.is_tool_execution()
+        and span.attributes.get("gen_ai.tool.name", None) == "as-tool-date_agent"
         for span in agent_trace.spans
     )
 
@@ -179,7 +191,6 @@ async def test_load_and_run_multi_agent_a2a(
 
         final_output_log = f"Final output: {agent_trace.final_output}"
         logger.info(final_output_log)
-
     finally:
         if served_server:
             await served_server.shutdown()
@@ -304,3 +315,124 @@ def test_load_and_run_multi_agent_a2a_sync(
                 # Force kill if graceful shutdown failed
                 server_process.kill()
                 server_process.join()
+
+
+@pytest.mark.skipif(
+    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
+    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
+)
+@pytest.mark.asyncio
+async def test_load_and_run_multi_agent_mcp(
+    agent_framework: AgentFramework, test_port: int
+) -> None:
+    """Tests that an agent contacts another using A2A using the adapter tool.
+
+    Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
+    """
+    if agent_framework in [
+        # async a2a is not supported
+        AgentFramework.SMOLAGENTS,
+        # spans are not built correctly
+        AgentFramework.LLAMA_INDEX,
+        # AgentFramework.GOOGLE,
+    ]:
+        pytest.skip(
+            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+        )
+    kwargs = {}
+
+    kwargs["model_id"] = "gpt-4.1-nano"
+    agent_model = kwargs["model_id"]
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
+    model_args = None
+
+    main_agent = None
+    served_agent = None
+    served_task = None
+    served_server = None
+
+    try:
+        tool_agent_endpoint = "tool_agent"
+
+        # DATE AGENT
+
+        import datetime
+
+        def get_datetime() -> str:
+            """Return the current date and time"""
+            return str(datetime.datetime.now())
+
+        date_agent_description = "Agent that can return the current date."
+        date_agent_cfg = AgentConfig(
+            instructions="Use the available tools to obtain additional information to answer the query.",
+            name="date_agent",
+            model_id=agent_model,
+            description=date_agent_description,
+            tools=[get_datetime],
+            model_args=model_args,
+        )
+        date_agent = await AnyAgent.create_async(
+            agent_framework=agent_framework,
+            agent_config=date_agent_cfg,
+            tracing=TracingConfig(console=False, cost_info=True),
+        )
+
+        # SERVING PROPER
+
+        served_agent = date_agent
+        (served_task, served_server) = await served_agent.serve_mcp_async(
+            # FIXME use another config model
+            serving_config=A2AServingConfig(
+                port=test_port,
+                endpoint=f"/{tool_agent_endpoint}",
+                log_level="info",
+            )
+        )
+        server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}/sse"
+        ping_url = f"http://localhost:{test_port}"
+        # We cannot use the SSE stream, as it will not be closed in the request
+        await wait_for_a2a_server_async(ping_url)
+
+        # Search agent is ready for card resolution
+
+        main_agent_cfg = AgentConfig(
+            instructions="Use the available tools to obtain additional information to answer the query.",
+            description="The orchestrator that can use other agents via tools using the A2A protocol.",
+            tools=[
+                MCPSse(url=server_url, client_session_timeout_seconds=300),
+            ],
+            model_args=model_args,
+            **kwargs,  # type: ignore[arg-type]
+        )
+
+        main_agent = await AnyAgent.create_async(
+            agent_framework=agent_framework,
+            agent_config=main_agent_cfg,
+            tracing=TracingConfig(console=False, cost_info=True),
+        )
+
+        agent_trace = await main_agent.run_async(DATE_PROMPT)
+
+        _assert_valid_agent_trace(agent_trace)
+        _assert_contains_current_date_info(agent_trace.final_output)
+        _assert_has_tool_date_agent_call(agent_trace)
+
+        try:
+            build_tree(agent_trace.spans).model_dump_json(indent=2)
+        except KeyError as e:
+            pytest.fail(f"The span tree was not built successfully: {e}")
+
+    finally:
+        if main_agent:
+            await main_agent._mcp_servers[0].server.cleanup()
+            main_agent.exit()
+        if served_server:
+            await served_server.shutdown()
+        if served_task:
+            try:
+                served_task.cancel()
+            finally:
+                pass

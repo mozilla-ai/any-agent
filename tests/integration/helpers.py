@@ -1,7 +1,8 @@
 import time
 
 import requests
-
+import httpx
+import asyncio
 
 def mock_search_web(query: str) -> str:
     """Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results.
@@ -33,9 +34,10 @@ def wait_for_a2a_server(server_url: str):
         try:
             # Try to make a basic GET request to check if server is responding
             response = requests.get(server_url, timeout=1.0)
+            print(response)
             if response.status_code in [200, 404, 405]:  # Server is responding
                 break
-        except (requests.RequestException, ConnectionError):
+        except (requests.RequestException, ConnectionError) as e:
             # Server not ready yet, continue polling
             pass
 
@@ -44,3 +46,25 @@ def wait_for_a2a_server(server_url: str):
         if attempts >= max_attempts:
             msg = f"Could not connect to {server_url}. Tried {max_attempts} times with {poll_interval} second interval."
             raise ConnectionError(msg)
+
+async def wait_for_a2a_server_async(server_url: str):
+    max_attempts = 10
+    poll_interval = 0.5
+    attempts = 0
+
+    async with httpx.AsyncClient() as client:
+        while True:
+            try:
+                # Try to make a basic GET request to check if server is responding
+                response = await client.get(server_url, timeout=5.0)
+                if response.status_code in [200, 404, 405]:  # Server is responding
+                    break
+            except (httpx.RequestError, httpx.NetworkError) as e:
+                # Server not ready yet, continue polling
+                pass
+
+            await asyncio.sleep(poll_interval)
+            attempts += 1
+            if attempts >= max_attempts:
+                msg = f"Could not connect to {server_url}. Tried {max_attempts} times with {poll_interval} second interval."
+                raise ConnectionError(msg)
