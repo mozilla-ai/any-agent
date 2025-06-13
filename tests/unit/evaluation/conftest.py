@@ -13,5 +13,5 @@ def evaluation_case() -> EvaluationCase:
                 {"criteria": "Check if the agent ran a calculation", "points": 1}
             )
         ],
-        llm_judge="gpt-4o-mini",
+        llm_judge="gpt-4o-nano",
     )

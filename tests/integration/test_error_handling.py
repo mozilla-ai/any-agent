@@ -23,7 +23,7 @@ def test_runtime_error(
     """
     kwargs = {}
 
-    kwargs["model_id"] = "gpt-4.1-mini"
+    kwargs["model_id"] = "gpt-4.1-nano"
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
