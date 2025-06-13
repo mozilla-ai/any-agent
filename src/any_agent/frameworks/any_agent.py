@@ -167,7 +167,9 @@ class AnyAgent(ABC):
         """
         trace = AgentTrace()
         trace_id: int
-        instrumentation_enabled = instrument and self._instrumentor
+        instrumentation_enabled = instrument and self._instrumentor is not None
+        exception_occurred = False
+        caught_exception = None
 
         with self._tracer.start_as_current_span(
             f"invoke_agent [{self.config.name}]"
@@ -195,6 +197,8 @@ class AnyAgent(ABC):
             try:
                 final_output = await self._run_async(prompt, **kwargs)
             except Exception as e:
+                exception_occurred = True
+                caught_exception = e
                 # Clean up instrumentation if it was enabled
                 if instrumentation_enabled:
                     async with self._lock:
@@ -203,17 +207,20 @@ class AnyAgent(ABC):
                         instrumented_trace = self._running_traces.pop(trace_id)
                         if instrumented_trace is not None:
                             trace = instrumented_trace
-                trace.add_span(invoke_span)
-                raise AgentRunError(trace) from e
 
-            if instrumentation_enabled:
-                async with self._lock:
-                    self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
-                    trace = self._running_traces.pop(trace_id)
-
+        # By setting it this way we still allow for the trace to leave the context manager before we add the final span.
+        if exception_occurred:
             trace.add_span(invoke_span)
-            trace.final_output = final_output
-            return trace
+            raise AgentRunError(trace) from caught_exception
+
+        if instrumentation_enabled:
+            async with self._lock:
+                self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
+                trace = self._running_traces.pop(trace_id)
+
+        trace.add_span(invoke_span)
+        trace.final_output = final_output
+        return trace
 
     def serve(self, serving_config: A2AServingConfig | None = None) -> None:
         """Serve this agent using the protocol defined in the serving_config.
