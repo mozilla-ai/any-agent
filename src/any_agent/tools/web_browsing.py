@@ -41,15 +41,16 @@ def search_web(query: str) -> str:
     )
 
 
-def visit_webpage(url: str) -> str:
+def visit_webpage(url: str, timeout: int = 30) -> str:
     """Visits a webpage at the given url and reads its content as a markdown string. Use this to browse webpages.
 
     Args:
         url: The url of the webpage to visit.
+        timeout: The timeout in seconds for the request.
 
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=timeout)
         response.raise_for_status()
 
         markdown_content = markdownify(response.text).strip()  # type: ignore[no-untyped-call]
