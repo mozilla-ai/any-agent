@@ -141,10 +141,6 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     assert result.score >= float(1 / 3)
 
 
-@pytest.mark.skipif(
-    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
-    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
-)
 def test_load_and_run_agent(
     agent_framework: AgentFramework, tmp_path: Path, request: pytest.FixtureRequest
 ) -> None:
@@ -231,10 +227,6 @@ def test_load_and_run_agent(
     assert_eval(agent_trace)
 
 
-@pytest.mark.skipif(
-    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
-    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
-)
 def test_exception_trace(
     agent_framework: AgentFramework,
     patched_function: str,
