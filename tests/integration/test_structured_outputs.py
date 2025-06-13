@@ -12,7 +12,7 @@ def test_output_type(agent_framework: AgentFramework) -> None:
     agent = AnyAgent.create(
         agent_framework,
         AgentConfig(
-            model_id="gpt-4.1-mini",
+            model_id="gpt-4.1-nano",
             output_type=TestOutput,
         ),
     )
