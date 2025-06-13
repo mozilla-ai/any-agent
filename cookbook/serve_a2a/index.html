@@ -1712,13 +1712,13 @@ else:
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -1731,7 +1731,11 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.serving</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2AServingConfig</span>
 
@@ -1752,9 +1756,36 @@ else:
         <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">],</span>
     <span class="p">),</span>
 <span class="p">)</span>
-<span class="p">(</span><span class="n">time_task</span><span class="p">,</span> <span class="n">time_server</span><span class="p">)</span> <span class="o">=</span> <span class="k">await</span> <span class="n">time</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span><span class="n">A2AServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">))</span>
+<span class="p">(</span><span class="n">time_task</span><span class="p">,</span> <span class="n">time_server</span><span class="p">)</span> <span class="o">=</span> <span class="k">await</span> <span class="n">time</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span><span class="n">A2AServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+<span class="n">server_port</span> <span class="o">=</span> <span class="n">time_server</span><span class="o">.</span><span class="n">servers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sockets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getsockname</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">max_attempts</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">poll_interval</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">server_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"http://localhost:</span><span class="si">{</span><span class="n">server_port</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Try to make a basic GET request to check if server is responding</span>
+            <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">server_url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Server is ready at </span><span class="si">{</span><span class="n">server_url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">httpx</span><span class="o">.</span><span class="n">RequestError</span><span class="p">,</span> <span class="n">httpx</span><span class="o">.</span><span class="n">TimeoutException</span><span class="p">):</span>
+            <span class="c1"># Server not ready yet, continue polling</span>
+            <span class="k">pass</span>
+
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
+        <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">attempts</span> <span class="o">&gt;=</span> <span class="n">max_attempts</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Could not connect to </span><span class="si">{</span><span class="n">server_url</span><span class="si">}</span><span class="s2">. Tried </span><span class="si">{</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2"> times with </span><span class="si">{</span><span class="n">poll_interval</span><span class="si">}</span><span class="s2"> second interval."</span>
+            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
+<div class="clipboard-copy-txt" id="cell-3">import asyncio
+
+import httpx
+
+from any_agent import AgentConfig, AnyAgent
 from any_agent.config import MCPStdio
 from any_agent.serving import A2AServingConfig
 
@@ -1775,7 +1806,51 @@ time = await AnyAgent.create_async(
         tools=[time_tool],
     ),
 )
-(time_task, time_server) = await time.serve_async(A2AServingConfig(port=5000))</div>
+(time_task, time_server) = await time.serve_async(A2AServingConfig(port=0))
+
+server_port = time_server.servers[0].sockets[0].getsockname()[1]
+
+max_attempts = 20
+poll_interval = 0.5
+attempts = 0
+server_url = f"http://localhost:{server_port}"
+async with httpx.AsyncClient() as client:
+    while True:
+        try:
+            # Try to make a basic GET request to check if server is responding
+            await client.get(server_url, timeout=1.0)
+            print(f"Server is ready at {server_url}")
+            break
+        except (httpx.RequestError, httpx.TimeoutException):
+            # Server not ready yet, continue polling
+            pass
+
+        await asyncio.sleep(poll_interval)
+        attempts += 1
+        if attempts &gt;= max_attempts:
+            msg = f"Could not connect to {server_url}. Tried {max_attempts} times with {poll_interval} second interval."
+            raise ConnectionError(msg)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>/Users/nbrake/scm/any-agent/.venv/lib/python3.13/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Server is ready at http://localhost:61416
+</pre>
 </div>
 </div>
 </div>
@@ -1788,7 +1863,7 @@ time = await AnyAgent.create_async(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="call-the-agent-using-a2aclient">Call the agent using A2AClient<a class="anchor-link" href="#call-the-agent-using-a2aclient">¶</a></h2><p>Now that the agent is listening on <a href="http://localhost:5000">http://localhost:5000</a>, we can communicate with it from any other application that supports A2A. For this tutorial we'll use the a2a python SDK, but any client that implements the <a href="https://github.com/google-a2a/A2A">A2A Protocol</a> would also work.</p>
+<h2 id="call-the-agent-using-a2aclient">Call the agent using A2AClient<a class="anchor-link" href="#call-the-agent-using-a2aclient">¶</a></h2><p>Now that the agent is listening on localhost, we can communicate with it from any other application that supports A2A. For this tutorial we'll use the a2a python SDK, but any client that implements the <a href="https://github.com/google-a2a/A2A">A2A Protocol</a> would also work.</p>
 </div>
 </div>
 </div>
@@ -1831,7 +1906,7 @@ time = await AnyAgent.create_async(
 
 <span class="n">agent_card</span><span class="p">:</span> <span class="n">AgentCard</span> <span class="o">=</span> <span class="k">await</span> <span class="n">A2ACardResolver</span><span class="p">(</span>
     <span class="n">httpx_client</span><span class="p">,</span>
-    <span class="n">base_url</span><span class="o">=</span><span class="s2">"http://localhost:5000"</span><span class="p">,</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="sa">f</span><span class="s2">"http://localhost:</span><span class="si">{</span><span class="n">server_port</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">get_agent_card</span><span class="p">(</span><span class="n">http_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">agent_card</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
 
@@ -1846,7 +1921,7 @@ httpx_client = httpx.AsyncClient()
 
 agent_card: AgentCard = await A2ACardResolver(
     httpx_client,
-    base_url="http://localhost:5000",
+    base_url=f"http://localhost:{server_port}",
 ).get_agent_card(http_kwargs=None)
 print(agent_card.model_dump_json(indent=2))
 
@@ -1864,6 +1939,7 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>{
   "capabilities": {
+    "extensions": null,
     "pushNotifications": false,
     "stateTransitionHistory": false,
     "streaming": false
@@ -1876,6 +1952,7 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
   ],
   "description": "I'm an agent to help with getting the time",
   "documentationUrl": null,
+  "iconUrl": null,
   "name": "any_agent",
   "provider": null,
   "security": null,
@@ -1892,7 +1969,7 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
     }
   ],
   "supportsAuthenticatedExtendedCard": null,
-  "url": "http://localhost:5000/",
+  "url": "http://localhost:61416/",
   "version": "0.1.0"
 }
 </pre>
@@ -1912,13 +1989,13 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -1970,6 +2047,84 @@ await httpx_client.aclose()</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"system"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"You are an agent - please keep going until the user's query is completely resolved, before </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"user"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"What time is it?"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"get_current_time"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"timezone\":\"America/New_York\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">227</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">18</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭────────────────────────────────────────</span> EXECUTE_TOOL: get_current_time <span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────╮</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"timezone"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"America/New_York"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"timezone"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"America/New_York"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"datetime"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-13T13:28:21-04:00"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"is_dst"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #00ff00; text-decoration-color: #00ff00; font-style: italic">true</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ The current time in New York (America/New_York timezone) is approximately 1:28 PM on June 13, 2025. If you  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ want to know the time in a different location or timezone, please let me know!                              │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">295</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">49</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell">
@@ -1977,7 +2132,7 @@ await httpx_client.aclose()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -2005,23 +2160,54 @@ await httpx_client.aclose()</div>
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>{
-  "id": "8c8d295b-1ef4-4ce4-9b9a-7edf65da27f1",
+  "id": "d9357217-38e7-40b5-ab6a-d6a06f83af0c",
   "jsonrpc": "2.0",
   "result": {
-    "contextId": null,
-    "kind": "message",
-    "messageId": "05c929d8-f009-4a59-a0a0-a1035a3e2099",
-    "metadata": null,
-    "parts": [
+    "artifacts": null,
+    "contextId": "6bde1392-d951-4876-9686-0bc30cd7dbb7",
+    "history": [
       {
-        "kind": "text",
+        "contextId": "6bde1392-d951-4876-9686-0bc30cd7dbb7",
+        "extensions": null,
+        "kind": "message",
+        "messageId": "56f9f3de356d48dbbd495882860252f9",
         "metadata": null,
-        "text": "The current time in New York (Eastern Time) is 6:20 AM on May 28, 2025. If you want the time for another timezone, please tell me which one."
+        "parts": [
+          {
+            "kind": "text",
+            "metadata": null,
+            "text": "What time is it?"
+          }
+        ],
+        "referenceTaskIds": null,
+        "role": "user",
+        "taskId": "894a7ed3-b1c7-4578-b8f8-f5845538859b"
       }
     ],
-    "referenceTaskIds": null,
-    "role": "agent",
-    "taskId": null
+    "id": "894a7ed3-b1c7-4578-b8f8-f5845538859b",
+    "kind": "task",
+    "metadata": null,
+    "status": {
+      "message": {
+        "contextId": "6bde1392-d951-4876-9686-0bc30cd7dbb7",
+        "extensions": null,
+        "kind": "message",
+        "messageId": "5ae21424-4882-4fd7-b386-6b620cd0a5a1",
+        "metadata": null,
+        "parts": [
+          {
+            "kind": "text",
+            "metadata": null,
+            "text": "{\"result\":\"The current time in New York (America/New_York timezone) is approximately 1:28 PM on June 13, 2025. If you want to know the time in a different location or timezone, please let me know!\"}"
+          }
+        ],
+        "referenceTaskIds": null,
+        "role": "agent",
+        "taskId": "894a7ed3-b1c7-4578-b8f8-f5845538859b"
+      },
+      "state": "completed",
+      "timestamp": "2025-06-13T17:28:24.396695+00:00"
+    }
   }
 }
 </pre>
@@ -2047,7 +2233,7 @@ await httpx_client.aclose()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -2063,24 +2249,38 @@ await httpx_client.aclose()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
 <span class="n">time_server</span><span class="o">.</span><span class="n">should_exit</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">time_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+<span class="n">wait_count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">max_wait_seconds</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">time_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Agent server task has completed!"</span><span class="p">)</span>
         <span class="k">break</span>
+    <span class="k">elif</span> <span class="n">wait_count</span> <span class="o">&gt;=</span> <span class="n">max_wait_seconds</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Timed out after </span><span class="si">{</span><span class="n">max_wait_seconds</span><span class="si">}</span><span class="s2"> seconds waiting for server to exit"</span><span class="p">)</span>
+        <span class="k">break</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Waiting for server to exit"</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">wait_count</span> <span class="o">+=</span> <span class="mi">1</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">import asyncio
 
 time_server.should_exit = True
+time_task.cancel()
+wait_count = 0
+max_wait_seconds = 10
 while True:
     if time_task.done():
         print("Agent server task has completed!")
         break
+    elif wait_count &gt;= max_wait_seconds:
+        print(f"Timed out after {max_wait_seconds} seconds waiting for server to exit")
+        break
     else:
         print("Waiting for server to exit")
-        await asyncio.sleep(1)</div>
+        await asyncio.sleep(1)
+        wait_count += 1</div>
 </div>
 </div>
 </div>
