@@ -1,6 +1,5 @@
-
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
-from any_agent.tracing.otel_types import SpanKind, SpanContext, Status, Resource
+from any_agent.tracing.otel_types import Resource, SpanContext, SpanKind, Status
 
 
 def create_llm_span(input_tokens: int = 100, output_tokens: int = 50) -> AgentSpan:
