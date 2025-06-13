@@ -177,24 +177,24 @@ class AgentTrace(BaseModel):
             return value.model_dump()
         return value
 
-    def _invalidate_usage_and_cost_cache(self) -> None:
-        """Clear the cached usage_and_cost property if it exists."""
-        if "usage" in self.__dict__:
+    def _invalidate_tokens_and_cost_cache(self) -> None:
+        """Clear the cached tokens_and_cost property if it exists."""
+        if "tokens" in self.__dict__:
             del self.tokens
         if "cost" in self.__dict__:
             del self.cost
 
     def add_span(self, span: AgentSpan | Span) -> None:
-        """Add an AgentSpan to the trace and clear the usage_and_cost cache if present."""
+        """Add an AgentSpan to the trace and clear the tokens_and_cost cache if present."""
         if not isinstance(span, AgentSpan):
             span = AgentSpan.from_otel(span)
         self.spans.append(span)
-        self._invalidate_usage_and_cost_cache()
+        self._invalidate_tokens_and_cost_cache()
 
     def add_spans(self, spans: list[AgentSpan]) -> None:
-        """Add a list of AgentSpans to the trace and clear the usage_and_cost cache if present."""
+        """Add a list of AgentSpans to the trace and clear the tokens_and_cost cache if present."""
         self.spans.extend(spans)
-        self._invalidate_usage_and_cost_cache()
+        self._invalidate_tokens_and_cost_cache()
 
     @property
     def duration(self) -> timedelta:
