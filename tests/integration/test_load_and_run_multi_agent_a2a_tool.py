@@ -47,10 +47,6 @@ DATE_PROMPT = (
 )
 
 
-@pytest.mark.skipif(
-    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
-    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
-)
 @pytest.mark.asyncio
 async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> None:
     """Tests that an agent contacts another using A2A using the adapter tool.
@@ -203,10 +199,6 @@ def _run_server(
     )
 
 
-@pytest.mark.skipif(
-    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
-    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
-)
 def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> None:
     """Tests that an agent contacts another using A2A using the sync adapter tool.
 
