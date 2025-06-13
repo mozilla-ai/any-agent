@@ -13,7 +13,7 @@ from any_agent.utils import run_async_in_sync
 
 from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
-from .envelope import prepare_agent_for_a2a
+from .envelope import prepare_agent_for_a2a, prepare_agent_for_a2a_async
 
 if TYPE_CHECKING:
     from multiprocessing import Queue
@@ -28,6 +28,21 @@ def _get_a2a_app(
     agent: AnyAgent, serving_config: A2AServingConfig
 ) -> A2AStarletteApplication:
     agent = prepare_agent_for_a2a(agent)
+
+    agent_card = _get_agent_card(agent, serving_config)
+
+    request_handler = DefaultRequestHandler(
+        agent_executor=AnyAgentExecutor(agent),
+        task_store=InMemoryTaskStore(),
+    )
+
+    return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
+
+
+async def _get_a2a_app_async(
+    agent: AnyAgent, serving_config: A2AServingConfig
+) -> A2AStarletteApplication:
+    agent = await prepare_agent_for_a2a_async(agent)
 
     agent_card = _get_agent_card(agent, serving_config)
 

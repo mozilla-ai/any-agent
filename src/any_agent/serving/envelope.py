@@ -66,6 +66,9 @@ def prepare_agent_for_a2a(agent: AnyAgent) -> AnyAgent:
     Otherwise we clone its config, wrap the output type, and spin up a
     *new* agent instance via `AnyAgent.create` so that framework-specific
     initialisation sees the correct schema right from the start.
+
+    This function preserves MCP servers from the original agent to avoid
+    connection timeouts.
     """
     if _is_a2a_envelope(agent.config.output_type):
         return agent
@@ -76,12 +79,16 @@ def prepare_agent_for_a2a(agent: AnyAgent) -> AnyAgent:
     new_config = agent.config.model_copy(deep=True)
     new_config.output_type = new_output_type
 
-    # Use the concrete agent class to recreate with the wrapped config
-    return agent.__class__.create(agent.framework, new_config)
+    # Create the new agent with the wrapped config, preserving MCP servers and tools
+    return agent.recreate_with_config(new_config)
 
 
 async def prepare_agent_for_a2a_async(agent: AnyAgent) -> AnyAgent:
-    """Async counterpart of :pyfunc:`prepare_agent_for_a2a`."""
+    """Async counterpart of :pyfunc:`prepare_agent_for_a2a`.
+
+    This function preserves MCP servers from the original agent to avoid
+    connection timeouts.
+    """
     if _is_a2a_envelope(agent.config.output_type):
         return agent
 
@@ -91,5 +98,5 @@ async def prepare_agent_for_a2a_async(agent: AnyAgent) -> AnyAgent:
     new_config = agent.config.model_copy(deep=True)
     new_config.output_type = new_output_type
 
-    # Use the concrete agent class to recreate with the wrapped config
-    return await agent.__class__.create_async(agent.framework, new_config)
+    # Create the new agent with the wrapped config, preserving MCP servers and tools
+    return await agent.recreate_with_config_async(new_config)
