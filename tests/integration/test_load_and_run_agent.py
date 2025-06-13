@@ -311,8 +311,8 @@ def test_exception_trace(
         )
 
 
-def test_resume_from_feature(agent_framework: AgentFramework, tmp_path: Path) -> None:
-    """Test that the agent can resume from a previous trace using the resume_from argument."""
+def test_history_feature(agent_framework: AgentFramework, tmp_path: Path) -> None:
+    """Test that the agent can resume from a previous trace using the history argument."""
     if agent_framework is AgentFramework.GOOGLE:
         pytest.skip(
             "Google infinite recursion bug: https://github.com/mozilla-ai/any-agent/issues/467 prevents this test from passing"
@@ -337,5 +337,5 @@ def test_resume_from_feature(agent_framework: AgentFramework, tmp_path: Path) ->
     )
     assert trace1.final_output.year == 2000
 
-    trace2 = agent.run("Now increment the year by 5.", resume_from=trace1)
+    trace2 = agent.run("Now increment the year by 5.", history=trace1.spans)
     assert trace2.final_output.year == 2005

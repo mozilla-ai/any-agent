@@ -12,6 +12,7 @@ from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.logging import logger
+from any_agent.tracing.agent_trace import spans_to_messages
 
 from .any_agent import AnyAgent
 
@@ -21,6 +22,8 @@ if TYPE_CHECKING:
     from litellm.types.utils import Message as LiteLLMMessage
     from litellm.types.utils import ModelResponse
     from pydantic import BaseModel
+
+    from any_agent.tracing.agent_trace import AgentSpan
 
 
 DEFAULT_SYSTEM_PROMPT = """
@@ -166,17 +169,27 @@ class TinyAgent(AnyAgent):
             self.clients[tool_name] = ToolExecutor(tool)
             logger.debug("Registered tool: %s", tool_name)
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str, history: list[AgentSpan] | None, **kwargs: Any
+    ) -> str | BaseModel:
         messages = [
             {
                 "role": "system",
                 "content": self.config.instructions or DEFAULT_SYSTEM_PROMPT,
-            },
+            }
+        ]
+
+        if history:
+            history_messages = spans_to_messages(history)
+            messages.extend(history_messages)
+
+        # Add current prompt
+        messages.append(
             {
                 "role": "user",
                 "content": prompt,
-            },
-        ]
+            }
+        )
 
         num_of_turns = 0
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)

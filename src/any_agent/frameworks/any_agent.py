@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
 
@@ -13,7 +12,7 @@ from any_agent.config import (
     Tool,
 )
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.tracing.agent_trace import AgentTrace
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.exporter import SCOPE_NAME
 from any_agent.tracing.instrumentation import (
     _get_instrumentor_by_framework,
@@ -142,25 +141,25 @@ class AnyAgent(ABC):
         return tools, mcp_servers
 
     def run(
-        self, prompt: str, resume_from: AgentTrace | None = None, **kwargs: Any
+        self, prompt: str, history: list[AgentSpan] | None = None, **kwargs: Any
     ) -> AgentTrace:
         """Run the agent with the given prompt."""
         return run_async_in_sync(
-            self.run_async(prompt=prompt, resume_from=resume_from, **kwargs)
+            self.run_async(prompt=prompt, history=history, **kwargs)
         )
 
     async def run_async(
         self,
         prompt: str,
         instrument: bool = True,
-        resume_from: AgentTrace | None = None,
+        history: list[AgentSpan] | None = None,
         **kwargs: Any,
     ) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.
 
         Args:
             prompt: The user prompt to be passed to the agent.
-            resume_from: The `AgentTrace` to resume from.
+            history: A list of `AgentSpan` objects to resume from.
             instrument: Whether to instrument the underlying framework
                 to generate LLM Calls and Tool Execution Spans.
 
@@ -175,17 +174,6 @@ class AnyAgent(ABC):
                 steps taken by the agent.
 
         """
-        if resume_from is not None:
-            # Construct a "history" string that can be prepended to the prompt
-            history = "\n".join(
-                [
-                    json.dumps(span.attributes)
-                    for span in resume_from.spans
-                    if span.attributes is not None
-                ]
-            )
-            prompt = f"History:\n{history}\nPrompt:\n{prompt}"
-
         try:
             trace = AgentTrace()
             with self._tracer.start_as_current_span(
@@ -210,7 +198,7 @@ class AnyAgent(ABC):
                         "gen_ai.request.model": self.config.model_id,
                     }
                 )
-                final_output = await self._run_async(prompt, **kwargs)
+                final_output = await self._run_async(prompt, history, **kwargs)
 
                 if instrument and self._instrumentor:
                     async with self._lock:
@@ -314,7 +302,9 @@ class AnyAgent(ABC):
         """Load the agent instance."""
 
     @abstractmethod
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str, history: list[AgentSpan] | None, **kwargs: Any
+    ) -> str | BaseModel:
         """To be implemented by each framework."""
 
     @property
