@@ -1,28 +1,15 @@
 import datetime
-import logging
 from multiprocessing import Process, Queue
 
 import pytest
 from litellm.utils import validate_environment
-from rich.logging import RichHandler
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
-from tests.conftest import build_tree
 
 from .helpers import wait_for_server, wait_for_server_async
-
-FORMAT = "%(message)s"
-logging.basicConfig(
-    level=logging.DEBUG,
-    format=FORMAT,
-    datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)],
-)
-logger = logging.getLogger("any_agent_test")
-logger.setLevel(logging.DEBUG)
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
@@ -135,11 +122,6 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
 
         # Search agent is ready for card resolution
 
-        logger.info(
-            "Setting up agent",
-            extra={"endpoint": server_url},
-        )
-
         main_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
@@ -158,16 +140,6 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
         _assert_valid_agent_trace(agent_trace)
         _assert_contains_current_date_info(agent_trace.final_output)
         _assert_has_date_agent_tool_call(agent_trace)
-
-        try:
-            span_tree = build_tree(agent_trace.spans).model_dump_json(indent=2)
-            logger.info("span tree:")
-            logger.info(span_tree)
-        except KeyError as e:
-            pytest.fail(f"The span tree was not built successfully: {e}")
-
-        final_output_log = f"Final output: {agent_trace.final_output}"
-        logger.info(final_output_log)
 
     finally:
         if served_server:
@@ -273,11 +245,6 @@ def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> N
 
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
         wait_for_server(server_url)
-
-        logger.info(
-            "Setting up sync agent",
-            extra={"endpoint": f"http://localhost:{test_port}/{tool_agent_endpoint}"},
-        )
 
         # Create main agent using sync methods
         main_agent_cfg = AgentConfig(
