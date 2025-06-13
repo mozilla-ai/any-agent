@@ -1,4 +1,3 @@
-import os
 from unittest.mock import patch
 
 import pytest
@@ -13,10 +12,6 @@ from any_agent import (
 from any_agent.tracing.otel_types import StatusCode
 
 
-@pytest.mark.skipif(
-    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
-    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
-)
 def test_runtime_error(
     agent_framework: AgentFramework,
 ) -> None:
@@ -79,10 +74,6 @@ def search_web(query: str) -> str:
     raise ValueError(msg)
 
 
-@pytest.mark.skipif(
-    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
-    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
-)
 def test_tool_error(
     agent_framework: AgentFramework,
 ) -> None:

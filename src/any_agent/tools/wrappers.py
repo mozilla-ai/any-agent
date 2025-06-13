@@ -1,6 +1,7 @@
 import asyncio
 import inspect
 from collections.abc import Callable, MutableSequence, Sequence
+from functools import wraps
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from any_agent.config import AgentFramework, MCPParams, Tool
@@ -32,7 +33,7 @@ def _wrap_no_exception(tool: Any) -> Any:
         except Exception as e:
             return f"Error calling tool: {e}"
 
-    if asyncio.iscoroutine(tool):
+    if asyncio.iscoroutinefunction(tool):
         return wrapped_coroutine
 
     return wrapped_function
