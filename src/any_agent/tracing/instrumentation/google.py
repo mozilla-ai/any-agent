@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from opentelemetry.trace import StatusCode
@@ -80,12 +79,7 @@ def _set_llm_input(llm_request: LlmRequest, span: Span) -> None:
 
 class _GoogleADKInstrumentor:
     def __init__(self) -> None:
-        self._original: dict[str, Any] = {
-            "before_model": None,
-            "before_tool": None,
-            "after_model": None,
-            "after_tool": None,
-        }
+        self._original: dict[str, Any] = {}
         self.first_llm_calls: set[int] = set()
         self._current_spans: dict[str, dict[str, Span]] = {
             "model": {},
@@ -98,7 +92,7 @@ class _GoogleADKInstrumentor:
 
         tracer = agent._tracer
 
-        self._original["before_model"] = deepcopy(agent._agent.before_model_callback)
+        self._original["before_model"] = agent._agent.before_model_callback
 
         def before_model_callback(
             callback_context: CallbackContext,
@@ -196,9 +190,8 @@ class _GoogleADKInstrumentor:
             span = self._current_spans["tool"][tool_context.invocation_id]
 
             _set_tool_output(tool_response, span)
-
-            span.set_status(StatusCode.OK)
             span.end()
+
             trace_id = span.get_span_context().trace_id
             agent._running_traces[trace_id].add_span(span)
 
@@ -216,11 +209,11 @@ class _GoogleADKInstrumentor:
     def uninstrument(self, agent: GoogleAgent) -> None:
         if len(agent._running_traces) > 1:
             return
-        if self._original["before_model"] is not None:
+        if "before_model" in self._original:
             agent._agent.before_model_callback = self._original["before_model"]
-        if self._original["before_tool"] is not None:
+        if "before_tool" in self._original:
             agent._agent.before_tool_callback = self._original["before_tool"]
-        if self._original["after_model"] is not None:
+        if "after_model" in self._original:
             agent._agent.after_model_callback = self._original["after_model"]
-        if self._original["after_tool"] is not None:
+        if "after_tool" in self._original:
             agent._agent.after_tool_callback = self._original["after_tool"]

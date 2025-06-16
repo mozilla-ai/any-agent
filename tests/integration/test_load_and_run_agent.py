@@ -5,16 +5,14 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
 
 import pytest
 from litellm.utils import validate_environment
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from any_agent import (
     AgentConfig,
     AgentFramework,
-    AgentRunError,
     AnyAgent,
 )
 from any_agent.config import MCPStdio
@@ -25,7 +23,6 @@ from any_agent.evaluation.schemas import (
     TraceEvaluationResult,
 )
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
-from any_agent.tracing.otel_types import StatusCode
 
 
 def uvx_installed() -> bool:
@@ -142,10 +139,16 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     assert result.score >= float(1 / 3)
 
 
-@pytest.mark.skipif(
-    os.environ.get("ANY_AGENT_INTEGRATION_TESTS", "FALSE").upper() != "TRUE",
-    reason="Integration tests require `ANY_AGENT_INTEGRATION_TESTS=TRUE` env var",
-)
+class Step(BaseModel):
+    number: int
+    description: str
+
+
+class Steps(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    steps: list[Step]
+
+
 def test_load_and_run_agent(
     agent_framework: AgentFramework, tmp_path: Path, request: pytest.FixtureRequest
 ) -> None:
@@ -192,8 +195,9 @@ def test_load_and_run_agent(
     ]
     agent_config = AgentConfig(
         tools=tools,  # type: ignore[arg-type]
-        instructions="Search the web to answer",
+        instructions="Use the available tools to answer.",
         model_args=model_args,
+        output_type=Steps,
         **kwargs,  # type: ignore[arg-type]
     )
     agent = AnyAgent.create(agent_framework, agent_config)
@@ -209,9 +213,12 @@ def test_load_and_run_agent(
 
     start_ns = time.time_ns()
     agent_trace = agent.run(
-        "Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.",
+        "Find what year it is in the America/New_York timezone and write the value (single number) to a file. "
+        "Finally, return a list of the steps you have taken.",
     )
     end_ns = time.time_ns()
+
+    assert isinstance(agent_trace.final_output, Steps)
 
     assert (tmp_path / tmp_file).read_text() == str(datetime.now().year)
 

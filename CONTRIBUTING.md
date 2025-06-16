@@ -43,7 +43,6 @@ We welcome all kinds of contributions, from improving customization, to extendin
 - Install the package using development dependencies before testing: `uv sync --group dev --extra all`
 - Integration tests need the following environment variables to be set:
   ```
-  ANY_AGENT_INTEGRATION_TESTS=TRUE
   OPENAI_API_KEY="YOUR API KEY"
   ```
 

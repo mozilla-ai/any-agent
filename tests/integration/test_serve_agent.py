@@ -15,10 +15,11 @@ from .helpers import wait_for_server_async
 
 def run_agent(port: int):
     agent = AnyAgent.create(
-        "openai",
+        "tinyagent",
         AgentConfig(
-            model_id="gpt-4.1-mini",
-            description="I'm an agent to help with booking airbnbs",
+            model_id="gpt-4.1-nano",
+            instructions="Directly answer the question without asking the user for input.",
+            description="I'm an agent to help.",
         ),
     )
     agent.serve(serving_config=A2AServingConfig(port=port))
@@ -26,10 +27,11 @@ def run_agent(port: int):
 
 async def run_agent_async(port: int):
     agent = await AnyAgent.create_async(
-        "openai",
+        "tinyagent",
         AgentConfig(
-            model_id="gpt-4.1-mini",
-            description="I'm an agent to help with booking airbnbs",
+            model_id="gpt-4.1-nano",
+            instructions="Directly answer the question without asking the user for input.",
+            description="I'm an agent to help.",
         ),
     )
     return await agent.serve_async(serving_config=A2AServingConfig(port=port))
@@ -45,14 +47,14 @@ async def test_agent_serving_and_communication(test_port):
     await wait_for_server_async(server_url)
 
     try:
-        async with httpx.AsyncClient() as httpx_client:
+        async with httpx.AsyncClient(timeout=10.0) as httpx_client:
             client = await A2AClient.get_client_from_agent_card_url(
                 httpx_client, server_url
             )
             send_message_payload = {
                 "message": {
                     "role": "user",
-                    "parts": [{"kind": "text", "text": "how much is 10 USD in EUR?"}],
+                    "parts": [{"kind": "text", "text": "What is an agent?"}],
                     "messageId": str(uuid4()),
                 },
             }
@@ -74,14 +76,14 @@ async def test_agent_serving_and_communication_async(test_port):
     await wait_for_server_async(server_url)
 
     try:
-        async with httpx.AsyncClient() as httpx_client:
+        async with httpx.AsyncClient(timeout=10.0) as httpx_client:
             client = await A2AClient.get_client_from_agent_card_url(
                 httpx_client, server_url
             )
             send_message_payload = {
                 "message": {
                     "role": "user",
-                    "parts": [{"kind": "text", "text": "how much is 10 USD in EUR?"}],
+                    "parts": [{"kind": "text", "text": "What is an agent?"}],
                     "messageId": uuid4().hex,
                 },
             }

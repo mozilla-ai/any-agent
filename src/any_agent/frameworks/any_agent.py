@@ -4,13 +4,14 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never
 
-from opentelemetry import trace
+from opentelemetry import trace as otel_trace
 
 from any_agent.config import (
     AgentConfig,
     AgentFramework,
     Tool,
 )
+from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.exporter import SCOPE_NAME
@@ -56,7 +57,7 @@ class AnyAgent(ABC):
         self._tools: list[Any] = []
 
         self._instrumentor = _get_instrumentor_by_framework(self.framework)
-        self._tracer: Tracer = trace.get_tracer(SCOPE_NAME)
+        self._tracer: Tracer = otel_trace.get_tracer(SCOPE_NAME)
 
         self._lock = asyncio.Lock()
         self._running_traces: dict[int, AgentTrace] = {}
@@ -174,21 +175,26 @@ class AnyAgent(ABC):
                 steps taken by the agent.
 
         """
+        trace = AgentTrace()
+        trace_id: int
+        instrumentation_enabled = instrument and self._instrumentor is not None
+
+        # This design is so that we only catch exceptions thrown by _run_async. All other exceptions will not be caught.
         try:
-            trace = AgentTrace()
             with self._tracer.start_as_current_span(
                 f"invoke_agent [{self.config.name}]"
             ) as invoke_span:
-                if instrument and self._instrumentor:
+                if instrumentation_enabled:
                     trace_id = invoke_span.get_span_context().trace_id
                     async with self._lock:
                         # We check the locked `_running_traces` inside `instrument`.
                         # If there is more than 1 entry in `running_traces`, it means that the agent has
-                        # already being instrumented so me won't instrument it again.
+                        # already being instrumented so we won't instrument it again.
                         self._running_traces[trace_id] = AgentTrace()
                         self._instrumentor.instrument(
                             agent=self,  # type: ignore[arg-type]
                         )
+
                 invoke_span.set_attributes(
                     {
                         "gen_ai.operation.name": "invoke_agent",
@@ -205,15 +211,25 @@ class AnyAgent(ABC):
                         self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
                         trace = self._running_traces.pop(trace_id)
         except Exception as e:
-            if instrument:
+            # Clean up instrumentation if it was enabled
+            if instrumentation_enabled:
                 async with self._lock:
-                    trace = self._running_traces.pop(trace_id)
+                    self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
+                    # Get the instrumented trace if available, otherwise use the original trace
+                    instrumented_trace = self._running_traces.pop(trace_id)
+                    if instrumented_trace is not None:
+                        trace = instrumented_trace
             trace.add_span(invoke_span)
             raise AgentRunError(trace) from e
-        else:
-            trace.add_span(invoke_span)
-            trace.final_output = final_output
-            return trace
+
+        if instrumentation_enabled:
+            async with self._lock:
+                self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
+                trace = self._running_traces.pop(trace_id)
+
+        trace.add_span(invoke_span)
+        trace.final_output = final_output
+        return trace
 
     def serve(self, serving_config: A2AServingConfig | None = None) -> None:
         """Serve this agent using the protocol defined in the serving_config.
@@ -275,7 +291,11 @@ class AnyAgent(ABC):
             ...     await task
 
         """
-        from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a_async
+        from any_agent.serving import (
+            A2AServingConfig,
+            _get_a2a_app_async,
+            serve_a2a_async,
+        )
 
         if serving_config is None:
             serving_config = A2AServingConfig()
@@ -287,7 +307,7 @@ class AnyAgent(ABC):
                 f"Currently only A2A serving is supported."
             )
             raise ValueError(msg)
-        app = _get_a2a_app(self, serving_config=serving_config)
+        app = await _get_a2a_app_async(self, serving_config=serving_config)
 
         return await serve_a2a_async(
             app,
@@ -296,6 +316,60 @@ class AnyAgent(ABC):
             endpoint=serving_config.endpoint,
             log_level=serving_config.log_level,
         )
+
+    def _recreate_with_config(self, new_config: AgentConfig) -> AnyAgent:
+        """Create a new agent instance with the given config, preserving MCP servers and tools.
+
+        This method creates a new agent with the modified configuration while transferring
+        the MCP servers and tools from the current agent to avoid recreating them, but only
+        if the tools configuration hasn't changed.
+
+        Args:
+            new_config: The new configuration to use for the recreated agent.
+
+        Returns:
+            A new agent instance with the modified config and transferred state (if tools unchanged)
+            or a completely new agent (if tools changed).
+
+        """
+        return run_async_in_sync(self._recreate_with_config_async(new_config))
+
+    async def _recreate_with_config_async(self, new_config: AgentConfig) -> AnyAgent:
+        """Async version of _recreate_with_config.
+
+        This method creates a new agent with the modified configuration while transferring
+        the MCP servers and tools from the current agent to avoid recreating them, but only
+        if the tools configuration hasn't changed.
+
+        Args:
+            new_config: The new configuration to use for the recreated agent.
+
+        Returns:
+            A new agent instance with the modified config and transferred state (if tools unchanged)
+            or a completely new agent (if tools changed).
+
+        """
+        # Check if tools configuration has changed
+        if self.config.tools != new_config.tools:
+            # Tools have changed, so we need to recreate everything from scratch
+            logger.info(
+                "Tools have changed, so we need to recreate everything from scratch"
+            )
+            return await self.create_async(self.framework, new_config)
+
+        # Tools haven't changed, so we can safely preserve MCP servers and tools
+        # Create the new agent with the modified config
+        # Don't use AnyAgent.create_async(), because it will recreate the MCP servers and tools
+        new_agent = self.__class__(new_config)
+
+        # Transfer MCP servers and tools from the original agent to avoid recreating them
+        new_agent._mcp_servers = self._mcp_servers
+        new_agent._tools = self._tools
+
+        # Load the agent with the existing MCP servers and tools
+        await new_agent._load_agent()
+
+        return new_agent
 
     @abstractmethod
     async def _load_agent(self) -> None:

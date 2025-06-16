@@ -141,7 +141,6 @@ class _OpenAIAgentsInstrumentor:
                         }
                     )
                     _set_tool_output(span_data.output, otel_span)
-                    otel_span.set_status(StatusCode.OK)
                     otel_span.end()
                     trace_id = otel_span.get_span_context().trace_id
                     if trace_id in agent._running_traces:

@@ -11,28 +11,13 @@ from litellm.types.utils import ModelResponse
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
-from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
 from tests.integration.helpers import wait_for_server_async
-
-PATCH_PER_FRAMEWORK = {
-    AgentFramework.AGNO: "agno.tools.function.FunctionCall.execute",
-    AgentFramework.GOOGLE: "google.adk.tools.function_tool.FunctionTool.run_async",
-    AgentFramework.LANGCHAIN: "langchain_core.tools.structured.StructuredTool._run",
-    AgentFramework.LLAMA_INDEX: "llama_index.core.agent.workflow.multi_agent_workflow.AgentWorkflow._call_tool",
-    AgentFramework.OPENAI: "agents.lifecycle.RunHooks.on_tool_start",
-    AgentFramework.SMOLAGENTS: "smolagents.agents.ToolCallingAgent.execute_tool_call",
-    AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.ToolExecutor.call_tool",
-}
 
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
 def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
     return request.param  # type: ignore[no-any-return]
-
-
-@pytest.fixture
-def patched_function(agent_framework):
-    return PATCH_PER_FRAMEWORK[agent_framework]
 
 
 @pytest.fixture
@@ -178,29 +163,3 @@ def agent_trace(request: pytest.FixtureRequest) -> AgentTrace:
     with open(trace_path, encoding="utf-8") as f:
         trace = json.load(f)
     return AgentTrace.model_validate(trace)
-
-
-CHILD_TAG = "any_agent.children"
-
-
-def build_tree(items: list[AgentSpan]) -> AgentSpan:
-    """Structures the spans into a tree."""
-    traces = {}
-    for trace in items:
-        k = trace.context.span_id
-        trace.attributes[CHILD_TAG] = {}
-        traces[k] = trace
-    for trace in items:
-        k = trace.context.span_id
-        if trace.parent:
-            parent_k = trace.parent.span_id
-            if parent_k:
-                try:
-                    traces[parent_k].attributes[CHILD_TAG][trace.context.span_id] = (
-                        trace
-                    )
-                except KeyError:
-                    pass
-            else:
-                traces[None] = trace
-    return traces[None]
