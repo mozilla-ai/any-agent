@@ -149,7 +149,7 @@ print(f"Agent: {response1.final_output}")
 conversation_history = spans_to_messages(response1.spans)
 # Convert previous conversation to readable format
 history_text = "\n".join([
-    f"{msg['role'].capitalize()}: {msg['content']}" 
+    f"{msg['role'].capitalize()}: {msg['content']}"
     for msg in conversation_history
     if msg['role'] != "system"
 ])
@@ -172,7 +172,7 @@ print(f"Agent: {response2.final_output}")  # Agent will understand "that city" r
 You may notice that the `agent.run()` method doesn't accept a `messages` parameter directly. This is an intentional design choice to encourage thoughtful handling of conversation history by developers. Rather than automatically managing message history, any-agent empowers you to:
 
 - **Choose your context strategy**: Decide what parts of conversation history are relevant
-- **Manage token usage**: Control how much context you include to optimize costs and performance  
+- **Manage token usage**: Control how much context you include to optimize costs and performance
 - **Handle complex scenarios**: Implement custom logic for conversation branching, summarization, or context windowing
 
 This approach ensures that conversation context is handled intentionally rather than automatically, leading to more efficient and purposeful agent interactions.
@@ -197,7 +197,7 @@ agent = AnyAgent.create(
 
 # The agent can now naturally ask questions during its execution
 prompt = """
-I'm planning a trip and need help finding accommodations. 
+I'm planning a trip and need help finding accommodations.
 Please ask me some questions to understand my preferences, then provide recommendations.
 """
 
