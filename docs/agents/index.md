@@ -124,3 +124,91 @@ async def main():
 if __name__ == "__main__":
     asyncio.run(main())
 ```
+
+### Multi-Turn Conversations
+
+For scenarios where you need to maintain conversation history across multiple agent interactions, you can leverage the [`spans_to_messages`][any_agent.tracing.agent_trace.spans_to_messages] function built into the AgentTrace. This function converts agent traces into a standardized message format that can be used to provide context in subsequent conversations.
+
+#### Basic Multi-Turn Example
+
+```python
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tracing.agent_trace import spans_to_messages
+
+# Create your agent
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="gpt-4.1-mini",
+        instructions="You are a helpful assistant. Use previous conversation context when available.",
+    )
+)
+
+response1 = agent.run("What's the capital of California?")
+print(f"Agent: {response1.final_output}")
+conversation_history = spans_to_messages(response1.spans)
+# Convert previous conversation to readable format
+history_text = "\n".join([
+    f"{msg['role'].capitalize()}: {msg['content']}" 
+    for msg in conversation_history
+    if msg['role'] != "system"
+])
+
+user_message = "What's the closest national park to that city"
+
+full_prompt = f"""Previous conversation:
+{history_text}
+
+Current user message: {user_message}
+
+Please respond taking into account the conversation history above."""
+
+response2 = agent.run(full_prompt)
+print(f"Agent: {response2.final_output}")  # Agent will understand "that city" refers to Sacramento
+```
+
+#### Design Philosophy: Thoughtful Message History Management
+
+You may notice that the `agent.run()` method doesn't accept a `messages` parameter directly. This is an intentional design choice to encourage thoughtful handling of conversation history by developers. Rather than automatically managing message history, any-agent empowers you to:
+
+- **Choose your context strategy**: Decide what parts of conversation history are relevant
+- **Manage token usage**: Control how much context you include to optimize costs and performance  
+- **Handle complex scenarios**: Implement custom logic for conversation branching, summarization, or context windowing
+
+This approach ensures that conversation context is handled intentionally rather than automatically, leading to more efficient and purposeful agent interactions.
+
+#### Using User Interaction Tools for Regular Conversations
+
+For scenarios where you need regular, back-and-forth interaction with users, we recommend using or building your own **user interaction tools** rather than managing conversation history manually. This pattern allows the agent to naturally ask follow-up questions and gather information as needed. We provide a default `send_console_message` tool which uses console inputs and outputs, but you may need to use a more advanced tool (such as a Slack MCP Server) to handle user interaction.
+
+```python
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tools.user_interaction import send_console_message
+
+# Create agent with user interaction capabilities
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="gpt-4.1-mini",
+        instructions="You are a helpful travel assistant. Send console messages to ask more questions. Do not stop until you've answered the question.",
+        tools=[send_console_message]
+    )
+)
+
+# The agent can now naturally ask questions during its execution
+prompt = """
+I'm planning a trip and need help finding accommodations. 
+Please ask me some questions to understand my preferences, then provide recommendations.
+"""
+
+agent_trace = agent.run(prompt)
+print(f"Final recommendations: {agent_trace.final_output}")
+```
+
+This approach is demonstrated in our [MCP Agent cookbook example](../cookbook/mcp_agent.ipynb), where an agent uses user interaction tools to gather trip planning information dynamically. The agent can ask clarifying questions, get user preferences, and provide personalized recommendations all within a single `run()` call.
+
+!!! tip "When to Use Each Approach"
+
+    - **Multi-turn with `spans_to_messages`**: When you need to maintain context across separate agent invocations or implement complex conversation management logic
+    - **User interaction tools**: When you want the agent to naturally interact with users during its execution, asking questions as needed to complete its task
+    - **Hybrid approach**: Combine both patterns for sophisticated agents that maintain long-term context while also gathering real-time user input
