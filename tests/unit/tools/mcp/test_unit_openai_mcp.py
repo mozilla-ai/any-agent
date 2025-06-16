@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -88,6 +87,7 @@ def test_openai_client_session_timeout_passed():
         mock_server_instance.__aexit__ = AsyncMock(return_value=None)
         mock_server_instance.list_tools = AsyncMock(return_value=[])
         mock_stdio.return_value = mock_server_instance
+        import asyncio
 
         asyncio.run(server._setup_tools())
         mock_stdio.assert_called_once()
