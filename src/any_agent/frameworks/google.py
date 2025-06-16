@@ -100,7 +100,8 @@ class GoogleAgent(AnyAgent):
         if self.config.output_type:
             final_output = None
             final_output_attempts = 0
-            max_attempts = 3
+            # We allow for two retries: one to make it a proper json string, and one to make it a valid pydantic model
+            max_output_attepts = 3
 
             async for event in runner.run_async(
                 user_id=user_id,
@@ -122,11 +123,11 @@ class GoogleAgent(AnyAgent):
                         if part.function_response.response.get("success"):
                             final_output = part.function_response.response.get("result")
                             break
-                        if final_output_attempts >= max_attempts:
+                        if final_output_attempts >= max_output_attepts:
                             msg = f"Final output failed after {final_output_attempts} attempts"
                             raise ValueError(msg)
 
-                if final_output or final_output_attempts >= max_attempts:
+                if final_output or final_output_attempts >= max_output_attepts:
                     break
 
             if not final_output:
