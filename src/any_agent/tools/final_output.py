@@ -1,3 +1,5 @@
+import json
+
 from pydantic import BaseModel, ValidationError
 
 
@@ -26,6 +28,15 @@ class FinalOutputTool:
     def __call__(self, answer: str) -> dict:  # type: ignore[type-arg]
         """Validate the final output."""
         try:
+            # First check if it's valid JSON
+            try:
+                json.loads(answer)
+            except json.JSONDecodeError as json_err:
+                return {
+                    "success": False,
+                    "result": f"Invalid JSON format: {json_err}. Please provide valid JSON.",
+                }
+            # Then validate against the Pydantic model
             self.output_type.model_validate_json(answer)
         except ValidationError as e:
             return {
