@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.tools.final_output import FinalOutputTool
-from any_agent.tracing.agent_trace import spans_to_string
 
 from .any_agent import AnyAgent
 
@@ -22,8 +21,6 @@ except ImportError:
 
 if TYPE_CHECKING:
     from google.adk.models.base_llm import BaseLlm
-
-    from any_agent.tracing.agent_trace import AgentSpan
 
 
 class GoogleAgent(AnyAgent):
@@ -84,7 +81,6 @@ class GoogleAgent(AnyAgent):
     async def _run_async(  # type: ignore[no-untyped-def]
         self,
         prompt: str,
-        history: list["AgentSpan"] | None,
         user_id: str | None = None,
         session_id: str | None = None,
         **kwargs,
@@ -101,19 +97,12 @@ class GoogleAgent(AnyAgent):
             session_id=session_id,
         )
 
-        # Prepare message content
-        if history:
-            prompt_to_use = spans_to_string(history) + "\n" + prompt
-        else:
-            prompt_to_use = prompt
-        new_message = types.Content(role="user", parts=[types.Part(text=prompt_to_use)])
-
         if self.config.output_type:
             final_output = None
             async for event in runner.run_async(
                 user_id=user_id,
                 session_id=session_id,
-                new_message=new_message,
+                new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
                 **kwargs,
             ):
                 if not event.content or not event.content.parts:
@@ -143,7 +132,7 @@ class GoogleAgent(AnyAgent):
         async for _ in runner.run_async(
             user_id=user_id,
             session_id=session_id,
-            new_message=new_message,
+            new_message=types.Content(role="user", parts=[types.Part(text=prompt)]),
             **kwargs,
         ):
             pass

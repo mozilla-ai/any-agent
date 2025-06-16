@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any, cast
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.tracing.agent_trace import spans_to_messages
 
 from .any_agent import AnyAgent
 
@@ -34,8 +33,6 @@ if TYPE_CHECKING:
     from langchain_core.language_models import LanguageModelLike
     from langchain_core.messages.base import BaseMessage
     from langgraph.graph.graph import CompiledGraph
-
-    from any_agent.tracing.agent_trace import AgentSpan
 
 
 class LangchainAgent(AnyAgent):
@@ -84,35 +81,11 @@ class LangchainAgent(AnyAgent):
             **agent_args,
         )
 
-    async def _run_async(
-        self, prompt: str, history: list["AgentSpan"] | None, **kwargs: Any
-    ) -> str | BaseModel:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-
-        if history:
-            messages = spans_to_messages(history)
-
-            # Convert to langchain message format: (role, content) tuples
-            langchain_messages: list[tuple[str, str]] = []
-            for history_msg in messages:
-                msg_role: str = history_msg["role"]
-                msg_content: str = history_msg["content"]
-                # Map role names to langchain format
-                if msg_role == "assistant":
-                    langchain_messages.append(("ai", msg_content))
-                elif msg_role == "user":
-                    langchain_messages.append(("user", msg_content))
-                else:
-                    # Default to human for unknown roles
-                    langchain_messages.append(("human", msg_content))
-
-            langchain_messages.append(("user", prompt))
-            inputs = {"messages": langchain_messages}
-        else:
-            inputs = {"messages": [("user", prompt)]}
-
+        inputs = {"messages": [("user", prompt)]}
         result = await self._agent.ainvoke(inputs, **kwargs)
         if self.config.output_type:
             structured_response = result.get("structured_response")

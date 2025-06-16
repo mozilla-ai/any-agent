@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.tracing.agent_trace import spans_to_string
 
 try:
     from smolagents import FinalAnswerTool, LiteLLMModel, ToolCallingAgent
@@ -15,8 +14,6 @@ except ImportError:
 
 if TYPE_CHECKING:
     from smolagents import MultiStepAgent
-
-    from any_agent.tracing.agent_trace import AgentSpan
 
 
 DEFAULT_AGENT_TYPE = ToolCallingAgent
@@ -98,19 +95,11 @@ class SmolagentsAgent(AnyAgent):
             """
         assert self._agent
 
-    async def _run_async(
-        self, prompt: str, history: list["AgentSpan"] | None, **kwargs: Any
-    ) -> str | BaseModel:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-
-        if history:
-            prompt_to_use = spans_to_string(history) + "\n" + prompt
-        else:
-            prompt_to_use = prompt
-        result = self._agent.run(prompt_to_use, **kwargs)
-
+        result = self._agent.run(prompt, **kwargs)
         if self.config.output_type:
             return self.config.output_type.model_validate_json(result)
         return str(result)

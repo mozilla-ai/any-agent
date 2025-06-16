@@ -146,29 +146,6 @@ def spans_to_messages(spans: list[AgentSpan]) -> list[dict[str, str]]:
     return messages
 
 
-def spans_to_string(spans: list[AgentSpan]) -> str:
-    """Convert spans to a consolidated string.
-
-    This is a helper for frameworks that want to provide conversation history
-    context by prepending the history to the current prompt.
-
-    Args:
-        spans: List of AgentSpan objects representing conversation history.
-
-    Returns:
-        A formatted string prompt of the conversation history.
-
-    """
-    messages = spans_to_messages(spans)
-    conversation_context = ""
-    for msg in messages:
-        msg_role: str = msg["role"]
-        msg_content: str = msg["content"]
-        conversation_context += f"{msg_role}: {msg_content}\n"
-
-    return conversation_context
-
-
 class AgentSpan(BaseModel):
     """A span that can be exported to JSON or printed to the console."""
 

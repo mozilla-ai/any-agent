@@ -143,5 +143,5 @@ def test_run_openai_with_custom_args() -> None:
         agent = AnyAgent.create(AgentFramework.OPENAI, AgentConfig(model_id="gpt-4o"))
         agent.run("foo", max_turns=30)
         mock_runner.run.assert_called_once_with(
-            starting_agent=mock_agent.return_value, input="foo", max_turns=30
+            mock_agent.return_value, "foo", max_turns=30
         )

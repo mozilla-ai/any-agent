@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.tracing.agent_trace import spans_to_messages
 
 from .any_agent import AnyAgent
 
@@ -25,8 +24,6 @@ except ImportError:
 
 if TYPE_CHECKING:
     from agents import Model
-
-    from any_agent.tracing.agent_trace import AgentSpan
 
 
 class OpenAIAgent(AnyAgent):
@@ -89,25 +86,9 @@ class OpenAIAgent(AnyAgent):
             non_mcp_tools.append(tool)
         return non_mcp_tools
 
-    async def _run_async(
-        self, prompt: str, history: list["AgentSpan"] | None, **kwargs: Any
-    ) -> str | BaseModel:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-
-        agent_input: str | list[dict[str, str]]
-
-        if history:
-            messages = spans_to_messages(history)
-            messages.append({"role": "user", "content": prompt})
-            agent_input = messages
-        else:
-            agent_input = prompt
-
-        result = await Runner.run(
-            starting_agent=self._agent,
-            input=agent_input,  # type: ignore[arg-type]
-            **kwargs,
-        )
+        result = await Runner.run(self._agent, prompt, **kwargs)
         return result.final_output  # type: ignore[no-any-return]

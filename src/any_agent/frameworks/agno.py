@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.tracing.agent_trace import spans_to_string
 
 from .any_agent import AnyAgent
 
@@ -21,8 +20,6 @@ except ImportError:
 if TYPE_CHECKING:
     from agno.agent import RunResponse
     from agno.models.base import Model
-
-    from any_agent.tracing.agent_trace import AgentSpan
 
 
 class AgnoAgent(AnyAgent):
@@ -77,19 +74,9 @@ class AgnoAgent(AnyAgent):
             **agent_args,
         )
 
-    async def _run_async(
-        self, prompt: str, history: list["AgentSpan"] | None, **kwargs: Any
-    ) -> str | BaseModel:
+    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-
-        # Prepare input for the agent
-        if history:
-            prompt_to_use = spans_to_string(history) + "\n" + prompt
-        else:
-            prompt_to_use = prompt
-
-        result: RunResponse = await self._agent.arun(prompt_to_use, **kwargs)
-
+        result: RunResponse = await self._agent.arun(prompt, **kwargs)
         return result.content  # type: ignore[return-value]
