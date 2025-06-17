@@ -51,7 +51,7 @@ class AgnoAgent(AnyAgent):
             if isinstance(tool, Toolkit):
                 unpacked.extend(f for f in tool.functions.values())
             else:
-                unpacked.append(tool)
+                unpacked.append(list(tool.functions.values()))
         return unpacked
 
     async def _load_agent(self) -> None:
