@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, assert_never
+from typing import TYPE_CHECKING, Any, assert_never, overload
+from uuid import uuid4
 
 from opentelemetry import trace as otel_trace
 
@@ -12,6 +13,8 @@ from any_agent.config import (
     Tool,
 )
 from any_agent.logging import logger
+from any_agent.serving import serve_a2a, serve_a2a_async, serve_mcp, serve_mcp_async
+from any_agent.serving.config import A2AServingConfig, MCPServingConfig
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.exporter import SCOPE_NAME
@@ -27,7 +30,6 @@ if TYPE_CHECKING:
     from opentelemetry.trace import Tracer
     from pydantic import BaseModel
 
-    from any_agent.serving.config import A2AServingConfig
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 
@@ -219,7 +221,7 @@ class AnyAgent(ABC):
 
     # Subclass: ServedAnyAgent?
 
-    def serve(self, serving_config: A2AServingConfig | None = None) -> None:
+    def serve_a2a(self, serving_config: A2AServingConfig) -> None:
         """Serve this agent using the protocol defined in the serving_config.
 
         Args:
@@ -237,23 +239,33 @@ class AnyAgent(ABC):
             ```
 
         """
-        from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a
+        from any_agent.serving import serve_a2a
 
-        if serving_config is None:
-            serving_config = A2AServingConfig()
+        serve_a2a(self, serving_config)
 
-        app = _get_a2a_app(self, serving_config=serving_config)
+    def serve_mcp(self, serving_config: MCPServingConfig) -> None:
+        from any_agent.serving import serve_mcp
 
-        serve_a2a(
-            app,
-            host=serving_config.host,
-            port=serving_config.port,
-            endpoint=serving_config.endpoint,
-            log_level=serving_config.log_level,
-        )
+        serve_mcp(self, serving_config)
 
-    async def serve_async(
-        self, serving_config: A2AServingConfig | None = None
+    @overload
+    async def serve(self, serving_config: MCPServingConfig) -> None: ...
+
+    @overload
+    async def serve(self, serving_config: A2AServingConfig | None = None) -> None: ...
+
+    async def serve(
+        self, serving_config: MCPServingConfig | A2AServingConfig | None
+    ) -> None:
+        if isinstance(serving_config, MCPServingConfig):
+            serve_mcp(self, serving_config)
+        elif isinstance(serving_config, A2AServingConfig):
+            serve_a2a(self, serving_config)
+        else:
+            serve_a2a(self, A2AServingConfig())
+
+    async def serve_a2a_async(
+        self, serving_config: A2AServingConfig
     ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
         """Serve this agent asynchronously using the protocol defined in the serving_config.
 
@@ -283,11 +295,7 @@ class AnyAgent(ABC):
             ```
 
         """
-        from any_agent.serving import (
-            A2AServingConfig,
-            _get_a2a_app_async,
-            serve_a2a_async,
-        )
+        from any_agent.serving import A2AServingConfig, serve_a2a_async
 
         if serving_config is None:
             serving_config = A2AServingConfig()
@@ -299,14 +307,10 @@ class AnyAgent(ABC):
                 f"Currently only A2A serving is supported."
             )
             raise ValueError(msg)
-        app = await _get_a2a_app_async(self, serving_config=serving_config)
 
         return await serve_a2a_async(
-            app,
-            host=serving_config.host,
-            port=serving_config.port,
-            endpoint=serving_config.endpoint,
-            log_level=serving_config.log_level,
+            self,
+            serving_config=serving_config,
         )
 
     def _recreate_with_config(self, new_config: AgentConfig) -> AnyAgent:
@@ -367,17 +371,30 @@ class AnyAgent(ABC):
     # by default: {query: str}
 
     async def serve_mcp_async(
-        self, serving_config: A2AServingConfig | None = None
+        self, serving_config: MCPServingConfig
     ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
         from any_agent.serving import serve_mcp_async
 
-        return await serve_mcp_async(
-            self,
-            host=serving_config.host,
-            port=serving_config.port,
-            endpoint=serving_config.endpoint,
-            log_level=serving_config.log_level,
-        )
+        return await serve_mcp_async(self, serving_config=serving_config)
+
+    @overload
+    async def serve_async(
+        self, serving_config: MCPServingConfig
+    ) -> tuple[asyncio.Task[Any], uvicorn.Server]: ...
+
+    @overload
+    async def serve_async(
+        self, serving_config: A2AServingConfig | None = None
+    ) -> tuple[asyncio.Task[Any], uvicorn.Server]: ...
+
+    async def serve_async(
+        self, serving_config: MCPServingConfig | A2AServingConfig | None
+    ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+        if isinstance(serving_config, MCPServingConfig):
+            return await serve_mcp_async(self, serving_config)
+        if isinstance(serving_config, A2AServingConfig):
+            return await serve_a2a_async(self, serving_config)
+        return await serve_a2a_async(self, A2AServingConfig())
 
     @abstractmethod
     async def _load_agent(self) -> None:
