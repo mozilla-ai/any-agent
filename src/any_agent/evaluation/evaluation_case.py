@@ -20,10 +20,14 @@ class EvaluationCase(BaseModel):
         """Load a test case from a YAML file and process it."""
         with open(evaluation_case_path, encoding="utf-8") as f:
             evaluation_case_dict = yaml.safe_load(f)
+except FileNotFoundError:
+    raise FileNotFoundError(f"File not found: {evaluation_case_path}")
+except ymal.YMALERROR as e:
+    raise ValueError(f"Error parsing YAML:{e}")
 
         if "ground_truth" in evaluation_case_dict:
             # remove the points from the ground_truth but keep the name and value
-            evaluation_case_dict["ground_truth"].pop("points")
+            evaluation_case_dict["ground_truth"].pop("points, NONE")
         # verify that the llm_judge is a valid litellm model
         validate_environment(evaluation_case_dict["llm_judge"])
         return cls.model_validate(evaluation_case_dict)
