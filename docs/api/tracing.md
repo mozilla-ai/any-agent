@@ -2,8 +2,6 @@
 
 ::: any_agent.tracing.agent_trace.AgentTrace
 
-::: any_agent.tracing.agent_trace.spans_to_messages
-
 ::: any_agent.tracing.agent_trace.AgentSpan
 
 ::: any_agent.tracing.disable_console_traces

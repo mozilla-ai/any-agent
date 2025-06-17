@@ -78,3 +78,12 @@ def test_invalidate_cache_method():
 
     assert "tokens" not in trace.__dict__
     assert "cost" not in trace.__dict__
+
+
+def test_spans_to_messages_handles_empty_spans():
+    """Test that spans_to_messages handles traces with no spans."""
+    empty_trace = AgentTrace()
+    messages = empty_trace.spans_to_messages()
+
+    assert isinstance(messages, list)
+    assert len(messages) == 0

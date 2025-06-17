@@ -127,13 +127,20 @@ if __name__ == "__main__":
 
 ### Multi-Turn Conversations
 
-For scenarios where you need to maintain conversation history across multiple agent interactions, you can leverage the [`spans_to_messages`][any_agent.tracing.agent_trace.spans_to_messages] function built into the AgentTrace. This function converts agent traces into a standardized message format that can be used to provide context in subsequent conversations.
+For scenarios where you need to maintain conversation history across multiple agent interactions, you can leverage the [`spans_to_messages`][any_agent.tracing.agent_trace.AgentTrace.spans_to_messages] method built into the AgentTrace. This function converts agent traces into a standardized message format that can be used to provide context in subsequent conversations.
+
+
+!!! tip "When to Use Each Approach"
+
+    - **Multi-turn with `spans_to_messages`**: When you need to maintain context across separate agent invocations or implement complex conversation management logic
+    - **User interaction tools**: When you want the agent to naturally interact with users during its execution, asking questions as needed to complete its task
+    - **Hybrid approach**: Combine both patterns for sophisticated agents that maintain long-term context while also gathering real-time user input
+
 
 #### Basic Multi-Turn Example
 
 ```python
 from any_agent import AgentConfig, AnyAgent
-from any_agent.tracing.agent_trace import spans_to_messages
 
 # Create your agent
 agent = AnyAgent.create(
@@ -146,12 +153,12 @@ agent = AnyAgent.create(
 
 response1 = agent.run("What's the capital of California?")
 print(f"Agent: {response1.final_output}")
-conversation_history = spans_to_messages(response1.spans)
+conversation_history = response1.spans_to_messages()
 # Convert previous conversation to readable format
 history_text = "\n".join([
-    f"{msg['role'].capitalize()}: {msg['content']}"
+    f"{msg.role.capitalize()}: {msg.content}"
     for msg in conversation_history
-    if msg['role'] != "system"
+    if msg.role != "system"
 ])
 
 user_message = "What's the closest national park to that city"
@@ -206,9 +213,3 @@ print(f"Final recommendations: {agent_trace.final_output}")
 ```
 
 This approach is demonstrated in our [MCP Agent cookbook example](../cookbook/mcp_agent.ipynb), where an agent uses user interaction tools to gather trip planning information dynamically. The agent can ask clarifying questions, get user preferences, and provide personalized recommendations all within a single `run()` call.
-
-!!! tip "When to Use Each Approach"
-
-    - **Multi-turn with `spans_to_messages`**: When you need to maintain context across separate agent invocations or implement complex conversation management logic
-    - **User interaction tools**: When you want the agent to naturally interact with users during its execution, asking questions as needed to complete its task
-    - **Hybrid approach**: Combine both patterns for sophisticated agents that maintain long-term context while also gathering real-time user input

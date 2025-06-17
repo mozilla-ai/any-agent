@@ -77,6 +77,11 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
     assert len(tool_executions) >= 2
     assert_first_tool_execution(tool_executions[0])
 
+    messages = agent_trace.spans_to_messages()
+    assert messages[0].role == "system"
+    assert messages[1].role == "user"
+    assert len(messages) == 2 + len(llm_calls) + len(tool_executions)
+
 
 def assert_duration(agent_trace: AgentTrace, wall_time_s: float) -> None:
     assert agent_trace.duration is not None

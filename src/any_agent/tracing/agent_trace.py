@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from litellm.cost_calculator import cost_per_token
 from opentelemetry.sdk.trace import ReadableSpan
@@ -83,67 +83,13 @@ def compute_cost_info(
     return CostInfo.model_validate(new_info)
 
 
-def spans_to_messages(spans: list[AgentSpan]) -> list[dict[str, str]]:
-    """Convert spans to standard message format.
+class AgentMessage(BaseModel):
+    """A message that can be exported to JSON or printed to the console."""
 
-    Args:
-        spans: List of AgentSpan objects to convert.
+    role: Literal["user", "assistant", "system", "tool"]
+    content: str
 
-    Returns:
-        List of message dicts with 'role' and 'content' keys.
-
-    """
-    messages: list[dict[str, str]] = []
-
-    # Process spans in chronological order (excluding the final invoke_agent span)
-    # Filter out any non-AgentSpan objects and agent invocation spans
-    filtered_spans: list[AgentSpan] = []
-    for span in spans:
-        if hasattr(span, "is_agent_invocation") and not span.is_agent_invocation():
-            filtered_spans.append(span)
-
-    for span in filtered_spans:
-        if span.is_llm_call():
-            # Extract input messages from the span
-            input_messages = span.get_input_messages()
-            if input_messages:
-                for msg in input_messages:
-                    # Deduplicate messages to avoid repeating context
-                    msg_dict = {
-                        "role": msg["role"],
-                        "content": msg["content"],
-                    }
-                    if not any(
-                        existing["role"] == msg_dict["role"]
-                        and existing["content"] == msg_dict["content"]
-                        for existing in messages
-                    ):
-                        messages.append(msg_dict)
-
-            # Add the assistant's response
-            output_content = span.get_output_content()
-            if output_content:
-                # Avoid duplicate assistant messages
-                if not (
-                    messages
-                    and messages[-1]["role"] == "assistant"
-                    and messages[-1]["content"] == output_content
-                ):
-                    messages.append({"role": "assistant", "content": output_content})
-
-        elif span.is_tool_execution():
-            # For tool executions, include the result in the conversation
-            output_content = span.get_output_content()
-            if output_content:
-                tool_name = span.attributes["gen_ai.tool.name"]
-                messages.append(
-                    {
-                        "role": "assistant",
-                        "content": f"[Tool {tool_name} executed: {output_content}]",
-                    }
-                )
-
-    return messages
+    model_config = ConfigDict(extra="forbid")
 
 
 class AgentSpan(BaseModel):
@@ -215,7 +161,7 @@ class AgentSpan(BaseModel):
         """Check whether this span is an execution of a tool."""
         return self.attributes.get("gen_ai.operation.name") == "execute_tool"
 
-    def get_input_messages(self) -> list[dict[str, Any]] | None:
+    def get_input_messages(self) -> list[AgentMessage] | None:
         """Extract input messages from an LLM call span.
 
         Returns:
@@ -241,7 +187,7 @@ class AgentSpan(BaseModel):
         if not isinstance(parsed_messages, list):
             msg = "Input messages are not a list of messages"
             raise ValueError(msg)
-        return parsed_messages
+        return [AgentMessage.model_validate(msg) for msg in parsed_messages]
 
     def get_output_content(self) -> str | None:
         """Extract output content from an LLM call or tool execution span.
@@ -304,6 +250,66 @@ class AgentTrace(BaseModel):
         """Add a list of AgentSpans to the trace and clear the tokens_and_cost cache if present."""
         self.spans.extend(spans)
         self._invalidate_tokens_and_cost_cache()
+
+    def spans_to_messages(self) -> list[AgentMessage]:
+        """Convert spans to standard message format.
+
+        Args:
+            spans: List of AgentSpan objects to convert.
+
+        Returns:
+            List of message dicts with 'role' and 'content' keys.
+
+        """
+        messages: list[AgentMessage] = []
+
+        # Process spans in chronological order (excluding the final invoke_agent span)
+        # Filter out any agent invocation spans
+        filtered_spans: list[AgentSpan] = []
+        for span in self.spans:
+            if not span.is_agent_invocation():
+                filtered_spans.append(span)
+
+        for span in filtered_spans:
+            if span.is_llm_call():
+                # Extract input messages from the span
+                input_messages = span.get_input_messages()
+                if input_messages:
+                    for msg in input_messages:
+                        if not any(
+                            existing.role == msg.role
+                            and existing.content == msg.content
+                            for existing in messages
+                        ):
+                            messages.append(msg)
+
+                # Add the assistant's response
+                output_content = span.get_output_content()
+                if output_content:
+                    # Avoid duplicate assistant messages
+                    if not (
+                        messages
+                        and messages[-1].role == "assistant"
+                        and messages[-1].content == output_content
+                    ):
+                        messages.append(
+                            AgentMessage(role="assistant", content=output_content)
+                        )
+
+            elif span.is_tool_execution():
+                # For tool executions, include the result in the conversation
+                output_content = span.get_output_content()
+                if output_content:
+                    tool_name = span.attributes["gen_ai.tool.name"]
+                    tool_args = span.attributes["gen_ai.tool.args"]
+                    messages.append(
+                        AgentMessage(
+                            role="assistant",
+                            content=f"[Tool {tool_name} executed: {output_content} with args: {tool_args}]",
+                        )
+                    )
+
+        return messages
 
     @property
     def duration(self) -> timedelta:
