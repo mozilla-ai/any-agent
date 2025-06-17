@@ -89,3 +89,37 @@ class A2AServingConfig(BaseModel):
 
     task_cleanup_interval_minutes: int = 5
     """Interval in minutes between task cleanup runs."""
+
+class MCPServingConfig(BaseModel):
+    """Configuration for serving an agent using the Model Context Protocol (MCP).
+
+    Example:
+        config = A2AServingConfig(
+            port=8080,
+            endpoint="/my-agent",
+            skills=[
+                AgentSkill(
+                    id="search",
+                    name="web_search",
+                    description="Search the web for information"
+                )
+            ]
+        )
+
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    host: str = "localhost"
+    """Will be passed as argument to `uvicorn.run`."""
+
+    port: int = 5000
+    """Will be passed as argument to `uvicorn.run`."""
+
+    endpoint: str = "/"
+    """Will be pass as argument to `Starlette().add_route`"""
+
+    log_level: str = "warning"
+    """Will be passed as argument to the `uvicorn` server."""
+
+    version: str = "0.1.0"
