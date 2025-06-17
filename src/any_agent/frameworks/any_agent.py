@@ -228,9 +228,11 @@ class AnyAgent(ABC):
             ImportError: If the `serving` dependencies are not installed.
 
         Example:
+            ```
             agent = AnyAgent.create("tinyagent", AgentConfig(...))
             config = A2AServingConfig(port=8080, endpoint="/my-agent")
             agent.serve(config)
+            ```
 
         """
         from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a
@@ -266,15 +268,17 @@ class AnyAgent(ABC):
             ImportError: If the `serving` dependencies are not installed.
 
         Example:
-            >>> agent = await AnyAgent.create_async("tinyagent", AgentConfig(...))
-            >>> config = A2AServingConfig(port=8080)
-            >>> task, server = await agent.serve_async(config)
-            >>> try:
-            ...     # Server is running
-            ...     await asyncio.sleep(10)
-            >>> finally:
-            ...     server.should_exit = True
-            ...     await task
+            ```
+            agent = await AnyAgent.create_async("tinyagent", AgentConfig(...))
+            config = A2AServingConfig(port=8080)
+            task, server = await agent.serve_async(config)
+            try:
+                # Server is running
+                await asyncio.sleep(10)
+            finally:
+                server.should_exit = True
+                await task
+            ```
 
         """
         from any_agent.serving import (
