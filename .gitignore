@@ -177,3 +177,6 @@ cython_debug/
 .pypirc
 
 .vscode
+
+# setuptools_scm
+src/any_agent/_version.py
