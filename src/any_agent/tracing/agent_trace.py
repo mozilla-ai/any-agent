@@ -254,9 +254,6 @@ class AgentTrace(BaseModel):
     def spans_to_messages(self) -> list[AgentMessage]:
         """Convert spans to standard message format.
 
-        Args:
-            spans: List of AgentSpan objects to convert.
-
         Returns:
             List of message dicts with 'role' and 'content' keys.
 
