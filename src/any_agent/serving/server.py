@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import TYPE_CHECKING, Any
 
 import uvicorn
@@ -9,6 +10,7 @@ from a2a.server.tasks import InMemoryTaskStore
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
+from any_agent.serving.task_manager import TaskManager
 from any_agent.utils import run_async_in_sync
 
 from .agent_card import _get_agent_card
@@ -21,8 +23,6 @@ if TYPE_CHECKING:
     from any_agent import AnyAgent
     from any_agent.serving import A2AServingConfig
 
-import asyncio
-
 
 def _get_a2a_app(
     agent: AnyAgent, serving_config: A2AServingConfig
@@ -30,9 +30,10 @@ def _get_a2a_app(
     agent = prepare_agent_for_a2a(agent)
 
     agent_card = _get_agent_card(agent, serving_config)
+    task_manager = TaskManager(serving_config)
 
     request_handler = DefaultRequestHandler(
-        agent_executor=AnyAgentExecutor(agent),
+        agent_executor=AnyAgentExecutor(agent, task_manager),
         task_store=InMemoryTaskStore(),
     )
 
@@ -45,9 +46,10 @@ async def _get_a2a_app_async(
     agent = await prepare_agent_for_a2a_async(agent)
 
     agent_card = _get_agent_card(agent, serving_config)
+    task_manager = TaskManager(serving_config)
 
     request_handler = DefaultRequestHandler(
-        agent_executor=AnyAgentExecutor(agent),
+        agent_executor=AnyAgentExecutor(agent, task_manager),
         task_store=InMemoryTaskStore(),
     )
 

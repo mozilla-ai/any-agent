@@ -11,7 +11,7 @@ dynamic = ["version"]
 dependencies = [
   "duckduckgo_search",
   "fire",
-  "litellm",
+  "litellm==1.72.4", # until https://github.com/BerriAI/litellm/issues/11759 is fixed
   "markdownify",
   "mcp>=1.5.0",
   "opentelemetry-exporter-otlp",

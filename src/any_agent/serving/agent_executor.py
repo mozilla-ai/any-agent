@@ -3,10 +3,7 @@ from typing import TYPE_CHECKING, override
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
 from a2a.server.tasks import TaskUpdater
-from a2a.types import (
-    Part,
-    TextPart,
-)
+from a2a.types import Part, TextPart
 from a2a.utils import (
     new_agent_parts_message,
     new_task,
@@ -15,17 +12,25 @@ from pydantic import BaseModel
 
 from any_agent.logging import logger
 from any_agent.serving.envelope import A2AEnvelope
+from any_agent.serving.task_manager import TaskManager
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
 
 
 class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
-    """Test AgentProxy Implementation."""
+    """AnyAgentExecutor Implementation with task management for multi-turn conversations."""
 
-    def __init__(self, agent: "AnyAgent"):
-        """Initialize the AnyAgentExecutor."""
+    def __init__(self, agent: "AnyAgent", task_manager: TaskManager):
+        """Initialize the AnyAgentExecutor.
+
+        Args:
+            agent: The agent to execute
+            task_manager: Task manager to use for task management
+
+        """
         self.agent = agent
+        self.task_manager = task_manager
 
     @override
     async def execute(  # type: ignore[misc]
@@ -36,13 +41,23 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         query = context.get_user_input()
         task = context.current_task
 
-        # This agent always produces Task objects.
-        agent_trace = await self.agent.run_async(query)
+        # Extract or create task ID
         if not task:
             task = new_task(context.message)
+            self.task_manager.add_task(task.id)
             await event_queue.enqueue_event(task)
         else:
-            logger.info("Task already exists: %s", task)
+            logger.info("Task already exists: %s", task.model_dump_json(indent=2))
+
+        formatted_query = self.task_manager.format_query_with_history(task.id, query)
+
+        # This agent always produces Task objects.
+        agent_trace = await self.agent.run_async(formatted_query)
+
+        # Update task with new trace
+        if task:
+            self.task_manager.update_task_trace(task.id, agent_trace)
+
         updater = TaskUpdater(event_queue, task.id, task.contextId)
 
         # Validate & interpret the envelope produced by the agent
@@ -66,8 +81,8 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         else:
             result_text = str(data_field)
 
-        # Right now all task states will mark the state as final. As we expand logic for multiturn tasks and streaming
-        # we may not want to always mark the state as final.
+        # Right now all task states will mark the state as final, because the server does not support streaming.
+        # As we expand logic for streaming we may not need to always mark the state as final.
         await updater.update_status(
             task_status,
             message=new_agent_parts_message(
