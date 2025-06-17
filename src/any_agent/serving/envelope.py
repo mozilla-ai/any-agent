@@ -34,7 +34,7 @@ class A2AEnvelope(BaseModel, Generic[BodyType]):
 def _is_a2a_envelope(typ: type[BaseModel] | None) -> bool:
     if typ is None:
         return False
-    fields: Any = getattr(typ, "__fields__", None)
+    fields: Any = getattr(typ, "model_fields", None)
 
     # We only care about a mapping with the required keys.
     if not isinstance(fields, Mapping):
