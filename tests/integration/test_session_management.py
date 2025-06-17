@@ -16,6 +16,7 @@ from .helpers import wait_for_server_async
 @pytest.mark.asyncio
 async def test_task_management_multi_turn_conversation():
     """Test that agents can maintain conversation context across multiple interactions."""
+
     # Only running this test with the tinyagent framework because the goal here is to test A2A classes, not the agent framework.
     class TestResult(BaseModel):
         name: str
@@ -78,7 +79,9 @@ async def test_task_management_multi_turn_conversation():
             response_1 = await client.send_message(request_1)
 
             assert response_1 is not None
-            result = TestResult.model_validate_json(response_1.root.result.status.message.parts[0].root.text)
+            result = TestResult.model_validate_json(
+                response_1.root.result.status.message.parts[0].root.text
+            )
             assert result.name == "Alice"
             assert result.job.lower() == "software engineer"
 
@@ -103,10 +106,12 @@ async def test_task_management_multi_turn_conversation():
             response_2 = await client.send_message(request_2)
 
             assert response_2 is not None
-            result = TestResult.model_validate_json(response_2.root.result.status.message.parts[0].root.text)
+            result = TestResult.model_validate_json(
+                response_2.root.result.status.message.parts[0].root.text
+            )
             assert result.name == "Alice"
             assert result.job.lower() == "software engineer"
-            assert result.age == None
+            assert result.age is None
             assert response_2.root.result.status.state == TaskState.input_required
 
             # Send a message to the agent to give the age
@@ -124,7 +129,9 @@ async def test_task_management_multi_turn_conversation():
             )
             response_3 = await client.send_message(request_3)
             assert response_3 is not None
-            result = TestResult.model_validate_json(response_3.root.result.status.message.parts[0].root.text)
+            result = TestResult.model_validate_json(
+                response_3.root.result.status.message.parts[0].root.text
+            )
             assert response_3.root.result.status.state == TaskState.completed
             assert result.age == 30
 

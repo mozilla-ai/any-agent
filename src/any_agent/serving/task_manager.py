@@ -69,7 +69,7 @@ class TaskManager:
         cleanup_interval = timedelta(minutes=self.config.task_cleanup_interval_minutes)
         return time_since_cleanup >= cleanup_interval
 
-    def add_task(self, task_id: str):
+    def add_task(self, task_id: str) -> None:
         """Store a new task.
 
         This method will also trigger cleanup of expired tasks if it hasn't
