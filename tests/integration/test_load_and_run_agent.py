@@ -27,7 +27,7 @@ from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, Token
 
 def uvx_installed() -> bool:
     try:
-        result = subprocess.run(  # noqa: S603
+        result = subprocess.run(
             ["uvx", "--version"],  # noqa: S607
             capture_output=True,
             check=True,
