@@ -59,7 +59,6 @@ class MockConversationAgent(TinyAgent):
         await super()._load_agent()
 
     async def run_async(self, prompt: str, **kwargs) -> AgentTrace:
-
         if self.turn_count == 0:
             # First turn: User introduces themselves
             assert FIRST_TURN_PROMPT == prompt
@@ -75,7 +74,7 @@ class MockConversationAgent(TinyAgent):
             return self._create_mock_trace(
                 envelope, FIRST_TURN_RESPONSE, FIRST_TURN_PROMPT
             )
-        elif self.turn_count == 1:
+        if self.turn_count == 1:
             # Second turn: User asks for information back
             assert FIRST_TURN_PROMPT in prompt
             assert SECOND_TURN_PROMPT in prompt
@@ -88,10 +87,8 @@ class MockConversationAgent(TinyAgent):
                     age=None,
                 ),
             )
-            return self._create_mock_trace(
-                envelope, SECOND_TURN_RESPONSE, prompt
-            )
-        elif self.turn_count == 2:
+            return self._create_mock_trace(envelope, SECOND_TURN_RESPONSE, prompt)
+        if self.turn_count == 2:
             # Third turn: User provides age
             assert FIRST_TURN_PROMPT in prompt
             assert SECOND_TURN_PROMPT in prompt
@@ -105,12 +102,9 @@ class MockConversationAgent(TinyAgent):
                     age=30,
                 ),
             )
-            return self._create_mock_trace(
-                envelope, THIRD_TURN_RESPONSE, prompt
-            )
-        else:
-            msg = f"Unexpected turn count: {self.turn_count}"
-            raise ValueError(msg)
+            return self._create_mock_trace(envelope, THIRD_TURN_RESPONSE, prompt)
+        msg = f"Unexpected turn count: {self.turn_count}"
+        raise ValueError(msg)
 
     def _create_mock_trace(
         self, envelope: A2AEnvelope, agent_response: str, prompt: str
@@ -139,11 +133,10 @@ class MockConversationAgent(TinyAgent):
             )
         )
 
-        trace = AgentTrace(
+        return AgentTrace(
             spans=spans,
             final_output=envelope,
         )
-        return trace
 
     @classmethod
     def create(cls, framework, config):
