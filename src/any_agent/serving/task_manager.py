@@ -55,20 +55,6 @@ class TaskManager:
         self._tasks: dict[str, TaskData] = {}
         self._last_cleanup: datetime | None = None
 
-    def _should_run_cleanup(self) -> bool:
-        """Check if cleanup should be run based on the last cleanup time.
-
-        Returns:
-            True if cleanup should be run, False otherwise
-
-        """
-        if self._last_cleanup is None:
-            return True
-
-        time_since_cleanup = datetime.now() - self._last_cleanup
-        cleanup_interval = timedelta(minutes=self.config.task_cleanup_interval_minutes)
-        return time_since_cleanup >= cleanup_interval
-
     def add_task(self, task_id: str) -> None:
         """Store a new task.
 
@@ -76,9 +62,7 @@ class TaskManager:
         run recently (based on task_cleanup_interval_minutes).
 
         """
-        # Trigger cleanup if needed
-        if self._should_run_cleanup():
-            self._cleanup_expired_tasks()
+        self._cleanup_expired_tasks()
 
         self._tasks[task_id] = TaskData(task_id)
         logger.debug("Created new task: %s", task_id)
