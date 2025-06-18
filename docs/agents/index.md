@@ -99,7 +99,7 @@ try:
     agent_trace = agent.run("Which Agent Framework is the best??")
     print(agent_trace.final_output)
 except AgentRunError as are:
-    spans = are.trace.spans
+    agent_trace = are.trace
 ```
 
 Check [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] for more info on the return type.
