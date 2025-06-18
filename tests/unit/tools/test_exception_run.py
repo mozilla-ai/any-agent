@@ -1,14 +1,18 @@
-import json
 import os
-import subprocess
-import time
-from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
 import pytest
-from litellm.utils import validate_environment
+from litellm.types.utils import (
+    ChatCompletionMessageToolCall,
+    Choices,
+    Delta,
+    Function,
+    Message,
+    ModelResponse,
+    StreamingChoices,
+)
 
 from any_agent import (
     AgentConfig,
@@ -16,17 +20,7 @@ from any_agent import (
     AgentRunError,
     AnyAgent,
 )
-from any_agent.config import MCPStdio
-from any_agent.evaluation import EvaluationCase, evaluate
-from any_agent.evaluation.schemas import (
-    AgentOutput,
-    CheckpointCriteria,
-    TraceEvaluationResult,
-)
-from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from any_agent.tracing.otel_types import StatusCode
-
-from litellm.types.utils import ModelResponse, Choices, Message, ChatCompletionMessageToolCall, Function, StreamingChoices, Delta
 
 
 def test_exception_trace(
@@ -35,10 +29,9 @@ def test_exception_trace(
     tmp_path: Path,
 ) -> None:
     if agent_framework in (
-        # LangChain does not trigger the tool
+        # Fails due to:
+        # `('Recursion limit of 25 reached without hitting a stop condition. You can increase the ...oubleshooting/errors/GRAPH_RECURSION_LIMIT',)`
         AgentFramework.LANGCHAIN,
-        # OPENAI wraps the function, so patching it becomes more difficult
-        # AgentFramework.OPENAI,
     ):
         pytest.skip(f"Framework {agent_framework.value} not currently passing the test")
 
@@ -85,18 +78,17 @@ def test_exception_trace(
     )
     agent = AnyAgent.create(agent_framework, agent_config)
 
-
     fake_response = ModelResponse(
-        choices = [
+        choices=[
             Choices(
-                message = Message(
-                    tool_calls = [ChatCompletionMessageToolCall(
+                message=Message(
+                    tool_calls=[
+                        ChatCompletionMessageToolCall(
                             id="call_12345xyz",
                             type="function",
                             function=Function(
-                                name="fail_tool",
-                                arguments="{\"text\":\"test sample\"}"
-                            )
+                                name="fail_tool", arguments='{"text":"test sample"}'
+                            ),
                         )
                     ]
                 )
@@ -105,16 +97,16 @@ def test_exception_trace(
     )
 
     fake_chunk = ModelResponse(
-        choices = [
+        choices=[
             StreamingChoices(
-                delta = Delta(
-                    tool_calls = [ChatCompletionMessageToolCall(
+                delta=Delta(
+                    tool_calls=[
+                        ChatCompletionMessageToolCall(
                             id="call_12345xyz",
                             type="function",
                             function=Function(
-                                name="fail_tool",
-                                arguments="{\"text\":\"test sample\"}"
-                            )
+                                name="fail_tool", arguments='{"text":"test sample"}'
+                            ),
                         )
                     ]
                 )
@@ -125,10 +117,21 @@ def test_exception_trace(
     async def fake_iter():
         yield fake_chunk
 
-    with patch(patched_function) as fw_agent_runtool, patch("litellm.acompletion") as acompletion_mock, patch("litellm.completion") as completion_mock:
+    with (
+        patch(patched_function) as fw_agent_runtool,
+        patch("litellm.acompletion") as acompletion_mock,
+        patch("litellm.completion") as completion_mock,
+    ):
         fw_agent_runtool.side_effect = RuntimeError(exc_reason)
-        acompletion_mock.return_value = fake_iter()
-        completion_mock.return_value = fake_iter()
+        if agent_framework in (
+            AgentFramework.GOOGLE,
+            AgentFramework.LLAMA_INDEX,
+        ):
+            acompletion_mock.return_value = fake_iter()
+            completion_mock.return_value = fake_iter()
+        else:
+            acompletion_mock.return_value = fake_response
+            completion_mock.return_value = fake_response
         spans = []
         try:
             agent.run(
