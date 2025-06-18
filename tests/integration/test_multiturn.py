@@ -16,9 +16,12 @@ from a2a.types import MessageSendParams, SendMessageRequest, TaskState
 from pydantic import BaseModel
 
 from any_agent import AgentConfig
+from any_agent.config import AgentFramework
+from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.serving.envelope import A2AEnvelope
+from any_agent.tools.a2a import a2a_tool_async
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.otel_types import (
     Resource,
@@ -260,6 +263,84 @@ async def test_task_management_multi_turn_conversation():
             assert response_3.root.result.status.state == TaskState.completed
             assert result.age == 30
 
+    finally:
+        await server.shutdown()
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
+
+
+@pytest.mark.asyncio
+async def test_multi_turn_a2a_tool():
+    """Test that agents can maintain conversation context across multiple interactions."""
+
+    # Create a mock agent that simulates multi-turn conversation
+    config = AgentConfig(
+        model_id="gpt-4o-mini",  # Using real model ID but will be mocked
+        instructions=(
+            "You are a helpful assistant that remembers our conversation. "
+            "When asked about previous information, reference what was said earlier. "
+            "Keep your responses concise."
+            " If you need more information, ask the user for it."
+        ),
+        name="Structured TestResult Agent",
+        description="Agent with conversation memory for testing session management.",
+        output_type=TestResult,
+    )
+
+    agent = MockConversationAgent(config)
+
+    # Configure session management with short timeout for testing
+    serving_config = A2AServingConfig(
+        port=0,
+        task_timeout_minutes=2,  # Short timeout for testing
+    )
+
+    (task, server) = await agent.serve_async(serving_config=serving_config)
+
+    test_port = server.servers[0].sockets[0].getsockname()[1]
+    server_url = f"http://localhost:{test_port}"
+    await wait_for_server_async(server_url)
+    try:
+
+        class MainAgentAnswer(BaseModel):
+            first_turn_success: bool
+            second_turn_success: bool
+            third_turn_success: bool
+
+        main_agent_cfg = AgentConfig(
+            model_id="gpt-4.1-nano",
+            instructions="Use the available tools to obtain additional information to answer the query.",
+            description="The orchestrator that can use other agents via tools using the A2A protocol.",
+            tools=[await a2a_tool_async(server_url, http_kwargs={"timeout": 10.0})],
+            output_type=MainAgentAnswer,
+            model_args={
+                "parallel_tool_calls": False  # to force it to talk to the agent one call at a time
+            },
+        )
+
+        main_agent = await AnyAgent.create_async(
+            agent_framework=AgentFramework.TINYAGENT,
+            agent_config=main_agent_cfg,
+        )
+        prompt = f"""
+        Please talk to the structured testresult agent and interact with it. You'll contact it to ask three questions.
+
+        1. {FIRST_TURN_PROMPT}
+        2. {SECOND_TURN_PROMPT}
+        3. {THIRD_TURN_PROMPT}
+
+        Make sure you appropriately continue the conversation by providing it with the task id if you want to continue the conversation.
+        """
+
+        agent_trace = await main_agent.run_async(prompt)
+        assert agent_trace.final_output is not None
+        assert isinstance(agent_trace.final_output, MainAgentAnswer)
+        assert agent_trace.final_output.first_turn_success
+        assert agent_trace.final_output.second_turn_success
+        assert agent_trace.final_output.third_turn_success
     finally:
         await server.shutdown()
         task.cancel()

@@ -51,7 +51,7 @@ async def a2a_tool_async(
             A2ACardResolver(httpx_client=resolver_client, base_url=url)
         ).get_agent_card()
 
-    async def _send_query(query: str) -> str:
+    async def _send_query(query: str, task_id: str = str(uuid4())) -> str:
         async with httpx.AsyncClient(follow_redirects=True) as query_client:
             client = A2AClient(httpx_client=query_client, agent_card=a2a_agent_card)
             send_message_payload = SendMessageRequest(
@@ -61,7 +61,8 @@ async def a2a_tool_async(
                         role=Role.user,
                         parts=[Part(root=TextPart(text=query))],
                         # the id is not currently tracked
-                        messageId=uuid4().hex,
+                        messageId=str(uuid4().hex),
+                        taskId=task_id,
                     )
                 ),
             )
@@ -104,6 +105,7 @@ async def a2a_tool_async(
 
         Args:
             query (str): The query to perform.
+            task_id (str): The task id to use for the conversation. Defaults to a new uuid. If you want to continue the conversation, you should provide the same task id that you received in a previous response.
 
         Returns:
             The result from the A2A agent, encoded as a json string.
