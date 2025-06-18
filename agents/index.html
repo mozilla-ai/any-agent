@@ -1245,7 +1245,7 @@
 <h1 id="defining-and-running-agents">Defining and Running Agents</h1>
 <h2 id="defining-agents">Defining Agents</h2>
 <p>To define any agent system you will always use the same imports:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span><span class="p">,</span> <span class="n">AgentRunError</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># In these examples, the built-in tools will be used</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span>
 </span></code></pre></div>
@@ -1320,10 +1320,14 @@ solve the task.</p>
 </span><span id="__span-2-47"><a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="running-agents">Running Agents</h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which Agent Framework is the best??&quot;</span><span class="p">)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which Agent Framework is the best??&quot;</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">except</span> <span class="n">AgentRunError</span> <span class="k">as</span> <span class="n">are</span><span class="p">:</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">agent_trace</span> <span class="o">=</span> <span class="n">are</span><span class="o">.</span><span class="n">trace</span>
 </span></code></pre></div>
 <p>Check <a class="autorefs autorefs-internal" title="any_agent.tracing.agent_trace.AgentTrace" href="../api/tracing/#any_agent.tracing.agent_trace.AgentTrace"><code>AgentTrace</code></a> for more info on the return type.</p>
+<p>Exceptions are wrapped in an <a class="autorefs autorefs-internal" title="any_agent.AgentRunError" href="../api/agent/#any_agent.AgentRunError"><code>AgentRunError</code></a>, that carries the original exception in the <code>__cause__</code> attribute. Additionally, its <code>trace</code> property holds the trace containing the spans collected so far.</p>
 <h3 id="async">Async</h3>
 <p>If you are running in <code>async</code> context, you should use the equivalent <a class="autorefs autorefs-internal" title="create_async(agent_framework, agent_config)
 
