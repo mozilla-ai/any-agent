@@ -5,7 +5,7 @@
 To define any agent system you will always use the same imports:
 
 ```python
-from any_agent import AgentConfig, AnyAgent
+from any_agent import AgentConfig, AnyAgent, AgentRunError
 # In these examples, the built-in tools will be used
 from any_agent.tools import search_web, visit_webpage
 ```
@@ -95,11 +95,16 @@ agent = AnyAgent.create(
 ## Running Agents
 
 ```python
-agent_trace = agent.run("Which Agent Framework is the best??")
-print(agent_trace.final_output)
+try:
+    agent_trace = agent.run("Which Agent Framework is the best??")
+    print(agent_trace.final_output)
+except AgentRunError as are:
+    agent_trace = are.trace
 ```
 
 Check [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] for more info on the return type.
+
+Exceptions are wrapped in an [`AgentRunError`][any_agent.AgentRunError], that carries the original exception in the `__cause__` attribute. Additionally, its `trace` property holds the trace containing the spans collected so far.
 
 ### Async
 
