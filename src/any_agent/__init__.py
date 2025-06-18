@@ -7,7 +7,9 @@ from .tracing.agent_trace import AgentTrace
 try:
     __version__ = version("any-agent")
 except PackageNotFoundError:
-    __version__ = "unknown"
+    # In the case of local development
+    # i.e., running directly from the source directory without package being installed
+    __version__ = "0.0.0-dev"
 
 __all__ = [
     "AgentConfig",
