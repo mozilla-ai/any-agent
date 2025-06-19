@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
-from contextlib import suppress
 from typing import Literal
 
 from pydantic import Field, PrivateAttr
@@ -13,18 +12,19 @@ from any_agent.config import (
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
 from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
-mcp_available = False
-with suppress(ImportError):
+try:
     from google.adk.tools.mcp_tool import MCPTool as GoogleMCPTool
     from google.adk.tools.mcp_tool import MCPToolset as GoogleMCPToolset
-    from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
-        SseServerParams as GoogleSseServerParameters,
+    from google.adk.tools.mcp_tool.mcp_session_manager import (
+        SseConnectionParams as GoogleSseServerParameters,
     )
-    from google.adk.tools.mcp_tool.mcp_toolset import (  # type: ignore[attr-defined]
+    from mcp import (
         StdioServerParameters as GoogleStdioServerParameters,
     )
 
     mcp_available = True
+except ImportError:
+    mcp_available = False
 
 
 class GoogleMCPConnection(_MCPConnection["GoogleMCPTool"], ABC):
