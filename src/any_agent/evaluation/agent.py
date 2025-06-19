@@ -1,121 +1,70 @@
-import json
-
-from pydantic import BaseModel
-
 from any_agent import AgentConfig, AnyAgent
+from any_agent.config import AgentFramework
 from any_agent.evaluation.schemas import AgentOutput
+from any_agent.evaluation.tools import AgentEvaluationTools
 from any_agent.tracing.agent_trace import AgentTrace
+from any_agent.utils.asyncio_sync import run_async_in_sync
 
-MAX_EVIDENCE_LENGTH: int = 500
+AGENT_INSTRUCTIONS = f"""You are a helpful assistant that will be used to evaluate the correctness of an agent trace. Given a specific question regarding the quality of the something about the agent, utilize the appropriate tools in order to gather the answer needed in order to accurately answer the question. If you are asked anything about what the agent did, you should strongly consider using the get_evidence_from_spans tool to get the evidence. However, if the question is about specific details of the agent's actions, you don't necessarily need to use the get_evidence_from_spans tool.
+
+Answer with:
+1. "passed": true or false
+2. "reasoning": Brief explanation for your decision
+
+Your final answer must be a valid JSON string that conforms to the following JSON schema:
+
+{AgentOutput.model_json_schema()}
+"""
 
 
-class AgentTooling:
-    def __init__(self, trace: AgentTrace):
-        self.trace = trace
+class AgentAsJudge:
+    """An agent that evaluates the correctness of another agent's trace."""
 
-    def get_final_output(self) -> str | BaseModel | None:
-        """Get the final output from the agent trace.
+    def __init__(
+        self, model: str, framework: AgentFramework = AgentFramework.TINYAGENT
+    ):
+        self.model = model
+        self.framework = framework
 
-        Returns:
-            str | BaseModel | None: The final output of the agent
+    def run(self, trace: AgentTrace, question: str) -> AgentOutput:
+        """Initialize the AgentAsJudge with a trace and model.
 
-        """
-        return self.trace.final_output
-
-    def get_tokens_used(self) -> int:
-        """Get the number of tokens used by the agent as reported by the trace.
-
-        Returns:
-            int: The number of tokens used by the agent
-
-        """
-        return self.trace.tokens.total_tokens
-
-    def get_number_of_steps(self) -> int:
-        """Get the number of steps taken by the agent as reported by the trace.
-
-        Returns:
-            int: The number of steps taken by the agent
-
-        """
-        return len(self.trace.spans)
-
-    def get_evidence_from_spans(self) -> str:
-        """Get a summary of what happened in each step/span of the agent trace.
-
-        This includes information about the input, output, and tool calls for each step.
+        Args:
+            trace: The agent trace to evaluate
+            question: The question to ask the agent
 
         Returns:
-            str: The evidence of all the spans in the trace
+            The evaluation result
 
         """
-        evidence = ""
-        for idx, span in enumerate(self.trace.spans):
-            evidence += (
-                f"### Step {idx}: {span.attributes.get('gen_ai.operation.name')}\n"
-            )
-            if idx == 0:
-                input_val = span.attributes.get("gen_ai.input.messages")
-                # messages should always be json
-                if input_val:
-                    input_json = json.loads(input_val)
-                    evidence += f"Input: {json.dumps(input_json, indent=2)}\n\n"
+        return run_async_in_sync(self.run_async(trace, question))
 
-            tool_args = span.attributes.get("gen_ai.tool.args")
-            if tool_args:
-                args_json = json.loads(tool_args)
-                tool_name = span.attributes.get("gen_ai.tool.name")
-                evidence += f"Tool called: {tool_name}\n\n"
-                evidence += f"Tool arguments: {json.dumps(args_json, indent=2)}\n\n"
+    async def run_async(self, trace: AgentTrace, question: str) -> AgentOutput:
+        """Run the agent asynchronously.
 
-            output = span.attributes.get("gen_ai.output")
-            if output:
-                try:
-                    output_json = json.loads(output)
-                    # the output can be quite long, truncate if needed
-                    pretty_output = json.dumps(output_json, indent=2)
-                    pretty_output = (
-                        pretty_output[:MAX_EVIDENCE_LENGTH] + "...[TRUNCATED]"
-                        if len(pretty_output) > MAX_EVIDENCE_LENGTH
-                        else pretty_output
-                    )
-                    evidence += f"Output: {pretty_output}\n\n"
-                except json.JSONDecodeError:
-                    evidence += f"Output: {output}\n\n"
-        return evidence
+        Args:
+            trace: The agent trace to evaluate
+            question: The question to ask the agent
 
+        Returns:
+            The evaluation result
 
-def get_agent(trace: AgentTrace, model: str) -> AnyAgent:
-    tooling = AgentTooling(trace)
+        """
+        tooling = AgentEvaluationTools(trace)
 
-    instructions = """You are a helpful assistant that will be used to evaluate the correctness of an agent trace. Given a specific question regarding the quality of the something about the agent, utilize the appropriate tools in order to gather the answer needed in order to accurately answer the question. If you're asked anything about what the agent did, you should strongly consider using the get_evidence_from_spans tool to get the evidence. However, if the question is about specific details of the agent's actions, you don't necessarily need to use the get_evidence_from_spans tool.
+        agent_config = AgentConfig(
+            model_id=self.model,
+            instructions=AGENT_INSTRUCTIONS,
+            tools=tooling.get_all_tools(),
+            output_type=AgentOutput,
+        )
 
-    Answer with:
-    1. "passed": true or false
-    2. "reasoning": Brief explanation for your decision
-
-    Your final answer should be the following valid JSON:
-
-    ```json
-    {
-        "passed": <true or false>,
-        "reasoning": "The answer to the question",
-    }
-    ```
-    """
-    agent_config = AgentConfig(
-        model_id=model,
-        instructions=instructions,
-        tools=[
-            tooling.get_final_output,
-            tooling.get_tokens_used,
-            tooling.get_number_of_steps,
-            tooling.get_evidence_from_spans,
-        ],
-        output_type=AgentOutput,
-    )
-
-    return AnyAgent.create(
-        "tinyagent",
-        agent_config=agent_config,
-    )
+        agent = await AnyAgent.create_async(
+            self.framework,
+            agent_config=agent_config,
+        )
+        agent_trace = await agent.run_async(question)
+        if not isinstance(agent_trace.final_output, AgentOutput):
+            msg = "Agent output is not an AgentOutput instance."
+            raise ValueError(msg)
+        return agent_trace.final_output
