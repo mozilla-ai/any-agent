@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 from any_agent import AgentConfig, AnyAgent
 from any_agent.config import AgentFramework
 from any_agent.evaluation.schemas import AgentOutput
@@ -26,7 +29,12 @@ class AgentAsJudge:
         self.model = model
         self.framework = framework
 
-    def run(self, trace: AgentTrace, question: str) -> AgentOutput:
+    def run(
+        self,
+        trace: AgentTrace,
+        question: str,
+        additional_tools: list[Callable[[], Any]] = [],
+    ) -> AgentOutput:
         """Initialize the AgentAsJudge with a trace and model.
 
         Args:
@@ -37,9 +45,16 @@ class AgentAsJudge:
             The evaluation result
 
         """
-        return run_async_in_sync(self.run_async(trace, question))
+        return run_async_in_sync(
+            self.run_async(trace, question, additional_tools)
+        )
 
-    async def run_async(self, trace: AgentTrace, question: str) -> AgentOutput:
+    async def run_async(
+        self,
+        trace: AgentTrace,
+        question: str,
+        additional_tools: list[Callable[[], Any]] = [],
+    ) -> AgentOutput:
         """Run the agent asynchronously.
 
         Args:
@@ -55,7 +70,7 @@ class AgentAsJudge:
         agent_config = AgentConfig(
             model_id=self.model,
             instructions=AGENT_INSTRUCTIONS,
-            tools=tooling.get_all_tools(),
+            tools=tooling.get_all_tools() + additional_tools,
             output_type=AgentOutput,
         )
 
