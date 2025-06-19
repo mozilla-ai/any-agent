@@ -48,16 +48,15 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
             await event_queue.enqueue_event(task)
         else:
             logger.info("Task already exists: %s", task.model_dump_json(indent=2))
-
+        updater = TaskUpdater(event_queue, task.id, task.contextId)
         formatted_query = self.task_manager.format_query_with_history(task.id, query)
 
         # This agent always produces Task objects.
+        await updater.start_work()
         agent_trace = await self.agent.run_async(formatted_query)
 
         # Update task with new trace
         self.task_manager.update_task_trace(task.id, agent_trace)
-
-        updater = TaskUpdater(event_queue, task.id, task.contextId)
 
         # Validate & interpret the envelope produced by the agent
         final_output = agent_trace.final_output

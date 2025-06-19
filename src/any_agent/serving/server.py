@@ -3,10 +3,11 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any
 
+import httpx
 import uvicorn
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
-from a2a.server.tasks import InMemoryTaskStore
+from a2a.server.tasks import InMemoryPushNotifier, InMemoryTaskStore
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
@@ -15,7 +16,7 @@ from any_agent.utils import run_async_in_sync
 
 from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
-from .envelope import prepare_agent_for_a2a, prepare_agent_for_a2a_async
+from .envelope import prepare_agent_for_a2a_async
 
 if TYPE_CHECKING:
     from multiprocessing import Queue
@@ -27,17 +28,7 @@ if TYPE_CHECKING:
 def _get_a2a_app(
     agent: AnyAgent, serving_config: A2AServingConfig
 ) -> A2AStarletteApplication:
-    agent = prepare_agent_for_a2a(agent)
-
-    agent_card = _get_agent_card(agent, serving_config)
-    task_manager = TaskManager(serving_config)
-
-    request_handler = DefaultRequestHandler(
-        agent_executor=AnyAgentExecutor(agent, task_manager),
-        task_store=InMemoryTaskStore(),
-    )
-
-    return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
+    return run_async_in_sync(_get_a2a_app_async(agent, serving_config))
 
 
 async def _get_a2a_app_async(
@@ -51,6 +42,7 @@ async def _get_a2a_app_async(
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
         task_store=InMemoryTaskStore(),
+        push_notifier=InMemoryPushNotifier(httpx_client=httpx.AsyncClient()),
     )
 
     return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)

@@ -46,7 +46,7 @@ def _get_agent_card(agent: AnyAgent, serving_config: A2AServingConfig) -> AgentC
         defaultOutputModes=["text"],
         url=f"http://{serving_config.host}:{serving_config.port}/{endpoint}",
         capabilities=AgentCapabilities(
-            streaming=False, pushNotifications=False, stateTransitionHistory=False
+            streaming=False, pushNotifications=True, stateTransitionHistory=False
         ),
         skills=skills,
     )
