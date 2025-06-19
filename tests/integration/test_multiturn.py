@@ -326,7 +326,7 @@ async def test_multi_turn_a2a_tool():
             agent_config=main_agent_cfg,
         )
         prompt = f"""
-        Please talk to the structured testresult agent and interact with it. You'll contact it to ask three questions.
+        Please talk to the structured testresult agent and interact with it. You'll contact it to ask three questions. Say the exact words from the prompt in your query to the agent.
 
         1. {FIRST_TURN_PROMPT}
         2. {SECOND_TURN_PROMPT}
