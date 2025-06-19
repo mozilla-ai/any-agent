@@ -4,15 +4,13 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
-from agents.tracing import TracingProcessor
-from agents.tracing.processors import BatchTraceProcessor
-from agents.tracing.setup import GLOBAL_TRACE_PROVIDER
-from agents.tracing.span_data import FunctionSpanData, GenerationSpanData
 from opentelemetry.trace import StatusCode
 
 from .common import _set_tool_output
 
 if TYPE_CHECKING:
+    from agents import GenerationSpanData
+    from agents.tracing import TracingProcessor
     from opentelemetry.trace import Span
 
     from any_agent.frameworks.openai import OpenAIAgent
@@ -78,6 +76,9 @@ class _OpenAIAgentsInstrumentor:
     def instrument(self, agent: OpenAIAgent) -> None:
         if len(agent._running_traces) > 1:
             return
+        from agents import FunctionSpanData, GenerationSpanData
+        from agents.tracing import TracingProcessor
+        from agents.tracing.processors import BatchTraceProcessor
 
         first_llm_calls = self.first_llm_calls
         current_spans = self.current_spans
@@ -154,6 +155,7 @@ class _OpenAIAgentsInstrumentor:
                 pass
 
         self._processor = AnyAgentTracingProcessor()
+        from agents.tracing.setup import GLOBAL_TRACE_PROVIDER
 
         with GLOBAL_TRACE_PROVIDER._multi_processor._lock:
             GLOBAL_TRACE_PROVIDER._multi_processor._processors = tuple(
@@ -166,6 +168,7 @@ class _OpenAIAgentsInstrumentor:
     def uninstrument(self, agent: OpenAIAgent) -> None:
         if len(agent._running_traces) > 1:
             return
+        from agents.tracing.setup import GLOBAL_TRACE_PROVIDER
 
         if self._processor:
             with GLOBAL_TRACE_PROVIDER._multi_processor._lock:
