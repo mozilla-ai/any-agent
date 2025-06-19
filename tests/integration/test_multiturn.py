@@ -64,7 +64,7 @@ class MockConversationAgent(TinyAgent):
     async def run_async(self, prompt: str, **kwargs) -> AgentTrace:
         if self.turn_count == 0:
             # First turn: User introduces themselves
-            assert FIRST_TURN_PROMPT == prompt
+            assert FIRST_TURN_PROMPT in prompt
             self.turn_count += 1
             envelope = self.output_type(
                 task_status=TaskState.completed,

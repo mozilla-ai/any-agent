@@ -84,7 +84,10 @@ async def a2a_tool_async(
                 )
             elif hasattr(response.root, "result"):
                 result = response.root.result.model_dump_json(
-                    exclude_none=True, exclude_unset=True, exclude_defaults=True
+                    exclude={"history"},
+                    exclude_none=True,
+                    exclude_unset=True,
+                    exclude_defaults=True,
                 )
             else:
                 msg = (
