@@ -28,7 +28,7 @@ agno = [
 ]
 
 google = [
-  "google-adk>=1.0.0, <2"
+  "google-adk>=1.4.1, <2"
 ]
 
 langchain = [
