@@ -21,7 +21,11 @@ def test_evaluate_runs_all_evaluators(
     ### Every evaluate will return the same result
     eval_result = [
         EvaluationResult(
-            criteria="test criteria", passed=True, reason="test passed", points=1
+            criteria="test criteria",
+            passed=True,
+            reason="test passed",
+            points=1,
+            id="1",
         )
     ]
 
@@ -58,7 +62,11 @@ def test_evaluate_when_no_final_output(
     ### Every evaluate will return the same result
     eval_result = [
         EvaluationResult(
-            criteria="test criteria", passed=True, reason="test passed", points=1
+            criteria="test criteria",
+            passed=True,
+            reason="test passed",
+            points=1,
+            id="1",
         )
     ]
     for evaluate_fn in [
@@ -91,15 +99,15 @@ def test_trace_evaluation_result_score_calculation(agent_trace: AgentTrace) -> N
     # Create evaluation results with different point values and pass status
     checkpoint_results = [
         EvaluationResult(
-            criteria="Criterion 1", passed=True, reason="Passed", points=2
+            criteria="Criterion 1", passed=True, reason="Passed", points=2, id="1"
         ),
         EvaluationResult(
-            criteria="Criterion 2", passed=False, reason="Failed", points=3
+            criteria="Criterion 2", passed=False, reason="Failed", points=3, id="2"
         ),
     ]
 
     ground_truth_result = EvaluationResult(
-        criteria="Direct 1", passed=True, reason="Passed", points=3
+        criteria="Direct 1", passed=True, reason="Passed", points=3, id="3"
     )
 
     # Create a TraceEvaluationResult instance
