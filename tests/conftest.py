@@ -14,16 +14,6 @@ from any_agent.logging import setup_logger
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.integration.helpers import wait_for_server_async
 
-PATCH_PER_FRAMEWORK = {
-    AgentFramework.AGNO: "agno.tools.function.FunctionCall.execute",
-    AgentFramework.GOOGLE: "google.adk.tools.function_tool.FunctionTool.run_async",
-    AgentFramework.LANGCHAIN: "langchain_core.tools.structured.StructuredTool._run",
-    AgentFramework.LLAMA_INDEX: "llama_index.core.llms.function_calling.FunctionCallingLLM.astream_chat_with_tools",
-    AgentFramework.OPENAI: "agents.lifecycle.RunHooks.on_tool_start",
-    AgentFramework.SMOLAGENTS: "smolagents.agents.ToolCallingAgent.execute_tool_call",
-    AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.ToolExecutor.call_tool",
-}
-
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
 def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:

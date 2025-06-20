@@ -25,7 +25,6 @@ from any_agent.tracing.otel_types import StatusCode
 
 def test_exception_trace(
     agent_framework: AgentFramework,
-    patched_function: str,
     tmp_path: Path,
 ) -> None:
     if agent_framework in (
@@ -51,15 +50,9 @@ def test_exception_trace(
         Returns:
             None
         """
-        with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
-            f.write(text)
+        raise RuntimeError(exc_reason)
 
     kwargs["model_id"] = "gpt-4.1-mini"
-    """
-    env_check = validate_environment(kwargs["model_id"])
-    if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
-    """
 
     model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
@@ -78,20 +71,24 @@ def test_exception_trace(
     )
     agent = AnyAgent.create(agent_framework, agent_config)
 
+    x_function = Function(
+        name="fail_tool", arguments={"text":"test sample"}
+    )
+
+    x_tool_call = {
+        "id": "call_12345xyz",
+        "type": "function",
+        "function": x_function
+    }
+
+    x_message = Message(
+        tool_calls=[x_tool_call]
+    )
+
     fake_response = ModelResponse(
         choices=[
             Choices(
-                message=Message(
-                    tool_calls=[
-                        ChatCompletionMessageToolCall(
-                            id="call_12345xyz",
-                            type="function",
-                            function=Function(
-                                name="fail_tool", arguments='{"text":"test sample"}'
-                            ),
-                        )
-                    ]
-                )
+                message=x_message
             )
         ]
     )
@@ -100,15 +97,7 @@ def test_exception_trace(
         choices=[
             StreamingChoices(
                 delta=Delta(
-                    tool_calls=[
-                        ChatCompletionMessageToolCall(
-                            id="call_12345xyz",
-                            type="function",
-                            function=Function(
-                                name="fail_tool", arguments='{"text":"test sample"}'
-                            ),
-                        )
-                    ]
+                    tool_calls=[x_tool_call]
                 )
             )
         ]
@@ -117,23 +106,30 @@ def test_exception_trace(
     async def fake_iter():
         yield fake_chunk
 
+    def fake_resp(*args, **kwargs):
+        return fake_response
+
+    patch_function = "litellm.acompletion"
+    """
+    if agent_framework is AgentFramework.GOOGLE:
+        patch_function = "google.adk.models.lite_llm.acompletion"
+    """
+    if agent_framework is AgentFramework.SMOLAGENTS:
+        patch_function = "litellm.completion"
+
     with (
-        patch(patched_function) as fw_agent_runtool,
-        patch("litellm.acompletion") as acompletion_mock,
-        patch("litellm.completion") as completion_mock,
+        patch(patch_function) as acompletion_mock,
     ):
-        fw_agent_runtool.side_effect = RuntimeError(exc_reason)
         if agent_framework in (
             AgentFramework.GOOGLE,
             AgentFramework.LLAMA_INDEX,
         ):
             acompletion_mock.return_value = fake_iter()
-            completion_mock.return_value = fake_iter()
         else:
-            acompletion_mock.return_value = fake_response
-            completion_mock.return_value = fake_response
+            acompletion_mock.side_effect = fake_resp
         spans = []
         try:
+
             agent.run(
                 "Write a four-line poem and use the tools to write it to a file.",
             )
