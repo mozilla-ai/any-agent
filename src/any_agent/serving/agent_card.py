@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from any_agent.serving.config import A2AServingConfig
 
 
-def _build_agent_card(agent: AnyAgent, serving_config: A2AServingConfig) -> AgentCard:
+def _get_agent_card(agent: AnyAgent, serving_config: A2AServingConfig) -> AgentCard:
     skills = serving_config.skills
     if skills is None:
         skills = []

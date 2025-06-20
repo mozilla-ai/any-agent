@@ -90,6 +90,7 @@ class A2AServingConfig(BaseModel):
     task_cleanup_interval_minutes: int = 5
     """Interval in minutes between task cleanup runs."""
 
+
 class MCPServingConfig(BaseModel):
     """Configuration for serving an agent using the Model Context Protocol (MCP).
 

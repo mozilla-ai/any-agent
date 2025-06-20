@@ -5,27 +5,6 @@ import httpx
 import requests
 
 
-def mock_search_web(query: str) -> str:
-    """Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results.
-
-    Args:
-        query (str): The search query to perform.
-
-    Returns:
-        The top search results.
-
-    """
-    return (
-        "[Any Agent](https://github.com/mozill-ai/any-agent) is the top choice for developers needing flexibility and power in multi-agent systems.\n"
-        "[Agno Framework Review](https://example.com/agno)\n"
-        "Agno is widely regarded as the most flexible and powerful agent framework available in 2024.\n\n"
-        "[TinyAgent: Lightweight but Limited](https://example.com/tinyagent)\n"
-        "TinyAgent is great for simple tasks, but lacks advanced multi-agent support.\n\n"
-        "[Llama Index: A Strong Contender](https://example.com/llama)\n"
-        "Llama Index offers robust features, but some users prefer Agno for its extensibility."
-    )
-
-
 def wait_for_server(
     server_url: str, max_attempts: int = 20, poll_interval: float = 0.5
 ):

@@ -18,22 +18,112 @@ from starlette.routing import Mount, Route
 from any_agent.serving.task_manager import TaskManager
 from any_agent.utils import run_async_in_sync
 
-from .agent_card import _build_agent_card
+from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
 from .envelope import prepare_agent_for_a2a, prepare_agent_for_a2a_async
 
 if TYPE_CHECKING:
     from multiprocessing import Queue
+
     from starlette.requests import Request
 
     from any_agent import AnyAgent
-    from any_agent.serving import A2AServingConfig, MCPServingConfig
+    from any_agent.serving import A2AServingConfig
+
+
+def _get_a2a_app(
+    agent: AnyAgent, serving_config: A2AServingConfig
+) -> A2AStarletteApplication:
+    agent = prepare_agent_for_a2a(agent)
+
+    agent_card = _get_agent_card(agent, serving_config)
+    task_manager = TaskManager(serving_config)
+
+    request_handler = DefaultRequestHandler(
+        agent_executor=AnyAgentExecutor(agent, task_manager),
+        task_store=InMemoryTaskStore(),
+    )
+
+    return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
+
+
+async def _get_a2a_app_async(
+    agent: AnyAgent, serving_config: A2AServingConfig
+) -> A2AStarletteApplication:
+    agent = await prepare_agent_for_a2a_async(agent)
+
+    agent_card = _get_agent_card(agent, serving_config)
+    task_manager = TaskManager(serving_config)
+
+    request_handler = DefaultRequestHandler(
+        agent_executor=AnyAgentExecutor(agent, task_manager),
+        task_store=InMemoryTaskStore(),
+    )
+
+    return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
+
+
+def _create_server(
+    app: A2AStarletteApplication,
+    host: str,
+    port: int,
+    endpoint: str,
+    log_level: str = "warning",
+) -> uvicorn.Server:
+    root = endpoint.lstrip("/").rstrip("/")
+    a2a_app = app.build()
+    internal_router = Starlette(routes=[Mount(f"/{root}", routes=a2a_app.routes)])
+
+    config = uvicorn.Config(internal_router, host=host, port=port, log_level=log_level)
+    return uvicorn.Server(config)
+
+
+async def serve_a2a_async(
+    server: A2AStarletteApplication,
+    host: str,
+    port: int,
+    endpoint: str,
+    log_level: str = "warning",
+) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+    """Provide an A2A server to be used in an event loop."""
+    uv_server = _create_server(server, host, port, endpoint, log_level)
+    task = asyncio.create_task(uv_server.serve())
+    while not uv_server.started:  # noqa: ASYNC110
+        await asyncio.sleep(0.1)
+    if port == 0:
+        server_port = uv_server.servers[0].sockets[0].getsockname()[1]
+        server.agent_card.url = f"http://{host}:{server_port}/{endpoint.lstrip('/')}"
+    return (task, uv_server)
+
+
+def serve_a2a(
+    server: A2AStarletteApplication,
+    host: str,
+    port: int,
+    endpoint: str,
+    log_level: str = "warning",
+    server_queue: Queue[int] | None = None,
+) -> None:
+    """Serve the A2A server."""
+
+    # Note that the task should be kept somewhere
+    # because the loop only keeps weak refs to tasks
+    # https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
+    async def run() -> None:
+        (task, uv_server) = await serve_a2a_async(
+            server, host, port, endpoint, log_level
+        )
+        if server_queue:
+            server_queue.put(uv_server.servers[0].sockets[0].getsockname()[1])
+        await task
+
+    return run_async_in_sync(run())
 
 
 def _create_mcp_server_instance(agent: AnyAgent) -> MCPServer[Any]:
-    server = MCPServer("any-agent-mcp-server", version="0.1.0")
+    server = MCPServer[Any]("any-agent-mcp-server")
 
-    @server.list_tools()
+    @server.list_tools()  # type: ignore[no-untyped-call,misc]
     async def handle_list_tools() -> list[mcptypes.Tool]:
         return [
             mcptypes.Tool(
@@ -52,7 +142,7 @@ def _create_mcp_server_instance(agent: AnyAgent) -> MCPServer[Any]:
             )
         ]
 
-    @server.call_tool()
+    @server.call_tool()  # type: ignore[no-untyped-call,misc]
     async def handle_call_tool(
         name: str, arguments: dict[str, Any]
     ) -> list[mcptypes.TextContent | mcptypes.ImageContent | mcptypes.EmbeddedResource]:
@@ -67,29 +157,18 @@ def _create_mcp_server_instance(agent: AnyAgent) -> MCPServer[Any]:
     return server
 
 
-async def serve_async(
-    starlette_app, host, port, log_level
-) -> tuple[asyncio.Task[Any], uvicorn.Server]:
-    config = uvicorn.Config(starlette_app, host=host, port=port, log_level=log_level)
-    uv_server = uvicorn.Server(config)
-    task = asyncio.create_task(uv_server.serve())
-    while not uv_server.started:  # noqa: ASYNC110
-        await asyncio.sleep(0.1)
-    return (task, uv_server)
-
-
-async def serve_mcp_async(
+def _get_mcp_app(
     agent: AnyAgent,
-    serving_config: A2AServingConfig,
-) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+    endpoint: str,
+) -> Starlette:
     """Provide an MCP server to be used in an event loop."""
-    root = serving_config.endpoint.lstrip("/").rstrip("/")
+    root = endpoint.lstrip("/").rstrip("/")
     msg_endpoint = f"/{root}/messages/"
     sse = SseServerTransport(msg_endpoint)
     server = _create_mcp_server_instance(agent)
     init_options = server.create_initialization_options()
 
-    async def _handle_sse(request: Request):
+    async def _handle_sse(request: Request):  # type: ignore[no-untyped-def]
         async with sse.connect_sse(
             request.scope, request.receive, request._send
         ) as streams:
@@ -102,60 +181,33 @@ async def serve_mcp_async(
         Route(f"/{root}/sse", endpoint=_handle_sse, methods=["GET"]),
         Mount(msg_endpoint, app=sse.handle_post_message),
     ]
-    starlette_app = Starlette(routes=routes)
-
-    return await serve_async(
-        starlette_app,
-        serving_config.host,
-        serving_config.port,
-        serving_config.log_level,
-    )
+    return Starlette(routes=routes)
 
 
-async def serve_a2a_async(
+async def serve_mcp_async(
     agent: AnyAgent,
-    serving_config: A2AServingConfig,
+    host: str,
+    port: int,
+    endpoint: str,
+    log_level: str = "warning",
 ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
-    """Provide an A2A server to be used in an event loop."""
-    agent_card = _build_agent_card(agent, serving_config)
-    request_handler = DefaultRequestHandler(
-        agent_executor=AnyAgentExecutor(agent),
-        task_store=InMemoryTaskStore(),
+    """Provide an MCP server to be used in an event loop."""
+    config = uvicorn.Config(
+        _get_mcp_app(agent, endpoint), host=host, port=port, log_level=log_level
     )
-    app_builder = A2AStarletteApplication(
-        agent_card=agent_card, http_handler=request_handler
-    )
-    root = serving_config.endpoint.lstrip("/").rstrip("/")
-    starlette_app = app_builder.build()
-    internal_router = Starlette(routes=[Mount(f"/{root}", routes=starlette_app.routes)])
-
-    return await serve_async(
-        internal_router,
-        serving_config.host,
-        serving_config.port,
-        serving_config.log_level,
-    )
-
-
-def serve_a2a(
-    agent: AnyAgent,
-    serving_config: A2AServingConfig,
-) -> None:
-    """Serve the A2A server."""
-
-    # Note that the task should be kept somewhere
-    # because the loop only keeps weak refs to tasks
-    # https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
-    async def run() -> None:
-        (task, _) = await serve_a2a_async(agent, serving_config)
-        await task
-
-    return run_async_in_sync(run())
+    uv_server = uvicorn.Server(config)
+    task = asyncio.create_task(uv_server.serve())
+    while not uv_server.started:  # noqa: ASYNC110
+        await asyncio.sleep(0.1)
+    return (task, uv_server)
 
 
 def serve_mcp(
     agent: AnyAgent,
-    serving_config: MCPServingConfig,
+    host: str,
+    port: int,
+    endpoint: str,
+    log_level: str = "warning",
 ) -> None:
     """Serve the MCP server."""
 
@@ -163,7 +215,7 @@ def serve_mcp(
     # because the loop only keeps weak refs to tasks
     # https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
     async def run() -> None:
-        (task, _) = await serve_mcp_async(agent, serving_config)
+        (task, _) = await serve_mcp_async(agent, host, port, endpoint, log_level)
         await task
 
     return run_async_in_sync(run())

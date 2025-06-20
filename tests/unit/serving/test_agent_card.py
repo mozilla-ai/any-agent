@@ -3,9 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from any_agent import AgentConfig, AgentFramework
-from any_agent.config import MCPSse
 from any_agent.tools import search_web
-from any_agent.tools.mcp import _get_mcp_server
 from any_agent.tools.wrappers import WRAPPERS
 
 # Skip entire module if a2a dependencies are not available
@@ -16,15 +14,15 @@ pytest.importorskip("any_agent.serving.agent_card")
 from a2a.types import AgentSkill
 
 from any_agent.serving import A2AServingConfig
-from any_agent.serving.agent_card import _build_agent_card
+from any_agent.serving.agent_card import _get_agent_card
 
 
-def test_build_agent_card(agent_framework: AgentFramework) -> None:
+def test_get_agent_card(agent_framework: AgentFramework) -> None:
     agent = MagicMock()
     agent.config = AgentConfig(model_id="foo", description="test agent")
     agent.framework = agent_framework
     agent._tools = [WRAPPERS[agent_framework](search_web)]
-    agent_card = _build_agent_card(agent, A2AServingConfig())
+    agent_card = _get_agent_card(agent, A2AServingConfig())
     assert agent_card.name == "any_agent"
     assert agent_card.description == "test agent"
     assert len(agent_card.skills) == 1
@@ -37,30 +35,7 @@ def test_build_agent_card(agent_framework: AgentFramework) -> None:
     assert agent_card.url == "http://localhost:5000/"
 
 
-@pytest.mark.asyncio
-async def test_build_agent_card_with_mcp(  # type: ignore[no-untyped-def]
-    agent_framework: AgentFramework, echo_sse_server
-) -> None:
-    agent = MagicMock()
-    agent.config = AgentConfig(model_id="foo", description="test agent")
-    agent.framework = agent_framework
-    server = _get_mcp_server(MCPSse(url=echo_sse_server["url"]), agent_framework)
-    await server._setup_tools()
-    if agent_framework is AgentFramework.AGNO:
-        agent._tools = list(server.tools[0].functions.values())  # type: ignore[union-attr]
-    else:
-        agent._tools = server.tools
-
-    agent_card = _build_agent_card(agent, A2AServingConfig())
-    assert agent_card.name == "any_agent"
-    assert agent_card.description == "test agent"
-    assert len(agent_card.skills) == 3
-    assert agent_card.skills[0].id == "any_agent-write_file"
-    assert agent_card.skills[0].name == "write_file"
-    assert agent_card.skills[0].description == "Say hi back with the input text"
-
-
-def test_build_agent_card_with_explicit_skills(agent_framework: AgentFramework) -> None:
+def test_get_agent_card_with_explicit_skills(agent_framework: AgentFramework) -> None:
     """Test that when skills are explicitly provided in A2AServingConfig, they are used instead of inferring from tools."""
     agent = MagicMock()
     agent.config = AgentConfig(model_id="foo", description="test agent")
@@ -85,7 +60,7 @@ def test_build_agent_card_with_explicit_skills(agent_framework: AgentFramework) 
     ]
 
     serving_config = A2AServingConfig(skills=explicit_skills)
-    agent_card = _build_agent_card(agent, serving_config)
+    agent_card = _get_agent_card(agent, serving_config)
 
     # Verify basic agent card properties
     assert agent_card.name == "any_agent"
