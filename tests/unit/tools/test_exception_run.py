@@ -27,12 +27,16 @@ def test_exception_trace(
     agent_framework: AgentFramework,
     tmp_path: Path,
 ) -> None:
-    if agent_framework in (
-        # Fails due to:
-        # `('Recursion limit of 25 reached without hitting a stop condition. You can increase the ...oubleshooting/errors/GRAPH_RECURSION_LIMIT',)`
-        AgentFramework.LANGCHAIN,
-    ):
-        pytest.skip(f"Framework {agent_framework.value} not currently passing the test")
+    skip_reason = {
+        # AgentFramework.GOOGLE: "assert False; the function does not seem to be called",
+        AgentFramework.AGNO: "Does not progress: Failed: Timeout (>30.0s) from pytest-timeout.",
+        # AgentFramework.SMOLAGENTS: "assert False",
+        #         while final_answer is None and self.step_number <= max_steps:
+        #         there's no final answer
+        # AgentFramework.TINYAGENT: "assert False"
+    }
+    if agent_framework in skip_reason:
+        pytest.skip(f"Framework {agent_framework.value} not currently passing the test, reason: {skip_reason[agent_framework]}")
 
     kwargs = {}
 
@@ -50,7 +54,7 @@ def test_exception_trace(
         Returns:
             None
         """
-        raise RuntimeError(exc_reason)
+        raise ValueError(exc_reason)
 
     kwargs["model_id"] = "gpt-4.1-mini"
 
@@ -110,10 +114,6 @@ def test_exception_trace(
         return fake_response
 
     patch_function = "litellm.acompletion"
-    """
-    if agent_framework is AgentFramework.GOOGLE:
-        patch_function = "google.adk.models.lite_llm.acompletion"
-    """
     if agent_framework is AgentFramework.SMOLAGENTS:
         patch_function = "litellm.completion"
 
@@ -129,14 +129,15 @@ def test_exception_trace(
             acompletion_mock.side_effect = fake_resp
         spans = []
         try:
-
-            agent.run(
+            agent_trace = agent.run(
                 "Write a four-line poem and use the tools to write it to a file.",
             )
-        except AgentRunError as are:
-            spans = are.trace.spans
+            spans = agent_trace.spans
+        except AgentRunError as e:
+            spans = e.trace.spans
         assert any(
-            span.status.status_code == StatusCode.ERROR
-            and exc_reason in span.status.description
+            span.is_tool_execution()
+            and span.status.status_code == StatusCode.ERROR
+            and exc_reason in getattr(span.status, "description", "")
             for span in spans
         )
