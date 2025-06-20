@@ -56,8 +56,6 @@ class MCPStdio(BaseModel):
     If none is specified, the default behavior is that the agent will have access to all tools under that MCP server.
     """
 
-    cwd: str | None = None
-
     client_session_timeout_seconds: float | None = 5
     """the read timeout passed to the MCP ClientSession."""
 
