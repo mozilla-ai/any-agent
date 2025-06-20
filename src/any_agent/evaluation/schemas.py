@@ -1,6 +1,7 @@
 from collections.abc import Callable, Sequence
+from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import TypedDict
 
 from any_agent.tracing.agent_trace import AgentTrace
@@ -15,10 +16,20 @@ class EvaluationResult(BaseModel):
     """Represents the result of evaluating a criterion."""
 
     model_config = ConfigDict(extra="forbid")
+    id: str
+    """The identifier for the result, corresponds to the id of the criteria."""
+
     passed: bool
+    """Whether the criteria was passed."""
+
     reason: str
+    """The reason for the result."""
+
     criteria: str | Callable[[AgentTrace], AgentOutput]
+    """The criteria to evaluate the agent's output against."""
+
     points: int
+    """The number of points the criteria is worth."""
 
 
 class AnswerDetails(TypedDict):
@@ -35,8 +46,15 @@ class CheckpointCriteria(BaseModel):
     """Represents a checkpoint criteria with a description."""
 
     model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    """The unique identifier for the criteria."""
+
     criteria: str | Callable[[AgentTrace], AgentOutput]
+    """The criteria to evaluate the agent's output against."""
+
     points: int
+    """The number of points the criteria is worth."""
 
 
 class GroundTruthAnswer(TypedDict):

@@ -48,6 +48,7 @@ def evaluate_checkpoints(
             reason=eval_output.reasoning,
             criteria=checkpoint.criteria,
             points=checkpoint.points,
+            id=checkpoint.id,
         )
         results.append(result)
     return results
@@ -91,4 +92,5 @@ def evaluate_final_output(
         reason=f"Partial Match (F1) score is {round(f1_score, 2)}",
         criteria="Is the answer a direct match?",
         points=1,
+        id="final_output",
     )

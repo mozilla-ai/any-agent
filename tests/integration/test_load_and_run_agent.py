@@ -119,29 +119,50 @@ def assert_eval(agent_trace: AgentTrace) -> None:
             passed=False, reasoning="Didn't find `write_file` tool usage."
         )
 
+    # Create checkpoints with mix of auto-generated and custom IDs
+    checkpoint_with_auto_id = CheckpointCriteria(
+        criteria=_check_if_agent_called_write_file,
+        points=1,
+    )
+    checkpoint_with_custom_id = CheckpointCriteria(
+        id="custom_year_check",
+        criteria="Check if the agent wrote the year to the file.",
+        points=1,
+    )
+    checkpoint_with_another_auto_id = CheckpointCriteria(
+        criteria="Check if the year was 1990",
+        points=1,
+    )
+
     case = EvaluationCase(
         llm_judge="gpt-4.1-mini",
         checkpoints=[
-            CheckpointCriteria(
-                criteria=_check_if_agent_called_write_file,
-                points=1,
-            ),
-            CheckpointCriteria(
-                criteria="Check if the agent wrote the year to the file.",
-                points=1,
-            ),
-            CheckpointCriteria(
-                criteria="Check if the year was 1990",
-                points=1,
-            ),
+            checkpoint_with_auto_id,
+            checkpoint_with_custom_id,
+            checkpoint_with_another_auto_id,
         ],
     )
+
     result: TraceEvaluationResult = evaluate(
         evaluation_case=case,
         trace=agent_trace,
     )
     assert result
     assert result.score >= float(1 / 3)
+
+    # Verify that IDs are preserved in evaluation results
+    assert len(result.checkpoint_results) == 3
+    result_ids = [r.id for r in result.checkpoint_results]
+
+    # Should contain the custom ID
+    assert "custom_year_check" in result_ids
+
+    # Should contain the auto-generated IDs
+    assert checkpoint_with_auto_id.id in result_ids
+    assert checkpoint_with_another_auto_id.id in result_ids
+
+    # Verify all IDs are unique
+    assert len(set(result_ids)) == 3
 
 
 class Step(BaseModel):
