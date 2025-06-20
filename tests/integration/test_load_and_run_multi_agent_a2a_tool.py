@@ -52,15 +52,14 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
 
     Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
     """
-    if agent_framework in [
-        # async a2a is not supported
-        AgentFramework.SMOLAGENTS,
-        # spans are not built correctly
-        AgentFramework.LLAMA_INDEX,
-        # AgentFramework.GOOGLE,
-    ]:
+    skip_reason = {
+        AgentFramework.SMOLAGENTS: "async a2a is not supported",
+        AgentFramework.GOOGLE: "Default value is not supported in function declaration schema for Google AI",
+        # AgentFramework.LLAMA_INDEX: "spans are not built correctly",
+    }
+    if agent_framework in skip_reason:
         pytest.skip(
-            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+            f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
     kwargs = {}
 
@@ -203,15 +202,13 @@ def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> N
 
     Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
     """
-    if agent_framework in [
-        # async a2a is not supported
-        AgentFramework.SMOLAGENTS,
-        # spans are not built correctly
-        AgentFramework.LLAMA_INDEX,
-        # AgentFramework.GOOGLE,
-    ]:
+    skip_reason = {
+        AgentFramework.SMOLAGENTS: "async a2a is not supported; run_async_in_sync fails",
+        # AgentFramework.LLAMA_INDEX: "spans are not built correctly",
+    }
+    if agent_framework in skip_reason:
         pytest.skip(
-            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+            f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
 
     kwargs = {}
