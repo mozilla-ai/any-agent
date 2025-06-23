@@ -652,6 +652,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#adding-an-opentelemetry-exporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding an OpenTelemetry exporter
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1054,6 +1063,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#adding-an-opentelemetry-exporter" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding an OpenTelemetry exporter
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1084,7 +1102,7 @@
   
       async
   " href="../api/agent/#any_agent.AnyAgent.run_async"><code>agent.run_async</code></a>.</p>
-<p><code>any-agent</code> generates standardized (regarding the structure) <a href="https://opentelemetry.io/">OpenTelemetry</a> traces regardless of the framework used, based on the <a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/">Semantic conventions for generative AI systems</a>.</p>
+<p><code>any-agent</code> generates standardized (regarding the structure) <a href="https://opentelemetry.io/">OpenTelemetry</a> traces regardless of the framework used, based on the <a href="https://opentelemetry.io/docs/specs/semconv/gen-ai/">Semantic conventions for generative AI systems</a>. This means that any OpenTelemetry exporter compatible with the Python SDK can be added. More information can be found <a href="#adding-an-opentelemetry-exporter">below</a>.</p>
 <p>You can try to 🔍 find 🔍 the subtle differences (regarding the content) across frameworks in the examples below.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -4139,6 +4157,17 @@
 </span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;Which agent framework is the best?&quot;</span><span class="p">)</span>
 </span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;agent_trace.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 </span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>  <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</span></code></pre></div>
+<h2 id="adding-an-opentelemetry-exporter">Adding an OpenTelemetry exporter</h2>
+<p>Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed. Note that this does not affect the existing processor that returns the traces to the user, and optionally prints them on <code>stdout</code>. Note that due to the breaking changes in the <a href="https://protobuf.dev/news/2022-05-06/#python-updates">protocol buffer Python implementation</a>, it may be necessary to use a pure Python implementation by using <code>PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python</code> in the environment.</p>
+<p>The following code will use the OpenTelemetry Python SDK to send the agent traces to an additional endpoint using OTLP over HTTP in the indicated URL:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry.trace</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_tracer_provider</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry.sdk.trace.export</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSpanProcessor</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry.exporter.otlp.proto.http.trace_exporter</span><span class="w"> </span><span class="kn">import</span> <span class="n">OTLPSpanExporter</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">tp</span> <span class="o">=</span> <span class="n">get_tracer_provider</span><span class="p">()</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="n">http_exporter</span> <span class="o">=</span> <span class="n">OTLPSpanExporter</span><span class="p">(</span><span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;http://localhost:4318/v1/traces&quot;</span><span class="p">)</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">tp</span><span class="o">.</span><span class="n">add_span_processor</span><span class="p">(</span><span class="n">SimpleSpanProcessor</span><span class="p">(</span><span class="n">http_exporter</span><span class="p">))</span>
 </span></code></pre></div>
 
 
