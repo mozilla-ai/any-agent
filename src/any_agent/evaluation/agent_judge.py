@@ -1,17 +1,18 @@
 from collections.abc import Callable
 from typing import Any
 
+from pydantic import BaseModel
+
 from any_agent import AgentConfig, AnyAgent
 from any_agent.config import AgentFramework
 from any_agent.evaluation.schemas import AgentOutput
 from any_agent.evaluation.tools import EvaluationTools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.utils.asyncio_sync import run_async_in_sync
-from pydantic import BaseModel
 
-AGENT_INSTRUCTIONS = f"""You are a helpful assistant that will be used to evaluate the correctness of an agent trace.
+AGENT_INSTRUCTIONS = """You are a helpful assistant that will be used to evaluate the correctness of an agent trace.
 Given a specific question regarding the quality of something about the agent, \
-utilize the appropriate tools in order to gather what you need to accurately answer the question. 
+utilize the appropriate tools in order to gather what you need to accurately answer the question.
 
 Answer with:
 1. "passed": true or false
@@ -33,13 +34,11 @@ class AgentJudge:
         self.model_args = model_args
         self.output_type = output_type
 
-
-
     def run(
         self,
         trace: AgentTrace,
         question: str,
-        additional_tools: list[Callable[[], Any]] = [],
+        additional_tools: list[Callable[[], Any]] | None = None,
     ) -> BaseModel:
         """Run the agent judge.
 
@@ -52,13 +51,15 @@ class AgentJudge:
             The evaluation result
 
         """
+        if additional_tools is None:
+            additional_tools = []
         return run_async_in_sync(self.run_async(trace, question, additional_tools))
 
     async def run_async(
         self,
         trace: AgentTrace,
         question: str,
-        additional_tools: list[Callable[[], Any]] = [],
+        additional_tools: list[Callable[[], Any]] | None = None,
     ) -> BaseModel:
         """Run the agent judge asynchronously.
 
@@ -70,6 +71,8 @@ class AgentJudge:
             The evaluation result
 
         """
+        if additional_tools is None:
+            additional_tools = []
         tooling = EvaluationTools(trace)
 
         agent_config = AgentConfig(

@@ -29,7 +29,7 @@ Your task is to carefully analyze the trace and provide a judgment on whether th
 
 TRACE FORMAT:
 The trace shows the conversation flow between the user, assistant (agent), and any tools used. Each message includes:
-- Role: system, user, assistant 
+- Role: system, user, assistant
 - Content: The actual message or tool execution details
 
 EVALUATION GUIDELINES:
@@ -50,7 +50,7 @@ Your response MUST be valid JSON matching this schema:
 }"""
 
 
-class LLMJudge:
+class LlmJudge:
     """An LLM that evaluates the correctness of another agent's trace."""
 
     def __init__(
@@ -75,7 +75,7 @@ class LLMJudge:
         trace: AgentTrace,
         question: str,
     ) -> BaseModel:
-        """Initialize the LLMJudge with a trace and model.
+        """Initialize the LlmJudge with a trace and model.
 
         Args:
             trace: The agent trace to evaluate
@@ -127,8 +127,6 @@ class LLMJudge:
                 passed=False, reasoning=f"Error during LLM evaluation: {e!s}"
             )
 
-        if not isinstance(response.choices[0].message, self.output_type):
-            msg = "LLM response is not an AgentOutput instance."
-            raise ValueError(msg)
-
-        return response.choices[0].message
+        return self.output_type.model_validate_json(
+            response.choices[0].message["content"]  # type: ignore[union-attr]
+        )

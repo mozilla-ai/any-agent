@@ -1,82 +1,185 @@
 # Agent Evaluation
 
-!!! warning
+The any-agent evaluation module provides two primitives for evaluating agent traces using LLM-as-a-judge techniques:
 
-    The codebase for evaluation is under development and is not yet stable. Use with caution,
-    we welcome contributions.
+- [`LlmJudge`][any_agent.evaluation.LlmJudge]: For evaluations that can be answered with a direct LLM call alongside the trace messages.
+- [`AgentJudge`][any_agent.evaluation.AgentJudge]: For complex evaluations that utilize built-in and customizable tools to inspect specific parts of the trace and additional content
 
-Evaluation using any_agent.evaluation is designed to be a "trace-first" evaluation. The evaluation of a trace
-is not designed to be pass/fail, but is rather a score based on the achievement of user-defined criteria for
-each example. Agent systems are hyper-specific to each use case, and it's difficult to provide a single set of metrics
-that would reliably provide the insight needed to make a decision about the effectiveness of an agent.
+Both judges work with any-agent's unified tracing format and return structured evaluation results.
 
-Using any-agent evaluation, you can specify any criteria you wish, and through the LLM-as-a-judge technique, any-agent will
-evaluate which criteria are satisfied.
+## Should you use an LlmJudge or AgentJudge?
 
-## Example
+Before automatically using an LLM based approach, it is worthwhile to consider whether it is necessary. For deterministic evaluations where you know exactly what to check, you may not want an LLM-based judge at all. Writing a custom evaluation function that directly examines the trace can be more efficient, reliable, and cost-effective. the any-agent [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] provides a few helpful methods that can be used to extract common information.
 
-Using the unified tracing format provided by any-agent's [tracing functionality](./tracing.md), the trace can be evaluated
-with user defined criteria. The steps for evaluating an agent are as follows:
-
-### Run an agent using any-agent, which will produce a trace. For example
+### Example: Custom Evaluation Function
 
 ```python
+from any_agent.tracing.agent_trace import AgentTrace
+
+def evaluate_efficiency(trace: AgentTrace) -> dict:
+    """Custom evaluation function for efficiency criteria."""
+
+    # Direct access to trace properties
+    token_count = trace.tokens.total_tokens
+    step_count = len(trace.spans)
+    final_output = trace.final_output
+
+    # Apply your specific criteria
+    results = {
+        "token_efficient": token_count < 1000,
+        "step_efficient": step_count <= 5,
+        "has_output": final_output is not None,
+        "token_count": token_count,
+        "step_count": step_count
+    }
+
+    # Calculate overall pass/fail
+    results["passed"] = all([
+        results["token_efficient"],
+        results["step_efficient"],
+        results["has_output"]
+    ])
+
+    return results
+
+# Usage
 from any_agent import AgentConfig, AnyAgent
+from any_agent.evaluation import LlmJudge
 from any_agent.tools import search_web
 
+# First, run an agent to get a trace
 agent = AnyAgent.create(
-    "langchain",
+    "tinyagent",
     AgentConfig(
-        model_id="gpt-4o-mini",
+        model_id="gpt-4.1-nano",
         tools=[search_web]
     ),
 )
-
-agent_trace = agent.run("How many seconds would it take for a leopard at full speed to run through Pont des Arts?")
+trace = agent.run("What is the capital of France?")
+evaluation = evaluate_efficiency(trace)
+print(f"Evaluation results: {evaluation}")
 ```
 
+### Working with Trace Messages
 
-### Define an evaluation case either in a yaml file or in python:
+You can also examine the conversation flow directly:
 
-=== "YAML"
-    ~~~yaml
-    {% include "./examples/evaluation_case.yaml" %}
-    ~~~
-    Then in python
-    ```python
-    from any_agent.evaluation.evaluation_case import EvaluationCase
-    evaluation_case = EvaluationCase.from_yaml(evaluation_case_path)
-    ```
+```python
+def check_tool_usage(trace: AgentTrace, required_tool: str) -> bool:
+    """Check if a specific tool was used in the trace."""
+    messages = trace.spans_to_messages()
 
-=== "Python"
-    ```python
-    from any_agent.evaluation.evaluation_case import EvaluationCase
-    evaluation_case = EvaluationCase(
-            ground_truth={ "value": "9", "points": 1.0},
-            checkpoints=[
-                {"criteria": "Did the agent run a calculation", "points": 1},
-                {"criteria": "Did the agent use fewer than 5 steps", "points": 4},
-            ],
-            llm_judge="gpt-4o-mini",
-    )
-    ```
+    for message in messages:
+        if message.role == "tool" and required_tool in message.content:
+            return True
+    return False
 
-### Run the evaluation using the test case and trace
+# Usage
+used_search = check_tool_usage(trace, "search_web")
+print(f"Used web search: {used_search}")
+```
 
-=== "Python"
-    ```python
-    from any_agent.evaluation.evaluate import evaluate
-    eval_result = evaluate(
-        evaluation_case=evaluation_case,
-        trace=agent_trace
-    )
-    print(f"Final score: {eval_result.score}")
-    print(f"Checkpoint scores: {eval_result.checkpoint_results}")
-    ```
+## LlmJudge
 
-=== "CLI"
-    ```bash
-    any-agent-evaluate \
-        --evaluation_case_path "docs/examples/evaluation_case.yaml" \
-        --trace_path "tests/assets/OPENAI_trace.json"
-    ```
+The `LlmJudge` is ideal for straightforward evaluation questions that can be answered by examining the complete trace text. It's efficient and works well for:
+
+- Basic pass/fail assessments
+- Simple criteria checking
+- Text-based evaluations
+
+### Example: Basic LLM Judge
+
+```python
+trace = agent.run("What is the capital of France?")
+
+# Create and run the LLM judge
+judge = LlmJudge(model_id="gpt-4o-mini")
+result = judge.run(
+    trace=trace,
+    question="Did the agent provide the correct answer about the capital of France?"
+)
+
+print(f"Passed: {result.passed}")
+print(f"Reasoning: {result.reasoning}")
+```
+
+## AgentJudge
+
+The `AgentJudge` is designed for complex evaluations that require inspecting specific aspects of the trace. It comes equipped with evaluation tools and can accept additional custom tools for specialized assessments.
+
+### Built-in Evaluation Tools
+
+The `AgentJudge` automatically has access to these evaluation tools:
+
+- `get_final_output()`: Get the agent's final output
+- `get_tokens_used()`: Get total token usage
+- `get_number_of_steps()`: Get number of steps taken
+- `get_messages_from_trace()`: Get formatted trace messages
+
+### Example: Agent Judge with Tool Access
+
+```python
+from any_agent.evaluation import AgentJudge
+
+# Create an agent judge
+judge = AgentJudge(model_id="gpt-4o")
+
+# Evaluate with access to trace inspection tools
+result = judge.run(
+    trace=trace,
+    question="Did the agent use web search and complete the task in under 5 steps?"
+)
+
+print(f"Passed: {result.passed}")
+print(f"Reasoning: {result.reasoning}")
+```
+
+### Adding Custom Tools
+
+You can extend the `AgentJudge` with additional tools for specialized evaluations:
+
+```python
+def check_for_ice_cream(message: str) -> bool:
+    """Custom tool to check if a specific API was mentioned in a message
+
+    Args:
+        message: The message text to check for ice cream mentions
+
+    Returns:
+        True if ice cream is mentioned in the message, False otherwise
+    """
+    if 'ice cream' in message:
+        return True
+    else:
+        return False
+
+judge = AgentJudge(model_id="gpt-4o")
+result = judge.run(
+    trace=trace,
+    question="Did the agent mention 'ice cream' in its final answer message?",
+    additional_tools=[check_for_ice_cream]
+)
+```
+
+## Custom Output Types
+
+Both judges support custom output schemas using Pydantic models:
+
+```python
+from pydantic import BaseModel
+
+class DetailedEvaluation(BaseModel):
+    passed: bool
+    reasoning: str
+    confidence_score: float
+    suggestions: list[str]
+
+judge = LlmJudge(
+    model_id="gpt-4o-mini",
+    output_type=DetailedEvaluation
+)
+
+result = judge.run(trace=trace, question="Evaluate the agent's performance")
+print(f"Confidence: {result.confidence_score}")
+print(f"Suggestions: {result.suggestions}")
+```
