@@ -4,38 +4,44 @@ from typing import Any
 from any_agent import AgentConfig, AnyAgent
 from any_agent.config import AgentFramework
 from any_agent.evaluation.schemas import AgentOutput
-from any_agent.evaluation.tools import AgentEvaluationTools
+from any_agent.evaluation.tools import EvaluationTools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.utils.asyncio_sync import run_async_in_sync
+from pydantic import BaseModel
 
-AGENT_INSTRUCTIONS = f"""You are a helpful assistant that will be used to evaluate the correctness of an agent trace. Given a specific question regarding the quality of the something about the agent, utilize the appropriate tools in order to gather the answer needed in order to accurately answer the question. If you are asked anything about what the agent did, you should strongly consider using the get_evidence_from_spans tool to get the evidence. However, if the question is about specific details of the agent's actions, you don't necessarily need to use the get_evidence_from_spans tool.
+AGENT_INSTRUCTIONS = f"""You are a helpful assistant that will be used to evaluate the correctness of an agent trace.
+Given a specific question regarding the quality of something about the agent, \
+utilize the appropriate tools in order to gather what you need to accurately answer the question. 
 
 Answer with:
 1. "passed": true or false
-2. "reasoning": Brief explanation for your decision
-
-Your final answer must be a valid JSON string that conforms to the following JSON schema:
-
-{AgentOutput.model_json_schema()}
-"""
+2. "reasoning": Brief explanation for your decision (2-3 sentences max)"""
 
 
-class AgentAsJudge:
+class AgentJudge:
     """An agent that evaluates the correctness of another agent's trace."""
 
     def __init__(
-        self, model: str, framework: AgentFramework = AgentFramework.TINYAGENT
+        self,
+        model_id: str,
+        framework: AgentFramework = AgentFramework.TINYAGENT,
+        output_type: type[BaseModel] = AgentOutput,
+        model_args: dict[str, Any] | None = None,
     ):
-        self.model = model
+        self.model_id = model_id
         self.framework = framework
+        self.model_args = model_args
+        self.output_type = output_type
+
+
 
     def run(
         self,
         trace: AgentTrace,
         question: str,
         additional_tools: list[Callable[[], Any]] = [],
-    ) -> AgentOutput:
-        """Initialize the AgentAsJudge with a trace and model.
+    ) -> BaseModel:
+        """Run the agent judge.
 
         Args:
             trace: The agent trace to evaluate
@@ -46,17 +52,15 @@ class AgentAsJudge:
             The evaluation result
 
         """
-        return run_async_in_sync(
-            self.run_async(trace, question, additional_tools)
-        )
+        return run_async_in_sync(self.run_async(trace, question, additional_tools))
 
     async def run_async(
         self,
         trace: AgentTrace,
         question: str,
         additional_tools: list[Callable[[], Any]] = [],
-    ) -> AgentOutput:
-        """Run the agent asynchronously.
+    ) -> BaseModel:
+        """Run the agent judge asynchronously.
 
         Args:
             trace: The agent trace to evaluate
@@ -66,13 +70,14 @@ class AgentAsJudge:
             The evaluation result
 
         """
-        tooling = AgentEvaluationTools(trace)
+        tooling = EvaluationTools(trace)
 
         agent_config = AgentConfig(
-            model_id=self.model,
+            model_id=self.model_id,
             instructions=AGENT_INSTRUCTIONS,
             tools=tooling.get_all_tools() + additional_tools,
-            output_type=AgentOutput,
+            output_type=self.output_type,
+            model_args=self.model_args,
         )
 
         agent = await AnyAgent.create_async(
@@ -80,7 +85,7 @@ class AgentAsJudge:
             agent_config=agent_config,
         )
         agent_trace = await agent.run_async(question)
-        if not isinstance(agent_trace.final_output, AgentOutput):
-            msg = "Agent output is not an AgentOutput instance."
+        if not isinstance(agent_trace.final_output, self.output_type):
+            msg = f"Agent output is not an {self.output_type} instance."
             raise ValueError(msg)
         return agent_trace.final_output

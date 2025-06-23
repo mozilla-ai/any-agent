@@ -1,17 +1,25 @@
-from collections.abc import Callable
 from typing import Any
-import json
 
-from any_agent import AgentConfig, AnyAgent
+from litellm import acompletion
+from litellm.utils import supports_response_schema
+from pydantic import BaseModel
+
 from any_agent.config import AgentFramework
 from any_agent.evaluation.schemas import AgentOutput
-from any_agent.evaluation.tools import AgentEvaluationTools
+from any_agent.evaluation.tools import EvaluationTools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.utils.asyncio_sync import run_async_in_sync
 
-from litellm import completion, acompletion
+DEFAULT_PROMPT = """Please evaluate the following agent execution trace:
 
-LLM_JUDGE_INSTRUCTIONS = """You are an expert evaluator that analyzes agent execution traces to answer specific questions about agent performance and behavior.
+AGENT TRACE:
+{trace_text}
+
+EVALUATION QUESTION:
+{question}"""
+
+
+LLM_JUDGE_SYSTEM_PROMPT = """You are an expert evaluator that analyzes agent execution traces to answer specific questions about agent performance and behavior.
 
 You will be provided with:
 1. A detailed trace of an agent's execution showing all the steps it took
@@ -42,21 +50,32 @@ Your response MUST be valid JSON matching this schema:
 }"""
 
 
-class LLMAsJudge:
+class LLMJudge:
     """An LLM that evaluates the correctness of another agent's trace."""
 
     def __init__(
-        self, model: str, framework: AgentFramework = AgentFramework.TINYAGENT
+        self,
+        model_id: str,
+        framework: AgentFramework = AgentFramework.TINYAGENT,
+        output_type: type[BaseModel] = AgentOutput,
+        model_args: dict[str, Any] | None = None,
     ):
-        self.model = model
+        if model_args is None:
+            model_args = {}
+        self.model_id = model_id
         self.framework = framework
+        self.model_args = model_args
+        self.output_type = output_type
+        # If LiteLLM detects that the model supports response_format, set it to the output_type automatically
+        if supports_response_schema(model=self.model_id):
+            self.model_args["response_format"] = self.output_type
 
     def run(
         self,
         trace: AgentTrace,
         question: str,
-    ) -> AgentOutput:
-        """Initialize the LLMAsJudge with a trace and model.
+    ) -> BaseModel:
+        """Initialize the LLMJudge with a trace and model.
 
         Args:
             trace: The agent trace to evaluate
@@ -72,60 +91,34 @@ class LLMAsJudge:
         self,
         trace: AgentTrace,
         question: str,
-    ) -> AgentOutput:
+        prompt: str = DEFAULT_PROMPT,
+    ) -> BaseModel:
         """Run the LLM asynchronously.
 
         Args:
             trace: The agent trace to evaluate
             question: The question to ask the agent
-
+            prompt: The prompt to use for the LLM
         Returns:
             The evaluation result
 
         """
         # Get formatted trace messages
-        trace_messages = trace.spans_to_messages()
-
-        # Format the trace into a readable string
-        trace_text = ""
-        for i, msg in enumerate(trace_messages):
-            trace_text += f"{i + 1}. {msg.role.capitalize()}: {msg.content}\n"
+        evaluation_tools = EvaluationTools(trace)
+        trace_text = evaluation_tools.get_messages_from_trace()
 
         # Create the evaluation prompt
-        prompt = f"""Please evaluate the following agent execution trace:
-
-AGENT TRACE:
-{trace_text}
-
-EVALUATION QUESTION:
-{question}
-
-Based on the trace above, does the agent's performance meet the criteria specified in the question?"""
+        prompt = prompt.format(trace_text=trace_text, question=question)
 
         # Make the LLM call
         try:
             response = await acompletion(
-                model=self.model,
+                model=self.model_id,
                 messages=[
-                    {"role": "system", "content": LLM_JUDGE_INSTRUCTIONS},
+                    {"role": "system", "content": LLM_JUDGE_SYSTEM_PROMPT},
                     {"role": "user", "content": prompt},
                 ],
-                response_format=AgentOutput,
-            )
-
-            # Extract the response content
-            if not response.choices or not response.choices[0].message:
-                raise ValueError("No response from LLM")
-
-            response_content = response.choices[0].message.content
-            if not response_content:
-                raise ValueError("Empty response from LLM")
-
-            # Parse the JSON response
-            parsed_response = json.loads(response_content)
-            return AgentOutput(
-                passed=parsed_response["passed"],
-                reasoning=parsed_response["reasoning"],
+                **self.model_args,
             )
 
         except Exception as e:
@@ -133,3 +126,9 @@ Based on the trace above, does the agent's performance meet the criteria specifi
             return AgentOutput(
                 passed=False, reasoning=f"Error during LLM evaluation: {e!s}"
             )
+
+        if not isinstance(response.choices[0].message, self.output_type):
+            msg = "LLM response is not an AgentOutput instance."
+            raise ValueError(msg)
+
+        return response.choices[0].message

@@ -1,3 +1,4 @@
-from .agent import AgentAsJudge
+from .agent_judge import AgentJudge
+from .llm_judge import LLMJudge
 
-__all__ = ["AgentAsJudge"]
+__all__ = ["AgentJudge", "LLMJudge"]
