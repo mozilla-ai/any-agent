@@ -54,7 +54,6 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
     """
     skip_reason = {
         AgentFramework.SMOLAGENTS: "async a2a is not supported",
-        AgentFramework.GOOGLE: "Default value is not supported in function declaration schema for Google AI",
         # AgentFramework.LLAMA_INDEX: "spans are not built correctly",
     }
     if agent_framework in skip_reason:
@@ -72,8 +71,9 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
     model_args = (
         {"parallel_tool_calls": False}
         if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
-        else None
+        else {}
     )
+    model_args["temperature"] = 0.0
 
     main_agent = None
     served_agent = None
