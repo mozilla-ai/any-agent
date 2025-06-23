@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-tests:
+  run-docs-tests:
     timeout-minutes: 30
     runs-on: ubuntu-latest
 

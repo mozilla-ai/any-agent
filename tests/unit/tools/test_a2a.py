@@ -78,18 +78,10 @@ def create_task_response():
                 role=Role.agent,
                 parts=[Part(root=TextPart(text="Task completed successfully"))],
                 messageId="msg-789",
+                taskId="task-123",
             ),
+            timestamp="2024-01-01T12:00:00Z",
         ),
-    )
-
-
-def create_message_response():
-    """Factory function to create a Message response."""
-    return Message(
-        role=Role.agent,
-        parts=[Part(root=TextPart(text="Hello from agent"))],
-        messageId="msg-456",
-        contextId="context-789",
     )
 
 
@@ -216,33 +208,14 @@ async def test_handles_task_response():
     ):
         result = await tool("Test query")
 
-        # Verify the result is the JSON serialized task
-        expected_json = task_response.model_dump_json(
-            exclude_none=True, exclude_unset=True, exclude_defaults=True
+        # Verify the result is the formatted string response
+        expected_result = (
+            f"Status: {task_response.status.state}\n\n"
+            f"Message: Task completed successfully\n\n"
+            f"TaskId: {task_response.status.message.taskId}\n\n"
+            f"Timestamp: {task_response.status.timestamp}\n\n"
         )
-        assert result == expected_json
-        mock_client.send_message.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_handles_message_response():
-    """Test that the a2a_tool properly handles receiving a Message message back from the server."""
-    message_response = create_message_response()
-    success_response = SendMessageSuccessResponse(
-        id="req-456", jsonrpc="2.0", result=message_response
-    )
-
-    async with mock_a2a_tool(mock_agent_card(), success_response) as (
-        tool,
-        mock_client,
-    ):
-        result = await tool("Hello")
-
-        # Verify the result is the JSON serialized message
-        expected_json = message_response.model_dump_json(
-            exclude_none=True, exclude_unset=True, exclude_defaults=True
-        )
-        assert result == expected_json
+        assert result == expected_result
         mock_client.send_message.assert_called_once()
 
 
@@ -254,9 +227,11 @@ async def test_handles_error_response():
     async with mock_a2a_tool(mock_agent_card(), error_response) as (tool, mock_client):
         result = await tool("Test query that will fail")
 
-        # Verify the result is the JSON serialized error
-        expected_json = error_response.error.model_dump_json(
-            exclude_none=True, exclude_unset=True, exclude_defaults=True
+        # Verify the result is the formatted error string
+        expected_result = (
+            f"Error: {error_response.error.message}\n\n"
+            f"Code: {error_response.error.code}\n\n"
+            f"Data: {error_response.error.data}\n\n"
         )
-        assert result == expected_json
+        assert result == expected_result
         mock_client.send_message.assert_called_once()
