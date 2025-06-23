@@ -2,7 +2,7 @@
 
 An [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] is returned when calling [`agent.run`][any_agent.AnyAgent.run] or [`agent.run_async`][any_agent.AnyAgent.run_async].
 
-`any-agent` generates standardized (regarding the structure) [OpenTelemetry](https://opentelemetry.io/) traces regardless of the framework used, based on the [Semantic conventions for generative AI systems](https://opentelemetry.io/docs/specs/semconv/gen-ai/).
+`any-agent` generates standardized (regarding the structure) [OpenTelemetry](https://opentelemetry.io/) traces regardless of the framework used, based on the [Semantic conventions for generative AI systems](https://opentelemetry.io/docs/specs/semconv/gen-ai/). This means that any OpenTelemetry exporter compatible with the Python SDK can be added. More information can be found [below](#adding-an-opentelemetry-exporter).
 
 You can try to 🔍 find 🔍 the subtle differences (regarding the content) across frameworks in the examples below.
 
@@ -111,4 +111,20 @@ agent = AnyAgent.create(
 agent_trace = agent.run("Which agent framework is the best?")
 with open("agent_trace.json", "w", encoding="utf-8") as f:
   f.write(agent_trace.model_dump_json(indent=2))
+```
+
+## Adding an OpenTelemetry exporter
+
+Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed. Note that this does not affect the existing processor that returns the traces to the user, and optionally prints them on `stdout`. Note that due to the breaking changes in the [protocol buffer Python implementation](https://protobuf.dev/news/2022-05-06/#python-updates), it may be necessary to use a pure Python implementation by using `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` in the environment.
+
+The following code will use the OpenTelemetry Python SDK to send the agent traces to an additional endpoint using OTLP over HTTP in the indicated URL:
+
+```python
+from opentelemetry.trace import get_tracer_provider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+
+tp = get_tracer_provider()
+http_exporter = OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces")
+tp.add_span_processor(SimpleSpanProcessor(http_exporter))
 ```
