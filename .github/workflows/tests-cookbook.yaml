@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  cookbook-tests:
+  run-cookbook-tests:
     timeout-minutes: 30
     runs-on: ubuntu-latest
 
