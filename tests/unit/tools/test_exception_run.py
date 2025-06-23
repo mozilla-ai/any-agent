@@ -1,6 +1,6 @@
+from collections.abc import AsyncIterator
+from typing import Any
 from unittest.mock import patch
-
-from typing import AsyncGenerator, Any
 
 import pytest
 from litellm.types.utils import (
@@ -63,7 +63,7 @@ def test_tool_error_llm_mocked(
         instructions="You must use the available tools to answer questions.",
         tools=[search_web],
         model_args=model_args,
-        **kwargs, # type: ignore[arg-type]
+        **kwargs,  # type: ignore[arg-type]
     )
 
     agent = AnyAgent.create(agent_framework, agent_config)
@@ -82,10 +82,10 @@ def test_tool_error_llm_mocked(
         choices=[StreamingChoices(delta=Delta(tool_calls=[x_tool_call]))]
     )
 
-    async def fake_iter() -> AsyncGenerator[ModelResponse]:
+    async def fake_iter() -> AsyncIterator[ModelResponse]:
         yield fake_chunk
 
-    def fake_resp(*args: list[Any], **kwargs: dict[str,Any]) -> ModelResponse:
+    def fake_resp(*args: list[Any], **kwargs: dict[str, Any]) -> ModelResponse:
         return fake_response
 
     patch_function = "litellm.acompletion"
