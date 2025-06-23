@@ -47,7 +47,7 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
             self.task_manager.add_task(task.id)
             await event_queue.enqueue_event(task)
         else:
-            logger.info("Task already exists: %s", task.model_dump_json(indent=2))
+            logger.debug("Task already exists: %s", task.model_dump_json(indent=2))
 
         formatted_query = self.task_manager.format_query_with_history(task.id, query)
 
