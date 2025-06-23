@@ -262,7 +262,7 @@ class AnyAgent(ABC):
                           Must be an instance of A2AServingConfig or MCPServingConfig.
 
         Raises:
-            ImportError: If the `a2a` dependencies are not installed.
+            ImportError: If the `a2a` dependencies are not installed and an `A2AServingConfig` is used.
 
         Example:
             ```
@@ -293,12 +293,6 @@ class AnyAgent(ABC):
         if serving_config is None:
             serving_config = A2AServingConfig()
 
-        if not isinstance(serving_config, A2AServingConfig):
-            msg = (
-                f"serving_config must be an instance of A2AServingConfig, "
-                f"got {serving_config.type}. "
-            )
-            raise ValueError(msg)
         app = await _get_a2a_app_async(self, serving_config=serving_config)
 
         return await serve_a2a_async(
@@ -312,14 +306,7 @@ class AnyAgent(ABC):
     async def _serve_mcp_async(
         self, serving_config: MCPServingConfig
     ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
-        from any_agent.serving import MCPServingConfig, serve_mcp_async
-
-        if not isinstance(serving_config, MCPServingConfig):
-            msg = (
-                f"serving_config must be an instance of MCPServingConfig, "
-                f"got {serving_config.type}. "
-            )
-            raise ValueError(msg)
+        from any_agent.serving import serve_mcp_async
 
         return await serve_mcp_async(
             self,
@@ -349,7 +336,7 @@ class AnyAgent(ABC):
                           Must be an instance of A2AServingConfig or MCPServingConfig.
 
         Raises:
-            ImportError: If the `a2a` dependencies are not installed.
+            ImportError: If the `a2a` dependencies are not installed and an `A2AServingConfig` is used.
 
         Example:
             ```

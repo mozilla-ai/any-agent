@@ -95,16 +95,9 @@ class MCPServingConfig(BaseModel):
     """Configuration for serving an agent using the Model Context Protocol (MCP).
 
     Example:
-        config = A2AServingConfig(
+        config = MCPServingConfig(
             port=8080,
             endpoint="/my-agent",
-            skills=[
-                AgentSkill(
-                    id="search",
-                    name="web_search",
-                    description="Search the web for information"
-                )
-            ]
         )
 
     """

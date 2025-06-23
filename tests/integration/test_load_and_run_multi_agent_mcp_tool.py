@@ -133,15 +133,17 @@ async def test_load_and_run_multi_agent_mcp(
         agent_trace = await main_agent.run_async(DATE_PROMPT)
 
         _assert_valid_agent_trace(agent_trace)
-        _assert_contains_current_date_info(agent_trace.final_output)
+        _assert_contains_current_date_info(str(agent_trace.final_output))
         _assert_has_tool_date_agent_call(agent_trace)
 
     finally:
         if main_agent:
-            await main_agent._mcp_servers[0].mcp_connection._exit_stack.aclose()
+            if mcp_conn := main_agent._mcp_servers[0].mcp_connection:
+                await mcp_conn._exit_stack.aclose()
         if AppStatus.should_exit_event is not None:
             AppStatus.should_exit_event.set()
             AppStatus.should_exit_event = None
         if served_server:
             served_server.should_exit = True
+        if served_task:
             await served_task

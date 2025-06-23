@@ -1,5 +1,6 @@
 import datetime
 from multiprocessing import Process, Queue
+from typing import Any
 
 import pytest
 from litellm.utils import validate_environment
@@ -68,7 +69,7 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
-    model_args = (
+    model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
         if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
         else {}
@@ -144,7 +145,7 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
         if served_server:
             await served_server.shutdown()
         if served_task:
-            served_task.cancel()
+            await served_task
 
 
 def get_datetime() -> str:
