@@ -1,11 +1,9 @@
-import os
-from pathlib import Path
-from typing import Any
 from unittest.mock import patch
+
+from typing import AsyncGenerator, Any
 
 import pytest
 from litellm.types.utils import (
-    ChatCompletionMessageToolCall,
     Choices,
     Delta,
     Function,
@@ -23,100 +21,78 @@ from any_agent import (
 from any_agent.tracing.otel_types import StatusCode
 
 
-def test_exception_trace(
+def search_web(query: str) -> str:
+    """Perform a duckduckgo web search based on your query then returns the top search results.
+
+    Args:
+        query (str): The search query to perform.
+
+    Returns:
+        The top search results.
+
+    """
+    msg = "It's a trap!"
+    raise ValueError(msg)
+
+
+def test_tool_error_llm_mocked(
     agent_framework: AgentFramework,
-    tmp_path: Path,
 ) -> None:
+    """An exception raised inside a tool will be caught by us.
+
+    We make sure an appropriate Status is set to the tool execution span.
+    We allow the Agent to try to recover from the tool calling failure.
+    """
+
     skip_reason = {
-        # AgentFramework.GOOGLE: "assert False; the function does not seem to be called",
-        AgentFramework.AGNO: "Does not progress: Failed: Timeout (>30.0s) from pytest-timeout.",
-        # AgentFramework.SMOLAGENTS: "assert False",
-        #         while final_answer is None and self.step_number <= max_steps:
-        #         there's no final answer
-        # AgentFramework.TINYAGENT: "assert False"
+        AgentFramework.AGNO: "Does not decide that the loop should end, and calls the tool the maximum amount of times before giving up",
+        AgentFramework.GOOGLE: "When mocking the LLM tool call, the tool calling does not happen and the loop is ended",
     }
     if agent_framework in skip_reason:
-        pytest.skip(f"Framework {agent_framework.value} not currently passing the test, reason: {skip_reason[agent_framework]}")
+        pytest.skip(
+            f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
+        )
 
     kwargs = {}
 
-    tmp_file = "tmp.txt"
-    # FIXME patch some call so an exception is triggered
-    # An exception within a tool will be handled by the framework
-    exc_reason = "the tool broke!"
+    kwargs["model_id"] = "gpt-4.1-nano"
 
-    def fail_tool(text: str) -> None:
-        """write the text to a file in the tmp_path directory
+    model_args = {"temperature": 0.0}
 
-        Args:
-            text (str): The text to write to the file.
-
-        Returns:
-            None
-        """
-        raise ValueError(exc_reason)
-
-    kwargs["model_id"] = "gpt-4.1-mini"
-
-    model_args: dict[str, Any] = (
-        {"parallel_tool_calls": False}
-        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
-        else {}
-    )
-    model_args["temperature"] = 0.0
-    tools = [
-        fail_tool,
-    ]
     agent_config = AgentConfig(
-        tools=tools,  # type: ignore[arg-type]
-        instructions="Answer the query.",
+        instructions="You must use the available tools to answer questions.",
+        tools=[search_web],
         model_args=model_args,
-        **kwargs,  # type: ignore[arg-type]
+        **kwargs, # type: ignore[arg-type]
     )
+
     agent = AnyAgent.create(agent_framework, agent_config)
 
     x_function = Function(
-        name="fail_tool", arguments={"text":"test sample"}
+        name="search_web", arguments={"query": "which agent framework is the best"}
     )
 
-    x_tool_call = {
-        "id": "call_12345xyz",
-        "type": "function",
-        "function": x_function
-    }
+    x_tool_call = {"id": "call_12345xyz", "type": "function", "function": x_function}
 
-    x_message = Message(
-        tool_calls=[x_tool_call]
-    )
+    x_message = Message(tool_calls=[x_tool_call])
 
-    fake_response = ModelResponse(
-        choices=[
-            Choices(
-                message=x_message
-            )
-        ]
-    )
+    fake_response = ModelResponse(choices=[Choices(message=x_message)])
 
     fake_chunk = ModelResponse(
-        choices=[
-            StreamingChoices(
-                delta=Delta(
-                    tool_calls=[x_tool_call]
-                )
-            )
-        ]
+        choices=[StreamingChoices(delta=Delta(tool_calls=[x_tool_call]))]
     )
 
-    async def fake_iter():
+    async def fake_iter() -> AsyncGenerator[ModelResponse]:
         yield fake_chunk
 
-    def fake_resp(*args, **kwargs):
+    def fake_resp(*args: list[Any], **kwargs: dict[str,Any]) -> ModelResponse:
         return fake_response
 
     patch_function = "litellm.acompletion"
     if agent_framework is AgentFramework.SMOLAGENTS:
         patch_function = "litellm.completion"
-
+    if agent_framework is AgentFramework.GOOGLE:
+        patch_function = "google.adk.models.lite_llm.acompletion"
     with (
         patch(patch_function) as acompletion_mock,
     ):
@@ -127,17 +103,17 @@ def test_exception_trace(
             acompletion_mock.return_value = fake_iter()
         else:
             acompletion_mock.side_effect = fake_resp
-        spans = []
+
+        agent_trace = None
         try:
             agent_trace = agent.run(
-                "Write a four-line poem and use the tools to write it to a file.",
+                "Check in the web which agent framework is the best.",
             )
-            spans = agent_trace.spans
         except AgentRunError as e:
-            spans = e.trace.spans
+            agent_trace = e.trace
         assert any(
             span.is_tool_execution()
             and span.status.status_code == StatusCode.ERROR
-            and exc_reason in getattr(span.status, "description", "")
-            for span in spans
+            and "It's a trap!" in getattr(span.status, "description", "")
+            for span in agent_trace.spans
         )
