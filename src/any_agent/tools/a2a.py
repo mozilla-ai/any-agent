@@ -79,15 +79,19 @@ async def a2a_tool_async(
                 raise ValueError(msg)
 
             if hasattr(response.root, "error"):
-                result = response.root.error.model_dump_json(
-                    exclude_none=True, exclude_unset=True, exclude_defaults=True
-                )
+                response_str = ""
+                response_str += f"Error: {response.root.error.message}\n\n"
+                response_str += f"Code: {response.root.error.code}\n\n"
+                response_str += f"Data: {response.root.error.data}\n\n"
             elif hasattr(response.root, "result"):
-                result = response.root.result.model_dump_json(
-                    exclude={"history"},
-                    exclude_none=True,
-                    exclude_unset=True,
-                    exclude_defaults=True,
+                response_str = ""
+                response_str += f"Status: {response.root.result.status.state}\n\n"
+                response_str += f"""Message: {" ".join([part.root.text for part in response.root.result.status.message.parts if part.root.kind == "text"])}\n\n"""
+                response_str += (
+                    f"TaskId: {response.root.result.status.message.taskId}\n\n"
+                )
+                response_str += (
+                    f"Timestamp: {response.root.result.status.timestamp}\n\n"
                 )
             else:
                 msg = (
@@ -96,7 +100,7 @@ async def a2a_tool_async(
                 )
                 raise ValueError(msg)
 
-            return result  # type: ignore[no-any-return]
+            return response_str
 
     new_name = toolname or a2a_agent_card.name
     new_name = re.sub(r"\s+", "_", new_name.strip())

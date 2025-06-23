@@ -33,7 +33,7 @@ class FinalOutputTool:
         except json.JSONDecodeError as json_err:
             return {
                 "success": False,
-                "result": f"Invalid JSON format: {json_err}. Please fix the input so that it is a valid JSON string and try again.",
+                "result": f"Invalid JSON format: {json_err}. Please fix the 'answer' parameter so that it is a valid JSON string and call this tool again.",
             }
         # Then validate against the Pydantic model
         try:
