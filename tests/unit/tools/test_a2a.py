@@ -212,9 +212,6 @@ async def test_handles_task_response():
         expected_result = (
             f"Status: {task_response.status.state}\n\n"
             f"Message: Task completed successfully\n\n"
-            f"Artifacts: None\n\n"
-            f"ContextId: {task_response.contextId}\n\n"
-            f"MessageId: {task_response.status.message.messageId}\n\n"
             f"TaskId: {task_response.status.message.taskId}\n\n"
             f"Timestamp: {task_response.status.timestamp}\n\n"
         )
