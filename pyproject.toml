@@ -137,6 +137,10 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 follow_untyped_imports = true
 
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_decorators = false # mypy gets confused by pytest decorators
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"

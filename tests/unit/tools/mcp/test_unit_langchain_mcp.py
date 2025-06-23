@@ -11,7 +11,7 @@ from any_agent.tools import _get_mcp_server
 @pytest.fixture
 def load_mcp_tools(
     tools: Sequence[Tool],
-) -> Generator[MagicMock]:
+) -> Generator[MagicMock, None, None]:
     with patch(
         "any_agent.tools.mcp.frameworks.langchain.load_mcp_tools"
     ) as mock_load_tools:
@@ -62,7 +62,7 @@ async def test_langchain_mcp_env() -> None:
 
 
 @pytest.mark.asyncio
-async def test_langchain_client_session_timeout_passed():
+async def test_langchain_client_session_timeout_passed() -> None:
     """Test that client_session_timeout_seconds parameter is properly passed to LangChain ClientSession (STDIO and SSE)."""
     custom_timeout = 15.0
     stdio_params = MCPStdio(

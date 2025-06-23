@@ -12,3 +12,4 @@ python -m pip install -e '.[all]' --quiet
 
 # Run on all files. The pre-commit hook was using ignore-missing-imports, so I will keep it here for the initial implementation.
 python -m mypy --ignore-missing-imports src/
+python -m mypy --ignore-missing-imports tests/
