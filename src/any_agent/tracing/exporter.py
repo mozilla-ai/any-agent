@@ -18,13 +18,11 @@ if TYPE_CHECKING:
 
     from opentelemetry.sdk.trace import ReadableSpan
 
-    from .agent_trace import AgentSpan
-
 
 SCOPE_NAME = "any_agent"
 
 
-def _get_output_panel(span: AgentSpan) -> Panel | None:
+def _get_output_panel(span: ReadableSpan) -> Panel | None:
     if output := span.attributes.get("gen_ai.output", None):
         output_type = span.attributes.get("gen_ai.output.type", "text")
         return Panel(

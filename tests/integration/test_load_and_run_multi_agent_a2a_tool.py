@@ -138,7 +138,7 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
         agent_trace = await main_agent.run_async(DATE_PROMPT)
 
         _assert_valid_agent_trace(agent_trace)
-        _assert_contains_current_date_info(agent_trace.final_output)
+        _assert_contains_current_date_info(str(agent_trace.final_output))
         _assert_has_date_agent_tool_call(agent_trace)
 
     finally:
@@ -158,8 +158,8 @@ def _run_server(
     port: int,
     endpoint: str,
     model_id: str,
-    server_queue: Queue,
-):
+    server_queue: "Queue[int]",
+) -> None:
     """Run the server for the sync test. This needs to be defined outside the test function so that it can be run in a separate process."""
     date_agent_description = "Agent that can return the current date."
     date_agent_cfg = AgentConfig(
@@ -225,7 +225,7 @@ def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> N
     server_process = None
     tool_agent_endpoint = "tool_agent_sync"
 
-    server_queue = Queue()
+    server_queue: Queue[int] = Queue()
 
     try:
         # Start the server in a separate process
@@ -267,7 +267,7 @@ def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> N
         agent_trace = main_agent.run(DATE_PROMPT)
 
         _assert_valid_agent_trace(agent_trace)
-        _assert_contains_current_date_info(agent_trace.final_output)
+        _assert_contains_current_date_info(str(agent_trace.final_output))
         _assert_has_date_agent_tool_call(agent_trace)
 
     finally:

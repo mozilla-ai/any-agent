@@ -64,7 +64,7 @@ async def test_openai_mcp_env() -> None:
         assert mocked_class.call_args_list[0][1]["params"]["env"] == {"FOO": "BAR"}
 
 
-def test_openai_client_session_timeout_passed():
+def test_openai_client_session_timeout_passed() -> None:
     """Test that client_session_timeout_seconds parameter is properly passed to OpenAI MCPServerStdio and MCPServerSse."""
     custom_timeout = 15.0
     stdio_params = MCPStdio(

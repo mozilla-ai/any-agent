@@ -3,6 +3,8 @@ import socket
 
 import pytest
 
+from any_agent.config import AgentFramework
+
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     """
@@ -50,7 +52,7 @@ def _get_deterministic_port(test_name: str, framework_name: str) -> int:
 
 
 @pytest.fixture
-def test_port(request, agent_framework):
+def test_port(request: pytest.FixtureRequest, agent_framework: AgentFramework) -> int:
     """Single fixture that provides a unique, deterministic port for each test."""
     test_name = request.node.name
     framework_name = agent_framework.value

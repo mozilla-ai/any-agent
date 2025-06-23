@@ -21,7 +21,9 @@ def agent_framework(request: pytest.FixtureRequest) -> AgentFramework:
 
 
 @pytest.fixture
-def _patch_stdio_client() -> Generator[tuple[AsyncMock, tuple[AsyncMock, AsyncMock]]]:
+def _patch_stdio_client() -> Generator[
+    tuple[AsyncMock, tuple[AsyncMock, AsyncMock]], None, None
+]:
     mock_cm = AsyncMock()
     mock_transport = (AsyncMock(), AsyncMock())
     mock_cm.__aenter__.return_value = mock_transport
@@ -59,7 +61,7 @@ SSE_MCP_SERVER_SCRIPT = dedent(
 @pytest.fixture(
     scope="session"
 )  # This means it only gets created once per test session
-async def echo_sse_server() -> AsyncGenerator[dict[str, str]]:
+async def echo_sse_server() -> AsyncGenerator[dict[str, str], None]:
     """This fixture runs a FastMCP server in a subprocess.
     I thought about trying to mock all the individual mcp client calls,
     but I went with this because this way we don't need to actually mock anything.
@@ -103,7 +105,7 @@ def mock_litellm_response() -> ModelResponse:
 
 
 @pytest.fixture
-def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any]]:
+def mock_litellm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
     """
     Create a fixture that returns an async generator function to mock streaming responses.
     This returns a function that can be used as a side_effect.
@@ -111,7 +113,7 @@ def mock_litellm_streaming() -> Callable[[Any, Any], AsyncGenerator[Any]]:
 
     async def _mock_streaming_response(
         *args: Any, **kwargs: Any
-    ) -> AsyncGenerator[Any]:
+    ) -> AsyncGenerator[Any, None]:
         # First chunk with role
         yield {
             "choices": [
