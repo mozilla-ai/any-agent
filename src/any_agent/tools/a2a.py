@@ -87,11 +87,6 @@ async def a2a_tool_async(
                 response_str = ""
                 response_str += f"Status: {response.root.result.status.state}\n\n"
                 response_str += f"""Message: {" ".join([part.root.text for part in response.root.result.status.message.parts if part.root.kind == "text"])}\n\n"""
-                response_str += f"Artifacts: {response.root.result.artifacts if response.root.result.artifacts else 'None'}\n\n"
-                response_str += f"ContextId: {response.root.result.contextId}\n\n"
-                response_str += (
-                    f"MessageId: {response.root.result.status.message.messageId}\n\n"
-                )
                 response_str += (
                     f"TaskId: {response.root.result.status.message.taskId}\n\n"
                 )
