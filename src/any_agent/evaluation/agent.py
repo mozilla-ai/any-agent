@@ -40,6 +40,7 @@ class AgentAsJudge:
         Args:
             trace: The agent trace to evaluate
             question: The question to ask the agent
+            additional_tools: Additional tools to use for the agent
 
         Returns:
             The evaluation result
@@ -60,7 +61,7 @@ class AgentAsJudge:
         Args:
             trace: The agent trace to evaluate
             question: The question to ask the agent
-
+            additional_tools: Additional tools to use for the agent
         Returns:
             The evaluation result
 
