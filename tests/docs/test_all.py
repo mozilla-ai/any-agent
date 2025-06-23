@@ -1,4 +1,5 @@
 import pathlib
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -44,7 +45,7 @@ def test_evaluation_md() -> None:
     mock_create = MagicMock(return_value=mock_agent)
     mock_a2a_tool = AsyncMock()
 
-    def mock_run_method(*args, **kwargs):
+    def mock_run_method(*args: Any, **kwargs: Any) -> Any:
         mock_result = MagicMock()
         mock_result.passed = True
         mock_result.reasoning = "Mock evaluation result"

@@ -128,5 +128,5 @@ class LlmJudge:
             )
 
         return self.output_type.model_validate_json(
-            response.choices[0].message["content"]  # type: ignore[union-attr]
+            response.choices[0].message["content"]
         )
