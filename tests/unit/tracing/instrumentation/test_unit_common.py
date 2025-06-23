@@ -23,7 +23,9 @@ foo_instance = FooClass()
         (foo_instance, json.dumps(foo_instance, default=str), "json"),
     ],
 )
-def test_set_tool_output(tool_output, expected_output, expected_output_type) -> None:
+def test_set_tool_output(
+    tool_output: object, expected_output: str, expected_output_type: str
+) -> None:
     span_mock = MagicMock()
     _set_tool_output(tool_output, span_mock)
 

@@ -7,7 +7,7 @@ pytest.importorskip("any_agent.serving.envelope")
 
 from a2a.types import TaskState
 
-from any_agent.config import AgentConfig
+from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.serving.envelope import (
     A2AEnvelope,
@@ -25,28 +25,28 @@ class CustomOutputType(BaseModel):
 class MockAgent(AnyAgent):
     """Mock agent implementation for testing."""
 
-    def __init__(self, config):
+    def __init__(self, config: AgentConfig) -> None:
         super().__init__(config)
         self._agent = None
 
-    async def _load_agent(self):
+    async def _load_agent(self) -> None:
         pass
 
-    async def _run_async(self, prompt: str, **kwargs):
+    async def _run_async(self, prompt: str, **kwargs: object) -> str:
         return "mock result"
 
     @property
-    def framework(self):
+    def framework(self) -> AgentFramework:
         from any_agent.config import AgentFramework
 
         return AgentFramework.TINYAGENT
 
     @classmethod
-    def create(cls, framework, config):
+    def create(cls, framework: object, config: AgentConfig) -> "MockAgent":
         return cls(config)
 
 
-def test_envelope_created_without_output_type():
+def test_envelope_created_without_output_type() -> None:
     """Test that the envelope is correctly created when the agent is configured without an output_type."""
     # Create agent config without output_type
     config = AgentConfig(model_id="test-model", description="test agent")
@@ -73,7 +73,7 @@ def test_envelope_created_without_output_type():
     assert envelope_instance.data.result == "test result"
 
 
-def test_envelope_created_with_output_type():
+def test_envelope_created_with_output_type() -> None:
     """Test that the envelope is correctly created when an agent is configured with an output_type."""
     # Create agent config with custom output_type
     config = AgentConfig(

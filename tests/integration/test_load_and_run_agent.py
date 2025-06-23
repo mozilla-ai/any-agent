@@ -22,7 +22,9 @@ from any_agent.evaluation.schemas import (
     CheckpointCriteria,
     TraceEvaluationResult,
 )
+from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
+from any_agent.tracing.exporter import _ConsoleExporter
 
 
 def uvx_installed() -> bool:
@@ -42,7 +44,9 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
         """Checks the `_set_llm_inputs` implemented by each framework's instrumentation."""
         assert llm_call.attributes.get("gen_ai.input.messages", None) is not None
         # input.messages should be a valid JSON string (list of dicts)
-        input_messages = json.loads(llm_call.attributes.get("gen_ai.input.messages"))
+        input_messages_raw = llm_call.attributes.get("gen_ai.input.messages")
+        assert input_messages_raw is not None
+        input_messages = json.loads(input_messages_raw)
         assert input_messages[0]["role"] == "system"
         assert input_messages[1]["role"] == "user"
 
@@ -50,7 +54,9 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
         """Checks the tools setup implemented by each framework's instrumentation."""
         assert tool_execution.attributes.get("gen_ai.tool.args", None) is not None
         # tool.args should be a JSON string (dict)
-        args = json.loads(tool_execution.attributes.get("gen_ai.tool.args"))
+        tool_args_raw = tool_execution.attributes.get("gen_ai.tool.args")
+        assert tool_args_raw is not None
+        args = json.loads(tool_args_raw)
         assert "timezone" in args
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
@@ -229,10 +235,8 @@ def test_load_and_run_agent(
     agent = AnyAgent.create(agent_framework, agent_config)
     update_trace = request.config.getoption("--update-trace-assets")
     if update_trace:
-        from any_agent.tracing import TRACE_PROVIDER, _ConsoleExporter
-
-        with TRACE_PROVIDER._active_span_processor._lock:
-            for p in TRACE_PROVIDER._active_span_processor._span_processors:
+        with TRACE_PROVIDER._active_span_processor._lock:  # type: ignore[attr-defined]
+            for p in TRACE_PROVIDER._active_span_processor._span_processors:  # type: ignore[attr-defined]
                 if isinstance(p.span_exporter, _ConsoleExporter):
                     console = p.span_exporter.console
                     console.record = True
@@ -258,7 +262,7 @@ def test_load_and_run_agent(
         with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
             f.write(agent_trace.model_dump_json(indent=2))
             f.write("\n")
-        html_output = console.export_html(inline_styles=True)  # type: ignore[union-attr]
+        html_output = console.export_html(inline_styles=True)
         with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
             f.write(html_output.replace("<!DOCTYPE html>", ""))
 

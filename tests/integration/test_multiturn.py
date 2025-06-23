@@ -5,8 +5,11 @@ no calls are made to the LLM. I mock the responses to create a trace that mimics
 and verify that the subsequent calls properly receive the previous conversation history.
 """
 
+from __future__ import annotations
+
 import asyncio
 import json
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 import httpx
@@ -32,6 +35,9 @@ from any_agent.tracing.otel_types import (
 
 from .helpers import wait_for_server_async
 
+if TYPE_CHECKING:
+    from typing import Any
+
 
 class TestResult(BaseModel):
     name: str
@@ -52,16 +58,18 @@ THIRD_TURN_RESPONSE = "Thank you for the information."
 class MockConversationAgent(TinyAgent):
     """Mock agent implementation that simulates multi-turn conversation for testing."""
 
-    def __init__(self, config):
+    def __init__(self, config: AgentConfig) -> None:
         super().__init__(config)
         self.output_type = A2AEnvelope[TestResult]
         self.turn_count = 0
 
-    async def _load_agent(self):
+    async def _load_agent(self) -> None:
         # Call parent's _load_agent to set up the basic structure
         await super()._load_agent()
 
-    async def run_async(self, prompt: str, **kwargs) -> AgentTrace:
+    async def run_async(
+        self, prompt: str, instrument: bool = True, **kwargs: Any
+    ) -> AgentTrace:
         if self.turn_count == 0:
             # First turn: User introduces themselves
             assert FIRST_TURN_PROMPT in prompt
@@ -110,7 +118,7 @@ class MockConversationAgent(TinyAgent):
         raise ValueError(msg)
 
     def _create_mock_trace(
-        self, envelope: A2AEnvelope, agent_response: str, prompt: str
+        self, envelope: A2AEnvelope[TestResult], agent_response: str, prompt: str
     ) -> AgentTrace:
         """Create a mock AgentTrace with minimal spans for testing."""
 
@@ -142,12 +150,12 @@ class MockConversationAgent(TinyAgent):
         )
 
     @classmethod
-    def create(cls, framework, config):
+    def create(cls, framework: AgentFramework | str, config: AgentConfig) -> AnyAgent:
         return cls(config)
 
 
 @pytest.mark.asyncio
-async def test_task_management_multi_turn_conversation():
+async def test_task_management_multi_turn_conversation() -> None:
     """Test that agents can maintain conversation context across multiple interactions."""
 
     # Create a mock agent that simulates multi-turn conversation
@@ -273,7 +281,7 @@ async def test_task_management_multi_turn_conversation():
 
 
 @pytest.mark.asyncio
-async def test_multi_turn_a2a_tool():
+async def test_multi_turn_a2a_tool() -> None:
     """Test that agents can maintain conversation context across multiple interactions."""
 
     # Create a mock agent that simulates multi-turn conversation

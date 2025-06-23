@@ -45,13 +45,13 @@ async def test_google_mcp_sse_integration(
     mcp_server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.GOOGLE)
     await mcp_server._setup_tools()
 
-    google_sse_params.assert_called_once_with(  # type: ignore[attr-defined]
+    google_sse_params.assert_called_once_with(
         url=mcp_sse_params_no_tools.url,
         headers=mcp_sse_params_no_tools.headers,
     )
 
     google_toolset.assert_called_once_with(  # type: ignore[attr-defined]
-        connection_params=google_sse_params.return_value  # type: ignore[attr-defined]
+        connection_params=google_sse_params.return_value
     )
 
     google_toolset().get_tools.assert_called_once()  # type: ignore[operator]

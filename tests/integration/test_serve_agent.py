@@ -1,8 +1,11 @@
+import asyncio
 import multiprocessing
+from typing import Any
 from uuid import uuid4
 
 import httpx
 import pytest
+import uvicorn
 from a2a.client import A2AClient
 from a2a.types import MessageSendParams, SendMessageRequest
 
@@ -13,7 +16,7 @@ from any_agent.serving import A2AServingConfig
 from .helpers import wait_for_server_async
 
 
-def run_agent(port: int):
+def run_agent(port: int) -> None:
     agent = AnyAgent.create(
         "tinyagent",
         AgentConfig(
@@ -25,7 +28,7 @@ def run_agent(port: int):
     agent.serve(serving_config=A2AServingConfig(port=port))
 
 
-async def run_agent_async(port: int):
+async def run_agent_async(port: int) -> tuple[asyncio.Task[Any], uvicorn.Server]:
     agent = await AnyAgent.create_async(
         "tinyagent",
         AgentConfig(
@@ -38,7 +41,7 @@ async def run_agent_async(port: int):
 
 
 @pytest.mark.asyncio
-async def test_agent_serving_and_communication(test_port):
+async def test_agent_serving_and_communication(test_port: int) -> None:
     """This test can be refactored to remove the need for multiproc, once we have support for control of the uvicorn server."""
     # Start the agent in a subprocess
     proc = multiprocessing.Process(target=run_agent, args=(test_port,), daemon=True)
@@ -69,9 +72,9 @@ async def test_agent_serving_and_communication(test_port):
 
 
 @pytest.mark.asyncio
-async def test_agent_serving_and_communication_async(test_port):
+async def test_agent_serving_and_communication_async(test_port: int) -> None:
     # Start the agent in a subprocess
-    (task, server) = await run_agent_async(test_port)
+    task, server = await run_agent_async(test_port)
     server_url = f"http://localhost:{test_port}"
     await wait_for_server_async(server_url)
 
