@@ -8,8 +8,7 @@ from a2a.client import A2AClient
 # Import your agent and config
 from any_agent import AgentConfig, AnyAgent
 from any_agent.serving import A2AServingConfig
-from tests import DEFAULT_MODEL_ID
-from tests.integration.helpers import wait_for_server_async
+from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server_async
 
 from .conftest import A2ATestHelpers, a2a_client_from_agent
 
