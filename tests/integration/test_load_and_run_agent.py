@@ -123,7 +123,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     assert result1.passed, (
         f"Expected agent to call write_file tool, but evaluation failed: {result1.reasoning}"
     )
- 
+
     # Test 2: Check if agent wrote the current year to file using AgentJudge
     agent_judge = AgentJudge(model_id="gpt-4.1-mini")
 
