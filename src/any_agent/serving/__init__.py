@@ -31,38 +31,4 @@ try:
     ]
 except ImportError:
     msg = "You need to `pip install 'any-agent[a2a]'` to use this method."
-
-    class A2AServingConfig:  # type: ignore[no-redef]
-        """Fail import."""
-
-        def __init__(self, **kwargs):  # type: ignore[no-untyped-def]
-            """Fail import."""
-            raise ImportError(msg) from None
-
-    def _get_a2a_app(agent, serving_config):  # type: ignore[no-untyped-def,misc]
-        raise ImportError(msg) from None
-
-    async def _get_a2a_app_async(agent, serving_config):  # type: ignore[no-untyped-def,misc]
-        raise ImportError(msg) from None
-
-    def serve_a2a(  # type: ignore[no-untyped-def,misc]
-        server,
-        host,
-        port,
-        endpoint,
-        log_level,
-        server_queue,
-    ):
-        """Fail import."""
-        raise ImportError(msg) from None
-
-    def serve_a2a_async(  # type: ignore[no-untyped-def,misc]
-        server,
-        host,
-        port,
-        endpoint,
-        log_level,
-        server_queue,
-    ):
-        """Fail import."""
-        raise ImportError(msg) from None
+    raise ImportError(msg) from None

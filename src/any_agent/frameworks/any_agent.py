@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from opentelemetry.trace import Tracer
     from pydantic import BaseModel
 
-    from any_agent.serving.config import A2AServingConfig, MCPServingConfig
+    from any_agent.serving import A2AServingConfig, MCPServingConfig
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 
