@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 
-class AgentOutput(BaseModel):
+class EvaluationOutput(BaseModel):
     passed: bool
     reasoning: str

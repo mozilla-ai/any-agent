@@ -5,10 +5,8 @@ from pydantic import BaseModel
 
 from any_agent.tracing.agent_trace import AgentTrace
 
-MAX_EVIDENCE_LENGTH: int = 50
 
-
-class EvaluationTools:
+class TraceTools:
     def __init__(self, trace: AgentTrace):
         self.trace = trace
 
@@ -69,3 +67,12 @@ class EvaluationTools:
         for message in messages:
             evidence += f"### {message.role}\n{message.content}\n\n"
         return evidence
+
+    def get_duration(self) -> float:
+        """Get the duration of the agent trace.
+
+        Returns:
+            float: The duration in seconds of the agent trace
+
+        """
+        return self.trace.duration.total_seconds()

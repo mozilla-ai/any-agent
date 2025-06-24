@@ -18,7 +18,7 @@ from any_agent import (
 from any_agent.config import MCPStdio
 from any_agent.evaluation.agent_judge import AgentJudge
 from any_agent.evaluation.llm_judge import LlmJudge
-from any_agent.evaluation.schemas import AgentOutput
+from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from any_agent.tracing.exporter import _ConsoleExporter
@@ -119,7 +119,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
         context=str(agent_trace.spans_to_messages()),
         question="Did the agent call the write_file tool during execution?",
     )
-    assert isinstance(result1, AgentOutput)
+    assert isinstance(result1, EvaluationOutput)
     assert result1.passed, (
         f"Expected agent to call write_file tool, but evaluation failed: {result1.reasoning}"
     )
@@ -136,7 +136,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
         question="Did the agent write the current year to a file?",
         additional_tools=[get_current_year],
     )
-    assert isinstance(result2, AgentOutput)
+    assert isinstance(result2, EvaluationOutput)
     assert result2.passed, (
         f"Expected agent to write current year to file, but evaluation failed: {result2.reasoning}"
     )
