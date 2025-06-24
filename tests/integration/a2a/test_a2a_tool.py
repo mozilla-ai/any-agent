@@ -8,8 +8,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
-from tests import DEFAULT_MODEL_ID
-from tests.integration.helpers import wait_for_server
+from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server
 
 from .conftest import (
     DATE_PROMPT,
