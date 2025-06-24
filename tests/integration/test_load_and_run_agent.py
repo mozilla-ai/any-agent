@@ -114,20 +114,27 @@ def assert_tokens(agent_trace: AgentTrace) -> None:
 def assert_eval(agent_trace: AgentTrace) -> None:
     """Test evaluation using the new judge classes."""
     # Test 1: Check if agent called write_file tool using LlmJudge
-    llm_judge = LlmJudge(model_id="gpt-4o-mini")
+    llm_judge = LlmJudge(model_id="gpt-4.1-nano")
     result1 = llm_judge.run(
-        trace=agent_trace,
+        context=str(agent_trace.spans_to_messages()),
         question="Did the agent call the write_file tool during execution?",
     )
     assert isinstance(result1, AgentOutput)
     assert result1.passed, (
         f"Expected agent to call write_file tool, but evaluation failed: {result1.reasoning}"
     )
-
+ 
     # Test 2: Check if agent wrote the current year to file using AgentJudge
-    agent_judge = AgentJudge(model_id="gpt-4o-mini")
+    agent_judge = AgentJudge(model_id="gpt-4.1-mini")
+
+    def get_current_year() -> str:
+        """Get the current year"""
+        return str(datetime.now().year)
+
     result2 = agent_judge.run(
-        trace=agent_trace, question="Did the agent write the current year to a file?"
+        trace=agent_trace,
+        question="Did the agent write the current year to a file?",
+        additional_tools=[get_current_year],
     )
     assert isinstance(result2, AgentOutput)
     assert result2.passed, (

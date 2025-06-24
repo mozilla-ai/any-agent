@@ -1,13 +1,22 @@
 # Agent Evaluation
 
-The any-agent evaluation module provides two primitives for evaluating agent traces using LLM-as-a-judge techniques:
+The any-agent evaluation module encourages three approaches for evaluating agent traces:
 
-- [`LlmJudge`][any_agent.evaluation.LlmJudge]: For evaluations that can be answered with a direct LLM call alongside the trace messages.
-- [`AgentJudge`][any_agent.evaluation.AgentJudge]: For complex evaluations that utilize built-in and customizable tools to inspect specific parts of the trace and additional content
+1. **Custom Code Evaluation**: Direct programmatic inspection of traces for deterministic checks
+2. **[`LlmJudge`][any_agent.evaluation.LlmJudge]**: LLM-as-a-judge for evaluations that can be answered with a direct LLM call alongside a custom context
+3. **[`AgentJudge`][any_agent.evaluation.AgentJudge]**: Complex LLM-based evaluations that utilize built-in and customizable tools to inspect specific parts of the trace or other custom information provided to the agent as a tool
+
+## Choosing the Right Evaluation Method
+
+| Method | Best For | Pros | Cons |
+|--------|----------|------|------|
+| **Custom Code** | Deterministic checks, performance metrics, specific criteria | Fast, reliable, cost-effective, precise control | Requires manual coding, limited to predefined checks |
+| **LlmJudge** | Simple qualitative assessments, text-based evaluations | Easy to set up, flexible questions, good for subjective evaluation | Can be inconsistent, costs tokens, slower than code |
+| **AgentJudge** | Complex multi-step evaluations, tool usage analysis | Most flexible, can support tool access to custom additional information sources | Highest cost, slowest, most complex setup |
 
 Both judges work with any-agent's unified tracing format and return structured evaluation results.
 
-## Should you use an LlmJudge or AgentJudge?
+## Custom Code Evaluation
 
 Before automatically using an LLM based approach, it is worthwhile to consider whether it is necessary. For deterministic evaluations where you know exactly what to check, you may not want an LLM-based judge at all. Writing a custom evaluation function that directly examines the trace can be more efficient, reliable, and cost-effective. the any-agent [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] provides a few helpful methods that can be used to extract common information.
 
@@ -87,20 +96,50 @@ The `LlmJudge` is ideal for straightforward evaluation questions that can be ans
 - Simple criteria checking
 - Text-based evaluations
 
-### Example: Basic LLM Judge
+### Example: Evaluating Response Quality and Helpfulness
 
 ```python
-trace = agent.run("What is the capital of France?")
-
-# Create and run the LLM judge
-judge = LlmJudge(model_id="gpt-4o-mini")
-result = judge.run(
-    trace=trace,
-    question="Did the agent provide the correct answer about the capital of France?"
+from any_agent import AnyAgent, AgentConfig
+from any_agent.tools import search_web
+from any_agent.evaluation import LlmJudge
+# Run an agent on a customer support task
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="gpt-4.1-mini",
+        tools=[search_web]
+    ),
 )
 
-print(f"Passed: {result.passed}")
-print(f"Reasoning: {result.reasoning}")
+trace = agent.run(
+    "A customer is asking about setting up a new email account on the latest version of iOS. "
+    "They mention they're not very tech-savvy and seem frustrated. "
+    "Help them with clear, step-by-step instructions."
+)
+
+# Evaluate the quality of the agent's response multiple times
+judge = LlmJudge(model_id="gpt-4.1-mini")
+evaluation_questions = [
+    "Did it provide clear, step-by-step instructions?",
+    "Was the tone empathetic and appropriate for a frustrated, non-technical customer?",
+    "Did it avoid using technical jargon without explanation?",
+    "Was the response complete and actionable?",
+    "Does the description specify which version of iOS this works with?"
+]
+
+
+# Run evaluation 4 times to check consistency
+results = []
+for evaluation_question in evaluation_questions:
+    question = f"Evaluate whether the agent's response demonstrates good customer service by considering: {evaluation_question}."
+    result = judge.run(context=str(trace.spans_to_messages()), question=evaluation_question)
+    results.append(result)
+
+# Print all results
+for i, result in enumerate(results, 1):
+    print(f"Run {i} - Passed: {result.passed}")
+    print(f"Run {i} - Reasoning: {result.reasoning}")
+    print("-" * 50)
 ```
 
 ## AgentJudge
@@ -122,12 +161,13 @@ The `AgentJudge` automatically has access to these evaluation tools:
 from any_agent.evaluation import AgentJudge
 
 # Create an agent judge
-judge = AgentJudge(model_id="gpt-4o")
+judge = AgentJudge(model_id="gpt-4.1-mini")
 
 # Evaluate with access to trace inspection tools
 result = judge.run(
     trace=trace,
-    question="Did the agent use web search and complete the task in under 5 steps?"
+    question="Does the final answer provided by the trace mention and correctly specify the most recent major version of iOS? You may need to do a web search to determine the most recent version of iOS. If the final answer does not mention the version at all, this criteria should fail",
+    additional_tools=[search_web]
 )
 
 print(f"Passed: {result.passed}")
@@ -139,25 +179,19 @@ print(f"Reasoning: {result.reasoning}")
 You can extend the `AgentJudge` with additional tools for specialized evaluations:
 
 ```python
-def check_for_ice_cream(message: str) -> bool:
-    """Custom tool to check if a specific API was mentioned in a message
-
-    Args:
-        message: The message text to check for ice cream mentions
+def current_ios_version() -> str:
+    """Custom tool to retrieve the most recent version of iOS
 
     Returns:
-        True if ice cream is mentioned in the message, False otherwise
+        The version of iOS
     """
-    if 'ice cream' in message:
-        return True
-    else:
-        return False
+    return "iOS 18.5"
 
-judge = AgentJudge(model_id="gpt-4o")
+judge = AgentJudge(model_id="gpt-4.1-mini")
 result = judge.run(
     trace=trace,
-    question="Did the agent mention 'ice cream' in its final answer message?",
-    additional_tools=[check_for_ice_cream]
+    question="Does the final answer provided by the trace mention and correctly specify the most recent major version of iOS? If the final answer does not mention the version at all, this criteria should fail",
+    additional_tools=[current_ios_version]
 )
 ```
 
@@ -175,7 +209,7 @@ class DetailedEvaluation(BaseModel):
     suggestions: list[str]
 
 judge = LlmJudge(
-    model_id="gpt-4o-mini",
+    model_id="gpt-4.1-mini",
     output_type=DetailedEvaluation
 )
 

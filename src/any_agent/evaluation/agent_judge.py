@@ -12,10 +12,10 @@ from any_agent.utils.asyncio_sync import run_async_in_sync
 
 AGENT_INSTRUCTIONS = """You are a helpful assistant that will be used to evaluate the correctness of an agent trace.
 Given a specific question regarding the quality of something about the agent, \
-utilize the appropriate tools in order to gather what you need to accurately answer the question.
+you may utilize tools in order to gather information to know if the trace satisfies the question.
 
 Answer with:
-1. "passed": true or false
+1. "passed": true or false (true if the trace satisfies the question, false otherwise)
 2. "reasoning": Brief explanation for your decision (2-3 sentences max)"""
 
 

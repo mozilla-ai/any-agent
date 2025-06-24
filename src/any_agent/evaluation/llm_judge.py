@@ -6,59 +6,49 @@ from pydantic import BaseModel
 
 from any_agent.config import AgentFramework
 from any_agent.evaluation.schemas import AgentOutput
-from any_agent.evaluation.tools import EvaluationTools
-from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.utils.asyncio_sync import run_async_in_sync
 
-DEFAULT_PROMPT = """Please evaluate the following agent execution trace:
+DEFAULT_PROMPT_TEMPLATE = """Please evaluate the evaluation question given the following contextual information:
 
-AGENT TRACE:
-{trace_text}
+CONTEXT:
+{context}
 
 EVALUATION QUESTION:
-{question}"""
+{question}
+
+Your output must match the following JSON schema:
+{response_schema}
+"""
 
 
-LLM_JUDGE_SYSTEM_PROMPT = """You are an expert evaluator that analyzes agent execution traces to answer specific questions about agent performance and behavior.
+LLM_JUDGE_SYSTEM_PROMPT = """You are an expert evaluator that analyzes contextual information to answer specific questions about agent performance and behavior.
 
 You will be provided with:
-1. A detailed trace of an agent's execution showing all the steps it took
+1. Detailed contextual information of an agent's execution showing all the steps it took
 2. A specific evaluation question to answer
 
-Your task is to carefully analyze the trace and provide a judgment on whether the agent's performance meets the criteria specified in the question.
+Your task is to carefully analyze the context and provide a judgment on whether the agent's performance meets the criteria specified in the question.
 
-TRACE FORMAT:
-The trace shows the conversation flow between the user, assistant (agent), and any tools used. Each message includes:
-- Role: system, user, assistant
-- Content: The actual message or tool execution details
+CONTEXT FORMAT:
+The context provides information that may be relevant and necessary in order to properly answer the evaluation question.
 
 EVALUATION GUIDELINES:
 - Be objective and thorough in your analysis
-- Focus on what actually happened in the trace, not what should have happened
-- Consider the agent's reasoning, tool usage, and final output
-- If the question asks about specific actions, look for evidence of those actions in the trace
+- If the question asks about specific actions, look for evidence of those actions in the context
 - If unsure, err on the side of being more critical rather than lenient
 
-Answer with:
-1. "passed": true or false
-2. "reasoning": Brief explanation for your decision (2-3 sentences max)
-
-Your response MUST be valid JSON matching this schema:
-{
-  "passed": boolean,
-  "reasoning": "string"
-}"""
+Your output must match the following JSON schema:
+{response_schema}"""
 
 
 class LlmJudge:
-    """An LLM that evaluates the correctness of another agent's trace."""
-
     def __init__(
         self,
         model_id: str,
         framework: AgentFramework = AgentFramework.TINYAGENT,
         output_type: type[BaseModel] = AgentOutput,
         model_args: dict[str, Any] | None = None,
+        system_prompt: str = LLM_JUDGE_SYSTEM_PROMPT,
     ):
         if model_args is None:
             model_args = {}
@@ -66,66 +56,72 @@ class LlmJudge:
         self.framework = framework
         self.model_args = model_args
         self.output_type = output_type
+        self.system_prompt = system_prompt
         # If LiteLLM detects that the model supports response_format, set it to the output_type automatically
         if supports_response_schema(model=self.model_id):
             self.model_args["response_format"] = self.output_type
 
+    def _create_prompt(self, context: str, question: str, prompt: str) -> str:
+        if (
+            "{context}" not in prompt
+            or "{question}" not in prompt
+            or "{response_schema}" not in prompt
+        ):
+            msg = "Prompt must contain the following placeholders: {context}, {question}, and {response_schema}"
+            raise ValueError(msg)
+        return prompt.format(
+            context=context,
+            question=question,
+            response_schema=self.output_type.model_json_schema(),
+        )
+
     def run(
         self,
-        trace: AgentTrace,
+        context: str,
         question: str,
+        prompt_template: str = DEFAULT_PROMPT_TEMPLATE,
     ) -> BaseModel:
-        """Initialize the LlmJudge with a trace and model.
+        """Run the judge synchronously.
 
         Args:
-            trace: The agent trace to evaluate
+            context: Any relevant information that may be needed to answer the question
             question: The question to ask the agent
+            prompt_template: The prompt to use for the LLM
 
         Returns:
             The evaluation result
 
         """
-        return run_async_in_sync(self.run_async(trace, question))
+        return run_async_in_sync(self.run_async(context, question, prompt_template))
 
     async def run_async(
         self,
-        trace: AgentTrace,
+        context: str,
         question: str,
-        prompt: str = DEFAULT_PROMPT,
+        prompt_template: str = DEFAULT_PROMPT_TEMPLATE,
     ) -> BaseModel:
         """Run the LLM asynchronously.
 
         Args:
-            trace: The agent trace to evaluate
+            context: Any relevant information that may be needed to answer the question
             question: The question to ask the agent
-            prompt: The prompt to use for the LLM
+            prompt_template: The prompt to use for the LLM
+
         Returns:
             The evaluation result
 
         """
-        # Get formatted trace messages
-        evaluation_tools = EvaluationTools(trace)
-        trace_text = evaluation_tools.get_messages_from_trace()
-
-        # Create the evaluation prompt
-        prompt = prompt.format(trace_text=trace_text, question=question)
+        prompt = self._create_prompt(context, question, prompt_template)
 
         # Make the LLM call
-        try:
-            response = await acompletion(
-                model=self.model_id,
-                messages=[
-                    {"role": "system", "content": LLM_JUDGE_SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt},
-                ],
-                **self.model_args,
-            )
-
-        except Exception as e:
-            # Return a failed evaluation with error details
-            return AgentOutput(
-                passed=False, reasoning=f"Error during LLM evaluation: {e!s}"
-            )
+        response = await acompletion(
+            model=self.model_id,
+            messages=[
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+            **self.model_args,
+        )
 
         return self.output_type.model_validate_json(
             response.choices[0].message["content"]
