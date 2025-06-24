@@ -39,9 +39,7 @@ def _assert_has_date_agent_tool_call(agent_trace: AgentTrace) -> None:
 
 
 @pytest.mark.asyncio
-async def test_a2a_tool_async(
-    agent_framework: AgentFramework
-) -> None:
+async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
     """Tests that an agent contacts another using A2A using the adapter tool."""
     if agent_framework in [
         AgentFramework.SMOLAGENTS,
@@ -153,9 +151,7 @@ def _run_server(
     )
 
 
-def test_a2a_tool_sync(
-    agent_framework: AgentFramework
-) -> None:
+def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
     """Tests that an agent contacts another using A2A using the sync adapter tool."""
     if agent_framework in [
         AgentFramework.SMOLAGENTS,
@@ -172,7 +168,7 @@ def test_a2a_tool_sync(
     server_process = None
     tool_agent_endpoint = "tool_agent_sync"
 
-    server_queue = Queue()
+    server_queue = Queue()  # type: ignore[var-annotated]
 
     try:
         # Start the server in a separate process
