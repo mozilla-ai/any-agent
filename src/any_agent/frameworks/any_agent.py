@@ -272,14 +272,12 @@ class AnyAgent(ABC):
             ```
 
         """
-        from any_agent.serving import A2AServingConfig, MCPServingConfig
+        from any_agent.serving import MCPServingConfig
 
         if isinstance(serving_config, MCPServingConfig):
             self._serve_mcp(serving_config)
-        elif isinstance(serving_config, A2AServingConfig):
-            self._serve_a2a(serving_config)
         else:
-            self._serve_a2a(None)
+            self._serve_a2a(serving_config)
 
     async def _serve_a2a_async(
         self, serving_config: A2AServingConfig | None
@@ -352,13 +350,11 @@ class AnyAgent(ABC):
             ```
 
         """
-        from any_agent.serving import A2AServingConfig, MCPServingConfig
+        from any_agent.serving import MCPServingConfig
 
         if isinstance(serving_config, MCPServingConfig):
             return await self._serve_mcp_async(serving_config)
-        if isinstance(serving_config, A2AServingConfig):
-            return await self._serve_a2a_async(serving_config)
-        return await self._serve_a2a_async(None)
+        return await self._serve_a2a_async(serving_config)
 
     def _recreate_with_config(self, new_config: AgentConfig) -> AnyAgent:
         """Create a new agent instance with the given config, preserving MCP servers and tools.

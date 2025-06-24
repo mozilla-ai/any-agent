@@ -143,7 +143,7 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
 
     finally:
         if served_server:
-            await served_server.shutdown()
+            served_server.should_exit = True
         if served_task:
             await served_task
 

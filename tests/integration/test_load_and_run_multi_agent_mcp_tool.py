@@ -56,7 +56,6 @@ async def test_load_and_run_multi_agent_mcp(
     """
     skip_reason = {
         AgentFramework.SMOLAGENTS: "async a2a is not supported",
-        # AgentFramework.LLAMA_INDEX: "spans are not built correctly",
     }
     if agent_framework in skip_reason:
         pytest.skip(
