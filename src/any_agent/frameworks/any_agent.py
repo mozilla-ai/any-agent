@@ -52,9 +52,11 @@ class AgentRunError(Exception):
         return self._original_exception
 
     def __str__(self) -> str:
+        """Return the string representation of the original exception."""
         return str(self._original_exception)
 
     def __repr__(self) -> str:
+        """Return the detailed representation of the AgentRunError."""
         return f"AgentRunError({self._original_exception!r})"
 
 
@@ -220,7 +222,7 @@ class AnyAgent(ABC):
                     if instrumented_trace is not None:
                         trace = instrumented_trace
             trace.add_span(invoke_span)
-            raise AgentRunError(trace, e)
+            raise AgentRunError(trace, e) from e
 
         if instrumentation_enabled:
             async with self._lock:
