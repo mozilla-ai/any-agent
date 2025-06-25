@@ -19,15 +19,12 @@ try:
         serve_a2a_async,
     )
 
-    __all__ = [
+    __all__ += [
         "A2AServingConfig",
-        "MCPServingConfig",
         "_get_a2a_app",
         "_get_a2a_app_async",
         "serve_a2a",
         "serve_a2a_async",
-        "serve_mcp",
-        "serve_mcp_async",
     ]
 except ImportError:
     msg = "You need to `pip install 'any-agent[a2a]'` to use this method."
