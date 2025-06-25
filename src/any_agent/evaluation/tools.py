@@ -44,7 +44,7 @@ class TraceTools:
         """
         return self.trace.tokens.total_tokens
 
-    def get_number_of_steps(self) -> int:
+    def get_steps_taken(self) -> int:
         """Get the number of steps taken by the agent as reported by the trace.
 
         Returns:

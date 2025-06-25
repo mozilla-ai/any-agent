@@ -152,7 +152,7 @@ The `AgentJudge` automatically has access to these evaluation tools:
 
 - `get_final_output()`: Get the agent's final output
 - `get_tokens_used()`: Get total token usage
-- `get_number_of_steps()`: Get number of steps taken
+- `get_steps_taken()`: Get number of steps taken
 - `get_messages_from_trace()`: Get formatted trace messages
 - `get_duration()`: Get the duration in seconds of the trace
 
