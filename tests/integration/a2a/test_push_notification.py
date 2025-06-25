@@ -7,12 +7,9 @@ for a task, and verifies that the server correctly sends notifications to the we
 import asyncio
 from uuid import uuid4
 
-import httpx
 import pytest
 import uvicorn
-from a2a.client import A2AClient
 from a2a.types import (
-    GetTaskPushNotificationConfigRequest,
     Message,
     MessageSendConfiguration,
     MessageSendParams,
@@ -20,7 +17,6 @@ from a2a.types import (
     PushNotificationConfig,
     SendMessageRequest,
     SetTaskPushNotificationConfigRequest,
-    TaskIdParams,
     TaskPushNotificationConfig,
 )
 from starlette.applications import Starlette
@@ -31,8 +27,9 @@ from starlette.routing import Route
 from any_agent import AgentConfig
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.serving import A2AServingConfig
+from tests.integration.helpers import wait_for_server_async
 
-from .helpers import wait_for_server_async
+from .conftest import DEFAULT_LONG_TIMEOUT, A2ATestHelpers, a2a_client_from_agent
 
 # Storage for notifications received by the webhook
 received_notifications = []
@@ -54,7 +51,7 @@ async def webhook_handler(request: Request) -> JSONResponse:
 
 
 @pytest.mark.asyncio
-async def test_push_notification():
+async def test_push_notification(a2a_test_helpers: A2ATestHelpers) -> None:
     """Test that the A2A server can send push notifications to a configured webhook."""
 
     # Clear any previous notifications
@@ -80,16 +77,8 @@ async def test_push_notification():
         task_timeout_minutes=2,  # Short timeout for testing
     )
 
-    (task, server) = await agent.serve_async(serving_config=serving_config)
-
-    test_port = server.servers[0].sockets[0].getsockname()[1]
-    server_url = f"http://localhost:{test_port}"
-    await wait_for_server_async(server_url)
-
     # Set up webhook server
-    webhook_app = Starlette(
-        routes=[Route("/webhook", webhook_handler)]
-    )
+    webhook_app = Starlette(routes=[Route("/webhook", webhook_handler)])
 
     # Start webhook server on available port
     webhook_config = uvicorn.Config(webhook_app, host="localhost", port=0)
@@ -103,16 +92,17 @@ async def test_push_notification():
     await wait_for_server_async(webhook_url)
 
     try:
-        async with httpx.AsyncClient(timeout=150.0) as httpx_client:
-            client = await A2AClient.get_client_from_agent_card_url(
-                httpx_client, server_url
-            )
-
-            # Configure push notifications in the initial message/send request
-            # following the A2A specification example
+        # Use the helper context manager for agent serving and client setup
+        async with a2a_client_from_agent(
+            agent, serving_config, http_timeout=DEFAULT_LONG_TIMEOUT
+        ) as (client, server_url):
+            # Generate IDs for the conversation
             first_message_id = str(uuid4())
             context_id = str(uuid4())
             task_id = str(uuid4())
+
+            # Configure push notifications in the initial message/send request
+            # following the A2A specification example
             params = MessageSendParams(
                 message=Message(
                     role="user",
@@ -136,8 +126,8 @@ async def test_push_notification():
             response_1 = await client.send_message(request_1)
             assert response_1.root.result.id == task_id
 
+            # Set up push notification configuration for the task
             push_notification_config = PushNotificationConfig(url=webhook_url)
-
             params_model = TaskPushNotificationConfig(
                 taskId=task_id, pushNotificationConfig=push_notification_config
             )
@@ -146,27 +136,32 @@ async def test_push_notification():
             response_0 = await client.set_task_callback(request_0)
             assert not hasattr(response_0, "error")
 
-            # now ask the agent a question on the same taskid
+            # Send another message to the same task to trigger notifications
             request_1 = SendMessageRequest(id=str(uuid4()), params=params)
             response_1 = await client.send_message(request_1)
             assert response_1.root.result.id == task_id
 
+            # Wait for potential notifications
             await asyncio.sleep(5)
 
-
     finally:
-        # Clean up servers
-        await server.shutdown()
-        task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
+        # Clean up webhook server properly
+        if webhook_server:
+            try:
+                # Try to shutdown gracefully first
+                if hasattr(webhook_server, "shutdown"):
+                    await webhook_server.shutdown()
+                else:
+                    webhook_server.should_exit = True
+                    # Give the server a moment to shut down gracefully
+                    await asyncio.sleep(0.1)
+            except Exception:
+                # If graceful shutdown fails, force it
+                webhook_server.should_exit = True
 
-        # Clean up webhook server
-        webhook_server.should_exit = True
-        webhook_task.cancel()
-        try:
-            await webhook_task
-        except asyncio.CancelledError:
-            pass
+        if webhook_task and not webhook_task.done():
+            webhook_task.cancel()
+            try:
+                await webhook_task
+            except asyncio.CancelledError:
+                pass
