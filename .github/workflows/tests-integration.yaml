@@ -1,0 +1,44 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+jobs:
+  run-integration-tests:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: 3.13
+          activate-environment: true
+
+      - name: Install barebones
+        run: |
+          uv sync --group tests
+
+      # Run the tinyagent test first to get an early signal of issues with the codebase.
+      - name: Run TINYAGENT test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: pytest -v tests/integration/test_agent.py -k "TINYAGENT"
+
+      - name: Run Snapshot tests
+        run: pytest -v tests/snapshots
+
+      - name: Install extras
+        run: |
+          uv sync --group tests --extra all --extra a2a
+
+      - name: Run Integration tests (parallel with xdist)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: pytest -v tests/integration -n auto -k "not test_load_and_run_agent[TINYAGENT]"

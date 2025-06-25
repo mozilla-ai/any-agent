@@ -4,10 +4,12 @@ import time
 import httpx
 import requests
 
+DEFAULT_MODEL_ID = "gpt-4.1-nano"
+
 
 def wait_for_server(
     server_url: str, max_attempts: int = 20, poll_interval: float = 0.5
-):
+) -> None:
     attempts = 0
     while True:
         try:
@@ -27,7 +29,7 @@ def wait_for_server(
 
 async def wait_for_server_async(
     server_url: str, max_attempts: int = 20, poll_interval: float = 0.5
-):
+) -> None:
     attempts = 0
 
     async with httpx.AsyncClient() as client:

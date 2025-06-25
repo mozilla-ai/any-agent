@@ -16,13 +16,12 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.config import MCPStdio
-from any_agent.evaluation import EvaluationCase, evaluate
-from any_agent.evaluation.schemas import (
-    AgentOutput,
-    CheckpointCriteria,
-    TraceEvaluationResult,
-)
+from any_agent.evaluation.agent_judge import AgentJudge
+from any_agent.evaluation.llm_judge import LlmJudge
+from any_agent.evaluation.schemas import EvaluationOutput
+from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
+from any_agent.tracing.exporter import _ConsoleExporter
 
 
 def uvx_installed() -> bool:
@@ -42,7 +41,9 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
         """Checks the `_set_llm_inputs` implemented by each framework's instrumentation."""
         assert llm_call.attributes.get("gen_ai.input.messages", None) is not None
         # input.messages should be a valid JSON string (list of dicts)
-        input_messages = json.loads(llm_call.attributes.get("gen_ai.input.messages"))
+        input_messages_raw = llm_call.attributes.get("gen_ai.input.messages")
+        assert input_messages_raw is not None
+        input_messages = json.loads(input_messages_raw)
         assert input_messages[0]["role"] == "system"
         assert input_messages[1]["role"] == "user"
 
@@ -50,7 +51,9 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
         """Checks the tools setup implemented by each framework's instrumentation."""
         assert tool_execution.attributes.get("gen_ai.tool.args", None) is not None
         # tool.args should be a JSON string (dict)
-        args = json.loads(tool_execution.attributes.get("gen_ai.tool.args"))
+        tool_args_raw = tool_execution.attributes.get("gen_ai.tool.args")
+        assert tool_args_raw is not None
+        args = json.loads(tool_args_raw)
         assert "timezone" in args
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
@@ -109,39 +112,41 @@ def assert_tokens(agent_trace: AgentTrace) -> None:
 
 
 def assert_eval(agent_trace: AgentTrace) -> None:
-    def _check_if_agent_called_write_file(trace: AgentTrace) -> AgentOutput:
-        if any(
-            span.attributes.get("gen_ai.tool.name") == "write_file"
-            for span in trace.spans
-        ):
-            return AgentOutput(passed=True, reasoning="Found `write_file` tool usage.")
-        return AgentOutput(
-            passed=False, reasoning="Didn't find `write_file` tool usage."
-        )
+    """Test evaluation using the new judge classes."""
+    # Test 1: Check if agent called write_file tool using LlmJudge
+    llm_judge = LlmJudge(model_id="gpt-4.1-nano")
+    result1 = llm_judge.run(
+        context=str(agent_trace.spans_to_messages()),
+        question="Did the agent call the write_file tool during execution?",
+    )
+    assert isinstance(result1, EvaluationOutput)
+    assert result1.passed, (
+        f"Expected agent to call write_file tool, but evaluation failed: {result1.reasoning}"
+    )
 
-    case = EvaluationCase(
-        llm_judge="gpt-4.1-mini",
-        checkpoints=[
-            CheckpointCriteria(
-                criteria=_check_if_agent_called_write_file,
-                points=1,
-            ),
-            CheckpointCriteria(
-                criteria="Check if the agent wrote the year to the file.",
-                points=1,
-            ),
-            CheckpointCriteria(
-                criteria="Check if the year was 1990",
-                points=1,
-            ),
-        ],
-    )
-    result: TraceEvaluationResult = evaluate(
-        evaluation_case=case,
+    # Test 2: Check if agent wrote the current year to file using AgentJudge
+    agent_judge = AgentJudge(model_id="gpt-4.1-mini")
+
+    def get_current_year() -> str:
+        """Get the current year"""
+        return str(datetime.now().year)
+
+    result2 = agent_judge.run(
         trace=agent_trace,
+        question="Did the agent write the current year to a file?",
+        additional_tools=[get_current_year],
     )
-    assert result
-    assert result.score >= float(1 / 3)
+    assert isinstance(result2, EvaluationOutput)
+    assert result2.passed, (
+        f"Expected agent to write current year to file, but evaluation failed: {result2.reasoning}"
+    )
+
+    # Test 3: Verify at least one evaluation passes (basic sanity check)
+    results = [result1, result2]
+    passed_count = sum(1 for r in results if r.passed)
+    assert passed_count >= 1, (
+        f"Expected at least 1 evaluation to pass, but got {passed_count}/2"
+    )
 
 
 class Step(BaseModel):
@@ -208,10 +213,8 @@ def test_load_and_run_agent(
     agent = AnyAgent.create(agent_framework, agent_config)
     update_trace = request.config.getoption("--update-trace-assets")
     if update_trace:
-        from any_agent.tracing import TRACE_PROVIDER, _ConsoleExporter
-
-        with TRACE_PROVIDER._active_span_processor._lock:
-            for p in TRACE_PROVIDER._active_span_processor._span_processors:
+        with TRACE_PROVIDER._active_span_processor._lock:  # type: ignore[attr-defined]
+            for p in TRACE_PROVIDER._active_span_processor._span_processors:  # type: ignore[attr-defined]
                 if isinstance(p.span_exporter, _ConsoleExporter):
                     console = p.span_exporter.console
                     console.record = True
@@ -237,7 +240,7 @@ def test_load_and_run_agent(
         with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
             f.write(agent_trace.model_dump_json(indent=2))
             f.write("\n")
-        html_output = console.export_html(inline_styles=True)  # type: ignore[union-attr]
+        html_output = console.export_html(inline_styles=True)
         with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
             f.write(html_output.replace("<!DOCTYPE html>", ""))
 

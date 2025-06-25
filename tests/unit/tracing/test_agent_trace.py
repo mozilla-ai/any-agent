@@ -20,7 +20,7 @@ def create_llm_span(input_tokens: int = 100, output_tokens: int = 50) -> AgentSp
     )
 
 
-def test_tokens_and_cost_properties_are_cached():
+def test_tokens_and_cost_properties_are_cached() -> None:
     """Test that tokens and cost properties are cached after first access."""
     trace = AgentTrace()
     trace.add_span(create_llm_span(input_tokens=100, output_tokens=50))
@@ -39,7 +39,7 @@ def test_tokens_and_cost_properties_are_cached():
     assert "cost" in trace.__dict__
 
 
-def test_add_span_invalidates_cache():
+def test_add_span_invalidates_cache() -> None:
     """Test that adding a span invalidates both tokens and cost caches."""
     trace = AgentTrace()
     trace.add_span(create_llm_span(input_tokens=100, output_tokens=50))
@@ -62,7 +62,7 @@ def test_add_span_invalidates_cache():
     assert tokens.output_tokens == 125
 
 
-def test_invalidate_cache_method():
+def test_invalidate_cache_method() -> None:
     """Test that _invalidate_tokens_and_cost_cache clears both caches."""
     trace = AgentTrace()
     trace.add_span(create_llm_span())
@@ -80,7 +80,7 @@ def test_invalidate_cache_method():
     assert "cost" not in trace.__dict__
 
 
-def test_spans_to_messages_handles_empty_spans():
+def test_spans_to_messages_handles_empty_spans() -> None:
     """Test that spans_to_messages handles traces with no spans."""
     empty_trace = AgentTrace()
     messages = empty_trace.spans_to_messages()

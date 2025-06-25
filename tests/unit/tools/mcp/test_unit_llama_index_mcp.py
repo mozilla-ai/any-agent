@@ -10,7 +10,7 @@ from any_agent.tools import _get_mcp_server
 
 
 @pytest.fixture
-def llama_index_mcp_client() -> Generator[LlamaIndexMCPClient]:
+def llama_index_mcp_client() -> Generator[LlamaIndexMCPClient, None, None]:
     with patch(
         "any_agent.tools.mcp.frameworks.llama_index.LlamaIndexMCPClient"
     ) as mock_client:
@@ -20,7 +20,7 @@ def llama_index_mcp_client() -> Generator[LlamaIndexMCPClient]:
 @pytest.fixture
 def llama_index_mcp_tool_spec(
     tools: Sequence[Tool],
-) -> Generator[LlamaIndexMcpToolSpec]:
+) -> Generator[LlamaIndexMcpToolSpec, None, None]:
     tool_spec = MagicMock()
     tool_spec.to_tool_list_async = AsyncMock(return_value=tools)
     with patch(
@@ -70,7 +70,7 @@ async def test_llama_index_mcp_env() -> None:
 
 
 @pytest.mark.asyncio
-async def test_llamaindex_client_session_timeout_passed():
+async def test_llamaindex_client_session_timeout_passed() -> None:
     """Test that client_session_timeout_seconds parameter is properly passed to LlamaIndex BasicMCPClient (STDIO only)."""
     custom_timeout = 15.0
     stdio_params = MCPStdio(

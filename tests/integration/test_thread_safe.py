@@ -25,8 +25,8 @@ def mock_capital(query: str) -> str:
 
 
 @pytest.mark.asyncio
-async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
-    """When an agent is run twice, state from the first run shouldn't bleed into the second run"""
+async def test_run_agent_concurrently(agent_framework: AgentFramework) -> None:
+    """When an agent is run concurrently, state from the first run shouldn't bleed into the second run"""
     model_id = "gpt-4.1-nano"
     env_check = validate_environment(model_id)
     if not env_check["keys_in_environment"]:
@@ -55,8 +55,8 @@ async def test_run_agent_twice(agent_framework: AgentFramework) -> None:
     outputs = [r.final_output for r in results]
     assert all(o is not None for o in outputs)
 
-    assert sum("Paris" in o for o in outputs) == 1
-    assert sum("Madrid" in o for o in outputs) == 1
+    assert sum("Paris" in str(o) for o in outputs) == 1
+    assert sum("Madrid" in str(o) for o in outputs) == 1
 
     first_spans = results[0].spans
     second_spans = results[1].spans

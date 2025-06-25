@@ -1,12 +1,11 @@
 import shutil
-from collections.abc import AsyncGenerator, Generator, Sequence
+from collections.abc import Generator, Sequence
 from contextlib import AsyncExitStack
 from typing import Any, Protocol
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from mcp import Tool as MCPTool
-from mcp.client.session import ClientSession
 from pydantic import Field
 from pytest_lazy_fixtures import lf
 
@@ -32,12 +31,14 @@ def mcp_sse_params_no_tools() -> MCPSse:
 
 
 @pytest.fixture
-def session() -> Generator[Any]:
+def session() -> AsyncMock:
     return AsyncMock()
 
 
 @pytest.fixture
-def _path_client_session(session: AsyncGenerator[Any]) -> Generator[None]:
+def _path_client_session(
+    session: AsyncMock,
+) -> Generator[None, None, None]:
     with patch(
         "any_agent.tools.mcp.frameworks.agno.ClientSession"
     ) as mock_client_session:
@@ -56,7 +57,7 @@ def mcp_sse_params_with_tools(
 def enter_context_with_transport_and_session(
     session: Any,
     tools: Sequence[str],
-) -> Generator[None]:
+) -> Generator[None, None, None]:
     transport = (AsyncMock(), AsyncMock())
     with patch.object(AsyncExitStack, "enter_async_context") as mock_context:
         mock_context.side_effect = [transport, session, tools]
@@ -91,7 +92,7 @@ def mcp_tools(tools: Sequence[str]) -> list[MCPTool]:
 
 
 @pytest.fixture
-def _patch_client_session_initialize() -> Generator[ClientSession]:
+def _patch_client_session_initialize() -> Generator[AsyncMock, None, None]:
     with patch(
         "mcp.client.session.ClientSession.initialize",
         new_callable=AsyncMock,
@@ -101,7 +102,9 @@ def _patch_client_session_initialize() -> Generator[ClientSession]:
 
 
 @pytest.fixture
-def _patch_client_session_list_tools(mcp_tools: Sequence[MCPTool]) -> Generator[None]:
+def _patch_client_session_list_tools(
+    mcp_tools: Sequence[MCPTool],
+) -> Generator[None, None, None]:
     tool_list = MagicMock()
     tool_list.tools = mcp_tools
     with patch("mcp.client.session.ClientSession.list_tools", return_value=tool_list):
@@ -109,7 +112,9 @@ def _patch_client_session_list_tools(mcp_tools: Sequence[MCPTool]) -> Generator[
 
 
 @pytest.fixture
-def sse_params_echo_server(echo_sse_server: Any, tools: Sequence[str]) -> MCPSse:
+def sse_params_echo_server(
+    echo_sse_server: dict[str, str], tools: Sequence[str]
+) -> MCPSse:
     return MCPSse(url=echo_sse_server["url"], tools=tools)
 
 

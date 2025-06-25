@@ -41,9 +41,9 @@ def test_runtime_error(
     with patch(patch_function) as litellm_path:
         litellm_path.side_effect = RuntimeError(exc_reason)
         agent_config = AgentConfig(
+            model_id=kwargs["model_id"],
             tools=[],
             model_args=model_args,
-            **kwargs,
         )
         agent = AnyAgent.create(agent_framework, agent_config)
         spans = []
@@ -55,6 +55,7 @@ def test_runtime_error(
             spans = are.trace.spans
             assert any(
                 span.status.status_code == StatusCode.ERROR
+                and span.status.description is not None
                 and exc_reason in span.status.description
                 for span in spans
             )
@@ -92,10 +93,10 @@ def test_tool_error(
     model_args = {"temperature": 0.0}
 
     agent_config = AgentConfig(
+        model_id=kwargs["model_id"],
         instructions="You must use the available tools to answer questions.",
         tools=[search_web],
         model_args=model_args,
-        **kwargs,
     )
 
     agent = AnyAgent.create(agent_framework, agent_config)

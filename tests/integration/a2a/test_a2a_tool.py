@@ -1,5 +1,5 @@
-import datetime
 from multiprocessing import Process, Queue
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from litellm.utils import validate_environment
@@ -8,26 +8,24 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
+from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server
 
-from .helpers import wait_for_server, wait_for_server_async
+from .conftest import (
+    DATE_PROMPT,
+    DEFAULT_TIMEOUT,
+    a2a_client_from_agent,
+    assert_contains_current_date_info,
+    get_datetime,
+)
+
+if TYPE_CHECKING:
+    from multiprocessing import Queue as QueueType
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
     """Assert that agent_trace is valid and has final output."""
     assert isinstance(agent_trace, AgentTrace)
     assert agent_trace.final_output
-
-
-def _assert_contains_current_date_info(final_output: str) -> None:
-    """Assert that the final output contains current date and time information."""
-    now = datetime.datetime.now()
-    assert all(
-        [
-            str(now.year) in final_output,
-            str(now.day) in final_output,
-            now.strftime("%B") in final_output,
-        ]
-    )
 
 
 def _assert_has_date_agent_tool_call(agent_trace: AgentTrace) -> None:
@@ -39,95 +37,65 @@ def _assert_has_date_agent_tool_call(agent_trace: AgentTrace) -> None:
     )
 
 
-DATE_PROMPT = (
-    "What date and time is it right now? "
-    "In your answer please include the year, month, day, and time. "
-    "Example answer could be something like 'Today is December 15, 2024'"
-)
-
-
 @pytest.mark.asyncio
-async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> None:
+async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
     """Tests that an agent contacts another using A2A using the adapter tool.
 
     Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
     """
-    if agent_framework in [
-        # async a2a is not supported
-        AgentFramework.SMOLAGENTS,
-        # spans are not built correctly
-        AgentFramework.LLAMA_INDEX,
-        # AgentFramework.GOOGLE,
-    ]:
+    skip_reason = {
+        AgentFramework.SMOLAGENTS: "async a2a is not supported",
+    }
+    if agent_framework in skip_reason:
         pytest.skip(
-            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+            f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
-    kwargs = {}
 
-    kwargs["model_id"] = "gpt-4.1-nano"
-    agent_model = kwargs["model_id"]
-    env_check = validate_environment(kwargs["model_id"])
+    env_check = validate_environment(DEFAULT_MODEL_ID)
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
-    model_args = (
+    model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
         if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
-        else None
+        else {}
+    )
+    model_args["temperature"] = 0.0
+
+    # Create date agent
+    date_agent_cfg = AgentConfig(
+        instructions="Use the available tools to obtain additional information to answer the query.",
+        name="date_agent",
+        model_id=DEFAULT_MODEL_ID,
+        description="Agent that can return the current date.",
+        tools=[get_datetime],
+        model_args=model_args,
+    )
+    date_agent = await AnyAgent.create_async(
+        agent_framework=agent_framework,
+        agent_config=date_agent_cfg,
     )
 
-    main_agent = None
-    served_agent = None
-    served_task = None
-    served_server = None
+    # Serve the agent and get client
+    tool_agent_endpoint = "tool_agent"
+    serving_config = A2AServingConfig(
+        port=0,
+        endpoint=f"/{tool_agent_endpoint}",
+        log_level="info",
+    )
 
-    try:
-        tool_agent_endpoint = "tool_agent"
-
-        # DATE AGENT
-
-        import datetime
-
-        def get_datetime() -> str:
-            """Return the current date and time"""
-            return str(datetime.datetime.now())
-
-        date_agent_description = "Agent that can return the current date."
-        date_agent_cfg = AgentConfig(
-            instructions="Use the available tools to obtain additional information to answer the query.",
-            name="date_agent",
-            model_id=agent_model,
-            description=date_agent_description,
-            tools=[get_datetime],
-            model_args=model_args,
-        )
-        date_agent = await AnyAgent.create_async(
-            agent_framework=agent_framework,
-            agent_config=date_agent_cfg,
-        )
-
-        # SERVING PROPER
-
-        served_agent = date_agent
-        (served_task, served_server) = await served_agent.serve_async(
-            serving_config=A2AServingConfig(
-                port=0,
-                endpoint=f"/{tool_agent_endpoint}",
-                log_level="info",
-            )
-        )
-        test_port = served_server.servers[0].sockets[0].getsockname()[1]
-        server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
-        await wait_for_server_async(server_url)
-
-        # Search agent is ready for card resolution
-
+    async with a2a_client_from_agent(date_agent, serving_config) as (_, server_url):
+        # Create main agent with A2A tool
         main_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
-            tools=[await a2a_tool_async(server_url, http_kwargs={"timeout": 10.0})],
+            model_id=DEFAULT_MODEL_ID,
+            tools=[
+                await a2a_tool_async(
+                    server_url, http_kwargs={"timeout": DEFAULT_TIMEOUT}
+                )
+            ],
             model_args=model_args,
-            **kwargs,  # type: ignore[arg-type]
         )
 
         main_agent = await AnyAgent.create_async(
@@ -138,19 +106,8 @@ async def test_load_and_run_multi_agent_a2a(agent_framework: AgentFramework) -> 
         agent_trace = await main_agent.run_async(DATE_PROMPT)
 
         _assert_valid_agent_trace(agent_trace)
-        _assert_contains_current_date_info(agent_trace.final_output)
+        assert_contains_current_date_info(str(agent_trace.final_output))
         _assert_has_date_agent_tool_call(agent_trace)
-
-    finally:
-        if served_server:
-            await served_server.shutdown()
-        if served_task:
-            served_task.cancel()
-
-
-def get_datetime() -> str:
-    """Return the current date and time"""
-    return str(datetime.datetime.now())
 
 
 def _run_server(
@@ -158,16 +115,15 @@ def _run_server(
     port: int,
     endpoint: str,
     model_id: str,
-    server_queue: Queue,
-):
-    """Run the server for the sync test. This needs to be defined outside the test function so that it can be run in a separate process."""
-    date_agent_description = "Agent that can return the current date."
+    server_queue: "QueueType[int]",
+) -> None:
+    """Run the server for the sync test."""
     date_agent_cfg = AgentConfig(
         instructions="Use the available tools to obtain additional information to answer the query.",
         name="date_agent",
-        model_id=model_id,
-        description=date_agent_description,
+        description="Agent that can return the current date.",
         tools=[get_datetime],
+        model_id=model_id,
         model_args={"parallel_tool_calls": False}
         if agent_framework_str not in ["agno", "llama_index"]
         else None,
@@ -198,34 +154,27 @@ def _run_server(
     )
 
 
-def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> None:
+def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
     """Tests that an agent contacts another using A2A using the sync adapter tool.
 
     Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
     """
-    if agent_framework in [
-        # async a2a is not supported
-        AgentFramework.SMOLAGENTS,
-        # spans are not built correctly
-        AgentFramework.LLAMA_INDEX,
-        # AgentFramework.GOOGLE,
-    ]:
+    skip_reason = {
+        AgentFramework.SMOLAGENTS: "async a2a is not supported; run_async_in_sync fails",
+    }
+    if agent_framework in skip_reason:
         pytest.skip(
-            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+            f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
 
-    kwargs = {}
-
-    kwargs["model_id"] = "gpt-4.1-nano"
-    agent_model = kwargs["model_id"]
-    env_check = validate_environment(kwargs["model_id"])
+    env_check = validate_environment(DEFAULT_MODEL_ID)
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
     server_process = None
     tool_agent_endpoint = "tool_agent_sync"
 
-    server_queue = Queue()
+    server_queue = Queue()  # type: ignore[var-annotated]
 
     try:
         # Start the server in a separate process
@@ -235,14 +184,13 @@ def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> N
                 agent_framework.value,
                 0,
                 tool_agent_endpoint,
-                agent_model,
+                DEFAULT_MODEL_ID,
                 server_queue,
             ),
         )
         server_process.start()
 
         test_port = server_queue.get()
-
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
         wait_for_server(server_url)
 
@@ -253,10 +201,10 @@ def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> N
             tools=[
                 a2a_tool(
                     f"http://localhost:{test_port}/{tool_agent_endpoint}",
-                    http_kwargs={"timeout": 10.0},
+                    http_kwargs={"timeout": DEFAULT_TIMEOUT},
                 )
             ],
-            **kwargs,  # type: ignore[arg-type]
+            model_id=DEFAULT_MODEL_ID,
         )
 
         main_agent = AnyAgent.create(
@@ -267,7 +215,7 @@ def test_load_and_run_multi_agent_a2a_sync(agent_framework: AgentFramework) -> N
         agent_trace = main_agent.run(DATE_PROMPT)
 
         _assert_valid_agent_trace(agent_trace)
-        _assert_contains_current_date_info(agent_trace.final_output)
+        assert_contains_current_date_info(str(agent_trace.final_output))
         _assert_has_date_agent_tool_call(agent_trace)
 
     finally:

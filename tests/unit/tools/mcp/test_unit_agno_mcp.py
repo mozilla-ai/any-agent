@@ -11,7 +11,7 @@ from any_agent.tools import _get_mcp_server
 
 
 @pytest.fixture
-def agno_mcp_tools() -> Generator[AgnoMCPTools]:
+def agno_mcp_tools() -> Generator[AgnoMCPTools, None, None]:
     with patch("any_agent.tools.mcp.frameworks.agno.AgnoMCPTools") as mock_mcp_tools:
         yield mock_mcp_tools
 
@@ -68,7 +68,7 @@ async def test_agno_mcp_env() -> None:
 
 
 @pytest.mark.asyncio
-async def test_agno_client_session_timeout_passed():
+async def test_agno_client_session_timeout_passed() -> None:
     """Test that client_session_timeout_seconds parameter is properly passed to AgnoMCPTools (STDIO only)."""
     custom_timeout = 15
     stdio_params = MCPStdio(

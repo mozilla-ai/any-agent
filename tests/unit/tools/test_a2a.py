@@ -1,5 +1,7 @@
 import asyncio
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -28,7 +30,7 @@ from any_agent.tools.a2a import a2a_tool, a2a_tool_async
 
 
 # Helper functions and fixtures
-def mock_agent_card(name="test_agent"):
+def mock_agent_card(name: str = "test_agent") -> AgentCard:
     """Fixture providing a mock AgentCard for testing."""
     return AgentCard(
         capabilities=AgentCapabilities(),
@@ -43,7 +45,9 @@ def mock_agent_card(name="test_agent"):
 
 
 @asynccontextmanager
-async def mock_a2a_tool(agent_card, response):
+async def mock_a2a_tool(
+    agent_card: AgentCard, response: Any
+) -> AsyncGenerator[tuple[Any, AsyncMock], None]:
     """Context manager that sets up A2A mocks and returns the created tool."""
     with (
         patch("any_agent.tools.a2a.A2ACardResolver") as mock_resolver,
@@ -66,7 +70,7 @@ async def mock_a2a_tool(agent_card, response):
         yield tool, mock_client_instance
 
 
-def create_task_response():
+def create_task_response() -> Task:
     """Factory function to create a Task response."""
     return Task(
         id="task-123",
@@ -78,22 +82,14 @@ def create_task_response():
                 role=Role.agent,
                 parts=[Part(root=TextPart(text="Task completed successfully"))],
                 messageId="msg-789",
+                taskId="task-123",
             ),
+            timestamp="2024-01-01T12:00:00Z",
         ),
     )
 
 
-def create_message_response():
-    """Factory function to create a Message response."""
-    return Message(
-        role=Role.agent,
-        parts=[Part(root=TextPart(text="Hello from agent"))],
-        messageId="msg-456",
-        contextId="context-789",
-    )
-
-
-def create_error_response():
+def create_error_response() -> JSONRPCErrorResponse:
     """Factory function to create an error response."""
     return JSONRPCErrorResponse(
         id="req-789",
@@ -106,7 +102,7 @@ def create_error_response():
     )
 
 
-def test_async_tool_name_default():
+def test_async_tool_name_default() -> None:
     """Test that async tool uses agent card name by default."""
     fun_name = "some_name"
     with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
@@ -115,7 +111,7 @@ def test_async_tool_name_default():
         assert created_fun.__name__ == f"call_{fun_name}"
 
 
-def test_async_tool_name_specific():
+def test_async_tool_name_specific() -> None:
     """Test that async tool accepts custom name parameter."""
     other_name = "other_name"
     with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
@@ -124,7 +120,7 @@ def test_async_tool_name_specific():
         assert created_fun.__name__ == f"call_{other_name}"
 
 
-def test_async_tool_name_whitespace_handling():
+def test_async_tool_name_whitespace_handling() -> None:
     """Test that async tool properly handles whitespace in names."""
     fun_name = "  some_n  ame  "
     corrected_fun_name = "some_n_ame"
@@ -134,7 +130,7 @@ def test_async_tool_name_whitespace_handling():
         assert created_fun.__name__ == f"call_{corrected_fun_name}"
 
 
-def test_async_tool_name_exotic_whitespace():
+def test_async_tool_name_exotic_whitespace() -> None:
     """Test that async tool handles various whitespace characters."""
     fun_name = " \n so \t me_n\t ame  \n"
     corrected_fun_name = "so_me_n_ame"
@@ -144,7 +140,7 @@ def test_async_tool_name_exotic_whitespace():
         assert created_fun.__name__ == f"call_{corrected_fun_name}"
 
 
-def test_async_tool_name_specific_whitespace():
+def test_async_tool_name_specific_whitespace() -> None:
     """Test that async tool handles whitespace in custom names."""
     other_name = " \n oth \t er_n\t ame  \n"
     corrected_other_name = "oth_er_n_ame"
@@ -154,7 +150,7 @@ def test_async_tool_name_specific_whitespace():
         assert created_fun.__name__ == f"call_{corrected_other_name}"
 
 
-def test_sync_tool_name_default():
+def test_sync_tool_name_default() -> None:
     """Test that sync tool uses agent card name by default."""
     fun_name = "some_name"
     with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
@@ -163,7 +159,7 @@ def test_sync_tool_name_default():
         assert created_fun.__name__ == f"call_{fun_name}"
 
 
-def test_sync_tool_name_specific():
+def test_sync_tool_name_specific() -> None:
     """Test that sync tool accepts custom name parameter."""
     other_name = "other_name"
     with patch("any_agent.tools.a2a.A2ACardResolver.get_agent_card") as agent_card_mock:
@@ -172,7 +168,7 @@ def test_sync_tool_name_specific():
         assert created_fun.__name__ == f"call_{other_name}"
 
 
-def test_sync_tool_name_whitespace_handling():
+def test_sync_tool_name_whitespace_handling() -> None:
     """Test that sync tool properly handles whitespace in names."""
     fun_name = "  some_n  ame  "
     corrected_fun_name = "some_n_ame"
@@ -182,7 +178,7 @@ def test_sync_tool_name_whitespace_handling():
         assert created_fun.__name__ == f"call_{corrected_fun_name}"
 
 
-def test_sync_tool_name_exotic_whitespace():
+def test_sync_tool_name_exotic_whitespace() -> None:
     """Test that sync tool handles various whitespace characters."""
     fun_name = " \n so \t me_n\t ame  \n"
     corrected_fun_name = "so_me_n_ame"
@@ -192,7 +188,7 @@ def test_sync_tool_name_exotic_whitespace():
         assert created_fun.__name__ == f"call_{corrected_fun_name}"
 
 
-def test_sync_tool_name_specific_whitespace():
+def test_sync_tool_name_specific_whitespace() -> None:
     """Test that sync tool handles whitespace in custom names."""
     other_name = " \n oth \t er_n\t ame  \n"
     corrected_other_name = "oth_er_n_ame"
@@ -203,7 +199,7 @@ def test_sync_tool_name_specific_whitespace():
 
 
 @pytest.mark.asyncio
-async def test_handles_task_response():
+async def test_handles_task_response() -> None:
     """Test that the a2a_tool properly handles receiving a Task message back from the server."""
     task_response = create_task_response()
     success_response = SendMessageSuccessResponse(
@@ -216,47 +212,30 @@ async def test_handles_task_response():
     ):
         result = await tool("Test query")
 
-        # Verify the result is the JSON serialized task
-        expected_json = task_response.model_dump_json(
-            exclude_none=True, exclude_unset=True, exclude_defaults=True
+        # Verify the result is the formatted string response
+        expected_result = (
+            f"Status: {task_response.status.state}\n\n"
+            f"Message: Task completed successfully\n\n"
+            f"TaskId: {task_response.status.message.taskId}\n\n"
+            f"Timestamp: {task_response.status.timestamp}\n\n"
         )
-        assert result == expected_json
+        assert result == expected_result
         mock_client.send_message.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_handles_message_response():
-    """Test that the a2a_tool properly handles receiving a Message message back from the server."""
-    message_response = create_message_response()
-    success_response = SendMessageSuccessResponse(
-        id="req-456", jsonrpc="2.0", result=message_response
-    )
-
-    async with mock_a2a_tool(mock_agent_card(), success_response) as (
-        tool,
-        mock_client,
-    ):
-        result = await tool("Hello")
-
-        # Verify the result is the JSON serialized message
-        expected_json = message_response.model_dump_json(
-            exclude_none=True, exclude_unset=True, exclude_defaults=True
-        )
-        assert result == expected_json
-        mock_client.send_message.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_handles_error_response():
+async def test_handles_error_response() -> None:
     """Test that the a2a_tool properly handles receiving an error back from the server."""
     error_response = create_error_response()
 
     async with mock_a2a_tool(mock_agent_card(), error_response) as (tool, mock_client):
         result = await tool("Test query that will fail")
 
-        # Verify the result is the JSON serialized error
-        expected_json = error_response.error.model_dump_json(
-            exclude_none=True, exclude_unset=True, exclude_defaults=True
+        # Verify the result is the formatted error string
+        expected_result = (
+            f"Error: {error_response.error.message}\n\n"
+            f"Code: {error_response.error.code}\n\n"
+            f"Data: {error_response.error.data}\n\n"
         )
-        assert result == expected_json
+        assert result == expected_result
         mock_client.send_message.assert_called_once()
