@@ -41,4 +41,4 @@ jobs:
       - name: Run Integration tests (parallel with xdist)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: pytest -v tests/integration -d --tx '4*popen//python=python' -k "not test_load_and_run_agent[TINYAGENT]"
+        run: pytest -v tests/integration -n auto -k "not test_load_and_run_agent[TINYAGENT]"
