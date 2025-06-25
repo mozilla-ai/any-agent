@@ -1,5 +1,6 @@
 from multiprocessing import Process, Queue
 from typing import TYPE_CHECKING
+from typing import Any
 
 import pytest
 from litellm.utils import validate_environment
@@ -39,24 +40,28 @@ def _assert_has_date_agent_tool_call(agent_trace: AgentTrace) -> None:
 
 @pytest.mark.asyncio
 async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
-    """Tests that an agent contacts another using A2A using the adapter tool."""
-    if agent_framework in [
-        AgentFramework.SMOLAGENTS,
-        AgentFramework.LLAMA_INDEX,
-    ]:
+    """Tests that an agent contacts another using A2A using the adapter tool.
+
+    Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
+    """
+    skip_reason = {
+        AgentFramework.SMOLAGENTS: "async a2a is not supported",
+    }
+    if agent_framework in skip_reason:
         pytest.skip(
-            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+            f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
 
     env_check = validate_environment(DEFAULT_MODEL_ID)
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
-    model_args = (
+    model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
         if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
-        else None
+        else {}
     )
+    model_args["temperature"] = 0.0
 
     # Create date agent
     date_agent_cfg = AgentConfig(
@@ -151,13 +156,16 @@ def _run_server(
 
 
 def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
-    """Tests that an agent contacts another using A2A using the sync adapter tool."""
-    if agent_framework in [
-        AgentFramework.SMOLAGENTS,
-        AgentFramework.LLAMA_INDEX,
-    ]:
+    """Tests that an agent contacts another using A2A using the sync adapter tool.
+
+    Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
+    """
+    skip_reason = {
+        AgentFramework.SMOLAGENTS: "async a2a is not supported; run_async_in_sync fails",
+    }
+    if agent_framework in skip_reason:
         pytest.skip(
-            "https://github.com/mozilla-ai/any-agent/issues/357 tracks fixing so these tests can be re-enabled"
+            f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
 
     env_check = validate_environment(DEFAULT_MODEL_ID)

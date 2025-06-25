@@ -16,12 +16,9 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.config import MCPStdio
-from any_agent.evaluation import EvaluationCase, evaluate
-from any_agent.evaluation.schemas import (
-    AgentOutput,
-    CheckpointCriteria,
-    TraceEvaluationResult,
-)
+from any_agent.evaluation.agent_judge import AgentJudge
+from any_agent.evaluation.llm_judge import LlmJudge
+from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from any_agent.tracing.exporter import _ConsoleExporter
@@ -115,60 +112,41 @@ def assert_tokens(agent_trace: AgentTrace) -> None:
 
 
 def assert_eval(agent_trace: AgentTrace) -> None:
-    def _check_if_agent_called_write_file(trace: AgentTrace) -> AgentOutput:
-        if any(
-            span.attributes.get("gen_ai.tool.name") == "write_file"
-            for span in trace.spans
-        ):
-            return AgentOutput(passed=True, reasoning="Found `write_file` tool usage.")
-        return AgentOutput(
-            passed=False, reasoning="Didn't find `write_file` tool usage."
-        )
-
-    # Create checkpoints with mix of auto-generated and custom IDs
-    checkpoint_with_auto_id = CheckpointCriteria(
-        criteria=_check_if_agent_called_write_file,
-        points=1,
+    """Test evaluation using the new judge classes."""
+    # Test 1: Check if agent called write_file tool using LlmJudge
+    llm_judge = LlmJudge(model_id="gpt-4.1-nano")
+    result1 = llm_judge.run(
+        context=str(agent_trace.spans_to_messages()),
+        question="Did the agent call the write_file tool during execution?",
     )
-    checkpoint_with_custom_id = CheckpointCriteria(
-        id="custom_year_check",
-        criteria="Check if the agent wrote the year to the file.",
-        points=1,
-    )
-    checkpoint_with_another_auto_id = CheckpointCriteria(
-        criteria="Check if the year was 1990",
-        points=1,
+    assert isinstance(result1, EvaluationOutput)
+    assert result1.passed, (
+        f"Expected agent to call write_file tool, but evaluation failed: {result1.reasoning}"
     )
 
-    case = EvaluationCase(
-        llm_judge="gpt-4.1-mini",
-        checkpoints=[
-            checkpoint_with_auto_id,
-            checkpoint_with_custom_id,
-            checkpoint_with_another_auto_id,
-        ],
-    )
+    # Test 2: Check if agent wrote the current year to file using AgentJudge
+    agent_judge = AgentJudge(model_id="gpt-4.1-mini")
 
-    result: TraceEvaluationResult = evaluate(
-        evaluation_case=case,
+    def get_current_year() -> str:
+        """Get the current year"""
+        return str(datetime.now().year)
+
+    result2 = agent_judge.run(
         trace=agent_trace,
+        question="Did the agent write the current year to a file?",
+        additional_tools=[get_current_year],
     )
-    assert result
-    assert result.score >= float(1 / 3)
+    assert isinstance(result2, EvaluationOutput)
+    assert result2.passed, (
+        f"Expected agent to write current year to file, but evaluation failed: {result2.reasoning}"
+    )
 
-    # Verify that IDs are preserved in evaluation results
-    assert len(result.checkpoint_results) == 3
-    result_ids = [r.id for r in result.checkpoint_results]
-
-    # Should contain the custom ID
-    assert "custom_year_check" in result_ids
-
-    # Should contain the auto-generated IDs
-    assert checkpoint_with_auto_id.id in result_ids
-    assert checkpoint_with_another_auto_id.id in result_ids
-
-    # Verify all IDs are unique
-    assert len(set(result_ids)) == 3
+    # Test 3: Verify at least one evaluation passes (basic sanity check)
+    results = [result1, result2]
+    passed_count = sum(1 for r in results if r.passed)
+    assert passed_count >= 1, (
+        f"Expected at least 1 evaluation to pass, but got {passed_count}/2"
+    )
 
 
 class Step(BaseModel):
