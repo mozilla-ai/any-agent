@@ -9,7 +9,7 @@ from any_agent.config import MCPSse
 from any_agent.serving import MCPServingConfig
 from any_agent.tracing.agent_trace import AgentTrace
 
-from .helpers import wait_for_server_async
+from tests.integration.helpers import wait_for_server_async
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
