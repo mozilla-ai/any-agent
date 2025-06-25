@@ -32,8 +32,7 @@ from any_agent.tracing.otel_types import (
     SpanKind,
     Status,
 )
-
-from .helpers import wait_for_server_async
+from tests.integration.helpers import wait_for_server_async
 
 if TYPE_CHECKING:
     from typing import Any
@@ -155,7 +154,7 @@ class MockConversationAgent(TinyAgent):
 
 
 @pytest.mark.asyncio
-async def test_task_management_multi_turn_conversation() -> None:
+async def test_a2a_tool_multiturn() -> None:
     """Test that agents can maintain conversation context across multiple interactions."""
 
     # Create a mock agent that simulates multi-turn conversation
@@ -281,7 +280,7 @@ async def test_task_management_multi_turn_conversation() -> None:
 
 
 @pytest.mark.asyncio
-async def test_multi_turn_a2a_tool() -> None:
+async def test_a2a_tool_multiturn_async() -> None:
     """Test that agents can maintain conversation context across multiple interactions."""
 
     # Create a mock agent that simulates multi-turn conversation

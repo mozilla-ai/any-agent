@@ -5,7 +5,7 @@ from any_agent.logging import logger
 from any_agent.tracing.agent_trace import AgentTrace
 
 if TYPE_CHECKING:
-    from any_agent.serving.config import A2AServingConfig
+    from any_agent.serving import A2AServingConfig
 
 
 class TaskData:
