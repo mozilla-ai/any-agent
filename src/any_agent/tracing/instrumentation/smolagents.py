@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 from .common import _set_tool_output
 
 
-def _set_llm_input(messages: list[dict[str, Any]], span: Span) -> None:
+def _set_llm_input(messages: list[ChatMessage], span: Span) -> None:
     if not messages:
         return
     span.set_attribute(
@@ -27,10 +27,11 @@ def _set_llm_input(messages: list[dict[str, Any]], span: Span) -> None:
         json.dumps(
             [
                 {
-                    "role": message["role"].value,
-                    "content": message["content"][0]["text"],
+                    "role": message.role.value,  # type: ignore[attr-defined]
+                    "content": message.content[0]["text"],  # type: ignore[index]
                 }
                 for message in messages
+                if message.content
             ],
             default=str,
             ensure_ascii=False,
@@ -42,7 +43,7 @@ def _set_llm_output(response: ChatMessage, span: Span) -> None:
     if content := response.content:
         span.set_attributes(
             {
-                "gen_ai.output": content,
+                "gen_ai.output": str(content),
                 "gen_ai.output.type": "text",
             }
         )
