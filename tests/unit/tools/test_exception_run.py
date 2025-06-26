@@ -7,17 +7,25 @@ from litellm.types.utils import (
     Function,
     Message,
     ModelResponse,
+    ModelResponseStream,
     StreamingChoices,
 )
 
 from any_agent import (
     AgentConfig,
     AgentFramework,
-    AgentRunError,
     AnyAgent,
+    AgentRunError
 )
 from any_agent.tracing.otel_types import StatusCode
 
+
+class StreamingEndpoint():
+    def __init__(self, responses):
+        self._responses = responses
+    def next(self, **kwargs):
+        print(f"--> requested: {kwargs}")
+        return self._responses.pop(0)
 
 def test_tool_error_llm_mocked(
     agent_framework: AgentFramework,
@@ -58,8 +66,7 @@ def test_tool_error_llm_mocked(
 
     agent = AnyAgent.create(agent_framework, agent_config)
 
-    give_up = """
-    It appears that I am unable to perform web searches at the moment. However, I can provide some general information based on my existing
+    give_up = """It appears that I am unable to perform web searches at the moment. However, I can provide some general information based on my existing
     knowledge.
 
     Some of the most popular and widely regarded agent frameworks include:
@@ -73,12 +80,12 @@ def test_tool_error_llm_mocked(
     If you need detailed comparisons or specific recommendations, I can help with that as well. Would you like me to do that?
     """
 
-    fake_give_up_chunk = ModelResponse(
-        choices=[StreamingChoices(delta=Delta(content=give_up))]
+    fake_give_up_response = ModelResponse(
+        choices=[Choices(message=Message(content=give_up), finish_reason="stop")]
     )
 
-    fake_give_up_response = ModelResponse(
-        choices=[Choices(message=Message(content=give_up))]
+    fake_give_up_chunk = ModelResponseStream(
+        choices=[StreamingChoices(delta=Delta(content=give_up), finish_reason="stop")]
     )
 
     function = Function(
@@ -91,7 +98,7 @@ def test_tool_error_llm_mocked(
         choices=[Choices(message=Message(tool_calls=[tool_call]))]
     )
 
-    fake_tool_fail_chunk = ModelResponse(
+    fake_tool_fail_chunk = ModelResponseStream(
         choices=[StreamingChoices(delta=Delta(tool_calls=[tool_call]))]
     )
 
@@ -99,9 +106,13 @@ def test_tool_error_llm_mocked(
         yield fake_tool_fail_response
         yield fake_give_up_response
 
-    async def async_fake_iter_chunks() -> AsyncIterator[ModelResponse]:
+    async def async_fake_tool_fail_chunk() -> AsyncIterator[ModelResponse]:
         yield fake_tool_fail_chunk
+
+    async def async_fake_give_up_chunk() -> AsyncIterator[ModelResponse]:
         yield fake_give_up_chunk
+
+    streaming = StreamingEndpoint([async_fake_tool_fail_chunk(), async_fake_give_up_chunk()])
 
     patch_function = "litellm.acompletion"
     if agent_framework is AgentFramework.GOOGLE:
@@ -109,20 +120,17 @@ def test_tool_error_llm_mocked(
     if agent_framework is AgentFramework.SMOLAGENTS:
         patch_function = "litellm.completion"
     with (
-        patch(patch_function) as acompletion_mock,
+        patch(patch_function) as litellm_mock,
     ):
-        if agent_framework in (AgentFramework.LLAMA_INDEX):
-            acompletion_mock.return_value = aiter(async_fake_iter_chunks())
-        else:
-            acompletion_mock.side_effect = fake_iter_msgs()
 
-        agent_trace = None
-        try:
-            agent_trace = agent.run(
-                "Check in the web which agent framework is the best.",
-            )
-        except AgentRunError as e:
-            agent_trace = e.trace
+        if agent_framework in (AgentFramework.LLAMA_INDEX):
+            litellm_mock.side_effect = streaming.next
+        else:
+            litellm_mock.side_effect = fake_iter_msgs()
+
+        agent_trace = agent.run(
+            "Check in the web which agent framework is the best.",
+        )
         assert any(
             span.is_tool_execution()
             and span.status.status_code == StatusCode.ERROR
