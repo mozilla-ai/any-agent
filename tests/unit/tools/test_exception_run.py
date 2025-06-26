@@ -15,17 +15,19 @@ from any_agent import (
     AgentConfig,
     AgentFramework,
     AnyAgent,
-    AgentRunError
 )
 from any_agent.tracing.otel_types import StatusCode
 
 
-class StreamingEndpoint():
-    def __init__(self, responses):
+class StreamingEndpoint:
+    _responses: list[AsyncIterator[ModelResponseStream]]
+
+    def __init__(self, responses: list[AsyncIterator[ModelResponseStream]]):
         self._responses = responses
-    def next(self, **kwargs):
-        print(f"--> requested: {kwargs}")
+
+    def next(self, **kwargs) -> AsyncIterator[ModelResponseStream]:  # type: ignore[no-untyped-def]
         return self._responses.pop(0)
+
 
 def test_tool_error_llm_mocked(
     agent_framework: AgentFramework,
@@ -81,11 +83,29 @@ def test_tool_error_llm_mocked(
     """
 
     fake_give_up_response = ModelResponse(
-        choices=[Choices(message=Message(content=give_up), finish_reason="stop")]
+        choices=[Choices(message=Message(content=give_up))]
     )
 
     fake_give_up_chunk = ModelResponseStream(
-        choices=[StreamingChoices(delta=Delta(content=give_up), finish_reason="stop")]
+        choices=[StreamingChoices(delta=Delta(content=give_up))]
+    )
+
+    fake_smolagents_final_answer_response = ModelResponse(
+        choices=[
+            Choices(
+                message=Message(
+                    tool_calls=[
+                        {
+                            "id": "call_67890abc",
+                            "type": "function",
+                            "function": Function(
+                                name="final_answer", arguments={"answer": give_up}
+                            ),
+                        }
+                    ]
+                )
+            )
+        ]
     )
 
     function = Function(
@@ -106,13 +126,19 @@ def test_tool_error_llm_mocked(
         yield fake_tool_fail_response
         yield fake_give_up_response
 
-    async def async_fake_tool_fail_chunk() -> AsyncIterator[ModelResponse]:
+    def fake_smol_iter_msgs() -> Iterator[ModelResponse]:
+        yield fake_tool_fail_response
+        yield fake_smolagents_final_answer_response
+
+    async def async_fake_tool_fail_chunk() -> AsyncIterator[ModelResponseStream]:
         yield fake_tool_fail_chunk
 
-    async def async_fake_give_up_chunk() -> AsyncIterator[ModelResponse]:
+    async def async_fake_give_up_chunk() -> AsyncIterator[ModelResponseStream]:
         yield fake_give_up_chunk
 
-    streaming = StreamingEndpoint([async_fake_tool_fail_chunk(), async_fake_give_up_chunk()])
+    streaming = StreamingEndpoint(
+        [async_fake_tool_fail_chunk(), async_fake_give_up_chunk()]
+    )
 
     patch_function = "litellm.acompletion"
     if agent_framework is AgentFramework.GOOGLE:
@@ -122,9 +148,10 @@ def test_tool_error_llm_mocked(
     with (
         patch(patch_function) as litellm_mock,
     ):
-
         if agent_framework in (AgentFramework.LLAMA_INDEX):
             litellm_mock.side_effect = streaming.next
+        elif agent_framework in (AgentFramework.SMOLAGENTS):
+            litellm_mock.side_effect = fake_smol_iter_msgs()
         else:
             litellm_mock.side_effect = fake_iter_msgs()
 
