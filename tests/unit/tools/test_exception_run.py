@@ -106,6 +106,8 @@ def test_tool_error_llm_mocked(
     patch_function = "litellm.acompletion"
     if agent_framework is AgentFramework.GOOGLE:
         patch_function = "google.adk.models.lite_llm.acompletion"
+    if agent_framework is AgentFramework.SMOLAGENTS:
+        patch_function = "litellm.completion"
     with (
         patch(patch_function) as acompletion_mock,
     ):
