@@ -29,6 +29,7 @@ nav:
     - Config: api/config.md
     - Tools: api/tools.md
     - Tracing: api/tracing.md
+    - Evaluation: api/evaluation.md
     - Logging: api/logging.md
 
 theme:
