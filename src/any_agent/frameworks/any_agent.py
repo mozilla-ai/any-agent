@@ -4,6 +4,7 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never, overload
 
+import uvicorn  # noqa: TC002
 from opentelemetry import trace as otel_trace
 from pydantic import BaseModel, ConfigDict
 
@@ -24,7 +25,6 @@ from any_agent.utils import run_async_in_sync
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    import uvicorn
     from opentelemetry.trace import Tracer
 
     from any_agent.serving import A2AServingConfig, MCPServingConfig
