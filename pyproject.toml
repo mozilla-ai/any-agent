@@ -24,7 +24,7 @@ dependencies = [
 
 [project.optional-dependencies]
 agno = [
-  "agno>=1.5.4",
+  "agno>=1.5.4,<1.7",
 ]
 
 google = [
