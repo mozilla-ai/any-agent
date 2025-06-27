@@ -1,4 +1,5 @@
 from .config_mcp import MCPServingConfig
+from .server_handle import ServerHandle
 from .server_mcp import (
     serve_mcp,
     serve_mcp_async,
@@ -6,6 +7,7 @@ from .server_mcp import (
 
 __all__ = [
     "MCPServingConfig",
+    "ServerHandle",
     "serve_mcp",
     "serve_mcp_async",
 ]
