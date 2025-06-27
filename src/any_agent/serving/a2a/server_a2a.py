@@ -10,7 +10,7 @@ from a2a.server.tasks import InMemoryTaskStore
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
-from any_agent.serving.task_manager import TaskManager
+from any_agent.serving.a2a.task_manager import TaskManager
 from any_agent.utils import run_async_in_sync
 
 from .agent_card import _get_agent_card
