@@ -361,7 +361,6 @@ class AnyAgent(ABC):
             config = MCPServingConfig(port=8080)
             server_handle = await agent.serve_async(config)
             try:
-                print(f"Server running at {server_handle.url}")
                 # Server is running
                 await asyncio.sleep(10)
             finally:
