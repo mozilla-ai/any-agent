@@ -109,7 +109,7 @@ class TaskManager:
             return
 
         task.agent_trace = agent_trace
-        
+
         # Extract the agent's response from the trace
         agent_response = (
             str(agent_trace.final_output) if agent_trace.final_output else ""
