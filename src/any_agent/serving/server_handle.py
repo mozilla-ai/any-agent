@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import uvicorn
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict
 
 from any_agent.logging import logger
+
+if TYPE_CHECKING:
+    import uvicorn
 
 
 class ServerHandle(BaseModel):
@@ -18,9 +20,7 @@ class ServerHandle(BaseModel):
 
     task: asyncio.Task[Any]
     server: uvicorn.Server
-
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     async def shutdown(self, timeout_seconds: float = 10.0) -> None:
         """Gracefully shutdown the server with a timeout.
