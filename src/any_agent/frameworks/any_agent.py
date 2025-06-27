@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never, overload
 
 from opentelemetry import trace as otel_trace
+from pydantic import BaseModel, ConfigDict
 
 from any_agent.config import (
     AgentConfig,
@@ -12,7 +13,6 @@ from any_agent.config import (
     Tool,
 )
 from any_agent.logging import logger
-from any_agent.serving import ServerHandle
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.exporter import SCOPE_NAME
@@ -24,11 +24,78 @@ from any_agent.utils import run_async_in_sync
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    import uvicorn
     from opentelemetry.trace import Tracer
-    from pydantic import BaseModel
 
     from any_agent.serving import A2AServingConfig, MCPServingConfig
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
+
+
+class ServerHandle(BaseModel):
+    """A handle for managing an async server instance.
+
+    This class provides a clean interface for managing the lifecycle of a server
+    without requiring manual management of the underlying task and server objects.
+    """
+
+    task: asyncio.Task[Any]
+    server: uvicorn.Server
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    async def shutdown(self, timeout_seconds: float = 10.0) -> None:
+        """Gracefully shutdown the server with a timeout.
+
+        Args:
+            timeout_seconds: Maximum time to wait for graceful shutdown before forcing cancellation.
+
+        """
+        if not self.is_running():
+            return  # Already shut down
+
+        self.server.should_exit = True
+        try:
+            await asyncio.wait_for(self.task, timeout=timeout_seconds)
+        except TimeoutError:
+            logger.warning(
+                "Server shutdown timed out after %ss, forcing cancellation",
+                timeout_seconds,
+            )
+            self.task.cancel()
+            try:
+                await self.task
+            except asyncio.CancelledError:
+                pass
+        except Exception as e:
+            logger.error("Error during server shutdown: %s", e)
+            # Still try to cancel the task to clean up
+            if not self.task.done():
+                self.task.cancel()
+                try:
+                    await self.task
+                except asyncio.CancelledError:
+                    pass
+
+    def is_running(self) -> bool:
+        """Check if the server is still running.
+
+        Returns:
+            True if the server task is still running, False otherwise.
+
+        """
+        return not self.task.done()
+
+    @property
+    def port(self) -> int:
+        """Get the port the server is running on.
+
+        Returns:
+            The port number the server is running on.
+
+        """
+        port = self.server.servers[0].sockets[0].getsockname()[1]
+        assert port is not None
+        assert isinstance(port, int)
+        return port
 
 
 class AgentRunError(Exception):
