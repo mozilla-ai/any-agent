@@ -54,8 +54,8 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         # This agent always produces Task objects.
         agent_trace = await self.agent.run_async(formatted_query)
 
-        # Update task with new trace
-        self.task_manager.update_task_trace(task.id, agent_trace)
+        # Update task with new trace, passing the original query (not formatted)
+        self.task_manager.update_task_trace(task.id, agent_trace, query)
 
         updater = TaskUpdater(event_queue, task.id, task.contextId)
 

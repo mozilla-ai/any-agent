@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from any_agent.logging import logger
-from any_agent.tracing.agent_trace import AgentTrace
+from any_agent.tracing.agent_trace import AgentMessage, AgentTrace
 
 if TYPE_CHECKING:
     from any_agent.serving import A2AServingConfig
@@ -20,6 +20,9 @@ class TaskData:
         """
         self.task_id = task_id
         self.agent_trace = AgentTrace()
+        self.conversation_history: list[
+            AgentMessage
+        ] = []  # Store original user queries and responses as AgentMessage objects
         self.last_activity = datetime.now()
         self.created_at = datetime.now()
 
@@ -89,12 +92,15 @@ class TaskManager:
         task.update_activity()
         return task
 
-    def update_task_trace(self, task_id: str, agent_trace: AgentTrace) -> None:
+    def update_task_trace(
+        self, task_id: str, agent_trace: AgentTrace, original_query: str
+    ) -> None:
         """Update the agent trace for a task.
 
         Args:
             task_id: Task ID to update
             agent_trace: New agent trace to merge/store
+            original_query: The original user query (without history formatting)
 
         """
         task = self._get_task(task_id)
@@ -103,6 +109,19 @@ class TaskManager:
             return
 
         task.agent_trace = agent_trace
+        
+        # Extract the agent's response from the trace
+        agent_response = (
+            str(agent_trace.final_output) if agent_trace.final_output else ""
+        )
+
+        task.conversation_history.append(
+            AgentMessage(role="user", content=original_query)
+        )
+        task.conversation_history.append(
+            AgentMessage(role="assistant", content=agent_response)
+        )
+
         task.update_activity()
 
     def format_query_with_history(self, task_id: str, current_query: str) -> str:
@@ -120,7 +139,8 @@ class TaskManager:
         if not task:
             return current_query
 
-        history = task.agent_trace.spans_to_messages()
+        # Use stored conversation history (already AgentMessage objects)
+        history = task.conversation_history
         return self.config.history_formatter(history, current_query)
 
     def remove_task(self, task_id: str) -> None:
