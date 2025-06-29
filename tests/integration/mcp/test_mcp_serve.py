@@ -69,8 +69,7 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
     model_args = None
 
     main_agent = None
-    served_task = None
-    served_server = None
+    server_handle = None
 
     try:
         tool_agent_endpoint = "tool_agent"
@@ -99,7 +98,7 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
 
         # SERVING PROPER
         server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}/sse"
-        (served_task, served_server) = await date_agent.serve_async(
+        server_handle = await date_agent.serve_async(
             serving_config=MCPServingConfig(
                 port=test_port,
                 endpoint=f"/{tool_agent_endpoint}",
@@ -139,7 +138,5 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
         if AppStatus.should_exit_event is not None:
             AppStatus.should_exit_event.set()
             AppStatus.should_exit_event = None
-        if served_server:
-            served_server.should_exit = True
-        if served_task:
-            await served_task
+        if server_handle:
+            await server_handle.shutdown()
