@@ -23,7 +23,7 @@ from any_agent.config import AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
-from any_agent.serving.envelope import A2AEnvelope
+from any_agent.serving.a2a.envelope import A2AEnvelope
 from any_agent.tools.a2a import a2a_tool_async
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.otel_types import (
