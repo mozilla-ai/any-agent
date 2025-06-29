@@ -69,9 +69,16 @@ class MockConversationAgent(TinyAgent):
     async def run_async(
         self, prompt: str, instrument: bool = True, **kwargs: Any
     ) -> AgentTrace:
+        # Verify that we don't have recursive "Previous conversation:" prefixes
+        conversation_count = prompt.count("Previous conversation:")
+
         if self.turn_count == 0:
             # First turn: User introduces themselves
             assert FIRST_TURN_PROMPT in prompt
+            # First turn should have no "Previous conversation:" prefix
+            assert conversation_count == 0, (
+                f"First turn should have no conversation history, but found {conversation_count} instances of 'Previous conversation:' in prompt: {prompt}"
+            )
             self.turn_count += 1
             envelope = self.output_type(
                 task_status=TaskState.completed,
@@ -88,6 +95,10 @@ class MockConversationAgent(TinyAgent):
             # Second turn: User asks for information back
             assert FIRST_TURN_PROMPT in prompt
             assert SECOND_TURN_PROMPT in prompt
+            # Second turn should have exactly 1 "Previous conversation:" prefix (not recursive)
+            assert conversation_count == 1, (
+                f"Second turn should have exactly 1 'Previous conversation:' prefix, but found {conversation_count} in prompt: {prompt}"
+            )
             self.turn_count += 1
             envelope = self.output_type(
                 task_status=TaskState.input_required,
@@ -103,6 +114,10 @@ class MockConversationAgent(TinyAgent):
             assert FIRST_TURN_PROMPT in prompt
             assert SECOND_TURN_PROMPT in prompt
             assert THIRD_TURN_PROMPT in prompt
+            # Third turn should have exactly 1 "Previous conversation:" prefix (not recursive)
+            assert conversation_count == 1, (
+                f"Third turn should have exactly 1 'Previous conversation:' prefix, but found {conversation_count} in prompt: {prompt}"
+            )
             self.turn_count += 1
             envelope = self.output_type(
                 task_status=TaskState.completed,
