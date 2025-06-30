@@ -1,3 +1,7 @@
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
 import json
 import logging
 from collections.abc import AsyncGenerator, Callable, Generator
