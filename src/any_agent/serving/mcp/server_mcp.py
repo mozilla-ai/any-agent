@@ -12,6 +12,7 @@ from starlette.applications import Starlette
 from starlette.responses import Response
 from starlette.routing import Mount, Route
 
+from any_agent.serving.server_handle import ServerHandle
 from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
@@ -90,7 +91,7 @@ async def serve_mcp_async(
     port: int,
     endpoint: str,
     log_level: str = "warning",
-) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+) -> ServerHandle:
     """Provide an MCP server to be used in an event loop."""
     config = uvicorn.Config(
         _get_mcp_app(agent, endpoint), host=host, port=port, log_level=log_level
@@ -99,7 +100,7 @@ async def serve_mcp_async(
     task = asyncio.create_task(uv_server.serve())
     while not uv_server.started:  # noqa: ASYNC110
         await asyncio.sleep(0.1)
-    return (task, uv_server)
+    return ServerHandle(task=task, server=uv_server)
 
 
 def serve_mcp(
@@ -115,7 +116,7 @@ def serve_mcp(
     # because the loop only keeps weak refs to tasks
     # https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
     async def run() -> None:
-        (task, _) = await serve_mcp_async(agent, host, port, endpoint, log_level)
-        await task
+        server_handle = await serve_mcp_async(agent, host, port, endpoint, log_level)
+        await server_handle.task
 
     return run_async_in_sync(run())

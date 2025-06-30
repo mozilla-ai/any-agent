@@ -7,7 +7,6 @@ and verify that the subsequent calls properly receive the previous conversation 
 
 from __future__ import annotations
 
-import asyncio
 import json
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
@@ -23,7 +22,7 @@ from any_agent.config import AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
-from any_agent.serving.envelope import A2AEnvelope
+from any_agent.serving.a2a.envelope import A2AEnvelope
 from any_agent.tools.a2a import a2a_tool_async
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.otel_types import (
@@ -38,7 +37,7 @@ if TYPE_CHECKING:
     from typing import Any
 
 
-class TestResult(BaseModel):
+class UserInfo(BaseModel):
     name: str
     job: str
     age: int | None = None
@@ -59,7 +58,7 @@ class MockConversationAgent(TinyAgent):
 
     def __init__(self, config: AgentConfig) -> None:
         super().__init__(config)
-        self.output_type = A2AEnvelope[TestResult]
+        self.output_type = A2AEnvelope[UserInfo]
         self.turn_count = 0
 
     async def _load_agent(self) -> None:
@@ -69,13 +68,22 @@ class MockConversationAgent(TinyAgent):
     async def run_async(
         self, prompt: str, instrument: bool = True, **kwargs: Any
     ) -> AgentTrace:
+        # Verify that we don't have recursive "Previous conversation:" prefixes
+        conversation_count = prompt.count("Previous conversation:")
+
         if self.turn_count == 0:
             # First turn: User introduces themselves
-            assert FIRST_TURN_PROMPT in prompt
+            assert prompt.count(FIRST_TURN_PROMPT) == 1, (
+                f"First turn prompt should occur exactly once, but found {prompt.count(FIRST_TURN_PROMPT)} occurrences in prompt: {prompt}"
+            )
+            # First turn should have no "Previous conversation:" prefix
+            assert conversation_count == 0, (
+                f"First turn should have no conversation history, but found {conversation_count} instances of 'Previous conversation:' in prompt: {prompt}"
+            )
             self.turn_count += 1
             envelope = self.output_type(
                 task_status=TaskState.completed,
-                data=TestResult(
+                data=UserInfo(
                     name="Alice",
                     job="software engineer",
                     age=None,
@@ -86,12 +94,20 @@ class MockConversationAgent(TinyAgent):
             )
         if self.turn_count == 1:
             # Second turn: User asks for information back
-            assert FIRST_TURN_PROMPT in prompt
-            assert SECOND_TURN_PROMPT in prompt
+            assert prompt.count(FIRST_TURN_PROMPT) == 1, (
+                f"First turn prompt should occur exactly once, but found {prompt.count(FIRST_TURN_PROMPT)} occurrences in prompt: {prompt}"
+            )
+            assert prompt.count(SECOND_TURN_PROMPT) == 1, (
+                f"Second turn prompt should occur exactly once, but found {prompt.count(SECOND_TURN_PROMPT)} occurrences in prompt: {prompt}"
+            )
+            # Second turn should have exactly 1 "Previous conversation:" prefix (not recursive)
+            assert conversation_count == 1, (
+                f"Second turn should have exactly 1 'Previous conversation:' prefix, but found {conversation_count} in prompt: {prompt}"
+            )
             self.turn_count += 1
             envelope = self.output_type(
                 task_status=TaskState.input_required,
-                data=TestResult(
+                data=UserInfo(
                     name="Alice",
                     job="software engineer",
                     age=None,
@@ -100,13 +116,23 @@ class MockConversationAgent(TinyAgent):
             return self._create_mock_trace(envelope, SECOND_TURN_RESPONSE, prompt)
         if self.turn_count == 2:
             # Third turn: User provides age
-            assert FIRST_TURN_PROMPT in prompt
-            assert SECOND_TURN_PROMPT in prompt
-            assert THIRD_TURN_PROMPT in prompt
+            assert prompt.count(FIRST_TURN_PROMPT) == 1, (
+                f"First turn prompt should occur exactly once, but found {prompt.count(FIRST_TURN_PROMPT)} occurrences in prompt: {prompt}"
+            )
+            assert prompt.count(SECOND_TURN_PROMPT) == 1, (
+                f"Second turn prompt should occur exactly once, but found {prompt.count(SECOND_TURN_PROMPT)} occurrences in prompt: {prompt}"
+            )
+            assert prompt.count(THIRD_TURN_PROMPT) == 1, (
+                f"Third turn prompt should occur exactly once, but found {prompt.count(THIRD_TURN_PROMPT)} occurrences in prompt: {prompt}"
+            )
+            # Third turn should have exactly 1 "Previous conversation:" prefix (not recursive)
+            assert conversation_count == 1, (
+                f"Third turn should have exactly 1 'Previous conversation:' prefix, but found {conversation_count} in prompt: {prompt}"
+            )
             self.turn_count += 1
             envelope = self.output_type(
                 task_status=TaskState.completed,
-                data=TestResult(
+                data=UserInfo(
                     name="Alice",
                     job="software engineer",
                     age=30,
@@ -117,7 +143,7 @@ class MockConversationAgent(TinyAgent):
         raise ValueError(msg)
 
     def _create_mock_trace(
-        self, envelope: A2AEnvelope[TestResult], agent_response: str, prompt: str
+        self, envelope: A2AEnvelope[UserInfo], agent_response: str, prompt: str
     ) -> AgentTrace:
         """Create a mock AgentTrace with minimal spans for testing."""
 
@@ -167,7 +193,7 @@ async def test_a2a_tool_multiturn() -> None:
             " If you need more information, ask the user for it."
         ),
         description="Agent with conversation memory for testing session management.",
-        output_type=TestResult,
+        output_type=UserInfo,
     )
 
     agent = MockConversationAgent(config)
@@ -178,10 +204,8 @@ async def test_a2a_tool_multiturn() -> None:
         task_timeout_minutes=2,  # Short timeout for testing
     )
 
-    (task, server) = await agent.serve_async(serving_config=serving_config)
-
-    test_port = server.servers[0].sockets[0].getsockname()[1]
-    server_url = f"http://localhost:{test_port}"
+    server_handle = await agent.serve_async(serving_config=serving_config)
+    server_url = f"http://localhost:{server_handle.port}"
     await wait_for_server_async(server_url)
 
     try:
@@ -214,7 +238,7 @@ async def test_a2a_tool_multiturn() -> None:
             response_1 = await client.send_message(request_1)
 
             assert response_1 is not None
-            result = TestResult.model_validate_json(
+            result = UserInfo.model_validate_json(
                 response_1.root.result.status.message.parts[0].root.text
             )
             assert result.name == "Alice"
@@ -241,7 +265,7 @@ async def test_a2a_tool_multiturn() -> None:
             response_2 = await client.send_message(request_2)
 
             assert response_2 is not None
-            result = TestResult.model_validate_json(
+            result = UserInfo.model_validate_json(
                 response_2.root.result.status.message.parts[0].root.text
             )
             assert result.name == "Alice"
@@ -264,19 +288,14 @@ async def test_a2a_tool_multiturn() -> None:
             )
             response_3 = await client.send_message(request_3)
             assert response_3 is not None
-            result = TestResult.model_validate_json(
+            result = UserInfo.model_validate_json(
                 response_3.root.result.status.message.parts[0].root.text
             )
             assert response_3.root.result.status.state == TaskState.completed
             assert result.age == 30
 
     finally:
-        await server.shutdown()
-        task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
+        await server_handle.shutdown()
 
 
 @pytest.mark.asyncio
@@ -292,9 +311,9 @@ async def test_a2a_tool_multiturn_async() -> None:
             "Keep your responses concise."
             " If you need more information, ask the user for it."
         ),
-        name="Structured TestResult Agent",
+        name="Structured UserInfo Agent",
         description="Agent with conversation memory for testing session management.",
-        output_type=TestResult,
+        output_type=UserInfo,
     )
 
     agent = MockConversationAgent(config)
@@ -305,10 +324,8 @@ async def test_a2a_tool_multiturn_async() -> None:
         task_timeout_minutes=2,  # Short timeout for testing
     )
 
-    (task, server) = await agent.serve_async(serving_config=serving_config)
-
-    test_port = server.servers[0].sockets[0].getsockname()[1]
-    server_url = f"http://localhost:{test_port}"
+    server_handle = await agent.serve_async(serving_config=serving_config)
+    server_url = f"http://localhost:{server_handle.port}"
     await wait_for_server_async(server_url)
     try:
 
@@ -333,7 +350,7 @@ async def test_a2a_tool_multiturn_async() -> None:
             agent_config=main_agent_cfg,
         )
         prompt = f"""
-        Please talk to the structured testresult agent and interact with it. You'll contact it to ask three questions. Say the exact words from the prompt in your query to the agent.
+        Please talk to the structured UserInfo agent and interact with it. You'll contact it to ask three questions. Say the exact words from the prompt in your query to the agent.
 
         1. {FIRST_TURN_PROMPT}
         2. {SECOND_TURN_PROMPT}
@@ -349,9 +366,4 @@ async def test_a2a_tool_multiturn_async() -> None:
         assert agent_trace.final_output.second_turn_success
         assert agent_trace.final_output.third_turn_success
     finally:
-        await server.shutdown()
-        task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
+        await server_handle.shutdown()
