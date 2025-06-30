@@ -12,9 +12,8 @@ from starlette.applications import Starlette
 from starlette.responses import Response
 from starlette.routing import Mount, Route
 
+from any_agent.serving.server_handle import ServerHandle
 from any_agent.utils import run_async_in_sync
-
-from .server_handle import ServerHandle
 
 if TYPE_CHECKING:
     from starlette.requests import Request

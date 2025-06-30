@@ -11,12 +11,12 @@ from starlette.applications import Starlette
 from starlette.routing import Mount
 
 from any_agent.serving.a2a.task_manager import TaskManager
+from any_agent.serving.server_handle import ServerHandle
 from any_agent.utils import run_async_in_sync
 
 from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
 from .envelope import prepare_agent_for_a2a, prepare_agent_for_a2a_async
-from .server_handle import ServerHandle
 
 if TYPE_CHECKING:
     from multiprocessing import Queue

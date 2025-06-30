@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any
 from dataclasses import dataclass
+from typing import Any
 
 from uvicorn import Server as UvicornServer  # noqa: TC002
 
