@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import asyncio
 from typing import Any
+from dataclasses import dataclass
 
-from pydantic import BaseModel, ConfigDict
 from uvicorn import Server as UvicornServer  # noqa: TC002
 
 from any_agent.logging import logger
 
 
-class ServerHandle(BaseModel):
+@dataclass
+class ServerHandle:
     """A handle for managing an async server instance.
 
     This class provides a clean interface for managing the lifecycle of a server
@@ -18,7 +19,6 @@ class ServerHandle(BaseModel):
 
     task: asyncio.Task[Any]
     server: UvicornServer
-    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     async def shutdown(self, timeout_seconds: float = 10.0) -> None:
         """Gracefully shutdown the server with a timeout.
