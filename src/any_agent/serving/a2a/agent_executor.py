@@ -11,8 +11,8 @@ from a2a.utils import (
 from pydantic import BaseModel
 
 from any_agent.logging import logger
-from any_agent.serving.envelope import A2AEnvelope
-from any_agent.serving.task_manager import TaskManager
+from any_agent.serving.a2a.envelope import A2AEnvelope
+from any_agent.serving.a2a.task_manager import TaskManager
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent

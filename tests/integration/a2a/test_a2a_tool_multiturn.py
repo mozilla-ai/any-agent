@@ -7,7 +7,6 @@ and verify that the subsequent calls properly receive the previous conversation 
 
 from __future__ import annotations
 
-import asyncio
 import json
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
@@ -23,7 +22,7 @@ from any_agent.config import AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
-from any_agent.serving.envelope import A2AEnvelope
+from any_agent.serving.a2a.envelope import A2AEnvelope
 from any_agent.tools.a2a import a2a_tool_async
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.otel_types import (
@@ -193,10 +192,8 @@ async def test_a2a_tool_multiturn() -> None:
         task_timeout_minutes=2,  # Short timeout for testing
     )
 
-    (task, server) = await agent.serve_async(serving_config=serving_config)
-
-    test_port = server.servers[0].sockets[0].getsockname()[1]
-    server_url = f"http://localhost:{test_port}"
+    server_handle = await agent.serve_async(serving_config=serving_config)
+    server_url = f"http://localhost:{server_handle.port}"
     await wait_for_server_async(server_url)
 
     try:
@@ -286,12 +283,7 @@ async def test_a2a_tool_multiturn() -> None:
             assert result.age == 30
 
     finally:
-        await server.shutdown()
-        task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
+        await server_handle.shutdown()
 
 
 @pytest.mark.asyncio
@@ -320,10 +312,8 @@ async def test_a2a_tool_multiturn_async() -> None:
         task_timeout_minutes=2,  # Short timeout for testing
     )
 
-    (task, server) = await agent.serve_async(serving_config=serving_config)
-
-    test_port = server.servers[0].sockets[0].getsockname()[1]
-    server_url = f"http://localhost:{test_port}"
+    server_handle = await agent.serve_async(serving_config=serving_config)
+    server_url = f"http://localhost:{server_handle.port}"
     await wait_for_server_async(server_url)
     try:
 
@@ -364,9 +354,4 @@ async def test_a2a_tool_multiturn_async() -> None:
         assert agent_trace.final_output.second_turn_success
         assert agent_trace.final_output.third_turn_success
     finally:
-        await server.shutdown()
-        task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
+        await server_handle.shutdown()
