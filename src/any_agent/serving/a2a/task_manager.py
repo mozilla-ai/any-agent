@@ -108,15 +108,25 @@ class TaskManager:
             return
 
         messages = agent_trace.spans_to_messages()
-        # Pop out the first user message, which is the reformatted original query, and instead add the original query
-        # Which is the first user message in the trace
-        # This logic relies on the design where the first message is from the user.
-        # Currently, the trace does not contain the system prompt. If the any-agent logic is changed to include the system prompt,
-        # this error will be raised and will identify the need to update this logic.
-        if not messages[0].role == "user":
-            msg = "First message in trace is not a user message."
+        # Find the first user message and verify it contains the original query before updating
+        first_user_index = None
+
+        for i, message in enumerate(messages):
+            if message.role == "user":
+                first_user_index = i
+                break
+
+        if first_user_index is None:
+            msg = "No user message found in trace."
             raise ValueError(msg)
-        messages[0] = AgentMessage(role="user", content=original_query)
+
+        # Verify that the original query exists in the first user message to confirm it's the right one
+        if original_query not in messages[first_user_index].content:
+            msg = f"Original query '{original_query}' not found in first user message content."
+            raise ValueError(msg)
+
+        # Update the content of the first user message with the original query
+        messages[first_user_index].content = original_query
         task.conversation_history.extend(messages)
 
         task.update_activity()
