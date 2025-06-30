@@ -102,12 +102,7 @@ class _AgnoInstrumentor:
                     self.first_llm_calls.add(trace_id)
                     _set_llm_input(kwargs.get("messages", []), span)
 
-                assistant_message: Message
-                has_tool_calls: bool
-
-                await self._original_aprocess_model(
-                    *args, **kwargs
-                )
+                await self._original_aprocess_model(*args, **kwargs)
 
                 # During the call, the assistant_message is filled in
                 _set_llm_output(kwargs["assistant_message"], span)
