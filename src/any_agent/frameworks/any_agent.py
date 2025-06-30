@@ -23,11 +23,10 @@ from any_agent.utils import run_async_in_sync
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    import uvicorn
     from opentelemetry.trace import Tracer
     from pydantic import BaseModel
 
-    from any_agent.serving import A2AServingConfig, MCPServingConfig
+    from any_agent.serving import A2AServingConfig, MCPServingConfig, ServerHandle
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 
@@ -297,7 +296,7 @@ class AnyAgent(ABC):
 
     async def _serve_a2a_async(
         self, serving_config: A2AServingConfig | None
-    ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+    ) -> ServerHandle:
         from any_agent.serving import (
             A2AServingConfig,
             _get_a2a_app_async,
@@ -317,9 +316,7 @@ class AnyAgent(ABC):
             log_level=serving_config.log_level,
         )
 
-    async def _serve_mcp_async(
-        self, serving_config: MCPServingConfig
-    ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+    async def _serve_mcp_async(self, serving_config: MCPServingConfig) -> ServerHandle:
         from any_agent.serving import serve_mcp_async
 
         return await serve_mcp_async(
@@ -331,23 +328,24 @@ class AnyAgent(ABC):
         )
 
     @overload
-    async def serve_async(
-        self, serving_config: MCPServingConfig
-    ) -> tuple[asyncio.Task[Any], uvicorn.Server]: ...
+    async def serve_async(self, serving_config: MCPServingConfig) -> ServerHandle: ...
 
     @overload
     async def serve_async(
         self, serving_config: A2AServingConfig | None = None
-    ) -> tuple[asyncio.Task[Any], uvicorn.Server]: ...
+    ) -> ServerHandle: ...
 
     async def serve_async(
         self, serving_config: MCPServingConfig | A2AServingConfig | None = None
-    ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+    ) -> ServerHandle:
         """Serve this agent asynchronously using the protocol defined in the serving_config.
 
         Args:
             serving_config: Configuration for serving the agent. If None, uses default A2AServingConfig.
                           Must be an instance of A2AServingConfig or MCPServingConfig.
+
+        Returns:
+            A ServerHandle instance that provides methods for managing the server lifecycle.
 
         Raises:
             ImportError: If the `a2a` dependencies are not installed and an `A2AServingConfig` is used.
@@ -356,13 +354,12 @@ class AnyAgent(ABC):
             ```
             agent = await AnyAgent.create_async("tinyagent", AgentConfig(...))
             config = MCPServingConfig(port=8080)
-            task, server = await agent.serve_async(config)
+            server_handle = await agent.serve_async(config)
             try:
                 # Server is running
                 await asyncio.sleep(10)
             finally:
-                server.should_exit = True
-                await task
+                await server_handle.shutdown()
             ```
 
         """

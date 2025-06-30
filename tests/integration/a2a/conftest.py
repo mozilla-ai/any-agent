@@ -84,15 +84,15 @@ class A2AServedAgent:
 
     async def __aenter__(self) -> "A2AServedAgent":
         """Start serving the agent."""
-        self.task, self.server = await self.agent.serve_async(
-            serving_config=self.serving_config
-        )
+        server_handle = await self.agent.serve_async(serving_config=self.serving_config)
+
+        self.task = server_handle.task
+        self.server = server_handle.server
 
         # Get the actual port from the server
         assert self.server is not None
-        test_port = self.server.servers[0].sockets[0].getsockname()[1]
         endpoint = getattr(self.serving_config, "endpoint", "")
-        self.server_url = f"http://localhost:{test_port}{endpoint}"
+        self.server_url = f"http://localhost:{server_handle.port}{endpoint}"
 
         # Wait for server to be ready
         await wait_for_server_async(self.server_url)
