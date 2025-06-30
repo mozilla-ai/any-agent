@@ -1834,6 +1834,8 @@ else:
 <span class="sd">        str: The response from the user.</span>
 
 <span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"IN_PYTEST"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"1"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">"2 people, next weekend, low budget. Do not ask for any more information or confirmation."</span>
     <span class="k">return</span> <span class="nb">input</span><span class="p">(</span><span class="n">message</span> <span class="o">+</span> <span class="s2">" "</span><span class="p">)</span>
 
 
@@ -1876,6 +1878,8 @@ def send_message(message: str) -&gt; str:
         str: The response from the user.
 
     """
+    if os.environ.get("IN_PYTEST") == "1":
+        return "2 people, next weekend, low budget. Do not ask for any more information or confirmation."
     return input(message + " ")
 
 
