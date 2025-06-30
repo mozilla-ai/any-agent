@@ -45,8 +45,12 @@ class OpenAIMCPConnection(_MCPConnection["MCPTool"], ABC):
             raise ValueError(msg)
 
         await self._exit_stack.enter_async_context(self._server)
-        run_context = RunContextWrapper(context=None) # can be removed after https://github.com/openai/openai-agents-python/pull/977 is merged
-        tmp_agent = Agent(name="tmp_agent") # this is an empty agent to avoid the error of `agent` being required
+        run_context = RunContextWrapper(
+            context=None
+        )  # can be removed after https://github.com/openai/openai-agents-python/pull/977 is merged
+        tmp_agent = Agent(
+            name="tmp_agent"
+        )  # this is an empty agent to avoid the error of `agent` being required
         tools = await self._server.list_tools(run_context=run_context, agent=tmp_agent)
         return self._filter_tools(tools)  # type: ignore[return-value]
 
