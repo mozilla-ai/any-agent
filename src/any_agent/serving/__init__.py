@@ -1,18 +1,20 @@
-from .config_mcp import MCPServingConfig
-from .server_mcp import (
+from .mcp.config_mcp import MCPServingConfig
+from .mcp.server_mcp import (
     serve_mcp,
     serve_mcp_async,
 )
+from .server_handle import ServerHandle
 
 __all__ = [
     "MCPServingConfig",
+    "ServerHandle",
     "serve_mcp",
     "serve_mcp_async",
 ]
 
 try:
-    from .config_a2a import A2AServingConfig
-    from .server_a2a import (
+    from .a2a.config_a2a import A2AServingConfig
+    from .a2a.server_a2a import (
         _get_a2a_app,
         _get_a2a_app_async,
         serve_a2a,

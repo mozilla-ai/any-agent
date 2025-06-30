@@ -34,8 +34,8 @@ def default_history_formatter(messages: list[AgentMessage], current_query: str) 
 
     return (
         f"Previous conversation:\n{history_text}\n"
+        "Please respond to the current user message, taking into account the conversation history above."
         f"Current user message: {current_query}\n"
-        "Please respond taking into account the conversation history above."
     )
 
 
