@@ -19,7 +19,6 @@ class TaskData:
 
         """
         self.task_id = task_id
-        self.agent_trace = AgentTrace()
         self.conversation_history: list[
             AgentMessage
         ] = []  # Store original user queries and responses as AgentMessage objects
@@ -107,8 +106,6 @@ class TaskManager:
         if not task:
             logger.warning("Attempted to update non-existent task: %s", task_id)
             return
-
-        task.agent_trace = agent_trace
 
         messages = agent_trace.spans_to_messages()
         # Pop out the first user message, which is the reformatted original query, and instead add the original query
