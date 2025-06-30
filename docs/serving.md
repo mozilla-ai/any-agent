@@ -247,4 +247,3 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-If both are specified, then only the Google expert is contacted. If only the OpenAI expert is left, it is contacted, but the expert will inform the main agent that it cannot answer questions about the Google ADK.
