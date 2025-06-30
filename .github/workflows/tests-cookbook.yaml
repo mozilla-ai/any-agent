@@ -1,4 +1,4 @@
-name: Tests for Cookbooks
+name: Cookbook Tests
 
 on:
   push:
@@ -27,10 +27,8 @@ jobs:
         run: |
           uv sync --group tests --extra all --extra a2a
 
-      - name: Run Jupyter Notebook tests
-        working-directory: docs/cookbook
+      - name: Run Cookbook Tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          python -m ipykernel install --user --name=anyagent
-          for nb in `ls -1 *.ipynb`; do jupyter execute --kernel_name=anyagent $nb; done
+          pytest tests/cookbooks -v -n 4
