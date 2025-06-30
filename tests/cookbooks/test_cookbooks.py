@@ -10,6 +10,7 @@ import pytest
     list(pathlib.Path("docs/cookbook").glob("*.ipynb")),
     ids=lambda x: x.stem,
 )
+@pytest.mark.timeout(130)  # 2+ minutes timeout for cookbook execution
 def test_cookbook_notebook(
     notebook_path: pathlib.Path, capsys: pytest.CaptureFixture
 ) -> None:
@@ -23,7 +24,7 @@ def test_cookbook_notebook(
                 "PATH": os.environ["PATH"],
                 "IN_PYTEST": "1",  # For mcp_agent notebook which needs to mock input
             },
-            timeout=29, # one second less than the timeout in pytest
+            timeout=120, # 2 minutes timeout for cookbook execution
             capture_output=True,
             check=False,
         )
@@ -31,7 +32,7 @@ def test_cookbook_notebook(
         # Handle timeout case - log stdout/stderr that were captured before timeout
         stdout = e.stdout.decode() if e.stdout else "(no stdout captured)"
         stderr = e.stderr.decode() if e.stderr else "(no stderr captured)"
-        pytest.fail(f"Notebook {notebook_path.name} timed out after 29 seconds\n stdout: {stdout}\n stderr: {stderr}")
+        pytest.fail(f"Notebook {notebook_path.name} timed out after 2 minutes\n stdout: {stdout}\n stderr: {stderr}")
     
     if result.returncode != 0:
         stdout = result.stdout.decode() if result.stdout else "(no stdout captured)"

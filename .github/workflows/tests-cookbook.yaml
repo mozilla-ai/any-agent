@@ -31,4 +31,4 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          pytest tests/cookbooks -v
+          pytest tests/cookbooks -v -n 4
