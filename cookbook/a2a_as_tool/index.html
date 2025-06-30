@@ -949,52 +949,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/tools/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Tools
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../api/tracing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Tracing
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../api/evaluation/" class="md-nav__link">
         
   
@@ -1024,6 +978,75 @@
   
   <span class="md-ellipsis">
     Logging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/serving/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Serving
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tools
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/tracing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tracing
     
   </span>
   
@@ -1633,7 +1656,7 @@ nest_asyncio.apply()</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -1698,13 +1721,13 @@ else:
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -1743,9 +1766,7 @@ else:
         <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">],</span>
     <span class="p">),</span>
 <span class="p">)</span>
-<span class="p">(</span><span class="n">time_task</span><span class="p">,</span> <span class="n">time_server</span><span class="p">)</span> <span class="o">=</span> <span class="k">await</span> <span class="n">time</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span>
-    <span class="n">A2AServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">"/time"</span><span class="p">)</span>
-<span class="p">)</span>
+<span class="n">time_handle</span> <span class="o">=</span> <span class="k">await</span> <span class="n">time</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span><span class="n">A2AServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">"/time"</span><span class="p">))</span>
 
 <span class="n">weather_expert</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>
@@ -1756,12 +1777,12 @@ else:
         <span class="n">description</span><span class="o">=</span><span class="s2">"I'm an agent that is an expert in recommending my favorite location given a time of the year"</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
-<span class="p">(</span><span class="n">weather_task</span><span class="p">,</span> <span class="n">weather_server</span><span class="p">)</span> <span class="o">=</span> <span class="k">await</span> <span class="n">weather_expert</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span>
+<span class="n">weather_handle</span> <span class="o">=</span> <span class="k">await</span> <span class="n">weather_expert</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span>
     <span class="n">A2AServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">"/location_recommender"</span><span class="p">)</span>
 <span class="p">)</span>
 
-<span class="n">weather_port</span> <span class="o">=</span> <span class="n">weather_server</span><span class="o">.</span><span class="n">servers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sockets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getsockname</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">time_port</span> <span class="o">=</span> <span class="n">time_server</span><span class="o">.</span><span class="n">servers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sockets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getsockname</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">weather_port</span> <span class="o">=</span> <span class="n">weather_handle</span><span class="o">.</span><span class="n">port</span>
+<span class="n">time_port</span> <span class="o">=</span> <span class="n">time_handle</span><span class="o">.</span><span class="n">port</span>
 
 <span class="n">max_attempts</span> <span class="o">=</span> <span class="mi">20</span>
 <span class="n">poll_interval</span> <span class="o">=</span> <span class="mf">0.5</span>
@@ -1811,9 +1832,7 @@ time = await AnyAgent.create_async(
         tools=[time_tool],
     ),
 )
-(time_task, time_server) = await time.serve_async(
-    A2AServingConfig(port=0, endpoint="/time")
-)
+time_handle = await time.serve_async(A2AServingConfig(port=0, endpoint="/time"))
 
 weather_expert = await AnyAgent.create_async(
     "tinyagent",
@@ -1824,12 +1843,12 @@ weather_expert = await AnyAgent.create_async(
         description="I'm an agent that is an expert in recommending my favorite location given a time of the year",
     ),
 )
-(weather_task, weather_server) = await weather_expert.serve_async(
+weather_handle = await weather_expert.serve_async(
     A2AServingConfig(port=0, endpoint="/location_recommender")
 )
 
-weather_port = weather_server.servers[0].sockets[0].getsockname()[1]
-time_port = time_server.servers[0].sockets[0].getsockname()[1]
+weather_port = weather_handle.port
+time_port = time_handle.port
 
 max_attempts = 20
 poll_interval = 0.5
@@ -1856,19 +1875,6 @@ async with httpx.AsyncClient() as client:
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Server is ready at http://localhost:61370
-</pre>
-</div>
-</div>
-</div>
-</div>
 </div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
@@ -1887,7 +1893,7 @@ async with httpx.AsyncClient() as client:
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -1991,14 +1997,18 @@ print(agent_trace.final_output)</div>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"call_time_agent"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"query\":\"current date and time\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"query\": \"current date\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                            │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"call_weather_expert"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"query\": \"recommend best location for skiing right now\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                            │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">237</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">18</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">341</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">54</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
@@ -2017,7 +2027,7 @@ print(agent_trace.final_output)</div>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"user"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"current date and time"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"current date"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                               │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -2031,7 +2041,7 @@ print(agent_trace.final_output)</div>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">226</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">224</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">18</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -2051,7 +2061,7 @@ print(agent_trace.final_output)</div>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"timezone"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"America/New_York"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"datetime"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-13T13:27:49-04:00"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"datetime"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-27T08:20:15-04:00"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"is_dst"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #00ff00; text-decoration-color: #00ff00; font-style: italic">true</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
@@ -2064,13 +2074,12 @@ print(agent_trace.final_output)</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-nano <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ The current date and time in the America/New_York timezone is June 13, 2025, 1:27 PM. How can I assist you  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ further?                                                                                                    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ The current date is June 27, 2025.                                                                          │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">294</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">36</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">292</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">13</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
@@ -2083,66 +2092,19 @@ print(agent_trace.final_output)</div>
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭─────────────────────────────────────────</span> EXECUTE_TOOL: call_time_agent <span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────╮</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"query"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"current date and time"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                          │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"query"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"current date"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"contextId"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"5ebef1a7-9444-4f75-94ac-1dc0d6d5397e"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"history"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                              │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"contextId"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"5ebef1a7-9444-4f75-94ac-1dc0d6d5397e"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"messageId"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"3e8fec67e7054f968604f36bc454d822"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"parts"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│         </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│           </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"text"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"current date and time"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│         </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                    │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"user"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"taskId"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"54da7aad-44f8-4b5f-8679-43d5920f3bf5"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"id"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"54da7aad-44f8-4b5f-8679-43d5920f3bf5"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"status"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"message"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"contextId"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"5ebef1a7-9444-4f75-94ac-1dc0d6d5397e"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"messageId"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"8060fe58-0e15-4fd0-b776-27fd3477018b"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"parts"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│         </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│           </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"text"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"result\":\"The current date and time in the America/New_York timezone is June 13, 202</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│         </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                    │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"agent"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│       </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"taskId"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"54da7aad-44f8-4b5f-8679-43d5920f3bf5"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"state"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"completed"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"timestamp"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-13T17:27:51.777479+00:00"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Status: TaskState.completed                                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Message: {"result":"The current date is June 27, 2025."}                                                    │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ TaskId: 16f71ba4-4fbe-4905-a528-9b3e26fed354                                                                │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Timestamp: 2025-06-27T12:20:16.700991+00:00                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"call_weather_expert"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"query\":\"best ski location to visit in mid June\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">579</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">23</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
@@ -2158,28 +2120,18 @@ print(agent_trace.final_output)</div>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"user"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"best ski location to visit in mid June"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"recommend best location for skiing right now"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                               │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ For skiing in mid-June, you'll want to consider locations with high-altitude terrain or glaciers that offer │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ year-round skiing. Some of the top destinations are:                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 1 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Zermatt, Switzerland: Known for its glacier skiing, Zermatt offers reliable snow conditions year-round.  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 2 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Whistler Blackcomb, Canada: While the main ski season ends in late spring, some glacier skiing options   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">might still be available early in the season.                                                            │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 3 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Tignes, France: Home to the Grande Motte glacier, it provides summer skiing opportunities.               │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 4 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Mammoth Mountain, USA: Has a glacier and high altitude terrain suitable for summer skiing.               │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 5 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Mount Hood, Oregon, USA: Offers summer skiing on the Palmer Glacier.                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Would you like me to provide current conditions or recommend the best place based on specific preferences   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ like terrain, scenery, or amenities?                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Could you please tell me your current location or where you are planning to travel from? This will help me  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ recommend the best skiing destination for you right now.                                                    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">53</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">172</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">52</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">32</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
@@ -2192,11 +2144,18 @@ print(agent_trace.final_output)</div>
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭───────────────────────────────────────</span> EXECUTE_TOOL: call_weather_expert <span style="color: #000080; text-decoration-color: #000080">───────────────────────────────────────╮</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"query"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"best ski location to visit in mid June"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"query"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"recommend best location for skiing right now"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Error calling tool: HTTP Error 503: Network communication error:                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Status: TaskState.input_required                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Message: {"result":"Please specify your current location or where you plan to travel from so I can          │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ recommend the best skiing destinations for this time of year."}                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ TaskId: fd36c8a1-7670-4d2c-ac2f-254402eed58a                                                                │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Timestamp: 2025-06-27T12:20:19.126381+00:00                                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
 <span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
@@ -2207,23 +2166,14 @@ print(agent_trace.final_output)</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ It seems that the ski location expert service is currently unavailable. However, since today is June 13,    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ 2025, and it is summer in the Northern Hemisphere, typical ski resorts in places like the Alps, Rockies, or │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ the Northeastern US might not have good snow conditions for skiing.                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ For skiing in June, you might consider high-altitude or glacier ski resorts where snow remains year-round.  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Some well-known options include:                                                                            │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Zermatt or Saas Fee in Switzerland (glacier skiing in the Alps)                                          │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Whistler Blackcomb in Canada (sometimes has summer glacier skiing)                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> • </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Timberline Lodge in Oregon, USA (summer skiing on the mountain)                                          │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Would you like more information on any of these or other types of activities to do this weekend?            │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Today is June 27, 2025. To recommend the best skiing destination for this weekend, could you please tell me │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ your current location or the place you plan to travel from? This will help me suggest the most suitable ski │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ locations for this time of year.                                                                            │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">626</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">154</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">584</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">54</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
@@ -2233,15 +2183,7 @@ print(agent_trace.final_output)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>It seems that the ski location expert service is currently unavailable. However, since today is June 13, 2025, and it is summer in the Northern Hemisphere, typical ski resorts in places like the Alps, Rockies, or the Northeastern US might not have good snow conditions for skiing. 
-
-For skiing in June, you might consider high-altitude or glacier ski resorts where snow remains year-round. Some well-known options include:
-
-- Zermatt or Saas Fee in Switzerland (glacier skiing in the Alps)
-- Whistler Blackcomb in Canada (sometimes has summer glacier skiing)
-- Timberline Lodge in Oregon, USA (summer skiing on the mountain)
-
-Would you like more information on any of these or other types of activities to do this weekend?
+<pre>Today is June 27, 2025. To recommend the best skiing destination for this weekend, could you please tell me your current location or the place you plan to travel from? This will help me suggest the most suitable ski locations for this time of year.
 </pre>
 </div>
 </div>
@@ -2259,13 +2201,13 @@ Would you like more information on any of these or other types of activities to 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -2278,95 +2220,11 @@ Would you like more information on any of these or other types of activities to 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-
-<span class="n">time_server</span><span class="o">.</span><span class="n">should_exit</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">time_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-<span class="n">time_wait_count</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">max_wait_seconds</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">time_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"Agent server task has completed!"</span><span class="p">)</span>
-        <span class="k">break</span>
-    <span class="k">elif</span> <span class="n">time_wait_count</span> <span class="o">&gt;=</span> <span class="n">max_wait_seconds</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"Timed out after </span><span class="si">{</span><span class="n">max_wait_seconds</span><span class="si">}</span><span class="s2"> seconds waiting for time server to exit"</span>
-        <span class="p">)</span>
-        <span class="k">break</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"Waiting for server to exit"</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">time_wait_count</span> <span class="o">+=</span> <span class="mi">1</span>
-
-<span class="n">weather_server</span><span class="o">.</span><span class="n">should_exit</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">weather_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-<span class="n">weather_wait_count</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">weather_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"Agent server task has completed!"</span><span class="p">)</span>
-        <span class="k">break</span>
-    <span class="k">elif</span> <span class="n">weather_wait_count</span> <span class="o">&gt;=</span> <span class="n">max_wait_seconds</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"Timed out after </span><span class="si">{</span><span class="n">max_wait_seconds</span><span class="si">}</span><span class="s2"> seconds waiting for weather server to exit"</span>
-        <span class="p">)</span>
-        <span class="k">break</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"Waiting for server to exit"</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">weather_wait_count</span> <span class="o">+=</span> <span class="mi">1</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">await</span> <span class="n">time_handle</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+<span class="k">await</span> <span class="n">weather_handle</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">import asyncio
-
-time_server.should_exit = True
-time_task.cancel()
-time_wait_count = 0
-max_wait_seconds = 10
-while True:
-    if time_task.done():
-        print("Agent server task has completed!")
-        break
-    elif time_wait_count &gt;= max_wait_seconds:
-        print(
-            f"Timed out after {max_wait_seconds} seconds waiting for time server to exit"
-        )
-        break
-    else:
-        print("Waiting for server to exit")
-        await asyncio.sleep(1)
-        time_wait_count += 1
-
-weather_server.should_exit = True
-weather_task.cancel()
-weather_wait_count = 0
-while True:
-    if weather_task.done():
-        print("Agent server task has completed!")
-        break
-    elif weather_wait_count &gt;= max_wait_seconds:
-        print(
-            f"Timed out after {max_wait_seconds} seconds waiting for weather server to exit"
-        )
-        break
-    else:
-        print("Waiting for server to exit")
-        await asyncio.sleep(1)
-        weather_wait_count += 1</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Waiting for server to exit
-Agent server task has completed!
-Waiting for server to exit
-Agent server task has completed!
-</pre>
+<div class="clipboard-copy-txt" id="cell-5">await time_handle.shutdown()
+await weather_handle.shutdown()</div>
 </div>
 </div>
 </div>
