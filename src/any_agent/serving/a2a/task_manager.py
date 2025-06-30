@@ -110,17 +110,17 @@ class TaskManager:
 
         task.agent_trace = agent_trace
 
-        # Extract the agent's response from the trace
-        agent_response = (
-            str(agent_trace.final_output) if agent_trace.final_output else ""
-        )
-
-        task.conversation_history.append(
-            AgentMessage(role="user", content=original_query)
-        )
-        task.conversation_history.append(
-            AgentMessage(role="assistant", content=agent_response)
-        )
+        messages = agent_trace.spans_to_messages()
+        # Pop out the first user message, which is the reformatted original query, and instead add the original query
+        # Which is the first user message in the trace
+        # This logic relies on the design where the first message is from the user.
+        # Currently, the trace does not contain the system prompt. If the any-agent logic is changed to include the system prompt,
+        # this error will be raised and will identify the need to update this logic.
+        if not messages[0].role == "user":
+            msg = "First message in trace is not a user message."
+            raise ValueError(msg)
+        messages[0] = AgentMessage(role="user", content=original_query)
+        task.conversation_history.extend(messages)
 
         task.update_activity()
 
