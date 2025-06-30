@@ -1,8 +1,8 @@
 # Serving
 
 `any-agent` provides a simple way of serving agents from any of the supported frameworks using the
-[Agent2Agent Protocol (A2A)](https://google.github.io/A2A/), via the [A2A Python SDK](https://github.com/google-a2a/a2a-python). You can refer to the link for more information on
-the protocol, as explaining it is out of the scope of this page.
+[Agent2Agent Protocol (A2A)](https://google.github.io/A2A/), via the [A2A Python SDK](https://github.com/google-a2a/a2a-python), or using the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification/2025-03-26), via the [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk). You can refer to the links for more information on
+these protocols, as explaining them is out of the scope of this page.
 
 !!! warning
 
@@ -12,7 +12,9 @@ In order to use A2A serving, you must first install the 'a2a' extra: `pip instal
 
 You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] and the [`AnyAgent.serve`][any_agent.AnyAgent.serve] or [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
 
-## Example
+## Serving via A2A
+
+### Example
 
 For illustrative purposes, we are going to define 2 separate scripts, each defining an agent to answer questions about a specific agent framework (either OpenAI Agents SDK or Google ADK):
 
@@ -114,9 +116,9 @@ You will see that the first agent answered the question, but the second agent di
 This is because the question was about Google ADK,
 but the agent was told it could only answer questions about the OpenAI Agents SDK.
 
-## Advanced Configuration
+### Advanced Configuration
 
-### Custom Skills
+#### Custom Skills
 
 By default, an agent's skills are automatically inferred from its tools. However, you can explicitly define skills for more control over the agent card:
 
@@ -146,12 +148,101 @@ config = A2AServingConfig(
 )
 ```
 
-## More Examples
+### More Examples
 
 Check out our cookbook example for building and serving an agent via A2A:
 
 👉 [Serve an Agent with A2A (Jupyter Notebook)](./cookbook/serve_a2a.ipynb)
 
-## Accessing an A2A agent using tools
+### Accessing an A2A agent using tools
 
 As described in the [tools section](./agents/tools.md#a2a-tools), an agent can request actions from other agents by using the `a2a_tool`  or `a2a_tool_async` function. It retrieves the agent card, and builds another function that relays the request via the A2A protocol and unpacks the result.
+
+## Serving via MCP
+
+### Example
+
+In a similar way to [the A2A example](#example), we are going to define two agents served over MCP:
+
+=== "Google Expert"
+
+    ```python
+    # google_expert.py
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.serving import MCPServingConfig
+    from any_agent.tools import search_web
+
+    agent = AnyAgent.create(
+        "google",
+        AgentConfig(
+            name="google_expert",
+            model_id="gpt-4.1-mini",
+            description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
+            tools=[search_web]
+        )
+    )
+
+    agent.serve(MCPServingConfig(port=5001,endpoint="/google"))
+    ```
+
+=== "OpenAI Expert"
+
+    ```python
+    # openai_expert.py
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.serving import MCPServingConfig
+    from any_agent.tools import search_web
+
+    agent = AnyAgent.create(
+        "openai",
+        AgentConfig(
+            name="openai_expert",
+            model_id="gpt-4.1-nano",
+            instructions="You can provide information about the OpenAI Agents SDK but nothing else (specially, nothing about the Google SDK).",
+            description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
+            tools=[search_web]
+        )
+    )
+
+    agent.serve(MCPServingConfig(port=5002,endpoint="/openai"))
+    ```
+
+We can then run each of the scripts in a separate terminal and leave them running in the background.
+
+Then, we run another python script containing the main agent that will contact one of the other two via MCP:
+
+```python
+# Main agent
+
+from uuid import uuid4
+import asyncio
+from any_agent.config import MCPSse
+from any_agent import AgentConfig, AgentFramework, AnyAgent
+
+async def main():
+    prompt = "What do you know about the Google ADK?"
+    google_server_url = f"http://localhost:5001/google/sse"
+    openai_server_url = f"http://localhost:5002/openai/sse"
+
+    main_agent_cfg = AgentConfig(
+        instructions="Use the available tools to obtain additional information to answer the query.",
+        description="The orchestrator that can use other agents via tools using the MCP protocol.",
+        tools=[
+            MCPSse(url=google_server_url, client_session_timeout_seconds=300),
+            MCPSse(url=openai_server_url, client_session_timeout_seconds=300),
+        ],
+        model_id="gpt-4.1-nano",
+    )
+
+    main_agent = await AnyAgent.create_async(
+        agent_framework=AgentFramework.OPENAI,
+        agent_config=main_agent_cfg,
+    )
+
+    agent_trace = await main_agent.run_async(prompt)
+
+    print(agent_trace)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
