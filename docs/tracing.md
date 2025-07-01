@@ -115,7 +115,7 @@ with open("agent_trace.json", "w", encoding="utf-8") as f:
 
 ## Adding an OpenTelemetry exporter
 
-Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed. Note that this does not affect the existing processor that returns the traces to the user, and optionally prints them on `stdout`. Note that due to the breaking changes in the [protocol buffer Python implementation](https://protobuf.dev/news/2022-05-06/#python-updates), it may be necessary to use a pure Python implementation by using `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` in the environment.
+Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed. Note that this does not affect the existing processor that returns the traces to the user, and optionally prints them on `stdout`.
 
 The following code will use the OpenTelemetry Python SDK to send the agent traces to an additional endpoint using OTLP over HTTP in the indicated URL:
 

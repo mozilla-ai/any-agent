@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING, Any, cast
 
+from litellm import acompletion
+from litellm.utils import supports_response_schema
 from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework
@@ -97,7 +99,25 @@ class LlamaIndexAgent(AnyAgent):
             msg = f"Agent did not return a valid response: {result.response}"
             raise ValueError(msg)
         if self.config.output_type:
+            # If the user needs a structured output, send it through litellm one last time to enforce the structured output.
+            completion_params = self.config.model_args or {}
+            completion_params["model"] = self.config.model_id
+            model_output_message = {
+                "role": "assistant",
+                "content": result.response.blocks[0].text,
+            }
+            structured_output_message = {
+                "role": "user",
+                "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
+            }
+            completion_params["messages"] = [
+                model_output_message,
+                structured_output_message,
+            ]
+            if supports_response_schema(model=self.config.model_id):
+                completion_params["response_format"] = self.config.output_type
+            response = await acompletion(**completion_params)
             return self.config.output_type.model_validate_json(
-                result.response.blocks[0].text
+                response.choices[0].message["content"]
             )
         return result.response.blocks[0].text
