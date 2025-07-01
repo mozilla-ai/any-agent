@@ -50,7 +50,7 @@ async def main():
     )
 
     # Note that an agent with structured output
-    async def google_agent_as_tool(query: str) -> AgentTrace:
+    async def google_agent_as_tool(query: str) -> str:
         out = await google_agent.run_async(prompt=query)
         return str(out.final_output)
 
