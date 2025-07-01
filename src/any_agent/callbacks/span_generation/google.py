@@ -20,9 +20,7 @@ if TYPE_CHECKING:
 
 def _set_llm_output(llm_response: LlmResponse, span: Span) -> None:
     content = llm_response.content
-    if not content:
-        return
-    if not content.parts:
+    if not content or not content.parts:
         return
 
     if content.parts[0].text:
