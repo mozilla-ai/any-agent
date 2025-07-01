@@ -134,6 +134,5 @@ class _SmolagentsSpanGeneration(Callback):
         trace_id = get_current_span().get_span_context().trace_id
         span: Span = context[f"execute_tool-{trace_id}"]
         _set_tool_output(output, span)
-        span.set_status(StatusCode.OK)
 
         return context
