@@ -32,7 +32,10 @@ class TokenInfo(BaseModel):
     """Token Count information."""
 
     input_tokens: int
+    """Number of input tokens."""
+
     output_tokens: int
+    """Number of output tokens."""
 
     @property
     def total_tokens(self) -> int:
@@ -46,7 +49,10 @@ class CostInfo(BaseModel):
     """Cost information."""
 
     input_cost: float
+    "Cost associated to the input tokens."
+
     output_cost: float
+    """Cost associated to the output tokens."""
 
     @property
     def total_cost(self) -> float:
@@ -334,7 +340,7 @@ class AgentTrace(BaseModel):
 
     @cached_property
     def tokens(self) -> TokenInfo:
-        """The current total token count for this trace. Cached after first computation."""
+        """The [`TokenInfo`][any_agent.tracing.agent_trace.TokenInfo] for this trace. Cached after first computation."""
         sum_input_tokens = 0
         sum_output_tokens = 0
         for span in self.spans:
@@ -347,7 +353,7 @@ class AgentTrace(BaseModel):
 
     @cached_property
     def cost(self) -> CostInfo:
-        """The current total cost for this trace. Cached after first computation."""
+        """The [`CostInfo`][any_agent.tracing.agent_trace.CostInfo] for this trace. Cached after first computation."""
         sum_input_cost = 0.0
         sum_output_cost = 0.0
         for span in self.spans:

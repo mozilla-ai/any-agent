@@ -89,7 +89,7 @@ class _AgnoInstrumentor:
         async def wrap_aprocess_model_response(
             *args,
             **kwargs,
-        ) -> tuple[Message, bool]:
+        ) -> None:
             with tracer.start_as_current_span(f"call_llm {model.id}") as span:
                 span.set_attributes(
                     {
@@ -102,18 +102,14 @@ class _AgnoInstrumentor:
                     self.first_llm_calls.add(trace_id)
                     _set_llm_input(kwargs.get("messages", []), span)
 
-                assistant_message: Message
-                has_tool_calls: bool
-                assistant_message, has_tool_calls = await self._original_aprocess_model(
-                    *args, **kwargs
-                )
+                await self._original_aprocess_model(*args, **kwargs)
 
-                _set_llm_output(assistant_message, span)
+                # During the call, the assistant_message is filled in
+                _set_llm_output(kwargs["assistant_message"], span)
 
                 span.set_status(StatusCode.OK)
 
             agent._running_traces[trace_id].add_span(span)
-            return assistant_message, has_tool_calls
 
         model._aprocess_model_response = wrap_aprocess_model_response
 
