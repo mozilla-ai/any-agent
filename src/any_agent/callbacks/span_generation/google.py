@@ -39,7 +39,7 @@ def _set_llm_output(llm_response: LlmResponse, span: Span) -> None:
                     [
                         {
                             "tool.name": getattr(part.function_call, "name", "No name"),
-                            "tool.args": getattr(part.function_call, "args", "No args"),
+                            "tool.args": getattr(part.function_call, "args", "{}"),
                         }
                         for part in content.parts
                         if part.function_call
