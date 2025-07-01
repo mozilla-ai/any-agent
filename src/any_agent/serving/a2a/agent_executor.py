@@ -52,7 +52,6 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         formatted_query = self.task_manager.format_query_with_history(task.id, query)
 
         # This agent always produces Task objects.
-        await updater.start_work()
         agent_trace = await self.agent.run_async(formatted_query)
 
         # Update task with new trace, passing the original query (not formatted)
