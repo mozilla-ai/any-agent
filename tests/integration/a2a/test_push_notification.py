@@ -1,4 +1,6 @@
 import asyncio
+import json
+from typing import Any
 from uuid import uuid4
 
 import pytest
@@ -17,11 +19,89 @@ from starlette.responses import JSONResponse
 from starlette.routing import Route
 
 from any_agent import AgentConfig
+from any_agent.config import AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
+from any_agent.serving.a2a.envelope import A2AEnvelope
+from any_agent.serving.a2a.task_manager import TaskData
+from any_agent.tracing.agent_trace import AgentTrace
 from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server_async
 
+
+from any_agent.tracing.otel_types import (
+    Resource,
+    SpanContext,
+    SpanKind,
+    Status,
+)
+
+from a2a.types import MessageSendParams, SendMessageRequest, TaskState
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from .conftest import DEFAULT_LONG_TIMEOUT, a2a_client_from_agent
+
+FIRST_TURN_PROMPT = "What's the capital of Pennsylvania?"
+FIRST_TURN_RESPONSE = "The capital of Pennsylvania is Harrisburg."
+
+class MockConversationAgent(TinyAgent):
+    """Mock agent implementation that provides simple answers for testing."""
+
+    def __init__(self, config: AgentConfig) -> None:
+        super().__init__(config)
+        self.output_type = A2AEnvelope[str]
+
+    async def _load_agent(self) -> None:
+        # Call parent's _load_agent to set up the basic structure
+        await super()._load_agent()
+
+    async def run_async(
+        self, prompt: str, instrument: bool = True, **kwargs: Any
+    ) -> AgentTrace:
+            envelope = self.output_type(
+                task_status=TaskState.input_required,
+                data=FIRST_TURN_RESPONSE,
+            )
+            return self._create_mock_trace(
+                envelope, FIRST_TURN_RESPONSE, FIRST_TURN_PROMPT
+            )
+        
+    def _create_mock_trace(
+        self, envelope: A2AEnvelope[str], agent_response: str, prompt: str
+    ) -> AgentTrace:
+        """Create a mock AgentTrace with minimal spans for testing."""
+
+        spans = []
+        spans.append(
+            AgentSpan(
+                name="call_llm gpt-4o-mini",
+                kind=SpanKind.INTERNAL,
+                status=Status(),
+                context=SpanContext(span_id=123),
+                attributes={
+                    "gen_ai.operation.name": "call_llm",
+                    "gen_ai.request.model": "mock-model",
+                    "gen_ai.input.messages": json.dumps(
+                        [{"role": "user", "content": prompt}]
+                    ),
+                    "gen_ai.output": agent_response,
+                    "gen_ai.output.type": "json",
+                },
+                links=[],
+                events=[],
+                resource=Resource(),
+            )
+        )
+
+        return AgentTrace(
+            spans=spans,
+            final_output=envelope,
+        )
+
+    @classmethod
+    def create(cls, framework: AgentFramework | str, config: AgentConfig) -> AnyAgent:
+        return cls(config)
+
+
 
 
 @pytest.mark.asyncio
@@ -61,7 +141,7 @@ async def test_push_notification_non_streaming() -> None:
         description="Agent with conversation memory for testing session management.",
     )
 
-    agent = await AnyAgent.create_async("tinyagent", config)
+    agent = MockConversationAgent(config)
 
     # Configure session management with short timeout for testing
     serving_config = A2AServingConfig(
@@ -102,7 +182,7 @@ async def test_push_notification_non_streaming() -> None:
                     parts=[
                         Part(
                             kind="text",
-                            text="Generate a Q1 sales report. This usually takes a while. Notify me when it's ready.",
+                            text=FIRST_TURN_PROMPT,
                         )
                     ],
                     messageId=first_message_id,
@@ -115,15 +195,21 @@ async def test_push_notification_non_streaming() -> None:
 
             request_1 = SendMessageRequest(id=str(uuid4()), params=params)
             response_1 = await client.send_message(request_1)
+            if hasattr(response_1.root, "error"):
+                raise RuntimeError(f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}")
             task_id = response_1.root.result.id
             params.message.taskId = task_id
 
             # Send another message to the same task to trigger notifications
             request_1 = SendMessageRequest(id=str(uuid4()), params=params)
             response_1 = await client.send_message(request_1)
+            if hasattr(response_1.root, "error"):
+                raise RuntimeError(f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}")
             assert response_1.root.result.id == task_id
 
             response_2 = await client.send_message(request_1)
+            if hasattr(response_2.root, "error"):
+                raise RuntimeError(f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}")
             assert response_2.root.result.id == task_id
 
             await asyncio.sleep(1)  # Give more time for notifications
