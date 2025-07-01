@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from opentelemetry.trace import StatusCode
 
-from any_agent.tracing.instrumentation.common import _set_tool_output
+from any_agent.callbacks.span_generation.common import _set_tool_output
 
 
 class FooClass:
@@ -39,7 +39,7 @@ def test_set_tool_output_error() -> None:
     error = "Error calling tool: It's a trap!"
     span_mock = MagicMock()
     status_mock = MagicMock()
-    with patch("any_agent.tracing.instrumentation.common.Status", status_mock):
+    with patch("any_agent.callbacks.span_generation.common.Status", status_mock):
         _set_tool_output(error, span_mock)
 
         span_mock.set_attributes.assert_called_with(

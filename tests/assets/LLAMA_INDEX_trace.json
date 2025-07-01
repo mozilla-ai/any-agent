@@ -4,8 +4,13 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8741777053539239902,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 15839130850711958450,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +19,25 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
       "start_time": 1751443023116214805,
       "end_time": null,
+=======
+      "start_time": 1751364638727936700,
+      "end_time": 1751364639396497027,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 15000329756418140046,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 5437505041388993338,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -56,8 +71,13 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8741777053539239902,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 15839130850711958450,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -66,15 +86,25 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
       "start_time": 1751443023773739038,
       "end_time": null,
+=======
+      "start_time": 1751364639400446111,
+      "end_time": 1751364639757409875,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 4826029691630229880,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 12272479227562662154,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -87,7 +117,11 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
+<<<<<<< HEAD
         "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-02T03:57:04-04:00\",\n  \"is_dst\": true\n}",
+=======
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-01T06:10:39-04:00\",\n  \"is_dst\": true\n}",
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -106,8 +140,13 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8741777053539239902,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 15839130850711958450,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -116,15 +155,25 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
       "start_time": 1751443024151366665,
       "end_time": null,
+=======
+      "start_time": 1751364639760126965,
+      "end_time": 1751364640516767452,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8926816263790697600,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 13305002561390147001,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -157,8 +206,13 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8741777053539239902,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 15839130850711958450,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -167,15 +221,25 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
       "start_time": 1751443024891352272,
       "end_time": null,
+=======
+      "start_time": 1751364640519909664,
+      "end_time": 1751364640520420228,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 2493618336866182168,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 10125499416320960376,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -207,8 +271,13 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8741777053539239902,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 15839130850711958450,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -217,15 +286,25 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
       "start_time": 1751443024893697824,
       "end_time": null,
+=======
+      "start_time": 1751364640522382985,
+      "end_time": 1751364642195529439,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 17032615235348679863,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 5013988611810076099,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -258,8 +337,13 @@
       "name": "execute_tool final_output",
       "kind": "internal",
       "parent": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8741777053539239902,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 15839130850711958450,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -268,15 +352,25 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
       "start_time": 1751443026332184665,
       "end_time": null,
+=======
+      "start_time": 1751364642198885659,
+      "end_time": 1751364642200298263,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 14664627323534379905,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 2318882139221024517,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -308,8 +402,13 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8741777053539239902,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 15839130850711958450,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -318,15 +417,25 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
       "start_time": 1751443026337166127,
       "end_time": null,
+=======
+      "start_time": 1751364642204374759,
+      "end_time": 1751364643425029211,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 1588588364148630196,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 4641189344926901144,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -369,15 +478,25 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
       "start_time": 1751443023113988677,
       "end_time": 1751443028220298653,
+=======
+      "start_time": 1751364638725589997,
+      "end_time": 1751364643429879093,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
         "trace_id": 328098691140313455314272792455481136950,
         "span_id": 8741777053539239902,
+=======
+        "trace_id": 22383283792740119736535387292755268694,
+        "span_id": 15839130850711958450,
+>>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
         "is_remote": false,
         "trace_flags": {
           "value": 0
