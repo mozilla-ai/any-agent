@@ -22,6 +22,7 @@ from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from any_agent.tracing.exporter import _ConsoleExporter
+from tests.integration.helpers import DEFAULT_MODEL_ID
 
 
 def uvx_installed() -> bool:
@@ -182,7 +183,7 @@ def test_load_and_run_agent(
         with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
             f.write(text)
 
-    kwargs["model_id"] = "gpt-4.1-mini"
+    kwargs["model_id"] = DEFAULT_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
