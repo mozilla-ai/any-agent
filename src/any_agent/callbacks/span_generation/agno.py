@@ -100,7 +100,8 @@ class _AgnoSpanGeneration(Callback):
         trace_id = get_current_span().get_span_context().trace_id
         span: Span = context[f"call_llm-{trace_id}"]
 
-        _set_llm_output(result[0], span)
+        if assistant_message := kwargs.get("assistant_message"):
+            _set_llm_output(assistant_message, span)
         span.set_status(StatusCode.OK)
 
         return context
