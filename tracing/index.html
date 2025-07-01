@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../images/any-agent_favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
     
     
       
@@ -1134,7 +1134,7 @@
 
 
   
-    <a href="https://github.com/mozilla-ai/any-agent/edit/main/docs/tracing.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/mozilla-ai/any-agent/edit/main/docs/tracing.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -4205,7 +4205,7 @@
 </span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>  <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
 </span></code></pre></div>
 <h2 id="adding-an-opentelemetry-exporter">Adding an OpenTelemetry exporter</h2>
-<p>Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed. Note that this does not affect the existing processor that returns the traces to the user, and optionally prints them on <code>stdout</code>. Note that due to the breaking changes in the <a href="https://protobuf.dev/news/2022-05-06/#python-updates">protocol buffer Python implementation</a>, it may be necessary to use a pure Python implementation by using <code>PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python</code> in the environment.</p>
+<p>Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed. Note that this does not affect the existing processor that returns the traces to the user, and optionally prints them on <code>stdout</code>.</p>
 <p>The following code will use the OpenTelemetry Python SDK to send the agent traces to an additional endpoint using OTLP over HTTP in the indicated URL:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry.trace</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_tracer_provider</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">opentelemetry.sdk.trace.export</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSpanProcessor</span>
@@ -4268,7 +4268,7 @@
       <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.tabs.link", "content.action.edit"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      <script src="../assets/javascripts/bundle.56ea9cef.min.js"></script>
       
     
   </body>
