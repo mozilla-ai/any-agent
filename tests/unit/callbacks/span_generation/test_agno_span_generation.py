@@ -2,8 +2,7 @@ from unittest.mock import MagicMock
 
 from agno.models.message import Message
 
-from any_agent.tracing.instrumentation.agno import (
-    _AgnoInstrumentor,
+from any_agent.callbacks.span_generation.agno import (
     _set_llm_input,
     _set_llm_output,
 )
@@ -27,7 +26,3 @@ def test_set_llm_output_missing_fields() -> None:
     span.set_attributes.assert_called_once_with(
         {"gen_ai.usage.input_tokens": 0, "gen_ai.usage.output_tokens": 0}
     )
-
-
-def test_uninstrument_before_instrument() -> None:
-    _AgnoInstrumentor().uninstrument(MagicMock())

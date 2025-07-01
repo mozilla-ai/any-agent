@@ -1,9 +1,9 @@
 from unittest.mock import MagicMock
 
-from agents.tracing.span_data import GenerationSpanData
+from google.adk.models.llm_request import LlmRequest
+from google.adk.models.llm_response import LlmResponse
 
-from any_agent.tracing.instrumentation.openai import (
-    _OpenAIAgentsInstrumentor,
+from any_agent.callbacks.span_generation.google import (
     _set_llm_input,
     _set_llm_output,
 )
@@ -12,7 +12,7 @@ from any_agent.tracing.instrumentation.openai import (
 def test_set_llm_input_missing_fields() -> None:
     """It should not fail when missing fields."""
     span = MagicMock()
-    _set_llm_input(GenerationSpanData(), span)
+    _set_llm_input(LlmRequest(), span)
 
     span.set_attribute.assert_not_called()
 
@@ -20,10 +20,6 @@ def test_set_llm_input_missing_fields() -> None:
 def test_set_llm_output_missing_fields() -> None:
     """It should not fail when missing fields."""
     span = MagicMock()
-    _set_llm_output(GenerationSpanData(), span)
+    _set_llm_output(LlmResponse(), span)
 
     span.set_attributes.assert_not_called()
-
-
-def test_uninstrument_before_instrument() -> None:
-    _OpenAIAgentsInstrumentor().uninstrument(MagicMock())

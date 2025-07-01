@@ -4,8 +4,7 @@ from langchain_core.messages import BaseMessage
 from langchain_core.outputs import LLMResult
 from langchain_core.outputs.generation import Generation
 
-from any_agent.tracing.instrumentation.langchain import (
-    _LangChainInstrumentor,
+from any_agent.callbacks.span_generation.langchain import (
     _set_llm_input,
     _set_llm_output,
 )
@@ -27,7 +26,3 @@ def test_set_llm_output_missing_fields() -> None:
     _set_llm_output(LLMResult(generations=[[Generation(text="")]]), span)
 
     span.set_attributes.assert_not_called()
-
-
-def test_uninstrument_before_instrument() -> None:
-    _LangChainInstrumentor().uninstrument(MagicMock())

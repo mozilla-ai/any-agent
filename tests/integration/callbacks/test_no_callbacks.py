@@ -6,7 +6,7 @@ from any_agent.tools import search_tavily
 from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID
 
 
-def test_no_instrument(
+def test_no_callbacks(
     agent_framework: AgentFramework,
 ) -> None:
     model_id = DEFAULT_SMALL_MODEL_ID
@@ -26,15 +26,14 @@ def test_no_instrument(
             instructions="Use the available tools search the web for answers.",
             model_args=model_args,
             model_id=model_id,
+            callbacks=None,
             tools=[search_tavily],
         ),
     )
 
-    assert agent._instrumentor
+    assert agent._wrapper is None
 
-    agent_trace = agent.run(
-        "How is the weather in Salvaterra de Miño?", instrument=False
-    )
+    agent_trace = agent.run("How is the weather in Salvaterra de Miño?")
 
     assert not any(
         span.is_llm_call() or span.is_tool_execution() for span in agent_trace.spans
