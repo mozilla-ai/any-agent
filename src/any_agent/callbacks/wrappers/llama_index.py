@@ -32,7 +32,7 @@ class _LlamaIndexWrapper:
         self._original_take_step = agent._agent.take_step
 
         async def wrap_take_step(
-            ctx: Context,
+            ctx: Context[Any],
             llm_input: list[ChatMessage],
             tools: Sequence[AsyncBaseTool],
             memory: BaseMemory,
