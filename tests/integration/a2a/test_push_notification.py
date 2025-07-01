@@ -1,5 +1,6 @@
 import asyncio
 from uuid import uuid4
+
 import pytest
 import uvicorn
 from a2a.types import (
@@ -23,18 +24,16 @@ from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server_async
 from .conftest import DEFAULT_LONG_TIMEOUT, a2a_client_from_agent
 
 
-
 @pytest.mark.asyncio
 async def test_push_notification_non_streaming() -> None:
     """Test that the A2A server can send push notifications to a configured webhook.
-    
+
     In non-streaming mode, the A2A server will send a single push notification at the end of message,
     which corresponds the the 'final' event in the TaskUpdater.
-    
+
     """
     # Storage for notifications received by the webhook
     received_notifications = []
-
 
     async def webhook_handler(request: Request) -> JSONResponse:
         """Handle webhook notifications from the A2A server."""
@@ -70,7 +69,9 @@ async def test_push_notification_non_streaming() -> None:
     )
 
     # Set up webhook server
-    webhook_app = Starlette(routes=[Route("/webhook", webhook_handler, methods=["GET", "POST"])])
+    webhook_app = Starlette(
+        routes=[Route("/webhook", webhook_handler, methods=["GET", "POST"])]
+    )
 
     # Start webhook server on available port - bind to all interfaces for better accessibility
     webhook_config = uvicorn.Config(webhook_app, port=0)
@@ -80,11 +81,9 @@ async def test_push_notification_non_streaming() -> None:
     # Wait for webhook server to start and get its port
     await asyncio.sleep(0.5)  # Give server more time to start
     webhook_port = webhook_server.servers[0].sockets[0].getsockname()[1]
-    
+
     webhook_url = f"http://localhost:{webhook_port}/webhook"
-    
-    print(f"Using webhook URL: {webhook_url}")
-    
+
     await wait_for_server_async(webhook_url)
 
     try:
@@ -116,7 +115,7 @@ async def test_push_notification_non_streaming() -> None:
 
             request_1 = SendMessageRequest(id=str(uuid4()), params=params)
             response_1 = await client.send_message(request_1)
-            task_id =  response_1.root.result.id
+            task_id = response_1.root.result.id
             params.message.taskId = task_id
 
             # Send another message to the same task to trigger notifications
