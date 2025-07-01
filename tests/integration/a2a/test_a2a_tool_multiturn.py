@@ -235,7 +235,7 @@ async def test_a2a_tool_multiturn() -> None:
             request_1 = SendMessageRequest(
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_1)
             )
-            response_1 = await client.send_message(request_1)
+            response_1 = await client.send_message(request_1, http_kwargs={"timeout": 30.0})
 
             assert response_1 is not None
             result = UserInfo.model_validate_json(
@@ -262,7 +262,7 @@ async def test_a2a_tool_multiturn() -> None:
             request_2 = SendMessageRequest(
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_2)
             )
-            response_2 = await client.send_message(request_2)
+            response_2 = await client.send_message(request_2, http_kwargs={"timeout": 30.0})
 
             assert response_2 is not None
             result = UserInfo.model_validate_json(
@@ -286,7 +286,7 @@ async def test_a2a_tool_multiturn() -> None:
             request_3 = SendMessageRequest(
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_3)
             )
-            response_3 = await client.send_message(request_3)
+            response_3 = await client.send_message(request_3, http_kwargs={"timeout": 30.0})
             assert response_3 is not None
             result = UserInfo.model_validate_json(
                 response_3.root.result.status.message.parts[0].root.text
