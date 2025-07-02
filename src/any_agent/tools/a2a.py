@@ -46,6 +46,13 @@ async def a2a_tool_async(
         msg = "You need to `pip install 'any-agent[a2a]'` to use this tool"
         raise ImportError(msg)
 
+    if http_kwargs is None:
+        http_kwargs = {}
+
+    # Default timeout in httpx is 5 seconds. For an agent response, the default should be more lenient.
+    if "timeout" not in http_kwargs:
+        http_kwargs["timeout"] = 30.0
+
     async with httpx.AsyncClient(follow_redirects=True) as resolver_client:
         a2a_agent_card: AgentCard = await (
             A2ACardResolver(httpx_client=resolver_client, base_url=url)
