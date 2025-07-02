@@ -1,4 +1,20 @@
-from typing import TYPE_CHECKING, override
+import sys
+
+PYTHONEGT312 = sys.version_info >= (3, 12)
+
+from typing import TYPE_CHECKING
+
+if PYTHONEGT312:
+    from typing import override
+else:
+    from collections.abc import Callable
+    from typing import Any, TypeVar
+
+    F = TypeVar("F", bound=Callable[..., Any])
+
+    def override(func: F, /) -> F:  # noqa: D103
+        return func
+
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
