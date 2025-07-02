@@ -368,10 +368,13 @@ async def test_a2a_tool_multiturn_async() -> None:
         prompt = f"""
         Please talk to the structured UserInfo agent and interact with it. You'll contact it to ask three questions. Say the exact words from the prompt in your query to the agent.
 
-        1. {FIRST_TURN_PROMPT}. Provide neither the context id nor the task id.
-        2. {SECOND_TURN_PROMPT}. Provide the context id but omit the task id.
-        3. {THIRD_TURN_PROMPT}. Provide both the context id and the task id.
+        1. {FIRST_TURN_PROMPT}
+        2. {SECOND_TURN_PROMPT}
+        3. {THIRD_TURN_PROMPT}
 
+        For question 1, when calling the tool, do not provide the context id or the task id.
+        For question 2, when calling the tool, provide the context id but omit the task id.
+        For question 3, when calling the tool, provide both the context id and the task id.
         """
 
         agent_trace = await main_agent.run_async(prompt)
