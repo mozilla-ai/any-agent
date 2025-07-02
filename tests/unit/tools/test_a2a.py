@@ -210,15 +210,16 @@ async def test_handles_task_response() -> None:
         tool,
         mock_client,
     ):
-        result = await tool("Test query")
+        result = await tool("Test query", None, None)
 
-        # Verify the result is the formatted string response
-        expected_result = (
-            f"Status: {task_response.status.state}\n\n"
-            f"Message: Task completed successfully\n\n"
-            f"TaskId: {task_response.status.message.taskId}\n\n"
-            f"Timestamp: {task_response.status.timestamp}\n\n"
-        )
+        # Verify the result is the expected dictionary format
+        expected_result = {
+            "task_id": task_response.status.message.taskId,
+            "context_id": task_response.status.message.contextId,
+            "timestamp": task_response.status.timestamp,
+            "status": task_response.status.state,
+            "message": {"Task completed successfully"},
+        }
         assert result == expected_result
         mock_client.send_message.assert_called_once()
 
@@ -229,13 +230,13 @@ async def test_handles_error_response() -> None:
     error_response = create_error_response()
 
     async with mock_a2a_tool(mock_agent_card(), error_response) as (tool, mock_client):
-        result = await tool("Test query that will fail")
+        result = await tool("Test query that will fail", None, None)
 
-        # Verify the result is the formatted error string
-        expected_result = (
-            f"Error: {error_response.error.message}\n\n"
-            f"Code: {error_response.error.code}\n\n"
-            f"Data: {error_response.error.data}\n\n"
-        )
+        # Verify the result is the expected error dictionary format
+        expected_result = {
+            "error": error_response.error.message,
+            "code": error_response.error.code,
+            "data": error_response.error.data,
+        }
         assert result == expected_result
         mock_client.send_message.assert_called_once()

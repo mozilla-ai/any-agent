@@ -3,7 +3,7 @@
 import re
 from collections.abc import Callable, Coroutine
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 from uuid import uuid4
 
 from any_agent.utils.asyncio_sync import run_async_in_sync
@@ -28,8 +28,8 @@ with suppress(ImportError):
 
 
 async def a2a_tool_async(
-    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
-) -> Callable[[str], Coroutine[Any, Any, str]]:
+    url: str, toolname: Optional[str] = None, http_kwargs: dict[str, Any] | None = None
+) -> Callable[[str, Optional[str], Optional[str]], Coroutine[Any, Any, dict[str, Any]]]:
     """Perform a query using A2A to another agent.
 
     Args:
@@ -46,12 +46,25 @@ async def a2a_tool_async(
         msg = "You need to `pip install 'any-agent[a2a]'` to use this tool"
         raise ImportError(msg)
 
+    if http_kwargs is None:
+        http_kwargs = {}
+
+    # Default timeout in httpx is 5 seconds. For an agent response, the default should be more lenient.
+    if "timeout" not in http_kwargs:
+        http_kwargs["timeout"] = 30.0
+
     async with httpx.AsyncClient(follow_redirects=True) as resolver_client:
         a2a_agent_card: AgentCard = await (
             A2ACardResolver(httpx_client=resolver_client, base_url=url)
         ).get_agent_card()
 
-    async def _send_query(query: str, task_id: str = str(uuid4())) -> str:
+    # NOTE: Use Optional[T] instead of T | None syntax throughout this module.
+    # Google ADK's _parse_schema_from_parameter function has compatibility
+    # with the traditional Optional[T] syntax for automatic function calling.
+    # Using T | None syntax causes"Failed to parse the parameter ... for automatic function calling"
+    async def _send_query(
+        query: str, task_id: Optional[str], context_id: Optional[str]
+    ) -> dict[str, Any]:
         async with httpx.AsyncClient(follow_redirects=True) as query_client:
             client = A2AClient(httpx_client=query_client, agent_card=a2a_agent_card)
             send_message_payload = SendMessageRequest(
@@ -63,6 +76,7 @@ async def a2a_tool_async(
                         # the id is not currently tracked
                         messageId=str(uuid4().hex),
                         taskId=task_id,
+                        contextId=context_id,
                     )
                 ),
             )
@@ -79,20 +93,27 @@ async def a2a_tool_async(
                 raise ValueError(msg)
 
             if hasattr(response.root, "error"):
-                response_str = ""
-                response_str += f"Error: {response.root.error.message}\n\n"
-                response_str += f"Code: {response.root.error.code}\n\n"
-                response_str += f"Data: {response.root.error.data}\n\n"
+                response_dict = {
+                    "error": response.root.error.message,
+                    "code": response.root.error.code,
+                    "data": response.root.error.data,
+                }
             elif hasattr(response.root, "result"):
-                response_str = ""
-                response_str += f"Status: {response.root.result.status.state}\n\n"
-                response_str += f"""Message: {" ".join([part.root.text for part in response.root.result.status.message.parts if part.root.kind == "text"])}\n\n"""
-                response_str += (
-                    f"TaskId: {response.root.result.status.message.taskId}\n\n"
-                )
-                response_str += (
-                    f"Timestamp: {response.root.result.status.timestamp}\n\n"
-                )
+                response_dict = {
+                    "task_id": response.root.result.status.message.taskId,
+                    "context_id": response.root.result.status.message.contextId,
+                    "timestamp": response.root.result.status.timestamp,
+                    "status": response.root.result.status.state,
+                    "message": {
+                        " ".join(
+                            [
+                                part.root.text
+                                for part in response.root.result.status.message.parts
+                                if part.root.kind == "text"
+                            ]
+                        )
+                    },
+                }
             else:
                 msg = (
                     "The A2A agent did not return a error or a result. Are you using an A2A agent not managed by any-agent? "
@@ -100,7 +121,7 @@ async def a2a_tool_async(
                 )
                 raise ValueError(msg)
 
-            return response_str
+            return response_dict
 
     new_name = toolname or a2a_agent_card.name
     new_name = re.sub(r"\s+", "_", new_name.strip())
@@ -111,18 +132,26 @@ async def a2a_tool_async(
         Agent description: {a2a_agent_card.description}
 
         Args:
-            query (str): The query to perform.
-            task_id (str): The task id to use for the conversation. Defaults to a new uuid. If you want to continue the conversation, you should provide the same task id that you received in a previous response.
+            query (str): The query to send to the agent.
+            task_id (str, optional): Task ID for continuing an incomplete task. Use the same
+                task_id from a previous response with TaskState.input_required to resume the task. If you want to start a new task, you should not provide a task id.
+            context_id (str, optional): Context ID for conversation continuity. Provides the
+                agent with conversation history. Omit to start a fresh conversation. If you want to start a new conversation, you should not provide a context id.
 
         Returns:
-            The result from the A2A agent, encoded as a json string.
+            dict: Response from the A2A agent containing:
+                - For successful responses: task_id, context_id, timestamp, status, and message
+                - For errors: error message, code, and data
+
+        Note:
+            If TaskState is terminal (completed/failed), do not reuse the same task_id.
     """
     return _send_query
 
 
 def a2a_tool(
-    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
-) -> Callable[[str], str]:
+    url: str, toolname: Optional[str] = None, http_kwargs: dict[str, Any] | None = None
+) -> Callable[[str, Optional[str], Optional[str]], str]:
     """Perform a query using A2A to another agent (synchronous version).
 
     Args:
@@ -142,9 +171,11 @@ def a2a_tool(
     # Fetch the async tool upfront to get proper name and documentation (otherwise the tool doesn't have the right name and documentation)
     async_tool = run_async_in_sync(a2a_tool_async(url, toolname, http_kwargs))
 
-    def sync_wrapper(query: str) -> Any:
+    def sync_wrapper(
+        query: str, task_id: Optional[str], context_id: Optional[str]
+    ) -> Any:
         """Execute the A2A tool query synchronously."""
-        return run_async_in_sync(async_tool(query))
+        return run_async_in_sync(async_tool(query, task_id, context_id))
 
     # Copy essential metadata from the async tool
     sync_wrapper.__name__ = async_tool.__name__

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from any_agent.serving import A2AServingConfig
 
 
-class TaskData:
+class ContextData:
     """Data stored for each task."""
 
     def __init__(self, task_id: str):
@@ -43,68 +43,67 @@ class TaskData:
         return datetime.now() > expiration_time
 
 
-class TaskManager:
-    """Manages agent conversation tasks for multi-turn interactions."""
+class ContextManager:
+    """Manages agent conversation context for multi-turn interactions."""
 
     def __init__(self, config: "A2AServingConfig"):
-        """Initialize the task manager.
+        """Initialize the context manager.
 
         Args:
-            config: Serving configuration containing task settings
+            config: Serving configuration containing context settings
 
         """
         self.config = config
-        self._tasks: dict[str, TaskData] = {}
+        self._tasks: dict[str, ContextData] = {}
         self._last_cleanup: datetime | None = None
 
-    def add_task(self, task_id: str) -> None:
-        """Store a new task.
+    def add_context(self, context_id: str) -> None:
+        """Store a new context.
 
-        This method will also trigger cleanup of expired tasks if it hasn't
-        run recently (based on task_cleanup_interval_minutes).
+        This method will also trigger cleanup of expired context
 
         """
-        self._cleanup_expired_tasks()
+        self._cleanup_expired_contexts()
 
-        self._tasks[task_id] = TaskData(task_id)
-        logger.debug("Created new task: %s", task_id)
+        self._tasks[context_id] = ContextData(context_id)
+        logger.debug("Created new context: %s", context_id)
 
-    def _get_task(self, task_id: str) -> TaskData | None:
-        """Get task data by ID.
+    def get_context(self, context_id: str) -> ContextData | None:
+        """Get context data by ID.
 
         Args:
-            task_id: Task ID to retrieve
+            context_id: context ID to retrieve
 
         Returns:
-            TaskData if found and not expired, None otherwise
+            ContextData if found and not expired, None otherwise
 
         """
-        task = self._tasks.get(task_id)
-        if not task:
+        context = self._tasks.get(context_id)
+        if not context:
             return None
 
-        if task.is_expired(self.config.task_timeout_minutes):
-            logger.debug("Task %s expired, removing", task_id)
-            self._tasks.pop(task_id, None)
+        if context.is_expired(self.config.context_timeout_minutes):
+            logger.debug("context %s expired, removing", context_id)
+            self._tasks.pop(context_id, None)
             return None
 
-        task.update_activity()
-        return task
+        context.update_activity()
+        return context
 
-    def update_task_trace(
-        self, task_id: str, agent_trace: AgentTrace, original_query: str
+    def update_context_trace(
+        self, context_id: str, agent_trace: AgentTrace, original_query: str
     ) -> None:
-        """Update the agent trace for a task.
+        """Update the agent trace for a context.
 
         Args:
-            task_id: Task ID to update
+            context_id: context ID to update
             agent_trace: New agent trace to merge/store
             original_query: The original user query (without history formatting)
 
         """
-        task = self._get_task(task_id)
-        if not task:
-            logger.warning("Attempted to update non-existent task: %s", task_id)
+        context = self.get_context(context_id)
+        if not context:
+            logger.warning("Attempted to update non-existent context: %s", context_id)
             return
 
         messages = agent_trace.spans_to_messages()
@@ -127,55 +126,55 @@ class TaskManager:
 
         # Update the content of the first user message with the original query
         messages[first_user_index].content = original_query
-        task.conversation_history.extend(messages)
+        context.conversation_history.extend(messages)
 
-        task.update_activity()
+        context.update_activity()
 
-    def format_query_with_history(self, task_id: str, current_query: str) -> str:
+    def format_query_with_history(self, context_id: str, current_query: str) -> str:
         """Format a query with conversation history.
 
         Args:
-            task_id: Task ID to get history for
+            context_id: context ID to get history for
             current_query: Current user query
 
         Returns:
             Formatted query string with history context
 
         """
-        task = self._get_task(task_id)
-        if not task:
+        context = self.get_context(context_id)
+        if not context:
             return current_query
 
         # Use stored conversation history (already AgentMessage objects)
-        history = task.conversation_history
+        history = context.conversation_history
         return self.config.history_formatter(history, current_query)
 
-    def remove_task(self, task_id: str) -> None:
-        """Remove a task.
+    def remove_context(self, context_id: str) -> None:
+        """Remove a context.
 
         Args:
-            task_id: Task ID to remove
+            context_id: context ID to remove
 
         """
-        if task_id in self._tasks:
-            del self._tasks[task_id]
-            logger.info("Removed task: %s", task_id)
+        if context_id in self._tasks:
+            del self._tasks[context_id]
+            logger.info("Removed context: %s", context_id)
 
-    def _cleanup_expired_tasks(self) -> None:
-        """Clean up expired tasks."""
-        expired_tasks = []
+    def _cleanup_expired_contexts(self) -> None:
+        """Clean up expired contexts."""
+        expired_contexts = []
 
-        for task_id, task in self._tasks.items():
-            if task.is_expired(self.config.task_timeout_minutes):
-                expired_tasks.append(task_id)
+        for context_id, context in self._tasks.items():
+            if context.is_expired(self.config.context_timeout_minutes):
+                expired_contexts.append(context_id)
 
-        for task_id in expired_tasks:
-            self.remove_task(task_id)
+        for context_id in expired_contexts:
+            self.remove_context(context_id)
 
         # Update last cleanup time
         self._last_cleanup = datetime.now()
 
-        if expired_tasks:
-            logger.info("Cleaned up %d expired tasks", len(expired_tasks))
+        if expired_contexts:
+            logger.info("Cleaned up %d expired contexts", len(expired_contexts))
         else:
-            logger.debug("No expired tasks to clean up")
+            logger.debug("No expired contexts to clean up")

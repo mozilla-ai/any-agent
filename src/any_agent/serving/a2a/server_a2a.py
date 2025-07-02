@@ -10,7 +10,7 @@ from a2a.server.tasks import InMemoryTaskStore
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
-from any_agent.serving.a2a.task_manager import TaskManager
+from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.server_handle import ServerHandle
 from any_agent.utils import run_async_in_sync
 
@@ -31,7 +31,7 @@ def _get_a2a_app(
     agent = prepare_agent_for_a2a(agent)
 
     agent_card = _get_agent_card(agent, serving_config)
-    task_manager = TaskManager(serving_config)
+    task_manager = ContextManager(serving_config)
 
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
@@ -47,7 +47,7 @@ async def _get_a2a_app_async(
     agent = await prepare_agent_for_a2a_async(agent)
 
     agent_card = _get_agent_card(agent, serving_config)
-    task_manager = TaskManager(serving_config)
+    task_manager = ContextManager(serving_config)
 
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
