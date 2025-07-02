@@ -1118,6 +1118,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#any_agent.serving.A2AServingConfig.context_timeout_minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      context_timeout_minutes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#any_agent.serving.A2AServingConfig.endpoint" class="md-nav__link">
     <span class="md-ellipsis">
       endpoint
@@ -1175,15 +1184,6 @@
   <a href="#any_agent.serving.A2AServingConfig.task_cleanup_interval_minutes" class="md-nav__link">
     <span class="md-ellipsis">
       task_cleanup_interval_minutes
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#any_agent.serving.A2AServingConfig.task_timeout_minutes" class="md-nav__link">
-    <span class="md-ellipsis">
-      task_timeout_minutes
     </span>
   </a>
   
@@ -1638,6 +1638,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#any_agent.serving.A2AServingConfig.context_timeout_minutes" class="md-nav__link">
+    <span class="md-ellipsis">
+      context_timeout_minutes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#any_agent.serving.A2AServingConfig.endpoint" class="md-nav__link">
     <span class="md-ellipsis">
       endpoint
@@ -1695,15 +1704,6 @@
   <a href="#any_agent.serving.A2AServingConfig.task_cleanup_interval_minutes" class="md-nav__link">
     <span class="md-ellipsis">
       task_cleanup_interval_minutes
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#any_agent.serving.A2AServingConfig.task_timeout_minutes" class="md-nav__link">
-    <span class="md-ellipsis">
-      task_timeout_minutes
     </span>
   </a>
   
@@ -2691,7 +2691,7 @@ you can pass <code>tools=["read_file", "list_directory"]</code> to limit the age
             description="Search the web for information"
         )
     ],
-    task_timeout_minutes=15
+    context_timeout_minutes=15
 )</p>
 </details>
 
@@ -2765,7 +2765,7 @@ you can pass <code>tools=["read_file", "list_directory"]</code> to limit the age
 </span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">                    description=&quot;Search the web for information&quot;</span>
 </span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">                )</span>
 </span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">            ],</span>
-</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">            task_timeout_minutes=15</span>
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">            context_timeout_minutes=15</span>
 </span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">        )</span>
 </span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58"></a>
 </span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -2792,8 +2792,8 @@ you can pass <code>tools=["read_file", "list_directory"]</code> to limit the age
 </span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a>
 </span><span id="__span-0-81"><a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span>
 </span><span id="__span-0-82"><a id="__codelineno-0-82" name="__codelineno-0-82"></a>
-</span><span id="__span-0-83"><a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="n">task_timeout_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
-</span><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Task timeout in minutes. Tasks will be cleaned up after this period of inactivity.&quot;&quot;&quot;</span>
+</span><span id="__span-0-83"><a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="n">context_timeout_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+</span><span id="__span-0-84"><a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Context timeout in minutes. Contexts will be cleaned up after this period of inactivity.&quot;&quot;&quot;</span>
 </span><span id="__span-0-85"><a id="__codelineno-0-85" name="__codelineno-0-85"></a>
 </span><span id="__span-0-86"><a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="n">history_formatter</span><span class="p">:</span> <span class="n">HistoryFormatter</span> <span class="o">=</span> <span class="n">default_history_formatter</span>
 </span><span id="__span-0-87"><a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to format conversation history and current query into a single prompt.</span>
@@ -2813,6 +2813,29 @@ you can pass <code>tools=["read_file", "list_directory"]</code> to limit the age
 
 
 
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="any_agent.serving.A2AServingConfig.context_timeout_minutes" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">context_timeout_minutes</span> <span class="o">=</span> <span class="mi">10</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Context timeout in minutes. Contexts will be cleaned up after this period of inactivity.</p>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-attribute">
 
@@ -2972,29 +2995,6 @@ Takes (messages, current_query) and returns formatted string.</p>
     <div class="doc doc-contents ">
 
         <p>Interval in minutes between task cleanup runs.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="any_agent.serving.A2AServingConfig.task_timeout_minutes" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">task_timeout_minutes</span> <span class="o">=</span> <span class="mi">10</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Task timeout in minutes. Tasks will be cleaned up after this period of inactivity.</p>
 
     </div>
 
