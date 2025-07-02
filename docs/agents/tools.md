@@ -26,7 +26,7 @@ main_agent = AgentConfig(
 )
 ```
 
-### Agents-as-tools
+### Agents-as-callables
 
 As any callable can be used as a tool, you can wrap calling an agent inside a function and pass it as a tool, as in the following example:
 
@@ -60,6 +60,8 @@ async def main():
         ],
         model_id="gpt-4.1-nano",
     )
+
+    # main agent creation and running would follow
 
 ```
 
@@ -137,3 +139,59 @@ asyncio.run(main())
 ```
 
 The tool description is derived from the agent card, which is retrieved when this function is invoked. View the docstring in [a2a_tool_async][any_agent.tools.a2a_tool_async] or [a2a_tool][any_agent.tools.a2a_tool] for a description of the arguments available.
+
+## Agents-as-tools comparison
+
+The following chart summarizes the different methods to set up an agent as a tool: wrapping it as a callable, serving it via A2A, and serving it via MCP:
+
+=== "Agent as callable"
+
+    ```python
+    async def callable_agent_as_tool(query: str) -> str:
+        out = await callable_agent.run_async(prompt=query)
+        return str(out.final_output)
+
+    callable_agent_as_tool.__doc__ = callable_agent.config.description
+
+    main_agent_cfg = AgentConfig(
+        tools=[
+            callable_agent_as_tool
+        ],
+        ...
+    )
+
+    ```
+
+=== "Agent as MCP"
+
+    ```python
+    mcp_handle = mcp_agent.serve_async(MCPServingConfig(port=sse_port,endpoint=sse_endpoint))
+
+    main_agent = AgentConfig(
+        tools=[
+            MCPSse(
+                url=f"http://localhost:{sse_port}/{sse_endpoint}"
+            ),
+        ],
+        ...
+    )
+    ```
+
+=== "Agent as A2A"
+
+    ```python
+    a2a_agent = AnyAgent.create(
+        ...
+    )
+
+    a2a_handle = a2a_agent.serve_async(A2AServingConfig(port=sse_port,endpoint=sse_endpoint))
+
+    a2a_agent_tool = await a2a_tool_async("http://example.net:10000/some_agent")
+
+    agent_cfg = AgentConfig(
+        tools=[
+            a2a_agent_tool
+        ],
+    )
+
+    ```
