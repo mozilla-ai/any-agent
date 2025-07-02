@@ -7,11 +7,22 @@ from typing import TYPE_CHECKING
 if PYTHONEGT312:
     from typing import override
 else:
+    # Fix for Python 3.11
+    # We will define a "noop" decorator that
+    # returns the same function
+    # Trying to modify decorators in place depending
+    # on the python version is much more cumbersome
     from collections.abc import Callable
     from typing import Any, TypeVar
 
+    # For any function that takes some params
+    # and returns whatever (upper bound)....
     F = TypeVar("F", bound=Callable[..., Any])
 
+    # ...we ensure that the decorator returns a function
+    # with the same type constraints (basically,
+    # because it's the same function), and that
+    # the decorator doesn't require any extra info
     def override(func: F, /) -> F:  # noqa: D103
         return func
 
