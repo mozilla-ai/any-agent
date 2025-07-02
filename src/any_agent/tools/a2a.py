@@ -63,7 +63,7 @@ async def a2a_tool_async(
     # with the traditional Optional[T] syntax for automatic function calling.
     # Using T | None syntax causes"Failed to parse the parameter ... for automatic function calling"
     async def _send_query(
-        query: str, task_id: Optional[str], context_id: Optional[str]
+        query: str, task_id: Optional[str] = None, context_id: Optional[str] = None
     ) -> dict[str, Any]:
         async with httpx.AsyncClient(follow_redirects=True) as query_client:
             client = A2AClient(httpx_client=query_client, agent_card=a2a_agent_card)
