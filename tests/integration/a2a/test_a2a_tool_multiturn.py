@@ -273,8 +273,8 @@ async def test_a2a_tool_multiturn() -> None:
 
             assert response_2 is not None
             # if the response is JSONRPCErrorResposne, log and raise an error
-            if hasattr(response_1.root, "error"):
-                msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
+            if hasattr(response_2.root, "error"):
+                msg = f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
                 response_2.root.result.status.message.parts[0].root.text
@@ -290,8 +290,8 @@ async def test_a2a_tool_multiturn() -> None:
                     "role": "user",
                     "parts": [{"kind": "text", "text": THIRD_TURN_PROMPT}],
                     "messageId": str(uuid4()),
-                    "contextId": response_1.root.result.contextId,  # Same context to continue conversation
-                    "taskId": response_1.root.result.id,
+                    "contextId": response_2.root.result.contextId,  # Same context to continue conversation
+                    "taskId": response_2.root.result.id,
                 },
             }
             request_3 = SendMessageRequest(
@@ -302,8 +302,8 @@ async def test_a2a_tool_multiturn() -> None:
             )
             assert response_3 is not None
             # if the response is JSONRPCErrorResposne, log and raise an error
-            if hasattr(response_1.root, "error"):
-                msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
+            if hasattr(response_3.root, "error"):
+                msg = f"Error: {response_3.root.error.message}, Code: {response_3.root.error.code}, Data: {response_3.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
                 response_3.root.result.status.message.parts[0].root.text

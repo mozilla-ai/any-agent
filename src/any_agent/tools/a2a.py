@@ -3,7 +3,7 @@
 import re
 from collections.abc import Callable, Coroutine
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 from uuid import uuid4
 
 from any_agent.utils.asyncio_sync import run_async_in_sync
@@ -28,8 +28,8 @@ with suppress(ImportError):
 
 
 async def a2a_tool_async(
-    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
-) -> Callable[[str], Coroutine[Any, Any, dict[str, Any]]]:
+    url: str, toolname: Optional[str] = None, http_kwargs: dict[str, Any] | None = None
+) -> Callable[[str, Optional[str], Optional[str]], Coroutine[Any, Any, dict[str, Any]]]:
     """Perform a query using A2A to another agent.
 
     Args:
@@ -63,7 +63,7 @@ async def a2a_tool_async(
     # with the traditional Optional[T] syntax for automatic function calling.
     # Using T | None syntax causes"Failed to parse the parameter ... for automatic function calling"
     async def _send_query(
-        query: str, task_id: str | None = None, context_id: str | None = None
+        query: str, task_id: Optional[str], context_id: Optional[str]
     ) -> dict[str, Any]:
         async with httpx.AsyncClient(follow_redirects=True) as query_client:
             client = A2AClient(httpx_client=query_client, agent_card=a2a_agent_card)
@@ -134,9 +134,9 @@ async def a2a_tool_async(
         Args:
             query (str): The query to send to the agent.
             task_id (str, optional): Task ID for continuing an incomplete task. Use the same
-                task_id from a previous response with TaskState.input_required to resume the task.
+                task_id from a previous response with TaskState.input_required to resume the task. If you want to start a new task, you should not provide a task id.
             context_id (str, optional): Context ID for conversation continuity. Provides the
-                agent with conversation history. Omit to start a fresh conversation.
+                agent with conversation history. Omit to start a fresh conversation. If you want to start a new conversation, you should not provide a context id.
 
         Returns:
             dict: Response from the A2A agent containing:
@@ -150,8 +150,8 @@ async def a2a_tool_async(
 
 
 def a2a_tool(
-    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
-) -> Callable[[str], str]:
+    url: str, toolname: Optional[str] = None, http_kwargs: dict[str, Any] | None = None
+) -> Callable[[str, Optional[str], Optional[str]], str]:
     """Perform a query using A2A to another agent (synchronous version).
 
     Args:
@@ -171,9 +171,11 @@ def a2a_tool(
     # Fetch the async tool upfront to get proper name and documentation (otherwise the tool doesn't have the right name and documentation)
     async_tool = run_async_in_sync(a2a_tool_async(url, toolname, http_kwargs))
 
-    def sync_wrapper(query: str) -> Any:
+    def sync_wrapper(
+        query: str, task_id: Optional[str], context_id: Optional[str]
+    ) -> Any:
         """Execute the A2A tool query synchronously."""
-        return run_async_in_sync(async_tool(query))
+        return run_async_in_sync(async_tool(query, task_id, context_id))
 
     # Copy essential metadata from the async tool
     sync_wrapper.__name__ = async_tool.__name__
