@@ -172,7 +172,7 @@ def a2a_tool(
     async_tool = run_async_in_sync(a2a_tool_async(url, toolname, http_kwargs))
 
     def sync_wrapper(
-        query: str, task_id: Optional[str], context_id: Optional[str]
+        query: str, task_id: Optional[str] = None, context_id: Optional[str] = None
     ) -> Any:
         """Execute the A2A tool query synchronously."""
         return run_async_in_sync(async_tool(query, task_id, context_id))
