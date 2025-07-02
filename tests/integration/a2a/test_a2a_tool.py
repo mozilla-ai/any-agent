@@ -12,7 +12,6 @@ from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server
 
 from .conftest import (
     DATE_PROMPT,
-    DEFAULT_TIMEOUT,
     a2a_client_from_agent,
     assert_contains_current_date_info,
     get_datetime,
@@ -90,11 +89,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
             model_id=DEFAULT_MODEL_ID,
-            tools=[
-                await a2a_tool_async(
-                    server_url, http_kwargs={"timeout": DEFAULT_TIMEOUT}
-                )
-            ],
+            tools=[await a2a_tool_async(server_url)],
             model_args=model_args,
         )
 
@@ -201,7 +196,6 @@ def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
             tools=[
                 a2a_tool(
                     f"http://localhost:{test_port}/{tool_agent_endpoint}",
-                    http_kwargs={"timeout": DEFAULT_TIMEOUT},
                 )
             ],
             model_id=DEFAULT_MODEL_ID,

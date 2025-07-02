@@ -235,7 +235,9 @@ async def test_a2a_tool_multiturn() -> None:
             request_1 = SendMessageRequest(
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_1)
             )
-            response_1 = await client.send_message(request_1)
+            response_1 = await client.send_message(
+                request_1, http_kwargs={"timeout": 30.0}
+            )
 
             assert response_1 is not None
             result = UserInfo.model_validate_json(
@@ -262,7 +264,9 @@ async def test_a2a_tool_multiturn() -> None:
             request_2 = SendMessageRequest(
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_2)
             )
-            response_2 = await client.send_message(request_2)
+            response_2 = await client.send_message(
+                request_2, http_kwargs={"timeout": 30.0}
+            )
 
             assert response_2 is not None
             result = UserInfo.model_validate_json(
@@ -286,7 +290,9 @@ async def test_a2a_tool_multiturn() -> None:
             request_3 = SendMessageRequest(
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_3)
             )
-            response_3 = await client.send_message(request_3)
+            response_3 = await client.send_message(
+                request_3, http_kwargs={"timeout": 30.0}
+            )
             assert response_3 is not None
             result = UserInfo.model_validate_json(
                 response_3.root.result.status.message.parts[0].root.text
@@ -338,7 +344,7 @@ async def test_a2a_tool_multiturn_async() -> None:
             model_id="gpt-4.1-nano",
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
-            tools=[await a2a_tool_async(server_url, http_kwargs={"timeout": 10.0})],
+            tools=[await a2a_tool_async(server_url)],
             output_type=MainAgentAnswer,
             model_args={
                 "parallel_tool_calls": False  # to force it to talk to the agent one call at a time
