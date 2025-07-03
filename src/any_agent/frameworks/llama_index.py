@@ -44,13 +44,17 @@ class LlamaIndexAgent(AnyAgent):
     def _get_model(self, agent_config: AgentConfig) -> "LLM":
         """Get the model configuration for a llama_index agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        additional_kwargs = agent_config.model_args or {}
+        additional_kwargs["stream_options"] = {
+            "include_usage": True
+        }  # Needed so that we get usage stats
         return cast(
             "LLM",
             model_type(
                 model=agent_config.model_id,
                 api_key=agent_config.api_key,
                 api_base=agent_config.api_base,
-                additional_kwargs=agent_config.model_args or {},  # type: ignore[arg-type]
+                additional_kwargs=additional_kwargs,  # type: ignore[arg-type]
             ),
         )
 
