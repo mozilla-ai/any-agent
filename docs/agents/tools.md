@@ -26,9 +26,10 @@ main_agent = AgentConfig(
 )
 ```
 
-### Agents-as-callables
+### Using an Agent as a tool
 
-As any callable can be used as a tool, you can wrap calling an agent inside a function and pass it as a tool, as in the following example:
+If you would like to directly use one agent as a tool for another agent, the simplest way to do this is to wrap
+the first agent inside of a callable and then provide that callable to the second agent as a tool.
 
 ```python
 import asyncio
@@ -36,35 +37,35 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent, AgentTrace
 from any_agent.tools import search_web
 
 async def main():
-    google_agent = AnyAgent.create(
+    google_agent = await AnyAgent.create_async(
         "google",
         AgentConfig(
             name="google_expert",
-            model_id="gpt-4.1-mini",
+            model_id="gpt-4.1-nano",
+            instructions="Use the available tools to answer questions about the Google ADK",
             description="An agent that can answer questions about the Google Agents Development Kit (ADK).",
             tools=[search_web]
         )
     )
 
-    # Note that an agent with structured output
     async def google_agent_as_tool(query: str) -> str:
-        out = await google_agent.run_async(prompt=query)
-        return str(out.final_output)
+        agent_trace = await google_agent.run_async(query)
+        return agent_trace.final_output
 
+    # Callables require a docstring so that they can be properly provided as a tool
     google_agent_as_tool.__doc__ = google_agent.config.description
 
-    main_agent_cfg = AgentConfig(
-        instructions="Use the available tools to obtain additional information to answer the query.",
-        tools=[
-            google_agent_as_tool
-        ],
-        model_id="gpt-4.1-nano",
+    main_agent = await AnyAgent.create_async(
+        "tinyagent",
+        AgentConfig(
+            name="main_agent",
+            model_id="gpt-4.1-nano",
+            instructions="Use the available tools to obtain additional information to answer the query.",
+            tools=[google_agent_as_tool],
+        )
     )
-
-    # main agent creation and running would follow
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    # .... Continue with logic to run and handle return values.
+asyncio.run(main())
 ```
 
 Since the agent will use the function documentation to decide whether it is appropriate to call the tool, we have copied the agent description into the function `__doc__` field. A normal docstring would also work.
