@@ -131,11 +131,12 @@ def assert_eval(agent_trace: AgentTrace) -> None:
         """Get the current year"""
         return str(datetime.now().year)
 
-    result2 = agent_judge.run(
+    eval_trace = agent_judge.run(
         trace=agent_trace,
         question="Did the agent write the current year to a file?",
         additional_tools=[get_current_year],
     )
+    result2 = eval_trace.final_output
     assert isinstance(result2, EvaluationOutput)
     assert result2.passed, (
         f"Expected agent to write current year to file, but evaluation failed: {result2.reasoning}"
