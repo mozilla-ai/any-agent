@@ -63,6 +63,8 @@ async def main():
 
     # main agent creation and running would follow
 
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 Since the agent will use the function documentation to decide whether it is appropriate to call the tool, we have copied the agent description into the function `__doc__` field. A normal docstring would also work.
@@ -142,7 +144,7 @@ The tool description is derived from the agent card, which is retrieved when thi
 
 ## Agents-as-tools comparison
 
-The following chart summarizes the different methods to set up an agent as a tool: wrapping it as a callable, serving it via A2A, and serving it via MCP:
+The following chart summarizes the different methods to set up an agent as a tool: wrapping it as a callable, serving it via MCP, and serving it via A2A:
 
 === "Agent as callable"
 
@@ -184,9 +186,9 @@ The following chart summarizes the different methods to set up an agent as a too
         ...
     )
 
-    a2a_handle = a2a_agent.serve_async(A2AServingConfig(port=sse_port,endpoint=sse_endpoint))
+    a2a_handle = a2a_agent.serve_async(A2AServingConfig(port=a2a_port,endpoint=a2a_endpoint))
 
-    a2a_agent_tool = await a2a_tool_async("http://example.net:10000/some_agent")
+    a2a_agent_tool = await a2a_tool_async(f"http://localhost:{a2a_port}/{a2a_endpoint}")
 
     agent_cfg = AgentConfig(
         tools=[
