@@ -13,6 +13,7 @@ TEST_PENALTY = 0.5
 TEST_QUERY = "what's the state capital of Pennsylvania"
 EXPECTED_OUTPUT = "The state capital of Pennsylvania is Harrisburg."
 
+
 def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
     """Helper function to create an agent with test model arguments"""
     return AnyAgent.create(
@@ -85,4 +86,3 @@ def test_model_args_streaming(
         assert mock_litellm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
         assert mock_litellm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
         assert mock_litellm.call_count > 0
-

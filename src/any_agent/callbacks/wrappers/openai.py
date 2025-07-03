@@ -20,7 +20,6 @@ class _OpenAIAgentsWrapper:
         self._original_invokes: dict[str, Any] = {}
 
     async def wrap(self, agent: OpenAIAgent) -> None:
-
         self._original_llm_call = agent._agent.model.get_response
 
         async def wrapped_llm_call(*args, **kwargs):
@@ -35,7 +34,10 @@ class _OpenAIAgentsWrapper:
             output = await self._original_llm_call(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output,)
+                context = callback.after_llm_call(
+                    context,
+                    output,
+                )
 
             return output
 
@@ -58,7 +60,10 @@ class _OpenAIAgentsWrapper:
             output = await original_invoke(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(context, output,)
+                context = callback.after_tool_execution(
+                    context,
+                    output,
+                )
 
             return output
 

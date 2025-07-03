@@ -11,7 +11,7 @@ will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.ru
 Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.
 
 Each time an agent is run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`agent.run`][any_agent.AnyAgent.run] ), a unique [`Context`][any_agent.callbacks.context.Context] object
-is shared across all callbacks. 
+is shared across all callbacks.
 
 All any-agent agents will populate the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
 property so that the callbacks can access information in a framework-agnostic way. You can check the attributes available
@@ -71,22 +71,22 @@ Callbacks can raise exceptions to stop agent execution. This is useful for imple
 class SafetyGuard(Callback):
     def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         tool_name = context.current_span.attributes.get("gen_ai.tool.name", "")
-        
+
         # Block dangerous tools
         if tool_name in ["delete_file", "execute_code"]:
             raise RuntimeError(f"Tool '{tool_name}' is not allowed for safety reasons")
-        
+
         return context
 
 class ContentFilter(Callback):
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         output = context.current_span.attributes.get("gen_ai.output", "")
-        
+
         # Check for inappropriate content
         inappropriate_words = ["spam", "malware", "hack"]
         if any(word in output.lower() for word in inappropriate_words):
             raise RuntimeError("Generated content contains inappropriate language")
-        
+
         return context
 ```
 
