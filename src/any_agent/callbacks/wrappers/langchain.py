@@ -3,49 +3,54 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from opentelemetry.trace import get_current_span
+
 if TYPE_CHECKING:
     from uuid import UUID
 
     from langchain_core.messages import BaseMessage
     from langchain_core.outputs import LLMResult
 
+    from any_agent.callbacks.context import Context
     from any_agent.frameworks.langchain import LangchainAgent
 
 
 class _LangChainWrapper:
     def __init__(self) -> None:
+        self.callback_context: dict[int, Context] = {}
         self._original_ainvoke: Any | None = None
-        self.context: dict[str, Any] = {}
 
     async def wrap(self, agent: LangchainAgent) -> None:
         from langchain_core.callbacks.base import BaseCallbackHandler
         from langchain_core.runnables import RunnableConfig
 
-        if len(agent._running_traces) > 1:
-            return
-
-        self.context["running_traces"] = agent._running_traces
-        self.context["tracer"] = agent._tracer
-
         def before_llm_call(*args, **kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
             for callback in agent.config.callbacks:
-                self.context = callback.before_llm_call(self.context, *args, **kwargs)
+                context = callback.before_llm_call(context, *args, **kwargs)
 
         def before_tool_execution(*args, **kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
             for callback in agent.config.callbacks:
-                self.context = callback.before_tool_execution(
-                    self.context, *args, **kwargs
-                )
+                context = callback.before_tool_execution(context, *args, **kwargs)
 
         def after_llm_call(*args, **kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
             for callback in agent.config.callbacks:
-                self.context = callback.after_llm_call(self.context, *args, **kwargs)
+                context = callback.after_llm_call(context, *args, **kwargs)
 
         def after_tool_execution(*args, **kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
             for callback in agent.config.callbacks:
-                self.context = callback.after_tool_execution(
-                    self.context, *args, **kwargs
-                )
+                context = callback.after_tool_execution(context, *args, **kwargs)
 
         class _LangChainTracingCallback(BaseCallbackHandler):
             def on_chat_model_start(
@@ -120,7 +125,5 @@ class _LangChainWrapper:
         agent._agent.ainvoke = wrap_ainvoke
 
     async def unwrap(self, agent: LangchainAgent) -> None:
-        if len(agent._running_traces) > 1:
-            return
         if self._original_ainvoke is not None:
             agent._agent.ainvoke = self._original_ainvoke

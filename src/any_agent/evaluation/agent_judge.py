@@ -84,6 +84,7 @@ class AgentJudge:
                 response_schema=self.output_type.model_json_schema()
             ),
             tools=tooling.get_all_tools() + additional_tools,
+            callbacks=None,
             output_type=self.output_type,
             model_args=self.model_args,
         )
