@@ -4,7 +4,8 @@ import time
 import httpx
 import requests
 
-DEFAULT_MODEL_ID = "mistral/mistral-small-latest"
+DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
+DEFAULT_MEDIUM_MODEL_ID = "mistral/mistral-medium-latest"
 
 
 def wait_for_server(

@@ -31,7 +31,7 @@ from any_agent.tracing.otel_types import (
     SpanKind,
     Status,
 )
-from tests.integration.helpers import wait_for_server_async
+from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
 
 if TYPE_CHECKING:
     from typing import Any
@@ -150,7 +150,7 @@ class MockConversationAgent(TinyAgent):
         spans = []
         spans.append(
             AgentSpan(
-                name="call_llm mistral/mistral-small-latest",
+                name=f"call_llm {DEFAULT_SMALL_MODEL_ID}",
                 kind=SpanKind.INTERNAL,
                 status=Status(),
                 context=SpanContext(span_id=123),
@@ -185,7 +185,7 @@ async def test_a2a_tool_multiturn() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id="mistral/mistral-small-latest",  # Using real model ID but will be mocked
+        model_id=DEFAULT_SMALL_MODEL_ID,  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
@@ -236,7 +236,7 @@ async def test_a2a_tool_multiturn() -> None:
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_1)
             )
             response_1 = await client.send_message(
-                request_1, http_kwargs={"timeout": 30.0}
+                request_1, http_kwargs={"timeout": 60.0}
             )
 
             assert response_1 is not None
@@ -268,7 +268,7 @@ async def test_a2a_tool_multiturn() -> None:
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_2)
             )
             response_2 = await client.send_message(
-                request_2, http_kwargs={"timeout": 30.0}
+                request_2, http_kwargs={"timeout": 60.0}
             )
 
             assert response_2 is not None
@@ -298,7 +298,7 @@ async def test_a2a_tool_multiturn() -> None:
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_3)
             )
             response_3 = await client.send_message(
-                request_3, http_kwargs={"timeout": 30.0}
+                request_3, http_kwargs={"timeout": 60.0}
             )
             assert response_3 is not None
             # if the response is JSONRPCErrorResposne, log and raise an error
@@ -321,7 +321,7 @@ async def test_a2a_tool_multiturn_async() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id="mistral/mistral-small-latest",  # Using real model ID but will be mocked
+        model_id=DEFAULT_SMALL_MODEL_ID,  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
@@ -352,7 +352,7 @@ async def test_a2a_tool_multiturn_async() -> None:
             third_turn_success: bool
 
         main_agent_cfg = AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[await a2a_tool_async(server_url)],
             output_type=MainAgentAnswer,

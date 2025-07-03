@@ -1,11 +1,11 @@
 {
   "spans": [
     {
-      "name": "call_llm mistral/mistral-medium-latest",
+      "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 3198739830877944511,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 11723409621708567792,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749653520544507947,
-      "end_time": 1749653521831819368,
+      "start_time": 1751552794231655000,
+      "end_time": 1751552795465417000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 15429515527183233835,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 6629046008635486987,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -33,12 +33,12 @@
       },
       "attributes": {
         "gen_ai.operation.name": "call_llm",
-        "gen_ai.request.model": "mistral/mistral-medium-latest",
-        "gen_ai.input.messages": "[{\"role\": \"system\", \"content\": \"Search the web to answer\"}, {\"role\": \"user\", \"content\": \"Use the tools to find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.\"}]",
+        "gen_ai.request.model": "mistral/mistral-small-latest",
+        "gen_ai.input.messages": "[{\"role\": \"system\", \"content\": \"Use the available tools to answer.\"}, {\"role\": \"user\", \"content\": \"Find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.\"}]",
         "gen_ai.output": "[{\"tool.name\": \"get_current_time\", \"tool.args\": {\"timezone\": \"America/New_York\"}}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 176,
-        "gen_ai.usage.output_tokens": 18
+        "gen_ai.usage.input_tokens": 241,
+        "gen_ai.usage.output_tokens": 16
       },
       "links": [],
       "events": [],
@@ -46,7 +46,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -56,8 +56,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 3198739830877944511,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 11723409621708567792,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -66,15 +66,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749653521837379507,
-      "end_time": 1749653521839967431,
+      "start_time": 1751552795474960000,
+      "end_time": 1751552795480133000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 12694592350726496362,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 9715171170701291227,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -88,9 +88,9 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-06-11T10:52:01-04:00\",\n  \"is_dst\": true\n}",
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-03T10:26:35-04:00\",\n  \"is_dst\": true\n}",
         "gen_ai.output.type": "json",
-        "gen_ai.tool.call.id": "call_vh3K5jau0FIlmNjqLk9vRkvm"
+        "gen_ai.tool.call.id": "Q0E6QSggO"
       },
       "links": [],
       "events": [],
@@ -98,18 +98,18 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
       }
     },
     {
-      "name": "call_llm mistral/mistral-medium-latest",
+      "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 3198739830877944511,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 11723409621708567792,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -118,15 +118,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749653521844526571,
-      "end_time": 1749653522534904651,
+      "start_time": 1751552795484618000,
+      "end_time": 1751552798025607000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 4414457778424721065,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 17397243399537753976,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -137,11 +137,11 @@
       },
       "attributes": {
         "gen_ai.operation.name": "call_llm",
-        "gen_ai.request.model": "mistral/mistral-medium-latest",
+        "gen_ai.request.model": "mistral/mistral-small-latest",
         "gen_ai.output": "[{\"tool.name\": \"write_file\", \"tool.args\": {\"text\": \"2025\"}}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 244,
-        "gen_ai.usage.output_tokens": 15
+        "gen_ai.usage.input_tokens": 329,
+        "gen_ai.usage.output_tokens": 14
       },
       "links": [],
       "events": [],
@@ -149,7 +149,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -159,8 +159,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 3198739830877944511,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 11723409621708567792,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -169,15 +169,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749653522542786056,
-      "end_time": 1749653522543628894,
+      "start_time": 1751552798033115000,
+      "end_time": 1751552798034903000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 17897266117201371147,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 7837922161109159581,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -193,7 +193,7 @@
         "gen_ai.tool.args": "{\"text\": \"2025\"}",
         "gen_ai.output": "null",
         "gen_ai.output.type": "json",
-        "gen_ai.tool.call.id": "call_WjAnsUUSLxRnLfxhh61weC3m"
+        "gen_ai.tool.call.id": "wS891YzqJ"
       },
       "links": [],
       "events": [],
@@ -201,18 +201,18 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
       }
     },
     {
-      "name": "call_llm mistral/mistral-medium-latest",
+      "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 3198739830877944511,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 11723409621708567792,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -221,15 +221,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749653522549746427,
-      "end_time": 1749653523664222039,
+      "start_time": 1751552798039666000,
+      "end_time": 1751552801384792000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 14018437287615583213,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 16294531372482106339,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -240,11 +240,11 @@
       },
       "attributes": {
         "gen_ai.operation.name": "call_llm",
-        "gen_ai.request.model": "mistral/mistral-medium-latest",
-        "gen_ai.output": "Steps taken:\n1. Retrieved the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the retrieved date and time.\n3. Wrote the year (2025) as a single number to a file.",
+        "gen_ai.request.model": "mistral/mistral-small-latest",
+        "gen_ai.output": "Here is the list of the steps I have taken:\n\n1. Found the current time in the America/New_York timezone.\n2. Wrote the year to a file.",
         "gen_ai.output.type": "text",
-        "gen_ai.usage.input_tokens": 268,
-        "gen_ai.usage.output_tokens": 55
+        "gen_ai.usage.input_tokens": 366,
+        "gen_ai.usage.output_tokens": 36
       },
       "links": [],
       "events": [],
@@ -252,7 +252,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -272,15 +272,15 @@
           "entries": {}
         }
       },
-      "start_time": 1749653520536020977,
-      "end_time": 1749653523669805284,
+      "start_time": 1751552794228424000,
+      "end_time": 1751552819630001000,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 113318947871988954667626338380080592053,
-        "span_id": 3198739830877944511,
+        "trace_id": 120125522732681452126628093347636658003,
+        "span_id": 11723409621708567792,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -293,7 +293,7 @@
         "gen_ai.operation.name": "invoke_agent",
         "gen_ai.agent.name": "any_agent",
         "gen_ai.agent.description": "No description.",
-        "gen_ai.request.model": "mistral/mistral-medium-latest"
+        "gen_ai.request.model": "mistral/mistral-small-latest"
       },
       "links": [],
       "events": [],
@@ -301,12 +301,23 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
       }
     }
   ],
-  "final_output": "Steps taken:\n1. Retrieved the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the retrieved date and time.\n3. Wrote the year (2025) as a single number to a file."
+  "final_output": {
+    "steps": [
+      {
+        "number": 1,
+        "description": "Found the current time in the America/New_York timezone."
+      },
+      {
+        "number": 2,
+        "description": "Wrote the year to a file."
+      }
+    ]
+  }
 }
