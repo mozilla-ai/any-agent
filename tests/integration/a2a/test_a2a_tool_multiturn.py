@@ -31,7 +31,7 @@ from any_agent.tracing.otel_types import (
     SpanKind,
     Status,
 )
-from tests.integration.helpers import wait_for_server_async
+from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
 
 if TYPE_CHECKING:
     from typing import Any
@@ -150,7 +150,7 @@ class MockConversationAgent(TinyAgent):
         spans = []
         spans.append(
             AgentSpan(
-                name="call_llm gpt-4.1-nano",
+                name=f"call_llm {DEFAULT_SMALL_MODEL_ID}",
                 kind=SpanKind.INTERNAL,
                 status=Status(),
                 context=SpanContext(span_id=123),
@@ -185,7 +185,7 @@ async def test_a2a_tool_multiturn() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id="gpt-4.1-nano",  # Using real model ID but will be mocked
+        model_id=DEFAULT_SMALL_MODEL_ID,  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
@@ -321,7 +321,7 @@ async def test_a2a_tool_multiturn_async() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id="gpt-4.1-nano",  # Using real model ID but will be mocked
+        model_id=DEFAULT_SMALL_MODEL_ID,  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
@@ -352,7 +352,7 @@ async def test_a2a_tool_multiturn_async() -> None:
             third_turn_success: bool
 
         main_agent_cfg = AgentConfig(
-            model_id="gpt-4.1-nano",
+            model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[await a2a_tool_async(server_url)],
             output_type=MainAgentAnswer,
