@@ -12,7 +12,9 @@ from a2a.types import (
     Part,
     PushNotificationConfig,
     SendMessageRequest,
+    TaskState,
 )
+from pydantic import BaseModel
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -24,31 +26,31 @@ from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.serving.a2a.envelope import A2AEnvelope
-from any_agent.serving.a2a.task_manager import TaskData
-from any_agent.tracing.agent_trace import AgentTrace
-from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server_async
-
-
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.otel_types import (
     Resource,
     SpanContext,
     SpanKind,
     Status,
 )
+from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server_async
 
-from a2a.types import MessageSendParams, SendMessageRequest, TaskState
-from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from .conftest import DEFAULT_LONG_TIMEOUT, a2a_client_from_agent
 
 FIRST_TURN_PROMPT = "What's the capital of Pennsylvania?"
 FIRST_TURN_RESPONSE = "The capital of Pennsylvania is Harrisburg."
+
+
+class StringInfo(BaseModel):
+    value: str
+
 
 class MockConversationAgent(TinyAgent):
     """Mock agent implementation that provides simple answers for testing."""
 
     def __init__(self, config: AgentConfig) -> None:
         super().__init__(config)
-        self.output_type = A2AEnvelope[str]
+        self.output_type = A2AEnvelope[StringInfo]
 
     async def _load_agent(self) -> None:
         # Call parent's _load_agent to set up the basic structure
@@ -57,16 +59,14 @@ class MockConversationAgent(TinyAgent):
     async def run_async(
         self, prompt: str, instrument: bool = True, **kwargs: Any
     ) -> AgentTrace:
-            envelope = self.output_type(
-                task_status=TaskState.input_required,
-                data=FIRST_TURN_RESPONSE,
-            )
-            return self._create_mock_trace(
-                envelope, FIRST_TURN_RESPONSE, FIRST_TURN_PROMPT
-            )
-        
+        envelope = self.output_type(
+            task_status=TaskState.input_required,
+            data=StringInfo(value=FIRST_TURN_RESPONSE),
+        )
+        return self._create_mock_trace(envelope, FIRST_TURN_RESPONSE, FIRST_TURN_PROMPT)
+
     def _create_mock_trace(
-        self, envelope: A2AEnvelope[str], agent_response: str, prompt: str
+        self, envelope: A2AEnvelope[StringInfo], agent_response: str, prompt: str
     ) -> AgentTrace:
         """Create a mock AgentTrace with minimal spans for testing."""
 
@@ -100,8 +100,6 @@ class MockConversationAgent(TinyAgent):
     @classmethod
     def create(cls, framework: AgentFramework | str, config: AgentConfig) -> AnyAgent:
         return cls(config)
-
-
 
 
 @pytest.mark.asyncio
@@ -196,7 +194,8 @@ async def test_push_notification_non_streaming() -> None:
             request_1 = SendMessageRequest(id=str(uuid4()), params=params)
             response_1 = await client.send_message(request_1)
             if hasattr(response_1.root, "error"):
-                raise RuntimeError(f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}")
+                msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
+                raise RuntimeError(msg)
             task_id = response_1.root.result.id
             params.message.taskId = task_id
 
@@ -204,12 +203,14 @@ async def test_push_notification_non_streaming() -> None:
             request_1 = SendMessageRequest(id=str(uuid4()), params=params)
             response_1 = await client.send_message(request_1)
             if hasattr(response_1.root, "error"):
-                raise RuntimeError(f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}")
+                msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
+                raise RuntimeError(msg)
             assert response_1.root.result.id == task_id
 
             response_2 = await client.send_message(request_1)
             if hasattr(response_2.root, "error"):
-                raise RuntimeError(f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}")
+                msg = f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}"
+                raise RuntimeError(msg)
             assert response_2.root.result.id == task_id
 
             await asyncio.sleep(1)  # Give more time for notifications
