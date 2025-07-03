@@ -5,12 +5,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 12029899248154105887,
 =======
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 16170982456308607321,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 14164831949945772982,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -20,17 +25,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443040992789703,
       "end_time": 1751443041733104589,
 =======
       "start_time": 1751364648275617811,
       "end_time": 1751364648876539008,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542099315655516,
+      "end_time": 1751542099904625647,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 11445217741856584497,
@@ -38,6 +49,10 @@
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 9384358394977883985,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 69126310352740027,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -61,7 +76,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -72,12 +87,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 12029899248154105887,
 =======
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 16170982456308607321,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 14164831949945772982,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -87,17 +107,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443041735793756,
       "end_time": 1751443041741494722,
 =======
       "start_time": 1751364648880361860,
       "end_time": 1751364648883887735,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542099907376670,
+      "end_time": 1751542099911307747,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 915828486276659880,
@@ -105,6 +131,10 @@
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 18141779368137326711,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 16558629015512473340,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -119,12 +149,17 @@
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
 <<<<<<< HEAD
+<<<<<<< HEAD
         "gen_ai.tool.call.id": "call_ORFUzQPSiIgGfwcLjaxEmBcb",
         "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-02T03:57:21-04:00\",\n  \"is_dst\": true\n}",
 =======
         "gen_ai.tool.call.id": "call_QwW3M6aa88La1xfRI8xE83RN",
         "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-01T06:10:48-04:00\",\n  \"is_dst\": true\n}",
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "gen_ai.tool.call.id": "call_FBhNthgiwcvCTr7AoFda7hAc",
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-03T07:28:19-04:00\",\n  \"is_dst\": true\n}",
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -133,7 +168,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -144,12 +179,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 12029899248154105887,
 =======
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 16170982456308607321,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 14164831949945772982,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -159,17 +199,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443041744374564,
       "end_time": 1751443042339232932,
 =======
       "start_time": 1751364648887318517,
       "end_time": 1751364649502371616,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542099914556150,
+      "end_time": 1751542100396055846,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 6244121585321868900,
@@ -177,6 +223,10 @@
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 6627279994257244529,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 12656022743977537810,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -199,7 +249,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -210,12 +260,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 12029899248154105887,
 =======
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 16170982456308607321,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 14164831949945772982,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -225,17 +280,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443042342714239,
       "end_time": 1751443042344584640,
 =======
       "start_time": 1751364649505892605,
       "end_time": 1751364649508558365,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542100399163421,
+      "end_time": 1751542100400658603,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 10945692929771395208,
@@ -243,6 +304,10 @@
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 9131284374827047754,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 12168089422454036520,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -257,11 +322,15 @@
         "gen_ai.tool.description": "write the text to a file in the tmp_path directory",
         "gen_ai.tool.args": "{\"text\": \"2025\"}",
 <<<<<<< HEAD
+<<<<<<< HEAD
         "gen_ai.tool.call.id": "call_YmcYV1ICtBQ2NQoGVbY4pnWv",
         "gen_ai.output": "None",
         "gen_ai.output.type": "text"
 =======
         "gen_ai.tool.call.id": "call_bYXQaQO5Rgd1pAiLko5bh2JU",
+=======
+        "gen_ai.tool.call.id": "call_QfGfO1E5CaeD2VkKIVQDW2d6",
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "gen_ai.output": "{}",
         "gen_ai.output.type": "json"
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
@@ -272,7 +341,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -283,12 +352,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 12029899248154105887,
 =======
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 16170982456308607321,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 14164831949945772982,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -298,17 +372,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443042346141617,
       "end_time": 1751443044824569488,
 =======
       "start_time": 1751364649511796765,
       "end_time": 1751364652482222085,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542100401874043,
+      "end_time": 1751542101820538572,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 8954695964028154243,
@@ -316,6 +396,10 @@
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 8892690072800945658,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 6424046630615038074,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -327,7 +411,7 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.output": "{\n  \"steps\": [\n    {\n      \"number\": 1,\n      \"description\": \"Get the current date and time in the America/New_York timezone.\"\n    },\n    {\n      \"number\": 2,\n      \"description\": \"Extract the year from the current date and time.\"\n    },\n    {\n      \"number\": 3,\n      \"description\": \"Write the extracted year (2025) as a single number to a file.\"\n    }\n  ]\n}",
+        "gen_ai.output": "{\n  \"steps\": [\n    {\n      \"number\": 1,\n      \"description\": \"Retrieve the current date and time in the America/New_York timezone.\"\n    },\n    {\n      \"number\": 2,\n      \"description\": \"Extract the year from the retrieved date and time.\"\n    },\n    {\n      \"number\": 3,\n      \"description\": \"Write the extracted year (2025) as a single number to a file.\"\n    }\n  ]\n}",
         "gen_ai.output.type": "text",
         "gen_ai.usage.input_tokens": 417,
         "gen_ai.usage.output_tokens": 98
@@ -338,7 +422,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -359,17 +443,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443040987112629,
       "end_time": 1751443045313388735,
 =======
       "start_time": 1751364648271897846,
       "end_time": 1751364653031806611,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542099308175029,
+      "end_time": 1751542102343142515,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 147305767934350403039908776704848861593,
         "span_id": 12029899248154105887,
@@ -377,6 +467,10 @@
         "trace_id": 140839101541724486458934246209109876390,
         "span_id": 16170982456308607321,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 147429199438570424191153202535173077537,
+        "span_id": 14164831949945772982,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -397,7 +491,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -408,11 +502,11 @@
     "steps": [
       {
         "number": 1,
-        "description": "Get the current date and time in the America/New_York timezone."
+        "description": "Retrieve the current date and time in the America/New_York timezone."
       },
       {
         "number": 2,
-        "description": "Extract the year from the current date and time."
+        "description": "Extract the year from the retrieved date and time."
       },
       {
         "number": 3,
