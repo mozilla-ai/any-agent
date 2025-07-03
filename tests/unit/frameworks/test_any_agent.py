@@ -6,23 +6,12 @@ from unittest.mock import patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from tests.unit.helpers import LITELLM_IMPORT_PATHS
 
 TEST_TEMPERATURE = 0.54321
 TEST_PENALTY = 0.5
 TEST_QUERY = "what's the state capital of Pennsylvania"
 EXPECTED_OUTPUT = "The state capital of Pennsylvania is Harrisburg."
-
-# Google ADK uses a different import path for LiteLLM, and smolagents uses the sync call
-LITELLM_IMPORT_PATHS = {
-    AgentFramework.GOOGLE: "google.adk.models.lite_llm.acompletion",
-    AgentFramework.LANGCHAIN: "litellm.acompletion",
-    AgentFramework.TINYAGENT: "litellm.acompletion",
-    AgentFramework.AGNO: "litellm.acompletion",
-    AgentFramework.OPENAI: "litellm.acompletion",
-    AgentFramework.SMOLAGENTS: "litellm.completion",
-    AgentFramework.LLAMA_INDEX: "litellm.acompletion",
-}
-
 
 def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
     """Helper function to create an agent with test model arguments"""
@@ -96,3 +85,4 @@ def test_model_args_streaming(
         assert mock_litellm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
         assert mock_litellm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
         assert mock_litellm.call_count > 0
+
