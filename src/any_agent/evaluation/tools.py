@@ -26,7 +26,7 @@ class TraceTools:
                     tools.append(attr)
         return tools
 
-    def get_final_output(self) -> str | BaseModel | None:
+    def get_final_output(self) -> str | BaseModel | dict[str, Any] | None:
         """Get the final output from the agent trace.
 
         Returns:

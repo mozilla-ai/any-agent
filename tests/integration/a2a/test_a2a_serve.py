@@ -42,7 +42,7 @@ async def test_serve_sync(test_port: int, a2a_test_helpers: A2ATestHelpers) -> N
             request = a2a_test_helpers.create_send_message_request(
                 text="What is an agent?"
             )
-            response = await client.send_message(request)
+            response = await client.send_message(request, http_kwargs={"timeout": 30.0})
             assert response is not None
     finally:
         proc.kill()
@@ -70,5 +70,5 @@ async def test_serve_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> 
             text="What is an agent?",
             message_id=uuid4().hex,
         )
-        response = await client.send_message(request)
+        response = await client.send_message(request, http_kwargs={"timeout": 30.0})
         assert response is not None

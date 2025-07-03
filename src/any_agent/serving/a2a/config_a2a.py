@@ -53,7 +53,7 @@ class A2AServingConfig(BaseModel):
                     description="Search the web for information"
                 )
             ],
-            task_timeout_minutes=15
+            context_timeout_minutes=15
         )
 
     """
@@ -80,8 +80,8 @@ class A2AServingConfig(BaseModel):
 
     version: str = "0.1.0"
 
-    task_timeout_minutes: int = 10
-    """Task timeout in minutes. Tasks will be cleaned up after this period of inactivity."""
+    context_timeout_minutes: int = 10
+    """Context timeout in minutes. Contexts will be cleaned up after this period of inactivity."""
 
     history_formatter: HistoryFormatter = default_history_formatter
     """Function to format conversation history and current query into a single prompt.
