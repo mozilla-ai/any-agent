@@ -1,9 +1,17 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent, ToolExecutor
+
+
+class SampleOutput(BaseModel):
+    """Test output model for structured output testing."""
+
+    answer: str
+    confidence: float
 
 
 async def sample_tool_function(arg1: int, arg2: str) -> str:
@@ -69,3 +77,43 @@ def test_run_tinyagent_agent_custom_args() -> None:
 
         # Assert that the result contains the expected content
         assert output == result.final_output
+
+
+def test_output_type_completion_params_isolation() -> None:
+    """Test that completion_params are not polluted between calls when using output_type."""
+    config = AgentConfig(model_id="gpt-4o", output_type=SampleOutput)
+    agent: TinyAgent = AnyAgent.create(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
+    original_completion_params = agent.completion_params.copy()
+
+    def create_mock_response(content: str, is_structured: bool = False) -> MagicMock:
+        """Helper to create mock responses."""
+        mock_message = MagicMock()
+        mock_message.content = content
+        mock_message.tool_calls = []
+        mock_message.model_dump.return_value = {
+            "content": content,
+            "role": "assistant",
+            "tool_calls": None,
+            "function_call": None,
+            "annotations": [],
+        }
+        if is_structured:
+            mock_message.__getitem__.return_value = content
+        return MagicMock(choices=[MagicMock(message=mock_message)])
+
+    with patch(
+        "any_agent.frameworks.tinyagent.litellm.acompletion"
+    ) as mock_acompletion:
+        # Mock responses: 2 calls per run (regular + structured output)
+        mock_acompletion.side_effect = [
+            create_mock_response("First response"),  # First run, regular call
+            create_mock_response(
+                '{"answer": "First response", "confidence": 0.9}', True
+            ),  # First run, structured
+        ]
+
+        # First call - should trigger structured output handling
+        agent.run("First question")
+
+        # Verify completion_params weren't modified
+        assert agent.completion_params == original_completion_params

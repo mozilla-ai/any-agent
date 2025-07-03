@@ -180,10 +180,11 @@ class TinyAgent(AnyAgent):
 
         num_of_turns = 0
         max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
+        completion_params = self.completion_params.copy()
 
         while num_of_turns < max_turns:
-            self.completion_params["messages"] = messages
-            response = await self.call_model(**self.completion_params)
+            completion_params["messages"] = messages
+            response = await self.call_model(**completion_params)
 
             message: LiteLLMMessage = response.choices[0].message  # type: ignore[union-attr]
 
@@ -225,13 +226,11 @@ class TinyAgent(AnyAgent):
                         "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
                     }
                     messages.append(structured_output_message)
-                    self.completion_params["messages"] = messages
+                    completion_params["messages"] = messages
                     if supports_response_schema(model=self.config.model_id):
-                        self.completion_params["response_format"] = (
-                            self.config.output_type
-                        )
-                    self.completion_params["tool_choice"] = "none"
-                    response = await litellm.acompletion(**self.completion_params)
+                        completion_params["response_format"] = self.config.output_type
+                    completion_params["tool_choice"] = "none"
+                    response = await litellm.acompletion(**completion_params)
                     return self.config.output_type.model_validate_json(
                         response.choices[0].message["content"]  # type: ignore[union-attr]
                     )
