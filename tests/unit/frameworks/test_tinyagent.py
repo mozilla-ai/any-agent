@@ -110,10 +110,6 @@ def test_output_type_completion_params_isolation() -> None:
             create_mock_response(
                 '{"answer": "First response", "confidence": 0.9}', True
             ),  # First run, structured
-            create_mock_response("Second response"),  # Second run, regular call
-            create_mock_response(
-                '{"answer": "Second response", "confidence": 0.95}', True
-            ),  # Second run, structured
         ]
 
         # First call - should trigger structured output handling
