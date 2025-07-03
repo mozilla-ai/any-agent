@@ -11,8 +11,8 @@ from a2a.utils import (
 from pydantic import BaseModel
 
 from any_agent.logging import logger
+from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.a2a.envelope import A2AEnvelope
-from any_agent.serving.a2a.task_manager import TaskManager
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
@@ -21,16 +21,16 @@ if TYPE_CHECKING:
 class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
     """AnyAgentExecutor Implementation with task management for multi-turn conversations."""
 
-    def __init__(self, agent: "AnyAgent", task_manager: TaskManager):
+    def __init__(self, agent: "AnyAgent", context_manager: ContextManager):
         """Initialize the AnyAgentExecutor.
 
         Args:
             agent: The agent to execute
-            task_manager: Task manager to use for task management
+            context_manager: context manager to use for context management
 
         """
         self.agent = agent
-        self.task_manager = task_manager
+        self.context_manager = context_manager
 
     @override
     async def execute(  # type: ignore[misc]
@@ -41,21 +41,26 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         query = context.get_user_input()
         task = context.current_task
 
+        context_id = context.message.contextId
+        if not self.context_manager.get_context(context_id):
+            self.context_manager.add_context(context_id)
+
         # Extract or create task ID
         if not task:
             task = new_task(context.message)
-            self.task_manager.add_task(task.id)
             await event_queue.enqueue_event(task)
         else:
             logger.debug("Task already exists: %s", task.model_dump_json(indent=2))
 
-        formatted_query = self.task_manager.format_query_with_history(task.id, query)
+        formatted_query = self.context_manager.format_query_with_history(
+            context_id, query
+        )
 
         # This agent always produces Task objects.
         agent_trace = await self.agent.run_async(formatted_query)
 
         # Update task with new trace, passing the original query (not formatted)
-        self.task_manager.update_task_trace(task.id, agent_trace, query)
+        self.context_manager.update_context_trace(context_id, agent_trace, query)
 
         updater = TaskUpdater(event_queue, task.id, task.contextId)
 
