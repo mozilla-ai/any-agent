@@ -228,9 +228,7 @@ class TinyAgent(AnyAgent):
                     messages.append(structured_output_message)
                     completion_params["messages"] = messages
                     if supports_response_schema(model=self.config.model_id):
-                        completion_params["response_format"] = (
-                            self.config.output_type
-                        )
+                        completion_params["response_format"] = self.config.output_type
                     completion_params["tool_choice"] = "none"
                     response = await litellm.acompletion(**completion_params)
                     return self.config.output_type.model_validate_json(

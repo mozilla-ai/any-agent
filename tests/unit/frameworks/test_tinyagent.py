@@ -81,92 +81,43 @@ def test_run_tinyagent_agent_custom_args() -> None:
 
 def test_output_type_completion_params_isolation() -> None:
     """Test that completion_params are not polluted between calls when using output_type."""
-    # Create agent with output_type
     config = AgentConfig(model_id="gpt-4o", output_type=SampleOutput)
-    agent = AnyAgent.create(AgentFramework.TINYAGENT, config)
+    agent: TinyAgent = AnyAgent.create(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
     original_completion_params = agent.completion_params.copy()
+
+    def create_mock_response(content: str, is_structured: bool = False) -> MagicMock:
+        """Helper to create mock responses."""
+        mock_message = MagicMock()
+        mock_message.content = content
+        mock_message.tool_calls = []
+        mock_message.model_dump.return_value = {
+            "content": content,
+            "role": "assistant",
+            "tool_calls": None,
+            "function_call": None,
+            "annotations": [],
+        }
+        if is_structured:
+            mock_message.__getitem__.return_value = content
+        return MagicMock(choices=[MagicMock(message=mock_message)])
 
     with patch(
         "any_agent.frameworks.tinyagent.litellm.acompletion"
     ) as mock_acompletion:
-        # Mock responses for the first run (2 calls: regular + structured output)
-        mock_response1 = MagicMock()
-        mock_message1 = MagicMock()
-        mock_message1.content = "First response"
-        mock_message1.tool_calls = []
-        mock_message1.model_dump.return_value = {
-            "content": "First response",
-            "role": "assistant",
-            "tool_calls": None,
-            "function_call": None,
-            "annotations": [],
-        }
-        mock_response1.choices = [MagicMock(message=mock_message1)]
-
-        # Mock response for the structured output call
-        mock_response_structured = MagicMock()
-        mock_message_structured = MagicMock()
-        mock_message_structured.content = (
-            '{"answer": "First response", "confidence": 0.9}'
-        )
-        mock_message_structured.tool_calls = []
-        mock_message_structured.model_dump.return_value = {
-            "content": '{"answer": "First response", "confidence": 0.9}',
-            "role": "assistant",
-            "tool_calls": None,
-            "function_call": None,
-            "annotations": [],
-        }
-        # Configure the mock to return the content string when accessed as dict
-        mock_message_structured.__getitem__.return_value = (
-            '{"answer": "First response", "confidence": 0.9}'
-        )
-        mock_response_structured.choices = [MagicMock(message=mock_message_structured)]
-
-        # Mock responses for the second run (2 calls: regular + structured output)
-        mock_response2 = MagicMock()
-        mock_message2 = MagicMock()
-        mock_message2.content = "Second response"
-        mock_message2.tool_calls = []
-        mock_message2.model_dump.return_value = {
-            "content": "Second response",
-            "role": "assistant",
-            "tool_calls": None,
-            "function_call": None,
-            "annotations": [],
-        }
-        mock_response2.choices = [MagicMock(message=mock_message2)]
-
-        mock_response_structured2 = MagicMock()
-        mock_message_structured2 = MagicMock()
-        mock_message_structured2.content = (
-            '{"answer": "Second response", "confidence": 0.95}'
-        )
-        mock_message_structured2.tool_calls = []
-        mock_message_structured2.model_dump.return_value = {
-            "content": '{"answer": "Second response", "confidence": 0.95}',
-            "role": "assistant",
-            "tool_calls": None,
-            "function_call": None,
-            "annotations": [],
-        }
-        # Configure the mock to return the content string when accessed as dict
-        mock_message_structured2.__getitem__.return_value = (
-            '{"answer": "Second response", "confidence": 0.95}'
-        )
-        mock_response_structured2.choices = [
-            MagicMock(message=mock_message_structured2)
-        ]
-
-        # Make acompletion return responses in order: first run (2 calls), then second run (2 calls)
+        # Mock responses: 2 calls per run (regular + structured output)
         mock_acompletion.side_effect = [
-            mock_response1,  # First run, first call
-            mock_response_structured,  # First run, structured output call
-            mock_response2,  # Second run, first call
-            mock_response_structured2,  # Second run, structured output call
+            create_mock_response("First response"),  # First run, regular call
+            create_mock_response(
+                '{"answer": "First response", "confidence": 0.9}', True
+            ),  # First run, structured
+            create_mock_response("Second response"),  # Second run, regular call
+            create_mock_response(
+                '{"answer": "Second response", "confidence": 0.95}', True
+            ),  # Second run, structured
         ]
 
         # First call - should trigger structured output handling
         agent.run("First question")
 
+        # Verify completion_params weren't modified
         assert agent.completion_params == original_completion_params
