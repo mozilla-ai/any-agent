@@ -4,7 +4,6 @@ import time
 import httpx
 import requests
 
-# DEFAULT_MODEL_ID = "gpt-4.1-mini"
 DEFAULT_MODEL_ID = "mistral/mistral-small-latest"
 
 
