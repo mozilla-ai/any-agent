@@ -42,7 +42,7 @@ class AgentJudge:
         trace: AgentTrace,
         question: str,
         additional_tools: list[Callable[[], Any]] | None = None,
-    ) -> BaseModel:
+    ) -> AgentTrace:
         """Run the agent judge.
 
         Args:
@@ -51,7 +51,9 @@ class AgentJudge:
             additional_tools: Additional tools to use for the agent
 
         Returns:
-            The evaluation result
+            The trace of the evaluation run.
+            You can access the evaluation result in the `final_output`
+            property.
 
         """
         if additional_tools is None:
@@ -63,7 +65,7 @@ class AgentJudge:
         trace: AgentTrace,
         question: str,
         additional_tools: list[Callable[[], Any]] | None = None,
-    ) -> BaseModel:
+    ) -> AgentTrace:
         """Run the agent judge asynchronously.
 
         Args:
@@ -71,7 +73,9 @@ class AgentJudge:
             question: The question to ask the agent
             additional_tools: Additional tools to use for the agent
         Returns:
-            The evaluation result
+            The trace of the evaluation run.
+            You can access the evaluation result in the `final_output`
+            property.
 
         """
         if additional_tools is None:
@@ -96,4 +100,4 @@ class AgentJudge:
         if not isinstance(agent_trace.final_output, self.output_type):
             msg = f"Agent output is not an {self.output_type} instance."
             raise ValueError(msg)
-        return agent_trace.final_output
+        return agent_trace
