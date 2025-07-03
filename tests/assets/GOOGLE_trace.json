@@ -4,18 +4,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 123756993629801267,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 4483645683282269881,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 7291331254182754677,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17367960837458394483,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -24,35 +14,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751442995912891380,
-      "end_time": 1751442998190407356,
-=======
-      "start_time": 1751364624713295987,
-      "end_time": 1751364625594266720,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542050948864571,
-      "end_time": 1751542052154436112,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542375214164586,
+      "end_time": 1751542377080907349,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 1391215345178444054,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 1474123940905714131,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 9534234589942748987,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17908327384789002758,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -86,18 +56,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 10824384008567535683,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 16153188178263807617,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 4337483102410184399,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 13690607474857799551,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -106,35 +66,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751442998195528686,
-      "end_time": 1751442998200264316,
-=======
-      "start_time": 1751364625597616941,
-      "end_time": 1751364625601361352,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542052159243155,
-      "end_time": 1751542052174934466,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542377086109156,
+      "end_time": 1751542377090146600,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 15589403731776718628,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 8395891058723725799,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 3066715834953184065,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 8472577099118036538,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -148,18 +88,8 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "gen_ai.tool.call.id": "call_Iq1QqEQUoPraWPMzsWNcsE0Y",
-        "gen_ai.output": "\"meta=None content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-07-02T03:56:38-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None, meta=None)] structuredContent=None isError=False\"",
-=======
-        "gen_ai.tool.call.id": "call_M2MTwCYGNpzOmet6JFBKo49y",
-        "gen_ai.output": "\"meta=None content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-07-01T06:10:25-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None, meta=None)] structuredContent=None isError=False\"",
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "gen_ai.tool.call.id": "call_vv5yv70Bn4KaH5RO8MUSJq9a",
-        "gen_ai.output": "\"meta=None content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-07-03T07:27:32-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None, meta=None)] structuredContent=None isError=False\"",
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "gen_ai.tool.call.id": "call_pHcVJh9Jg6cqKu2OXmGElu34",
+        "gen_ai.output": "\"meta=None content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-07-03T07:32:57-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None, meta=None)] structuredContent=None isError=False\"",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -178,18 +108,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 123756993629801267,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 4483645683282269881,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 7291331254182754677,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17367960837458394483,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -198,35 +118,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751442998202710220,
-      "end_time": 1751442999268047025,
-=======
-      "start_time": 1751364625605038985,
-      "end_time": 1751364626546323633,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542052178685926,
-      "end_time": 1751542053031102257,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542377092288350,
+      "end_time": 1751542378448727787,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 3331181287391978276,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 11933164808486394963,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 15912142868838285593,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 16863833402598411116,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -259,18 +159,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 18085666591425567667,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 15490701583544096238,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 15401627082846213571,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 15341938080753267630,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -279,35 +169,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751442999270204777,
-      "end_time": 1751442999270446367,
-=======
-      "start_time": 1751364626549767692,
-      "end_time": 1751364626550067619,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542053033832323,
-      "end_time": 1751542053034190850,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542378450357176,
+      "end_time": 1751542378450579696,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 778085122749838356,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 15017520461614332204,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 14199313227477906644,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 13034248572748671760,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -321,15 +191,7 @@
         "gen_ai.tool.name": "write_file",
         "gen_ai.tool.description": "write the text to a file in the tmp_path directory\n\nArgs:\n    text (str): The text to write to the file.\n\nReturns:\n    None",
         "gen_ai.tool.args": "{\"text\": \"2025\"}",
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "gen_ai.tool.call.id": "call_SpgUjgMj069qqLWtTFHYal5D",
-=======
-        "gen_ai.tool.call.id": "call_8XNY181QgX5gTVTO45uRV1Xd",
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "gen_ai.tool.call.id": "call_6hVTNnCQlE487HXMU8IhO84p",
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "gen_ai.tool.call.id": "call_BB8bcPllqYB67FOSGzr6OCA3",
         "gen_ai.output": "{}",
         "gen_ai.output.type": "json"
       },
@@ -349,18 +211,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 123756993629801267,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 4483645683282269881,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 7291331254182754677,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17367960837458394483,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -369,35 +221,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751442999272235742,
-      "end_time": 1751443001181574060,
-=======
-      "start_time": 1751364626552229840,
-      "end_time": 1751364628015768972,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542053036268268,
-      "end_time": 1751542055046262159,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542378452182026,
+      "end_time": 1751542380226451757,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 9898575930321485606,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 1500483053177267629,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 12760959192876623526,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 6309122888871636183,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -409,24 +241,10 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "gpt-4.1-mini",
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "gen_ai.output": "[{\"tool.name\": \"final_output\", \"tool.args\": {\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}}]",
+        "gen_ai.output": "[{\"tool.name\": \"final_output\", \"tool.args\": {\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year value (2025) to a file.\\\"}]}\"}}]",
         "gen_ai.output.type": "json",
         "gen_ai.usage.input_tokens": 685,
-        "gen_ai.usage.output_tokens": 82
-=======
-        "gen_ai.output": "[{\"tool.name\": \"final_output\", \"tool.args\": {\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the extracted year (2025) to a file.\\\"}] }\"}}]",
-        "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 685,
-        "gen_ai.usage.output_tokens": 78
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "gen_ai.output": "[{\"tool.name\": \"final_output\", \"tool.args\": {\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}}]",
-        "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 685,
-        "gen_ai.usage.output_tokens": 82
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "gen_ai.usage.output_tokens": 84
       },
       "links": [],
       "events": [],
@@ -444,18 +262,8 @@
       "name": "execute_tool final_output",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 7630902076009088337,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 17533917550733287065,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 12300333066041342144,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17012419415444699414,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -464,35 +272,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443001185165197,
-      "end_time": 1751443001185381909,
-=======
-      "start_time": 1751364628018903131,
-      "end_time": 1751364628019171637,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542055047999109,
-      "end_time": 1751542055048242232,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542380230731695,
+      "end_time": 1751542380231007445,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 11014526377420035709,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 13035498506748425548,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 12456275244049589835,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 13943079130629484494,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -505,21 +293,9 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "final_output",
         "gen_ai.tool.description": "You must call this tool in order to return the final answer.\n\nArgs:\n    answer: The final output that can be loaded as a Pydantic model. This must be a JSON compatible string that matches the following schema:\n        {'$defs': {'Step': {'properties': {'number': {'title': 'Number', 'type': 'integer'}, 'description': {'title': 'Description', 'type': 'string'}}, 'required': ['number', 'description'], 'title': 'Step', 'type': 'object'}}, 'additionalProperties': False, 'properties': {'steps': {'items': {'$ref': '#/$defs/Step'}, 'title': 'Steps', 'type': 'array'}}, 'required': ['steps'], 'title': 'Steps', 'type': 'object'}\n\nReturns:\n    A dictionary with the following keys:\n        - success: True if the output is valid, False otherwise.\n        - result: The final output if success is True, otherwise an error message.",
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "gen_ai.tool.args": "{\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}",
-        "gen_ai.tool.call.id": "call_GpkIrgJQa2jyMSJTgRnLRxWK",
-        "gen_ai.output": "{\"success\": true, \"result\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}",
-=======
-        "gen_ai.tool.args": "{\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the extracted year (2025) to a file.\\\"}] }\"}",
-        "gen_ai.tool.call.id": "call_n4eHzKyGfVulkF1qvwrKIEMn",
-        "gen_ai.output": "{\"success\": true, \"result\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the extracted year (2025) to a file.\\\"}] }\"}",
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "gen_ai.tool.args": "{\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}",
-        "gen_ai.tool.call.id": "call_eRVLqYMw7m9ZfVnheV5CJHfG",
-        "gen_ai.output": "{\"success\": true, \"result\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}",
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "gen_ai.tool.args": "{\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year value (2025) to a file.\\\"}]}\"}",
+        "gen_ai.tool.call.id": "call_1EZeDA3NIQMicRwwy7bzj1Qt",
+        "gen_ai.output": "{\"success\": true, \"result\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year value (2025) to a file.\\\"}]}\"}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -548,35 +324,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751442995911277335,
-      "end_time": 1751443001187373782,
-=======
-      "start_time": 1751364624711704573,
-      "end_time": 1751364628020901237,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542050944521110,
-      "end_time": 1751542055049570210,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542375212668300,
+      "end_time": 1751542380233416777,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 17999881488315848035,
-=======
-        "trace_id": 122507392838571016606477094160067522807,
-        "span_id": 6059608635823348767,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 204428967221607361587790685033831824831,
-        "span_id": 5173904302556198313,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 2939314501100541147,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -604,36 +360,5 @@
       }
     }
   ],
-  "final_output": {
-    "steps": [
-      {
-        "number": 1,
-        "description": "Get the current date and time in the America/New_York timezone."
-      },
-      {
-        "number": 2,
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "description": "Extract the year from the current date and time, which is 2025."
-      },
-      {
-        "number": 3,
-        "description": "Write the year 2025 to a file."
-=======
-        "description": "Extract the year from the current date and time."
-      },
-      {
-        "number": 3,
-        "description": "Write the extracted year (2025) to a file."
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "description": "Extract the year from the current date and time, which is 2025."
-      },
-      {
-        "number": 3,
-        "description": "Write the year 2025 to a file."
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
-      }
-    ]
-  }
+  "final_output": {}
 }

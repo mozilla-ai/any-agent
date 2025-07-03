@@ -4,18 +4,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8741777053539239902,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 15839130850711958450,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 15697530005605789909,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15993389293127588900,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -24,35 +14,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443023116214805,
-      "end_time": null,
-=======
-      "start_time": 1751364638727936700,
-      "end_time": 1751364639396497027,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542078576450210,
-      "end_time": 1751542079135316208,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542395641435265,
+      "end_time": 1751542396109017790,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 15000329756418140046,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 5437505041388993338,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 10677979672150969590,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 6217958451434241205,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -86,18 +56,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8741777053539239902,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 15839130850711958450,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 15697530005605789909,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15993389293127588900,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -106,35 +66,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443023773739038,
-      "end_time": null,
-=======
-      "start_time": 1751364639400446111,
-      "end_time": 1751364639757409875,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542079150262159,
-      "end_time": 1751542081992555989,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542396112090064,
+      "end_time": 1751542396456927229,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 4826029691630229880,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 12272479227562662154,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 10743466587921158219,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15449685136423035739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -148,15 +88,7 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-02T03:57:04-04:00\",\n  \"is_dst\": true\n}",
-=======
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-01T06:10:39-04:00\",\n  \"is_dst\": true\n}",
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-03T07:28:01-04:00\",\n  \"is_dst\": true\n}",
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-03T07:33:16-04:00\",\n  \"is_dst\": true\n}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -175,18 +107,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8741777053539239902,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 15839130850711958450,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 15697530005605789909,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15993389293127588900,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -195,35 +117,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443024151366665,
-      "end_time": null,
-=======
-      "start_time": 1751364639760126965,
-      "end_time": 1751364640516767452,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542082077214883,
-      "end_time": 1751542082678715552,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542396459588735,
+      "end_time": 1751542396895211486,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8926816263790697600,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 13305002561390147001,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 968864978612674509,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 5949746556784382100,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -256,18 +158,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8741777053539239902,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 15839130850711958450,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 15697530005605789909,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15993389293127588900,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -276,35 +168,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443024891352272,
-      "end_time": null,
-=======
-      "start_time": 1751364640519909664,
-      "end_time": 1751364640520420228,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542082686670001,
-      "end_time": 1751542082693268243,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542396898666742,
+      "end_time": 1751542396899853220,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 2493618336866182168,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 10125499416320960376,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 4815376649326775764,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 9916183804355894561,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -337,18 +209,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8741777053539239902,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 15839130850711958450,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 15697530005605789909,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15993389293127588900,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -357,35 +219,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443024893697824,
-      "end_time": null,
-=======
-      "start_time": 1751364640522382985,
-      "end_time": 1751364642195529439,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542082704221087,
-      "end_time": 1751542083715100250,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542396901846830,
+      "end_time": 1751542398124785847,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 17032615235348679863,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 5013988611810076099,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 16261141591694418913,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 733545299743184848,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -418,18 +260,8 @@
       "name": "execute_tool final_output",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8741777053539239902,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 15839130850711958450,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 15697530005605789909,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15993389293127588900,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -438,35 +270,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443026332184665,
-      "end_time": null,
-=======
-      "start_time": 1751364642198885659,
-      "end_time": 1751364642200298263,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542083758109153,
-      "end_time": 1751542083777039882,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542398127779923,
+      "end_time": 1751542398128756625,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 14664627323534379905,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 2318882139221024517,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 6993350818525601629,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 12333788494745347850,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -479,8 +291,8 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "final_output",
         "gen_ai.tool.description": "final_output(answer: str) -> dict\nYou must call this tool in order to return the final answer.\n\n        Args:\n            answer: The final output that can be loaded as a Pydantic model. This must be a JSON compatible string that matches the following schema:\n                {'$defs': {'Step': {'properties': {'number': {'title': 'Number', 'type': 'integer'}, 'description': {'title': 'Description', 'type': 'string'}}, 'required': ['number', 'description'], 'title': 'Step', 'type': 'object'}}, 'additionalProperties': False, 'properties': {'steps': {'items': {'$ref': '#/$defs/Step'}, 'title': 'Steps', 'type': 'array'}}, 'required': ['steps'], 'title': 'Steps', 'type': 'object'}\n\n        Returns:\n            A dictionary with the following keys:\n                - success: True if the output is valid, False otherwise.\n                - result: The final output if success is True, otherwise an error message.\n\n        ",
-        "gen_ai.tool.args": "{\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the extracted year (2025) to a file.\\\"}] }\"}",
-        "gen_ai.output": "{\"success\": true, \"result\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the extracted year (2025) to a file.\\\"}] }\"}",
+        "gen_ai.tool.args": "{\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the extracted year (2025) to a file.\\\"}]}\"}",
+        "gen_ai.output": "{\"success\": true, \"result\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the extracted year (2025) to a file.\\\"}]}\"}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -499,18 +311,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8741777053539239902,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 15839130850711958450,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 15697530005605789909,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15993389293127588900,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -519,35 +321,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443026337166127,
-      "end_time": null,
-=======
-      "start_time": 1751364642204374759,
-      "end_time": 1751364643425029211,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542083792444858,
-      "end_time": 1751542084808840983,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542398130890918,
+      "end_time": 1751542399750247098,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 1588588364148630196,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 4641189344926901144,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 1573246872727617580,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 11034534125071640558,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -590,35 +372,15 @@
           "entries": {}
         }
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "start_time": 1751443023113988677,
-      "end_time": 1751443028220298653,
-=======
-      "start_time": 1751364638725589997,
-      "end_time": 1751364643429879093,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-      "start_time": 1751542078404658678,
-      "end_time": 1751542084918243705,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+      "start_time": 1751542395638722581,
+      "end_time": 1751542399755096579,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "trace_id": 328098691140313455314272792455481136950,
-        "span_id": 8741777053539239902,
-=======
-        "trace_id": 22383283792740119736535387292755268694,
-        "span_id": 15839130850711958450,
->>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
-=======
-        "trace_id": 89712955212557298532129576975330159916,
-        "span_id": 15697530005605789909,
->>>>>>> 9adcd0e (Add _SpanGeneration base class)
+        "trace_id": 3364913774242437763692553334454027698,
+        "span_id": 15993389293127588900,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -646,20 +408,5 @@
       }
     }
   ],
-  "final_output": {
-    "steps": [
-      {
-        "number": 1,
-        "description": "Get the current date and time in the America/New_York timezone."
-      },
-      {
-        "number": 2,
-        "description": "Extract the year from the current date and time."
-      },
-      {
-        "number": 3,
-        "description": "Write the extracted year (2025) to a file."
-      }
-    ]
-  }
+  "final_output": {}
 }
