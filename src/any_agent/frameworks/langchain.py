@@ -19,7 +19,7 @@ try:
     from langgraph.prebuilt import create_react_agent
 
     # Add your custom models to the existing list
-    additional_models = ["gpt-4.1-mini", "gpt-4.1-nano"]
+    additional_models = ["mistral/mistral-medium-latest", "mistral/mistral-small-latest"]
 
     # Extend the existing _OPENAI_MODELS list
     if hasattr(langchain_litellm_module, "_OPENAI_MODELS"):

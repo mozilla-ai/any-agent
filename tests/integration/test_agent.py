@@ -115,7 +115,7 @@ def assert_tokens(agent_trace: AgentTrace) -> None:
 def assert_eval(agent_trace: AgentTrace) -> None:
     """Test evaluation using the new judge classes."""
     # Test 1: Check if agent called write_file tool using LlmJudge
-    llm_judge = LlmJudge(model_id="gpt-4.1-nano")
+    llm_judge = LlmJudge(model_id="mistral/mistral-small-latest")
     result1 = llm_judge.run(
         context=str(agent_trace.spans_to_messages()),
         question="Did the agent call the write_file tool during execution?",
@@ -126,7 +126,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     )
 
     # Test 2: Check if agent wrote the current year to file using AgentJudge
-    agent_judge = AgentJudge(model_id="gpt-4.1-mini")
+    agent_judge = AgentJudge(model_id="mistral/mistral-medium-latest")
 
     def get_current_year() -> str:
         """Get the current year"""

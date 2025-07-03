@@ -150,7 +150,7 @@ class MockConversationAgent(TinyAgent):
         spans = []
         spans.append(
             AgentSpan(
-                name="call_llm gpt-4.1-nano",
+                name="call_llm mistral/mistral-small-latest",
                 kind=SpanKind.INTERNAL,
                 status=Status(),
                 context=SpanContext(span_id=123),
@@ -185,7 +185,7 @@ async def test_a2a_tool_multiturn() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id="gpt-4.1-nano",  # Using real model ID but will be mocked
+        model_id="mistral/mistral-small-latest",  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
@@ -321,7 +321,7 @@ async def test_a2a_tool_multiturn_async() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id="gpt-4.1-nano",  # Using real model ID but will be mocked
+        model_id="mistral/mistral-small-latest",  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
@@ -352,7 +352,7 @@ async def test_a2a_tool_multiturn_async() -> None:
             third_turn_success: bool
 
         main_agent_cfg = AgentConfig(
-            model_id="gpt-4.1-nano",
+            model_id="mistral/mistral-small-latest",
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[await a2a_tool_async(server_url)],
             output_type=MainAgentAnswer,

@@ -60,7 +60,7 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
         )
     kwargs = {}
 
-    kwargs["model_id"] = "gpt-4.1-nano"
+    kwargs["model_id"] = "mistral/mistral-small-latest"
     agent_model = kwargs["model_id"]
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:

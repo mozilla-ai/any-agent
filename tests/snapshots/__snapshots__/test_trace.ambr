@@ -14,7 +14,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": "{\\"timezone\\":\\"America/New_York\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 175,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -36,7 +36,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 7911453272944395713,
@@ -130,7 +130,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": "{\\"text\\":\\"2025\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 243,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -152,7 +152,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 7911453272944395713,
@@ -245,7 +245,7 @@
             3. Wrote the year (2025) as a single number to a file.
           ''',
           'gen_ai.output.type': 'text',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 267,
           'gen_ai.usage.output_tokens': 55,
         }),
@@ -267,7 +267,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 7911453272944395713,
@@ -300,7 +300,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
         }),
         'context': dict({
           'is_remote': False,
@@ -366,7 +366,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": {"timezone": "America/New_York"}}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 189,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -388,7 +388,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 6271309294193643750,
@@ -477,7 +477,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": {"text": "2025"}}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 288,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -499,7 +499,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 6271309294193643750,
@@ -602,7 +602,7 @@
             3. Wrote the year (2025) to a file.
           ''',
           'gen_ai.output.type': 'text',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 312,
           'gen_ai.usage.output_tokens': 51,
         }),
@@ -624,7 +624,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 6271309294193643750,
@@ -657,7 +657,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
         }),
         'context': dict({
           'is_remote': False,
@@ -723,7 +723,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": {"timezone": "America/New_York"}}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 176,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -745,7 +745,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 3198739830877944511,
@@ -840,7 +840,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": {"text": "2025"}}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 244,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -862,7 +862,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 3198739830877944511,
@@ -964,7 +964,7 @@
             3. Wrote the year (2025) as a single number to a file.
           ''',
           'gen_ai.output.type': 'text',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 268,
           'gen_ai.usage.output_tokens': 55,
         }),
@@ -986,7 +986,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 3198739830877944511,
@@ -1019,7 +1019,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
         }),
         'context': dict({
           'is_remote': False,
@@ -1085,7 +1085,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": "{}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 193,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -1107,7 +1107,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 13794501128766776,
@@ -1200,7 +1200,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": "{}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 284,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -1222,7 +1222,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 13794501128766776,
@@ -1314,7 +1314,7 @@
             3. Wrote the year (2025) as a single number to a file.
           ''',
           'gen_ai.output.type': 'text',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 308,
           'gen_ai.usage.output_tokens': 55,
         }),
@@ -1336,7 +1336,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 13794501128766776,
@@ -1369,7 +1369,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
         }),
         'context': dict({
           'is_remote': False,
@@ -1435,7 +1435,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": "{\\"timezone\\":\\"America/New_York\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 299,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -1457,7 +1457,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 4139765639447034684,
@@ -1544,7 +1544,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": "{\\"text\\":\\"2025\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 382,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -1566,7 +1566,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 4139765639447034684,
@@ -1658,7 +1658,7 @@
             3. Wrote the year value (2025) to a file.
           ''',
           'gen_ai.output.type': 'text',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
           'gen_ai.usage.input_tokens': 406,
           'gen_ai.usage.output_tokens': 52,
         }),
@@ -1680,7 +1680,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 4139765639447034684,
@@ -1713,7 +1713,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
         }),
         'context': dict({
           'is_remote': False,
@@ -1781,8 +1781,8 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": "{\\"timezone\\":\\"America/New_York\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
-          'gen_ai.response.model': 'gpt-4.1-mini-2025-04-14',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.response.model': 'mistral/mistral-medium-latest-2025-04-14',
           'gen_ai.usage.input_tokens': 200,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -1804,7 +1804,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 1643607755459745391,
@@ -1898,8 +1898,8 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": "{\\"text\\":\\"2025\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
-          'gen_ai.response.model': 'gpt-4.1-mini-2025-04-14',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.response.model': 'mistral/mistral-medium-latest-2025-04-14',
           'gen_ai.usage.input_tokens': 327,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -1921,7 +1921,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 1643607755459745391,
@@ -2009,8 +2009,8 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "final_answer", "tool.args": "{\\"answer\\":\\"Steps taken:\\\\n1. Used the \'get_current_time\' function to get the current date and time in the America/New_York timezone.\\\\n2. Extracted the year (2025) from the returned datetime string.\\\\n3. Used the \'write_file\' function to write the year (2025) to a file.\\\\n\\\\nThe year in the America/New_York timezone is 2025.\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
-          'gen_ai.response.model': 'gpt-4.1-mini-2025-04-14',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.response.model': 'mistral/mistral-medium-latest-2025-04-14',
           'gen_ai.usage.input_tokens': 408,
           'gen_ai.usage.output_tokens': 97,
         }),
@@ -2032,7 +2032,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 1643607755459745391,
@@ -2127,7 +2127,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
         }),
         'context': dict({
           'is_remote': False,
@@ -2193,8 +2193,8 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": "{\\"timezone\\":\\"America/New_York\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
-          'gen_ai.response.model': 'gpt-4.1-mini-2025-04-14',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.response.model': 'mistral/mistral-medium-latest-2025-04-14',
           'gen_ai.usage.input_tokens': 180,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -2216,7 +2216,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 9557437574363556845,
@@ -2309,8 +2309,8 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": "{\\"text\\":\\"2025\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'gpt-4.1-mini',
-          'gen_ai.response.model': 'gpt-4.1-mini-2025-04-14',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.response.model': 'mistral/mistral-medium-latest-2025-04-14',
           'gen_ai.usage.input_tokens': 248,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -2332,7 +2332,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 9557437574363556845,
@@ -2424,8 +2424,8 @@
             3. Wrote the year (2025) as a single number to a file.
           ''',
           'gen_ai.output.type': 'text',
-          'gen_ai.request.model': 'gpt-4.1-mini',
-          'gen_ai.response.model': 'gpt-4.1-mini-2025-04-14',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.response.model': 'mistral/mistral-medium-latest-2025-04-14',
           'gen_ai.usage.input_tokens': 272,
           'gen_ai.usage.output_tokens': 55,
         }),
@@ -2447,7 +2447,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm gpt-4.1-mini',
+        'name': 'call_llm mistral/mistral-medium-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 9557437574363556845,
@@ -2480,7 +2480,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'gpt-4.1-mini',
+          'gen_ai.request.model': 'mistral/mistral-medium-latest',
         }),
         'context': dict({
           'is_remote': False,

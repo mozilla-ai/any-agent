@@ -21,7 +21,7 @@ from any_agent import AgentConfig
 from any_agent.tools import search_web
 
 main_agent = AgentConfig(
-    model_id="gpt-4o-mini",
+    model_id="mistral/mistral-small-latest",
     tools=[search_web]
 )
 ```
@@ -42,7 +42,7 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
     from any_agent.config import MCPStdio
 
     main_agent = AgentConfig(
-        model_id="gpt-4o-mini",
+        model_id="mistral/mistral-small-latest",
         tools=[
             MCPStdio(
                 command="docker",
@@ -62,7 +62,7 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
     from any_agent.config import MCPSse
 
     main_agent = AgentConfig(
-        model_id="gpt-4o-mini",
+        model_id="mistral/mistral-small-latest",
         tools=[
             MCPSse(
                 url="http://localhost:8000/sse"
@@ -89,7 +89,7 @@ async def main():
     agent_cfg = AgentConfig(
         instructions="Use the available tools to obtain additional information to answer the query.",
         description="A sample agent.",
-        model_id="gpt-4o-mini",
+        model_id="mistral/mistral-small-latest",
         tools=[some_agent_tool],
     )
 asyncio.run(main())

@@ -8,7 +8,7 @@ from any_agent.tools import search_tavily
 def test_no_instrument(
     agent_framework: AgentFramework,
 ) -> None:
-    model_id = "gpt-4.1-nano"
+    model_id = "mistral/mistral-small-latest"
     env_check = validate_environment("model_id")
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")

@@ -27,7 +27,7 @@ def mock_capital(query: str) -> str:
 @pytest.mark.asyncio
 async def test_run_agent_concurrently(agent_framework: AgentFramework) -> None:
     """When an agent is run concurrently, state from the first run shouldn't bleed into the second run"""
-    model_id = "gpt-4.1-nano"
+    model_id = "mistral/mistral-small-latest"
     env_check = validate_environment(model_id)
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
