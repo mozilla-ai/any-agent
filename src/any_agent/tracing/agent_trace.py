@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from litellm.cost_calculator import cost_per_token
 from opentelemetry.sdk.trace import ReadableSpan
-from pydantic import BaseModel, ConfigDict, Field, field_serializer
+from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.logging import logger
 
@@ -220,23 +220,11 @@ class AgentTrace(BaseModel):
     """A list of [`AgentSpan`][any_agent.tracing.agent_trace.AgentSpan] that form the trace.
     """
 
-    final_output: str | BaseModel | None = Field(default=None)
+    final_output: str | dict[str, Any] | BaseModel | None = Field(default=None)
     """Contains the final output message returned by the agent.
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    @field_serializer("final_output")
-    def serialize_final_output(self, value: str | BaseModel | None) -> Any:
-        """Serialize the final_output and handle any BaseModel subclass."""
-        if value is None:
-            return None
-        if isinstance(value, str):
-            return value
-        if isinstance(value, BaseModel):
-            # This will properly serialize any BaseModel subclass
-            return value.model_dump()
-        return value
 
     def _invalidate_tokens_and_cost_cache(self) -> None:
         """Clear the cached tokens_and_cost property if it exists."""
