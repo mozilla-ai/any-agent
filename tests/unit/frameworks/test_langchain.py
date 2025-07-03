@@ -17,10 +17,16 @@ def test_load_langchain_agent_default() -> None:
         patch("any_agent.frameworks.langchain.DEFAULT_MODEL_TYPE", model_mock),
         patch("langchain_core.tools.tool", tool_mock),
     ):
-        AnyAgent.create(AgentFramework.LANGCHAIN, AgentConfig(model_id="mistral/mistral-medium-latest"))
+        AnyAgent.create(
+            AgentFramework.LANGCHAIN,
+            AgentConfig(model_id="mistral/mistral-medium-latest"),
+        )
 
         model_mock.assert_called_once_with(
-            model="mistral/mistral-medium-latest", api_base=None, api_key=None, model_kwargs={}
+            model="mistral/mistral-medium-latest",
+            api_base=None,
+            api_key=None,
+            model_kwargs={},
         )
         create_mock.assert_called_once_with(
             name="any_agent",
@@ -33,7 +39,10 @@ def test_load_langchain_agent_default() -> None:
 def test_load_langchain_agent_missing() -> None:
     with patch("any_agent.frameworks.langchain.langchain_available", False):
         with pytest.raises(ImportError):
-            AnyAgent.create(AgentFramework.LANGCHAIN, AgentConfig(model_id="mistral/mistral-medium-latest"))
+            AnyAgent.create(
+                AgentFramework.LANGCHAIN,
+                AgentConfig(model_id="mistral/mistral-medium-latest"),
+            )
 
 
 def test_run_langchain_agent_custom_args() -> None:
@@ -48,7 +57,8 @@ def test_run_langchain_agent_custom_args() -> None:
         patch("langchain_core.tools.tool"),
     ):
         agent = AnyAgent.create(
-            AgentFramework.LANGCHAIN, AgentConfig(model_id="mistral/mistral-medium-latest")
+            AgentFramework.LANGCHAIN,
+            AgentConfig(model_id="mistral/mistral-medium-latest"),
         )
         agent.run("foo", debug=True)
         agent_mock.ainvoke.assert_called_once_with(

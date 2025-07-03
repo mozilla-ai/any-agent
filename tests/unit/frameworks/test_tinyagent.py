@@ -42,7 +42,9 @@ def test_run_tinyagent_agent_custom_args() -> None:
     create_mock.return_value = agent_mock
     output = "The state capital of Pennsylvania is Harrisburg."
 
-    agent = AnyAgent.create(AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-medium-latest"))
+    agent = AnyAgent.create(
+        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-medium-latest")
+    )
     with patch(
         "any_agent.frameworks.tinyagent.litellm.acompletion"
     ) as mock_acompletion:

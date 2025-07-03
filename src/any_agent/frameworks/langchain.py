@@ -11,15 +11,18 @@ from .any_agent import AnyAgent
 try:
     from langchain_core.language_models import LanguageModelLike
     from langchain_litellm import ChatLiteLLM
-    from langchain_litellm.chat_models.litellm import _convert_message_to_dict
 
     # Patch the _OPENAI_MODELS list to include additional models
     # This can be removed after https://github.com/Akshay-Dongare/langchain-litellm/issues/7
     from langchain_litellm.chat_models import litellm as langchain_litellm_module
+    from langchain_litellm.chat_models.litellm import _convert_message_to_dict
     from langgraph.prebuilt import create_react_agent
 
     # Add your custom models to the existing list
-    additional_models = ["mistral/mistral-medium-latest", "mistral/mistral-small-latest"]
+    additional_models = [
+        "mistral/mistral-medium-latest",
+        "mistral/mistral-small-latest",
+    ]
 
     # Extend the existing _OPENAI_MODELS list
     if hasattr(langchain_litellm_module, "_OPENAI_MODELS"):
@@ -104,13 +107,18 @@ class LangchainAgent(AnyAgent):
                 "role": "user",
                 "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
             }
-            completion_params = {}
+            completion_params: dict[str, Any] = {}
             if self.config.model_args:
                 completion_params.update(self.config.model_args)
             completion_params["tool_choice"] = "none"
             completion_params["model"] = self.config.model_id
-            previous_messages = [ _convert_message_to_dict(m) for m in result["messages"] ]
-            completion_params["messages"] = [*previous_messages, structured_output_message]
+            previous_messages = [
+                _convert_message_to_dict(m) for m in result["messages"]
+            ]
+            completion_params["messages"] = [
+                *previous_messages,
+                structured_output_message,
+            ]
 
             # Use response schema if supported by the model
             if supports_response_schema(model=self.config.model_id):
@@ -118,7 +126,7 @@ class LangchainAgent(AnyAgent):
 
             response = await litellm.acompletion(**completion_params)
             return self.config.output_type.model_validate_json(
-                response.choices[0].message["content"]  # type: ignore[union-attr]
+                response.choices[0].message["content"]
             )
 
         return content

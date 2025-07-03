@@ -39,18 +39,24 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
 
 
 def test_create_any_with_framework(agent_framework: AgentFramework) -> None:
-    agent = AnyAgent.create(agent_framework, AgentConfig(model_id="mistral/mistral-medium-latest"))
+    agent = AnyAgent.create(
+        agent_framework, AgentConfig(model_id="mistral/mistral-medium-latest")
+    )
     assert agent
 
 
 def test_create_any_with_valid_string(agent_framework: AgentFramework) -> None:
-    agent = AnyAgent.create(agent_framework.name, AgentConfig(model_id="mistral/mistral-medium-latest"))
+    agent = AnyAgent.create(
+        agent_framework.name, AgentConfig(model_id="mistral/mistral-medium-latest")
+    )
     assert agent
 
 
 def test_create_any_with_invalid_string() -> None:
     with pytest.raises(ValueError, match="Unsupported agent framework"):
-        AnyAgent.create("non-existing", AgentConfig(model_id="mistral/mistral-medium-latest"))
+        AnyAgent.create(
+            "non-existing", AgentConfig(model_id="mistral/mistral-medium-latest")
+        )
 
 
 def test_model_args(
