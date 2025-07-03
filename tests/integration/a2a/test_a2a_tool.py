@@ -148,6 +148,7 @@ def _run_server(
         server_queue=server_queue,
     )
 
+
 def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
     """Tests that an agent contacts another using A2A using the sync adapter tool.
 

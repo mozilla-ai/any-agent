@@ -22,7 +22,7 @@ from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from any_agent.tracing.exporter import _ConsoleExporter
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, DEFAULT_MEDIUM_MODEL_ID
+from tests.integration.helpers import DEFAULT_MEDIUM_MODEL_ID, DEFAULT_SMALL_MODEL_ID
 
 
 def uvx_installed() -> bool:
