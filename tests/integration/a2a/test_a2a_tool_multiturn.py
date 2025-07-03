@@ -150,7 +150,7 @@ class MockConversationAgent(TinyAgent):
         spans = []
         spans.append(
             AgentSpan(
-                name="call_llm gpt-4o-mini",
+                name="call_llm gpt-4.1-nano",
                 kind=SpanKind.INTERNAL,
                 status=Status(),
                 context=SpanContext(span_id=123),
@@ -185,7 +185,7 @@ async def test_a2a_tool_multiturn() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id="gpt-4o-mini",  # Using real model ID but will be mocked
+        model_id="gpt-4.1-nano",  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
@@ -201,7 +201,7 @@ async def test_a2a_tool_multiturn() -> None:
     # Configure session management with short timeout for testing
     serving_config = A2AServingConfig(
         port=0,
-        task_timeout_minutes=2,  # Short timeout for testing
+        context_timeout_minutes=2,  # Short timeout for testing
     )
 
     server_handle = await agent.serve_async(serving_config=serving_config)
@@ -240,6 +240,10 @@ async def test_a2a_tool_multiturn() -> None:
             )
 
             assert response_1 is not None
+            # if the response is JSONRPCErrorResposne, log and raise an error
+            if hasattr(response_1.root, "error"):
+                msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
+                raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
                 response_1.root.result.status.message.parts[0].root.text
             )
@@ -257,7 +261,6 @@ async def test_a2a_tool_multiturn() -> None:
                     ],
                     "messageId": str(uuid4()),
                     "contextId": response_1.root.result.contextId,  # Same context to continue conversation
-                    "taskId": response_1.root.result.id,
                 },
             }
 
@@ -269,6 +272,10 @@ async def test_a2a_tool_multiturn() -> None:
             )
 
             assert response_2 is not None
+            # if the response is JSONRPCErrorResposne, log and raise an error
+            if hasattr(response_2.root, "error"):
+                msg = f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}"
+                raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
                 response_2.root.result.status.message.parts[0].root.text
             )
@@ -283,8 +290,8 @@ async def test_a2a_tool_multiturn() -> None:
                     "role": "user",
                     "parts": [{"kind": "text", "text": THIRD_TURN_PROMPT}],
                     "messageId": str(uuid4()),
-                    "contextId": response_1.root.result.contextId,  # Same context to continue conversation
-                    "taskId": response_1.root.result.id,
+                    "contextId": response_2.root.result.contextId,  # Same context to continue conversation
+                    "taskId": response_2.root.result.id,
                 },
             }
             request_3 = SendMessageRequest(
@@ -294,6 +301,10 @@ async def test_a2a_tool_multiturn() -> None:
                 request_3, http_kwargs={"timeout": 30.0}
             )
             assert response_3 is not None
+            # if the response is JSONRPCErrorResposne, log and raise an error
+            if hasattr(response_3.root, "error"):
+                msg = f"Error: {response_3.root.error.message}, Code: {response_3.root.error.code}, Data: {response_3.root.error.data}"
+                raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
                 response_3.root.result.status.message.parts[0].root.text
             )
@@ -310,7 +321,7 @@ async def test_a2a_tool_multiturn_async() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id="gpt-4o-mini",  # Using real model ID but will be mocked
+        model_id="gpt-4.1-nano",  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
@@ -327,7 +338,7 @@ async def test_a2a_tool_multiturn_async() -> None:
     # Configure session management with short timeout for testing
     serving_config = A2AServingConfig(
         port=0,
-        task_timeout_minutes=2,  # Short timeout for testing
+        context_timeout_minutes=2,  # Short timeout for testing
     )
 
     server_handle = await agent.serve_async(serving_config=serving_config)
@@ -343,7 +354,6 @@ async def test_a2a_tool_multiturn_async() -> None:
         main_agent_cfg = AgentConfig(
             model_id="gpt-4.1-nano",
             instructions="Use the available tools to obtain additional information to answer the query.",
-            description="The orchestrator that can use other agents via tools using the A2A protocol.",
             tools=[await a2a_tool_async(server_url)],
             output_type=MainAgentAnswer,
             model_args={
@@ -362,7 +372,9 @@ async def test_a2a_tool_multiturn_async() -> None:
         2. {SECOND_TURN_PROMPT}
         3. {THIRD_TURN_PROMPT}
 
-        Make sure you appropriately continue the conversation by providing it with the task id if you want to continue the conversation.
+        For question 1, when calling the tool, do not provide the context id or the task id.
+        For question 2, when calling the tool, provide the context id but omit the task id.
+        For question 3, when calling the tool, provide both the context id and the task id.
         """
 
         agent_trace = await main_agent.run_async(prompt)
