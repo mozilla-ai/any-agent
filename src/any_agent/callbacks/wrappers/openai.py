@@ -3,39 +3,39 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from opentelemetry.trace import get_current_span
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from any_agent.callbacks.context import Context
     from any_agent.frameworks.openai import OpenAIAgent
 
 
 class _OpenAIAgentsWrapper:
     def __init__(self) -> None:
+        self.callback_context: dict[int, Context] = {}
         self._original_llm_call: Callable[..., Any] | None = None
         self._original_get_all_tools: Callable[..., Any] | None = None
         self._original_invokes: dict[str, Any] = {}
-        self.context: dict[str, Any] = {}
 
     async def wrap(self, agent: OpenAIAgent) -> None:
-        if len(agent._running_traces) > 1:
-            return
-
-        self.context["running_traces"] = agent._running_traces
-        self.context["tracer"] = agent._tracer
-        self.context["model_id"] = getattr(agent._agent.model, "model", None)
 
         self._original_llm_call = agent._agent.model.get_response
 
         async def wrapped_llm_call(*args, **kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
+            context.shared["model_id"] = getattr(agent._agent.model, "model", None)
+
             for callback in agent.config.callbacks:
-                self.context = callback.before_llm_call(self.context, *args, **kwargs)
+                context = callback.before_llm_call(context, *args, **kwargs)
 
             output = await self._original_llm_call(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                self.context = callback.after_llm_call(
-                    self.context, output, *args, **kwargs
-                )
+                context = callback.after_llm_call(context, output,)
 
             return output
 
@@ -47,19 +47,18 @@ class _OpenAIAgentsWrapper:
         async def wrapped_tool_execution(
             original_tool, original_invoke, *args, **kwargs
         ):
-            context = {**self.context, "original_tool": original_tool}
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
+            context.shared["original_tool"] = original_tool
+
             for callback in agent.config.callbacks:
                 context = callback.before_tool_execution(context, *args, **kwargs)
 
             output = await original_invoke(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(
-                    context, output, *args, **kwargs
-                )
-
-            context.pop("original_tool")
-            self.context = context
+                context = callback.after_tool_execution(context, output,)
 
             return output
 
@@ -88,9 +87,6 @@ class _OpenAIAgentsWrapper:
         agent._agent.get_all_tools = wrapped_get_all_tools
 
     async def unwrap(self, agent: OpenAIAgent) -> None:
-        if len(agent._running_traces) > 1:
-            return
-
         if self._original_llm_call is not None:
             agent._agent.model.get_response = self._original_llm_call
 

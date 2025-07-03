@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, assert_never, overload
 
 from opentelemetry import trace as otel_trace
 
+from any_agent.callbacks.context import Context
 from any_agent.callbacks.wrappers import (
     _get_wrapper_by_framework,
 )
@@ -79,7 +80,7 @@ class AnyAgent(ABC):
         self._tracer: Tracer = otel_trace.get_tracer(SCOPE_NAME)
 
         self._lock = asyncio.Lock()
-        self._running_traces: dict[int, AgentTrace] = {}
+        self._callback_context: dict[int, Context] = {}
 
     @staticmethod
     def _get_agent_type_by_framework(
@@ -187,15 +188,21 @@ class AnyAgent(ABC):
                 f"invoke_agent [{self.config.name}]"
             ) as invoke_span:
                 if self._wrapper:
-                    trace_id = invoke_span.get_span_context().trace_id
                     async with self._lock:
-                        # We check the locked `_running_traces` inside `wrap`.
-                        # If there is more than 1 entry in `running_traces`, it means that the agent has
-                        # already being wrapped so we won't wrap it again.
-                        self._running_traces[trace_id] = AgentTrace()
-                        await self._wrapper.wrap(
-                            agent=self,  # type: ignore[arg-type]
+                        trace_id = invoke_span.get_span_context().trace_id
+                        self._wrapper.callback_context[trace_id] = Context(
+                            current_span=invoke_span,
+                            trace=AgentTrace(),
+                            tracer=self._tracer,
+                            shared={},
                         )
+
+                        if len(self._wrapper.callback_context) == 1:
+                            # If there is more than 1 entry in `callback_context`, it means that the agent has
+                            # already being wrapped so we won't wrap it again.
+                            await self._wrapper.wrap(
+                                agent=self,  # type: ignore[arg-type]
+                            )
 
                 invoke_span.set_attributes(
                     {
@@ -206,21 +213,28 @@ class AnyAgent(ABC):
                         "gen_ai.request.model": self.config.model_id,
                     }
                 )
+
                 final_output = await self._run_async(prompt, **kwargs)
         except Exception as e:
             if self._wrapper:
                 async with self._lock:
-                    await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-                    wrapped_trace = self._running_traces.pop(trace_id)
-                    if wrapped_trace is not None:
-                        trace = wrapped_trace
+                    if len(self._wrapper.callback_context) == 1:
+                        await self._wrapper.unwrap(self)  # type: ignore[arg-type]
+                    if wrapped_context := self._wrapper.callback_context.pop(
+                        trace_id, None
+                    ):
+                        trace = wrapped_context.trace
             trace.add_span(invoke_span)
             raise AgentRunError(trace, e) from e
 
         if self._wrapper:
             async with self._lock:
-                await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-                trace = self._running_traces.pop(trace_id)
+                if len(self._wrapper.callback_context) == 1:
+                    await self._wrapper.unwrap(self)  # type: ignore[arg-type]
+                if wrapped_context := self._wrapper.callback_context.pop(
+                    trace_id, None
+                ):
+                    trace = wrapped_context.trace
 
         trace.add_span(invoke_span)
         trace.final_output = final_output

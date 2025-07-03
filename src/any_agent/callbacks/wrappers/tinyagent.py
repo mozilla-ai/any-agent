@@ -4,48 +4,52 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
+from opentelemetry.trace import get_current_span
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from any_agent.callbacks.context import Context
     from any_agent.frameworks.tinyagent import TinyAgent
 
 
 class _TinyAgentWrapper:
     def __init__(self) -> None:
+        self.callback_context: dict[int, Context] = {}
         self._original_llm_call: Callable[..., Any] | None = None
         self._original_clients: Any | None = None
-        self.context: dict[str, Any] = {}
 
     async def wrap(self, agent: TinyAgent) -> None:
-        if len(agent._running_traces) > 1:
-            return
-
-        self.context["running_traces"] = agent._running_traces
-        self.context["tracer"] = agent._tracer
 
         self._original_llm_call = agent.call_model
 
         async def wrap_call_model(**kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
             for callback in agent.config.callbacks:
-                self.context = callback.before_llm_call(self.context, **kwargs)
+                context = callback.before_llm_call(context, **kwargs)
 
             output = await self._original_llm_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                self.context = callback.after_llm_call(self.context, output)
+                context = callback.after_llm_call(context, output)
 
             return output
 
         agent.call_model = wrap_call_model
 
         async def wrapped_tool_execution(original_call, request):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
             for callback in agent.config.callbacks:
-                self.context = callback.before_tool_execution(self.context, request)
+                context = callback.before_tool_execution(context, request)
 
             output = await original_call(request)
 
             for callback in agent.config.callbacks:
-                self.context = callback.after_tool_execution(self.context, output)
+                context = callback.after_tool_execution(context, output)
 
             return output
 
@@ -65,8 +69,6 @@ class _TinyAgentWrapper:
         agent.clients = wrapped_tools
 
     async def unwrap(self, agent: TinyAgent) -> None:
-        if len(agent._running_traces) > 1:
-            return
         if self._original_llm_call:
             agent.call_model = self._original_llm_call
         if self._original_clients:
