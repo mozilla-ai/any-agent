@@ -1,161 +1,76 @@
 # mypy: disable-error-code="method-assign,no-untyped-def,union-attr"
 from __future__ import annotations
 
-import json
 from typing import TYPE_CHECKING, Any
 
-from opentelemetry.trace import StatusCode, get_current_span
-
-from any_agent.callbacks.base import Callback
-from any_agent.callbacks.span_generation.common import _set_tool_output
+from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
     from langchain_core.messages import BaseMessage
     from langchain_core.outputs import LLMResult
-    from opentelemetry.trace import Span, Tracer
+
+    from any_agent.callbacks.context import Context
 
 
-def _set_llm_input(messages: list[list[BaseMessage]], span: Span) -> None:
-    if not messages:
-        return
-    if not messages[0]:
-        return
+class _LangchainSpanGeneration(_SpanGeneration):
+    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+        messages: list[list[BaseMessage]] = args[1]
+        if not messages or not messages[0]:
+            return context
 
-    span.set_attribute(
-        "gen_ai.input.messages",
-        json.dumps(
-            [
-                {
-                    "role": message.type.replace("human", "user"),
-                    "content": message.content,
-                }
-                for message in messages[0]
-            ],
-            default=str,
-            ensure_ascii=False,
-        ),
-    )
+        model_id = kwargs.get("invocation_params", {}).get("model", "No model")
 
-
-def _set_llm_output(response: LLMResult, span: Span) -> None:
-    if not response.generations:
-        return
-    if not response.generations[0]:
-        return
-
-    generation = response.generations[0][0]
-
-    if text := generation.text:
-        span.set_attributes(
+        input_messages = [
             {
-                "gen_ai.output": text,
-                "gen_ai.output.type": "text",
+                "role": str(message.type).replace("human", "user"),
+                "content": str(message.content),
             }
-        )
-    if message := getattr(generation, "message", None):
-        if tool_calls := getattr(message, "tool_calls", None):
-            span.set_attributes(
-                {
-                    "gen_ai.output": json.dumps(
-                        [
-                            {
-                                "tool.name": tool.get("name", "No name"),
-                                "tool.args": tool.get("args", "No args"),
-                            }
-                            for tool in tool_calls
-                        ],
-                        default=str,
-                        ensure_ascii=False,
-                    ),
-                    "gen_ai.output.type": "json",
-                }
-            )
+            for message in messages[0]
+        ]
 
-    if llm_output := getattr(response, "llm_output", None):
-        if token_usage := llm_output.get("token_usage", None):
-            span.set_attributes(
-                {
-                    "gen_ai.usage.input_tokens": token_usage.prompt_tokens,
-                    "gen_ai.usage.output_tokens": token_usage.completion_tokens,
-                }
-            )
+        return self._set_llm_input(context, model_id, input_messages)
 
+    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+        response: LLMResult = args[0]
+        if not response.generations or not response.generations[0]:
+            return context
 
-class _LangchainSpanGeneration(Callback):
-    def __init__(self) -> None:
-        self.first_llm_calls: set[int] = set()
-        super().__init__()
+        generation = response.generations[0][0]
 
-    def before_llm_call(self, context, *args, **kwargs):
-        tracer: Tracer = context["tracer"]
+        output: str | list[dict[str, Any]]
+        if text := generation.text:
+            output = text
+        elif message := getattr(generation, "message", None):
+            if tool_calls := getattr(message, "tool_calls", None):
+                output = [
+                    {
+                        "tool.name": tool.get("name", "No name"),
+                        "tool.args": tool.get("args", "No args"),
+                    }
+                    for tool in tool_calls
+                ]
 
-        messages = args[1]
+        input_tokens = 0
+        output_tokens = 0
+        if llm_output := getattr(response, "llm_output", None):
+            if token_usage := llm_output.get("token_usage", None):
+                input_tokens = token_usage.prompt_tokens
+                output_tokens = token_usage.completion_tokens
 
-        model = kwargs.get("invocation_params", {}).get("model", "No model")
-        span: Span = tracer.start_span(
-            name=f"call_llm {model}",
-        )
-        span.set_attributes(
-            {
-                "gen_ai.operation.name": "call_llm",
-                "gen_ai.request.model": model,
-            }
-        )
-        trace_id = span.get_span_context().trace_id
-        if trace_id not in self.first_llm_calls:
-            self.first_llm_calls.add(trace_id)
-            _set_llm_input(messages, span)
+        return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-        context[f"call_llm-{trace_id}"] = span
-
-        return context
-
-    def after_llm_call(self, context, response: LLMResult, *args, **kwargs):
-        trace_id = get_current_span().get_span_context().trace_id
-        span: Span = context[f"call_llm-{trace_id}"]
-        _set_llm_output(response, span)
-        span.set_status(StatusCode.OK)
-
-        return context
-
-    def before_tool_execution(
-        self,
-        context: dict[str, Any],
-        serialized: dict[str, Any],
-        input_str,
-        *args,
-        **kwargs,
-    ):
-        tracer: Tracer = context["tracer"]
-
-        span: Span = tracer.start_span(
-            name=f"execute_tool {serialized.get('name')}",
-        )
-        span.set_attributes(
-            {
-                "gen_ai.operation.name": "execute_tool",
-                "gen_ai.tool.name": serialized.get("name", "No name"),
-                "gen_ai.tool.description": serialized.get(
-                    "description", "No description"
-                ),
-                "gen_ai.tool.args": json.dumps(
-                    kwargs.get("inputs", {}), default=str, ensure_ascii=False
-                ),
-            }
+    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        serialized: dict[str, Any] = args[0]
+        return self._set_tool_input(
+            context,
+            name=serialized.get("name", "No name"),
+            description=serialized.get("description"),
+            args=kwargs.get("inputs"),
         )
 
-        trace_id = span.get_span_context().trace_id
-        context[f"execute_tool-{trace_id}"] = span
-
-        return context
-
-    def after_tool_execution(self, context, output, *args, **kwargs):
-        trace_id = get_current_span().get_span_context().trace_id
-        span: Span = context[f"execute_tool-{trace_id}"]
-
+    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        output = args[0]
         if content := getattr(output, "content", None):
-            _set_tool_output(content, span)
-            if tool_call_id := getattr(output, "tool_call_id", None):
-                span.set_attribute("gen_ai.tool.call.id", tool_call_id)
+            return self._set_tool_output(context, content)
 
         return context

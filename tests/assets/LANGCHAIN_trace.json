@@ -5,12 +5,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7207974586661659304,
 =======
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 4665685493851860178,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 8568617676130014826,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -20,17 +25,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443008140859853,
       "end_time": 1751443010512145557,
 =======
       "start_time": 1751364628495711646,
       "end_time": 1751364634109390657,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542061173525069,
+      "end_time": 1751542061899626908,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 13201657136171109097,
@@ -38,6 +49,10 @@
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 10341212905524214750,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 5043846032307891654,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -61,7 +76,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -72,12 +87,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7207974586661659304,
 =======
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 4665685493851860178,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 8568617676130014826,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -87,17 +107,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443010517770178,
       "end_time": 1751443010521331753,
 =======
       "start_time": 1751364634116087417,
       "end_time": 1751364634120982537,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542061912951922,
+      "end_time": 1751542061920739439,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 10879050815132692786,
@@ -105,6 +131,10 @@
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 6509301554472621870,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 14593004389578011270,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -119,6 +149,7 @@
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
 <<<<<<< HEAD
+<<<<<<< HEAD
         "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-02T03:56:50-04:00\",\n  \"is_dst\": true\n}",
         "gen_ai.output.type": "json",
         "gen_ai.tool.call.id": "call_5BPaLUIAartwhORlhI2taNow"
@@ -127,6 +158,10 @@
         "gen_ai.output.type": "json",
         "gen_ai.tool.call.id": "call_P2HqOj1TKmFg55sbRD2KY9MY"
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-03T07:27:41-04:00\",\n  \"is_dst\": true\n}",
+        "gen_ai.output.type": "json"
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       },
       "links": [],
       "events": [],
@@ -134,7 +169,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -145,12 +180,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7207974586661659304,
 =======
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 4665685493851860178,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 8568617676130014826,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -160,17 +200,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443010526161719,
       "end_time": 1751443011032820856,
 =======
       "start_time": 1751364634125803205,
       "end_time": 1751364634689726356,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542061927840525,
+      "end_time": 1751542062672990804,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 6921030465518385784,
@@ -178,6 +224,10 @@
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 7515824420279852193,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 2020654554214858181,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -200,7 +250,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -211,12 +261,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7207974586661659304,
 =======
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 4665685493851860178,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 8568617676130014826,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -226,17 +281,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443011036996583,
       "end_time": 1751443011037601799,
 =======
       "start_time": 1751364634698487812,
       "end_time": 1751364634699343626,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542062681502246,
+      "end_time": 1751542062682555803,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7752104089924401862,
@@ -244,6 +305,10 @@
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 7498092294019968934,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 8726554329647082390,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -258,12 +323,16 @@
         "gen_ai.tool.description": "write the text to a file in the tmp_path directory\n\nArgs:\n    text (str): The text to write to the file.\n\nReturns:\n    None",
         "gen_ai.tool.args": "{\"text\": \"2025\"}",
         "gen_ai.output": "null",
+<<<<<<< HEAD
         "gen_ai.output.type": "json",
 <<<<<<< HEAD
         "gen_ai.tool.call.id": "call_dT2Ai16L5k3Yx6JGl0SqTL04"
 =======
         "gen_ai.tool.call.id": "call_LZmr2UlL94d17kSrRlk32fwj"
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "gen_ai.output.type": "json"
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       },
       "links": [],
       "events": [],
@@ -271,7 +340,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -282,12 +351,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7207974586661659304,
 =======
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 4665685493851860178,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 8568617676130014826,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -296,6 +370,7 @@
           "entries": {}
         }
       },
+<<<<<<< HEAD
 <<<<<<< HEAD
       "start_time": 1751443011041630042,
       "end_time": 1751443012297815793,
@@ -303,11 +378,16 @@
       "start_time": 1751364634704291502,
       "end_time": 1751364636579942450,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542062694588478,
+      "end_time": 1751542065279566371,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 3594518962711009302,
@@ -315,6 +395,10 @@
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 12806285956343663450,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 13047973776983136850,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -326,10 +410,10 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.output": "Steps taken:\n1. Retrieved the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the retrieved date and time.\n3. Wrote the year (2025) as a single number to a file.",
+        "gen_ai.output": "Steps taken:\n1. Retrieved the current date and time in the America/New_York timezone.\n2. Extracted the year (2025) from the retrieved date.\n3. Wrote the year (2025) as a single number to a file.",
         "gen_ai.output.type": "text",
         "gen_ai.usage.input_tokens": 265,
-        "gen_ai.usage.output_tokens": 55
+        "gen_ai.usage.output_tokens": 53
       },
       "links": [],
       "events": [],
@@ -337,7 +421,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -348,12 +432,17 @@
       "kind": "internal",
       "parent": {
 <<<<<<< HEAD
+<<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7207974586661659304,
 =======
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 4665685493851860178,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 8568617676130014826,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -363,17 +452,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443012319396075,
       "end_time": 1751443014070746001,
 =======
       "start_time": 1751364636594418629,
       "end_time": 1751364638156298301,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542065343912842,
+      "end_time": 1751542069450161400,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7313606902743325902,
@@ -381,6 +476,10 @@
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 11169876265730361993,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 5878739044562995143,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -392,10 +491,10 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.output": "[{\"tool.name\": \"Steps\", \"tool.args\": {\"steps\": [{\"number\": 1, \"description\": \"Retrieved the current date and time in the America/New_York timezone.\"}, {\"number\": 2, \"description\": \"Extracted the year (2025) from the retrieved date and time.\"}, {\"number\": 3, \"description\": \"Wrote the year (2025) as a single number to a file.\"}]}}]",
+        "gen_ai.output": "[{\"tool.name\": \"Steps\", \"tool.args\": {\"steps\": [{\"number\": 1, \"description\": \"Retrieved the current date and time in the America/New_York timezone.\"}, {\"number\": 2, \"description\": \"Extracted the year (2025) from the retrieved date.\"}, {\"number\": 3, \"description\": \"Wrote the year (2025) as a single number to a file.\"}]}}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 231,
-        "gen_ai.usage.output_tokens": 81
+        "gen_ai.usage.input_tokens": 229,
+        "gen_ai.usage.output_tokens": 79
       },
       "links": [],
       "events": [],
@@ -403,7 +502,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -424,17 +523,23 @@
         }
       },
 <<<<<<< HEAD
+<<<<<<< HEAD
       "start_time": 1751443008122939438,
       "end_time": 1751443014078673682,
 =======
       "start_time": 1751364628488885681,
       "end_time": 1751364638167028580,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+      "start_time": 1751542061150866612,
+      "end_time": 1751542069463792041,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
+<<<<<<< HEAD
 <<<<<<< HEAD
         "trace_id": 109017751807985128252918013942510315486,
         "span_id": 7207974586661659304,
@@ -442,6 +547,10 @@
         "trace_id": 134344031616462346762212400690826395185,
         "span_id": 4665685493851860178,
 >>>>>>> ca8cc62 (feat: Introduce `any_agent/callbacks`.)
+=======
+        "trace_id": 12470005592421257300791723746921756886,
+        "span_id": 8568617676130014826,
+>>>>>>> 9adcd0e (Add _SpanGeneration base class)
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -462,7 +571,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -477,7 +586,7 @@
       },
       {
         "number": 2,
-        "description": "Extracted the year (2025) from the retrieved date and time."
+        "description": "Extracted the year (2025) from the retrieved date."
       },
       {
         "number": 3,
