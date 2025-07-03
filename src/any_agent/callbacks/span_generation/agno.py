@@ -22,7 +22,7 @@ class _AgnoSpanGeneration(_SpanGeneration):
         return self._set_llm_input(context, context.shared["model_id"], input_messages)
 
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
-        output: str | list[dict[str, Any]]
+        output: str | list[dict[str, Any]] = ""
         if assistant_message := kwargs.get("assistant_message"):
             if content := getattr(assistant_message, "content", None):
                 output = str(content)
