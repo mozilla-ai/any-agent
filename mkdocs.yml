@@ -27,9 +27,11 @@ nav:
   - API Reference:
     - Agent: api/agent.md
     - Config: api/config.md
+    - Evaluation: api/evaluation.md
+    - Logging: api/logging.md
+    - Serving: api/serving.md
     - Tools: api/tools.md
     - Tracing: api/tracing.md
-    - Logging: api/logging.md
 
 theme:
   name: material

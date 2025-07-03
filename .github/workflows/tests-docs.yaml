@@ -34,6 +34,4 @@ jobs:
           uv sync --group tests --extra all --extra a2a
 
       - name: Run Documentation tests
-        # The env key is necessary for docs involving OTel
-        # see https://protobuf.dev/news/2022-05-06/#python-updates
-        run: PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python pytest -v tests/docs
+        run: pytest -v tests/docs

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import uvicorn
 from a2a.server.apps import A2AStarletteApplication
@@ -10,7 +10,8 @@ from a2a.server.tasks import InMemoryTaskStore
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
-from any_agent.serving.task_manager import TaskManager
+from any_agent.serving.a2a.context_manager import ContextManager
+from any_agent.serving.server_handle import ServerHandle
 from any_agent.utils import run_async_in_sync
 
 from .agent_card import _get_agent_card
@@ -30,7 +31,7 @@ def _get_a2a_app(
     agent = prepare_agent_for_a2a(agent)
 
     agent_card = _get_agent_card(agent, serving_config)
-    task_manager = TaskManager(serving_config)
+    task_manager = ContextManager(serving_config)
 
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
@@ -46,7 +47,7 @@ async def _get_a2a_app_async(
     agent = await prepare_agent_for_a2a_async(agent)
 
     agent_card = _get_agent_card(agent, serving_config)
-    task_manager = TaskManager(serving_config)
+    task_manager = ContextManager(serving_config)
 
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
@@ -77,7 +78,7 @@ async def serve_a2a_async(
     port: int,
     endpoint: str,
     log_level: str = "warning",
-) -> tuple[asyncio.Task[Any], uvicorn.Server]:
+) -> ServerHandle:
     """Provide an A2A server to be used in an event loop."""
     uv_server = _create_server(server, host, port, endpoint, log_level)
     task = asyncio.create_task(uv_server.serve())
@@ -86,7 +87,7 @@ async def serve_a2a_async(
     if port == 0:
         server_port = uv_server.servers[0].sockets[0].getsockname()[1]
         server.agent_card.url = f"http://{host}:{server_port}/{endpoint.lstrip('/')}"
-    return (task, uv_server)
+    return ServerHandle(task=task, server=uv_server)
 
 
 def serve_a2a(
@@ -103,11 +104,9 @@ def serve_a2a(
     # because the loop only keeps weak refs to tasks
     # https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
     async def run() -> None:
-        (task, uv_server) = await serve_a2a_async(
-            server, host, port, endpoint, log_level
-        )
+        server_handle = await serve_a2a_async(server, host, port, endpoint, log_level)
         if server_queue:
-            server_queue.put(uv_server.servers[0].sockets[0].getsockname()[1])
-        await task
+            server_queue.put(server_handle.port)
+        await server_handle.task
 
     return run_async_in_sync(run())

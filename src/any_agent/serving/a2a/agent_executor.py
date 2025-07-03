@@ -1,4 +1,31 @@
-from typing import TYPE_CHECKING, override
+import sys
+
+PYTHONEGT312 = sys.version_info >= (3, 12)
+
+from typing import TYPE_CHECKING
+
+if PYTHONEGT312:
+    from typing import override
+else:
+    # Fix for Python 3.11
+    # We will define a "noop" decorator that
+    # returns the same function
+    # Trying to modify decorators in place depending
+    # on the python version is much more cumbersome
+    from collections.abc import Callable
+    from typing import Any, TypeVar
+
+    # For any function that takes some params
+    # and returns whatever (upper bound)....
+    F = TypeVar("F", bound=Callable[..., Any])
+
+    # ...we ensure that the decorator returns a function
+    # with the same type constraints (basically,
+    # because it's the same function), and that
+    # the decorator doesn't require any extra info
+    def override(func: F, /) -> F:  # noqa: D103
+        return func
+
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
@@ -11,8 +38,8 @@ from a2a.utils import (
 from pydantic import BaseModel
 
 from any_agent.logging import logger
-from any_agent.serving.envelope import A2AEnvelope
-from any_agent.serving.task_manager import TaskManager
+from any_agent.serving.a2a.context_manager import ContextManager
+from any_agent.serving.a2a.envelope import A2AEnvelope
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
@@ -21,16 +48,16 @@ if TYPE_CHECKING:
 class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
     """AnyAgentExecutor Implementation with task management for multi-turn conversations."""
 
-    def __init__(self, agent: "AnyAgent", task_manager: TaskManager):
+    def __init__(self, agent: "AnyAgent", context_manager: ContextManager):
         """Initialize the AnyAgentExecutor.
 
         Args:
             agent: The agent to execute
-            task_manager: Task manager to use for task management
+            context_manager: context manager to use for context management
 
         """
         self.agent = agent
-        self.task_manager = task_manager
+        self.context_manager = context_manager
 
     @override
     async def execute(  # type: ignore[misc]
@@ -41,21 +68,26 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         query = context.get_user_input()
         task = context.current_task
 
+        context_id = context.message.contextId
+        if not self.context_manager.get_context(context_id):
+            self.context_manager.add_context(context_id)
+
         # Extract or create task ID
         if not task:
             task = new_task(context.message)
-            self.task_manager.add_task(task.id)
             await event_queue.enqueue_event(task)
         else:
             logger.debug("Task already exists: %s", task.model_dump_json(indent=2))
 
-        formatted_query = self.task_manager.format_query_with_history(task.id, query)
+        formatted_query = self.context_manager.format_query_with_history(
+            context_id, query
+        )
 
         # This agent always produces Task objects.
         agent_trace = await self.agent.run_async(formatted_query)
 
-        # Update task with new trace
-        self.task_manager.update_task_trace(task.id, agent_trace)
+        # Update task with new trace, passing the original query (not formatted)
+        self.context_manager.update_context_trace(context_id, agent_trace, query)
 
         updater = TaskUpdater(event_queue, task.id, task.contextId)
 

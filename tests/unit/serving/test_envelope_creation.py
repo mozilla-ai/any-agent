@@ -9,7 +9,7 @@ from a2a.types import TaskState
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.serving.envelope import (
+from any_agent.serving.a2a.envelope import (
     A2AEnvelope,
     _DefaultBody,
     _is_a2a_envelope,

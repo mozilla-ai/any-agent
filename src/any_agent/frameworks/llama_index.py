@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING, Any, cast
 
-from pydantic import BaseModel
+from litellm import acompletion
+from litellm.utils import supports_response_schema
+from pydantic import BaseModel, ValidationError
 
 from any_agent import AgentConfig, AgentFramework
 from any_agent.logging import logger
@@ -42,13 +44,17 @@ class LlamaIndexAgent(AnyAgent):
     def _get_model(self, agent_config: AgentConfig) -> "LLM":
         """Get the model configuration for a llama_index agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        additional_kwargs = agent_config.model_args or {}
+        additional_kwargs["stream_options"] = {
+            "include_usage": True
+        }  # Needed so that we get usage stats
         return cast(
             "LLM",
             model_type(
                 model=agent_config.model_id,
                 api_key=agent_config.api_key,
                 api_base=agent_config.api_base,
-                additional_kwargs=agent_config.model_args or {},  # type: ignore[arg-type]
+                additional_kwargs=additional_kwargs,  # type: ignore[arg-type]
             ),
         )
 
@@ -97,7 +103,31 @@ class LlamaIndexAgent(AnyAgent):
             msg = f"Agent did not return a valid response: {result.response}"
             raise ValueError(msg)
         if self.config.output_type:
-            return self.config.output_type.model_validate_json(
-                result.response.blocks[0].text
-            )
+            # First try to validate the output directly
+            try:
+                return self.config.output_type.model_validate_json(
+                    result.response.blocks[0].text
+                )
+            except ValidationError:
+                # If validation fails, send it through litellm to enforce structured output
+                completion_params = self.config.model_args or {}
+                completion_params["model"] = self.config.model_id
+                model_output_message = {
+                    "role": "assistant",
+                    "content": result.response.blocks[0].text,
+                }
+                structured_output_message = {
+                    "role": "user",
+                    "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
+                }
+                completion_params["messages"] = [
+                    model_output_message,
+                    structured_output_message,
+                ]
+                if supports_response_schema(model=self.config.model_id):
+                    completion_params["response_format"] = self.config.output_type
+                response = await acompletion(**completion_params)
+                return self.config.output_type.model_validate_json(
+                    response.choices[0].message["content"]
+                )
         return result.response.blocks[0].text

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, assert_never
+from typing import TYPE_CHECKING, Any, assert_never, overload
 
 from opentelemetry import trace as otel_trace
 
@@ -23,11 +23,10 @@ from any_agent.utils import run_async_in_sync
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    import uvicorn
     from opentelemetry.trace import Tracer
     from pydantic import BaseModel
 
-    from any_agent.serving.config import A2AServingConfig
+    from any_agent.serving import A2AServingConfig, MCPServingConfig, ServerHandle
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 
@@ -35,13 +34,29 @@ class AgentRunError(Exception):
     """Error that wraps underlying framework specific errors and carries spans."""
 
     _trace: AgentTrace
+    _original_exception: Exception
 
-    def __init__(self, trace: AgentTrace):
+    def __init__(self, trace: AgentTrace, original_exception: Exception):
         self._trace = trace
+        self._original_exception = original_exception
+        # Set the exception message to be the original exception's message
+        super().__init__(str(original_exception))
 
     @property
     def trace(self) -> AgentTrace:
         return self._trace
+
+    @property
+    def original_exception(self) -> Exception:
+        return self._original_exception
+
+    def __str__(self) -> str:
+        """Return the string representation of the original exception."""
+        return str(self._original_exception)
+
+    def __repr__(self) -> str:
+        """Return the detailed representation of the AgentRunError."""
+        return f"AgentRunError({self._original_exception!r})"
 
 
 class AnyAgent(ABC):
@@ -206,7 +221,7 @@ class AnyAgent(ABC):
                     if instrumented_trace is not None:
                         trace = instrumented_trace
             trace.add_span(invoke_span)
-            raise AgentRunError(trace) from e
+            raise AgentRunError(trace, e) from e
 
         if instrumentation_enabled:
             async with self._lock:
@@ -217,24 +232,7 @@ class AnyAgent(ABC):
         trace.final_output = final_output
         return trace
 
-    def serve(self, serving_config: A2AServingConfig | None = None) -> None:
-        """Serve this agent using the protocol defined in the serving_config.
-
-        Args:
-            serving_config: Configuration for serving the agent. If None, uses default A2AServingConfig.
-                          Must be an instance of A2AServingConfig.
-
-        Raises:
-            ImportError: If the `serving` dependencies are not installed.
-
-        Example:
-            ```
-            agent = AnyAgent.create("tinyagent", AgentConfig(...))
-            config = A2AServingConfig(port=8080, endpoint="/my-agent")
-            agent.serve(config)
-            ```
-
-        """
+    def _serve_a2a(self, serving_config: A2AServingConfig | None) -> None:
         from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a
 
         if serving_config is None:
@@ -250,37 +248,55 @@ class AnyAgent(ABC):
             log_level=serving_config.log_level,
         )
 
-    async def serve_async(
-        self, serving_config: A2AServingConfig | None = None
-    ) -> tuple[asyncio.Task[Any], uvicorn.Server]:
-        """Serve this agent asynchronously using the protocol defined in the serving_config.
+    def _serve_mcp(self, serving_config: MCPServingConfig) -> None:
+        from any_agent.serving import (
+            serve_mcp,
+        )
+
+        serve_mcp(
+            self,
+            host=serving_config.host,
+            port=serving_config.port,
+            endpoint=serving_config.endpoint,
+            log_level=serving_config.log_level,
+        )
+
+    @overload
+    def serve(self, serving_config: MCPServingConfig) -> None: ...
+
+    @overload
+    def serve(self, serving_config: A2AServingConfig | None = None) -> None: ...
+
+    def serve(
+        self, serving_config: MCPServingConfig | A2AServingConfig | None = None
+    ) -> None:
+        """Serve this agent using the protocol defined in the serving_config.
 
         Args:
             serving_config: Configuration for serving the agent. If None, uses default A2AServingConfig.
-                          Must be an instance of A2AServingConfig.
-
-        Returns:
-            A tuple containing:
-            - asyncio.Task: The server task (keep a reference to prevent garbage collection)
-            - uvicorn.Server: The server instance for controlling the server lifecycle
+                          Must be an instance of A2AServingConfig or MCPServingConfig.
 
         Raises:
-            ImportError: If the `serving` dependencies are not installed.
+            ImportError: If the `a2a` dependencies are not installed and an `A2AServingConfig` is used.
 
         Example:
             ```
-            agent = await AnyAgent.create_async("tinyagent", AgentConfig(...))
-            config = A2AServingConfig(port=8080)
-            task, server = await agent.serve_async(config)
-            try:
-                # Server is running
-                await asyncio.sleep(10)
-            finally:
-                server.should_exit = True
-                await task
+            agent = AnyAgent.create("tinyagent", AgentConfig(...))
+            config = A2AServingConfig(port=8080, endpoint="/my-agent")
+            agent.serve(config)
             ```
 
         """
+        from any_agent.serving import MCPServingConfig
+
+        if isinstance(serving_config, MCPServingConfig):
+            self._serve_mcp(serving_config)
+        else:
+            self._serve_a2a(serving_config)
+
+    async def _serve_a2a_async(
+        self, serving_config: A2AServingConfig | None
+    ) -> ServerHandle:
         from any_agent.serving import (
             A2AServingConfig,
             _get_a2a_app_async,
@@ -290,13 +306,6 @@ class AnyAgent(ABC):
         if serving_config is None:
             serving_config = A2AServingConfig()
 
-        if not isinstance(serving_config, A2AServingConfig):
-            msg = (
-                f"serving_config must be an instance of A2AServingConfig, "
-                f"got {serving_config.type}. "
-                f"Currently only A2A serving is supported."
-            )
-            raise ValueError(msg)
         app = await _get_a2a_app_async(self, serving_config=serving_config)
 
         return await serve_a2a_async(
@@ -306,6 +315,59 @@ class AnyAgent(ABC):
             endpoint=serving_config.endpoint,
             log_level=serving_config.log_level,
         )
+
+    async def _serve_mcp_async(self, serving_config: MCPServingConfig) -> ServerHandle:
+        from any_agent.serving import serve_mcp_async
+
+        return await serve_mcp_async(
+            self,
+            host=serving_config.host,
+            port=serving_config.port,
+            endpoint=serving_config.endpoint,
+            log_level=serving_config.log_level,
+        )
+
+    @overload
+    async def serve_async(self, serving_config: MCPServingConfig) -> ServerHandle: ...
+
+    @overload
+    async def serve_async(
+        self, serving_config: A2AServingConfig | None = None
+    ) -> ServerHandle: ...
+
+    async def serve_async(
+        self, serving_config: MCPServingConfig | A2AServingConfig | None = None
+    ) -> ServerHandle:
+        """Serve this agent asynchronously using the protocol defined in the serving_config.
+
+        Args:
+            serving_config: Configuration for serving the agent. If None, uses default A2AServingConfig.
+                          Must be an instance of A2AServingConfig or MCPServingConfig.
+
+        Returns:
+            A ServerHandle instance that provides methods for managing the server lifecycle.
+
+        Raises:
+            ImportError: If the `a2a` dependencies are not installed and an `A2AServingConfig` is used.
+
+        Example:
+            ```
+            agent = await AnyAgent.create_async("tinyagent", AgentConfig(...))
+            config = MCPServingConfig(port=8080)
+            server_handle = await agent.serve_async(config)
+            try:
+                # Server is running
+                await asyncio.sleep(10)
+            finally:
+                await server_handle.shutdown()
+            ```
+
+        """
+        from any_agent.serving import MCPServingConfig
+
+        if isinstance(serving_config, MCPServingConfig):
+            return await self._serve_mcp_async(serving_config)
+        return await self._serve_a2a_async(serving_config)
 
     def _recreate_with_config(self, new_config: AgentConfig) -> AnyAgent:
         """Create a new agent instance with the given config, preserving MCP servers and tools.

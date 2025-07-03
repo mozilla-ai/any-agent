@@ -27,8 +27,12 @@ def test_rich_console_span_exporter_default(
         exporter = _ConsoleExporter()
         exporter.export(readable_spans)
         console_mock.return_value.print.assert_called()
-        # TINYAGENT ends with a `task_completed` tool call
-        if request.node.callspec.id not in ("TINYAGENT_trace",):
+        # Frameworks that end with a tool call
+        if request.node.callspec.id not in (
+            "GOOGLE_trace",
+            "SMOLAGENTS_trace",
+            "TINYAGENT_trace",
+        ):
             panel_mock.assert_any_call(
                 markdown_mock(agent_trace.final_output),
                 title="OUTPUT",
@@ -63,7 +67,13 @@ def test_get_output_panel(
             json_mock.assert_called_once()
             panel_mock.assert_called_once()
 
-    if request.node.callspec.id not in ("TINYAGENT_trace",):
+    # Skip frameworks that end with a tool call
+    if request.node.callspec.id not in (
+        "GOOGLE_trace",
+        "LANGCHAIN_trace",
+        "SMOLAGENTS_trace",
+        "TINYAGENT_trace",
+    ):
         # Final LLM call returns string
         panel_mock = MagicMock()
         json_mock = MagicMock()

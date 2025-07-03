@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from litellm.cost_calculator import cost_per_token
 from opentelemetry.sdk.trace import ReadableSpan
-from pydantic import BaseModel, ConfigDict, Field, field_serializer
+from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.logging import logger
 
@@ -32,7 +32,10 @@ class TokenInfo(BaseModel):
     """Token Count information."""
 
     input_tokens: int
+    """Number of input tokens."""
+
     output_tokens: int
+    """Number of output tokens."""
 
     @property
     def total_tokens(self) -> int:
@@ -46,7 +49,10 @@ class CostInfo(BaseModel):
     """Cost information."""
 
     input_cost: float
+    "Cost associated to the input tokens."
+
     output_cost: float
+    """Cost associated to the output tokens."""
 
     @property
     def total_cost(self) -> float:
@@ -214,23 +220,11 @@ class AgentTrace(BaseModel):
     """A list of [`AgentSpan`][any_agent.tracing.agent_trace.AgentSpan] that form the trace.
     """
 
-    final_output: str | BaseModel | None = Field(default=None)
+    final_output: str | dict[str, Any] | BaseModel | None = Field(default=None)
     """Contains the final output message returned by the agent.
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    @field_serializer("final_output")
-    def serialize_final_output(self, value: str | BaseModel | None) -> Any:
-        """Serialize the final_output and handle any BaseModel subclass."""
-        if value is None:
-            return None
-        if isinstance(value, str):
-            return value
-        if isinstance(value, BaseModel):
-            # This will properly serialize any BaseModel subclass
-            return value.model_dump()
-        return value
 
     def _invalidate_tokens_and_cost_cache(self) -> None:
         """Clear the cached tokens_and_cost property if it exists."""
@@ -334,7 +328,7 @@ class AgentTrace(BaseModel):
 
     @cached_property
     def tokens(self) -> TokenInfo:
-        """The current total token count for this trace. Cached after first computation."""
+        """The [`TokenInfo`][any_agent.tracing.agent_trace.TokenInfo] for this trace. Cached after first computation."""
         sum_input_tokens = 0
         sum_output_tokens = 0
         for span in self.spans:
@@ -347,7 +341,7 @@ class AgentTrace(BaseModel):
 
     @cached_property
     def cost(self) -> CostInfo:
-        """The current total cost for this trace. Cached after first computation."""
+        """The [`CostInfo`][any_agent.tracing.agent_trace.CostInfo] for this trace. Cached after first computation."""
         sum_input_cost = 0.0
         sum_output_cost = 0.0
         for span in self.spans:

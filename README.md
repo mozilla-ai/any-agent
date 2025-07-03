@@ -9,7 +9,7 @@
 # any-agent
 
 [![Docs](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/)
-[![Tests](https://github.com/mozilla-ai/any-agent/actions/workflows/tests.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/tests.yaml/)
+[![Tests](https://github.com/mozilla-ai/any-agent/actions/workflows/tests-integration.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/tests-integration.yaml/)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
 A single interface to use and evaluate different agent frameworks.
