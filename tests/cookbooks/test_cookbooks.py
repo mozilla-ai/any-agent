@@ -20,7 +20,7 @@ def test_cookbook_notebook(
             ["jupyter", "execute", notebook_path.name],  # noqa: S607
             cwd="docs/cookbook",  # Run in cookbook directory like original action
             env={
-                "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
+                "MISTRAL_API_KEY": os.environ["MISTRAL_API_KEY"],
                 "PATH": os.environ["PATH"],
                 "IN_PYTEST": "1",  # For mcp_agent notebook which needs to mock input
             },

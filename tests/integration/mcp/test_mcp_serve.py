@@ -8,7 +8,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import MCPSse
 from any_agent.serving import MCPServingConfig
 from any_agent.tracing.agent_trace import AgentTrace
-from tests.integration.helpers import wait_for_server_async
+from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
@@ -60,7 +60,7 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
         )
     kwargs = {}
 
-    kwargs["model_id"] = "gpt-4.1-nano"
+    kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     agent_model = kwargs["model_id"]
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:

@@ -10,6 +10,7 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.tracing.otel_types import StatusCode
+from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID
 
 
 def test_runtime_error(
@@ -23,7 +24,7 @@ def test_runtime_error(
     """
     kwargs = {}
 
-    kwargs["model_id"] = "gpt-4.1-nano"
+    kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
@@ -85,7 +86,7 @@ def test_tool_error(
     """
     kwargs = {}
 
-    kwargs["model_id"] = "gpt-4.1-nano"
+    kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")

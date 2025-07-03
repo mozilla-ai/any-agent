@@ -8,7 +8,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
-from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server
+from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server
 
 from .conftest import (
     DATE_PROMPT,
@@ -50,7 +50,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
 
-    env_check = validate_environment(DEFAULT_MODEL_ID)
+    env_check = validate_environment(DEFAULT_SMALL_MODEL_ID)
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
@@ -65,7 +65,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
     date_agent_cfg = AgentConfig(
         instructions="Use the available tools to obtain additional information to answer the query.",
         name="date_agent",
-        model_id=DEFAULT_MODEL_ID,
+        model_id=DEFAULT_SMALL_MODEL_ID,
         description="Agent that can return the current date.",
         tools=[get_datetime],
         model_args=model_args,
@@ -88,7 +88,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
         main_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
-            model_id=DEFAULT_MODEL_ID,
+            model_id=DEFAULT_SMALL_MODEL_ID,
             tools=[await a2a_tool_async(server_url)],
             model_args=model_args,
         )
@@ -162,7 +162,7 @@ def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
             f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
 
-    env_check = validate_environment(DEFAULT_MODEL_ID)
+    env_check = validate_environment(DEFAULT_SMALL_MODEL_ID)
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
@@ -179,7 +179,7 @@ def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
                 agent_framework.value,
                 0,
                 tool_agent_endpoint,
-                DEFAULT_MODEL_ID,
+                DEFAULT_SMALL_MODEL_ID,
                 server_queue,
             ),
         )
@@ -198,7 +198,7 @@ def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
                     f"http://localhost:{test_port}/{tool_agent_endpoint}",
                 )
             ],
-            model_id=DEFAULT_MODEL_ID,
+            model_id=DEFAULT_SMALL_MODEL_ID,
         )
 
         main_agent = AnyAgent.create(

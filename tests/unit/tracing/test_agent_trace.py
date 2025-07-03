@@ -5,7 +5,7 @@ from any_agent.tracing.otel_types import Resource, SpanContext, SpanKind, Status
 def create_llm_span(input_tokens: int = 100, output_tokens: int = 50) -> AgentSpan:
     """Create a mock LLM span with token usage."""
     return AgentSpan(
-        name="call_llm gpt-4o-mini",
+        name="call_llm mistral/mistral-small-latest",
         kind=SpanKind.INTERNAL,
         status=Status(),
         context=SpanContext(span_id=123),

@@ -78,7 +78,7 @@ class OpenAIAgent(AnyAgent):
         )
 
     def _filter_mcp_tools(self, tools: list[Any], mcp_servers: list[Any]) -> list[Any]:
-        """OpenAI frameowrk doesn't expect the mcp tool to be included in `tools`."""
+        """OpenAI framework doesn't expect the mcp tool to be included in `tools`."""
         non_mcp_tools = []
         for tool in tools:
             if any(tool in mcp_server.tools for mcp_server in mcp_servers):
