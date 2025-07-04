@@ -4,7 +4,8 @@ import time
 import httpx
 import requests
 
-DEFAULT_MODEL_ID = "gpt-4.1-nano"
+DEFAULT_SMALL_MODEL_ID = "gpt-4.1-nano"
+DEFAULT_MEDIUM_MODEL_ID = "gpt-4.1-mini"
 
 
 def wait_for_server(

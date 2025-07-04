@@ -22,6 +22,7 @@ from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from any_agent.tracing.exporter import _ConsoleExporter
+from tests.integration.helpers import DEFAULT_MEDIUM_MODEL_ID, DEFAULT_SMALL_MODEL_ID
 
 
 def uvx_installed() -> bool:
@@ -114,7 +115,7 @@ def assert_tokens(agent_trace: AgentTrace) -> None:
 def assert_eval(agent_trace: AgentTrace) -> None:
     """Test evaluation using the new judge classes."""
     # Test 1: Check if agent called write_file tool using LlmJudge
-    llm_judge = LlmJudge(model_id="gpt-4.1-nano")
+    llm_judge = LlmJudge(model_id=DEFAULT_SMALL_MODEL_ID)
     result1 = llm_judge.run(
         context=str(agent_trace.spans_to_messages()),
         question="Did the agent call the write_file tool during execution?",
@@ -125,7 +126,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     )
 
     # Test 2: Check if agent wrote the current year to file using AgentJudge
-    agent_judge = AgentJudge(model_id="gpt-4.1-mini")
+    agent_judge = AgentJudge(model_id=DEFAULT_MEDIUM_MODEL_ID)
 
     def get_current_year() -> str:
         """Get the current year"""
@@ -183,7 +184,7 @@ def test_load_and_run_agent(
         with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
             f.write(text)
 
-    kwargs["model_id"] = "gpt-4.1-mini"
+    kwargs["model_id"] = DEFAULT_MEDIUM_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
