@@ -1237,7 +1237,7 @@ tool so it becomes usable by the selected framework.</p>
 <h2 id="using-agents-as-tools">Using Agents-As-Tools</h2>
 <p>To directly use one agent as a tool for another agent, <code>any-agent</code> provides 3 different approaches:</p>
 <p>The agent to be used as a tool can be defined as usual:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">google_agent</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
@@ -1255,7 +1255,7 @@ tool so it becomes usable by the selected framework.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Agent as Callable</label><label for="__tabbed_2_2">Agent as MCP</label><label for="__tabbed_2_3">Agent as A2A</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">google_agent_as_tool</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">google_agent_as_tool</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">agent_trace</span> <span class="o">=</span> <span class="k">await</span> <span class="n">google_agent</span><span class="o">.</span><span class="n">run_async</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
@@ -1263,7 +1263,7 @@ tool so it becomes usable by the selected framework.</p>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPSse</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPSse</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.serving</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPServingConfig</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">mcp_handle</span> <span class="o">=</span> <span class="k">await</span> <span class="n">google_agent</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span>
@@ -1274,7 +1274,7 @@ tool so it becomes usable by the selected framework.</p>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.serving</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2AServingConfig</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.serving</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2AServingConfig</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">a2a_tool_async</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">a2a_handle</span> <span class="o">=</span> <span class="k">await</span> <span class="n">google_agent</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span>
@@ -1287,7 +1287,7 @@ tool so it becomes usable by the selected framework.</p>
 </div>
 </div>
 <p>Finally, regardless of the option chosen above, you can pass the agent as a tool to another agent:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">main_agent</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">main_agent</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">&quot;tinyagent&quot;</span><span class="p">,</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">AgentConfig</span><span class="p">(</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;main_agent&quot;</span><span class="p">,</span>
