@@ -80,7 +80,7 @@ class AnyAgent(ABC):
         self._tracer: Tracer = otel_trace.get_tracer(SCOPE_NAME)
 
         self._lock = asyncio.Lock()
-        self._callback_context: dict[int, Context] = {}
+        self._callback_contexts: dict[int, Context] = {}
 
     @staticmethod
     def _get_agent_type_by_framework(
