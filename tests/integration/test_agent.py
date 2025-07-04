@@ -205,6 +205,7 @@ def test_load_and_run_agent(
             ],
         ),
     ]
+
     agent_config = AgentConfig(
         tools=tools,  # type: ignore[arg-type]
         instructions="Use the available tools to answer.",
