@@ -102,9 +102,9 @@ class _SpanGeneration(Callback):
                 "gen_ai.tool.name": name,
             }
         )
-        if description:
+        if description is not None:
             span.set_attribute("gen_ai.tool.description", description)
-        if args:
+        if args is not None:
             span.set_attribute(
                 "gen_ai.tool.args",
                 json.dumps(
@@ -113,7 +113,7 @@ class _SpanGeneration(Callback):
                     ensure_ascii=False,
                 ),
             )
-        if call_id:
+        if call_id is not None:
             span.set_attribute("gen_ai.tool.call.id", call_id)
 
         context.current_span = span
