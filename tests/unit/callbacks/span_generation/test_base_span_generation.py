@@ -85,13 +85,10 @@ def test_set_llm_output() -> None:
         }
     )
 
+
 def test_set_tool_input() -> None:
     context = MagicMock()
 
     span_generation = _SpanGeneration()
-    span_generation._set_tool_input(
-        context,
-        name="foo",
-        args={}
-    )
+    span_generation._set_tool_input(context, name="foo", args={})
     context.current_span.set_attribute.assert_called_with("gen_ai.tool.args", "{}")

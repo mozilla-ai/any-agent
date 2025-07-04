@@ -72,10 +72,8 @@ class AnyAgent(ABC):
         self._mcp_servers: list[_MCPServerBase[Any]] = []
         self._tools: list[Any] = []
 
-        self._wrapper = None
-        if self.config.callbacks is not None:
-            self._add_span_callbacks()
-            self._wrapper = _get_wrapper_by_framework(self.framework)
+        self._add_span_callbacks()
+        self._wrapper = _get_wrapper_by_framework(self.framework)
 
         self._tracer: Tracer = otel_trace.get_tracer(SCOPE_NAME)
 
@@ -187,22 +185,21 @@ class AnyAgent(ABC):
             with self._tracer.start_as_current_span(
                 f"invoke_agent [{self.config.name}]"
             ) as invoke_span:
-                if self._wrapper:
-                    async with self._lock:
-                        trace_id = invoke_span.get_span_context().trace_id
-                        self._wrapper.callback_context[trace_id] = Context(
-                            current_span=invoke_span,
-                            trace=AgentTrace(),
-                            tracer=self._tracer,
-                            shared={},
-                        )
+                async with self._lock:
+                    trace_id = invoke_span.get_span_context().trace_id
+                    self._wrapper.callback_context[trace_id] = Context(
+                        current_span=invoke_span,
+                        trace=AgentTrace(),
+                        tracer=self._tracer,
+                        shared={},
+                    )
 
-                        if len(self._wrapper.callback_context) == 1:
-                            # If there is more than 1 entry in `callback_context`, it means that the agent has
-                            # already being wrapped so we won't wrap it again.
-                            await self._wrapper.wrap(
-                                agent=self,  # type: ignore[arg-type]
-                            )
+                    if len(self._wrapper.callback_context) == 1:
+                        # If there is more than 1 entry in `callback_context`, it means that the agent has
+                        # already being wrapped so we won't wrap it again.
+                        await self._wrapper.wrap(
+                            agent=self,  # type: ignore[arg-type]
+                        )
 
                 invoke_span.set_attributes(
                     {
@@ -216,18 +213,6 @@ class AnyAgent(ABC):
 
                 final_output = await self._run_async(prompt, **kwargs)
         except Exception as e:
-            if self._wrapper:
-                async with self._lock:
-                    if len(self._wrapper.callback_context) == 1:
-                        await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-                    if wrapped_context := self._wrapper.callback_context.pop(
-                        trace_id, None
-                    ):
-                        trace = wrapped_context.trace
-            trace.add_span(invoke_span)
-            raise AgentRunError(trace, e) from e
-
-        if self._wrapper:
             async with self._lock:
                 if len(self._wrapper.callback_context) == 1:
                     await self._wrapper.unwrap(self)  # type: ignore[arg-type]
@@ -235,6 +220,14 @@ class AnyAgent(ABC):
                     trace_id, None
                 ):
                     trace = wrapped_context.trace
+            trace.add_span(invoke_span)
+            raise AgentRunError(trace, e) from e
+
+        async with self._lock:
+            if len(self._wrapper.callback_context) == 1:
+                await self._wrapper.unwrap(self)  # type: ignore[arg-type]
+            if wrapped_context := self._wrapper.callback_context.pop(trace_id, None):
+                trace = wrapped_context.trace
 
         trace.add_span(invoke_span)
         trace.final_output = final_output
