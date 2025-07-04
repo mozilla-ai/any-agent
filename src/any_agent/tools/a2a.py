@@ -16,11 +16,14 @@ with suppress(ImportError):
     import httpx
     from a2a.client import A2ACardResolver, A2AClient
     from a2a.types import (
+        JSONRPCErrorResponse,
         Message,
         MessageSendParams,
         Part,
         Role,
         SendMessageRequest,
+        SendMessageSuccessResponse,
+        Task,
         TextPart,
     )
 
@@ -92,28 +95,46 @@ async def a2a_tool_async(
                 )
                 raise ValueError(msg)
 
-            if hasattr(response.root, "error"):
+            if isinstance(response.root, JSONRPCErrorResponse):
                 response_dict = {
                     "error": response.root.error.message,
                     "code": response.root.error.code,
                     "data": response.root.error.data,
                 }
-            elif hasattr(response.root, "result"):
-                response_dict = {
-                    "task_id": response.root.result.status.message.taskId,
-                    "context_id": response.root.result.status.message.contextId,
-                    "timestamp": response.root.result.status.timestamp,
-                    "status": response.root.result.status.state,
-                    "message": {
-                        " ".join(
-                            [
-                                part.root.text
-                                for part in response.root.result.status.message.parts
-                                if part.root.kind == "text"
-                            ]
-                        )
-                    },
-                }
+            elif isinstance(response.root, SendMessageSuccessResponse):
+                # Task
+                if isinstance(response.root.result, Task):
+                    task = response.root.result
+                    response_dict = {
+                        "timestamp": task.status.timestamp,
+                        "status": task.status.state,
+                    }
+                    if task.status.message:
+                        response_dict["task_id"] = task.status.message.taskId
+                        response_dict["context_id"] = task.status.message.contextId
+                        response_dict["message"] = {
+                            " ".join(
+                                [
+                                    part.root.text
+                                    for part in task.status.message.parts
+                                    if isinstance(part.root, TextPart)
+                                ]
+                            )
+                        }
+                # Message
+                else:
+                    response_dict = {
+                        "message": {
+                            " ".join(
+                                [
+                                    part.root.text
+                                    for part in response.root.result.parts
+                                    if isinstance(part.root, TextPart)
+                                ]
+                            )
+                        },
+                        "task_id": response.root.result.taskId,
+                    }
             else:
                 msg = (
                     "The A2A agent did not return a error or a result. Are you using an A2A agent not managed by any-agent? "

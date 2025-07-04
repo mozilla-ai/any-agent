@@ -8,8 +8,8 @@ cd "$(dirname "$0")/.."
 
 # Install the dependencies into the mypy env.
 # Note that this can take seconds to run.
-python -m pip install -e '.[all]' --quiet
+python -m pip install -e '.[all,a2a]' --quiet
 
-# Run on all files. The pre-commit hook was using ignore-missing-imports, so I will keep it here for the initial implementation.
-python -m mypy --ignore-missing-imports src/
-python -m mypy --ignore-missing-imports tests/
+# Run on all files.
+python -m mypy src/
+python -m mypy tests/

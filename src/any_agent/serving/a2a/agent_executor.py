@@ -45,7 +45,7 @@ if TYPE_CHECKING:
     from any_agent import AnyAgent
 
 
-class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
+class AnyAgentExecutor(AgentExecutor):
     """AnyAgentExecutor Implementation with task management for multi-turn conversations."""
 
     def __init__(self, agent: "AnyAgent", context_manager: ContextManager):
@@ -60,7 +60,7 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         self.context_manager = context_manager
 
     @override
-    async def execute(  # type: ignore[misc]
+    async def execute(
         self,
         context: RequestContext,
         event_queue: EventQueue,
@@ -68,26 +68,33 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         query = context.get_user_input()
         task = context.current_task
 
-        context_id = context.message.contextId
-        if not self.context_manager.get_context(context_id):
-            self.context_manager.add_context(context_id)
+        # FIXME context.message may be None
+        context_id = context.message.contextId  # type: ignore[union-attr]
+        if not self.context_manager.get_context(context_id):  # type: ignore[arg-type]
+            self.context_manager.add_context(context_id)  # type: ignore[arg-type]
 
         # Extract or create task ID
         if not task:
-            task = new_task(context.message)
-            await event_queue.enqueue_event(task)
+            if context.message is not None:
+                task = new_task(context.message)
+                await event_queue.enqueue_event(task)
+            else:
+                msg = "Task does not exist but the message in context is None"
+                logger.warning(msg)
+                raise ValueError(msg)
         else:
             logger.debug("Task already exists: %s", task.model_dump_json(indent=2))
 
         formatted_query = self.context_manager.format_query_with_history(
-            context_id, query
+            context_id,  # type: ignore[arg-type]
+            query,
         )
 
         # This agent always produces Task objects.
         agent_trace = await self.agent.run_async(formatted_query)
 
         # Update task with new trace, passing the original query (not formatted)
-        self.context_manager.update_context_trace(context_id, agent_trace, query)
+        self.context_manager.update_context_trace(context_id, agent_trace, query)  # type: ignore[arg-type]
 
         updater = TaskUpdater(event_queue, task.id, task.contextId)
 
@@ -125,6 +132,6 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
         )
 
     @override
-    async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:  # type: ignore[misc]
+    async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:
         msg = "cancel not supported"
         raise ValueError(msg)
