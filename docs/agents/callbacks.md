@@ -3,7 +3,7 @@
 For greater control when running your agent, `any-agent` includes support for custom [`Callbacks`][any_agent.callbacks.base.Callback] that
 will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.run]:
 
-```python
+```py
 # pseudocode of an Agent run
 
 history = [system_prompt, user_prompt]
