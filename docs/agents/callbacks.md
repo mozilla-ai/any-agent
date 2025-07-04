@@ -3,10 +3,38 @@
 For greater control when running your agent, `any-agent` includes support for custom [`Callbacks`][any_agent.callbacks.base.Callback] that
 will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.run]:
 
-- [`before_llm_call`][any_agent.callbacks.base.Callback.before_llm_call]
-- [`after_llm_call`][any_agent.callbacks.base.Callback.after_llm_call]
-- [`before_tool_execution`][any_agent.callbacks.base.Callback.before_tool_execution]
-- [`after_tool_execution`][any_agent.callbacks.base.Callback.after_tool_execution]
+```python
+# pseudocode of an Agent run
+
+history = [system_prompt, user_prompt]
+while True:
+
+    for callback in agent.config.callbacks:
+        context = callback.before_llm_call(context)
+    
+    response = CALL_LLM(history)
+
+    for callback in agent.config.callbacks:
+        context = callback.after_llm_call(context)
+
+    history.append(response)
+    
+    if response.tool_executions:
+        for tool_execution in tool_executions:
+            
+            for callback in agent.config.callbacks:
+                context = callback.before_tool_execution(context)
+            
+            tool_response = EXECUTE_TOOL(tool_execution)
+
+            for callback in agent.config.callbacks:
+                context = callback.after_tool_execution(context)
+
+            history.append(tool_response)
+
+    else:
+        return response    
+```
 
 Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.
 
@@ -63,6 +91,23 @@ agent = AnyAgent.create(
 )
 ```
 
+!!! warning
+
+    Callbacks will be called in the order that they are added, so it is important to pay attention to the order
+    in which you set the callback configuration.
+
+    In the above example, passing:
+
+    ```py
+        callbacks=[
+            LimitSearchWeb(max_calls=3)
+            CountSearchWeb()
+        ]
+    ```
+
+    Would fail because `context.shared["search_web_count"]`
+    was not set yet.
+
 ## Error Handling in Callbacks
 
 Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:
@@ -90,21 +135,7 @@ class ContentFilter(Callback):
         return context
 ```
 
-**Note**: Exceptions in callbacks will terminate the agent run immediately. Use this feature carefully to implement safety measures or validation logic.
-
 !!! warning
 
-    Callbacks will be called in the order that they are added, so it is important to pay attention to the order
-    in which you set the callback configuration.
+    Raising exceptions in callbacks will terminate the agent run immediately. Use this feature carefully to implement safety measures or validation logic.
 
-    In the above example, passing:
-
-    ```py
-        callbacks=[
-            LimitSearchWeb(max_calls=3)
-            CountSearchWeb()
-        ]
-    ```
-
-    Would fail because `context.shared["search_web_count"]`
-    was not set yet.
