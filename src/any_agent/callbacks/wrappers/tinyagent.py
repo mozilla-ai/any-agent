@@ -20,7 +20,6 @@ class _TinyAgentWrapper:
         self._original_clients: Any | None = None
 
     async def wrap(self, agent: TinyAgent) -> None:
-
         self._original_llm_call = agent.call_model
 
         async def wrap_call_model(**kwargs):

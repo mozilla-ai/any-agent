@@ -1,6 +1,6 @@
 # Agent Callbacks
 
-`any-agent` allow you to provide custom [`Callbacks`][any_agent.callbacks.base.Callback] that
+For greater control when running your agent, `any-agent` includes support for custom [`Callbacks`][any_agent.callbacks.base.Callback] that
 will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.run]:
 
 - [`before_llm_call`][any_agent.callbacks.base.Callback.before_llm_call]
@@ -8,28 +8,28 @@ will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.ru
 - [`before_tool_execution`][any_agent.callbacks.base.Callback.before_tool_execution]
 - [`after_tool_execution`][any_agent.callbacks.base.Callback.after_tool_execution]
 
-Each separate agent run share an unique [`Context`][any_agent.callbacks.context.Context] object
-across all callbacks.
+Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.
 
-`any-agent` takes care of populating the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
-property so the callbacks can access information in a framework-agnostic way. You can check the attributes available
+Each time an agent is run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`agent.run`][any_agent.AnyAgent.run] ), a unique [`Context`][any_agent.callbacks.context.Context] object
+is shared across all callbacks.
+
+All any-agent agents will populate the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
+property so that the callbacks can access information in a framework-agnostic way. You can check the attributes available
 for LLM Calls and Tool Executions in the [example spans](../tracing.md#spans).
 
 ## Implementing Callbacks
 
 All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and
- only need to implement the methods they need:
+ can choose to implement any subset of the available callback methods.:
 
 ```python
-from any_agent.callbacks.base import Callback
-from any_agent.callbacks.context import Context
+from any_agent.callbacks import Callback, Context
 
 class CountSearchWeb(Callback):
     def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        current_span = context.current_span
         if "search_web_count" not in context.shared:
             context.shared["search_web_count"] = 0
-        if current_span.attributes["gen_ai.tool.name"] == "search_web":
+        if context.current_span.attributes["gen_ai.tool.name"] == "search_web":
             context.shared["search_web_count"] += 1
 
 class LimitSearchWeb(Callback):
@@ -43,10 +43,11 @@ class LimitSearchWeb(Callback):
 
 ## Providing Callbacks
 
-You can provide callbacks to the agent using the [`AgentConfig.callbacks`] property:
+These callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agent.AgentConfig.callbacks] property:
 
 ```python
-from any_agent import AgentConfig
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
     "tinyagent",
@@ -62,9 +63,39 @@ agent = AnyAgent.create(
 )
 ```
 
+## Error Handling in Callbacks
+
+Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:
+
+```python
+class SafetyGuard(Callback):
+    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        tool_name = context.current_span.attributes.get("gen_ai.tool.name", "")
+
+        # Block dangerous tools
+        if tool_name in ["delete_file", "execute_code"]:
+            raise RuntimeError(f"Tool '{tool_name}' is not allowed for safety reasons")
+
+        return context
+
+class ContentFilter(Callback):
+    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+        output = context.current_span.attributes.get("gen_ai.output", "")
+
+        # Check for inappropriate content
+        inappropriate_words = ["spam", "malware", "hack"]
+        if any(word in output.lower() for word in inappropriate_words):
+            raise RuntimeError("Generated content contains inappropriate language")
+
+        return context
+```
+
+**Note**: Exceptions in callbacks will terminate the agent run immediately. Use this feature carefully to implement safety measures or validation logic.
+
 !!! warning
 
-    The order of the callbacks matter.
+    Callbacks will be called in the order that they are added, so it is important to pay attention to the order
+    in which you set the callback configuration.
 
     In the above example, passing:
 
@@ -75,5 +106,5 @@ agent = AnyAgent.create(
         ]
     ```
 
-    Would fail during the first call because `context.shared["search_web_count"]`
+    Would fail because `context.shared["search_web_count"]`
     was not set yet.
