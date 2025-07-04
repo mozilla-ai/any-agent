@@ -112,8 +112,7 @@ async def a2a_tool_async(
                     if task.status.message:
                         response_dict["task_id"] = task.status.message.taskId
                         response_dict["context_id"] = task.status.message.contextId
-                        response_dict["message"] = (
-                            {
+                        response_dict["message"] = {
                                 " ".join(
                                     [
                                         part.root.text
@@ -121,8 +120,7 @@ async def a2a_tool_async(
                                         if isinstance(part.root, TextPart)
                                     ]
                                 )
-                            },
-                        )
+                            }
                 # Message
                 else:
                     response_dict = {
