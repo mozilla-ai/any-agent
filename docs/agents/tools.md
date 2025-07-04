@@ -79,7 +79,7 @@ To directly use one agent as a tool for another agent, `any-agent` provides 3 di
 
 The agent to be used as a tool can be defined as usual:
 
-```python
+```py
 from any_agent import AgentConfig, AnyAgent
 from any_agent.tools import search_web
 
@@ -99,7 +99,7 @@ You can then choose to wrap the agent using different approaches:
 
 === "Agent as Callable"
 
-    ```python
+    ```py
     async def google_agent_as_tool(query: str) -> str:
         agent_trace = await google_agent.run_async(prompt=query)
         return str(agent_trace.final_output)
@@ -109,7 +109,7 @@ You can then choose to wrap the agent using different approaches:
 
 === "Agent as MCP"
 
-    ```python
+    ```py
     from any_agent.config import MCPSse
     from any_agent.serving import MCPServingConfig
 
@@ -122,7 +122,7 @@ You can then choose to wrap the agent using different approaches:
 
 === "Agent as A2A"
 
-    ```python
+    ```py
     from any_agent.serving import A2AServingConfig
     from any_agent.tools import a2a_tool_async
 
@@ -135,7 +135,7 @@ You can then choose to wrap the agent using different approaches:
 
 Finally, regardless of the option chosen above, you can pass the agent as a tool to another agent:
 
-```python
+```py
 main_agent = await AnyAgent.create_async(
     "tinyagent",
     AgentConfig(
