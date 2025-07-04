@@ -68,15 +68,15 @@ class AnyAgentExecutor(AgentExecutor):
         query = context.get_user_input()
         task = context.current_task
 
+        # FIXME context.message may be None
         context_id = context.message.contextId  # type: ignore[union-attr]
-        if not self.context_manager.get_context(context_id):
-            self.context_manager.add_context(context_id)
+        if not self.context_manager.get_context(context_id):  # type: ignore[arg-type]
+            self.context_manager.add_context(context_id)  # type: ignore[arg-type]
 
         # Extract or create task ID
         if not task:
             if context.message is not None:
                 task = new_task(context.message)
-                self.task_manager.add_task(task.id)
                 await event_queue.enqueue_event(task)
             else:
                 msg = "Task does not exist but the message in context is None"
@@ -86,14 +86,15 @@ class AnyAgentExecutor(AgentExecutor):
             logger.debug("Task already exists: %s", task.model_dump_json(indent=2))
 
         formatted_query = self.context_manager.format_query_with_history(
-            context_id, query
+            context_id,  # type: ignore[arg-type]
+            query,
         )
 
         # This agent always produces Task objects.
         agent_trace = await self.agent.run_async(formatted_query)
 
         # Update task with new trace, passing the original query (not formatted)
-        self.context_manager.update_context_trace(context_id, agent_trace, query)
+        self.context_manager.update_context_trace(context_id, agent_trace, query)  # type: ignore[arg-type]
 
         updater = TaskUpdater(event_queue, task.id, task.contextId)
 

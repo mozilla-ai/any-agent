@@ -9,7 +9,7 @@ from any_agent import AgentFramework
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
-    from any_agent.serving.config import A2AServingConfig
+    from any_agent.serving.a2a.config_a2a import A2AServingConfig
 
 
 def _get_agent_card(agent: AnyAgent, serving_config: A2AServingConfig) -> AgentCard:

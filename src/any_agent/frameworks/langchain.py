@@ -40,7 +40,7 @@ class LangchainAgent(AnyAgent):
 
     def __init__(self, config: AgentConfig):
         super().__init__(config)
-        self._agent: CompiledStateGraph | None = None
+        self._agent: CompiledStateGraph[Any] | None = None
 
     @property
     def framework(self) -> AgentFramework:

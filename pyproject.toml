@@ -143,6 +143,10 @@ follow_untyped_imports = true
 module = "tests.*"
 disallow_untyped_decorators = false # mypy gets confused by pytest decorators
 
+[[tool.mypy.overrides]]
+module = ["pytest", "mktestdocs", "pytest_lazy_fixtures", "syrupy.assertion"]
+ignore_missing_imports = true # pytest related modules are not found
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"

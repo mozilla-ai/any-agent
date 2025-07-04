@@ -213,15 +213,19 @@ async def test_handles_task_response() -> None:
         result = await tool("Test query", None, None)
 
         # Verify the result is the expected dictionary format
-        expected_result = {
-            "task_id": task_response.status.message.taskId,
-            "context_id": task_response.status.message.contextId,
-            "timestamp": task_response.status.timestamp,
-            "status": task_response.status.state,
-            "message": {"Task completed successfully"},
-        }
-        assert result == expected_result
-        mock_client.send_message.assert_called_once()
+        if task_response.status.message:
+            expected_result = {
+                "task_id": task_response.status.message.taskId,
+                "context_id": task_response.status.message.contextId,
+                "timestamp": task_response.status.timestamp,
+                "status": task_response.status.state,
+                "message": {"Task completed successfully"},
+            }
+            assert result == expected_result
+            mock_client.send_message.assert_called_once()
+        else:
+            msg = "task_response.status.message is None"
+            raise ValueError(msg)
 
 
 @pytest.mark.asyncio
