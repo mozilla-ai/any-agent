@@ -11,20 +11,20 @@ while True:
 
     for callback in agent.config.callbacks:
         context = callback.before_llm_call(context)
-    
+
     response = CALL_LLM(history)
 
     for callback in agent.config.callbacks:
         context = callback.after_llm_call(context)
 
     history.append(response)
-    
+
     if response.tool_executions:
         for tool_execution in tool_executions:
-            
+
             for callback in agent.config.callbacks:
                 context = callback.before_tool_execution(context)
-            
+
             tool_response = EXECUTE_TOOL(tool_execution)
 
             for callback in agent.config.callbacks:
@@ -33,7 +33,7 @@ while True:
             history.append(tool_response)
 
     else:
-        return response    
+        return response
 ```
 
 Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.
@@ -138,4 +138,3 @@ class ContentFilter(Callback):
 !!! warning
 
     Raising exceptions in callbacks will terminate the agent run immediately. Use this feature carefully to implement safety measures or validation logic.
-
