@@ -336,6 +336,29 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../agents/callbacks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Callbacks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
     
@@ -345,10 +368,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
             
   
   
@@ -361,8 +384,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
             <span class="md-nav__icon md-icon"></span>
             Frameworks
           </label>
@@ -823,6 +846,29 @@
   
   <span class="md-ellipsis">
     Agent
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../callbacks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Callbacks
     
   </span>
   
@@ -1867,7 +1913,7 @@
 </span><span id="__span-0-292"><a id="__codelineno-0-292" name="__codelineno-0-292"></a>                <span class="n">output_content</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">get_output_content</span><span class="p">()</span>
 </span><span id="__span-0-293"><a id="__codelineno-0-293" name="__codelineno-0-293"></a>                <span class="k">if</span> <span class="n">output_content</span><span class="p">:</span>
 </span><span id="__span-0-294"><a id="__codelineno-0-294" name="__codelineno-0-294"></a>                    <span class="n">tool_name</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;gen_ai.tool.name&quot;</span><span class="p">]</span>
-</span><span id="__span-0-295"><a id="__codelineno-0-295" name="__codelineno-0-295"></a>                    <span class="n">tool_args</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;gen_ai.tool.args&quot;</span><span class="p">]</span>
+</span><span id="__span-0-295"><a id="__codelineno-0-295" name="__codelineno-0-295"></a>                    <span class="n">tool_args</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gen_ai.tool.args&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="__span-0-296"><a id="__codelineno-0-296" name="__codelineno-0-296"></a>                    <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
 </span><span id="__span-0-297"><a id="__codelineno-0-297" name="__codelineno-0-297"></a>                        <span class="n">AgentMessage</span><span class="p">(</span>
 </span><span id="__span-0-298"><a id="__codelineno-0-298" name="__codelineno-0-298"></a>                            <span class="n">role</span><span class="o">=</span><span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
@@ -2268,7 +2314,7 @@
 </span><span id="__span-0-292"><a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="n">output_content</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">get_output_content</span><span class="p">()</span>
 </span><span id="__span-0-293"><a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="k">if</span> <span class="n">output_content</span><span class="p">:</span>
 </span><span id="__span-0-294"><a id="__codelineno-0-294" name="__codelineno-0-294"></a>                <span class="n">tool_name</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;gen_ai.tool.name&quot;</span><span class="p">]</span>
-</span><span id="__span-0-295"><a id="__codelineno-0-295" name="__codelineno-0-295"></a>                <span class="n">tool_args</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;gen_ai.tool.args&quot;</span><span class="p">]</span>
+</span><span id="__span-0-295"><a id="__codelineno-0-295" name="__codelineno-0-295"></a>                <span class="n">tool_args</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gen_ai.tool.args&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="__span-0-296"><a id="__codelineno-0-296" name="__codelineno-0-296"></a>                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
 </span><span id="__span-0-297"><a id="__codelineno-0-297" name="__codelineno-0-297"></a>                    <span class="n">AgentMessage</span><span class="p">(</span>
 </span><span id="__span-0-298"><a id="__codelineno-0-298" name="__codelineno-0-298"></a>                        <span class="n">role</span><span class="o">=</span><span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
