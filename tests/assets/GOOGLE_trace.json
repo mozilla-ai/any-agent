@@ -4,8 +4,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 123756993629801267,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17367960837458394483,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751442995912891380,
-      "end_time": 1751442998190407356,
+      "start_time": 1751542375214164586,
+      "end_time": 1751542377080907349,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 1391215345178444054,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17908327384789002758,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -46,7 +46,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -56,8 +56,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 10824384008567535683,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 13690607474857799551,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -66,15 +66,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751442998195528686,
-      "end_time": 1751442998200264316,
+      "start_time": 1751542377086109156,
+      "end_time": 1751542377090146600,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 15589403731776718628,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 8472577099118036538,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -88,8 +88,8 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
-        "gen_ai.tool.call.id": "call_Iq1QqEQUoPraWPMzsWNcsE0Y",
-        "gen_ai.output": "\"meta=None content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-07-02T03:56:38-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None, meta=None)] structuredContent=None isError=False\"",
+        "gen_ai.tool.call.id": "call_pHcVJh9Jg6cqKu2OXmGElu34",
+        "gen_ai.output": "\"meta=None content=[TextContent(type='text', text='{\\\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\\\n  \\\"datetime\\\": \\\"2025-07-03T07:32:57-04:00\\\",\\\\n  \\\"is_dst\\\": true\\\\n}', annotations=None, meta=None)] structuredContent=None isError=False\"",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -98,7 +98,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -108,8 +108,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 123756993629801267,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17367960837458394483,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -118,15 +118,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751442998202710220,
-      "end_time": 1751442999268047025,
+      "start_time": 1751542377092288350,
+      "end_time": 1751542378448727787,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 3331181287391978276,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 16863833402598411116,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -149,7 +149,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -159,8 +159,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 18085666591425567667,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 15341938080753267630,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -169,15 +169,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751442999270204777,
-      "end_time": 1751442999270446367,
+      "start_time": 1751542378450357176,
+      "end_time": 1751542378450579696,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 778085122749838356,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 13034248572748671760,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -191,7 +191,7 @@
         "gen_ai.tool.name": "write_file",
         "gen_ai.tool.description": "write the text to a file in the tmp_path directory\n\nArgs:\n    text (str): The text to write to the file.\n\nReturns:\n    None",
         "gen_ai.tool.args": "{\"text\": \"2025\"}",
-        "gen_ai.tool.call.id": "call_SpgUjgMj069qqLWtTFHYal5D",
+        "gen_ai.tool.call.id": "call_BB8bcPllqYB67FOSGzr6OCA3",
         "gen_ai.output": "{}",
         "gen_ai.output.type": "json"
       },
@@ -201,7 +201,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -211,8 +211,8 @@
       "name": "call_llm gpt-4.1-mini",
       "kind": "internal",
       "parent": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 123756993629801267,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17367960837458394483,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -221,15 +221,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751442999272235742,
-      "end_time": 1751443001181574060,
+      "start_time": 1751542378452182026,
+      "end_time": 1751542380226451757,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 9898575930321485606,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 6309122888871636183,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -241,10 +241,10 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "gpt-4.1-mini",
-        "gen_ai.output": "[{\"tool.name\": \"final_output\", \"tool.args\": {\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}}]",
+        "gen_ai.output": "[{\"tool.name\": \"final_output\", \"tool.args\": {\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year value (2025) to a file.\\\"}]}\"}}]",
         "gen_ai.output.type": "json",
         "gen_ai.usage.input_tokens": 685,
-        "gen_ai.usage.output_tokens": 82
+        "gen_ai.usage.output_tokens": 84
       },
       "links": [],
       "events": [],
@@ -252,7 +252,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -262,8 +262,8 @@
       "name": "execute_tool final_output",
       "kind": "internal",
       "parent": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 7630902076009088337,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 17012419415444699414,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -272,15 +272,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751443001185165197,
-      "end_time": 1751443001185381909,
+      "start_time": 1751542380230731695,
+      "end_time": 1751542380231007445,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 11014526377420035709,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 13943079130629484494,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -293,9 +293,9 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "final_output",
         "gen_ai.tool.description": "You must call this tool in order to return the final answer.\n\nArgs:\n    answer: The final output that can be loaded as a Pydantic model. This must be a JSON compatible string that matches the following schema:\n        {'$defs': {'Step': {'properties': {'number': {'title': 'Number', 'type': 'integer'}, 'description': {'title': 'Description', 'type': 'string'}}, 'required': ['number', 'description'], 'title': 'Step', 'type': 'object'}}, 'additionalProperties': False, 'properties': {'steps': {'items': {'$ref': '#/$defs/Step'}, 'title': 'Steps', 'type': 'array'}}, 'required': ['steps'], 'title': 'Steps', 'type': 'object'}\n\nReturns:\n    A dictionary with the following keys:\n        - success: True if the output is valid, False otherwise.\n        - result: The final output if success is True, otherwise an error message.",
-        "gen_ai.tool.args": "{\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}",
-        "gen_ai.tool.call.id": "call_GpkIrgJQa2jyMSJTgRnLRxWK",
-        "gen_ai.output": "{\"success\": true, \"result\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year 2025 to a file.\\\"}]}\"}",
+        "gen_ai.tool.args": "{\"answer\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year value (2025) to a file.\\\"}]}\"}",
+        "gen_ai.tool.call.id": "call_1EZeDA3NIQMicRwwy7bzj1Qt",
+        "gen_ai.output": "{\"success\": true, \"result\": \"{\\\"steps\\\":[{\\\"number\\\":1,\\\"description\\\":\\\"Get the current date and time in the America/New_York timezone.\\\"},{\\\"number\\\":2,\\\"description\\\":\\\"Extract the year from the current date and time, which is 2025.\\\"},{\\\"number\\\":3,\\\"description\\\":\\\"Write the year value (2025) to a file.\\\"}]}\"}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -304,7 +304,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -324,15 +324,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751442995911277335,
-      "end_time": 1751443001187373782,
+      "start_time": 1751542375212668300,
+      "end_time": 1751542380233416777,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 135579973638133578069390341751246879560,
-        "span_id": 17999881488315848035,
+        "trace_id": 164150258907307397774640275248999507752,
+        "span_id": 2939314501100541147,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -353,27 +353,12 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.33.1",
+          "telemetry.sdk.version": "1.34.1",
           "service.name": "unknown_service"
         },
         "schema_url": ""
       }
     }
   ],
-  "final_output": {
-    "steps": [
-      {
-        "number": 1,
-        "description": "Get the current date and time in the America/New_York timezone."
-      },
-      {
-        "number": 2,
-        "description": "Extract the year from the current date and time, which is 2025."
-      },
-      {
-        "number": 3,
-        "description": "Write the year 2025 to a file."
-      }
-    ]
-  }
+  "final_output": {}
 }

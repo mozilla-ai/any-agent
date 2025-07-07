@@ -292,7 +292,7 @@ class AgentTrace(BaseModel):
                 output_content = span.get_output_content()
                 if output_content:
                     tool_name = span.attributes["gen_ai.tool.name"]
-                    tool_args = span.attributes["gen_ai.tool.args"]
+                    tool_args = span.attributes.get("gen_ai.tool.args", "{}")
                     messages.append(
                         AgentMessage(
                             role="assistant",
