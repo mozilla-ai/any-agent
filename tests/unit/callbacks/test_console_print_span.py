@@ -4,7 +4,7 @@ import pytest
 from opentelemetry.sdk.trace import ReadableSpan
 
 from any_agent import AgentTrace
-from any_agent.tracing.exporter import _ConsoleExporter, _get_output_panel
+from any_agent.callbacks.span_print import ConsolePrintSpan, _get_output_panel
 
 
 @pytest.fixture
@@ -12,21 +12,29 @@ def readable_spans(agent_trace: AgentTrace) -> list[ReadableSpan]:
     return [span.to_readable_span() for span in agent_trace.spans]
 
 
-def test_rich_console_span_exporter_default(
+def test_console_print_span(
     agent_trace: AgentTrace, request: pytest.FixtureRequest
 ) -> None:
     console_mock = MagicMock()
     panel_mock = MagicMock()
     markdown_mock = MagicMock()
-    readable_spans = [span.to_readable_span() for span in agent_trace.spans]
     with (
-        patch("any_agent.tracing.exporter.Console", console_mock),
-        patch("any_agent.tracing.exporter.Markdown", markdown_mock),
-        patch("any_agent.tracing.exporter.Panel", panel_mock),
+        patch("any_agent.callbacks.span_print.Console", console_mock),
+        patch("any_agent.callbacks.span_print.Markdown", markdown_mock),
+        patch("any_agent.callbacks.span_print.Panel", panel_mock),
     ):
-        exporter = _ConsoleExporter()
-        exporter.export(readable_spans)
+        callback = ConsolePrintSpan()
+
+        context = MagicMock()
+        for span in agent_trace.spans:
+            context.current_span = span.to_readable_span()
+            if span.is_llm_call():
+                callback.after_llm_call(context)
+            elif span.is_tool_execution():
+                callback.after_tool_execution(context)
+
         console_mock.return_value.print.assert_called()
+
         # Frameworks that end with a tool call
         if request.node.callspec.id not in (
             "GOOGLE_trace",
@@ -48,8 +56,8 @@ def test_get_output_panel(
     panel_mock = MagicMock()
     json_mock = MagicMock()
     with (
-        patch("any_agent.tracing.exporter.Panel", panel_mock),
-        patch("any_agent.tracing.exporter.JSON", json_mock),
+        patch("any_agent.callbacks.span_print.Panel", panel_mock),
+        patch("any_agent.callbacks.span_print.JSON", json_mock),
     ):
         _get_output_panel(readable_spans[0])
         json_mock.assert_called_once()
@@ -60,8 +68,8 @@ def test_get_output_panel(
         panel_mock = MagicMock()
         json_mock = MagicMock()
         with (
-            patch("any_agent.tracing.exporter.Panel", panel_mock),
-            patch("any_agent.tracing.exporter.JSON", json_mock),
+            patch("any_agent.callbacks.span_print.Panel", panel_mock),
+            patch("any_agent.callbacks.span_print.JSON", json_mock),
         ):
             _get_output_panel(readable_spans[1])
             json_mock.assert_called_once()
@@ -78,8 +86,8 @@ def test_get_output_panel(
         panel_mock = MagicMock()
         json_mock = MagicMock()
         with (
-            patch("any_agent.tracing.exporter.Panel", panel_mock),
-            patch("any_agent.tracing.exporter.JSON", json_mock),
+            patch("any_agent.callbacks.span_print.Panel", panel_mock),
+            patch("any_agent.callbacks.span_print.JSON", json_mock),
         ):
             _get_output_panel(readable_spans[-2])
             json_mock.assert_not_called()
@@ -89,8 +97,8 @@ def test_get_output_panel(
     panel_mock = MagicMock()
     json_mock = MagicMock()
     with (
-        patch("any_agent.tracing.exporter.Panel", panel_mock),
-        patch("any_agent.tracing.exporter.JSON", json_mock),
+        patch("any_agent.callbacks.span_print.Panel", panel_mock),
+        patch("any_agent.callbacks.span_print.JSON", json_mock),
     ):
         _get_output_panel(readable_spans[-1])
         json_mock.assert_not_called()
