@@ -165,12 +165,13 @@ from any_agent.evaluation import AgentJudge
 judge = AgentJudge(model_id="mistral/mistral-medium-latest")
 
 # Evaluate with access to trace inspection tools
-result = judge.run(
+eval_trace = judge.run(
     trace=trace,
     question="Does the final answer provided by the trace mention and correctly specify the most recent major version of iOS? You may need to do a web search to determine the most recent version of iOS. If the final answer does not mention the version at all, this criteria should fail",
     additional_tools=[search_web]
 )
 
+result = eval_trace.final_output
 print(f"Passed: {result.passed}")
 print(f"Reasoning: {result.reasoning}")
 ```

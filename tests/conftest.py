@@ -105,6 +105,14 @@ def mock_litellm_response() -> ModelResponse:
 
 
 @pytest.fixture
+def mock_litellm_tool_call_response() -> ModelResponse:
+    """Fixture to create a mock LiteLLM response that includes tool calls"""
+    return ModelResponse.model_validate_json(
+        '{"id":"chatcmpl-tool-call","created":1747157127,"model":"gpt-4o-2024-08-06","object":"chat.completion","choices":[{"finish_reason":"tool_calls","index":0,"message":{"content":null,"role":"assistant","tool_calls":[{"id":"call_123","type":"function","function":{"name":"search_web","arguments":"{\\"query\\":\\"latest AI developments\\"}"}}]}}],"usage":{"completion_tokens":20,"prompt_tokens":150,"total_tokens":170}}'
+    )
+
+
+@pytest.fixture
 def mock_litellm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
     """
     Create a fixture that returns an async generator function to mock streaming responses.

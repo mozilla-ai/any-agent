@@ -4,6 +4,8 @@ from typing import Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from any_agent.callbacks.base import Callback
+
 
 class AgentFramework(StrEnum):
     GOOGLE = auto()
@@ -112,7 +114,7 @@ Tool = str | MCPParams | Callable[..., Any]
 
 
 class AgentConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid")
 
     model_id: str
     """Select the underlying model used by the agent.
@@ -139,6 +141,12 @@ class AgentConfig(BaseModel):
     """List of tools to be used by the agent.
 
     See more info at [Tools](../agents/tools.md).
+    """
+
+    callbacks: list[Callback] | None = []
+    """List of callbacks to use during agent invocation.
+
+    See more info at [Callbacks](../agents/callbacks.md).
     """
 
     agent_type: Callable[..., Any] | None = None

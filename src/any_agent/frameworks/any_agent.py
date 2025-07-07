@@ -6,6 +6,10 @@ from typing import TYPE_CHECKING, Any, assert_never, overload
 
 from opentelemetry import trace as otel_trace
 
+from any_agent.callbacks.context import Context
+from any_agent.callbacks.wrappers import (
+    _get_wrapper_by_framework,
+)
 from any_agent.config import (
     AgentConfig,
     AgentFramework,
@@ -15,9 +19,6 @@ from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.exporter import SCOPE_NAME
-from any_agent.tracing.instrumentation import (
-    _get_instrumentor_by_framework,
-)
 from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
@@ -71,11 +72,13 @@ class AnyAgent(ABC):
         self._mcp_servers: list[_MCPServerBase[Any]] = []
         self._tools: list[Any] = []
 
-        self._instrumentor = _get_instrumentor_by_framework(self.framework)
+        self._add_span_callbacks()
+        self._wrapper = _get_wrapper_by_framework(self.framework)
+
         self._tracer: Tracer = otel_trace.get_tracer(SCOPE_NAME)
 
         self._lock = asyncio.Lock()
-        self._running_traces: dict[int, AgentTrace] = {}
+        self._callback_contexts: dict[int, Context] = {}
 
     @staticmethod
     def _get_agent_type_by_framework(
@@ -160,18 +163,11 @@ class AnyAgent(ABC):
         """Run the agent with the given prompt."""
         return run_async_in_sync(self.run_async(prompt, **kwargs))
 
-    async def run_async(
-        self, prompt: str, instrument: bool = True, **kwargs: Any
-    ) -> AgentTrace:
+    async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.
 
         Args:
             prompt: The user prompt to be passed to the agent.
-            instrument: Whether to instrument the underlying framework
-                to generate LLM Calls and Tool Execution Spans.
-
-                If `False` the returned `AgentTrace` will only
-                contain a single `invoke_agent` span.
 
             kwargs: Will be passed to the underlying runner used
                 by the framework.
@@ -183,21 +179,25 @@ class AnyAgent(ABC):
         """
         trace = AgentTrace()
         trace_id: int
-        instrumentation_enabled = instrument and self._instrumentor is not None
 
         # This design is so that we only catch exceptions thrown by _run_async. All other exceptions will not be caught.
         try:
             with self._tracer.start_as_current_span(
                 f"invoke_agent [{self.config.name}]"
             ) as invoke_span:
-                if instrumentation_enabled:
+                async with self._lock:
                     trace_id = invoke_span.get_span_context().trace_id
-                    async with self._lock:
-                        # We check the locked `_running_traces` inside `instrument`.
-                        # If there is more than 1 entry in `running_traces`, it means that the agent has
-                        # already being instrumented so we won't instrument it again.
-                        self._running_traces[trace_id] = AgentTrace()
-                        self._instrumentor.instrument(
+                    self._wrapper.callback_context[trace_id] = Context(
+                        current_span=invoke_span,
+                        trace=AgentTrace(),
+                        tracer=self._tracer,
+                        shared={},
+                    )
+
+                    if len(self._wrapper.callback_context) == 1:
+                        # If there is more than 1 entry in `callback_context`, it means that the agent has
+                        # already being wrapped so we won't wrap it again.
+                        await self._wrapper.wrap(
                             agent=self,  # type: ignore[arg-type]
                         )
 
@@ -210,23 +210,24 @@ class AnyAgent(ABC):
                         "gen_ai.request.model": self.config.model_id,
                     }
                 )
+
                 final_output = await self._run_async(prompt, **kwargs)
         except Exception as e:
-            # Clean up instrumentation if it was enabled
-            if instrumentation_enabled:
-                async with self._lock:
-                    self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
-                    # Get the instrumented trace if available, otherwise use the original trace
-                    instrumented_trace = self._running_traces.pop(trace_id)
-                    if instrumented_trace is not None:
-                        trace = instrumented_trace
+            async with self._lock:
+                if len(self._wrapper.callback_context) == 1:
+                    await self._wrapper.unwrap(self)  # type: ignore[arg-type]
+                if wrapped_context := self._wrapper.callback_context.pop(
+                    trace_id, None
+                ):
+                    trace = wrapped_context.trace
             trace.add_span(invoke_span)
             raise AgentRunError(trace, e) from e
 
-        if instrumentation_enabled:
-            async with self._lock:
-                self._instrumentor.uninstrument(self)  # type: ignore[arg-type]
-                trace = self._running_traces.pop(trace_id)
+        async with self._lock:
+            if len(self._wrapper.callback_context) == 1:
+                await self._wrapper.unwrap(self)  # type: ignore[arg-type]
+            if wrapped_context := self._wrapper.callback_context.pop(trace_id, None):
+                trace = wrapped_context.trace
 
         trace.add_span(invoke_span)
         trace.final_output = final_output
@@ -422,6 +423,23 @@ class AnyAgent(ABC):
         await new_agent._load_agent()
 
         return new_agent
+
+    def _add_span_callbacks(self) -> None:
+        if self.config.callbacks is None:
+            return
+
+        from any_agent.callbacks.span_end import SpanEndCallback
+        from any_agent.callbacks.span_generation import (
+            SpanGeneration,
+            _get_span_generation_callback,
+        )
+
+        if not any(isinstance(c, SpanGeneration) for c in self.config.callbacks):
+            self.config.callbacks.insert(
+                0, _get_span_generation_callback(self.framework)
+            )
+        if not any(isinstance(c, SpanEndCallback) for c in self.config.callbacks):
+            self.config.callbacks.append(SpanEndCallback())
 
     @abstractmethod
     async def _load_agent(self) -> None:

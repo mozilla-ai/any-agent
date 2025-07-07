@@ -7,6 +7,7 @@ nav:
   - Intro: index.md
   - Agents:
     - Defining and Running Agents: agents/index.md
+    - Callbacks: agents/callbacks.md
     - Frameworks:
       - Agno: agents/frameworks/agno.md
       - Google ADK: agents/frameworks/google_adk.md
@@ -26,6 +27,7 @@ nav:
       - Use an Agent as a tool for another agent (A2A): cookbook/a2a_as_tool.ipynb
   - API Reference:
     - Agent: api/agent.md
+    - Callbacks: api/callbacks.md
     - Config: api/config.md
     - Evaluation: api/evaluation.md
     - Logging: api/logging.md
