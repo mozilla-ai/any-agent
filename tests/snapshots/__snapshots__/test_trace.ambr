@@ -10,7 +10,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": "{\\"timezone\\":\\"America/New_York\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_tokens': 175,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -32,7 +32,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 15185287192202592430,
@@ -127,7 +127,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": "{\\"text\\":\\"2025\\"}"}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_tokens': 243,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -149,7 +149,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 15185287192202592430,
@@ -255,7 +255,7 @@
             }
           ''',
           'gen_ai.output.type': 'text',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_tokens': 267,
           'gen_ai.usage.output_tokens': 55,
         }),
@@ -277,7 +277,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 15185287192202592430,
@@ -310,7 +310,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
         }),
         'context': dict({
           'is_remote': False,
@@ -372,7 +372,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": {"timezone": "America/New_York"}}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_tokens': 189,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -394,7 +394,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 17367960837458394483,
@@ -483,7 +483,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": {"text": "2025"}}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_tokens': 288,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -505,7 +505,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 17367960837458394483,
@@ -624,7 +624,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 17367960837458394483,
@@ -724,7 +724,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
         }),
         'context': dict({
           'is_remote': False,
@@ -786,7 +786,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": {"timezone": "America/New_York"}}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_tokens': 176,
           'gen_ai.usage.output_tokens': 18,
         }),
@@ -808,7 +808,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 14347642381584919208,
@@ -902,7 +902,7 @@
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": {"text": "2025"}}]',
           'gen_ai.output.type': 'json',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_tokens': 244,
           'gen_ai.usage.output_tokens': 15,
         }),
@@ -924,7 +924,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 14347642381584919208,
@@ -1047,7 +1047,7 @@
         'kind': <SpanKind.INTERNAL: 'internal'>,
         'links': list([
         ]),
-        'name': 'call_llm mistral/mistral-medium-latest',
+        'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
           'span_id': 14347642381584919208,
@@ -1135,7 +1135,7 @@
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
-          'gen_ai.request.model': 'mistral/mistral-medium-latest',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
         }),
         'context': dict({
           'is_remote': False,

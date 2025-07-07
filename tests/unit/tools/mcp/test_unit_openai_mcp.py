@@ -35,7 +35,7 @@ def test_openai_mcpsse(
 ) -> None:
     """This is a test kept for legacy purposes."""
     agent_config = AgentConfig(
-        model_id="mistral/mistral-medium-latest", tools=[mcp_sse_params_no_tools]
+        model_id="mistral/mistral-small-latest", tools=[mcp_sse_params_no_tools]
     )
 
     agent = AnyAgent.create("openai", agent_config)

@@ -31,7 +31,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
         "google",
         AgentConfig(
             name="google_expert",
-            model_id="mistral/mistral-medium-latest",
+            model_id="mistral/mistral-small-latest",
             description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
             tools=[search_web]
         )
@@ -176,7 +176,7 @@ In a similar way to [the A2A example](#example), we are going to define two agen
         "google",
         AgentConfig(
             name="google_expert",
-            model_id="mistral/mistral-medium-latest",
+            model_id="mistral/mistral-small-latest",
             description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
             tools=[search_web]
         )

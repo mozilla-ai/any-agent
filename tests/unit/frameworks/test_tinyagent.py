@@ -23,7 +23,7 @@ async def sample_tool_function(arg1: int, arg2: str) -> str:
 @pytest.mark.asyncio
 async def test_tool_argument_casting() -> None:
     agent: TinyAgent = await AnyAgent.create_async(
-        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-medium-latest")
+        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-small-latest")
     )  # type: ignore[assignment]
 
     # Register the sample tool function
@@ -51,7 +51,7 @@ def test_run_tinyagent_agent_custom_args() -> None:
     output = "The state capital of Pennsylvania is Harrisburg."
 
     agent = AnyAgent.create(
-        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-medium-latest")
+        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-small-latest")
     )
     with patch(
         "any_agent.frameworks.tinyagent.litellm.acompletion"

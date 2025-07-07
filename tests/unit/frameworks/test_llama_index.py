@@ -48,7 +48,7 @@ def test_load_llama_index_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.LLAMA_INDEX,
-                AgentConfig(model_id="mistral/mistral-medium-latest"),
+                AgentConfig(model_id="mistral/mistral-small-latest"),
             )
 
 
