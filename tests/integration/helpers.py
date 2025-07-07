@@ -5,7 +5,10 @@ import httpx
 import requests
 
 DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
-DEFAULT_MEDIUM_MODEL_ID = "mistral/mistral-medium-latest"
+
+DEFAULT_MODEL_ARGS = {"temperature": 0.0, "parallel_tool_calls": False}
+
+DEFAULT_HTTP_KWARGS = {"timeout": 60.0}
 
 
 def wait_for_server(

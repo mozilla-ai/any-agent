@@ -67,7 +67,7 @@ class AnyAgent(ABC):
     """
 
     def __init__(self, config: AgentConfig):
-        self.config = config
+        self.config = config.model_copy(deep=True)
 
         self._mcp_servers: list[_MCPServerBase[Any]] = []
         self._tools: list[Any] = []
