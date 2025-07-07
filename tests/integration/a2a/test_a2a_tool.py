@@ -87,7 +87,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
             model_id=DEFAULT_SMALL_MODEL_ID,
-            tools=[await a2a_tool_async(server_url)],
+            tools=[await a2a_tool_async(server_url, http_kwargs=DEFAULT_HTTP_KWARGS)],
             model_args=get_default_agent_model_args(agent_framework),
         )
 
