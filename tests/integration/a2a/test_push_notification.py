@@ -33,7 +33,7 @@ from any_agent.tracing.otel_types import (
     SpanKind,
     Status,
 )
-from tests.integration.helpers import DEFAULT_MODEL_ID, wait_for_server_async
+from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
 
 from .conftest import DEFAULT_LONG_TIMEOUT, a2a_client_from_agent
 
@@ -129,7 +129,7 @@ async def test_push_notification_non_streaming() -> None:
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
-        model_id=DEFAULT_MODEL_ID,  # Using real model ID but will be mocked
+        model_id=DEFAULT_SMALL_MODEL_ID,  # Using real model ID but will be mocked
         instructions=(
             "You are a helpful assistant that remembers our conversation. "
             "When asked about previous information, reference what was said earlier. "
