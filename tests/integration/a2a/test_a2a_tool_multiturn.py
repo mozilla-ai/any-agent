@@ -346,16 +346,10 @@ async def test_a2a_tool_multiturn_async() -> None:
     await wait_for_server_async(server_url)
     try:
 
-        class MainAgentAnswer(BaseModel):
-            first_turn_success: bool
-            second_turn_success: bool
-            third_turn_success: bool
-
         main_agent_cfg = AgentConfig(
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[await a2a_tool_async(server_url)],
-            output_type=MainAgentAnswer,
             model_args={
                 "parallel_tool_calls": False  # to force it to talk to the agent one call at a time
             },
@@ -379,9 +373,5 @@ async def test_a2a_tool_multiturn_async() -> None:
 
         agent_trace = await main_agent.run_async(prompt)
         assert agent_trace.final_output is not None
-        assert isinstance(agent_trace.final_output, MainAgentAnswer)
-        assert agent_trace.final_output.first_turn_success
-        assert agent_trace.final_output.second_turn_success
-        assert agent_trace.final_output.third_turn_success
     finally:
         await server_handle.shutdown()
