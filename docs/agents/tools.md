@@ -140,7 +140,7 @@ main_agent = await AnyAgent.create_async(
     "tinyagent",
     AgentConfig(
         name="main_agent",
-        model_id="gpt-4.1-nano",
+        model_id="mistral-small-latest",
         instructions="Use the available tools to obtain additional information to answer the query.",
         tools=[google_agent_as_tool],
     )

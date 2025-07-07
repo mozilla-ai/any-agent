@@ -4,8 +4,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 4953840567163471747,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 1633577075403848739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751552840905371000,
-      "end_time": null,
+      "start_time": 1751897248737217000,
+      "end_time": 1751897249091940000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 3389527599951174133,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 17658840996957324202,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -38,7 +38,7 @@
         "gen_ai.output": "[{\"tool.name\": \"get_current_time\", \"tool.args\": \"{}\"}]",
         "gen_ai.output.type": "json",
         "gen_ai.usage.input_tokens": 207,
-        "gen_ai.usage.output_tokens": 36
+        "gen_ai.usage.output_tokens": 35
       },
       "links": [],
       "events": [],
@@ -56,8 +56,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 4953840567163471747,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 1633577075403848739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -66,15 +66,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751552846681035000,
-      "end_time": null,
+      "start_time": 1751897249093948000,
+      "end_time": 1751897249316027000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 10832196540566406685,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 406442054799583800,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -88,7 +88,7 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-03T10:27:27-04:00\",\n  \"is_dst\": true\n}",
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-07T10:07:29-04:00\",\n  \"is_dst\": true\n}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -107,8 +107,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 4953840567163471747,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 1633577075403848739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -117,15 +117,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751552847006510000,
-      "end_time": null,
+      "start_time": 1751897249317898000,
+      "end_time": 1751897257026914000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 15195867154156480558,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 2550053444359641565,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -139,8 +139,8 @@
         "gen_ai.request.model": "mistral/mistral-small-latest",
         "gen_ai.output": "[{\"tool.name\": \"write_file\", \"tool.args\": \"{}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 300,
-        "gen_ai.usage.output_tokens": 34
+        "gen_ai.usage.input_tokens": 299,
+        "gen_ai.usage.output_tokens": 32
       },
       "links": [],
       "events": [],
@@ -158,8 +158,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 4953840567163471747,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 1633577075403848739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -168,15 +168,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751552847900866000,
-      "end_time": null,
+      "start_time": 1751897257029735000,
+      "end_time": 1751897257030377000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 11598487804274006429,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 4285065974194427279,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -209,8 +209,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 4953840567163471747,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 1633577075403848739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -219,15 +219,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751552847904982000,
-      "end_time": null,
+      "start_time": 1751897257031992000,
+      "end_time": 1751897257925471000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 12270615622205318191,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 16504047282824464779,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -241,8 +241,8 @@
         "gen_ai.request.model": "mistral/mistral-small-latest",
         "gen_ai.output": "[{\"tool.name\": \"final_output\", \"tool.args\": \"{}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 324,
-        "gen_ai.usage.output_tokens": 125
+        "gen_ai.usage.input_tokens": 321,
+        "gen_ai.usage.output_tokens": 165
       },
       "links": [],
       "events": [],
@@ -260,8 +260,8 @@
       "name": "execute_tool final_output",
       "kind": "internal",
       "parent": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 4953840567163471747,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 1633577075403848739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -270,15 +270,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751552850357280000,
-      "end_time": null,
+      "start_time": 1751897257929455000,
+      "end_time": 1751897257929839000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 2225855846235287397,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 7767233091264036754,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -290,8 +290,9 @@
       "attributes": {
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "final_output",
-        "gen_ai.tool.args": "{\"answer\": \"{\\n  \\\"steps\\\": [\\n    {\\n      \\\"number\\\": 1,\\n      \\\"description\\\": \\\"Get current time in the America/New_York timezone.\\\"\\n    },\\n    {\\n      \\\"number\\\": 2,\\n      \\\"description\\\": \\\"Write the year to a file.\\\"\\n    }\\n  ]\\n}\"}",
-        "gen_ai.output": "{\"success\": true, \"result\": \"{\\n  \\\"steps\\\": [\\n    {\\n      \\\"number\\\": 1,\\n      \\\"description\\\": \\\"Get current time in the America/New_York timezone.\\\"\\n    },\\n    {\\n      \\\"number\\\": 2,\\n      \\\"description\\\": \\\"Write the year to a file.\\\"\\n    }\\n  ]\\n}\"}",
+        "gen_ai.tool.description": "final_output(answer: str) -> dict\nYou must call this tool in order to return the final answer.\n\n        Args:\n            answer: The final output that can be loaded as a Pydantic model. This must be a JSON compatible string that matches the following schema:\n                {'$defs': {'Step': {'properties': {'number': {'title': 'Number', 'type': 'integer'}, 'description': {'title': 'Description', 'type': 'string'}}, 'required': ['number', 'description'], 'title': 'Step', 'type': 'object'}}, 'additionalProperties': False, 'properties': {'steps': {'items': {'$ref': '#/$defs/Step'}, 'title': 'Steps', 'type': 'array'}}, 'required': ['steps'], 'title': 'Steps', 'type': 'object'}\n\n        Returns:\n            A dictionary with the following keys:\n                - success: True if the output is valid, False otherwise.\n                - result: The final output if success is True, otherwise an error message.\n\n        ",
+        "gen_ai.tool.args": "{\"answer\": \"{\\n  \\\"steps\\\": [\\n    {\\n      \\\"number\\\": 1,\\n      \\\"description\\\": \\\"Get current time in the America/New_York timezone.\\\"\\n    },\\n    {\\n      \\\"number\\\": 2,\\n      \\\"description\\\": \\\"Write the year to a file.\\\"\\n    },\\n    {\\n      \\\"number\\\": 3,\\n      \\\"description\\\": \\\"Return a list of the steps taken.\\\"\\n    }\\n  ]\\n}\"}",
+        "gen_ai.output": "{\"success\": true, \"result\": \"{\\n  \\\"steps\\\": [\\n    {\\n      \\\"number\\\": 1,\\n      \\\"description\\\": \\\"Get current time in the America/New_York timezone.\\\"\\n    },\\n    {\\n      \\\"number\\\": 2,\\n      \\\"description\\\": \\\"Write the year to a file.\\\"\\n    },\\n    {\\n      \\\"number\\\": 3,\\n      \\\"description\\\": \\\"Return a list of the steps taken.\\\"\\n    }\\n  ]\\n}\"}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -310,8 +311,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 4953840567163471747,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 1633577075403848739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -320,15 +321,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751552850359938000,
-      "end_time": null,
+      "start_time": 1751897257932539000,
+      "end_time": 1751897258764420000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 13064460218055487787,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 9541133311533202824,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -340,10 +341,10 @@
       "attributes": {
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "mistral/mistral-small-latest",
-        "gen_ai.output": "```json\n{\n  \"steps\": [\n    {\n      \"number\": 1,\n      \"description\": \"Get current time in the America/New_York timezone.\"\n    },\n    {\n      \"number\": 2,\n      \"description\": \"Write the year to a file.\"\n    }\n  ]\n}\n```",
+        "gen_ai.output": "The final output is:\n\n```json\n{\n  \"steps\": [\n    {\n      \"number\": 1,\n      \"description\": \"Get current time in the America/New_York timezone.\"\n    },\n    {\n      \"number\": 2,\n      \"description\": \"Write the year to a file.\"\n    },\n    {\n      \"number\": 3,\n      \"description\": \"Return a list of the steps taken.\"\n    }\n  ]\n}\n```",
         "gen_ai.output.type": "text",
-        "gen_ai.usage.input_tokens": 499,
-        "gen_ai.usage.output_tokens": 63
+        "gen_ai.usage.input_tokens": 556,
+        "gen_ai.usage.output_tokens": 92
       },
       "links": [],
       "events": [],
@@ -371,15 +372,15 @@
           "entries": {}
         }
       },
-      "start_time": 1751552840903961000,
-      "end_time": 1751552856082616000,
+      "start_time": 1751897248735387000,
+      "end_time": 1751897262268111000,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 247926053392528800012498711214918491834,
-        "span_id": 4953840567163471747,
+        "trace_id": 147660503400784894640475885575959805023,
+        "span_id": 1633577075403848739,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -407,16 +408,5 @@
       }
     }
   ],
-  "final_output": {
-    "steps": [
-      {
-        "number": 1,
-        "description": "Get current time in the America/New_York timezone."
-      },
-      {
-        "number": 2,
-        "description": "Write the year to a file."
-      }
-    ]
-  }
+  "final_output": {}
 }
