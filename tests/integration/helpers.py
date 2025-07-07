@@ -10,7 +10,6 @@ from any_agent.config import AgentFramework
 DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
 
 
-
 def get_default_agent_model_args(agent_framework: AgentFramework) -> dict[str, Any]:
     # use a function to avoid passing by reference
     model_args: dict[str, Any] = (

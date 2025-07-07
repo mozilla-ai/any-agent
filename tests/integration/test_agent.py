@@ -120,7 +120,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     llm_judge = LlmJudge(
         model_id=DEFAULT_SMALL_MODEL_ID,
         model_args={
-            "timeout": 30.0
+            "temperature": 0.0,
         },  # Because it's an llm not agent, the default_model_args are not used
     )
     result1 = llm_judge.run(

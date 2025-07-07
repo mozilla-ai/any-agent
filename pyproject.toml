@@ -11,7 +11,7 @@ dynamic = ["version"]
 dependencies = [
   "duckduckgo_search",
   "fire",
-  "litellm",
+  "litellm>=1.74.0",
   "markdownify",
   "mcp>=1.5.0",
   "opentelemetry-exporter-otlp",
@@ -148,9 +148,6 @@ disallow_untyped_decorators = false # mypy gets confused by pytest decorators
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 timeout = 120
-filterwarnings = [
-    "ignore::UserWarning:pydantic.main",
-]
 
 
 [dependency-groups]
