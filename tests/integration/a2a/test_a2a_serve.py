@@ -6,9 +6,14 @@ import pytest
 from a2a.client import A2AClient
 
 # Import your agent and config
-from any_agent import AgentConfig, AnyAgent
+from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
+from tests.integration.helpers import (
+    DEFAULT_HTTP_KWARGS,
+    DEFAULT_SMALL_MODEL_ID,
+    get_default_agent_model_args,
+    wait_for_server_async,
+)
 
 from .conftest import A2ATestHelpers, a2a_client_from_agent
 
@@ -20,6 +25,7 @@ def serve_agent(port: int) -> None:
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Directly answer the question without asking the user for input.",
             description="I'm an agent to help.",
+            model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
         ),
     )
     agent.serve(serving_config=A2AServingConfig(port=port))
@@ -42,7 +48,9 @@ async def test_serve_sync(test_port: int, a2a_test_helpers: A2ATestHelpers) -> N
             request = a2a_test_helpers.create_send_message_request(
                 text="What is an agent?"
             )
-            response = await client.send_message(request, http_kwargs={"timeout": 30.0})
+            response = await client.send_message(
+                request, http_kwargs=DEFAULT_HTTP_KWARGS
+            )
             assert response is not None
     finally:
         proc.kill()
@@ -58,6 +66,7 @@ async def test_serve_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> 
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Directly answer the question without asking the user for input.",
             description="I'm an agent to help.",
+            model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
         ),
     )
 
@@ -70,5 +79,5 @@ async def test_serve_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> 
             text="What is an agent?",
             message_id=uuid4().hex,
         )
-        response = await client.send_message(request, http_kwargs={"timeout": 30.0})
+        response = await client.send_message(request, http_kwargs=DEFAULT_HTTP_KWARGS)
         assert response is not None

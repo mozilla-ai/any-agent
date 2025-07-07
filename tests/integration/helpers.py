@@ -1,11 +1,28 @@
 import asyncio
 import time
+from typing import Any
 
 import httpx
 import requests
 
+from any_agent.config import AgentFramework
+
 DEFAULT_SMALL_MODEL_ID = "gpt-4.1-nano"
 DEFAULT_MEDIUM_MODEL_ID = "gpt-4.1-mini"
+
+
+def get_default_agent_model_args(agent_framework: AgentFramework) -> dict[str, Any]:
+    # use a function to avoid passing by reference
+    model_args: dict[str, Any] = (
+        {"parallel_tool_calls": False}
+        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
+        else {}
+    )
+    model_args["temperature"] = 0.0
+    return model_args
+
+
+DEFAULT_HTTP_KWARGS = {"timeout": 30.0}
 
 
 def wait_for_server(
