@@ -21,7 +21,10 @@ from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.tracing import TRACE_PROVIDER
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from any_agent.tracing.exporter import _ConsoleExporter
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, get_model_args
+from tests.integration.helpers import (
+    DEFAULT_SMALL_MODEL_ID,
+    get_default_agent_model_args,
+)
 
 
 def uvx_installed() -> bool:
@@ -114,7 +117,12 @@ def assert_tokens(agent_trace: AgentTrace) -> None:
 def assert_eval(agent_trace: AgentTrace) -> None:
     """Test evaluation using the new judge classes."""
     # Test 1: Check if agent called write_file tool using LlmJudge
-    llm_judge = LlmJudge(model_id=DEFAULT_SMALL_MODEL_ID, model_args=get_model_args())
+    llm_judge = LlmJudge(
+        model_id=DEFAULT_SMALL_MODEL_ID,
+        model_args={
+            "timeout": 30.0
+        },  # Because it's an llm not agent, the default_model_args are not used
+    )
     result1 = llm_judge.run(
         context=str(agent_trace.spans_to_messages()),
         question="Did the agent call the write_file tool during execution?",
@@ -126,7 +134,8 @@ def assert_eval(agent_trace: AgentTrace) -> None:
 
     # Test 2: Check if agent wrote the current year to file using AgentJudge
     agent_judge = AgentJudge(
-        model_id=DEFAULT_SMALL_MODEL_ID, model_args=get_model_args()
+        model_id=DEFAULT_SMALL_MODEL_ID,
+        model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
     )
 
     def get_current_year() -> str:
@@ -203,7 +212,7 @@ def test_load_and_run_agent(
     agent_config = AgentConfig(
         tools=tools,  # type: ignore[arg-type]
         instructions="Use the available tools to answer.",
-        model_args=get_model_args(),
+        model_args=get_default_agent_model_args(agent_framework),
         output_type=Steps,
         **kwargs,  # type: ignore[arg-type]
     )

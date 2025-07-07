@@ -28,6 +28,9 @@ class A2AEnvelope(BaseModel, Generic[BodyType]):
     task_status: Literal[  # type: ignore[valid-type]
         TaskState.input_required, TaskState.completed, TaskState.failed
     ]
+    """Restricted to the states that are leveraged by our implementation of the A2A protocol.
+    When we support streaming, the rest of the states can be added and supported."""
+
     data: BodyType
 
     model_config = ConfigDict(extra="forbid")

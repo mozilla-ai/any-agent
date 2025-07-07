@@ -4,7 +4,10 @@ import pytest
 from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, get_model_args
+from tests.integration.helpers import (
+    DEFAULT_SMALL_MODEL_ID,
+    get_default_agent_model_args,
+)
 
 
 def mock_capital(query: str) -> str:
@@ -37,7 +40,7 @@ async def test_run_agent_concurrently(agent_framework: AgentFramework) -> None:
         AgentConfig(
             model_id=model_id,
             instructions="You must use the tools to find an answer",
-            model_args=get_model_args(),
+            model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
             tools=[mock_capital],
         ),
     )
