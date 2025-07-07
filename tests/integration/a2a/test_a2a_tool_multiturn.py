@@ -31,7 +31,12 @@ from any_agent.tracing.otel_types import (
     SpanKind,
     Status,
 )
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
+from tests.integration.helpers import (
+    DEFAULT_HTTP_KWARGS,
+    DEFAULT_SMALL_MODEL_ID,
+    get_default_agent_model_args,
+    wait_for_server_async,
+)
 
 if TYPE_CHECKING:
     from typing import Any
@@ -205,6 +210,7 @@ async def test_a2a_tool_multiturn() -> None:
         description="Agent with conversation memory for testing session management.",
         output_type=UserInfo,
         tools=[call_counter],
+        model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
     )
 
     agent = MockConversationAgent(config)
@@ -247,7 +253,7 @@ async def test_a2a_tool_multiturn() -> None:
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_1)
             )
             response_1 = await client.send_message(
-                request_1, http_kwargs={"timeout": 30.0}
+                request_1, http_kwargs=DEFAULT_HTTP_KWARGS
             )
 
             assert response_1 is not None
@@ -279,7 +285,7 @@ async def test_a2a_tool_multiturn() -> None:
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_2)
             )
             response_2 = await client.send_message(
-                request_2, http_kwargs={"timeout": 30.0}
+                request_2, http_kwargs=DEFAULT_HTTP_KWARGS
             )
 
             assert response_2 is not None
@@ -309,7 +315,7 @@ async def test_a2a_tool_multiturn() -> None:
                 id=str(uuid4()), params=MessageSendParams(**send_message_payload_3)
             )
             response_3 = await client.send_message(
-                request_3, http_kwargs={"timeout": 30.0}
+                request_3, http_kwargs=DEFAULT_HTTP_KWARGS
             )
             assert response_3 is not None
             # if the response is JSONRPCErrorResposne, log and raise an error
@@ -352,6 +358,7 @@ async def test_a2a_tool_multiturn_async() -> None:
         description="Agent with conversation memory for testing session management.",
         output_type=UserInfo,
         tools=[call_counter],
+        model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
     )
 
     agent = MockConversationAgent(config)
@@ -370,9 +377,8 @@ async def test_a2a_tool_multiturn_async() -> None:
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[await a2a_tool_async(server_url)],
-            model_args={
-                "parallel_tool_calls": False  # to force it to talk to the agent one call at a time
-            },
+            output_type=MainAgentAnswer,
+            model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
         )
 
         main_agent = await AnyAgent.create_async(

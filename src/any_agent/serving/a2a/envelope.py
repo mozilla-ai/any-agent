@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeVar
 
 from a2a.types import TaskState  # noqa: TC002
 from pydantic import BaseModel, ConfigDict
@@ -25,7 +25,12 @@ BodyType = TypeVar("BodyType", bound=BaseModel)
 class A2AEnvelope(BaseModel, Generic[BodyType]):
     """A2A envelope that wraps response data with task status."""
 
-    task_status: TaskState
+    task_status: Literal[  # type: ignore[valid-type]
+        TaskState.input_required, TaskState.completed, TaskState.failed
+    ]
+    """Restricted to the states that are leveraged by our implementation of the A2A protocol.
+    When we support streaming, the rest of the states can be added and supported."""
+
     data: BodyType
 
     model_config = ConfigDict(extra="forbid")
