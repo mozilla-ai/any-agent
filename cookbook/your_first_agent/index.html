@@ -1758,7 +1758,7 @@ nest_asyncio.apply()</div>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="configure-the-agent">Configure the Agent<a class="anchor-link" href="#configure-the-agent">¶</a></h2><p>Now it's time to configure the agent! At this stage you have a few choices:</p>
 <h3 id="pick-the-framework">Pick the framework<a class="anchor-link" href="#pick-the-framework">¶</a></h3><p>We support a variety of underlying agent frameworks (OpenAI, Smolagents, Langchain, TinyAgent, etc), which all have their own particular agentic AI implementations. For this tutorial's simple use case, any of the frameworks should work just fine, but any-agent makes it easy to try out a different framework later, if we so choose. For this example, we will use the <a href="frameworks/tinyagent.md">TinyAgent</a> framework.</p>
-<h3 id="pick-an-llm">Pick an LLM<a class="anchor-link" href="#pick-an-llm">¶</a></h3><p>Regardless of which agent framework you choose, each framework supports LiteLLM, which is a proxy that allows us to use whichever LLM inside the framework, hosted on by any provider. For example, we could use a local model via llama.cpp or llamafile, a google hosted gemini model, or a AWS bedrock hosted Llama model. For this example, let's use OpenAI's gpt-4.1-nano.</p>
+<h3 id="pick-an-llm">Pick an LLM<a class="anchor-link" href="#pick-an-llm">¶</a></h3><p>Regardless of which agent framework you choose, each framework supports LiteLLM, which is a proxy that allows us to use whichever LLM inside the framework, hosted on by any provider. For example, we could use a local model via llama.cpp or llamafile, a google hosted gemini model, or a AWS bedrock hosted Llama model. For this example, let's use Mistral AI's mistral/mistral-small-latest LLM.</p>
 <h3 id="pick-which-tools-to-use">Pick which tools to use<a class="anchor-link" href="#pick-which-tools-to-use">¶</a></h3><p>In this tutorial, we will provide the agent with access to web searches and web page visits. In later examples we will show more advanced tool usage like Model Context Protocol (MCP) tool use or inter-agent communication using Agent-2-Agent (A2A).</p>
 </div>
 </div>
@@ -1785,24 +1785,24 @@ nest_asyncio.apply()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getpass</span>
 
-<span class="k">if</span> <span class="s2">"OPENAI_API_KEY"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"OPENAI_API_KEY not found in environment!"</span><span class="p">)</span>
-    <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">"Please enter your OPENAI_API_KEY: "</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"OPENAI_API_KEY"</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_key</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"OPENAI_API_KEY set for this session!"</span><span class="p">)</span>
+<span class="k">if</span> <span class="s2">"MISTRAL_API_KEY"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"MISTRAL_API_KEY not found in environment!"</span><span class="p">)</span>
+    <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">"Please enter your MISTRAL_API_KEY: "</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"MISTRAL_API_KEY"</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_key</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"MISTRAL_API_KEY set for this session!"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"OPENAI_API_KEY found in environment."</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"MISTRAL_API_KEY found in environment."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import os
 from getpass import getpass
 
-if "OPENAI_API_KEY" not in os.environ:
-    print("OPENAI_API_KEY not found in environment!")
-    api_key = getpass("Please enter your OPENAI_API_KEY: ")
-    os.environ["OPENAI_API_KEY"] = api_key
-    print("OPENAI_API_KEY set for this session!")
+if "MISTRAL_API_KEY" not in os.environ:
+    print("MISTRAL_API_KEY not found in environment!")
+    api_key = getpass("Please enter your MISTRAL_API_KEY: ")
+    os.environ["MISTRAL_API_KEY"] = api_key
+    print("MISTRAL_API_KEY set for this session!")
 else:
-    print("OPENAI_API_KEY found in environment.")</div>
+    print("MISTRAL_API_KEY found in environment.")</div>
 </div>
 </div>
 </div>
@@ -1814,7 +1814,7 @@ else:
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>OPENAI_API_KEY found in environment.
+<pre>MISTRAL_API_KEY found in environment.
 </pre>
 </div>
 </div>
@@ -1845,7 +1845,9 @@ else:
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
-    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"gpt-4.1-mini"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">]),</span>
+    <span class="n">AgentConfig</span><span class="p">(</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">]</span>
+    <span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
@@ -1853,7 +1855,9 @@ from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
     "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
-    AgentConfig(model_id="gpt-4.1-mini", tools=[search_web, visit_webpage]),
+    AgentConfig(
+        model_id="mistral/mistral-small-latest", tools=[search_web, visit_webpage]
+    ),
 )</div>
 </div>
 </div>
@@ -1908,7 +1912,7 @@ agent = AnyAgent.create(
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -1960,7 +1964,7 @@ agent = AnyAgent.create(
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: gpt-4.1-mini <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
