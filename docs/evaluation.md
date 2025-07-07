@@ -190,7 +190,7 @@ def current_ios_version() -> str:
     return "iOS 18.5"
 
 judge = AgentJudge(model_id="mistral/mistral-small-latest")
-result = judge.run(
+eval_trace = judge.run(
     trace=trace,
     question="Does the final answer provided by the trace mention and correctly specify the most recent major version of iOS? If the final answer does not mention the version at all, this criteria should fail",
     additional_tools=[current_ios_version]
