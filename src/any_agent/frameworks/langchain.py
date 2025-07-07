@@ -37,7 +37,6 @@ except ImportError:
 
 if TYPE_CHECKING:
     from langchain_core.language_models import LanguageModelLike
-    from langchain_core.messages.base import BaseMessage
     from langgraph.graph.graph import CompiledGraph
 
 
@@ -77,7 +76,6 @@ class LangchainAgent(AnyAgent):
         self._tools = imported_tools
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         agent_args = self.config.agent_args or {}
-        # Remove the response_format from agent args - we'll handle structured output in post-processing
         self._agent = agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
@@ -97,10 +95,10 @@ class LangchainAgent(AnyAgent):
             msg = "No messages returned from the agent."
             raise ValueError(msg)
 
-        last_message: BaseMessage = result["messages"][-1]
-        content = str(last_message.content)
-
         # Post-process for structured output if needed
+        # This emulates the langgraph behavior for structured outputs,
+        # but since it happens outside of langgraph we can control the model call,
+        # because some providers like mistral don't allow for the model to be called without the most recent message being a user message.
         if self.config.output_type:
             # Add a follow-up message to request structured output
             structured_output_message = {
@@ -109,8 +107,14 @@ class LangchainAgent(AnyAgent):
             }
             completion_params: dict[str, Any] = {}
             if self.config.model_args:
-                completion_params.update(self.config.model_args)
-            completion_params["tool_choice"] = "none"
+                # only include the temperature and frequency_penalty, not anything related to tools
+                completion_params["temperature"] = self.config.model_args.get(
+                    "temperature"
+                )
+                completion_params["frequency_penalty"] = self.config.model_args.get(
+                    "frequency_penalty"
+                )
+
             completion_params["model"] = self.config.model_id
             previous_messages = [
                 _convert_message_to_dict(m) for m in result["messages"]
@@ -128,5 +132,4 @@ class LangchainAgent(AnyAgent):
             return self.config.output_type.model_validate_json(
                 response.choices[0].message["content"]
             )
-
-        return content
+        return str(result["messages"][-1].content)
