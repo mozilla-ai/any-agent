@@ -47,9 +47,7 @@ class LlmJudge:
             model_args = {}
         self.model_id = model_id
         self.framework = framework
-        self.model_args = (
-            model_args.copy()
-        )  # Make a copy to avoid modifying the original dict
+        self.model_args = model_args
         self.output_type = output_type
         self.system_prompt = system_prompt.format(
             response_schema=self.output_type.model_json_schema()
