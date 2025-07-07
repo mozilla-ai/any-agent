@@ -104,8 +104,10 @@ class LangchainAgent(AnyAgent):
             }
             completion_params: dict[str, Any] = {}
             if self.config.model_args:
-                completion_params.update(self.config.model_args)
-            completion_params["tool_choice"] = "none"
+                # only include the temperature and frequency_penalty, not anything related to tools
+                completion_params["temperature"] = self.config.model_args.get("temperature")
+                completion_params["frequency_penalty"] = self.config.model_args.get("frequency_penalty")
+
             completion_params["model"] = self.config.model_id
             previous_messages = [
                 _convert_message_to_dict(m) for m in result["messages"]
