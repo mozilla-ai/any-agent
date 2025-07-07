@@ -377,7 +377,6 @@ async def test_a2a_tool_multiturn_async() -> None:
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[await a2a_tool_async(server_url)],
-            output_type=MainAgentAnswer,
             model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
         )
 
