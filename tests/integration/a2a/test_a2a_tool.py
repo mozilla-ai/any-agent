@@ -10,8 +10,8 @@ from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.integration.helpers import (
     DEFAULT_HTTP_KWARGS,
-    DEFAULT_MODEL_ARGS,
     DEFAULT_SMALL_MODEL_ID,
+    get_model_args,
     wait_for_server,
 )
 
@@ -66,7 +66,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
         model_id=DEFAULT_SMALL_MODEL_ID,
         description="Agent that can return the current date.",
         tools=[get_datetime],
-        model_args=DEFAULT_MODEL_ARGS,
+        model_args=get_model_args(),
     )
     date_agent = await AnyAgent.create_async(
         agent_framework=agent_framework,
@@ -88,7 +88,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
             model_id=DEFAULT_SMALL_MODEL_ID,
             tools=[await a2a_tool_async(server_url, http_kwargs=DEFAULT_HTTP_KWARGS)],
-            model_args=DEFAULT_MODEL_ARGS,
+            model_args=get_model_args(),
         )
 
         main_agent = await AnyAgent.create_async(
@@ -117,7 +117,7 @@ def _run_server(
         description="Agent that can return the current date.",
         tools=[get_datetime],
         model_id=model_id,
-        model_args=DEFAULT_MODEL_ARGS,
+        model_args=get_model_args(),
     )
 
     date_agent = AnyAgent.create(
@@ -196,7 +196,7 @@ def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
                 )
             ],
             model_id=DEFAULT_SMALL_MODEL_ID,
-            model_args=DEFAULT_MODEL_ARGS,
+            model_args=get_model_args(),
         )
 
         main_agent = AnyAgent.create(

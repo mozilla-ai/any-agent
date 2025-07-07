@@ -33,8 +33,8 @@ from any_agent.tracing.otel_types import (
 )
 from tests.integration.helpers import (
     DEFAULT_HTTP_KWARGS,
-    DEFAULT_MODEL_ARGS,
     DEFAULT_SMALL_MODEL_ID,
+    get_model_args,
     wait_for_server_async,
 )
 
@@ -199,7 +199,7 @@ async def test_a2a_tool_multiturn() -> None:
         ),
         description="Agent with conversation memory for testing session management.",
         output_type=UserInfo,
-        model_args=DEFAULT_MODEL_ARGS,
+        model_args=get_model_args(),
     )
 
     agent = MockConversationAgent(config)
@@ -337,7 +337,7 @@ async def test_a2a_tool_multiturn_async() -> None:
         name="Structured UserInfo Agent",
         description="Agent with conversation memory for testing session management.",
         output_type=UserInfo,
-        model_args=DEFAULT_MODEL_ARGS,
+        model_args=get_model_args(),
     )
 
     agent = MockConversationAgent(config)
@@ -361,7 +361,7 @@ async def test_a2a_tool_multiturn_async() -> None:
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[await a2a_tool_async(server_url, http_kwargs=DEFAULT_HTTP_KWARGS)],
             output_type=MainAgentAnswer,
-            model_args=DEFAULT_MODEL_ARGS,
+            model_args=get_model_args(),
         )
 
         main_agent = await AnyAgent.create_async(

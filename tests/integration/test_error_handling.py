@@ -10,7 +10,7 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.tracing.otel_types import StatusCode
-from tests.integration.helpers import DEFAULT_MODEL_ARGS, DEFAULT_SMALL_MODEL_ID
+from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, get_model_args
 
 
 def test_runtime_error(
@@ -40,7 +40,7 @@ def test_runtime_error(
     with patch(patch_function) as litellm_path:
         litellm_path.side_effect = RuntimeError(exc_reason)
         agent_config = AgentConfig(
-            model_id=kwargs["model_id"], tools=[], model_args=DEFAULT_MODEL_ARGS
+            model_id=kwargs["model_id"], tools=[], model_args=get_model_args()
         )
         agent = AnyAgent.create(agent_framework, agent_config)
         spans = []
@@ -91,7 +91,7 @@ def test_tool_error(
         model_id=kwargs["model_id"],
         instructions="You must use the available tools to answer questions.",
         tools=[search_web],
-        model_args=DEFAULT_MODEL_ARGS,
+        model_args=get_model_args(),
     )
 
     agent = AnyAgent.create(agent_framework, agent_config)

@@ -9,8 +9,8 @@ from any_agent.config import MCPSse
 from any_agent.serving import MCPServingConfig
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.integration.helpers import (
-    DEFAULT_MODEL_ARGS,
     DEFAULT_SMALL_MODEL_ID,
+    get_model_args,
     wait_for_server_async,
 )
 
@@ -91,7 +91,7 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
             model_id=agent_model,
             description=date_agent_description,
             tools=[get_datetime],
-            model_args=DEFAULT_MODEL_ARGS,
+            model_args=get_model_args(),
         )
         date_agent = await AnyAgent.create_async(
             agent_framework=agent_framework,
@@ -118,7 +118,7 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
             tools=[
                 MCPSse(url=server_url, client_session_timeout_seconds=300),
             ],
-            model_args=DEFAULT_MODEL_ARGS,
+            model_args=get_model_args(),
             **kwargs,  # type: ignore[arg-type]
         )
 

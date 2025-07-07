@@ -10,8 +10,8 @@ from any_agent import AgentConfig, AnyAgent
 from any_agent.serving import A2AServingConfig
 from tests.integration.helpers import (
     DEFAULT_HTTP_KWARGS,
-    DEFAULT_MODEL_ARGS,
     DEFAULT_SMALL_MODEL_ID,
+    get_model_args,
     wait_for_server_async,
 )
 
@@ -25,7 +25,7 @@ def serve_agent(port: int) -> None:
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Directly answer the question without asking the user for input.",
             description="I'm an agent to help.",
-            model_args=DEFAULT_MODEL_ARGS,
+            model_args=get_model_args(),
         ),
     )
     agent.serve(serving_config=A2AServingConfig(port=port))
@@ -66,7 +66,7 @@ async def test_serve_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> 
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Directly answer the question without asking the user for input.",
             description="I'm an agent to help.",
-            model_args=DEFAULT_MODEL_ARGS,
+            model_args=get_model_args(),
         ),
     )
 
