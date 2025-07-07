@@ -55,7 +55,7 @@ For this example we use a model hosted by openai, but you may need to set the re
 See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
 
 ```bash
-export MISTRAL_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
+export MISTRAL_API_KEY="YOUR_KEY_HERE"  # or OPENAI_API_KEY, etc
 ```
 
 ```python
