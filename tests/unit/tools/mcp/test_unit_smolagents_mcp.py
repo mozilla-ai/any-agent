@@ -3,16 +3,15 @@ from collections.abc import Generator, Sequence
 from unittest.mock import MagicMock, patch
 
 import pytest
-from smolagents.mcp_client import MCPClient
 
-from any_agent.config import AgentFramework, MCPSse, MCPStdio, Tool
+from any_agent.config import AgentFramework, MCPSse, MCPStdio, MCPStreamableHttp, Tool
 from any_agent.tools import _get_mcp_server
 
 
 @pytest.fixture
 def smolagents_mcp_server(
     tools: Sequence[Tool],
-) -> Generator[MCPClient]:
+) -> Generator[MagicMock]:
     with patch(
         "any_agent.tools.mcp.frameworks.smolagents.MCPClient"
     ) as mock_client_class:
@@ -23,13 +22,31 @@ def smolagents_mcp_server(
 @pytest.mark.asyncio
 async def test_smolagents_mcp_sse_integration(
     mcp_sse_params_no_tools: MCPSse,
-    smolagents_mcp_server: MCPClient,
+    smolagents_mcp_server: MagicMock,
 ) -> None:
     server = _get_mcp_server(mcp_sse_params_no_tools, AgentFramework.SMOLAGENTS)
 
     await server._setup_tools()
 
-    smolagents_mcp_server.assert_called_once_with({"url": mcp_sse_params_no_tools.url})  # type: ignore[attr-defined]
+    smolagents_mcp_server.assert_called_once_with(
+        {"url": mcp_sse_params_no_tools.url, "transport": "sse"}
+    )
+
+
+@pytest.mark.asyncio
+async def test_smolagents_mcp_streamablehttp_integration(
+    mcp_streamablehttp_params_no_tools: MCPStreamableHttp,
+    smolagents_mcp_server: MagicMock,
+) -> None:
+    server = _get_mcp_server(
+        mcp_streamablehttp_params_no_tools, AgentFramework.SMOLAGENTS
+    )
+
+    await server._setup_tools()
+
+    smolagents_mcp_server.assert_called_once_with(
+        {"url": mcp_streamablehttp_params_no_tools.url, "transport": "streamable-http"}
+    )
 
 
 @pytest.mark.asyncio

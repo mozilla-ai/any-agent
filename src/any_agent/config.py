@@ -83,6 +83,27 @@ class MCPSse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class MCPStreamableHttp(BaseModel):
+    url: str
+    """The URL of the server."""
+
+    headers: Mapping[str, str] | None = None
+    """The headers to send to the server."""
+
+    tools: Sequence[str] | None = None
+    """List of tool names to use from the MCP Server.
+
+    Use it to limit the tools accessible by the agent.
+    For example, if you use [`mcp/filesystem`](https://hub.docker.com/r/mcp/filesystem),
+    you can pass `tools=["read_file", "list_directory"]` to limit the agent to read-only operations.
+    """
+
+    client_session_timeout_seconds: float | None = 5
+    """the read timeout passed to the MCP ClientSession."""
+
+    model_config = ConfigDict(frozen=True)
+
+
 class ServingConfig(BaseModel):
     """Configuration for serving an agent using the Agent2Agent Protocol (A2A).
 
@@ -106,7 +127,7 @@ class ServingConfig(BaseModel):
     version: str = "0.1.0"
 
 
-MCPParams = MCPStdio | MCPSse
+MCPParams = MCPStdio | MCPSse | MCPStreamableHttp
 
 Tool = str | MCPParams | Callable[..., Any]
 

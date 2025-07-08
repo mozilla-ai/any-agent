@@ -15,7 +15,7 @@ from any_agent import (
     AgentFramework,
     AnyAgent,
 )
-from any_agent.config import MCPStdio
+from any_agent.config import MCPStdio, MCPStreamableHttp
 from any_agent.evaluation.agent_judge import AgentJudge
 from any_agent.evaluation.llm_judge import LlmJudge
 from any_agent.evaluation.schemas import EvaluationOutput
@@ -79,6 +79,58 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
     assert_first_llm_call(llm_calls[0])
 
     assert len(tool_executions) >= 2
+    assert_first_tool_execution(tool_executions[0])
+
+    messages = agent_trace.spans_to_messages()
+    assert messages[0].role == "system"
+    assert messages[1].role == "user"
+    assert len(messages) == 2 + len(llm_calls) + len(tool_executions)
+
+
+def assert_trace_only_mcp(
+    agent_trace: AgentTrace, agent_framework: AgentFramework
+) -> None:
+    def assert_first_llm_call(llm_call: AgentSpan) -> None:
+        """Checks the `_set_llm_inputs` implemented by each framework's instrumentation."""
+        assert llm_call.attributes.get("gen_ai.input.messages", None) is not None
+        # input.messages should be a valid JSON string (list of dicts)
+        input_messages_raw = llm_call.attributes.get("gen_ai.input.messages")
+        assert input_messages_raw is not None
+        input_messages = json.loads(input_messages_raw)
+        assert input_messages[0]["role"] == "system"
+        assert input_messages[1]["role"] == "user"
+
+    def assert_first_tool_execution(tool_execution: AgentSpan) -> None:
+        """Checks the tools setup implemented by each framework's instrumentation."""
+        assert tool_execution.attributes.get("gen_ai.tool.args", None) is not None
+        # tool.args should be a JSON string (dict)
+        tool_args_raw = tool_execution.attributes.get("gen_ai.tool.args")
+        assert tool_args_raw is not None
+        args = json.loads(tool_args_raw)
+        assert "timezone" in args
+        assert isinstance(agent_trace, AgentTrace)
+        assert agent_trace.final_output
+
+    agent_invocations = []
+    llm_calls = []
+    tool_executions = []
+    for span in agent_trace.spans:
+        if span.is_agent_invocation():
+            agent_invocations.append(span)
+        elif span.is_llm_call():
+            llm_calls.append(span)
+        elif span.is_tool_execution():
+            tool_executions.append(span)
+        else:
+            msg = f"Unexpected span: {span}"
+            raise AssertionError(msg)
+
+    assert len(agent_invocations) == 1
+
+    assert len(llm_calls) >= 2
+    assert_first_llm_call(llm_calls[0])
+
+    assert len(tool_executions) >= 1
     assert_first_tool_execution(tool_executions[0])
 
     messages = agent_trace.spans_to_messages()
@@ -247,3 +299,86 @@ def test_load_and_run_agent(
             f.write(html_output.replace("<!DOCTYPE html>", ""))
 
     assert_eval(agent_trace)
+
+
+def test_load_and_run_agent_streamable_http(
+    agent_framework: AgentFramework,
+    tmp_path: Path,
+    request: pytest.FixtureRequest,
+    date_streamable_http_server: dict[str, Any],
+) -> None:
+    kwargs = {}
+
+    tmp_file = "tmp.txt"
+
+    def write_file(text: str) -> None:
+        """write the text to a file in the tmp_path directory
+
+        Args:
+            text (str): The text to write to the file.
+
+        Returns:
+            None
+        """
+        with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
+            f.write(text)
+
+    kwargs["model_id"] = DEFAULT_MEDIUM_MODEL_ID
+    env_check = validate_environment(kwargs["model_id"])
+    if not env_check["keys_in_environment"]:
+        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
+    model_args: dict[str, Any] = (
+        {"parallel_tool_calls": False}
+        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
+        else {}
+    )
+    model_args["temperature"] = 0.0
+    tools = [
+        MCPStreamableHttp(
+            url=date_streamable_http_server["url"],
+            client_session_timeout_seconds=30,
+        ),
+    ]
+    agent_config = AgentConfig(
+        tools=tools,
+        instructions="Use the available tools to answer.",
+        model_args=model_args,
+        output_type=Steps,
+        **kwargs,  # type: ignore[arg-type]
+    )
+    agent = AnyAgent.create(agent_framework, agent_config)
+    update_trace = request.config.getoption("--update-trace-assets")
+    if update_trace:
+        with TRACE_PROVIDER._active_span_processor._lock:  # type: ignore[attr-defined]
+            for p in TRACE_PROVIDER._active_span_processor._span_processors:  # type: ignore[attr-defined]
+                if isinstance(p.span_exporter, _ConsoleExporter):
+                    console = p.span_exporter.console
+                    console.record = True
+
+    start_ns = time.time_ns()
+    agent_trace = agent.run(
+        "Return what year it is in the America/New_York timezone. One of the steps returned must include this year."
+    )
+    end_ns = time.time_ns()
+
+    assert isinstance(agent_trace.final_output, Steps)
+
+    steps = agent_trace.final_output.steps
+    assert any(
+        str(datetime.now().year) in steps[n].description for n in range(len(steps))
+    )
+
+    assert_trace_only_mcp(agent_trace, agent_framework)
+    assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
+    assert_cost(agent_trace)
+    assert_tokens(agent_trace)
+
+    if update_trace:
+        trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
+        with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
+            f.write(agent_trace.model_dump_json(indent=2))
+            f.write("\n")
+        html_output = console.export_html(inline_styles=True)
+        with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
+            f.write(html_output.replace("<!DOCTYPE html>", ""))
