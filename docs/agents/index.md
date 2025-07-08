@@ -132,7 +132,7 @@ if __name__ == "__main__":
 
 ### Batch Processing
 
-While any-agent doesn't provide a dedicated `.run_batch()` API, we recommend using `asyncio.gather` with the `run_async` API for concurrent processing:
+While any-agent doesn't provide a dedicated `.run_batch()` API, we recommend using `asyncio.gather` with the [`AnyAgent.run_async`][any_agent.AnyAgent.run_async] API for concurrent processing:
 
 ```python
 import asyncio
