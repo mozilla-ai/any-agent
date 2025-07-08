@@ -400,9 +400,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#providing-callbacks" class="md-nav__link">
+  <a href="#default-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
-      Providing Callbacks
+      Default Callbacks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#providing-your-own-callbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Providing your own Callbacks
     </span>
   </a>
   
@@ -1131,9 +1140,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#providing-callbacks" class="md-nav__link">
+  <a href="#default-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
-      Providing Callbacks
+      Default Callbacks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#providing-your-own-callbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Providing your own Callbacks
     </span>
   </a>
   
@@ -1178,36 +1196,38 @@ will be called at different points of the <a class="autorefs autorefs-internal" 
 <div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># pseudocode of an Agent run</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">history</span> <span class="o">=</span> <span class="p">[</span><span class="n">system_prompt</span><span class="p">,</span> <span class="n">user_prompt</span><span class="p">]</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">()</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="n">context</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">before_llm_call</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">response</span> <span class="o">=</span> <span class="n">CALL_LLM</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="n">context</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">before_llm_call</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="n">context</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">after_llm_call</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">response</span> <span class="o">=</span> <span class="n">CALL_LLM</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="n">context</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">after_llm_call</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">tool_executions</span><span class="p">:</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="k">for</span> <span class="n">tool_execution</span> <span class="ow">in</span> <span class="n">tool_executions</span><span class="p">:</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>            <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>                <span class="n">context</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">before_tool_execution</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>            <span class="n">tool_response</span> <span class="o">=</span> <span class="n">EXECUTE_TOOL</span><span class="p">(</span><span class="n">tool_execution</span><span class="p">)</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">tool_executions</span><span class="p">:</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>        <span class="k">for</span> <span class="n">tool_execution</span> <span class="ow">in</span> <span class="n">tool_executions</span><span class="p">:</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>            <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>                <span class="n">context</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">before_tool_execution</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>            <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>                <span class="n">context</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">after_tool_execution</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>            <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tool_response</span><span class="p">)</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>            <span class="n">tool_response</span> <span class="o">=</span> <span class="n">EXECUTE_TOOL</span><span class="p">(</span><span class="n">tool_execution</span><span class="p">)</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>            <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>                <span class="n">context</span> <span class="o">=</span> <span class="n">callback</span><span class="o">.</span><span class="n">after_tool_execution</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
 </span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>        <span class="k">return</span> <span class="n">response</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>            <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tool_response</span><span class="p">)</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>        <span class="k">return</span> <span class="n">response</span>
 </span></code></pre></div>
 <p>Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.</p>
-<p>Each time an agent is run ( <a class="autorefs autorefs-internal" title="run_async(prompt, **kwargs)
+<p>During the agent run ( <a class="autorefs autorefs-internal" title="run_async(prompt, **kwargs)
 
   
       async
@@ -1216,14 +1236,13 @@ will be called at different points of the <a class="autorefs autorefs-internal" 
 
   
       dataclass
-  " href="../../api/callbacks/#any_agent.callbacks.context.Context"><code>Context</code></a> object
-is shared across all callbacks.</p>
-<p>All any-agent agents will populate the <a class="autorefs autorefs-internal" title="current_span
+  " href="../../api/callbacks/#any_agent.callbacks.context.Context"><code>Context</code></a> object is created and shared across all callbacks.</p>
+<p><code>any-agent</code> populates the <a class="autorefs autorefs-internal" title="current_span
 
   
       instance-attribute
   " href="../../api/callbacks/#any_agent.callbacks.context.Context.current_span"><code>Context.current_span</code></a>
-property so that the callbacks can access information in a framework-agnostic way. You can check the attributes available
+property so that callbacks can access information in a framework-agnostic way. You can check the attributes available
 for LLM Calls and Tool Executions in the <a href="../../tracing/#spans">example spans</a>.</p>
 <h2 id="implementing-callbacks">Implementing Callbacks</h2>
 <p>All callbacks must inherit from the base <a class="autorefs autorefs-internal" title="any_agent.callbacks.base.Callback" href="../../api/callbacks/#any_agent.callbacks.base.Callback"><code>Callback</code></a> class and
@@ -1245,13 +1264,12 @@ for LLM Calls and Tool Executions in the <a href="../../tracing/#spans">example 
 </span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>        <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">&quot;search_web_count&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_calls</span><span class="p">:</span>
 </span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Reached limit of `search_web` calls.&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<h2 id="providing-callbacks">Providing Callbacks</h2>
-<p>These callbacks are provided to the agent using the <a class="autorefs autorefs-internal" title="callbacks = []
-
-  
-      class-attribute
-      instance-attribute
-  " href="../../api/config/#any_agent.config.AgentConfig.callbacks"><code>AgentConfig.callbacks</code></a> property:</p>
+<h2 id="default-callbacks">Default Callbacks</h2>
+<p><code>any-agent</code> comes with a set of default callbacks that will be used by default (if you don't pass a value to <code>AgentConfig.callbacks</code>):</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="any_agent.callbacks.span_print.ConsolePrintSpan" href="../../api/callbacks/#any_agent.callbacks.span_print.ConsolePrintSpan"><code>ConsolePrintSpan</code></a></li>
+</ul>
+<p>If you want to disable these default callbacks, you can pass an empty list:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
@@ -1261,48 +1279,94 @@ for LLM Calls and Tool Executions in the <a href="../../tracing/#spans">example 
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4.1-nano&quot;</span><span class="p">,</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;Use the tools to find an answer&quot;</span><span class="p">,</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">],</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            <span class="n">CountSearchWeb</span><span class="p">(),</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>            <span class="n">LimitSearchWeb</span><span class="p">(</span><span class="n">max_calls</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="p">]</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="p">),</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">)</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">callbacks</span><span class="o">=</span><span class="p">[]</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="p">),</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
 </span></code></pre></div>
+<h2 id="providing-your-own-callbacks">Providing your own Callbacks</h2>
+<p>Callbacks are provided to the agent using the <a class="autorefs autorefs-internal" title="callbacks = Field(default_factory=get_default_callbacks)
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../api/config/#any_agent.config.AgentConfig.callbacks"><code>AgentConfig.callbacks</code></a> property.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Alongside the default callbacks</label><label for="__tabbed_1_2">Override the default callbacks</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>You can use <a class="autorefs autorefs-internal" title="any_agent.callbacks.get_default_callbacks()" href="../../api/callbacks/#any_agent.callbacks.get_default_callbacks"><code>get_default_callbacks</code></a>:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_callbacks</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">&quot;tinyagent&quot;</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">AgentConfig</span><span class="p">(</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4.1-nano&quot;</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;Use the tools to find an answer&quot;</span><span class="p">,</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">],</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>            <span class="n">CountSearchWeb</span><span class="p">(),</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>            <span class="n">LimitSearchWeb</span><span class="p">(</span><span class="n">max_calls</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>        <span class="p">]</span> <span class="o">+</span> <span class="n">get_default_callbacks</span><span class="p">()</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="p">),</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">)</span>
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-py highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">&quot;tinyagent&quot;</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">AgentConfig</span><span class="p">(</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="n">model_id</span><span class="o">=</span><span class="s2">&quot;gpt-4.1-nano&quot;</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>        <span class="n">instructions</span><span class="o">=</span><span class="s2">&quot;Use the tools to find an answer&quot;</span><span class="p">,</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">],</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>            <span class="n">CountSearchWeb</span><span class="p">(),</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>            <span class="n">LimitSearchWeb</span><span class="p">(</span><span class="n">max_calls</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>        <span class="p">]</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="p">),</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">)</span>
+</span></code></pre></div>
+</div>
+</div>
+</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Callbacks will be called in the order that they are added, so it is important to pay attention to the order
 in which you set the callback configuration.</p>
 <p>In the above example, passing:</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>    <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>        <span class="n">LimitSearchWeb</span><span class="p">(</span><span class="n">max_calls</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="n">CountSearchWeb</span><span class="p">()</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="p">]</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>    <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>        <span class="n">LimitSearchWeb</span><span class="p">(</span><span class="n">max_calls</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>        <span class="n">CountSearchWeb</span><span class="p">()</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="p">]</span>
 </span></code></pre></div>
 <p>Would fail because <code>context.shared["search_web_count"]</code>
 was not set yet.</p>
 </div>
 <h2 id="error-handling-in-callbacks">Error Handling in Callbacks</h2>
 <p>Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">SafetyGuard</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">before_tool_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="n">tool_name</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gen_ai.tool.name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="c1"># Block dangerous tools</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>        <span class="k">if</span> <span class="n">tool_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;delete_file&quot;</span><span class="p">,</span> <span class="s2">&quot;execute_code&quot;</span><span class="p">]:</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tool &#39;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&#39; is not allowed for safety reasons&quot;</span><span class="p">)</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>        <span class="k">return</span> <span class="n">context</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="k">class</span><span class="w"> </span><span class="nc">ContentFilter</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">after_llm_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>        <span class="n">output</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gen_ai.output&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>        <span class="c1"># Check for inappropriate content</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>        <span class="n">inappropriate_words</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;spam&quot;</span><span class="p">,</span> <span class="s2">&quot;malware&quot;</span><span class="p">,</span> <span class="s2">&quot;hack&quot;</span><span class="p">]</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">word</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">inappropriate_words</span><span class="p">):</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Generated content contains inappropriate language&quot;</span><span class="p">)</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>        <span class="k">return</span> <span class="n">context</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">SafetyGuard</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">before_tool_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>        <span class="n">tool_name</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gen_ai.tool.name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="c1"># Block dangerous tools</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="k">if</span> <span class="n">tool_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;delete_file&quot;</span><span class="p">,</span> <span class="s2">&quot;execute_code&quot;</span><span class="p">]:</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tool &#39;</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">&#39; is not allowed for safety reasons&quot;</span><span class="p">)</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>        <span class="k">return</span> <span class="n">context</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">class</span><span class="w"> </span><span class="nc">ContentFilter</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">after_llm_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>        <span class="n">output</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gen_ai.output&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>        <span class="c1"># Check for inappropriate content</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>        <span class="n">inappropriate_words</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;spam&quot;</span><span class="p">,</span> <span class="s2">&quot;malware&quot;</span><span class="p">,</span> <span class="s2">&quot;hack&quot;</span><span class="p">]</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">word</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">inappropriate_words</span><span class="p">):</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Generated content contains inappropriate language&quot;</span><span class="p">)</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>        <span class="k">return</span> <span class="n">context</span>
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>

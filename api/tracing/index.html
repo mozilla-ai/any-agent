@@ -1308,24 +1308,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#any_agent.tracing.disable_console_traces" class="md-nav__link">
-    <span class="md-ellipsis">
-      disable_console_traces
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#any_agent.tracing.enable_console_traces" class="md-nav__link">
-    <span class="md-ellipsis">
-      enable_console_traces
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1623,24 +1605,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#any_agent.tracing.disable_console_traces" class="md-nav__link">
-    <span class="md-ellipsis">
-      disable_console_traces
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#any_agent.tracing.enable_console_traces" class="md-nav__link">
-    <span class="md-ellipsis">
-      enable_console_traces
-    </span>
-  </a>
   
 </li>
       
@@ -3291,80 +3255,6 @@
 
   </div>
 
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="any_agent.tracing.disable_console_traces" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">any_agent</span><span class="o">.</span><span class="n">tracing</span><span class="o">.</span><span class="n">disable_console_traces</span><span class="p">()</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents first">
-
-        <p>Disable printing traces to the console.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/any_agent/tracing/__init__.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-24">24</a></span>
-<span class="normal"><a href="#__codelineno-0-25">25</a></span>
-<span class="normal"><a href="#__codelineno-0-26">26</a></span>
-<span class="normal"><a href="#__codelineno-0-27">27</a></span>
-<span class="normal"><a href="#__codelineno-0-28">28</a></span>
-<span class="normal"><a href="#__codelineno-0-29">29</a></span>
-<span class="normal"><a href="#__codelineno-0-30">30</a></span>
-<span class="normal"><a href="#__codelineno-0-31">31</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a><span class="k">def</span><span class="w"> </span><span class="nf">disable_console_traces</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Disable printing traces to the console.&quot;&quot;&quot;</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="k">with</span> <span class="n">TRACE_PROVIDER</span><span class="o">.</span><span class="n">_active_span_processor</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a>        <span class="n">TRACE_PROVIDER</span><span class="o">.</span><span class="n">_active_span_processor</span><span class="o">.</span><span class="n">_span_processors</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a>            <span class="n">p</span>
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29"></a>            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">TRACE_PROVIDER</span><span class="o">.</span><span class="n">_active_span_processor</span><span class="o">.</span><span class="n">_span_processors</span>
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;span_exporter&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">_ConsoleExporter</span><span class="p">)</span>
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a>        <span class="p">)</span>
-</span></code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="any_agent.tracing.enable_console_traces" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">any_agent</span><span class="o">.</span><span class="n">tracing</span><span class="o">.</span><span class="n">enable_console_traces</span><span class="p">()</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents first">
-
-        <p>Enable printing traces to the console.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/any_agent/tracing/__init__.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-14">14</a></span>
-<span class="normal"><a href="#__codelineno-0-15">15</a></span>
-<span class="normal"><a href="#__codelineno-0-16">16</a></span>
-<span class="normal"><a href="#__codelineno-0-17">17</a></span>
-<span class="normal"><a href="#__codelineno-0-18">18</a></span>
-<span class="normal"><a href="#__codelineno-0-19">19</a></span>
-<span class="normal"><a href="#__codelineno-0-20">20</a></span>
-<span class="normal"><a href="#__codelineno-0-21">21</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="k">def</span><span class="w"> </span><span class="nf">enable_console_traces</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Enable printing traces to the console.&quot;&quot;&quot;</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16"></a>    <span class="n">has_console_exporter</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17"></a>        <span class="nb">isinstance</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;span_exporter&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">_ConsoleExporter</span><span class="p">)</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18"></a>        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">TRACE_PROVIDER</span><span class="o">.</span><span class="n">_active_span_processor</span><span class="o">.</span><span class="n">_span_processors</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19"></a>    <span class="p">)</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_console_exporter</span><span class="p">:</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a>        <span class="n">TRACE_PROVIDER</span><span class="o">.</span><span class="n">add_span_processor</span><span class="p">(</span><span class="n">SimpleSpanProcessor</span><span class="p">(</span><span class="n">_ConsoleExporter</span><span class="p">()))</span>
-</span></code></pre></div></td></tr></table></div>
-            </details>
     </div>
 
 </div>
