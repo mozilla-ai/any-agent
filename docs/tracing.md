@@ -44,15 +44,10 @@ Here is what the console output looks like:
 
 !!! tip
 
-    Showing traces in the console is enabled by default.
+    The spans are printed to the console by default, using the `callback` mechanism.
 
-    You can disable the console traces using [`disable_console_traces`][any_agent.tracing.disable_console_traces]:
-
-    ```python
-    from any_agent.tracing import disable_console_traces
-
-    disable_console_traces()
-    ```
+    See [Default Callbacks](./agents/callbacks.md#default-callbacks) for more information
+    and how to disable this behavior.
 
 ## Spans
 
@@ -104,7 +99,7 @@ from any_agent.tools import search_web
 agent = AnyAgent.create(
     "openai",
     agent_config=AgentConfig(
-            model_id="gpt-4o",
+            model_id="mistral/mistral-small-latest",
             tools=[search_web],
     )
 )

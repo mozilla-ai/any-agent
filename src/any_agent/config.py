@@ -4,6 +4,9 @@ from typing import Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from any_agent.callbacks import get_default_callbacks
+from any_agent.callbacks.base import Callback
+
 
 class AgentFramework(StrEnum):
     GOOGLE = auto()
@@ -133,7 +136,7 @@ Tool = str | MCPParams | Callable[..., Any]
 
 
 class AgentConfig(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid")
 
     model_id: str
     """Select the underlying model used by the agent.
@@ -162,6 +165,12 @@ class AgentConfig(BaseModel):
     See more info at [Tools](../agents/tools.md).
     """
 
+    callbacks: list[Callback] = Field(default_factory=get_default_callbacks)
+    """List of callbacks to use during agent invocation.
+
+    See more info at [Callbacks](../agents/callbacks.md).
+    """
+
     agent_type: Callable[..., Any] | None = None
     """Control the type of agent class that is used by the framework, and is unique to the framework used.
 
@@ -183,7 +192,7 @@ class AgentConfig(BaseModel):
 
     agent = AnyAgent.create(
         AgentConfig(
-            model_id="gpt-4.1-mini",
+            model_id="mistral/mistral-small-latest",
             instructions="Extract calendar events from text",
             agent_args={
                 "output_type": CalendarEvent

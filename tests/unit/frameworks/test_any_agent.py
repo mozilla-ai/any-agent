@@ -6,22 +6,12 @@ from unittest.mock import patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from tests.unit.helpers import LITELLM_IMPORT_PATHS
 
 TEST_TEMPERATURE = 0.54321
 TEST_PENALTY = 0.5
 TEST_QUERY = "what's the state capital of Pennsylvania"
 EXPECTED_OUTPUT = "The state capital of Pennsylvania is Harrisburg."
-
-# Google ADK uses a different import path for LiteLLM, and smolagents uses the sync call
-LITELLM_IMPORT_PATHS = {
-    AgentFramework.GOOGLE: "google.adk.models.lite_llm.acompletion",
-    AgentFramework.LANGCHAIN: "litellm.acompletion",
-    AgentFramework.TINYAGENT: "litellm.acompletion",
-    AgentFramework.AGNO: "litellm.acompletion",
-    AgentFramework.OPENAI: "litellm.acompletion",
-    AgentFramework.SMOLAGENTS: "litellm.completion",
-    AgentFramework.LLAMA_INDEX: "litellm.acompletion",
-}
 
 
 def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
@@ -29,7 +19,7 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
     return AnyAgent.create(
         framework,
         AgentConfig(
-            model_id="gpt-4o",
+            model_id="mistral/mistral-small-latest",
             model_args={
                 "temperature": TEST_TEMPERATURE,
                 "frequency_penalty": TEST_PENALTY,
@@ -39,18 +29,24 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
 
 
 def test_create_any_with_framework(agent_framework: AgentFramework) -> None:
-    agent = AnyAgent.create(agent_framework, AgentConfig(model_id="gpt-4o"))
+    agent = AnyAgent.create(
+        agent_framework, AgentConfig(model_id="mistral/mistral-small-latest")
+    )
     assert agent
 
 
 def test_create_any_with_valid_string(agent_framework: AgentFramework) -> None:
-    agent = AnyAgent.create(agent_framework.name, AgentConfig(model_id="gpt-4o"))
+    agent = AnyAgent.create(
+        agent_framework.name, AgentConfig(model_id="mistral/mistral-small-latest")
+    )
     assert agent
 
 
 def test_create_any_with_invalid_string() -> None:
     with pytest.raises(ValueError, match="Unsupported agent framework"):
-        AnyAgent.create("non-existing", AgentConfig(model_id="gpt-4o"))
+        AnyAgent.create(
+            "non-existing", AgentConfig(model_id="mistral/mistral-small-latest")
+        )
 
 
 def test_model_args(

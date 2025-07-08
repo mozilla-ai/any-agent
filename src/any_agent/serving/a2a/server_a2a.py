@@ -3,10 +3,10 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING
 
+import httpx
 import uvicorn
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
-from a2a.server.tasks import InMemoryTaskStore
 from starlette.applications import Starlette
 from starlette.routing import Mount
 
@@ -32,10 +32,12 @@ def _get_a2a_app(
 
     agent_card = _get_agent_card(agent, serving_config)
     task_manager = ContextManager(serving_config)
-
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
-        task_store=InMemoryTaskStore(),
+        task_store=serving_config.task_store_type(),
+        push_notifier=serving_config.push_notifier_type(
+            httpx_client=httpx.AsyncClient()
+        ),
     )
 
     return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
@@ -51,7 +53,10 @@ async def _get_a2a_app_async(
 
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
-        task_store=InMemoryTaskStore(),
+        task_store=serving_config.task_store_type(),
+        push_notifier=serving_config.push_notifier_type(
+            httpx_client=httpx.AsyncClient()
+        ),
     )
 
     return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
