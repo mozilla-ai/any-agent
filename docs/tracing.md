@@ -44,7 +44,7 @@ Here is what the console output looks like:
 
 !!! tip
 
-    The spans are printed to the console by default.
+    The spans are printed to the console by default, using the `callback` mechanism.
 
     See [Default Callbacks](./agents/callbacks.md#default-callbacks) for more information
     and how to disable this behavior.
