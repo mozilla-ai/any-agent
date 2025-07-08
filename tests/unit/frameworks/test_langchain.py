@@ -1,8 +1,15 @@
+from typing import TYPE_CHECKING
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
+from langchain_core.messages import AIMessage
+from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from tests.unit.helpers import LITELLM_IMPORT_PATHS
+
+if TYPE_CHECKING:
+    from any_agent.frameworks.langchain import LangchainAgent
 
 
 def test_load_langchain_agent_default() -> None:
@@ -54,3 +61,45 @@ def test_run_langchain_agent_custom_args() -> None:
         agent_mock.ainvoke.assert_called_once_with(
             {"messages": [("user", "foo")]}, debug=True, config={"callbacks": [ANY]}
         )
+
+
+class SampleOutput(BaseModel):
+    answer: str
+    confidence: float
+
+
+def test_structured_output_without_tools() -> None:
+    """Test that structured output works correctly when no tools are present and tool-related params are not set."""
+    config = AgentConfig(model_id="gpt-4.1-mini", output_type=SampleOutput)
+    agent: LangchainAgent = AnyAgent.create(AgentFramework.LANGCHAIN, config)  # type: ignore[assignment]
+
+    # Patch the agent's _agent to return a mock result for ainvoke
+    mock_agent = AsyncMock()
+    mock_agent.ainvoke.return_value = {
+        "messages": [AIMessage(content="Initial response")]
+    }
+    agent._agent = mock_agent
+
+    def create_mock_response(content: str) -> MagicMock:
+        mock_message = MagicMock()
+        mock_message.content = content
+        mock_message.__getitem__.side_effect = (
+            lambda key: content if key == "content" else None
+        )
+        return MagicMock(choices=[MagicMock(message=mock_message)])
+
+    with patch(LITELLM_IMPORT_PATHS[AgentFramework.LANGCHAIN]) as mock_acompletion:
+        mock_acompletion.return_value = create_mock_response(
+            '{"answer": "Structured answer", "confidence": 0.95}'
+        )
+        agent.run("Test question")
+
+        # Only expect that acompletion was called once for structured output
+        assert mock_acompletion.call_count == 1
+        call_args = mock_acompletion.call_args[1]
+        # Should not include any tool-related keys
+        assert "tools" not in call_args
+        assert "tool_choice" not in call_args
+        # Should include response_format
+        assert "response_format" in call_args
+        assert call_args["response_format"] == SampleOutput
