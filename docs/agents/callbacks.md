@@ -40,7 +40,7 @@ while True:
 
 Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.
 
-During the agent run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`agent.run`][any_agent.AnyAgent.run] ), a unique [`Context`][any_agent.callbacks.context.Context] object is created shared across all callbacks.
+During the agent run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`agent.run`][any_agent.AnyAgent.run] ), a unique [`Context`][any_agent.callbacks.context.Context] object is created and shared across all callbacks.
 
 `any-agent` populates the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
 property so that callbacks can access information in a framework-agnostic way. You can check the attributes available
