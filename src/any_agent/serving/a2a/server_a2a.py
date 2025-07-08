@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from any_agent.serving import A2AServingConfig
 
 DEFAULT_PUSH_NOTIFIER = InMemoryPushNotifier
+DEFAULT_TASK_STORE = InMemoryTaskStore
 
 
 def _get_a2a_app(
@@ -35,10 +36,12 @@ def _get_a2a_app(
 
     agent_card = _get_agent_card(agent, serving_config)
     task_manager = ContextManager(serving_config)
-
+    push_notifier_type = serving_config.push_notifier_type or DEFAULT_PUSH_NOTIFIER
+    task_store_type = serving_config.task_store_type or DEFAULT_TASK_STORE
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
-        task_store=InMemoryTaskStore(),
+        task_store=task_store_type(),
+        push_notifier=push_notifier_type(httpx_client=httpx.AsyncClient()),
     )
 
     return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
@@ -53,10 +56,10 @@ async def _get_a2a_app_async(
     task_manager = ContextManager(serving_config)
 
     push_notifier_type = serving_config.push_notifier_type or DEFAULT_PUSH_NOTIFIER
-
+    task_store_type = serving_config.task_store_type or DEFAULT_TASK_STORE
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
-        task_store=InMemoryTaskStore(),
+        task_store=task_store_type(),
         push_notifier=push_notifier_type(httpx_client=httpx.AsyncClient()),
     )
 

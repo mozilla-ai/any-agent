@@ -1,6 +1,7 @@
 from collections.abc import Callable
 
 from a2a.server.tasks.push_notifier import PushNotifier
+from a2a.server.tasks.task_store import TaskStore
 from a2a.types import AgentSkill
 from pydantic import BaseModel, ConfigDict
 
@@ -95,4 +96,10 @@ class A2AServingConfig(BaseModel):
     """Push notifier to be used by the agent.
 
     If not provided, a default in-memory push notifier will be used.
+    """
+
+    task_store_type: type[TaskStore] | None = None
+    """Task store to be used by the agent.
+
+    If not provided, a default in-memory task store will be used.
     """
