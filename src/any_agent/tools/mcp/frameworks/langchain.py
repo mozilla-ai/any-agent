@@ -11,15 +11,14 @@ from any_agent.tools.mcp.mcp_connection import _MCPConnection
 from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 mcp_available = False
-with suppress(ImportError):
-    from langchain_core.tools import BaseTool  # noqa: TC002
-    from langchain_mcp_adapters.tools import load_mcp_tools
-    from mcp import ClientSession, StdioServerParameters
-    from mcp.client.sse import sse_client
-    from mcp.client.stdio import stdio_client
-    from mcp.client.streamable_http import streamablehttp_client
+from langchain_core.tools import BaseTool  # noqa: TC002
+from langchain_mcp_adapters.tools import load_mcp_tools
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.sse import sse_client
+from mcp.client.stdio import stdio_client
+from mcp.client.streamable_http import streamablehttp_client
 
-    mcp_available = True
+mcp_available = True
 
 
 class LangchainMCPConnection(_MCPConnection["BaseTool"], ABC):
