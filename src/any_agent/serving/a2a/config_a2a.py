@@ -1,5 +1,8 @@
 from collections.abc import Callable
 
+from a2a.server.tasks import InMemoryPushNotifier, InMemoryTaskStore
+from a2a.server.tasks.push_notifier import PushNotifier
+from a2a.server.tasks.task_store import TaskStore
 from a2a.types import AgentSkill
 from pydantic import BaseModel, ConfigDict
 
@@ -89,3 +92,15 @@ class A2AServingConfig(BaseModel):
 
     task_cleanup_interval_minutes: int = 5
     """Interval in minutes between task cleanup runs."""
+
+    push_notifier_type: type[PushNotifier] = InMemoryPushNotifier
+    """Push notifier to be used by the agent.
+
+    If not provided, a default in-memory push notifier will be used.
+    """
+
+    task_store_type: type[TaskStore] = InMemoryTaskStore
+    """Task store to be used by the agent.
+
+    If not provided, a default in-memory task store will be used.
+    """

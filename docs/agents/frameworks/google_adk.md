@@ -28,7 +28,7 @@ from google.adk.agents.run_config import RunConfig
 agent = AnyAgent.create(
     "google",
     AgentConfig(
-        model_id="gpt-4.1-nano",
+        model_id="mistral/mistral-small-latest",
         instructions="You must use the available tools to find an answer",
         tools=[search_web, visit_webpage]
     )

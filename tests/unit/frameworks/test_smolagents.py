@@ -68,7 +68,10 @@ def test_load_smolagent_with_api_base() -> None:
 def test_load_smolagents_agent_missing() -> None:
     with patch("any_agent.frameworks.smolagents.smolagents_available", False):
         with pytest.raises(ImportError):
-            AnyAgent.create(AgentFramework.SMOLAGENTS, AgentConfig(model_id="gpt-4o"))
+            AnyAgent.create(
+                AgentFramework.SMOLAGENTS,
+                AgentConfig(model_id="mistral/mistral-small-latest"),
+            )
 
 
 def test_run_smolagent_custom_args() -> None:

@@ -13,11 +13,13 @@ def test_load_agno_default() -> None:
         patch("any_agent.frameworks.agno.Agent", mock_agent),
         patch("any_agent.frameworks.agno.DEFAULT_MODEL_TYPE", mock_model),
     ):
-        AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
+        AnyAgent.create(
+            AgentFramework.AGNO, AgentConfig(model_id="mistral/mistral-small-latest")
+        )
         mock_agent.assert_called_once_with(
             name="any_agent",
             instructions=None,
-            model=mock_model(model="gpt-4o"),
+            model=mock_model(model="mistral/mistral-small-latest"),
             tools=[],
         )
 
@@ -25,7 +27,10 @@ def test_load_agno_default() -> None:
 def test_load_agno_agent_missing() -> None:
     with patch("any_agent.frameworks.agno.agno_available", False):
         with pytest.raises(ImportError):
-            AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
+            AnyAgent.create(
+                AgentFramework.AGNO,
+                AgentConfig(model_id="mistral/mistral-small-latest"),
+            )
 
 
 def test_run_agno_custom_args() -> None:
@@ -45,7 +50,9 @@ def test_run_agno_custom_args() -> None:
         patch("any_agent.frameworks.agno.Agent", mock_agent),
         patch("any_agent.frameworks.agno.DEFAULT_MODEL_TYPE", mock_model),
     ):
-        agent = AnyAgent.create(AgentFramework.AGNO, AgentConfig(model_id="gpt-4o"))
+        agent = AnyAgent.create(
+            AgentFramework.AGNO, AgentConfig(model_id="mistral/mistral-small-latest")
+        )
         result = agent.run("foo", retries=2)
 
         # Verify the result is as expected

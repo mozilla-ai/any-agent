@@ -31,7 +31,12 @@ from any_agent.tracing.otel_types import (
     SpanKind,
     Status,
 )
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
+from tests.integration.helpers import (
+    DEFAULT_HTTP_KWARGS,
+    DEFAULT_SMALL_MODEL_ID,
+    get_default_agent_model_args,
+    wait_for_server_async,
+)
 
 if TYPE_CHECKING:
     from typing import Any
@@ -60,6 +65,9 @@ class MockConversationAgent(TinyAgent):
         super().__init__(config)
         self.output_type = A2AEnvelope[UserInfo]
         self.turn_count = 0
+        assert len(self.config.tools) == 1, (
+            "This mock agent should have exactly one tool to be used for testing"
+        )
 
     async def _load_agent(self) -> None:
         # Call parent's _load_agent to set up the basic structure
@@ -70,6 +78,7 @@ class MockConversationAgent(TinyAgent):
     ) -> AgentTrace:
         # Verify that we don't have recursive "Previous conversation:" prefixes
         conversation_count = prompt.count("Previous conversation:")
+        self._tools[0]()
 
         if self.turn_count == 0:
             # First turn: User introduces themselves
@@ -182,6 +191,12 @@ class MockConversationAgent(TinyAgent):
 @pytest.mark.asyncio
 async def test_a2a_tool_multiturn() -> None:
     """Test that agents can maintain conversation context across multiple interactions."""
+    call_count = 0
+
+    def call_counter() -> None:
+        """Callback to count the number of times the tool is called."""
+        nonlocal call_count
+        call_count += 1
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
@@ -194,6 +209,8 @@ async def test_a2a_tool_multiturn() -> None:
         ),
         description="Agent with conversation memory for testing session management.",
         output_type=UserInfo,
+        tools=[call_counter],
+        model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
     )
 
     agent = MockConversationAgent(config)
@@ -237,7 +254,7 @@ async def test_a2a_tool_multiturn() -> None:
                 params=MessageSendParams(**send_message_payload_1),  # type: ignore[arg-type]
             )
             response_1 = await client.send_message(
-                request_1, http_kwargs={"timeout": 30.0}
+                request_1, http_kwargs=DEFAULT_HTTP_KWARGS
             )
 
             assert response_1 is not None
@@ -270,7 +287,7 @@ async def test_a2a_tool_multiturn() -> None:
                 params=MessageSendParams(**send_message_payload_2),  # type: ignore[arg-type]
             )
             response_2 = await client.send_message(
-                request_2, http_kwargs={"timeout": 30.0}
+                request_2, http_kwargs=DEFAULT_HTTP_KWARGS
             )
 
             assert response_2 is not None
@@ -301,7 +318,7 @@ async def test_a2a_tool_multiturn() -> None:
                 params=MessageSendParams(**send_message_payload_3),  # type: ignore[arg-type]
             )
             response_3 = await client.send_message(
-                request_3, http_kwargs={"timeout": 30.0}
+                request_3, http_kwargs=DEFAULT_HTTP_KWARGS
             )
             assert response_3 is not None
             # if the response is JSONRPCErrorResposne, log and raise an error
@@ -314,6 +331,8 @@ async def test_a2a_tool_multiturn() -> None:
             assert response_3.root.result.status.state == TaskState.completed  # type: ignore[union-attr]
             assert result.age == 30
 
+            assert call_count == 3
+
     finally:
         await server_handle.shutdown()
 
@@ -321,6 +340,13 @@ async def test_a2a_tool_multiturn() -> None:
 @pytest.mark.asyncio
 async def test_a2a_tool_multiturn_async() -> None:
     """Test that agents can maintain conversation context across multiple interactions."""
+
+    call_count = 0
+
+    def call_counter() -> None:
+        """Callback to count the number of times the tool is called."""
+        nonlocal call_count
+        call_count += 1
 
     # Create a mock agent that simulates multi-turn conversation
     config = AgentConfig(
@@ -334,6 +360,8 @@ async def test_a2a_tool_multiturn_async() -> None:
         name="Structured UserInfo Agent",
         description="Agent with conversation memory for testing session management.",
         output_type=UserInfo,
+        tools=[call_counter],
+        model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
     )
 
     agent = MockConversationAgent(config)
@@ -348,20 +376,11 @@ async def test_a2a_tool_multiturn_async() -> None:
     server_url = f"http://localhost:{server_handle.port}"
     await wait_for_server_async(server_url)
     try:
-
-        class MainAgentAnswer(BaseModel):
-            first_turn_success: bool
-            second_turn_success: bool
-            third_turn_success: bool
-
         main_agent_cfg = AgentConfig(
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[await a2a_tool_async(server_url)],
-            output_type=MainAgentAnswer,
-            model_args={
-                "parallel_tool_calls": False  # to force it to talk to the agent one call at a time
-            },
+            model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
         )
 
         main_agent = await AnyAgent.create_async(
@@ -382,9 +401,6 @@ async def test_a2a_tool_multiturn_async() -> None:
 
         agent_trace = await main_agent.run_async(prompt)
         assert agent_trace.final_output is not None
-        assert isinstance(agent_trace.final_output, MainAgentAnswer)
-        assert agent_trace.final_output.first_turn_success
-        assert agent_trace.final_output.second_turn_success
-        assert agent_trace.final_output.third_turn_success
+        assert call_count == 3
     finally:
         await server_handle.shutdown()

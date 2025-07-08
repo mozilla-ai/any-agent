@@ -40,7 +40,7 @@ def test_tool_error_llm_mocked(
 
     kwargs = {}
 
-    kwargs["model_id"] = "gpt-4.1-nano"
+    kwargs["model_id"] = "mistral/mistral-small-latest"
 
     model_args = {"temperature": 0.0}
 
