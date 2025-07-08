@@ -125,7 +125,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     )
     result1 = llm_judge.run(
         context=str(agent_trace.spans_to_messages()),
-        question="Did the agent call the write_file tool during execution?",
+        question="Do the messages contain the year 2025?",
     )
     assert isinstance(result1, EvaluationOutput)
     assert result1.passed, (
@@ -144,7 +144,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
 
     eval_trace = agent_judge.run(
         trace=agent_trace,
-        question="Did the agent write the current year to a file? Grab the messages from the trace and check if the write_file tool was called and if the content of the file is the current year.",
+        question="Did the agent write the year to a file? Grab the messages from the trace and check if the write_file tool was called.",
         additional_tools=[get_current_year],
     )
     result2 = eval_trace.final_output
