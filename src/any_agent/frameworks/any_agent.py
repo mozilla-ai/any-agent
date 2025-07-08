@@ -18,7 +18,6 @@ from any_agent.config import (
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentTrace
-from any_agent.tracing.exporter import SCOPE_NAME
 from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
@@ -75,7 +74,7 @@ class AnyAgent(ABC):
         self._add_span_callbacks()
         self._wrapper = _get_wrapper_by_framework(self.framework)
 
-        self._tracer: Tracer = otel_trace.get_tracer(SCOPE_NAME)
+        self._tracer: Tracer = otel_trace.get_tracer("any_agent")
 
         self._lock = asyncio.Lock()
         self._callback_contexts: dict[int, Context] = {}

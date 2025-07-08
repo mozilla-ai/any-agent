@@ -7,6 +7,8 @@ will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.ru
 # pseudocode of an Agent run
 
 history = [system_prompt, user_prompt]
+context = Context()
+
 while True:
 
     for callback in agent.config.callbacks:
@@ -38,11 +40,10 @@ while True:
 
 Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.
 
-Each time an agent is run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`agent.run`][any_agent.AnyAgent.run] ), a unique [`Context`][any_agent.callbacks.context.Context] object
-is shared across all callbacks.
+During the agent run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`agent.run`][any_agent.AnyAgent.run] ), a unique [`Context`][any_agent.callbacks.context.Context] object is created and shared across all callbacks.
 
-All any-agent agents will populate the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
-property so that the callbacks can access information in a framework-agnostic way. You can check the attributes available
+`any-agent` populates the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
+property so that callbacks can access information in a framework-agnostic way. You can check the attributes available
 for LLM Calls and Tool Executions in the [example spans](../tracing.md#spans).
 
 ## Implementing Callbacks
@@ -69,9 +70,13 @@ class LimitSearchWeb(Callback):
             raise RuntimeError("Reached limit of `search_web` calls.")
 ```
 
-## Providing Callbacks
+## Default Callbacks
 
-These callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agent.AgentConfig.callbacks] property:
+`any-agent` comes with a set of default callbacks that will be used by default (if you don't pass a value to `AgentConfig.callbacks`):
+
+- [`ConsolePrintSpan`][any_agent.callbacks.span_print.ConsolePrintSpan]
+
+If you want to disable these default callbacks, you can pass an empty list:
 
 ```python
 from any_agent import AgentConfig, AnyAgent
@@ -83,13 +88,57 @@ agent = AnyAgent.create(
         model_id="gpt-4.1-nano",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage],
-        callbacks=[
-            CountSearchWeb(),
-            LimitSearchWeb(max_calls=3)
-        ]
+        callbacks=[]
     ),
 )
 ```
+
+## Providing your own Callbacks
+
+Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agent.AgentConfig.callbacks] property.
+
+=== "Alongside the default callbacks"
+
+    You can use [`get_default_callbacks`][any_agent.callbacks.get_default_callbacks]:
+
+    ```py
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.callbacks import get_default_callbacks
+    from any_agent.tools import search_web, visit_webpage
+
+    agent = AnyAgent.create(
+        "tinyagent",
+        AgentConfig(
+            model_id="gpt-4.1-nano",
+            instructions="Use the tools to find an answer",
+            tools=[search_web, visit_webpage],
+            callbacks=[
+                CountSearchWeb(),
+                LimitSearchWeb(max_calls=3)
+            ] + get_default_callbacks()
+        ),
+    )
+    ```
+
+=== "Override the default callbacks"
+
+    ```py
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.tools import search_web, visit_webpage
+
+    agent = AnyAgent.create(
+        "tinyagent",
+        AgentConfig(
+            model_id="gpt-4.1-nano",
+            instructions="Use the tools to find an answer",
+            tools=[search_web, visit_webpage],
+            callbacks=[
+                CountSearchWeb(),
+                LimitSearchWeb(max_calls=3)
+            ]
+        ),
+    )
+    ```
 
 !!! warning
 
