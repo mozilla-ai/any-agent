@@ -6,7 +6,6 @@ from datetime import timedelta
 from functools import cached_property
 from typing import TYPE_CHECKING, Any, Literal
 
-from litellm.cost_calculator import cost_per_token
 from opentelemetry.sdk.trace import ReadableSpan
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -60,33 +59,6 @@ class CostInfo(BaseModel):
         return self.input_cost + self.output_cost
 
     model_config = ConfigDict(extra="forbid")
-
-
-def compute_cost_info(
-    attributes: Mapping[str, AttributeValue],
-) -> CostInfo | None:
-    """Use litellm to compute cost."""
-    if not any(
-        key in attributes
-        for key in ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"]
-    ):
-        return None
-
-    new_info: dict[str, float] = {}
-    try:
-        cost_prompt, cost_completion = cost_per_token(
-            model=str(attributes.get("gen_ai.request.model", "")),
-            prompt_tokens=int(attributes.get("gen_ai.usage.input_tokens", 0)),  # type: ignore[arg-type]
-            completion_tokens=int(attributes.get("gen_ai.usage.output_tokens", 0)),  # type: ignore[arg-type]
-        )
-        new_info["input_cost"] = cost_prompt
-        new_info["output_cost"] = cost_completion
-    except Exception as e:
-        msg = f"Error computing cost_per_token: {e}"
-        logger.warning(msg)
-        new_info["input_cost"] = 0.0
-        new_info["output_cost"] = 0.0
-    return CostInfo.model_validate(new_info)
 
 
 class AgentMessage(BaseModel):
@@ -346,8 +318,12 @@ class AgentTrace(BaseModel):
         sum_output_cost = 0.0
         for span in self.spans:
             if span.is_llm_call():
-                cost_info = compute_cost_info(span.attributes)
-                if cost_info:
-                    sum_input_cost += cost_info.input_cost
-                    sum_output_cost += cost_info.output_cost
+                if any(
+                    key in span.attributes
+                    for key in ["gen_ai.usage.input_cost", "gen_ai.usage.output_cost"]
+                ):
+                    sum_input_cost += span.attributes.get("gen_ai.usage.input_cost", 0)
+                    sum_output_cost += span.attributes.get(
+                        "gen_ai.usage.output_cost", 0
+                    )
         return CostInfo(input_cost=sum_input_cost, output_cost=sum_output_cost)

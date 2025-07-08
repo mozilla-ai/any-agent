@@ -1,5 +1,6 @@
 from .base import Callback
 from .context import Context
+from .span_cost import AddCostInfo
 from .span_print import ConsolePrintSpan
 
 __all__ = ["Callback", "ConsolePrintSpan", "Context"]
@@ -14,7 +15,8 @@ def get_default_callbacks() -> list[Callback]:
     Returns:
         A list of instances containing:
 
+            - [`AddCostInfo`][any_agent.callbacks.span_cost.AddCostInfo]
             - [`ConsolePrintSpan`][any_agent.callbacks.span_print.ConsolePrintSpan]
 
     """
-    return [ConsolePrintSpan()]
+    return [AddCostInfo(), ConsolePrintSpan()]
