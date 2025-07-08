@@ -81,8 +81,12 @@ def prepare_agent_for_a2a(agent: AnyAgent) -> AnyAgent:
     body_type = agent.config.output_type or _DefaultBody
     new_output_type = _create_a2a_envelope(body_type)
 
+    original_callbacks = agent.config.callbacks
+    agent.config.callbacks = []
     new_config = agent.config.model_copy(deep=True)
     new_config.output_type = new_output_type
+    new_config.callbacks = original_callbacks
+    agent.config.callbacks = original_callbacks
 
     # Create the new agent with the wrapped config, preserving MCP servers and tools
     return agent._recreate_with_config(new_config)
@@ -100,8 +104,12 @@ async def prepare_agent_for_a2a_async(agent: AnyAgent) -> AnyAgent:
     body_type = agent.config.output_type or _DefaultBody
     new_output_type = _create_a2a_envelope(body_type)
 
+    original_callbacks = agent.config.callbacks
+    agent.config.callbacks = []
     new_config = agent.config.model_copy(deep=True)
     new_config.output_type = new_output_type
+    new_config.callbacks = original_callbacks
+    agent.config.callbacks = original_callbacks
 
     # Create the new agent with the wrapped config, preserving MCP servers and tools
     return await agent._recreate_with_config_async(new_config)
