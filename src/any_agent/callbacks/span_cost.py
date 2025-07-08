@@ -30,8 +30,12 @@ def add_cost_info(span: Span) -> None:
                 prompt_tokens=int(attributes.get("gen_ai.usage.input_tokens", 0)),  # type: ignore[arg-type]
                 completion_tokens=int(attributes.get("gen_ai.usage.output_tokens", 0)),  # type: ignore[arg-type]
             )
-            attributes["gen_ai.usage.input_cost"] = cost_prompt
-            attributes["gen_ai.usage.output_cost"] = cost_completion
+            span.set_attributes(
+                {
+                    "gen_ai.usage.input_cost": cost_prompt,
+                    "gen_ai.usage.output_cost": cost_completion,
+                }
+            )
         except Exception as e:
             msg = f"Error computing cost_per_token: {e}"
             logger.warning(msg)
