@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent, ToolExecutor
+from tests.unit.helpers import LITELLM_IMPORT_PATHS
 
 
 class SampleOutput(BaseModel):
@@ -117,3 +118,50 @@ def test_output_type_completion_params_isolation() -> None:
 
         # Verify completion_params weren't modified
         assert agent.completion_params == original_completion_params
+
+
+def test_structured_output_without_tools() -> None:
+    """Test that structured output works correctly when no tools are present and tool_choice is not set."""
+    config = AgentConfig(model_id="gpt-4.1-mini", output_type=SampleOutput)
+    agent: TinyAgent = AnyAgent.create(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
+
+    def create_mock_response(content: str, is_structured: bool = False) -> MagicMock:
+        """Helper to create mock responses."""
+        mock_message = MagicMock()
+        mock_message.content = content
+        mock_message.tool_calls = []
+        mock_message.model_dump.return_value = {
+            "content": content,
+            "role": "assistant",
+            "tool_calls": None,
+            "function_call": None,
+            "annotations": [],
+        }
+        if is_structured:
+            mock_message.__getitem__.return_value = content
+        return MagicMock(choices=[MagicMock(message=mock_message)])
+
+    with patch(LITELLM_IMPORT_PATHS[AgentFramework.TINYAGENT]) as mock_acompletion:
+        # Mock responses: 2 calls per run (regular + structured output)
+        mock_acompletion.side_effect = [
+            create_mock_response("Initial response"),  # First call - regular response
+            create_mock_response(
+                '{"answer": "Structured answer", "confidence": 0.95}', True
+            ),  # Second call - structured output
+        ]
+
+        # Run the agent
+        agent.run("Test question")
+
+        # Verify that acompletion was called twice. Once for the regular output and once for the structured output.
+        assert mock_acompletion.call_count == 2
+
+        # Get the call arguments for the second call (structured output)
+        second_call_args = mock_acompletion.call_args_list[1][1]
+
+        # tool choice should not be set to none when no tools are present
+        assert second_call_args["tool_choice"] == "auto"
+
+        # Verify that response_format is set for structured output
+        assert "response_format" in second_call_args
+        assert second_call_args["response_format"] == SampleOutput
