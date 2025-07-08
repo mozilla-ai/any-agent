@@ -6,14 +6,14 @@ from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
-from any_agent.tools import a2a_tool, a2a_tool_async
-from any_agent.tracing.agent_trace import AgentTrace
-from tests.integration.helpers import (
+from any_agent.testing.helpers import (
     DEFAULT_HTTP_KWARGS,
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
     wait_for_server,
 )
+from any_agent.tools import a2a_tool, a2a_tool_async
+from any_agent.tracing.agent_trace import AgentTrace
 
 from .conftest import (
     DATE_PROMPT,

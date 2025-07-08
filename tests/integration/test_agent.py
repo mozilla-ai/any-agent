@@ -19,11 +19,11 @@ from any_agent.config import MCPStdio
 from any_agent.evaluation.agent_judge import AgentJudge
 from any_agent.evaluation.llm_judge import LlmJudge
 from any_agent.evaluation.schemas import EvaluationOutput
-from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
-from tests.integration.helpers import (
+from any_agent.testing.helpers import (
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
 )
+from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 
 
 def uvx_installed() -> bool:

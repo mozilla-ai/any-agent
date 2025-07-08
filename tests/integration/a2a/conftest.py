@@ -14,7 +14,7 @@ from a2a.types import MessageSendParams, SendMessageRequest
 
 from any_agent import AnyAgent
 from any_agent.serving import A2AServingConfig
-from tests.integration.helpers import wait_for_server_async
+from any_agent.testing.helpers import wait_for_server_async
 
 if TYPE_CHECKING:
     from uvicorn.server import Server

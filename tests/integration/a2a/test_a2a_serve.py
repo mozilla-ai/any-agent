@@ -8,7 +8,7 @@ from a2a.client import A2AClient
 # Import your agent and config
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
-from tests.integration.helpers import (
+from any_agent.testing.helpers import (
     DEFAULT_HTTP_KWARGS,
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,

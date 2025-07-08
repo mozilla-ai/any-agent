@@ -4,7 +4,7 @@ import pytest
 from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from tests.integration.helpers import (
+from any_agent.testing.helpers import (
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
 )
