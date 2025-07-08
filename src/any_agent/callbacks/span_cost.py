@@ -1,4 +1,4 @@
-# mypy: disable-error-code="no-untyped-def"
+# mypy: disable-error-code="attr-defined,index,no-untyped-def"
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
