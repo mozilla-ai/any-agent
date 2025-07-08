@@ -1,5 +1,6 @@
 from collections.abc import Callable
 
+from a2a.server.tasks.push_notifier import PushNotifier
 from a2a.types import AgentSkill
 from pydantic import BaseModel, ConfigDict
 
@@ -89,3 +90,9 @@ class A2AServingConfig(BaseModel):
 
     task_cleanup_interval_minutes: int = 5
     """Interval in minutes between task cleanup runs."""
+
+    push_notifier_type: type[PushNotifier] | None = None
+    """Push notifier to be used by the agent.
+
+    If not provided, a default in-memory push notifier will be used.
+    """

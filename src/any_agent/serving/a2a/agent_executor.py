@@ -77,7 +77,8 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
             task = new_task(context.message)
             await event_queue.enqueue_event(task)
         else:
-            logger.debug("Task already exists: %s", task.model_dump_json(indent=2))
+            logger.info("Task already exists: %s", task.model_dump_json(indent=2))
+        updater = TaskUpdater(event_queue, task.id, task.contextId)
 
         formatted_query = self.context_manager.format_query_with_history(
             context_id, query
@@ -88,8 +89,6 @@ class AnyAgentExecutor(AgentExecutor):  # type: ignore[misc]
 
         # Update task with new trace, passing the original query (not formatted)
         self.context_manager.update_context_trace(context_id, agent_trace, query)
-
-        updater = TaskUpdater(event_queue, task.id, task.contextId)
 
         # Validate & interpret the envelope produced by the agent
         final_output = agent_trace.final_output
