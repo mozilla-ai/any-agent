@@ -15,8 +15,8 @@ from any_agent import (
     AgentFramework,
     AnyAgent,
 )
-from any_agent.config import MCPStdio, MCPStreamableHttp
 from any_agent.callbacks.span_print import ConsolePrintSpan
+from any_agent.config import MCPStdio, MCPStreamableHttp
 from any_agent.evaluation.agent_judge import AgentJudge
 from any_agent.evaluation.llm_judge import LlmJudge
 from any_agent.evaluation.schemas import EvaluationOutput
@@ -353,11 +353,10 @@ def test_load_and_run_agent_streamable_http(
     agent = AnyAgent.create(agent_framework, agent_config)
     update_trace = request.config.getoption("--update-trace-assets")
     if update_trace:
-        with TRACE_PROVIDER._active_span_processor._lock:  # type: ignore[attr-defined]
-            for p in TRACE_PROVIDER._active_span_processor._span_processors:  # type: ignore[attr-defined]
-                if isinstance(p.span_exporter, _ConsoleExporter):
-                    console = p.span_exporter.console
-                    console.record = True
+        for callback in agent.config.callbacks:
+            if isinstance(callback, ConsolePrintSpan):
+                console = callback.console
+                callback.console.record = True
 
     start_ns = time.time_ns()
     agent_trace = agent.run(
