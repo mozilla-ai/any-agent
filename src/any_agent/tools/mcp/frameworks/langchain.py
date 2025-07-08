@@ -11,21 +11,22 @@ from any_agent.tools.mcp.mcp_connection import _MCPConnection
 from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 mcp_available = False
-from langchain_core.tools import BaseTool  # noqa: TC002
-from langchain_mcp_adapters.tools import load_mcp_tools
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.sse import sse_client
-from mcp.client.stdio import stdio_client
-from mcp.client.streamable_http import streamablehttp_client
+with suppress(ImportError):
+    from langchain_core.tools import BaseTool  # noqa: TC002
+    from langchain_mcp_adapters.tools import load_mcp_tools
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.sse import sse_client
+    from mcp.client.stdio import stdio_client
+    from mcp.client.streamable_http import streamablehttp_client
 
-mcp_available = True
+    mcp_available = True
 
 
 class LangchainMCPConnection(_MCPConnection["BaseTool"], ABC):
     """Base class for LangChain MCP connections."""
 
     _client: Any | None = PrivateAttr(default=None)
-    session: ClientSession | None = None
+    session: type["ClientSession"] | None = None
 
     @abstractmethod
     async def list_tools(self) -> list["BaseTool"]:

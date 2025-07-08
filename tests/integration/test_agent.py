@@ -312,20 +312,6 @@ def test_load_and_run_agent_streamable_http(
 ) -> None:
     kwargs = {}
 
-    tmp_file = "tmp.txt"
-
-    def write_file(text: str) -> None:
-        """write the text to a file in the tmp_path directory
-
-        Args:
-            text (str): The text to write to the file.
-
-        Returns:
-            None
-        """
-        with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
-            f.write(text)
-
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:

@@ -61,20 +61,9 @@ SSE_MCP_SERVER_SCRIPT = dedent(
 STRHTTP_MCP_SERVER_SCRIPT = dedent(
     '''
         from zoneinfo import ZoneInfo
-        from tzlocal import get_localzone_name
         from mcp.server.fastmcp import FastMCP
         from mcp.shared.exceptions import McpError
         from datetime import datetime
-
-        def get_local_tz(local_tz_override: str | None = None) -> ZoneInfo:
-            if local_tz_override:
-                return ZoneInfo(local_tz_override)
-
-            # Get local timezone from datetime.now()
-            local_tzname = get_localzone_name()
-            if local_tzname is not None:
-                return ZoneInfo(local_tzname)
-            raise McpError("Could not determine local timezone - tzinfo is None")
 
         def get_zoneinfo(timezone_name: str) -> ZoneInfo:
             try:
