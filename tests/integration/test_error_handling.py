@@ -10,7 +10,10 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.tracing.otel_types import StatusCode
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID
+from tests.integration.helpers import (
+    DEFAULT_SMALL_MODEL_ID,
+    get_default_agent_model_args,
+)
 
 
 def test_runtime_error(
@@ -29,8 +32,6 @@ def test_runtime_error(
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
-    model_args = {"temperature": 0.0}
-
     exc_reason = "It's a trap!"
 
     patch_function = "litellm.acompletion"
@@ -44,7 +45,7 @@ def test_runtime_error(
         agent_config = AgentConfig(
             model_id=kwargs["model_id"],
             tools=[],
-            model_args=model_args,
+            model_args=get_default_agent_model_args(agent_framework),
         )
         agent = AnyAgent.create(agent_framework, agent_config)
         spans = []
@@ -91,13 +92,11 @@ def test_tool_error(
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
-    model_args = {"temperature": 0.0}
-
     agent_config = AgentConfig(
         model_id=kwargs["model_id"],
         instructions="You must use the available tools to answer questions.",
         tools=[search_web],
-        model_args=model_args,
+        model_args=get_default_agent_model_args(agent_framework),
     )
 
     agent = AnyAgent.create(agent_framework, agent_config)

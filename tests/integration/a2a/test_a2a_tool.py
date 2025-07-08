@@ -1,5 +1,5 @@
 from multiprocessing import Process, Queue
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pytest
 from litellm.utils import validate_environment
@@ -8,7 +8,11 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server
+from tests.integration.helpers import (
+    DEFAULT_SMALL_MODEL_ID,
+    get_default_agent_model_args,
+    wait_for_server,
+)
 
 from .conftest import (
     DATE_PROMPT,
@@ -54,13 +58,6 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
 
-    model_args: dict[str, Any] = (
-        {"parallel_tool_calls": False}
-        if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
-        else {}
-    )
-    model_args["temperature"] = 0.0
-
     # Create date agent
     date_agent_cfg = AgentConfig(
         instructions="Use the available tools to obtain additional information to answer the query.",
@@ -68,7 +65,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
         model_id=DEFAULT_SMALL_MODEL_ID,
         description="Agent that can return the current date.",
         tools=[get_datetime],
-        model_args=model_args,
+        model_args=get_default_agent_model_args(agent_framework),
     )
     date_agent = await AnyAgent.create_async(
         agent_framework=agent_framework,
@@ -90,7 +87,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
             model_id=DEFAULT_SMALL_MODEL_ID,
             tools=[await a2a_tool_async(server_url)],
-            model_args=model_args,
+            model_args=get_default_agent_model_args(agent_framework),
         )
 
         main_agent = await AnyAgent.create_async(
@@ -119,9 +116,9 @@ def _run_server(
         description="Agent that can return the current date.",
         tools=[get_datetime],
         model_id=model_id,
-        model_args={"parallel_tool_calls": False}
-        if agent_framework_str not in ["agno", "llama_index"]
-        else None,
+        model_args=get_default_agent_model_args(
+            AgentFramework.from_string(agent_framework_str)
+        ),
     )
 
     date_agent = AnyAgent.create(
@@ -199,6 +196,7 @@ def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
                 )
             ],
             model_id=DEFAULT_SMALL_MODEL_ID,
+            model_args=get_default_agent_model_args(agent_framework),
         )
 
         main_agent = AnyAgent.create(
