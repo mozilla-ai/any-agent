@@ -326,7 +326,7 @@ def test_load_and_run_agent_streamable_http(
         with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
             f.write(text)
 
-    kwargs["model_id"] = DEFAULT_MEDIUM_MODEL_ID
+    kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
