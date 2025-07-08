@@ -142,6 +142,9 @@ for i, result in enumerate(results, 1):
     print("-" * 50)
 ```
 
+!!! tip "Async Usage"
+    For async applications, use `judge.run_async()` instead of `judge.run()`.
+
 ## AgentJudge
 
 The `AgentJudge` is designed for complex evaluations that require inspecting specific aspects of the trace. It comes equipped with evaluation tools and can accept additional custom tools for specialized assessments.
@@ -175,6 +178,9 @@ result = eval_trace.final_output
 print(f"Passed: {result.passed}")
 print(f"Reasoning: {result.reasoning}")
 ```
+
+!!! tip "Async Usage"
+    For async applications, use `judge.run_async()` instead of `judge.run()`.
 
 ### Adding Custom Tools
 
