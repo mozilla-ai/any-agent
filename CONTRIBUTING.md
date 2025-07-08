@@ -43,7 +43,7 @@ We welcome all kinds of contributions, from improving customization, to extendin
 - Install the package using development dependencies before testing: `uv sync --group dev --extra all`
 - Integration tests need the following environment variables to be set:
   ```
-  OPENAI_API_KEY="YOUR API KEY"
+  MISTRAL_API_KEY="YOUR API KEY"
   ```
 
 **Documentation**

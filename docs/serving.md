@@ -31,7 +31,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
         "google",
         AgentConfig(
             name="google_expert",
-            model_id="gpt-4.1-mini",
+            model_id="mistral/mistral-small-latest",
             description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
             tools=[search_web]
         )
@@ -52,7 +52,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
         "openai",
         AgentConfig(
             name="openai_expert",
-            model_id="gpt-4.1-nano",
+            model_id="mistral/mistral-small-latest",
             instructions="You can answer questions about the OpenAI Agents SDK but nothing else.",
             description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
             tools=[search_web]
@@ -176,7 +176,7 @@ In a similar way to [the A2A example](#example), we are going to define two agen
         "google",
         AgentConfig(
             name="google_expert",
-            model_id="gpt-4.1-mini",
+            model_id="mistral/mistral-small-latest",
             description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
             tools=[search_web]
         )
@@ -197,7 +197,7 @@ In a similar way to [the A2A example](#example), we are going to define two agen
         "openai",
         AgentConfig(
             name="openai_expert",
-            model_id="gpt-4.1-nano",
+            model_id="mistral/mistral-small-latest",
             instructions="You can provide information about the OpenAI Agents SDK but nothing else (specially, nothing about the Google SDK).",
             description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
             tools=[search_web]
@@ -231,7 +231,7 @@ async def main():
             MCPSse(url=google_server_url, client_session_timeout_seconds=300),
             MCPSse(url=openai_server_url, client_session_timeout_seconds=300),
         ],
-        model_id="gpt-4.1-nano",
+        model_id="mistral/mistral-small-latest",
     )
 
     main_agent = await AnyAgent.create_async(

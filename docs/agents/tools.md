@@ -21,7 +21,7 @@ from any_agent import AgentConfig
 from any_agent.tools import search_web
 
 main_agent = AgentConfig(
-    model_id="gpt-4o-mini",
+    model_id="mistral/mistral-small-latest",
     tools=[search_web]
 )
 ```
@@ -44,7 +44,7 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
     from any_agent.config import MCPStdio
 
     main_agent = AgentConfig(
-        model_id="gpt-4o-mini",
+        model_id="mistral/mistral-small-latest",
         tools=[
             MCPStdio(
                 command="docker",
@@ -64,7 +64,7 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
     from any_agent.config import MCPSse
 
     main_agent = AgentConfig(
-        model_id="gpt-4o-mini",
+        model_id="mistral/mistral-small-latest",
         tools=[
             MCPSse(
                 url="http://localhost:8000/sse"
@@ -87,7 +87,7 @@ google_agent = await AnyAgent.create_async(
     "google",
     AgentConfig(
         name="google_expert",
-        model_id="gpt-4.1-nano",
+        model_id="mistral/mistral-small-latest",
         instructions="Use the available tools to answer questions about the Google ADK",
         description="An agent that can answer questions about the Google Agents Development Kit (ADK).",
         tools=[search_web]
@@ -140,7 +140,7 @@ main_agent = await AnyAgent.create_async(
     "tinyagent",
     AgentConfig(
         name="main_agent",
-        model_id="gpt-4.1-nano",
+        model_id="mistral-small-latest",
         instructions="Use the available tools to obtain additional information to answer the query.",
         tools=[google_agent_as_tool],
     )

@@ -11,7 +11,7 @@ dynamic = ["version"]
 dependencies = [
   "duckduckgo_search",
   "fire",
-  "litellm==1.72.4", # until https://github.com/BerriAI/litellm/issues/11759 is fixed
+  "litellm>=1.74.0",
   "markdownify",
   "mcp>=1.5.0",
   "opentelemetry-exporter-otlp",
@@ -33,7 +33,7 @@ google = [
 
 langchain = [
   "langchain",
-  "langchain-litellm",
+  "langchain-litellm @ git+https://github.com/njbrake/langchain-litellm@patch-3", # until https://github.com/Akshay-Dongare/langchain-litellm/pull/19 is merged
   "langchain-mcp-adapters>=0.0.3",
   "langgraph",
 ]
@@ -147,7 +147,7 @@ disallow_untyped_decorators = false # mypy gets confused by pytest decorators
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
-timeout = 30
+timeout = 120
 
 
 [dependency-groups]

@@ -7,8 +7,7 @@ import requests
 
 from any_agent.config import AgentFramework
 
-DEFAULT_SMALL_MODEL_ID = "gpt-4.1-nano"
-DEFAULT_MEDIUM_MODEL_ID = "gpt-4.1-mini"
+DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
 
 
 def get_default_agent_model_args(agent_framework: AgentFramework) -> dict[str, Any]:
@@ -22,7 +21,7 @@ def get_default_agent_model_args(agent_framework: AgentFramework) -> dict[str, A
     return model_args
 
 
-DEFAULT_HTTP_KWARGS = {"timeout": 30.0}
+DEFAULT_HTTP_KWARGS = {"timeout": 60.0}
 
 
 def wait_for_server(

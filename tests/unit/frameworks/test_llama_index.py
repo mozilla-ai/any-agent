@@ -46,7 +46,10 @@ def test_load_llama_index_agent_default() -> None:
 def test_load_llama_index_agent_missing() -> None:
     with patch("any_agent.frameworks.llama_index.llama_index_available", False):
         with pytest.raises(ImportError):
-            AnyAgent.create(AgentFramework.LLAMA_INDEX, AgentConfig(model_id="gpt-4o"))
+            AnyAgent.create(
+                AgentFramework.LLAMA_INDEX,
+                AgentConfig(model_id="mistral/mistral-small-latest"),
+            )
 
 
 def test_run_llama_index_agent_custom_args() -> None:

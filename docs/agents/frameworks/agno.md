@@ -23,7 +23,7 @@ from any_agent.tools import search_web, visit_webpage
 agent = AnyAgent.create(
     "agno",
     AgentConfig(
-        model_id="gpt-4.1-nano",
+        model_id="mistral/mistral-small-latest",
         instructions="You must use the available tools to find an answer",
         tools=[search_web, visit_webpage]
     ),

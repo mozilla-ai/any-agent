@@ -19,7 +19,7 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
     return AnyAgent.create(
         framework,
         AgentConfig(
-            model_id="gpt-4o",
+            model_id="mistral/mistral-small-latest",
             model_args={
                 "temperature": TEST_TEMPERATURE,
                 "frequency_penalty": TEST_PENALTY,
@@ -29,18 +29,24 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
 
 
 def test_create_any_with_framework(agent_framework: AgentFramework) -> None:
-    agent = AnyAgent.create(agent_framework, AgentConfig(model_id="gpt-4o"))
+    agent = AnyAgent.create(
+        agent_framework, AgentConfig(model_id="mistral/mistral-small-latest")
+    )
     assert agent
 
 
 def test_create_any_with_valid_string(agent_framework: AgentFramework) -> None:
-    agent = AnyAgent.create(agent_framework.name, AgentConfig(model_id="gpt-4o"))
+    agent = AnyAgent.create(
+        agent_framework.name, AgentConfig(model_id="mistral/mistral-small-latest")
+    )
     assert agent
 
 
 def test_create_any_with_invalid_string() -> None:
     with pytest.raises(ValueError, match="Unsupported agent framework"):
-        AnyAgent.create("non-existing", AgentConfig(model_id="gpt-4o"))
+        AnyAgent.create(
+            "non-existing", AgentConfig(model_id="mistral/mistral-small-latest")
+        )
 
 
 def test_model_args(

@@ -55,7 +55,7 @@ For this example we use a model hosted by openai, but you may need to set the re
 See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
 
 ```bash
-export OPENAI_API_KEY="YOUR_KEY_HERE"  # or MISTRAL_API_KEY, etc
+export MISTRAL_API_KEY="YOUR_KEY_HERE"  # or OPENAI_API_KEY, etc
 ```
 
 ```python
@@ -64,7 +64,7 @@ from any_agent.tools import search_web, visit_webpage
 agent = AnyAgent.create(
     "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
-        model_id="gpt-4.1-nano",
+        model_id="mistral/mistral-small-latest",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
     )

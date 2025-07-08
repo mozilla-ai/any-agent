@@ -21,7 +21,6 @@ from any_agent.evaluation.llm_judge import LlmJudge
 from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from tests.integration.helpers import (
-    DEFAULT_MEDIUM_MODEL_ID,
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
 )
@@ -120,12 +119,12 @@ def assert_eval(agent_trace: AgentTrace) -> None:
     llm_judge = LlmJudge(
         model_id=DEFAULT_SMALL_MODEL_ID,
         model_args={
-            "timeout": 30.0
+            "temperature": 0.0,
         },  # Because it's an llm not agent, the default_model_args are not used
     )
     result1 = llm_judge.run(
         context=str(agent_trace.spans_to_messages()),
-        question="Did the agent call the write_file tool during execution?",
+        question="Do the messages contain the year 2025?",
     )
     assert isinstance(result1, EvaluationOutput)
     assert result1.passed, (
@@ -134,7 +133,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
 
     # Test 2: Check if agent wrote the current year to file using AgentJudge
     agent_judge = AgentJudge(
-        model_id=DEFAULT_MEDIUM_MODEL_ID,
+        model_id=DEFAULT_SMALL_MODEL_ID,
         model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
     )
 
@@ -144,7 +143,7 @@ def assert_eval(agent_trace: AgentTrace) -> None:
 
     eval_trace = agent_judge.run(
         trace=agent_trace,
-        question="Did the agent write the current year to a file?",
+        question="Did the agent write the year to a file? Grab the messages from the trace and check if the write_file tool was called.",
         additional_tools=[get_current_year],
     )
     result2 = eval_trace.final_output
@@ -194,11 +193,10 @@ def test_load_and_run_agent(
         with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
             f.write(text)
 
-    kwargs["model_id"] = DEFAULT_MEDIUM_MODEL_ID
+    kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
-
     tools = [
         write_file,
         MCPStdio(

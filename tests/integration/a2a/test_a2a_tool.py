@@ -9,6 +9,7 @@ from any_agent.serving import A2AServingConfig
 from any_agent.tools import a2a_tool, a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
 from tests.integration.helpers import (
+    DEFAULT_HTTP_KWARGS,
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
     wait_for_server,
@@ -86,7 +87,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
             model_id=DEFAULT_SMALL_MODEL_ID,
-            tools=[await a2a_tool_async(server_url)],
+            tools=[await a2a_tool_async(server_url, http_kwargs=DEFAULT_HTTP_KWARGS)],
             model_args=get_default_agent_model_args(agent_framework),
         )
 
@@ -193,6 +194,7 @@ def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
             tools=[
                 a2a_tool(
                     f"http://localhost:{test_port}/{tool_agent_endpoint}",
+                    http_kwargs=DEFAULT_HTTP_KWARGS,
                 )
             ],
             model_id=DEFAULT_SMALL_MODEL_ID,

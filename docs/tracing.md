@@ -99,7 +99,7 @@ from any_agent.tools import search_web
 agent = AnyAgent.create(
     "openai",
     agent_config=AgentConfig(
-            model_id="gpt-4o",
+            model_id="mistral/mistral-small-latest",
             tools=[search_web],
     )
 )

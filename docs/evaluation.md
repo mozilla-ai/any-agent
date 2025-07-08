@@ -60,7 +60,7 @@ from any_agent.tools import search_web
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="gpt-4.1-nano",
+        model_id="mistral/mistral-small-latest",
         tools=[search_web]
     ),
 )
@@ -106,7 +106,7 @@ from any_agent.evaluation import LlmJudge
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="gpt-4.1-mini",
+        model_id="mistral/mistral-small-latest",
         tools=[search_web]
     ),
 )
@@ -118,7 +118,7 @@ trace = agent.run(
 )
 
 # Evaluate the quality of the agent's response multiple times
-judge = LlmJudge(model_id="gpt-4.1-mini")
+judge = LlmJudge(model_id="mistral/mistral-small-latest")
 evaluation_questions = [
     "Did it provide clear, step-by-step instructions?",
     "Was the tone empathetic and appropriate for a frustrated, non-technical customer?",
@@ -162,7 +162,7 @@ The `AgentJudge` automatically has access to these evaluation tools:
 from any_agent.evaluation import AgentJudge
 
 # Create an agent judge
-judge = AgentJudge(model_id="gpt-4.1-mini")
+judge = AgentJudge(model_id="mistral/mistral-small-latest")
 
 # Evaluate with access to trace inspection tools
 eval_trace = judge.run(
@@ -189,7 +189,7 @@ def current_ios_version() -> str:
     """
     return "iOS 18.5"
 
-judge = AgentJudge(model_id="gpt-4.1-mini")
+judge = AgentJudge(model_id="mistral/mistral-small-latest")
 eval_trace = judge.run(
     trace=trace,
     question="Does the final answer provided by the trace mention and correctly specify the most recent major version of iOS? If the final answer does not mention the version at all, this criteria should fail",
@@ -211,7 +211,7 @@ class DetailedEvaluation(BaseModel):
     suggestions: list[str]
 
 judge = LlmJudge(
-    model_id="gpt-4.1-mini",
+    model_id="mistral/mistral-small-latest",
     output_type=DetailedEvaluation
 )
 
