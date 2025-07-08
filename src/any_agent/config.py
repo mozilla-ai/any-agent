@@ -4,6 +4,7 @@ from typing import Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from any_agent.callbacks import get_default_callbacks
 from any_agent.callbacks.base import Callback
 
 
@@ -143,7 +144,7 @@ class AgentConfig(BaseModel):
     See more info at [Tools](../agents/tools.md).
     """
 
-    callbacks: list[Callback] | None = []
+    callbacks: list[Callback] = Field(default_factory=get_default_callbacks)
     """List of callbacks to use during agent invocation.
 
     See more info at [Callbacks](../agents/callbacks.md).
