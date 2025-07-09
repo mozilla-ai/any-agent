@@ -126,6 +126,7 @@ extend-select = ["ALL"]
 "src/any_agent/config.py" = ["D101", "D102"]
 "src/any_agent/evaluation/*" = ["D101", "D103", "D107"]  # TODO: Revisit when working on evaluation
 "src/any_agent/callbacks/*" = ["D102"]
+"docs/cookbook/*" = ["D"]
 "src/any_agent/evaluation/evaluators/*" = ["D103", "D107"]
 "src/any_agent/frameworks/*" = ["D107", "D102"]
 "src/any_agent/serving/a2a/agent_executor.py" = ["E402", "D102"]  # Due to Python 3.11 compatibility
