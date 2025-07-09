@@ -3012,7 +3012,7 @@ you can pass <code>tools=["read_file", "list_directory"]</code> to limit the age
 </span><span id="__span-0-112"><a id="__codelineno-0-112" name="__codelineno-0-112"></a>    <span class="n">push_notifier_sender_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">PushNotificationSender</span><span class="p">]</span> <span class="o">=</span> <span class="n">BasePushNotificationSender</span>
 </span><span id="__span-0-113"><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Push notifier sender to be used by the agent.</span>
 </span><span id="__span-0-114"><a id="__codelineno-0-114" name="__codelineno-0-114"></a>
-</span><span id="__span-0-115"><a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    If not provided, a default in-memory push notifier sender will be used.</span>
+</span><span id="__span-0-115"><a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="sd">    If not provided, a default async httpx-based push notifier sender will be used.</span>
 </span><span id="__span-0-116"><a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="__span-0-117"><a id="__codelineno-0-117" name="__codelineno-0-117"></a>
 </span><span id="__span-0-118"><a id="__codelineno-0-118" name="__codelineno-0-118"></a>    <span class="n">task_store_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">TaskStore</span><span class="p">]</span> <span class="o">=</span> <span class="n">InMemoryTaskStore</span>
@@ -3190,7 +3190,7 @@ Takes (messages, current_query) and returns formatted string.</p>
     <div class="doc doc-contents ">
 
         <p>Push notifier sender to be used by the agent.</p>
-<p>If not provided, a default in-memory push notifier sender will be used.</p>
+<p>If not provided, a default async httpx-based push notifier sender will be used.</p>
 
     </div>
 
