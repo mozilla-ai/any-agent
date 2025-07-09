@@ -30,5 +30,6 @@ jobs:
       - name: Run Cookbook Tests
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
         run: |
           pytest tests/cookbooks -v -n 4
