@@ -188,3 +188,34 @@ class ContentFilter(Callback):
 !!! warning
 
     Raising exceptions in callbacks will terminate the agent run immediately. Use this feature carefully to implement safety measures or validation logic.
+
+## Example: Offloading sensitive information
+
+Some inputs and/or outputs in your traces might contain sensitive information that you don't want
+to be exposed in the [traces](../tracing.md).
+
+You can use callbacks to offload the sensitive information to an external location and replace the span
+attributes with a reference to that location:
+
+```python
+from pathlib import Path
+from time import time
+
+class SensitiveDataOffloader(Callback):
+
+    def __init__(self, output_dir: str) -> None:
+        self.output_dir = Path(output_dir)
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+
+        span = context.current_span
+
+        input_messages = span.attributes.pop("gen_ai.input.messages")
+
+        output_file = self.output_dir / f"{time.now()}.txt"
+        output_file.write_text(str(input_messages))
+
+        span.set_attribute("gen_ai.input.messages_ref", str(output_file))
+
+        return context
+```
