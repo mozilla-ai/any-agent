@@ -15,6 +15,7 @@ from any_agent.tools.mcp.mcp_server import _MCPServerBase
 try:
     from google.adk.tools.mcp_tool import MCPTool as GoogleMCPTool
     from google.adk.tools.mcp_tool import MCPToolset as GoogleMCPToolset
+    from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
     from google.adk.tools.mcp_tool.mcp_session_manager import (
         SseConnectionParams as GoogleSseServerParameters,
     )
@@ -51,10 +52,19 @@ class GoogleMCPStdioConnection(GoogleMCPConnection):
 
     async def list_tools(self) -> list["GoogleMCPTool"]:
         """List tools from the MCP server."""
+
         self._params = GoogleStdioServerParameters(
             command=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
             env=self.mcp_tool.env,
+        )
+        self._params = StdioConnectionParams(
+            server_params=GoogleStdioServerParameters(
+                command=self.mcp_tool.command,
+                args=list(self.mcp_tool.args),
+                env=self.mcp_tool.env,
+            ),
+            timeout=self.mcp_tool.client_session_timeout_seconds
         )
         return await super().list_tools()
 
@@ -67,6 +77,8 @@ class GoogleMCPSseConnection(GoogleMCPConnection):
         self._params = GoogleSseServerParameters(
             url=self.mcp_tool.url,
             headers=dict(self.mcp_tool.headers or {}),
+            timeout=self.mcp_tool.client_session_timeout_seconds,
+            sse_read_timeout=self.mcp_tool.client_session_timeout_seconds,
         )
         return await super().list_tools()
 
