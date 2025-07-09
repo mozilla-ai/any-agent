@@ -48,8 +48,9 @@ for LLM Calls and Tool Executions in the [example spans](../tracing.md#spans).
 
 ## Implementing Callbacks
 
-All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and
- can choose to implement any subset of the available callback methods.:
+All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and can choose to implement any subset of the available callback methods.
+
+You can use the [`Context.shared`][any_agent.callbacks.context.Context.shared]
 
 ```python
 from any_agent.callbacks import Callback, Context
@@ -60,7 +61,12 @@ class CountSearchWeb(Callback):
             context.shared["search_web_count"] = 0
         if context.current_span.attributes["gen_ai.tool.name"] == "search_web":
             context.shared["search_web_count"] += 1
+```
 
+
+Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:
+
+```python
 class LimitSearchWeb(Callback):
     def __init__(self, max_calls: int):
         self.max_calls = max_calls
@@ -69,6 +75,10 @@ class LimitSearchWeb(Callback):
         if context.shared["search_web_count"] > self.max_calls:
             raise RuntimeError("Reached limit of `search_web` calls.")
 ```
+
+!!! warning
+
+    Raising exceptions in callbacks will terminate the agent run immediately. Use this feature carefully to implement safety measures or validation logic.
 
 ## Default Callbacks
 
@@ -158,37 +168,6 @@ Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agen
     Would fail because `context.shared["search_web_count"]`
     was not set yet.
 
-## Error Handling in Callbacks
-
-Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:
-
-```python
-class SafetyGuard(Callback):
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        tool_name = context.current_span.attributes.get("gen_ai.tool.name", "")
-
-        # Block dangerous tools
-        if tool_name in ["delete_file", "execute_code"]:
-            raise RuntimeError(f"Tool '{tool_name}' is not allowed for safety reasons")
-
-        return context
-
-class ContentFilter(Callback):
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
-        output = context.current_span.attributes.get("gen_ai.output", "")
-
-        # Check for inappropriate content
-        inappropriate_words = ["spam", "malware", "hack"]
-        if any(word in output.lower() for word in inappropriate_words):
-            raise RuntimeError("Generated content contains inappropriate language")
-
-        return context
-```
-
-!!! warning
-
-    Raising exceptions in callbacks will terminate the agent run immediately. Use this feature carefully to implement safety measures or validation logic.
-
 ## Example: Offloading sensitive information
 
 Some inputs and/or outputs in your traces might contain sensitive information that you don't want
@@ -198,24 +177,32 @@ You can use callbacks to offload the sensitive information to an external locati
 attributes with a reference to that location:
 
 ```python
+import json
 from pathlib import Path
-from time import time
+
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+
 
 class SensitiveDataOffloader(Callback):
 
     def __init__(self, output_dir: str) -> None:
         self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(exist_ok=True, parents=True)
 
     def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
 
         span = context.current_span
 
-        input_messages = span.attributes.pop("gen_ai.input.messages")
+        if input_messages := span.attributes.get("gen_ai.input.messages"):
+            output_file = self.output_dir / f"{span.get_span_context().trace_id}.txt"
+            output_file.write_text(str(input_messages))
 
-        output_file = self.output_dir / f"{time.now()}.txt"
-        output_file.write_text(str(input_messages))
-
-        span.set_attribute("gen_ai.input.messages_ref", str(output_file))
+            span.set_attribute("gen_ai.input.messages", json.dumps(
+                {"ref": str(output_file)}
+            ))
 
         return context
 ```
+
+You can find a working example in the [Callbacks Cookbook](../cookbook/callbacks.ipynb).
