@@ -11,8 +11,11 @@ from a2a.types import (
     MessageSendParams,
     Part,
     PushNotificationConfig,
+    Role,
     SendMessageRequest,
+    Task,
     TaskState,
+    TextPart,
 )
 from pydantic import BaseModel
 from starlette.applications import Starlette
@@ -176,11 +179,13 @@ async def test_push_notification_non_streaming() -> None:
             # following the A2A specification example
             params = MessageSendParams(
                 message=Message(
-                    role="user",
+                    role=Role.user,
                     parts=[
                         Part(
-                            kind="text",
-                            text=FIRST_TURN_PROMPT,
+                            root=TextPart(
+                                kind="text",
+                                text=FIRST_TURN_PROMPT,
+                            )
                         )
                     ],
                     messageId=first_message_id,
@@ -196,7 +201,10 @@ async def test_push_notification_non_streaming() -> None:
             if hasattr(response_1.root, "error"):
                 msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
                 raise RuntimeError(msg)
-            task_id = response_1.root.result.id
+            if isinstance(response_1.root.result, Task):
+                task_id = response_1.root.result.id
+            else:  # Message
+                task_id = response_1.root.result.messageId
             params.message.taskId = task_id
 
             # Send another message to the same task to trigger notifications
@@ -205,13 +213,19 @@ async def test_push_notification_non_streaming() -> None:
             if hasattr(response_1.root, "error"):
                 msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
                 raise RuntimeError(msg)
-            assert response_1.root.result.id == task_id
+            if isinstance(response_1.root.result, Task):
+                assert response_1.root.result.id == task_id
+            else:  # Message
+                assert response_1.root.result.messageId == task_id
 
             response_2 = await client.send_message(request_1)
             if hasattr(response_2.root, "error"):
                 msg = f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}"
                 raise RuntimeError(msg)
-            assert response_2.root.result.id == task_id
+            if isinstance(response_2.root.result, Task):
+                assert response_2.root.result.id == task_id
+            else:  # Message
+                assert response_2.root.result.messageId == task_id
 
             await asyncio.sleep(1)  # Give more time for notifications
 

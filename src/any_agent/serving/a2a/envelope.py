@@ -25,7 +25,7 @@ BodyType = TypeVar("BodyType", bound=BaseModel)
 class A2AEnvelope(BaseModel, Generic[BodyType]):
     """A2A envelope that wraps response data with task status."""
 
-    task_status: Literal[  # type: ignore[valid-type]
+    task_status: Literal[
         TaskState.input_required, TaskState.completed, TaskState.failed
     ]
     """Restricted to the states that are leveraged by our implementation of the A2A protocol.

@@ -34,7 +34,7 @@ def _get_a2a_app(
     task_manager = ContextManager(serving_config)
     push_notification_config_store = serving_config.push_notifier_store_type()
     push_notification_sender = serving_config.push_notifier_sender_type(
-        httpx_client=httpx.AsyncClient(),
+        httpx_client=httpx.AsyncClient(),  # type: ignore[call-arg]
         config_store=push_notification_config_store,
     )
 
@@ -57,7 +57,7 @@ async def _get_a2a_app_async(
     task_manager = ContextManager(serving_config)
     push_notification_config_store = serving_config.push_notifier_store_type()
     push_notification_sender = serving_config.push_notifier_sender_type(
-        httpx_client=httpx.AsyncClient(),
+        httpx_client=httpx.AsyncClient(),  # type: ignore[call-arg]
         config_store=push_notification_config_store,
     )
 

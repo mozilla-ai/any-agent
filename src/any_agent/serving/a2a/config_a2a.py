@@ -112,7 +112,7 @@ class A2AServingConfig(BaseModel):
     push_notifier_sender_type: type[PushNotificationSender] = BasePushNotificationSender
     """Push notifier sender to be used by the agent.
 
-    If not provided, a default in-memory push notifier sender will be used.
+    If not provided, a default async httpx-based push notifier sender will be used.
     """
 
     task_store_type: type[TaskStore] = InMemoryTaskStore
