@@ -25,6 +25,7 @@ repos:
         args:
           - "--fix"
           - "--exit-non-zero-on-fix"
+        exclude: src/any_agent/vendor
       - id: ruff-format
 
   - repo: local
