@@ -49,7 +49,7 @@ from langchain_core.runnables import Runnable
 from langchain_core.tools import BaseTool
 from langchain_core.utils import get_from_dict_or_env, pre_init
 from langchain_core.utils.function_calling import convert_to_openai_tool
-from litellm import acompletion
+import litellm
 from litellm.types.utils import Delta
 from pydantic import BaseModel, Field
 
@@ -112,7 +112,7 @@ async def acompletion_with_retry(
     """Simple retry wrapper for litellm.acompletion"""
     for try_num in range(llm.max_retries):
         try:
-            return await acompletion(**kwargs)
+            return await litellm.acompletion(**kwargs)
         except Exception as e:
             logger.error(f"Error in completion with retry: {e}")
             if try_num == llm.max_retries - 1:
