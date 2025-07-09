@@ -10,20 +10,9 @@ from .any_agent import AnyAgent
 
 try:
     from langchain_core.language_models import LanguageModelLike
-    from langchain_litellm import ChatLiteLLM
-
-    # Patch the _OPENAI_MODELS list to include additional models
-    # This can be removed after https://github.com/Akshay-Dongare/langchain-litellm/issues/7
-    from langchain_litellm.chat_models import litellm as langchain_litellm_module
-    from langchain_litellm.chat_models.litellm import _convert_message_to_dict
     from langgraph.prebuilt import create_react_agent
 
-    # Add your custom models to the existing list
-    additional_models = ["gpt-4.1-mini", "gpt-4.1-nano"]
-
-    # Extend the existing _OPENAI_MODELS list
-    if hasattr(langchain_litellm_module, "_OPENAI_MODELS"):
-        langchain_litellm_module._OPENAI_MODELS.extend(additional_models)
+    from any_agent.vendor.langchain_litellm import ChatLiteLLM, _convert_message_to_dict
 
     DEFAULT_AGENT_TYPE = create_react_agent
     DEFAULT_MODEL_TYPE = ChatLiteLLM

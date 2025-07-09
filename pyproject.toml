@@ -33,7 +33,6 @@ google = [
 
 langchain = [
   "langchain",
-  "langchain-litellm @ git+https://github.com/njbrake/langchain-litellm@patch-3", # until https://github.com/Akshay-Dongare/langchain-litellm/pull/19 is merged
   "langchain-mcp-adapters>=0.0.3",
   "langgraph",
 ]
