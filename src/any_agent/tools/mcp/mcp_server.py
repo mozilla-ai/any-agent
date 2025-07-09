@@ -38,7 +38,6 @@ class _MCPServerBase(BaseModel, ABC, Generic[T_co]):
             raise ValueError(msg)
 
         self.mcp_connection = mcp_connection
-        # FIXME separate client init from specific calls
         self.tools = await mcp_connection.list_tools()
 
     @property
