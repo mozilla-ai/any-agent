@@ -16,6 +16,9 @@ class _GoogleADKWrapper:
         self._original: dict[str, Any] = {}
 
     async def wrap(self, agent: GoogleAgent) -> None:
+        if agent._agent is None:
+            return
+
         self._original["before_model"] = agent._agent.before_model_callback
 
         def before_model_callback(*args, **kwargs) -> Any | None:
@@ -85,6 +88,9 @@ class _GoogleADKWrapper:
         agent._agent.after_tool_callback = after_tool_callback
 
     async def unwrap(self, agent: GoogleAgent) -> None:
+        if agent._agent is None:
+            return
+
         if "before_model" in self._original:
             agent._agent.before_model_callback = self._original["before_model"]
         if "before_tool" in self._original:

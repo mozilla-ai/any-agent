@@ -154,6 +154,15 @@ asyncio_default_fixture_loop_scope = "session"
 timeout = 120
 
 
+[tool.ty.rules]
+possibly-unbound-attribute = "ignore"
+invalid-argument-type = "ignore"
+unresolved-attribute = "ignore"
+invalid-type-form = "ignore"
+possibly-unbound-import = "ignore"
+type-assertion-failure = "ignore"
+unknown-argument = "ignore"
+
 [dependency-groups]
 dev = [
   { include-group = "docs" },
