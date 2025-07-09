@@ -34,7 +34,7 @@ except ImportError:
 
 if TYPE_CHECKING:
     from langchain_core.language_models import LanguageModelLike
-    from langgraph.graph.graph import CompiledGraph
+    from langgraph.graph.state import CompiledStateGraph
 
 
 class LangchainAgent(AnyAgent):
@@ -42,7 +42,7 @@ class LangchainAgent(AnyAgent):
 
     def __init__(self, config: AgentConfig):
         super().__init__(config)
-        self._agent: CompiledGraph | None = None
+        self._agent: CompiledStateGraph[Any] | None = None
 
     @property
     def framework(self) -> AgentFramework:
