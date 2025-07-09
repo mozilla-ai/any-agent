@@ -50,7 +50,8 @@ for LLM Calls and Tool Executions in the [example spans](../tracing.md#spans).
 
 All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and can choose to implement any subset of the available callback methods.
 
-You can use the [`Context.shared`][any_agent.callbacks.context.Context.shared]
+You can use [`Context.shared`][any_agent.callbacks.context.Context.shared] to store information meant
+to be reused across callbacks:
 
 ```python
 from any_agent.callbacks import Callback, Context
@@ -62,7 +63,6 @@ class CountSearchWeb(Callback):
         if context.current_span.attributes["gen_ai.tool.name"] == "search_web":
             context.shared["search_web_count"] += 1
 ```
-
 
 Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:
 
