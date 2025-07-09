@@ -115,7 +115,7 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, Any]]:
 
 
 @pytest.fixture(scope="session")
-async def date_streamable_http_server(worker_id) -> AsyncGenerator[dict[str, Any]]:
+async def date_streamable_http_server(worker_id: str) -> AsyncGenerator[dict[str, Any]]:
     """This fixture runs a FastMCP server in a subprocess.
     I thought about trying to mock all the individual mcp client calls,
     but I went with this because this way we don't need to actually mock anything.
