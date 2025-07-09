@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from contextlib import suppress
 from datetime import timedelta
-from typing import Any, Literal
+from typing import Any, Literal, Union
 
 from pydantic import Field, PrivateAttr
 
@@ -26,7 +26,7 @@ class LangchainMCPConnection(_MCPConnection["BaseTool"], ABC):
     """Base class for LangChain MCP connections."""
 
     _client: Any | None = PrivateAttr(default=None)
-    session: type["ClientSession"] | None = None
+    session: Union["ClientSession", None] = None
 
     @abstractmethod
     async def list_tools(self) -> list["BaseTool"]:
