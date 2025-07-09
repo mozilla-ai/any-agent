@@ -34,3 +34,8 @@
   vertical-align: middle;
   margin-left: 0.3em;
 }
+
+/*  From https://github.com/squidfunk/mkdocs-material/discussions/6404#discussioncomment-7695243 */
+.md-main__inner.md-grid {
+  max-width: initial;
+}
