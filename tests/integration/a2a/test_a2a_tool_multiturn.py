@@ -23,6 +23,12 @@ from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.serving.a2a.envelope import A2AEnvelope
+from any_agent.testing.helpers import (
+    DEFAULT_HTTP_KWARGS,
+    DEFAULT_SMALL_MODEL_ID,
+    get_default_agent_model_args,
+    wait_for_server_async,
+)
 from any_agent.tools.a2a import a2a_tool_async
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.otel_types import (
@@ -30,12 +36,6 @@ from any_agent.tracing.otel_types import (
     SpanContext,
     SpanKind,
     Status,
-)
-from tests.integration.helpers import (
-    DEFAULT_HTTP_KWARGS,
-    DEFAULT_SMALL_MODEL_ID,
-    get_default_agent_model_args,
-    wait_for_server_async,
 )
 
 if TYPE_CHECKING:

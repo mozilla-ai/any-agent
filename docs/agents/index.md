@@ -130,6 +130,22 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+### Batch Processing
+
+While any-agent doesn't provide a dedicated `.run_batch()` API, we recommend using `asyncio.gather` with the [`AnyAgent.run_async`][any_agent.AnyAgent.run_async] API for concurrent processing:
+
+```python
+import asyncio
+from any_agent import AgentConfig, AnyAgent
+
+async def process_batch():
+    agent = await AnyAgent.create_async("tinyagent", AgentConfig(...))
+    inputs = ["Input 1", "Input 2", "Input 3"]
+    tasks = [agent.run_async(input_text) for input_text in inputs]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    return results
+```
+
 ### Multi-Turn Conversations
 
 For scenarios where you need to maintain conversation history across multiple agent interactions, you can leverage the [`spans_to_messages`][any_agent.tracing.agent_trace.AgentTrace.spans_to_messages] method built into the AgentTrace. This function converts agent traces into a standardized message format that can be used to provide context in subsequent conversations.

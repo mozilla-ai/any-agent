@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from tests.unit.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
 
 TEST_TEMPERATURE = 0.54321
 TEST_PENALTY = 0.5

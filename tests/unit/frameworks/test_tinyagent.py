@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent, ToolExecutor
-from tests.unit.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
 
 
 class SampleOutput(BaseModel):

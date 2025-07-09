@@ -8,7 +8,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AgentRunError, AnyAgent
 from any_agent.callbacks import Callback, Context
-from tests.unit.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
 
 
 class SampleCallback(Callback):

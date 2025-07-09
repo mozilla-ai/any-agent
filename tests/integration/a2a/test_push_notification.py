@@ -26,6 +26,7 @@ from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.serving.a2a.envelope import A2AEnvelope
+from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
 from any_agent.tracing.otel_types import (
     Resource,
@@ -33,7 +34,6 @@ from any_agent.tracing.otel_types import (
     SpanKind,
     Status,
 )
-from tests.integration.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
 
 from .conftest import DEFAULT_LONG_TIMEOUT, a2a_client_from_agent
 

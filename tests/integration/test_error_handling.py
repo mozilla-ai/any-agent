@@ -9,11 +9,11 @@ from any_agent import (
     AgentRunError,
     AnyAgent,
 )
-from any_agent.tracing.otel_types import StatusCode
-from tests.integration.helpers import (
+from any_agent.testing.helpers import (
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
 )
+from any_agent.tracing.otel_types import StatusCode
 
 
 def test_runtime_error(

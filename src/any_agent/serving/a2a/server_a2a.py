@@ -32,12 +32,17 @@ def _get_a2a_app(
 
     agent_card = _get_agent_card(agent, serving_config)
     task_manager = ContextManager(serving_config)
+    push_notification_config_store = serving_config.push_notifier_store_type()
+    push_notification_sender = serving_config.push_notifier_sender_type(
+        httpx_client=httpx.AsyncClient(),
+        config_store=push_notification_config_store,
+    )
+
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
         task_store=serving_config.task_store_type(),
-        push_notifier=serving_config.push_notifier_type(
-            httpx_client=httpx.AsyncClient()
-        ),
+        push_config_store=push_notification_config_store,
+        push_sender=push_notification_sender,
     )
 
     return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
@@ -50,13 +55,17 @@ async def _get_a2a_app_async(
 
     agent_card = _get_agent_card(agent, serving_config)
     task_manager = ContextManager(serving_config)
+    push_notification_config_store = serving_config.push_notifier_store_type()
+    push_notification_sender = serving_config.push_notifier_sender_type(
+        httpx_client=httpx.AsyncClient(),
+        config_store=push_notification_config_store,
+    )
 
     request_handler = DefaultRequestHandler(
         agent_executor=AnyAgentExecutor(agent, task_manager),
         task_store=serving_config.task_store_type(),
-        push_notifier=serving_config.push_notifier_type(
-            httpx_client=httpx.AsyncClient()
-        ),
+        push_config_store=push_notification_config_store,
+        push_sender=push_notification_sender,
     )
 
     return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)

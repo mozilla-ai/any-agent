@@ -11,8 +11,8 @@ from litellm.types.utils import ModelResponse
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
+from any_agent.testing.helpers import wait_for_server_async
 from any_agent.tracing.agent_trace import AgentTrace
-from tests.integration.helpers import wait_for_server_async
 
 
 @pytest.fixture(params=list(AgentFramework), ids=lambda x: x.name)
