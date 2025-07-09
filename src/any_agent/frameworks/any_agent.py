@@ -4,7 +4,6 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never, overload
 
-import litellm
 from opentelemetry import trace as otel_trace
 
 from any_agent.callbacks.context import Context
@@ -29,9 +28,6 @@ if TYPE_CHECKING:
 
     from any_agent.serving import A2AServingConfig, MCPServingConfig, ServerHandle
     from any_agent.tools.mcp.mcp_server import _MCPServerBase
-
-
-litellm.drop_params = True
 
 
 class AgentRunError(Exception):
