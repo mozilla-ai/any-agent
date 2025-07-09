@@ -115,7 +115,7 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, Any]]:
 
 
 @pytest.fixture(scope="session")
-async def date_streamable_http_server() -> AsyncGenerator[dict[str, Any]]:
+async def date_streamable_http_server(worker_id) -> AsyncGenerator[dict[str, Any]]:
     """This fixture runs a FastMCP server in a subprocess.
     I thought about trying to mock all the individual mcp client calls,
     but I went with this because this way we don't need to actually mock anything.
@@ -123,13 +123,18 @@ async def date_streamable_http_server() -> AsyncGenerator[dict[str, Any]]:
     """
     import asyncio
 
-    port = 9010
+    port = 19010
+    if worker_id and "gw" in worker_id:
+        port += int(worker_id.strip("gw"))
 
     process = await asyncio.create_subprocess_exec(
         "python",
         "-c",
         STRHTTP_MCP_SERVER_SCRIPT.format(port=port),
     )
+
+    print(f"--> executing server on worker_id: {worker_id}")
+    print(f"--> executing server on port: {port}")
 
     # Smart ping instead of hardcoded sleep
     await wait_for_server_async(f"http://127.0.0.1:{port}")
