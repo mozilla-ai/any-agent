@@ -133,9 +133,6 @@ async def date_streamable_http_server(worker_id) -> AsyncGenerator[dict[str, Any
         STRHTTP_MCP_SERVER_SCRIPT.format(port=port),
     )
 
-    print(f"--> executing server on worker_id: {worker_id}")
-    print(f"--> executing server on port: {port}")
-
     # Smart ping instead of hardcoded sleep
     await wait_for_server_async(f"http://127.0.0.1:{port}")
 
