@@ -33,10 +33,10 @@ jobs:
 
       - uses: actions/cache@v4
         with:
-          path: ~/.cache/pre-commit
-          key: ${{ runner.os }}-pre-commit-${{ hashFiles('**/.pre-commit-config.yaml') }}
+          path: .mypy_cache
+          key: ${{ runner.os }}-mypy-${{ hashFiles('**/pyproject.toml') }}
           restore-keys: |
-            ${{ runner.os }}-pre-commit-
+            ${{ runner.os }}-mypy-
 
       - name: pre-commit
         run: uv run pre-commit run --all-files --verbose
