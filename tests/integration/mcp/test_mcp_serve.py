@@ -7,12 +7,12 @@ from sse_starlette.sse import AppStatus
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.config import MCPSse
 from any_agent.serving import MCPServingConfig
-from any_agent.tracing.agent_trace import AgentTrace
-from tests.integration.helpers import (
+from any_agent.testing.helpers import (
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
     wait_for_server_async,
 )
+from any_agent.tracing.agent_trace import AgentTrace
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:

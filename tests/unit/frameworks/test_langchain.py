@@ -6,7 +6,7 @@ from langchain_core.messages import AIMessage
 from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from tests.unit.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
 
 if TYPE_CHECKING:
     from any_agent.frameworks.langchain import LangchainAgent
