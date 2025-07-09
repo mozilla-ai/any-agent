@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../mcp_agent/">
+        <link rel="prev" href="../your_first_agent/">
       
       
-        <link rel="next" href="../a2a_as_tool/">
+        <link rel="next" href="../mcp_agent/">
       
       
       <link rel="icon" href="../../images/any-agent_favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Serve an Agent with A2A - any-agent</title>
+        <title>Using Callbacks - any-agent</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#serve-an-agent-with-a2a" class="md-skip">
+        <a href="#using-callbacks" class="md-skip">
           Skip to content
         </a>
       
@@ -111,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Serve an Agent with A2A
+              Using Callbacks
             
           </span>
         </div>
@@ -725,10 +725,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../callbacks/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Using Callbacks
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -739,6 +761,44 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-with-default-callbacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running with default callbacks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-callback-to-offload-sensitive-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Callback to offload sensitive information
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -771,32 +831,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Serve an Agent with A2A
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../serve_a2a/" class="md-nav__link">
         
   
   
@@ -807,86 +845,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#install-dependencies" class="md-nav__link">
-    <span class="md-ellipsis">
-      Install Dependencies
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configure-and-run-the-server" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configure and run the server
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#call-the-agent-using-a2aclient" class="md-nav__link">
-    <span class="md-ellipsis">
-      Call the agent using A2AClient
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Call the agent using A2AClient">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#a2a-agent-card" class="md-nav__link">
-    <span class="md-ellipsis">
-      A2A Agent Card
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#make-a-request-of-the-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      Make a request of the agent
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cleanup
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1178,60 +1136,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install-dependencies" class="md-nav__link">
+  <a href="#running-with-default-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
-      Install Dependencies
+      Running with default callbacks
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configure-and-run-the-server" class="md-nav__link">
+  <a href="#adding-callback-to-offload-sensitive-information" class="md-nav__link">
     <span class="md-ellipsis">
-      Configure and run the server
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#call-the-agent-using-a2aclient" class="md-nav__link">
-    <span class="md-ellipsis">
-      Call the agent using A2AClient
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Call the agent using A2AClient">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#a2a-agent-card" class="md-nav__link">
-    <span class="md-ellipsis">
-      A2A Agent Card
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#make-a-request-of-the-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      Make a request of the agent
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Cleanup
+      Adding Callback to offload sensitive information
     </span>
   </a>
   
@@ -1253,7 +1169,7 @@
 
 
   
-    <a href="https://github.com/mozilla-ai/any-agent/edit/main/docs/cookbook/serve_a2a.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/mozilla-ai/any-agent/edit/main/docs/cookbook/callbacks.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1697,37 +1613,25 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1c2010a8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="serve-an-agent-with-a2a">Serve an Agent with A2A<a class="anchor-link" href="#serve-an-agent-with-a2a">¶</a></h1><p>Once you've built an agent, a common question might be: "how do I let other developers/applications access it?". Enter the <a href="https://github.com/google-a2a/A2A">A2A</a> protocol by Google! A2A is "An open protocol enabling communication and interoperability between opaque agentic applications". Any-Agent provides support for serving an agent over A2A, as simple as calling <code>agent.serve()</code>. In this tutorial, we'll build and serve an agent using any-agent, and show how you can serve and interact with it via the A2A protocol.</p>
-<img alt="" src="/images/serve_a2a.png" style="max-width: 500px; height: auto;"/>
-<p>This tutorial assumes basic familiarity with any-agent: if you haven't used any-agent before you may also find the <a href="./../your_first_agent">Creating your first agent</a> cookbook to be useful.</p>
-<p>Note: because this tutorial relies upon advanced stdio/stderr communication using the MCP Server, it cannot be run on Google Colab.</p>
+<h1 id="using-callbacks">Using Callbacks<a class="anchor-link" href="#using-callbacks">¶</a></h1><p>This cookbook illustrates how to implement and use custom callbacks in <code>any-agent</code>.</p>
+<p>You can find more information about callbacks in the docs:</p>
+<p><a href="https://mozilla-ai.github.io/any-agent/agents/callbacks/">https://mozilla-ai.github.io/any-agent/agents/callbacks/</a></p>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="install-dependencies">Install Dependencies<a class="anchor-link" href="#install-dependencies">¶</a></h2><p>any-agent uses the python asyncio module to support async functionality. When running in Jupyter notebooks, this means we need to enable the use of nested event loops. We'll install any-agent and enable this below using nest_asyncio.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=41f330e1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -1740,13 +1644,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent[a2a]'</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
 
 <span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent[a2a]'
+<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent'
 
 import nest_asyncio
 
@@ -1755,9 +1659,23 @@ nest_asyncio.apply()</div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>/home/daavoo/any-agent/.venv/bin/python: No module named pip
+Note: you may need to restart the kernel to use updated packages.
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2976be95">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -1778,26 +1696,26 @@ nest_asyncio.apply()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getpass</span>
 
-<span class="c1"># This notebook communicates with Mistral models using the Mistral API.</span>
-<span class="k">if</span> <span class="s2">"MISTRAL_API_KEY"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"MISTRAL_API_KEY not found in environment!"</span><span class="p">)</span>
-    <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">"Please enter your MISTRAL_API_KEY: "</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"MISTRAL_API_KEY"</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_key</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"MISTRAL_API_KEY set for this session!"</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"MISTRAL_API_KEY found in environment."</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"MISTRAL_API_KEY"</span><span class="p">,</span> <span class="s2">"TAVILY_API_KEY"</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> not found in environment!"</span><span class="p">)</span>
+        <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Please enter your </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: "</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_key</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> set for this session!"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> found in environment."</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import os
 from getpass import getpass
 
-# This notebook communicates with Mistral models using the Mistral API.
-if "MISTRAL_API_KEY" not in os.environ:
-    print("MISTRAL_API_KEY not found in environment!")
-    api_key = getpass("Please enter your MISTRAL_API_KEY: ")
-    os.environ["MISTRAL_API_KEY"] = api_key
-    print("MISTRAL_API_KEY set for this session!")
-else:
-    print("MISTRAL_API_KEY found in environment.")</div>
+for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
+    if key not in os.environ:
+        print(f"{key} not found in environment!")
+        api_key = getpass(f"Please enter your {key}: ")
+        os.environ[key] = api_key
+        print(f"{key} set for this session!")
+    else:
+        print(f"{key} found in environment.")</div>
 </div>
 </div>
 </div>
@@ -1810,30 +1728,20 @@ else:
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>MISTRAL_API_KEY found in environment.
+TAVILY_API_KEY found in environment.
 </pre>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="configure-and-run-the-server">Configure and run the server<a class="anchor-link" href="#configure-and-run-the-server">¶</a></h2><p>Let's give our agent the very simple capability to access the current time through a Model Context Protocol (MCP) server. For this demo, we'll use the async method <code>agent.serve_async</code> so that we can easily run both the server and client from inside the notebook.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=2656879d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -1846,134 +1754,58 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.serving</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2AServingConfig</span>
-
-<span class="c1"># This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/</span>
-<span class="n">time_tool</span> <span class="o">=</span> <span class="n">MCPStdio</span><span class="p">(</span>
-    <span class="n">command</span><span class="o">=</span><span class="s2">"uvx"</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"mcp-server-time"</span><span class="p">,</span> <span class="s2">"--local-timezone=America/New_York"</span><span class="p">],</span>
-    <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
-        <span class="s2">"get_current_time"</span><span class="p">,</span>
-    <span class="p">],</span>
-<span class="p">)</span>
-
-<span class="n">time</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
-    <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
-    <span class="n">AgentConfig</span><span class="p">(</span>
-        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">"I'm an agent to help with getting the time"</span><span class="p">,</span>
-        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">],</span>
-    <span class="p">),</span>
-<span class="p">)</span>
-<span class="n">time_handle</span> <span class="o">=</span> <span class="k">await</span> <span class="n">time</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span><span class="n">A2AServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
-
-<span class="n">server_port</span> <span class="o">=</span> <span class="n">time_handle</span><span class="o">.</span><span class="n">port</span>
-
-<span class="n">max_attempts</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="n">poll_interval</span> <span class="o">=</span> <span class="mf">0.5</span>
-<span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">server_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"http://localhost:</span><span class="si">{</span><span class="n">server_port</span><span class="si">}</span><span class="s2">"</span>
-<span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Try to make a basic GET request to check if server is responding</span>
-            <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">server_url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Server is ready at </span><span class="si">{</span><span class="n">server_url</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">break</span>
-        <span class="k">except</span> <span class="p">(</span><span class="n">httpx</span><span class="o">.</span><span class="n">RequestError</span><span class="p">,</span> <span class="n">httpx</span><span class="o">.</span><span class="n">TimeoutException</span><span class="p">):</span>
-            <span class="c1"># Server not ready yet, continue polling</span>
-            <span class="k">pass</span>
-
-        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">poll_interval</span><span class="p">)</span>
-        <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">attempts</span> <span class="o">&gt;=</span> <span class="n">max_attempts</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Could not connect to </span><span class="si">{</span><span class="n">server_url</span><span class="si">}</span><span class="s2">. Tried </span><span class="si">{</span><span class="n">max_attempts</span><span class="si">}</span><span class="s2"> times with </span><span class="si">{</span><span class="n">poll_interval</span><span class="si">}</span><span class="s2"> second interval."</span>
-            <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_tavily</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">import asyncio
-
-import httpx
-
-from any_agent import AgentConfig, AnyAgent
-from any_agent.config import MCPStdio
-from any_agent.serving import A2AServingConfig
-
-# This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/
-time_tool = MCPStdio(
-    command="uvx",
-    args=["mcp-server-time", "--local-timezone=America/New_York"],
-    tools=[
-        "get_current_time",
-    ],
-)
-
-time = await AnyAgent.create_async(
-    "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
-    AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        description="I'm an agent to help with getting the time",
-        tools=[time_tool],
-    ),
-)
-time_handle = await time.serve_async(A2AServingConfig(port=0))
-
-server_port = time_handle.port
-
-max_attempts = 20
-poll_interval = 0.5
-attempts = 0
-server_url = f"http://localhost:{server_port}"
-async with httpx.AsyncClient() as client:
-    while True:
-        try:
-            # Try to make a basic GET request to check if server is responding
-            await client.get(server_url, timeout=1.0)
-            print(f"Server is ready at {server_url}")
-            break
-        except (httpx.RequestError, httpx.TimeoutException):
-            # Server not ready yet, continue polling
-            pass
-
-        await asyncio.sleep(poll_interval)
-        attempts += 1
-        if attempts &gt;= max_attempts:
-            msg = f"Could not connect to {server_url}. Tried {max_attempts} times with {poll_interval} second interval."
-            raise ConnectionError(msg)</div>
+<div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
+from any_agent.tools import search_tavily</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>/home/daavoo/any-agent/.venv/lib/python3.13/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a2b06e73">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="call-the-agent-using-a2aclient">Call the agent using A2AClient<a class="anchor-link" href="#call-the-agent-using-a2aclient">¶</a></h2><p>Now that the agent is listening on localhost, we can communicate with it from any other application that supports A2A. For this tutorial we'll use the a2a python SDK, but any client that implements the <a href="https://github.com/google-a2a/A2A">A2A Protocol</a> would also work.</p>
+<h2 id="running-with-default-callbacks">Running with default callbacks<a class="anchor-link" href="#running-with-default-callbacks">¶</a></h2>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1725e98a">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="a2a-agent-card">A2A Agent Card<a class="anchor-link" href="#a2a-agent-card">¶</a></h3><p>Before giving the agent a task, we first retrieve the agent's model card, which is a description of the agents capabilities. This helps the client understand what the agent can do, and what A2A features are available.</p>
+<p><code>any-agent</code> comes with a set of default callbacks that will be used by default (if you don't pass a value to <code>AgentConfig.callbacks</code>):</p>
+<ul>
+<li><a href="https://mozilla-ai.github.io/any-agent/api/callbacks/#any_agent.callbacks.span_cost.AddCostInfo"><code>AddCostInfo</code></a></li>
+<li><a href="https://mozilla-ai.github.io/any-agent/api/callbacks/#any_agent.callbacks.span_print.ConsolePrintSpan"><code>ConsolePrintSpan</code></a></li>
+</ul>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1083c995">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -1991,35 +1823,17 @@ async with httpx.AsyncClient() as client:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">a2a.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2ACardResolver</span><span class="p">,</span> <span class="n">A2AClient</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">a2a.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentCard</span>
-
-<span class="c1"># Create the httpx client</span>
-<span class="n">httpx_client</span> <span class="o">=</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">()</span>
-
-<span class="n">agent_card</span><span class="p">:</span> <span class="n">AgentCard</span> <span class="o">=</span> <span class="k">await</span> <span class="n">A2ACardResolver</span><span class="p">(</span>
-    <span class="n">httpx_client</span><span class="p">,</span>
-    <span class="n">base_url</span><span class="o">=</span><span class="sa">f</span><span class="s2">"http://localhost:</span><span class="si">{</span><span class="n">server_port</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-<span class="p">)</span><span class="o">.</span><span class="n">get_agent_card</span><span class="p">(</span><span class="n">http_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">agent_card</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-
-<span class="n">client</span> <span class="o">=</span> <span class="n">A2AClient</span><span class="p">(</span><span class="n">httpx_client</span><span class="o">=</span><span class="n">httpx_client</span><span class="p">,</span> <span class="n">agent_card</span><span class="o">=</span><span class="n">agent_card</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="s2">"tinyagent"</span><span class="p">,</span>
+    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">]),</span>
+<span class="p">)</span>
+<span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"What are 5 LLM agent frameworks that are trending in 2025?"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">import httpx
-from a2a.client import A2ACardResolver, A2AClient
-from a2a.types import AgentCard
-
-# Create the httpx client
-httpx_client = httpx.AsyncClient()
-
-agent_card: AgentCard = await A2ACardResolver(
-    httpx_client,
-    base_url=f"http://localhost:{server_port}",
-).get_agent_card(http_kwargs=None)
-print(agent_card.model_dump_json(indent=2))
-
-client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
+<div class="clipboard-copy-txt" id="cell-4">agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(model_id="mistral/mistral-small-latest", tools=[search_tavily]),
+)
+agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 2025?")</div>
 </div>
 </div>
 </div>
@@ -2030,42 +1844,126 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{
-  "capabilities": {
-    "extensions": null,
-    "pushNotifications": false,
-    "stateTransitionHistory": false,
-    "streaming": false
-  },
-  "defaultInputModes": [
-    "text"
-  ],
-  "defaultOutputModes": [
-    "text"
-  ],
-  "description": "I'm an agent to help with getting the time",
-  "documentationUrl": null,
-  "iconUrl": null,
-  "name": "any_agent",
-  "provider": null,
-  "security": null,
-  "securitySchemes": null,
-  "skills": [
-    {
-      "description": "Get current time in a specific timezones",
-      "examples": null,
-      "id": "any_agent-get_current_time",
-      "inputModes": null,
-      "name": "get_current_time",
-      "outputModes": null,
-      "tags": []
-    }
-  ],
-  "supportsAuthenticatedExtendedCard": null,
-  "url": "http://localhost:54288/",
-  "version": "0.1.0"
-}
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"system"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"You are an agent - please keep going until the user's query is completely resolved, before </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"user"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"What are 5 LLM agent frameworks that are trending in 2025?"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                 │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"search_tavily"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"query\": \"5 LLM agent frameworks that are trending in 2025\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">335</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">27</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3.35e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8.1e-06</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭──────────────────────────────────────────</span> EXECUTE_TOOL: search_tavily <span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────╮</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"query"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"5 LLM agent frameworks that are trending in 2025"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://skillcrush.com/blog/best-llm-frameworks/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">The Top 5 LLM Frameworks in 2025 - Skillcrush</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Frameworks are a collection of libraries, tools, and features │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ that make it easier for developers to build applications that use large language models (LLMs). Huggingface │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Transformers also makes it easier to use their models with other machine learning — specifically deep       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ learning — libraries like TensorFlow and Pytorch. Speaking of TensorFlow…TensorFlow is Google’s open-source │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ framework that AI engineers use to build machine learning applications and develop learning models and      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ algorithms (artificial neural networks). To be honest, TensorFlow comes with a pretty steep learning curve, │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ but its value is unbeatable when working with LLMs. It’s a lot easier to use TensorFlow if you have a basic │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ understanding of machine learning, so make sure you check out our beginner’s guide to machine learning.     │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://medium.com/@iamanraghuvanshi/agentic-ai-3-top-ai-agent-frameworks-in-2025-langchain-autogen-crewai-beyond-2fc3388e7dec" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Top AI Agent Frameworks in 2025: LangChain, AutoGen, CrewAI ...</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Agentic AI #3 — Top AI Agent Frameworks in  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ 2025: LangChain, AutoGen, CrewAI &amp; Beyond | by Aman Raghuvanshi | May, 2025 | Medium Agentic AI #3 — Top AI │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Agent Frameworks in 2025: LangChain, AutoGen, CrewAI &amp; Beyond Whether building a single intelligent         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ assistant or deploying a network of collaborating agents, this guide will help you evaluate the tools that  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ can take your AI projects to the next level. AI agents are more than just LLM wrappers — they require       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ memory, reasoning, decision-making, tool usage, and often complex multi-step workflows. </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">AutoGen</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">, developed  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ by Microsoft, is a </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">multi-agent framework</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> built around conversational AI and collaborative workflows. Image  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ 25: Building a Multi-Agent AI System with LangChain                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://www.reddit.com/r/AI_Agents/comments/1hq9il6/best_ai_agent_frameworks_in_2025_a_comprehensive/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Best AI Agent Frameworks in 2025: A Comprehensive Guide - Reddit</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Image 1: r/AI_Agents icon Go to AI_Agents  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ r/AI_Agents Image 2: r/AI_Agents iconr/AI_Agents A place for discussion around the use of AI Agents and     │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ related tools. AI Agents are LLMs that have the ability to "use tools" or "execute functions" in an         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ autonomous or semi-autonomous (also known as human-in-the-loop) fashion. Best AI Agent Frameworks in 2025:  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ A Comprehensive Guide As we dive into 2025, the world of AI agent frameworks continues to expand and        │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ evolve, offering exciting new tools and capabilities for developers and researchers. *   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Pros</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Strong       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ integration with Microsoft tools *   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Features</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Adaptive agent creation, LLM integration *   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Features</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">:       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Visual AI tools, Azure integration *   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Use Cases</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Streamlined AI processes *   Multi-agent orchestration is │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ key as AI applications grow more complex.                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://www.chatbase.co/blog/llm-agent-framework-guide" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">LLM Agent Frameworks 2025: Guide &amp; Comparison - Chatbase</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Explore LLM agent frameworks in 2025. Understand   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ core components, compare LangChain vs AutoGen vs CrewAI, and build agents easily with our                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://www.lindy.ai/blog/best-ai-agent-frameworks" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">10 Best AI Agent Frameworks: Picking the Right One | 2025 - Lindy</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Lindy is a no-code AI agent framework     │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ designed for business users who want to build autonomous agents. Rasa is an open-source framework for       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ building conversational AI agents â including chatbots, voice assistants, and AI-powered helpdesk tools.    │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Yet, with the sheer number of agentic and conversational AI frameworks, there is a tool designed for your   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ specific needs.Â An AI agent framework is a </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">toolkit developers use to build autonomous agents.</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> It includes  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ components like LLMs, memory, APIs, and orchestration logic. No, you donât.Â  No-code frameworks like Lindy │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ enable you to create agents using visual tools and templates. ### Is Lindy an AI agent framework? </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Yes</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Lindy is an AI agent framework designed for non-developers.                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Here are 5 LLM agent frameworks that are trending in 2025:                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 1 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Huggingface Transformers</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: This framework makes it easier to use models with other machine learning       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">libraries like TensorFlow and Pytorch. It is a collection of libraries, tools, and features that         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">simplify the development of applications using large language models (LLMs) [REF]h7cQdytcT[/REF].        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 2 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">TensorFlow</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Developed by Google, TensorFlow is an open-source framework used by AI engineers to build    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">machine learning applications and develop learning models and algorithms. It has a steep learning curve  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">but is highly valuable when working with LLMs [REF]h7cQdytcT[/REF].                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 3 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">AutoGen</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Developed by Microsoft, AutoGen is a multi-agent framework built around conversational AI and   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">collaborative workflows. It is known for its strong integration with Microsoft tools and features like   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">adaptive agent creation and LLM integration [REF]h7cQdytcT,h7cQdytcT[/REF].                              │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 4 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">LangChain</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: This framework is designed for building a single intelligent assistant or deploying a network │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">of collaborating agents. It includes components like LLMs, memory, APIs, and orchestration logic         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">[REF]h7cQdytcT,h7cQdytcT[/REF].                                                                          │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 5 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Lindy</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Lindy is a no-code AI agent framework designed for business users who want to build autonomous    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">agents. It enables users to create agents using visual tools and templates, making it accessible for     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">non-developers [REF]h7cQdytcT[/REF].                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1352</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">348</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0001352</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.00010439999999999999</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
@@ -2073,18 +1971,20 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ad79387b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="make-a-request-of-the-agent">Make a request of the agent<a class="anchor-link" href="#make-a-request-of-the-agent">¶</a></h3><p>Now that we've connected to the agent with the A2AClient, we're ready to make a request of the agent!</p>
+<h2 id="adding-callback-to-offload-sensitive-information">Adding Callback to offload sensitive information<a class="anchor-link" href="#adding-callback-to-offload-sensitive-information">¶</a></h2><p>Some inputs and/or outputs in your traces might contain sensitive information that you don't want
+to be exposed in the <a href="https://mozilla-ai.github.io/any-agent/tracing/">traces</a>.</p>
+<p>We are going to implement a callback that takes the value of the input messages (which contain the instructions and the user prompt), writes it to an external destination (in this example, a local file), and replaces the value of the attribute in the span with a reference to that external destination.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=41945c61">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2102,126 +2002,75 @@ client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">a2a.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageSendParams</span><span class="p">,</span> <span class="n">SendMessageRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
 
-<span class="n">send_message_payload</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"message"</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span>
-        <span class="s2">"parts"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"kind"</span><span class="p">:</span> <span class="s2">"text"</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">:</span> <span class="s2">"What time is it?"</span><span class="p">}],</span>
-        <span class="s2">"messageId"</span><span class="p">:</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
-    <span class="p">},</span>
-<span class="p">}</span>
-<span class="n">request</span> <span class="o">=</span> <span class="n">SendMessageRequest</span><span class="p">(</span>
-    <span class="nb">id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()),</span> <span class="n">params</span><span class="o">=</span><span class="n">MessageSendParams</span><span class="p">(</span><span class="o">**</span><span class="n">send_message_payload</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">http_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"timeout"</span><span class="p">:</span> <span class="mf">30.0</span><span class="p">})</span>
-<span class="c1"># Close the httpx client when done</span>
-<span class="k">await</span> <span class="n">httpx_client</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SensitiveDataOffloader</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">before_llm_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+        <span class="n">span</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span>
+
+        <span class="k">if</span> <span class="n">input_messages</span> <span class="o">:=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gen_ai.input.messages"</span><span class="p">):</span>
+            <span class="n">output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">span</span><span class="o">.</span><span class="n">get_span_context</span><span class="p">()</span><span class="o">.</span><span class="n">trace_id</span><span class="si">}</span><span class="s2">.txt"</span>
+            <span class="n">output_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">input_messages</span><span class="p">))</span>
+
+            <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span>
+                <span class="s2">"gen_ai.input.messages"</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"ref"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_file</span><span class="p">)})</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">context</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">from uuid import uuid4
+<div class="clipboard-copy-txt" id="cell-5">import json
+from pathlib import Path
 
-from a2a.types import MessageSendParams, SendMessageRequest
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
 
-send_message_payload = {
-    "message": {
-        "role": "user",
-        "parts": [{"kind": "text", "text": "What time is it?"}],
-        "messageId": uuid4().hex,
-    },
-}
-request = SendMessageRequest(
-    id=str(uuid4()), params=MessageSendParams(**send_message_payload)
-)
-response = await client.send_message(request, http_kwargs={"timeout": 30.0})
-# Close the httpx client when done
-await httpx_client.aclose()</div>
+
+class SensitiveDataOffloader(Callback):
+    def __init__(self, output_dir: str) -&gt; None:
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(exist_ok=True, parents=True)
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -&gt; Context:
+        span = context.current_span
+
+        if input_messages := span.attributes.get("gen_ai.input.messages"):
+            output_file = self.output_dir / f"{span.get_span_context().trace_id}.txt"
+            output_file.write_text(str(input_messages))
+
+            span.set_attribute(
+                "gen_ai.input.messages", json.dumps({"ref": str(output_file)})
+            )
+
+        return context</div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral/mistral-medium-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"system"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"You are an agent - please keep going until the user's query is completely resolved, before </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"role"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"user"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"content"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"What time is it?"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"get_current_time"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"timezone\":\"America/New_York\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">227</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">18</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
 </div>
 </div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭────────────────────────────────────────</span> EXECUTE_TOOL: get_current_time <span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────╮</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"timezone"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"America/New_York"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"timezone"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"America/New_York"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"datetime"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"2025-06-27T08:20:44-04:00"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"is_dst"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #00ff00; text-decoration-color: #00ff00; font-style: italic">true</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                            │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
-<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=deebc239">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral/mistral-medium-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ The current time in the America/New_York timezone is 8:20 AM on June 27, 2025. If you want to know the time │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ in another timezone, please let me know.                                                                    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">295</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">42</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
-<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
-</pre>
-</div>
-</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>We can now provide our callback to the agent.</p>
+<p>You can find more information in:</p>
+<p><a href="https://mozilla-ai.github.io/any-agent/agents/callbacks/#providing-your-own-callbacks">https://mozilla-ai.github.io/any-agent/agents/callbacks/#providing-your-own-callbacks</a></p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fc1b83b3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2239,9 +2088,29 @@ await httpx_client.aclose()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_callbacks</span>
+
+<span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="s2">"tinyagent"</span><span class="p">,</span>
+    <span class="n">AgentConfig</span><span class="p">(</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span>
+        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">],</span>
+        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">SensitiveDataOffloader</span><span class="p">(</span><span class="s2">"sensitive-info"</span><span class="p">),</span> <span class="o">*</span><span class="n">get_default_callbacks</span><span class="p">()],</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"What are 5 LLM agent frameworks that are trending in 2025?"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">print(response.model_dump_json(indent=2))</div>
+<div class="clipboard-copy-txt" id="cell-6">from any_agent.callbacks import get_default_callbacks
+
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[search_tavily],
+        callbacks=[SensitiveDataOffloader("sensitive-info"), *get_default_callbacks()],
+    ),
+)
+agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 2025?")</div>
 </div>
 </div>
 </div>
@@ -2252,58 +2121,122 @@ await httpx_client.aclose()</div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>{
-  "id": "fb2bed8d-5a97-4200-9d85-9435fa7e5056",
-  "jsonrpc": "2.0",
-  "result": {
-    "artifacts": null,
-    "contextId": "2bc7f223-b5ea-4e26-a135-329ecd15fb11",
-    "history": [
-      {
-        "contextId": "2bc7f223-b5ea-4e26-a135-329ecd15fb11",
-        "extensions": null,
-        "kind": "message",
-        "messageId": "35685ee6f31c428aa9b93c1e98eb9fc8",
-        "metadata": null,
-        "parts": [
-          {
-            "kind": "text",
-            "metadata": null,
-            "text": "What time is it?"
-          }
-        ],
-        "referenceTaskIds": null,
-        "role": "user",
-        "taskId": "d740f7e4-d44d-4df8-bc7e-f82379ff803c"
-      }
-    ],
-    "id": "d740f7e4-d44d-4df8-bc7e-f82379ff803c",
-    "kind": "task",
-    "metadata": null,
-    "status": {
-      "message": {
-        "contextId": "2bc7f223-b5ea-4e26-a135-329ecd15fb11",
-        "extensions": null,
-        "kind": "message",
-        "messageId": "64bb6ebe-4f8b-4579-a509-8ba3c3d59a51",
-        "metadata": null,
-        "parts": [
-          {
-            "kind": "text",
-            "metadata": null,
-            "text": "{\"result\":\"The current time in the America/New_York timezone is 8:20 AM on June 27, 2025. If you want to know the time in another timezone, please let me know.\"}"
-          }
-        ],
-        "referenceTaskIds": null,
-        "role": "agent",
-        "taskId": "d740f7e4-d44d-4df8-bc7e-f82379ff803c"
-      },
-      "state": "completed",
-      "timestamp": "2025-06-27T12:20:45.987764+00:00"
-    }
-  }
-}
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"ref"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"sensitive-info/320624889481214829213442967250469732873.txt"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.name"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"search_tavily"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│     </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"tool.args"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"{\"query\": \"5 LLM agent frameworks that are trending in 2025\"}"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                        │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">]</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">335</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">27</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                      │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3.35e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8.1e-06</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">╭──────────────────────────────────────────</span> EXECUTE_TOOL: search_tavily <span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────╮</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> Input </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"query"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"5 LLM agent frameworks that are trending in 2025"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                               │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #000080; text-decoration-color: #000080"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://skillcrush.com/blog/best-llm-frameworks/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">The Top 5 LLM Frameworks in 2025 - Skillcrush</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Frameworks are a collection of libraries, tools, and features │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ that make it easier for developers to build applications that use large language models (LLMs). Huggingface │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Transformers also makes it easier to use their models with other machine learning — specifically deep       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ learning — libraries like TensorFlow and Pytorch. Speaking of TensorFlow…TensorFlow is Google’s open-source │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ framework that AI engineers use to build machine learning applications and develop learning models and      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ algorithms (artificial neural networks). To be honest, TensorFlow comes with a pretty steep learning curve, │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ but its value is unbeatable when working with LLMs. It’s a lot easier to use TensorFlow if you have a basic │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ understanding of machine learning, so make sure you check out our beginner’s guide to machine learning.     │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://medium.com/@iamanraghuvanshi/agentic-ai-3-top-ai-agent-frameworks-in-2025-langchain-autogen-crewai-beyond-2fc3388e7dec" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Top AI Agent Frameworks in 2025: LangChain, AutoGen, CrewAI ...</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Agentic AI #3 — Top AI Agent Frameworks in  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ 2025: LangChain, AutoGen, CrewAI &amp; Beyond | by Aman Raghuvanshi | May, 2025 | Medium Agentic AI #3 — Top AI │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Agent Frameworks in 2025: LangChain, AutoGen, CrewAI &amp; Beyond Whether building a single intelligent         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ assistant or deploying a network of collaborating agents, this guide will help you evaluate the tools that  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ can take your AI projects to the next level. AI agents are more than just LLM wrappers — they require       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ memory, reasoning, decision-making, tool usage, and often complex multi-step workflows. </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">AutoGen</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">, developed  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ by Microsoft, is a </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">multi-agent framework</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> built around conversational AI and collaborative workflows. Image  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ 25: Building a Multi-Agent AI System with LangChain                                                         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://www.reddit.com/r/AI_Agents/comments/1hq9il6/best_ai_agent_frameworks_in_2025_a_comprehensive/" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">Best AI Agent Frameworks in 2025: A Comprehensive Guide - Reddit</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Image 1: r/AI_Agents icon Go to AI_Agents  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ r/AI_Agents Image 2: r/AI_Agents iconr/AI_Agents A place for discussion around the use of AI Agents and     │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ related tools. AI Agents are LLMs that have the ability to "use tools" or "execute functions" in an         │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ autonomous or semi-autonomous (also known as human-in-the-loop) fashion. Best AI Agent Frameworks in 2025:  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ A Comprehensive Guide As we dive into 2025, the world of AI agent frameworks continues to expand and        │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ evolve, offering exciting new tools and capabilities for developers and researchers. *   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Pros</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Strong       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ integration with Microsoft tools *   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Features</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Adaptive agent creation, LLM integration *   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Features</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">:       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Visual AI tools, Azure integration *   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Use Cases</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Streamlined AI processes *   Multi-agent orchestration is │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ key as AI applications grow more complex.                                                                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://www.chatbase.co/blog/llm-agent-framework-guide" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">LLM Agent Frameworks 2025: Guide &amp; Comparison - Chatbase</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Explore LLM agent frameworks in 2025. Understand   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ core components, compare LangChain vs AutoGen vs CrewAI, and build agents easily with our                   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><a href="https://www.lindy.ai/blog/best-ai-agent-frameworks" target="_blank"><span style="color: #000080; text-decoration-color: #000080; text-decoration: underline">10 Best AI Agent Frameworks: Picking the Right One | 2025 - Lindy</span></a><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> Lindy is a no-code AI agent framework     │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ designed for business users who want to build autonomous agents. Rasa is an open-source framework for       │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ building conversational AI agents â including chatbots, voice assistants, and AI-powered helpdesk tools.    │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Yet, with the sheer number of agentic and conversational AI frameworks, there is a tool designed for your   │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ specific needs.Â An AI agent framework is a </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">toolkit developers use to build autonomous agents.</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0"> It includes  │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ components like LLMs, memory, APIs, and orchestration logic. No, you donât.Â  No-code frameworks like Lindy │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ enable you to create agents using visual tools and templates. ### Is Lindy an AI agent framework? </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Yes</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,      │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Lindy is an AI agent framework designed for non-developers.                                                 │</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #000080; text-decoration-color: #000080"> │</span>
+<span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Here are 5 LLM agent frameworks that are trending in 2025:                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 1 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">Huggingface Transformers</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Huggingface Transformers is a popular framework that simplifies the use of     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">large language models (LLMs) and integrates well with other machine learning libraries like TensorFlow   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">and PyTorch.                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 2 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">TensorFlow</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Developed by Google, TensorFlow is an open-source framework widely used for building machine │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">learning applications and developing learning models and algorithms. It is particularly valuable when    │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">working with LLMs, although it has a steep learning curve.                                               │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 3 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">AutoGen</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: Developed by Microsoft, AutoGen is a multi-agent framework focused on conversational AI and     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">collaborative workflows. It is designed to handle complex multi-step workflows and integrates well with  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">Microsoft tools.                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 4 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">LangChain</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: LangChain is another prominent framework that supports the creation of intelligent assistants │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">and networks of collaborating agents. It is known for its strong integration with various AI tools and   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">services.                                                                                                │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold"> 5 </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">CrewAI</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: CrewAI is a framework that emphasizes multi-agent orchestration, making it ideal for             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">applications that require multiple agents to work together. It is particularly useful as AI applications │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #808000; text-decoration-color: #808000; font-weight: bold">   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">grow more complex.                                                                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ These frameworks provide a range of features and capabilities, making them suitable for different types of  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ AI projects and use cases.                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> USAGE </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1352</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_tokens"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">268</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                     │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"input_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.0001352</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">,                                                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"output_cost"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8.04e-05</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                   │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">}</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
+<span style="color: #808000; text-decoration-color: #808000">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div>
 </div>
@@ -2311,23 +2244,23 @@ await httpx_client.aclose()</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0451a128">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="cleanup">Cleanup<a class="anchor-link" href="#cleanup">¶</a></h2><p>In order to shut down the A2A server, we can set the <code>should_exit</code> property of the server, which will cause the server to shutdown and the asyncio task to complete.</p>
+<p>As you can see in the console output, the input messages in the trace have been now replaced by a reference to the external destination.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a99ff239">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -2340,11 +2273,13 @@ await httpx_client.aclose()</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">await</span> <span class="n">time_handle</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Agent server has been shut down!"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">"sensitive-info/320624889481214829213442967250469732873.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">await time_handle.shutdown()
-print("Agent server has been shut down!")</div>
+<div class="clipboard-copy-txt" id="cell-7">json.loads(
+    Path("sensitive-info/320624889481214829213442967250469732873.txt").read_text()
+)</div>
 </div>
 </div>
 </div>
@@ -2353,11 +2288,13 @@ print("Agent server has been shut down!")</div>
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Agent server has been shut down!
-</pre>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[ ]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[{'role': 'system',
+  'content': "You are an agent - please keep going until the user's query is completely resolved, before ending your turn and yielding back to the user. Only terminate your turn when you are sure that the problem is solved, or if you need more info from the user to solve the problem.\n\nIf you are not sure about anything pertaining to the user's request, use your tools to read files and gather the relevant information: do NOT guess or make up an answer.\n\nYou MUST plan extensively before each function call, and reflect extensively on the outcomes of the previous function calls. DO NOT do this entire process by making function calls only, as this can impair your ability to solve the problem and think insightfully."},
+ {'role': 'user',
+  'content': 'What are 5 LLM agent frameworks that are trending in 2025?'}]</pre>
 </div>
 </div>
 </div>
