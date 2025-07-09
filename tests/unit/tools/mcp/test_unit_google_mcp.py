@@ -83,10 +83,10 @@ async def test_google_mcp_stdio_timeout() -> None:
     custom_timeout = 10.0
     mcp_server = _get_mcp_server(
         MCPStdio(
-            command="print('Hello MCP')", 
-            args=[], 
+            command="print('Hello MCP')",
+            args=[],
             env={"FOO": "BAR"},
-            client_session_timeout_seconds=custom_timeout
+            client_session_timeout_seconds=custom_timeout,
         ),
         AgentFramework.GOOGLE,
     )
@@ -111,17 +111,21 @@ async def test_google_mcp_sse_timeout() -> None:
         headers={"Authorization": "Bearer test-token"},
         client_session_timeout_seconds=custom_timeout,
     )
-    
-    with patch("any_agent.tools.mcp.frameworks.google.GoogleSseServerParameters") as mock_sse_params:
-        with patch("any_agent.tools.mcp.frameworks.google.GoogleMCPToolset") as mock_toolset:
+
+    with patch(
+        "any_agent.tools.mcp.frameworks.google.GoogleSseServerParameters"
+    ) as mock_sse_params:
+        with patch(
+            "any_agent.tools.mcp.frameworks.google.GoogleMCPToolset"
+        ) as mock_toolset:
             # Mock the get_tools method to return an empty list
             mock_toolset_instance = AsyncMock()
             mock_toolset_instance.get_tools.return_value = []
             mock_toolset.return_value = mock_toolset_instance
-            
+
             mcp_server = _get_mcp_server(mcp_sse_params, AgentFramework.GOOGLE)
             await mcp_server._setup_tools()
-            
+
             mock_sse_params.assert_called_once_with(
                 url=mcp_sse_params.url,
                 headers=dict(mcp_sse_params.headers or {}),
