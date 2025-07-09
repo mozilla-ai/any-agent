@@ -64,34 +64,6 @@ def _create_a2a_envelope(body_type: type[BaseModel]) -> type[A2AEnvelope[Any]]:
     return EnvelopeInstance
 
 
-def prepare_agent_for_a2a(agent: AnyAgent) -> AnyAgent:
-    """Return an agent whose ``config.output_type`` is A2A-ready.
-
-    If *agent* is already envelope-compatible we hand it back untouched.
-    Otherwise we clone its config, wrap the output type, and spin up a
-    *new* agent instance via `AnyAgent.create` so that framework-specific
-    initialisation sees the correct schema right from the start.
-
-    This function preserves MCP servers from the original agent to avoid
-    connection timeouts.
-    """
-    if _is_a2a_envelope(agent.config.output_type):
-        return agent
-
-    body_type = agent.config.output_type or _DefaultBody
-    new_output_type = _create_a2a_envelope(body_type)
-
-    original_callbacks = agent.config.callbacks
-    agent.config.callbacks = []
-    new_config = agent.config.model_copy(deep=True)
-    new_config.output_type = new_output_type
-    new_config.callbacks = original_callbacks
-    agent.config.callbacks = original_callbacks
-
-    # Create the new agent with the wrapped config, preserving MCP servers and tools
-    return agent._recreate_with_config(new_config)
-
-
 async def prepare_agent_for_a2a_async(agent: AnyAgent) -> AnyAgent:
     """Async counterpart of :pyfunc:`prepare_agent_for_a2a`.
 
