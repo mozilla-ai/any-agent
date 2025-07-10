@@ -17,7 +17,7 @@ pytest.importorskip("typing.override")
 from a2a.types import AgentSkill
 
 from any_agent.serving import A2AServingConfig
-from any_agent.serving.agent_card import _get_agent_card
+from any_agent.serving.a2a.agent_card import _get_agent_card
 
 
 def test_get_agent_card(agent_framework: AgentFramework) -> None:

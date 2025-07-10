@@ -59,6 +59,9 @@ theme:
 extra_css:
   - assets/custom.css
 
+extra_javascript:
+  - assets/custom.js
+
 markdown_extensions:
   - admonition
   - pymdownx.highlight:

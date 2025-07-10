@@ -250,7 +250,8 @@ async def test_a2a_tool_multiturn() -> None:
             }
 
             request_1 = SendMessageRequest(
-                id=str(uuid4()), params=MessageSendParams(**send_message_payload_1)
+                id=str(uuid4()),
+                params=MessageSendParams(**send_message_payload_1),  # type: ignore[arg-type]
             )
             response_1 = await client.send_message(
                 request_1, http_kwargs=DEFAULT_HTTP_KWARGS
@@ -262,7 +263,7 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_1.root.result.status.message.parts[0].root.text
+                response_1.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
             )
             assert result.name == "Alice"
             assert result.job.lower() == "software engineer"
@@ -282,7 +283,8 @@ async def test_a2a_tool_multiturn() -> None:
             }
 
             request_2 = SendMessageRequest(
-                id=str(uuid4()), params=MessageSendParams(**send_message_payload_2)
+                id=str(uuid4()),
+                params=MessageSendParams(**send_message_payload_2),  # type: ignore[arg-type]
             )
             response_2 = await client.send_message(
                 request_2, http_kwargs=DEFAULT_HTTP_KWARGS
@@ -294,12 +296,12 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_2.root.result.status.message.parts[0].root.text
+                response_2.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
             )
             assert result.name == "Alice"
             assert result.job.lower() == "software engineer"
             assert result.age is None
-            assert response_2.root.result.status.state == TaskState.input_required
+            assert response_2.root.result.status.state == TaskState.input_required  # type: ignore[union-attr]
 
             # Send a message to the agent to give the age
             send_message_payload_3 = {
@@ -308,11 +310,12 @@ async def test_a2a_tool_multiturn() -> None:
                     "parts": [{"kind": "text", "text": THIRD_TURN_PROMPT}],
                     "messageId": str(uuid4()),
                     "contextId": response_2.root.result.contextId,  # Same context to continue conversation
-                    "taskId": response_2.root.result.id,
+                    "taskId": response_2.root.result.id,  # type: ignore[union-attr]
                 },
             }
             request_3 = SendMessageRequest(
-                id=str(uuid4()), params=MessageSendParams(**send_message_payload_3)
+                id=str(uuid4()),
+                params=MessageSendParams(**send_message_payload_3),  # type: ignore[arg-type]
             )
             response_3 = await client.send_message(
                 request_3, http_kwargs=DEFAULT_HTTP_KWARGS
@@ -323,9 +326,9 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_3.root.error.message}, Code: {response_3.root.error.code}, Data: {response_3.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_3.root.result.status.message.parts[0].root.text
+                response_3.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
             )
-            assert response_3.root.result.status.state == TaskState.completed
+            assert response_3.root.result.status.state == TaskState.completed  # type: ignore[union-attr]
             assert result.age == 30
 
             assert call_count == 3
