@@ -3,7 +3,7 @@
 import re
 from collections.abc import Callable, Coroutine
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from any_agent.utils.asyncio_sync import run_async_in_sync
@@ -31,8 +31,8 @@ with suppress(ImportError):
 
 
 async def a2a_tool_async(
-    url: str, toolname: Optional[str] = None, http_kwargs: dict[str, Any] | None = None
-) -> Callable[[str, Optional[str], Optional[str]], Coroutine[Any, Any, dict[str, Any]]]:
+    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
+) -> Callable[[str, str | None, str | None], Coroutine[Any, Any, dict[str, Any]]]:
     """Perform a query using A2A to another agent.
 
     Args:
@@ -68,7 +68,7 @@ async def a2a_tool_async(
     # with the traditional Optional[T] syntax for automatic function calling.
     # Using T | None syntax causes"Failed to parse the parameter ... for automatic function calling"
     async def _send_query(
-        query: str, task_id: Optional[str] = None, context_id: Optional[str] = None
+        query: str, task_id: str | None = None, context_id: str | None = None
     ) -> dict[str, Any]:
         async with httpx.AsyncClient(follow_redirects=True) as query_client:
             client = A2AClient(httpx_client=query_client, agent_card=a2a_agent_card)
@@ -173,8 +173,8 @@ async def a2a_tool_async(
 
 
 def a2a_tool(
-    url: str, toolname: Optional[str] = None, http_kwargs: dict[str, Any] | None = None
-) -> Callable[[str, Optional[str], Optional[str]], str]:
+    url: str, toolname: str | None = None, http_kwargs: dict[str, Any] | None = None
+) -> Callable[[str, str | None, str | None], str]:
     """Perform a query using A2A to another agent (synchronous version).
 
     Args:
@@ -195,7 +195,7 @@ def a2a_tool(
     async_tool = run_async_in_sync(a2a_tool_async(url, toolname, http_kwargs))
 
     def sync_wrapper(
-        query: str, task_id: Optional[str] = None, context_id: Optional[str] = None
+        query: str, task_id: str | None = None, context_id: str | None = None
     ) -> Any:
         """Execute the A2A tool query synchronously."""
         return run_async_in_sync(async_tool(query, task_id, context_id))

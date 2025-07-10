@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 from any_agent.callbacks.span_cost import AddCostInfo
+from any_agent.tracing.attributes import MODEL_ID
 
 
 def test_span_cost() -> None:
@@ -8,7 +9,7 @@ def test_span_cost() -> None:
     current_span = MagicMock()
 
     current_span.attributes = {
-        "gen_ai.request.model": "gpt-4.1-mini",
+        MODEL_ID: "mistral/mistral-small-latest",
         "gen_ai.usage.input_tokens": 100,
         "gen_ai.usage.output_tokens": 1000,
     }
@@ -29,7 +30,7 @@ def test_span_cost_missing_input() -> None:
     current_span = MagicMock()
 
     current_span.attributes = {
-        "gen_ai.request.model": "gpt-4.1-mini",
+        MODEL_ID: "mistral/mistral-small-latest",
         "gen_ai.usage.output_tokens": 1000,
     }
 
@@ -49,7 +50,7 @@ def test_span_cost_missing_output() -> None:
     current_span = MagicMock()
 
     current_span.attributes = {
-        "gen_ai.request.model": "gpt-4.1-mini",
+        MODEL_ID: "mistral/mistral-small-latest",
         "gen_ai.usage.input_tokens": 100,
     }
 
@@ -69,7 +70,7 @@ def test_span_cost_missing_all() -> None:
     current_span = MagicMock()
 
     current_span.attributes = {
-        "gen_ai.request.model": "gpt-4.1-mini",
+        MODEL_ID: "mistral/mistral-small-latest",
     }
 
     context.current_span = current_span

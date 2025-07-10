@@ -6,6 +6,16 @@ from typing import TYPE_CHECKING, Any
 from opentelemetry.trace import Status, StatusCode
 
 from any_agent.callbacks.base import Callback
+from any_agent.tracing.attributes import (
+    INPUT_MESSAGES,
+    MODEL_ID,
+    OPERATION,
+    OUTPUT,
+    OUTPUT_TYPE,
+    TOOL_ARGS,
+    TOOL_DESCRIPTION,
+    TOOL_NAME,
+)
 
 if TYPE_CHECKING:
     from any_agent.callbacks.context import Context
@@ -23,8 +33,8 @@ class _SpanGeneration(Callback):
         span = tracer.start_span(f"call_llm {model_id}")
         span.set_attributes(
             {
-                "gen_ai.operation.name": "call_llm",
-                "gen_ai.request.model": model_id,
+                OPERATION: "call_llm",
+                MODEL_ID: model_id,
             }
         )
 
@@ -32,7 +42,7 @@ class _SpanGeneration(Callback):
         if trace_id not in self.first_llm_calls:
             self.first_llm_calls.add(trace_id)
             span.set_attribute(
-                "gen_ai.input.messages",
+                INPUT_MESSAGES,
                 json.dumps(
                     input_messages,
                     default=str,
@@ -56,19 +66,19 @@ class _SpanGeneration(Callback):
         if isinstance(output, str):
             span.set_attributes(
                 {
-                    "gen_ai.output": output,
-                    "gen_ai.output.type": "text",
+                    OUTPUT: output,
+                    OUTPUT_TYPE: "text",
                 }
             )
         else:
             span.set_attributes(
                 {
-                    "gen_ai.output": json.dumps(
+                    OUTPUT: json.dumps(
                         output,
                         default=str,
                         ensure_ascii=False,
                     ),
-                    "gen_ai.output.type": "json",
+                    OUTPUT_TYPE: "json",
                 }
             )
 
@@ -98,15 +108,15 @@ class _SpanGeneration(Callback):
         )
         span.set_attributes(
             {
-                "gen_ai.operation.name": "execute_tool",
-                "gen_ai.tool.name": name,
+                OPERATION: "execute_tool",
+                TOOL_NAME: name,
             }
         )
         if description is not None:
-            span.set_attribute("gen_ai.tool.description", description)
+            span.set_attribute(TOOL_DESCRIPTION, description)
         if args is not None:
             span.set_attribute(
-                "gen_ai.tool.args",
+                TOOL_ARGS,
                 json.dumps(
                     args,
                     default=str,
@@ -144,9 +154,7 @@ class _SpanGeneration(Callback):
                 tool_output = str(tool_output)
                 output_type = "text"
 
-        span.set_attributes(
-            {"gen_ai.output": tool_output, "gen_ai.output.type": output_type}
-        )
+        span.set_attributes({OUTPUT: tool_output, OUTPUT_TYPE: output_type})
         span.set_status(status)
 
         return context

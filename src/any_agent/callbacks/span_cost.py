@@ -7,6 +7,7 @@ from litellm.cost_calculator import cost_per_token
 
 from any_agent.callbacks.base import Callback
 from any_agent.logging import logger
+from any_agent.tracing.attributes import MODEL_ID
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -26,7 +27,7 @@ def add_cost_info(span: Span) -> None:
     ):
         try:
             cost_prompt, cost_completion = cost_per_token(
-                model=str(attributes.get("gen_ai.request.model", "")),
+                model=str(attributes.get(MODEL_ID, "")),
                 prompt_tokens=int(attributes.get("gen_ai.usage.input_tokens", 0)),  # type: ignore[arg-type]
                 completion_tokens=int(attributes.get("gen_ai.usage.output_tokens", 0)),  # type: ignore[arg-type]
             )

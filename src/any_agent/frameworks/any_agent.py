@@ -18,6 +18,7 @@ from any_agent.config import (
 from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentTrace
+from any_agent.tracing.attributes import MODEL_ID, OPERATION
 from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
@@ -202,11 +203,11 @@ class AnyAgent(ABC):
 
                 invoke_span.set_attributes(
                     {
-                        "gen_ai.operation.name": "invoke_agent",
+                        OPERATION: "invoke_agent",
                         "gen_ai.agent.name": self.config.name,
                         "gen_ai.agent.description": self.config.description
                         or "No description.",
-                        "gen_ai.request.model": self.config.model_id,
+                        MODEL_ID: self.config.model_id,
                     }
                 )
 

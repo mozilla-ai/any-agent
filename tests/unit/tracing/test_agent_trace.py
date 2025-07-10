@@ -1,4 +1,5 @@
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+from any_agent.tracing.attributes import OPERATION
 from any_agent.tracing.otel_types import Resource, SpanContext, SpanKind, Status
 
 
@@ -10,7 +11,7 @@ def create_llm_span(input_tokens: int = 100, output_tokens: int = 50) -> AgentSp
         status=Status(),
         context=SpanContext(span_id=123),
         attributes={
-            "gen_ai.operation.name": "call_llm",
+            OPERATION: "call_llm",
             "gen_ai.usage.input_tokens": input_tokens,
             "gen_ai.usage.output_tokens": output_tokens,
         },
