@@ -19,10 +19,10 @@ try:
     from google.adk.tools.mcp_tool.mcp_session_manager import (
         SseConnectionParams as GoogleSseServerParameters,
     )
+    from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
     from google.adk.tools.mcp_tool.mcp_session_manager import (
         StreamableHTTPConnectionParams as GoogleStreamableHTTPServerParameters,
     )
-    from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
     from mcp import (
         StdioServerParameters as GoogleStdioServerParameters,
     )
