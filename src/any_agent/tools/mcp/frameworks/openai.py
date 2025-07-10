@@ -1,3 +1,4 @@
+import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from contextlib import suppress
@@ -94,6 +95,11 @@ class OpenAIMCPSseConnection(OpenAIMCPConnection):
 
     async def list_tools(self) -> list["MCPTool"]:
         """List tools from the MCP server."""
+        warnings.warn(
+            "SSE is deprecated in the MCP specification as of version 2025-03-26",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         params = OpenAIInternalMCPServerSseParams(url=self.mcp_tool.url)
 
         self._server = OpenAIInternalMCPServerSse(

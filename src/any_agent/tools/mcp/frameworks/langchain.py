@@ -1,3 +1,4 @@
+import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from contextlib import suppress
@@ -75,6 +76,11 @@ class LangchainMCPSseConnection(LangchainMCPConnection):
 
     async def list_tools(self) -> list["BaseTool"]:
         """List tools from the MCP server."""
+        warnings.warn(
+            "SSE is deprecated in the MCP specification as of version 2025-03-26",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         sse_kwargs = {}
         if self.mcp_tool.client_session_timeout_seconds:
             sse_kwargs["sse_read_timeout"] = (

@@ -1,3 +1,4 @@
+import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import Literal
@@ -68,6 +69,11 @@ class GoogleMCPSseConnection(GoogleMCPConnection):
 
     async def list_tools(self) -> list["GoogleMCPTool"]:
         """List tools from the MCP server."""
+        warnings.warn(
+            "SSE is deprecated in the MCP specification as of version 2025-03-26",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self._params = GoogleSseServerParameters(
             url=self.mcp_tool.url,
             headers=dict(self.mcp_tool.headers or {}),

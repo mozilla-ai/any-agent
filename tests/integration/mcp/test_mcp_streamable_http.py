@@ -1,9 +1,8 @@
 import json
-import os
 import subprocess
 import time
 from datetime import datetime, timedelta
-from pathlib import Path
+from typing import Any
 
 import pytest
 from litellm.utils import validate_environment
@@ -14,8 +13,7 @@ from any_agent import (
     AgentFramework,
     AnyAgent,
 )
-from any_agent.callbacks.span_print import ConsolePrintSpan
-from any_agent.config import MCPStdio
+from any_agent.config import MCPStreamableHttp
 from any_agent.evaluation.agent_judge import AgentJudge
 from any_agent.evaluation.llm_judge import LlmJudge
 from any_agent.evaluation.schemas import EvaluationOutput
@@ -79,7 +77,7 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
     assert len(llm_calls) >= 2
     assert_first_llm_call(llm_calls[0])
 
-    assert len(tool_executions) >= 2
+    assert len(tool_executions) >= 1
     assert_first_tool_execution(tool_executions[0])
 
     messages = agent_trace.spans_to_messages()
@@ -170,82 +168,47 @@ class Steps(BaseModel):
     steps: list[Step]
 
 
-def test_load_and_run_agent(
-    agent_framework: AgentFramework, tmp_path: Path, request: pytest.FixtureRequest
+def test_load_and_run_agent_streamable_http(
+    agent_framework: AgentFramework,
+    request: pytest.FixtureRequest,
+    date_streamable_http_server: dict[str, Any],
 ) -> None:
     kwargs = {}
-
-    tmp_file = "tmp.txt"
-
-    if not uvx_installed():
-        msg = "uvx is not installed. Please install it to run this test."
-        raise RuntimeError(msg)
-
-    def write_file(text: str) -> None:
-        """write the text to a file in the tmp_path directory
-
-        Args:
-            text (str): The text to write to the file.
-
-        Returns:
-            None
-        """
-        with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
-            f.write(text)
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+
     tools = [
-        write_file,
-        MCPStdio(
-            command="uvx",
-            args=["mcp-server-time", "--local-timezone=America/New_York"],
-            tools=[
-                "get_current_time",
-            ],
+        MCPStreamableHttp(
+            url=date_streamable_http_server["url"],
+            client_session_timeout_seconds=30,
         ),
     ]
-
     agent_config = AgentConfig(
-        tools=tools,  # type: ignore[arg-type]
+        tools=tools,
         instructions="Use the available tools to answer.",
         model_args=get_default_agent_model_args(agent_framework),
         output_type=Steps,
         **kwargs,  # type: ignore[arg-type]
     )
     agent = AnyAgent.create(agent_framework, agent_config)
-    update_trace = request.config.getoption("--update-trace-assets")
-    if update_trace:
-        for callback in agent.config.callbacks:
-            if isinstance(callback, ConsolePrintSpan):
-                console = callback.console
-                callback.console.record = True
 
     start_ns = time.time_ns()
     agent_trace = agent.run(
-        "Find what year it is in the America/New_York timezone and write the value (single number) to a file. "
-        "Finally, return a list of the steps you have taken.",
+        "Return what year it is in the America/New_York timezone. One of the steps returned must include this year."
     )
     end_ns = time.time_ns()
 
     assert isinstance(agent_trace.final_output, Steps)
 
-    assert (tmp_path / tmp_file).read_text() == str(datetime.now().year)
+    steps = agent_trace.final_output.steps
+    assert any(
+        str(datetime.now().year) in steps[n].description for n in range(len(steps))
+    )
 
     assert_trace(agent_trace, agent_framework)
     assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
     assert_cost(agent_trace)
     assert_tokens(agent_trace)
-
-    if update_trace:
-        trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
-        with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
-            f.write(agent_trace.model_dump_json(indent=2))
-            f.write("\n")
-        html_output = console.export_html(inline_styles=True)
-        with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
-            f.write(html_output.replace("<!DOCTYPE html>", ""))
-
-    assert_eval(agent_trace)
