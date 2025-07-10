@@ -35,7 +35,13 @@
   margin-left: 0.3em;
 }
 
-/*  From https://github.com/squidfunk/mkdocs-material/discussions/6404#discussioncomment-7695243 */
+ /* From https://github.com/squidfunk/mkdocs-material/discussions/6404#discussioncomment-7695243
+/* Apply max-width: initial to all pages by default */
 .md-main__inner.md-grid {
   max-width: initial;
+}
+
+/* The tracing page is designed to show traces in default material theme max-width of 1440px */
+body.tracing-page .md-grid {
+  max-width: 1440px;
 }
