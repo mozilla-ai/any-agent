@@ -22,6 +22,7 @@ try:
     from google.adk.tools.mcp_tool.mcp_session_manager import (
         StreamableHTTPConnectionParams as GoogleStreamableHTTPServerParameters,
     )
+    from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
     from mcp import (
         StdioServerParameters as GoogleStdioServerParameters,
     )
@@ -34,7 +35,7 @@ except ImportError:
 class GoogleMCPConnection(_MCPConnection["GoogleMCPTool"], ABC):
     """Base class for Google MCP connections."""
 
-    _params: "GoogleStdioServerParameters | GoogleSseServerParameters | GoogleStreamableHTTPServerParameters | None" = PrivateAttr(
+    _params: "GoogleStdioServerParameters | GoogleSseServerParameters | GoogleStreamableHTTPServerParameters | StdioConnectionParams | None" = PrivateAttr(
         default=None
     )
 
@@ -55,11 +56,20 @@ class GoogleMCPStdioConnection(GoogleMCPConnection):
 
     async def list_tools(self) -> list["GoogleMCPTool"]:
         """List tools from the MCP server."""
-        self._params = GoogleStdioServerParameters(
+        server_params = GoogleStdioServerParameters(
             command=self.mcp_tool.command,
             args=list(self.mcp_tool.args),
             env=self.mcp_tool.env,
         )
+
+        timeout = self.mcp_tool.client_session_timeout_seconds
+        if timeout is None:
+            self._params = server_params
+        else:
+            self._params = StdioConnectionParams(
+                server_params=server_params,
+                timeout=timeout,
+            )
         return await super().list_tools()
 
 
@@ -68,10 +78,19 @@ class GoogleMCPSseConnection(GoogleMCPConnection):
 
     async def list_tools(self) -> list["GoogleMCPTool"]:
         """List tools from the MCP server."""
-        self._params = GoogleSseServerParameters(
-            url=self.mcp_tool.url,
-            headers=dict(self.mcp_tool.headers or {}),
-        )
+        timeout = self.mcp_tool.client_session_timeout_seconds
+        if timeout is None:
+            self._params = GoogleSseServerParameters(
+                url=self.mcp_tool.url,
+                headers=dict(self.mcp_tool.headers or {}),
+            )
+        else:
+            self._params = GoogleSseServerParameters(
+                url=self.mcp_tool.url,
+                headers=dict(self.mcp_tool.headers or {}),
+                timeout=timeout,
+                sse_read_timeout=timeout,
+            )
         return await super().list_tools()
 
 

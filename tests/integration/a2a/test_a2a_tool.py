@@ -1,6 +1,3 @@
-from multiprocessing import Process, Queue
-from typing import TYPE_CHECKING
-
 import pytest
 from litellm.utils import validate_environment
 
@@ -10,9 +7,8 @@ from any_agent.testing.helpers import (
     DEFAULT_HTTP_KWARGS,
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
-    wait_for_server,
 )
-from any_agent.tools import a2a_tool, a2a_tool_async
+from any_agent.tools import a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
 
 from .conftest import (
@@ -21,9 +17,6 @@ from .conftest import (
     assert_contains_current_date_info,
     get_datetime,
 )
-
-if TYPE_CHECKING:
-    from multiprocessing import Queue as QueueType
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
@@ -101,123 +94,3 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
         _assert_valid_agent_trace(agent_trace)
         assert_contains_current_date_info(str(agent_trace.final_output))
         _assert_has_date_agent_tool_call(agent_trace)
-
-
-def _run_server(
-    agent_framework_str: str,
-    port: int,
-    endpoint: str,
-    model_id: str,
-    server_queue: "QueueType[int]",
-) -> None:
-    """Run the server for the sync test."""
-    date_agent_cfg = AgentConfig(
-        instructions="Use the available tools to obtain additional information to answer the query.",
-        name="date_agent",
-        description="Agent that can return the current date.",
-        tools=[get_datetime],
-        model_id=model_id,
-        model_args=get_default_agent_model_args(
-            AgentFramework.from_string(agent_framework_str)
-        ),
-    )
-
-    date_agent = AnyAgent.create(
-        agent_framework=AgentFramework.from_string(agent_framework_str),
-        agent_config=date_agent_cfg,
-    )
-
-    from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a
-
-    serving_config = A2AServingConfig(
-        port=port,
-        endpoint=f"/{endpoint}",
-        log_level="info",
-    )
-
-    app = _get_a2a_app(date_agent, serving_config=serving_config)
-
-    serve_a2a(
-        app,
-        host=serving_config.host,
-        port=serving_config.port,
-        endpoint=serving_config.endpoint,
-        log_level=serving_config.log_level,
-        server_queue=server_queue,
-    )
-
-
-def test_a2a_tool_sync(agent_framework: AgentFramework) -> None:
-    """Tests that an agent contacts another using A2A using the sync adapter tool.
-
-    Note that there is an issue when using Google ADK: https://github.com/google/adk-python/pull/566
-    """
-    skip_reason = {
-        AgentFramework.SMOLAGENTS: "async a2a is not supported; run_async_in_sync fails",
-    }
-    if agent_framework in skip_reason:
-        pytest.skip(
-            f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
-        )
-
-    env_check = validate_environment(DEFAULT_SMALL_MODEL_ID)
-    if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
-
-    server_process = None
-    tool_agent_endpoint = "tool_agent_sync"
-
-    server_queue = Queue()  # type: ignore[var-annotated]
-
-    try:
-        # Start the server in a separate process
-        server_process = Process(
-            target=_run_server,
-            args=(
-                agent_framework.value,
-                0,
-                tool_agent_endpoint,
-                DEFAULT_SMALL_MODEL_ID,
-                server_queue,
-            ),
-        )
-        server_process.start()
-
-        test_port = server_queue.get()
-        server_url = f"http://localhost:{test_port}/{tool_agent_endpoint}"
-        wait_for_server(server_url)
-
-        # Create main agent using sync methods
-        main_agent_cfg = AgentConfig(
-            instructions="Use the available tools to obtain additional information to answer the query.",
-            description="The orchestrator that can use other agents via tools using the A2A protocol (sync version).",
-            tools=[
-                a2a_tool(
-                    f"http://localhost:{test_port}/{tool_agent_endpoint}",
-                    http_kwargs=DEFAULT_HTTP_KWARGS,
-                )
-            ],
-            model_id=DEFAULT_SMALL_MODEL_ID,
-            model_args=get_default_agent_model_args(agent_framework),
-        )
-
-        main_agent = AnyAgent.create(
-            agent_framework=agent_framework,
-            agent_config=main_agent_cfg,
-        )
-
-        agent_trace = main_agent.run(DATE_PROMPT)
-
-        _assert_valid_agent_trace(agent_trace)
-        assert_contains_current_date_info(str(agent_trace.final_output))
-        _assert_has_date_agent_tool_call(agent_trace)
-
-    finally:
-        if server_process and server_process.is_alive():
-            # Send SIGTERM for graceful shutdown
-            server_process.terminate()
-            server_process.join(timeout=10)
-            if server_process.is_alive():
-                # Force kill if graceful shutdown failed
-                server_process.kill()
-                server_process.join()

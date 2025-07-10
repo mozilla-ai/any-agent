@@ -232,68 +232,6 @@ class AnyAgent(ABC):
         trace.final_output = final_output
         return trace
 
-    def _serve_a2a(self, serving_config: A2AServingConfig | None) -> None:
-        from any_agent.serving import A2AServingConfig, _get_a2a_app, serve_a2a
-
-        if serving_config is None:
-            serving_config = A2AServingConfig()
-
-        app = _get_a2a_app(self, serving_config=serving_config)
-
-        serve_a2a(
-            app,
-            host=serving_config.host,
-            port=serving_config.port,
-            endpoint=serving_config.endpoint,
-            log_level=serving_config.log_level,
-        )
-
-    def _serve_mcp(self, serving_config: MCPServingConfig) -> None:
-        from any_agent.serving import (
-            serve_mcp,
-        )
-
-        serve_mcp(
-            self,
-            host=serving_config.host,
-            port=serving_config.port,
-            endpoint=serving_config.endpoint,
-            log_level=serving_config.log_level,
-        )
-
-    @overload
-    def serve(self, serving_config: MCPServingConfig) -> None: ...
-
-    @overload
-    def serve(self, serving_config: A2AServingConfig | None = None) -> None: ...
-
-    def serve(
-        self, serving_config: MCPServingConfig | A2AServingConfig | None = None
-    ) -> None:
-        """Serve this agent using the protocol defined in the serving_config.
-
-        Args:
-            serving_config: Configuration for serving the agent. If None, uses default A2AServingConfig.
-                          Must be an instance of A2AServingConfig or MCPServingConfig.
-
-        Raises:
-            ImportError: If the `a2a` dependencies are not installed and an `A2AServingConfig` is used.
-
-        Example:
-            ```
-            agent = AnyAgent.create("tinyagent", AgentConfig(...))
-            config = A2AServingConfig(port=8080, endpoint="/my-agent")
-            agent.serve(config)
-            ```
-
-        """
-        from any_agent.serving import MCPServingConfig
-
-        if isinstance(serving_config, MCPServingConfig):
-            self._serve_mcp(serving_config)
-        else:
-            self._serve_a2a(serving_config)
-
     async def _serve_a2a_async(
         self, serving_config: A2AServingConfig | None
     ) -> ServerHandle:

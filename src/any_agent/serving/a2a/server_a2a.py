@@ -12,40 +12,14 @@ from starlette.routing import Mount
 
 from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.server_handle import ServerHandle
-from any_agent.utils import run_async_in_sync
 
 from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
-from .envelope import prepare_agent_for_a2a, prepare_agent_for_a2a_async
+from .envelope import prepare_agent_for_a2a_async
 
 if TYPE_CHECKING:
-    from multiprocessing import Queue
-
     from any_agent import AnyAgent
     from any_agent.serving import A2AServingConfig
-
-
-def _get_a2a_app(
-    agent: AnyAgent, serving_config: A2AServingConfig
-) -> A2AStarletteApplication:
-    agent = prepare_agent_for_a2a(agent)
-
-    agent_card = _get_agent_card(agent, serving_config)
-    task_manager = ContextManager(serving_config)
-    push_notification_config_store = serving_config.push_notifier_store_type()
-    push_notification_sender = serving_config.push_notifier_sender_type(
-        httpx_client=httpx.AsyncClient(),  # type: ignore[call-arg]
-        config_store=push_notification_config_store,
-    )
-
-    request_handler = DefaultRequestHandler(
-        agent_executor=AnyAgentExecutor(agent, task_manager),
-        task_store=serving_config.task_store_type(),
-        push_config_store=push_notification_config_store,
-        push_sender=push_notification_sender,
-    )
-
-    return A2AStarletteApplication(agent_card=agent_card, http_handler=request_handler)
 
 
 async def _get_a2a_app_async(
@@ -102,25 +76,3 @@ async def serve_a2a_async(
         server_port = uv_server.servers[0].sockets[0].getsockname()[1]
         server.agent_card.url = f"http://{host}:{server_port}/{endpoint.lstrip('/')}"
     return ServerHandle(task=task, server=uv_server)
-
-
-def serve_a2a(
-    server: A2AStarletteApplication,
-    host: str,
-    port: int,
-    endpoint: str,
-    log_level: str = "warning",
-    server_queue: Queue[int] | None = None,
-) -> None:
-    """Serve the A2A server."""
-
-    # Note that the task should be kept somewhere
-    # because the loop only keeps weak refs to tasks
-    # https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
-    async def run() -> None:
-        server_handle = await serve_a2a_async(server, host, port, endpoint, log_level)
-        if server_queue:
-            server_queue.put(server_handle.port)
-        await server_handle.task
-
-    return run_async_in_sync(run())

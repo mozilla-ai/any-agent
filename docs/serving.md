@@ -10,7 +10,41 @@ these protocols, as explaining them is out of the scope of this page.
 
 In order to use A2A serving, you must first install the 'a2a' extra: `pip install 'any-agent[a2a]'`
 
-You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] and the [`AnyAgent.serve`][any_agent.AnyAgent.serve] or [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
+You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] and the [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
+
+## Running Async Servers in Sync Environments
+
+Since `any-agent` uses async/await patterns for better performance and resource management, the serving functions are async by default. However, you can easily run async servers in sync environments using Python's `asyncio` utilities:
+
+### Using `asyncio.run()`
+
+The simplest approach is to wrap your async code in `asyncio.run()`:
+
+```python
+import asyncio
+from any_agent import AgentConfig, AnyAgent
+from any_agent.serving import A2AServingConfig
+
+async def main():
+    agent = await AnyAgent.create_async(
+        "tinyagent",
+        AgentConfig(
+            name="my_agent",
+            model_id="mistral/mistral-small-latest",
+            description="A helpful agent"
+        )
+    )
+
+    server_handle = await agent.serve_async(A2AServingConfig(port=8080))
+
+    try:
+        # Keep the server running
+        await server_handle.task
+    except KeyboardInterrupt:
+        await server_handle.shutdown()
+
+asyncio.run(main())
+```
 
 ## Serving via A2A
 
@@ -23,43 +57,53 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
 
     ```python
     # google_expert.py
+    import asyncio
     from any_agent import AgentConfig, AnyAgent
     from any_agent.serving import A2AServingConfig
     from any_agent.tools import search_web
 
-    agent = AnyAgent.create(
-        "google",
-        AgentConfig(
-            name="google_expert",
-            model_id="mistral/mistral-small-latest",
-            description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
-            tools=[search_web]
+    async def main():
+        agent = await AnyAgent.create_async(
+            "google",
+            AgentConfig(
+                name="google_expert",
+                model_id="mistral/mistral-small-latest",
+                description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
+                tools=[search_web]
+            )
         )
-    )
 
-    agent.serve(A2AServingConfig(port=5001))
+        server_handle = await agent.serve_async(A2AServingConfig(port=5001))
+        await server_handle.task
+
+    asyncio.run(main())
     ```
 
 === "OpenAI Expert"
 
     ```python
     # openai_expert.py
+    import asyncio
     from any_agent import AgentConfig, AnyAgent
     from any_agent.serving import A2AServingConfig
     from any_agent.tools import search_web
 
-    agent = AnyAgent.create(
-        "openai",
-        AgentConfig(
-            name="openai_expert",
-            model_id="mistral/mistral-small-latest",
-            instructions="You can answer questions about the OpenAI Agents SDK but nothing else.",
-            description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
-            tools=[search_web]
+    async def main():
+        agent = await AnyAgent.create_async(
+            "openai",
+            AgentConfig(
+                name="openai_expert",
+                model_id="mistral/mistral-small-latest",
+                instructions="You can answer questions about the OpenAI Agents SDK but nothing else.",
+                description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
+                tools=[search_web]
+            )
         )
-    )
 
-    agent.serve(A2AServingConfig(port=5002))
+        server_handle = await agent.serve_async(A2AServingConfig(port=5002))
+        await server_handle.task
+
+    asyncio.run(main())
     ```
 
 We can then run each of the scripts in a separate terminal and leave them running in the background.
@@ -168,43 +212,53 @@ In a similar way to [the A2A example](#example), we are going to define two agen
 
     ```python
     # google_expert.py
+    import asyncio
     from any_agent import AgentConfig, AnyAgent
     from any_agent.serving import MCPServingConfig
     from any_agent.tools import search_web
 
-    agent = AnyAgent.create(
-        "google",
-        AgentConfig(
-            name="google_expert",
-            model_id="mistral/mistral-small-latest",
-            description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
-            tools=[search_web]
+    async def main():
+        agent = await AnyAgent.create_async(
+            "google",
+            AgentConfig(
+                name="google_expert",
+                model_id="mistral/mistral-small-latest",
+                description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
+                tools=[search_web]
+            )
         )
-    )
 
-    agent.serve(MCPServingConfig(port=5001,endpoint="/google"))
+        server_handle = await agent.serve_async(MCPServingConfig(port=5001, endpoint="/google"))
+        await server_handle.task
+
+    asyncio.run(main())
     ```
 
 === "OpenAI Expert"
 
     ```python
     # openai_expert.py
+    import asyncio
     from any_agent import AgentConfig, AnyAgent
     from any_agent.serving import MCPServingConfig
     from any_agent.tools import search_web
 
-    agent = AnyAgent.create(
-        "openai",
-        AgentConfig(
-            name="openai_expert",
-            model_id="mistral/mistral-small-latest",
-            instructions="You can provide information about the OpenAI Agents SDK but nothing else (specially, nothing about the Google SDK).",
-            description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
-            tools=[search_web]
+    async def main():
+        agent = await AnyAgent.create_async(
+            "openai",
+            AgentConfig(
+                name="openai_expert",
+                model_id="mistral/mistral-small-latest",
+                instructions="You can provide information about the OpenAI Agents SDK but nothing else (specially, nothing about the Google SDK).",
+                description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
+                tools=[search_web]
+            )
         )
-    )
 
-    agent.serve(MCPServingConfig(port=5002,endpoint="/openai"))
+        server_handle = await agent.serve_async(MCPServingConfig(port=5002, endpoint="/openai"))
+        await server_handle.task
+
+    asyncio.run(main())
     ```
 
 We can then run each of the scripts in a separate terminal and leave them running in the background.

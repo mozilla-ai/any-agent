@@ -13,7 +13,7 @@ from any_agent.serving.a2a.envelope import (
     A2AEnvelope,
     _DefaultBody,
     _is_a2a_envelope,
-    prepare_agent_for_a2a,
+    prepare_agent_for_a2a_async,
 )
 
 
@@ -46,7 +46,8 @@ class MockAgent(AnyAgent):
         return cls(config)
 
 
-def test_envelope_created_without_output_type() -> None:
+@pytest.mark.asyncio
+async def test_envelope_created_without_output_type() -> None:
     """Test that the envelope is correctly created when the agent is configured without an output_type."""
     # Create agent config without output_type
     config = AgentConfig(model_id="test-model", description="test agent")
@@ -56,7 +57,7 @@ def test_envelope_created_without_output_type() -> None:
     agent = MockAgent(config)
 
     # Prepare agent for A2A
-    prepared_agent = prepare_agent_for_a2a(agent)
+    prepared_agent = await prepare_agent_for_a2a_async(agent)
 
     # Verify the envelope was created with default body
     assert prepared_agent.config.output_type is not None
@@ -73,7 +74,8 @@ def test_envelope_created_without_output_type() -> None:
     assert envelope_instance.data.result == "test result"
 
 
-def test_envelope_created_with_output_type() -> None:
+@pytest.mark.asyncio
+async def test_envelope_created_with_output_type() -> None:
     """Test that the envelope is correctly created when an agent is configured with an output_type."""
     # Create agent config with custom output_type
     config = AgentConfig(
@@ -84,7 +86,7 @@ def test_envelope_created_with_output_type() -> None:
     agent = MockAgent(config)
 
     # Prepare agent for A2A
-    prepared_agent = prepare_agent_for_a2a(agent)
+    prepared_agent = await prepare_agent_for_a2a_async(agent)
 
     # Verify the envelope was created with custom output type
     assert prepared_agent.config.output_type is not None
