@@ -4,4 +4,4 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('/tracing/')) {
         document.body.classList.add('tracing-page');
     }
-}); 
+});
