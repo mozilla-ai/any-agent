@@ -6,6 +6,9 @@ Trying to follow OpenTelemetry's [Semantic Conventions for Generative AI](https:
 INPUT_MESSAGES = "gen_ai.input.messages"
 """System prompt and user input."""
 
+INPUT_TOKENS = "gen_ai.usage.input_tokens"
+"""Number of tokens spent for the input of the LLM."""
+
 MODEL_ID = "gen_ai.request.model"
 """Underlying (LLM) model used by the agent. For example: `gpt-4.1-mini`"""
 
@@ -14,6 +17,9 @@ OPERATION = "gen_ai.operation.name"
 
 OUTPUT = "gen_ai.output"
 """Used in both LLM Calls and Tool Executions for holding their respective outputs."""
+
+OUTPUT_TOKENS = "gen_ai.usage.output_tokens"
+"""Number of tokens spent for the output of the LLM."""
 
 OUTPUT_TYPE = "gen_ai.output.type"
 """One of `json` or `text`. If `json`, the value of `OUTPUT` can be passed to `json.loads`."""

@@ -30,14 +30,8 @@ from any_agent.testing.helpers import (
     wait_for_server_async,
 )
 from any_agent.tools.a2a import a2a_tool_async
+from any_agent.tracing import span_attrs
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
-from any_agent.tracing.attributes import (
-    INPUT_MESSAGES,
-    MODEL_ID,
-    OPERATION,
-    OUTPUT,
-    OUTPUT_TYPE,
-)
 from any_agent.tracing.otel_types import (
     Resource,
     SpanContext,
@@ -171,11 +165,13 @@ class MockConversationAgent(TinyAgent):
                 status=Status(),
                 context=SpanContext(span_id=123),
                 attributes={
-                    OPERATION: "call_llm",
-                    MODEL_ID: "mock-model",
-                    INPUT_MESSAGES: json.dumps([{"role": "user", "content": prompt}]),
-                    OUTPUT: agent_response,
-                    OUTPUT_TYPE: "json",
+                    span_attrs.OPERATION: "call_llm",
+                    span_attrs.MODEL_ID: "mock-model",
+                    span_attrs.INPUT_MESSAGES: json.dumps(
+                        [{"role": "user", "content": prompt}]
+                    ),
+                    span_attrs.OUTPUT: agent_response,
+                    span_attrs.OUTPUT_TYPE: "json",
                 },
                 links=[],
                 events=[],

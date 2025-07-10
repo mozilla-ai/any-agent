@@ -8,4 +8,4 @@
 
 ::: any_agent.tracing.agent_trace.TokenInfo
 
-::: any_agent.tracing.attributes
+::: any_agent.tracing.span_attrs

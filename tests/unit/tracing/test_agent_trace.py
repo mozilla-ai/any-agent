@@ -1,17 +1,18 @@
+from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID
+from any_agent.tracing import span_attrs
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
-from any_agent.tracing.attributes import OPERATION
 from any_agent.tracing.otel_types import Resource, SpanContext, SpanKind, Status
 
 
 def create_llm_span(input_tokens: int = 100, output_tokens: int = 50) -> AgentSpan:
     """Create a mock LLM span with token usage."""
     return AgentSpan(
-        name="call_llm mistral/mistral-small-latest",
+        name=f"call_llm {DEFAULT_SMALL_MODEL_ID}",
         kind=SpanKind.INTERNAL,
         status=Status(),
         context=SpanContext(span_id=123),
         attributes={
-            OPERATION: "call_llm",
+            span_attrs.OPERATION: "call_llm",
             "gen_ai.usage.input_tokens": input_tokens,
             "gen_ai.usage.output_tokens": output_tokens,
         },

@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock
 
 from any_agent.callbacks.span_cost import AddCostInfo
-from any_agent.tracing.attributes import MODEL_ID
+from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID
+from any_agent.tracing import span_attrs
 
 
 def test_span_cost() -> None:
@@ -9,7 +10,7 @@ def test_span_cost() -> None:
     current_span = MagicMock()
 
     current_span.attributes = {
-        MODEL_ID: "mistral/mistral-small-latest",
+        span_attrs.MODEL_ID: DEFAULT_SMALL_MODEL_ID,
         "gen_ai.usage.input_tokens": 100,
         "gen_ai.usage.output_tokens": 1000,
     }
@@ -30,7 +31,7 @@ def test_span_cost_missing_input() -> None:
     current_span = MagicMock()
 
     current_span.attributes = {
-        MODEL_ID: "mistral/mistral-small-latest",
+        span_attrs.MODEL_ID: DEFAULT_SMALL_MODEL_ID,
         "gen_ai.usage.output_tokens": 1000,
     }
 
@@ -50,7 +51,7 @@ def test_span_cost_missing_output() -> None:
     current_span = MagicMock()
 
     current_span.attributes = {
-        MODEL_ID: "mistral/mistral-small-latest",
+        span_attrs.MODEL_ID: DEFAULT_SMALL_MODEL_ID,
         "gen_ai.usage.input_tokens": 100,
     }
 
@@ -70,7 +71,7 @@ def test_span_cost_missing_all() -> None:
     current_span = MagicMock()
 
     current_span.attributes = {
-        MODEL_ID: "mistral/mistral-small-latest",
+        span_attrs.MODEL_ID: DEFAULT_SMALL_MODEL_ID,
     }
 
     context.current_span = current_span

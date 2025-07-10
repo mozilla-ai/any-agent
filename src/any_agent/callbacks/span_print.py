@@ -10,13 +10,7 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 
 from any_agent.callbacks.base import Callback
-from any_agent.tracing.attributes import (
-    INPUT_MESSAGES,
-    OPERATION,
-    OUTPUT,
-    OUTPUT_TYPE,
-    TOOL_ARGS,
-)
+from any_agent.tracing import span_attrs
 
 if TYPE_CHECKING:
     from opentelemetry.sdk.trace import ReadableSpan
@@ -25,8 +19,8 @@ if TYPE_CHECKING:
 
 
 def _get_output_panel(span: ReadableSpan) -> Panel | None:
-    if output := span.attributes.get(OUTPUT, None):
-        output_type = span.attributes.get(OUTPUT_TYPE, "text")
+    if output := span.attributes.get(span_attrs.OUTPUT, None):
+        output_type = span.attributes.get(span_attrs.OUTPUT_TYPE, "text")
         return Panel(
             Markdown(output) if output_type != "json" else JSON(output),
             title="OUTPUT",
@@ -52,14 +46,14 @@ class ConsolePrintSpan(Callback):
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         span = context.current_span
 
-        operation_name = span.attributes.get(OPERATION, "")
+        operation_name = span.attributes.get(span_attrs.OPERATION, "")
 
         if operation_name != "call_llm":
             return context
 
         panels = []
 
-        if messages := span.attributes.get(INPUT_MESSAGES):
+        if messages := span.attributes.get(span_attrs.INPUT_MESSAGES):
             panels.append(
                 Panel(JSON(messages), title="INPUT", style="white", title_align="left")
             )
@@ -84,7 +78,7 @@ class ConsolePrintSpan(Callback):
         self.console.print(
             Panel(
                 Group(*panels),
-                title=f"{operation_name.upper()}: {span.attributes.get('gen_ai.request.model')}",
+                title=f"{operation_name.upper()}: {span.attributes.get(span_attrs.MODEL_ID)}",
                 style="yellow",
             )
         )
@@ -94,14 +88,14 @@ class ConsolePrintSpan(Callback):
     def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         span = context.current_span
 
-        operation_name = span.attributes.get(OPERATION, "")
+        operation_name = span.attributes.get(span_attrs.OPERATION, "")
 
         if operation_name != "execute_tool":
             return context
 
         panels = [
             Panel(
-                JSON(span.attributes.get(TOOL_ARGS, "{}")),
+                JSON(span.attributes.get(span_attrs.TOOL_ARGS, "{}")),
                 title="Input",
                 style="white",
                 title_align="left",

@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.logging import logger
 
-from .attributes import INPUT_MESSAGES, OPERATION, OUTPUT, TOOL_ARGS, TOOL_NAME
+from . import span_attrs
 from .otel_types import (
     AttributeValue,
     Event,
@@ -130,15 +130,15 @@ class AgentSpan(BaseModel):
 
     def is_agent_invocation(self) -> bool:
         """Check whether this span is an agent invocation (the very first span)."""
-        return self.attributes.get(OPERATION) == "invoke_agent"
+        return self.attributes.get(span_attrs.OPERATION) == "invoke_agent"
 
     def is_llm_call(self) -> bool:
         """Check whether this span is a call to an LLM."""
-        return self.attributes.get(OPERATION) == "call_llm"
+        return self.attributes.get(span_attrs.OPERATION) == "call_llm"
 
     def is_tool_execution(self) -> bool:
         """Check whether this span is an execution of a tool."""
-        return self.attributes.get(OPERATION) == "execute_tool"
+        return self.attributes.get(span_attrs.OPERATION) == "execute_tool"
 
     def get_input_messages(self) -> list[AgentMessage] | None:
         """Extract input messages from an LLM call span.
@@ -151,7 +151,7 @@ class AgentSpan(BaseModel):
             msg = "Span is not an LLM call"
             raise ValueError(msg)
 
-        messages_json = self.attributes.get(INPUT_MESSAGES)
+        messages_json = self.attributes.get(span_attrs.INPUT_MESSAGES)
         if not messages_json:
             logger.debug("No input messages found in span")
             return None
@@ -179,7 +179,7 @@ class AgentSpan(BaseModel):
             msg = "Span is not an LLM call or tool execution"
             raise ValueError(msg)
 
-        output = self.attributes.get(OUTPUT)
+        output = self.attributes.get(span_attrs.OUTPUT)
         if not output:
             logger.debug("No output found in span")
             return None
@@ -264,8 +264,8 @@ class AgentTrace(BaseModel):
                 # For tool executions, include the result in the conversation
                 output_content = span.get_output_content()
                 if output_content:
-                    tool_name = span.attributes[TOOL_NAME]
-                    tool_args = span.attributes.get(TOOL_ARGS, "{}")
+                    tool_name = span.attributes[span_attrs.TOOL_NAME]
+                    tool_args = span.attributes.get(span_attrs.TOOL_ARGS, "{}")
                     messages.append(
                         AgentMessage(
                             role="assistant",

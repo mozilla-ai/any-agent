@@ -6,16 +6,7 @@ from typing import TYPE_CHECKING, Any
 from opentelemetry.trace import Status, StatusCode
 
 from any_agent.callbacks.base import Callback
-from any_agent.tracing.attributes import (
-    INPUT_MESSAGES,
-    MODEL_ID,
-    OPERATION,
-    OUTPUT,
-    OUTPUT_TYPE,
-    TOOL_ARGS,
-    TOOL_DESCRIPTION,
-    TOOL_NAME,
-)
+from any_agent.tracing import span_attrs
 
 if TYPE_CHECKING:
     from any_agent.callbacks.context import Context
@@ -33,8 +24,8 @@ class _SpanGeneration(Callback):
         span = tracer.start_span(f"call_llm {model_id}")
         span.set_attributes(
             {
-                OPERATION: "call_llm",
-                MODEL_ID: model_id,
+                span_attrs.OPERATION: "call_llm",
+                span_attrs.MODEL_ID: model_id,
             }
         )
 
@@ -42,7 +33,7 @@ class _SpanGeneration(Callback):
         if trace_id not in self.first_llm_calls:
             self.first_llm_calls.add(trace_id)
             span.set_attribute(
-                INPUT_MESSAGES,
+                span_attrs.INPUT_MESSAGES,
                 json.dumps(
                     input_messages,
                     default=str,
@@ -66,19 +57,19 @@ class _SpanGeneration(Callback):
         if isinstance(output, str):
             span.set_attributes(
                 {
-                    OUTPUT: output,
-                    OUTPUT_TYPE: "text",
+                    span_attrs.OUTPUT: output,
+                    span_attrs.OUTPUT_TYPE: "text",
                 }
             )
         else:
             span.set_attributes(
                 {
-                    OUTPUT: json.dumps(
+                    span_attrs.OUTPUT: json.dumps(
                         output,
                         default=str,
                         ensure_ascii=False,
                     ),
-                    OUTPUT_TYPE: "json",
+                    span_attrs.OUTPUT_TYPE: "json",
                 }
             )
 
@@ -108,15 +99,15 @@ class _SpanGeneration(Callback):
         )
         span.set_attributes(
             {
-                OPERATION: "execute_tool",
-                TOOL_NAME: name,
+                span_attrs.OPERATION: "execute_tool",
+                span_attrs.TOOL_NAME: name,
             }
         )
         if description is not None:
-            span.set_attribute(TOOL_DESCRIPTION, description)
+            span.set_attribute(span_attrs.TOOL_DESCRIPTION, description)
         if args is not None:
             span.set_attribute(
-                TOOL_ARGS,
+                span_attrs.TOOL_ARGS,
                 json.dumps(
                     args,
                     default=str,
@@ -154,7 +145,9 @@ class _SpanGeneration(Callback):
                 tool_output = str(tool_output)
                 output_type = "text"
 
-        span.set_attributes({OUTPUT: tool_output, OUTPUT_TYPE: output_type})
+        span.set_attributes(
+            {span_attrs.OUTPUT: tool_output, span_attrs.OUTPUT_TYPE: output_type}
+        )
         span.set_status(status)
 
         return context

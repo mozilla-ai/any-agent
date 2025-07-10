@@ -47,7 +47,7 @@ During the agent run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`ag
 `any-agent` populates the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
 property so that callbacks can access information in a framework-agnostic way.
 
-You can check the attributes available for LLM Calls and Tool Executions in the [Attributes Reference](../api/tracing.md#any_agent.tracing.attributes).
+You can check the attributes available for LLM Calls and Tool Executions in the [Attributes Reference](../api/tracing.md#any_agent.tracing.span_attrs).
 
 ## Implementing Callbacks
 
@@ -58,13 +58,13 @@ to be reused across callbacks:
 
 ```python
 from any_agent.callbacks import Callback, Context
-from any_agent.tracing.attributes import TOOL_NAME
+from any_agent.tracing import span_attrs
 
 class CountSearchWeb(Callback):
     def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         if "search_web_count" not in context.shared:
             context.shared["search_web_count"] = 0
-        if context.current_span.attributes[TOOL_NAME] == "search_web":
+        if context.current_span.attributes[span_attrs.TOOL_NAME] == "search_web":
             context.shared["search_web_count"] += 1
 ```
 
@@ -187,7 +187,7 @@ from pathlib import Path
 
 from any_agent.callbacks.base import Callback
 from any_agent.callbacks.context import Context
-from any_agent.tracing.attributes import INPUT_MESSAGES
+from any_agent.tracing import span_attrs
 
 class SensitiveDataOffloader(Callback):
 
@@ -199,12 +199,12 @@ class SensitiveDataOffloader(Callback):
 
         span = context.current_span
 
-        if input_messages := span.attributes.get(INPUT_MESSAGES):
+        if input_messages := span.attributes.get(span_attrs.INPUT_MESSAGES):
             output_file = self.output_dir / f"{span.get_span_context().trace_id}.txt"
             output_file.write_text(str(input_messages))
 
             span.set_attribute(
-                INPUT_MESSAGES,
+                span_attrs.INPUT_MESSAGES,
                 json.dumps(
                     {"ref": str(output_file)}
                 )
