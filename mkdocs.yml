@@ -88,6 +88,6 @@ plugins:
           heading_level: 3
 
 hooks:
-  - hooks.py
+  - scripts/hooks.py
 
 edit_uri: edit/main/docs/
