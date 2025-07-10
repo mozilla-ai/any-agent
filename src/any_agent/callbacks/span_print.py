@@ -108,7 +108,7 @@ class ConsolePrintSpan(Callback):
         self.console.print(
             Panel(
                 Group(*panels),
-                title=f"{operation_name.upper()}: {span.attributes.get('gen_ai.tool.name')}",
+                title=f"{operation_name.upper()}: {span.attributes.get(span_attrs.TOOL_NAME)}",
                 style="blue",
             )
         )

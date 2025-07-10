@@ -13,8 +13,8 @@ def create_llm_span(input_tokens: int = 100, output_tokens: int = 50) -> AgentSp
         context=SpanContext(span_id=123),
         attributes={
             span_attrs.OPERATION: "call_llm",
-            "gen_ai.usage.input_tokens": input_tokens,
-            "gen_ai.usage.output_tokens": output_tokens,
+            span_attrs.INPUT_TOKENS: input_tokens,
+            span_attrs.OUTPUT_TOKENS: output_tokens,
         },
         links=[],
         events=[],

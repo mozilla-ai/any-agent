@@ -75,8 +75,8 @@ class _SpanGeneration(Callback):
 
         span.set_attributes(
             {
-                "gen_ai.usage.input_tokens": input_tokens,
-                "gen_ai.usage.output_tokens": output_tokens,
+                span_attrs.INPUT_TOKENS: input_tokens,
+                span_attrs.OUTPUT_TOKENS: output_tokens,
             }
         )
 

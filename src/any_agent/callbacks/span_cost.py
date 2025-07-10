@@ -32,8 +32,8 @@ def add_cost_info(span: Span) -> None:
             )
             span.set_attributes(
                 {
-                    "gen_ai.usage.input_cost": cost_prompt,
-                    "gen_ai.usage.output_cost": cost_completion,
+                    span_attrs.INPUT_COST: cost_prompt,
+                    span_attrs.OUTPUT_COST: cost_completion,
                 }
             )
         except Exception as e:
