@@ -1,10 +1,12 @@
 from uuid import uuid4
 
 import pytest
+from pydantic import BaseModel
 
 # Import your agent and config
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
+from any_agent.serving.a2a.envelope import A2AEnvelope
 from any_agent.testing.helpers import (
     DEFAULT_HTTP_KWARGS,
     DEFAULT_SMALL_MODEL_ID,
@@ -13,6 +15,10 @@ from any_agent.testing.helpers import (
 )
 
 from .conftest import A2ATestHelpers, a2a_client_from_agent
+
+
+class SimpleResponse(BaseModel):
+    result: str
 
 
 @pytest.mark.asyncio
@@ -24,6 +30,7 @@ async def test_serve_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> 
             model_id=DEFAULT_SMALL_MODEL_ID,
             instructions="Directly answer the question without asking the user for input.",
             description="I'm an agent to help.",
+            output_type=A2AEnvelope[SimpleResponse],
             model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
         ),
     )

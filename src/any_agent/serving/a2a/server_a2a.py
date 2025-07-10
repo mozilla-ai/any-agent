@@ -15,7 +15,7 @@ from any_agent.serving.server_handle import ServerHandle
 
 from .agent_card import _get_agent_card
 from .agent_executor import AnyAgentExecutor
-from .envelope import prepare_agent_for_a2a_async
+from .envelope import validate_a2a_output_type
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 async def _get_a2a_app_async(
     agent: AnyAgent, serving_config: A2AServingConfig
 ) -> A2AStarletteApplication:
-    agent = await prepare_agent_for_a2a_async(agent)
+    validate_a2a_output_type(agent)
 
     agent_card = _get_agent_card(agent, serving_config)
     task_manager = ContextManager(serving_config)

@@ -140,6 +140,7 @@ async def test_push_notification_non_streaming() -> None:
             " If you need more information, ask the user for it."
         ),
         description="Agent with conversation memory for testing session management.",
+        output_type=A2AEnvelope[StringInfo],
     )
 
     agent = MockConversationAgent(config)

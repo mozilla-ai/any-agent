@@ -1,8 +1,10 @@
 import pytest
 from litellm.utils import validate_environment
+from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
+from any_agent.serving.a2a.envelope import A2AEnvelope
 from any_agent.testing.helpers import (
     DEFAULT_HTTP_KWARGS,
     DEFAULT_SMALL_MODEL_ID,
@@ -17,6 +19,10 @@ from .conftest import (
     assert_contains_current_date_info,
     get_datetime,
 )
+
+
+class MainResponse(BaseModel):
+    result: str
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
@@ -58,6 +64,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
         name="date_agent",
         model_id=DEFAULT_SMALL_MODEL_ID,
         description="Agent that can return the current date.",
+        output_type=A2AEnvelope[MainResponse],
         tools=[get_datetime],
         model_args=get_default_agent_model_args(agent_framework),
     )
@@ -80,6 +87,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
             model_id=DEFAULT_SMALL_MODEL_ID,
+            output_type=A2AEnvelope[MainResponse],
             tools=[await a2a_tool_async(server_url, http_kwargs=DEFAULT_HTTP_KWARGS)],
             model_args=get_default_agent_model_args(agent_framework),
         )
