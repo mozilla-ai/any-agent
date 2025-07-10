@@ -119,7 +119,6 @@ def generate_llms_full_txt(docs_dir, site_dir, nav_config):
         pass
 
 
-
 def on_post_build(config, **kwargs):
     """Generate llms-full.txt files"""
     docs_dir = Path(config["docs_dir"])
