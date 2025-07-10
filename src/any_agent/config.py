@@ -71,7 +71,7 @@ class MCPSse(BaseModel):
     @classmethod
     def sse_deprecation(cls, data: Any) -> Any:
         warnings.warn(
-            "SSE is deprecated in the MCP specification as of version 2025-03-26",
+            "SSE is deprecated in the MCP specification in favor of Streamable HTTP as of version 2025-03-26",
             DeprecationWarning,
             stacklevel=2,
         )

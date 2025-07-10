@@ -1,5 +1,4 @@
 import json
-import subprocess
 import time
 from datetime import datetime, timedelta
 from typing import Any
@@ -14,26 +13,12 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.config import MCPStreamableHttp
-from any_agent.evaluation.agent_judge import AgentJudge
-from any_agent.evaluation.llm_judge import LlmJudge
-from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.testing.helpers import (
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
+    group_spans,
 )
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
-
-
-def uvx_installed() -> bool:
-    try:
-        result = subprocess.run(
-            ["uvx", "--version"],  # noqa: S607
-            capture_output=True,
-            check=True,
-        )
-        return True if result.returncode == 0 else False  # noqa: TRY300
-    except Exception:
-        return False
 
 
 def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> None:
@@ -58,19 +43,7 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
 
-    agent_invocations = []
-    llm_calls = []
-    tool_executions = []
-    for span in agent_trace.spans:
-        if span.is_agent_invocation():
-            agent_invocations.append(span)
-        elif span.is_llm_call():
-            llm_calls.append(span)
-        elif span.is_tool_execution():
-            tool_executions.append(span)
-        else:
-            msg = f"Unexpected span: {span}"
-            raise AssertionError(msg)
+    agent_invocations, llm_calls, tool_executions = group_spans(agent_trace.spans)
 
     assert len(agent_invocations) == 1
 
@@ -109,53 +82,6 @@ def assert_tokens(agent_trace: AgentTrace) -> None:
     assert agent_trace.tokens.input_tokens > 0
     assert agent_trace.tokens.output_tokens > 0
     assert (agent_trace.tokens.input_tokens + agent_trace.tokens.output_tokens) < 20000
-
-
-def assert_eval(agent_trace: AgentTrace) -> None:
-    """Test evaluation using the new judge classes."""
-    # Test 1: Check if agent called write_file tool using LlmJudge
-    llm_judge = LlmJudge(
-        model_id=DEFAULT_SMALL_MODEL_ID,
-        model_args={
-            "temperature": 0.0,
-        },  # Because it's an llm not agent, the default_model_args are not used
-    )
-    result1 = llm_judge.run(
-        context=str(agent_trace.spans_to_messages()),
-        question="Do the messages contain the year 2025?",
-    )
-    assert isinstance(result1, EvaluationOutput)
-    assert result1.passed, (
-        f"Expected agent to call write_file tool, but evaluation failed: {result1.reasoning}"
-    )
-
-    # Test 2: Check if agent wrote the current year to file using AgentJudge
-    agent_judge = AgentJudge(
-        model_id=DEFAULT_SMALL_MODEL_ID,
-        model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
-    )
-
-    def get_current_year() -> str:
-        """Get the current year"""
-        return str(datetime.now().year)
-
-    eval_trace = agent_judge.run(
-        trace=agent_trace,
-        question="Did the agent write the year to a file? Grab the messages from the trace and check if the write_file tool was called.",
-        additional_tools=[get_current_year],
-    )
-    result2 = eval_trace.final_output
-    assert isinstance(result2, EvaluationOutput)
-    assert result2.passed, (
-        f"Expected agent to write current year to file, but evaluation failed: {result2.reasoning}"
-    )
-
-    # Test 3: Verify at least one evaluation passes (basic sanity check)
-    results = [result1, result2]
-    passed_count = sum(1 for r in results if r.passed)
-    assert passed_count >= 1, (
-        f"Expected at least 1 evaluation to pass, but got {passed_count}/2"
-    )
 
 
 class Step(BaseModel):
