@@ -1,8 +1,9 @@
 from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import StrEnum, auto
 from typing import Any, Self
+import warnings
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from any_agent.callbacks import get_default_callbacks
 from any_agent.callbacks.base import Callback
@@ -66,6 +67,16 @@ class MCPStdio(BaseModel):
 
 
 class MCPSse(BaseModel):
+    @model_validator(mode='before')
+    @classmethod
+    def sse_deprecation(cls, data: Any) -> Any:  
+        warnings.warn(
+            "SSE is deprecated in the MCP specification as of version 2025-03-26",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return data
+
     url: str
     """The URL of the server."""
 

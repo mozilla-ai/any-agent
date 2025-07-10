@@ -1,4 +1,3 @@
-import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from contextlib import suppress
@@ -71,11 +70,6 @@ class AgnoMCPSseConnection(AgnoMCPConnection):
 
     async def list_tools(self) -> list["AgnoMCPTools"]:
         """List tools from the MCP server."""
-        warnings.warn(
-            "SSE is deprecated in the MCP specification as of version 2025-03-26",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         client = sse_client(
             url=self.mcp_tool.url,
             headers=dict(self.mcp_tool.headers or {}),

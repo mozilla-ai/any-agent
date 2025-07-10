@@ -1,4 +1,3 @@
-import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from contextlib import suppress
@@ -54,11 +53,6 @@ class SmolagentsMCPSseConnection(SmolagentsMCPConnection):
 
     async def list_tools(self) -> list["SmolagentsTool"]:
         """List tools from the MCP server."""
-        warnings.warn(
-            "SSE is deprecated in the MCP specification as of version 2025-03-26",
-            DeprecationWarning,
-            stacklevel=2,
-        )
         server_parameters = {"url": self.mcp_tool.url, "transport": "sse"}
         self._client = MCPClient(server_parameters)
 
