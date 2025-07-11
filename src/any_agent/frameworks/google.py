@@ -61,7 +61,7 @@ class GoogleAgent(AnyAgent):
 
         instructions = self.config.instructions or ""
         if self.config.output_type:
-            instructions, final_output_function = prepare_final_output_config_function(
+            instructions, final_output_tool = prepare_final_output_config_function(
                 self.config.output_type, instructions
             )
             tools.append(final_output_function)
