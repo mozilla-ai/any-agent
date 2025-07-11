@@ -391,6 +391,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Context
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#implementing-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
       Implementing Callbacks
@@ -1154,6 +1163,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Context
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#implementing-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
       Implementing Callbacks
@@ -1250,6 +1268,7 @@ will be called at different points of the <a class="autorefs autorefs-internal" 
 </span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>        <span class="k">return</span> <span class="n">response</span>
 </span></code></pre></div>
 <p>Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.</p>
+<h2 id="context">Context</h2>
 <p>During the agent run ( <a class="autorefs autorefs-internal" title="run_async(prompt, **kwargs)
 
   
@@ -1265,8 +1284,8 @@ will be called at different points of the <a class="autorefs autorefs-internal" 
   
       instance-attribute
   " href="../../api/callbacks/#any_agent.callbacks.context.Context.current_span"><code>Context.current_span</code></a>
-property so that callbacks can access information in a framework-agnostic way. You can check the attributes available
-for LLM Calls and Tool Executions in the <a href="../../tracing/#spans">example spans</a>.</p>
+property so that callbacks can access information in a framework-agnostic way.</p>
+<p>You can see what attributes are available for LLM Calls and Tool Executions by examining the <a class="autorefs autorefs-internal" title="any_agent.tracing.attributes.GenAI" href="../../api/tracing/#any_agent.tracing.attributes.GenAI"><code>GenAI</code></a> class.</p>
 <h2 id="implementing-callbacks">Implementing Callbacks</h2>
 <p>All callbacks must inherit from the base <a class="autorefs autorefs-internal" title="any_agent.callbacks.base.Callback" href="../../api/callbacks/#any_agent.callbacks.base.Callback"><code>Callback</code></a> class and can choose to implement any subset of the available callback methods.</p>
 <p>You can use <a class="autorefs autorefs-internal" title="shared
@@ -1276,13 +1295,14 @@ for LLM Calls and Tool Executions in the <a href="../../tracing/#spans">example 
   " href="../../api/callbacks/#any_agent.callbacks.context.Context.shared"><code>Context.shared</code></a> to store information meant
 to be reused across callbacks:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span><span class="p">,</span> <span class="n">Context</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">CountSearchWeb</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">after_tool_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="k">if</span> <span class="s2">&quot;search_web_count&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">:</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>            <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">&quot;search_web_count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;gen_ai.tool.name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;search_web&quot;</span><span class="p">:</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>            <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">&quot;search_web_count&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tracing.attributes</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenAI</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">CountSearchWeb</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">after_tool_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="k">if</span> <span class="s2">&quot;search_web_count&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">:</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>            <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">&quot;search_web_count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">GenAI</span><span class="o">.</span><span class="n">TOOL_NAME</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;search_web&quot;</span><span class="p">:</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>            <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">&quot;search_web_count&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 </span></code></pre></div>
 <p>Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">LimitSearchWeb</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
@@ -1340,10 +1360,11 @@ to be reused across callbacks:</p>
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">],</span>
 </span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span>
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>            <span class="n">CountSearchWeb</span><span class="p">(),</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>            <span class="n">LimitSearchWeb</span><span class="p">(</span><span class="n">max_calls</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>        <span class="p">]</span> <span class="o">+</span> <span class="n">get_default_callbacks</span><span class="p">()</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="p">),</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="p">)</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>            <span class="n">LimitSearchWeb</span><span class="p">(</span><span class="n">max_calls</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>            <span class="o">*</span><span class="n">get_default_callbacks</span><span class="p">()</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>        <span class="p">]</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>    <span class="p">),</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1389,7 +1410,7 @@ attributes with a reference to that location:</p>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tracing.attributes</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenAI</span>
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="k">class</span><span class="w"> </span><span class="nc">SensitiveDataOffloader</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
@@ -1401,15 +1422,18 @@ attributes with a reference to that location:</p>
 </span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
 </span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>        <span class="n">span</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span>
 </span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
-</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>        <span class="k">if</span> <span class="n">input_messages</span> <span class="o">:=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gen_ai.input.messages&quot;</span><span class="p">):</span>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>        <span class="k">if</span> <span class="n">input_messages</span> <span class="o">:=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GenAI</span><span class="o">.</span><span class="n">INPUT_MESSAGES</span><span class="p">):</span>
 </span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>            <span class="n">output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">span</span><span class="o">.</span><span class="n">get_span_context</span><span class="p">()</span><span class="o">.</span><span class="n">trace_id</span><span class="si">}</span><span class="s2">.txt&quot;</span>
 </span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>            <span class="n">output_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">input_messages</span><span class="p">))</span>
 </span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
-</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>            <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="s2">&quot;gen_ai.input.messages&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
-</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>                <span class="p">{</span><span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_file</span><span class="p">)}</span>
-</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>            <span class="p">))</span>
-</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>
-</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>        <span class="k">return</span> <span class="n">context</span>
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>            <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>                <span class="n">GenAI</span><span class="o">.</span><span class="n">INPUT_MESSAGES</span><span class="p">,</span>
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>                    <span class="p">{</span><span class="s2">&quot;ref&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_file</span><span class="p">)}</span>
+</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>                <span class="p">)</span>
+</span><span id="__span-7-27"><a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>            <span class="p">)</span>
+</span><span id="__span-7-28"><a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>
+</span><span id="__span-7-29"><a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a>        <span class="k">return</span> <span class="n">context</span>
 </span></code></pre></div>
 <p>You can find a working example in the <a href="../../cookbook/callbacks/">Callbacks Cookbook</a>.</p>
 

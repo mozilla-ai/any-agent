@@ -1989,7 +1989,7 @@ to be exposed in the <a href="https://mozilla-ai.github.io/any-agent/tracing/">t
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -2007,6 +2007,7 @@ to be exposed in the <a href="https://mozilla-ai.github.io/any-agent/tracing/">t
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tracing.attributes</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenAI</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">SensitiveDataOffloader</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
@@ -2017,12 +2018,12 @@ to be exposed in the <a href="https://mozilla-ai.github.io/any-agent/tracing/">t
     <span class="k">def</span><span class="w"> </span><span class="nf">before_llm_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
         <span class="n">span</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span>
 
-        <span class="k">if</span> <span class="n">input_messages</span> <span class="o">:=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gen_ai.input.messages"</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">input_messages</span> <span class="o">:=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GenAI</span><span class="o">.</span><span class="n">INPUT_MESSAGES</span><span class="p">):</span>
             <span class="n">output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">span</span><span class="o">.</span><span class="n">get_span_context</span><span class="p">()</span><span class="o">.</span><span class="n">trace_id</span><span class="si">}</span><span class="s2">.txt"</span>
             <span class="n">output_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">input_messages</span><span class="p">))</span>
 
             <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span>
-                <span class="s2">"gen_ai.input.messages"</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"ref"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_file</span><span class="p">)})</span>
+                <span class="n">GenAI</span><span class="o">.</span><span class="n">INPUT_MESSAGES</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"ref"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_file</span><span class="p">)})</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">context</span>
@@ -2032,6 +2033,7 @@ from pathlib import Path
 
 from any_agent.callbacks.base import Callback
 from any_agent.callbacks.context import Context
+from any_agent.tracing.attributes import GenAI
 
 
 class SensitiveDataOffloader(Callback):
@@ -2042,12 +2044,12 @@ class SensitiveDataOffloader(Callback):
     def before_llm_call(self, context: Context, *args, **kwargs) -&gt; Context:
         span = context.current_span
 
-        if input_messages := span.attributes.get("gen_ai.input.messages"):
+        if input_messages := span.attributes.get(GenAI.INPUT_MESSAGES):
             output_file = self.output_dir / f"{span.get_span_context().trace_id}.txt"
             output_file.write_text(str(input_messages))
 
             span.set_attribute(
-                "gen_ai.input.messages", json.dumps({"ref": str(output_file)})
+                GenAI.INPUT_MESSAGES, json.dumps({"ref": str(output_file)})
             )
 
         return context</div>
