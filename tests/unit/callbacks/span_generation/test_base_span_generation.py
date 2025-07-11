@@ -74,18 +74,23 @@ def test_set_llm_output() -> None:
     span_generation._set_llm_output(
         context, output="foo", input_tokens=0, output_tokens=0
     )
-    context.current_span.set_attributes.assert_any_call(
+    # Check that the call includes all expected attributes
+    context.current_span.set_attributes.assert_called_with(
         {
             GenAI.OUTPUT: "foo",
             GenAI.OUTPUT_TYPE: "text",
+            GenAI.USAGE_INPUT_TOKENS: 0,
+            GenAI.USAGE_OUTPUT_TOKENS: 0,
         }
     )
 
     span_generation._set_llm_output(context, output=[], input_tokens=0, output_tokens=0)
-    context.current_span.set_attributes.assert_any_call(
+    context.current_span.set_attributes.assert_called_with(
         {
             GenAI.OUTPUT: "[]",
             GenAI.OUTPUT_TYPE: "json",
+            GenAI.USAGE_INPUT_TOKENS: 0,
+            GenAI.USAGE_OUTPUT_TOKENS: 0,
         }
     )
 
@@ -95,4 +100,9 @@ def test_set_tool_input() -> None:
 
     span_generation = _SpanGeneration()
     span_generation._set_tool_input(context, name="foo", args={})
-    context.current_span.set_attribute.assert_called_with(GenAI.TOOL_ARGS, "{}")
+    # Check that set_attributes was called with the correct arguments
+    context.current_span.set_attributes.assert_called_with({
+        GenAI.OPERATION_NAME: "execute_tool",
+        GenAI.TOOL_NAME: "foo",
+        GenAI.TOOL_ARGS: "{}",
+    })

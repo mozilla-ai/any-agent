@@ -35,9 +35,11 @@ def test_console_print_span(
 
         console_mock.return_value.print.assert_called()
 
-        # Frameworks that end with a tool call
+        # Frameworks that end with a tool call or have JSON final output
         if request.node.callspec.id not in (
+            "AGNO_trace",
             "GOOGLE_trace",
+            "OPENAI_trace",
             "SMOLAGENTS_trace",
             "TINYAGENT_trace",
         ):
@@ -75,10 +77,13 @@ def test_get_output_panel(
             json_mock.assert_called_once()
             panel_mock.assert_called_once()
 
-    # Skip frameworks that end with a tool call
+    # Skip frameworks that end with a tool call or now return JSON in final LLM call
     if request.node.callspec.id not in (
+        "AGNO_trace",
         "GOOGLE_trace",
         "LANGCHAIN_trace",
+        "LLAMA_INDEX_trace",
+        "OPENAI_trace",
         "SMOLAGENTS_trace",
         "TINYAGENT_trace",
     ):
