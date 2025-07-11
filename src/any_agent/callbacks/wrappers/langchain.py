@@ -19,6 +19,7 @@ class _LangChainWrapper:
     def __init__(self) -> None:
         self.callback_context: dict[int, Context] = {}
         self._original_ainvoke: Any | None = None
+        self._original_call_model: Any | None = None
 
     async def wrap(self, agent: LangchainAgent) -> None:
         from langchain_core.callbacks.base import BaseCallbackHandler
@@ -124,6 +125,29 @@ class _LangChainWrapper:
 
         agent._agent.ainvoke = wrap_ainvoke
 
+        # Wrap call_model to capture litellm calls during structured output processing
+        self._original_call_model = agent.call_model
+
+        async def wrap_call_model(**kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
+
+            for callback in agent.config.callbacks:
+                context = callback.before_llm_call(context, **kwargs)
+
+            output = await self._original_call_model(**kwargs)
+
+            for callback in agent.config.callbacks:
+                context = callback.after_llm_call(context, output)
+
+            return output
+
+        agent.call_model = wrap_call_model
+
     async def unwrap(self, agent: LangchainAgent) -> None:
         if self._original_ainvoke is not None:
             agent._agent.ainvoke = self._original_ainvoke
+
+        if self._original_call_model is not None:
+            agent.call_model = self._original_call_model
