@@ -49,7 +49,7 @@ openai = [
 ]
 
 smolagents = [
-  "smolagents[mcp]>=1.19.0",
+  "smolagents[mcp]>=1.20.0",
 ]
 
 a2a = [
