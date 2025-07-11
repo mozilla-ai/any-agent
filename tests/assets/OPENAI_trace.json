@@ -4,8 +4,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 668567127634199968,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 13251595216712378167,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752242903600128000,
-      "end_time": 1752242904418673000,
+      "start_time": 1752254632791233000,
+      "end_time": 1752254633563698000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 7720954420916537781,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 7799434623476300260,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -58,8 +58,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 668567127634199968,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 13251595216712378167,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -68,15 +68,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752242904420065000,
-      "end_time": 1752242904425580000,
+      "start_time": 1752254633564309000,
+      "end_time": 1752254633567510000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 3854308545166560081,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 13831041676017815850,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -89,8 +89,8 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
-        "gen_ai.tool.args": "\"{\\\"timezone\\\": \\\"America/New_York\\\"}\"",
-        "gen_ai.output": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-07-11T10:08:24-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null,\"meta\":null}",
+        "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
+        "gen_ai.output": "{\"type\":\"text\",\"text\":\"{\\n  \\\"timezone\\\": \\\"America/New_York\\\",\\n  \\\"datetime\\\": \\\"2025-07-11T13:23:53-04:00\\\",\\n  \\\"is_dst\\\": true\\n}\",\"annotations\":null,\"meta\":null}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -109,8 +109,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 668567127634199968,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 13251595216712378167,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -119,15 +119,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752242904428089000,
-      "end_time": 1752242905225070000,
+      "start_time": 1752254633569407000,
+      "end_time": 1752254633974908000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 6868857887609282361,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 9656689941528142839,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -141,9 +141,9 @@
         "gen_ai.request.model": "mistral/mistral-small-latest",
         "gen_ai.output": "[{\"tool.name\": \"write_file\", \"tool.args\": \"{\\\"text\\\": \\\"2025\\\"}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 558,
+        "gen_ai.usage.input_tokens": 554,
         "gen_ai.usage.output_tokens": 14,
-        "gen_ai.usage.input_cost": 0.000055799999999999994,
+        "gen_ai.usage.input_cost": 0.0000554,
         "gen_ai.usage.output_cost": 4.2e-6
       },
       "links": [],
@@ -162,8 +162,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 668567127634199968,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 13251595216712378167,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -172,15 +172,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752242905225970000,
-      "end_time": 1752242905227046000,
+      "start_time": 1752254633975452000,
+      "end_time": 1752254633976123000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 9082296852391654166,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 654137331890684209,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -193,7 +193,7 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "write_file",
         "gen_ai.tool.description": "write the text to a file in the tmp_path directory",
-        "gen_ai.tool.args": "\"{\\\"text\\\": \\\"2025\\\"}\"",
+        "gen_ai.tool.args": "{\"text\": \"2025\"}",
         "gen_ai.output": "{}",
         "gen_ai.output.type": "json"
       },
@@ -213,8 +213,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 668567127634199968,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 13251595216712378167,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -223,15 +223,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752242905225970000,
-      "end_time": 1752242905227046000,
+      "start_time": 1752254633975452000,
+      "end_time": 1752254633976123000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 9082296852391654166,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 654137331890684209,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -244,7 +244,7 @@
         "gen_ai.operation.name": "execute_tool",
         "gen_ai.tool.name": "write_file",
         "gen_ai.tool.description": "write the text to a file in the tmp_path directory",
-        "gen_ai.tool.args": "\"{\\\"text\\\": \\\"2025\\\"}\"",
+        "gen_ai.tool.args": "{\"text\": \"2025\"}",
         "gen_ai.output": "{}",
         "gen_ai.output.type": "json"
       },
@@ -264,8 +264,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 668567127634199968,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 13251595216712378167,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -274,15 +274,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752242905230476000,
-      "end_time": 1752242907103313000,
+      "start_time": 1752254633978459000,
+      "end_time": 1752254635611206000,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 3978522140353504100,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 3375284087590671414,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -295,10 +295,10 @@
         "gen_ai.operation.name": "call_llm",
         "gen_ai.request.model": "mistral/mistral-small-latest",
         "gen_ai.output": "{\"steps\": [{\"number\": 1, \"description\": \"Find what year it is in the America/New_York timezone\"}, {\"number\": 2, \"description\": \"Write the value (single number) to a file\"}, {\"number\": 3, \"description\": \"Return a list of the steps you have taken\"}]}",
-        "gen_ai.output.type": "text",
-        "gen_ai.usage.input_tokens": 587,
+        "gen_ai.output.type": "json",
+        "gen_ai.usage.input_tokens": 589,
         "gen_ai.usage.output_tokens": 70,
-        "gen_ai.usage.input_cost": 0.0000587,
+        "gen_ai.usage.input_cost": 0.000058899999999999995,
         "gen_ai.usage.output_cost": 0.000021
       },
       "links": [],
@@ -327,15 +327,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752242903598182000,
-      "end_time": 1752242907104703000,
+      "start_time": 1752254632789144000,
+      "end_time": 1752254635611755000,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 328763700714006172422748723723478400766,
-        "span_id": 668567127634199968,
+        "trace_id": 154879540709795964004422558759530759862,
+        "span_id": 13251595216712378167,
         "is_remote": false,
         "trace_flags": {
           "value": 0
