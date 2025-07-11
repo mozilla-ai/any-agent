@@ -15,7 +15,6 @@ from any_agent.config import (
     AgentFramework,
     Tool,
 )
-from any_agent.logging import logger
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.attributes import GenAI
@@ -308,60 +307,6 @@ class AnyAgent(ABC):
             return await self._serve_mcp_async(serving_config)
         return await self._serve_a2a_async(serving_config)
 
-    def _recreate_with_config(self, new_config: AgentConfig) -> AnyAgent:
-        """Create a new agent instance with the given config, preserving MCP servers and tools.
-
-        This method creates a new agent with the modified configuration while transferring
-        the MCP servers and tools from the current agent to avoid recreating them, but only
-        if the tools configuration hasn't changed.
-
-        Args:
-            new_config: The new configuration to use for the recreated agent.
-
-        Returns:
-            A new agent instance with the modified config and transferred state (if tools unchanged)
-            or a completely new agent (if tools changed).
-
-        """
-        return run_async_in_sync(self._recreate_with_config_async(new_config))
-
-    async def _recreate_with_config_async(self, new_config: AgentConfig) -> AnyAgent:
-        """Async version of _recreate_with_config.
-
-        This method creates a new agent with the modified configuration while transferring
-        the MCP servers and tools from the current agent to avoid recreating them, but only
-        if the tools configuration hasn't changed.
-
-        Args:
-            new_config: The new configuration to use for the recreated agent.
-
-        Returns:
-            A new agent instance with the modified config and transferred state (if tools unchanged)
-            or a completely new agent (if tools changed).
-
-        """
-        # Check if tools configuration has changed
-        if self.config.tools != new_config.tools:
-            # Tools have changed, so we need to recreate everything from scratch
-            logger.info(
-                "Tools have changed, so we need to recreate everything from scratch"
-            )
-            return await self.create_async(self.framework, new_config)
-
-        # Tools haven't changed, so we can safely preserve MCP servers and tools
-        # Create the new agent with the modified config
-        # Don't use AnyAgent.create_async(), because it will recreate the MCP servers and tools
-        new_agent = self.__class__(new_config)
-
-        # Transfer MCP servers and tools from the original agent to avoid recreating them
-        new_agent._mcp_servers = self._mcp_servers
-        new_agent._tools = self._tools
-
-        # Load the agent with the existing MCP servers and tools
-        await new_agent._load_agent()
-
-        return new_agent
-
     def _add_span_callbacks(self) -> None:
         if self.config.callbacks is None:
             return
@@ -386,6 +331,21 @@ class AnyAgent(ABC):
     @abstractmethod
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         """To be implemented by each framework."""
+
+    @abstractmethod
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        This method allows updating the agent's output type without recreating
+        the entire agent instance, which is more efficient than the current
+        approach of recreating the agent.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
 
     @property
     @abstractmethod

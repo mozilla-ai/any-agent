@@ -122,3 +122,67 @@ class SmolagentsAgent(AnyAgent):
         if self.config.output_type:
             return self.config.output_type.model_validate_json(result)
         return str(result)
+
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
+
+        # If agent is already loaded, we need to update its output handling
+        if self._agent:
+            # Remove existing final_answer tool if it exists
+            if "final_answer" in self._agent.tools:
+                del self._agent.tools["final_answer"]
+
+            # Reset system prompt to original instructions
+            if self.config.instructions:
+                self._agent.prompt_templates["system_prompt"] = self.config.instructions
+
+            # If we have a new output type, set up the final output function
+            if output_type:
+                instructions, final_output_function = prepare_final_output(
+                    output_type, self.config.instructions
+                )
+
+                # Create a custom tool for smolagents that wraps our final output function
+                class FinalAnswerToolWrapper(FinalAnswerTool):  # type: ignore[no-untyped-call]
+                    def __init__(
+                        self, final_output_func: Callable[[str], dict[str, str | bool]]
+                    ):
+                        super().__init__()  # type: ignore[no-untyped-call]
+                        self.final_output_func = final_output_func
+                        # Copying the __doc__ relies upon the final_output_func having a single str parameter called "answer"
+                        if (
+                            not self.final_output_func.__code__.co_varnames[0]
+                            == "answer"
+                            or not self.final_output_func.__doc__
+                        ):
+                            msg = "The final_output_func must have a single parameter of type str"
+                            raise ValueError(msg)
+
+                        self.inputs = {
+                            "answer": {
+                                "type": "string",
+                                "description": self.final_output_func.__doc__,
+                            }
+                        }
+
+                    def forward(self, answer: str) -> Any:
+                        result = self.final_output_func(answer)
+                        if result.get("success"):
+                            return result["result"]
+                        raise ValueError(result["result"])
+
+                self._agent.tools["final_answer"] = FinalAnswerToolWrapper(
+                    final_output_function
+                )
+
+                # Update the system prompt with the modified instructions
+                if instructions:
+                    self._agent.prompt_templates["system_prompt"] = instructions
