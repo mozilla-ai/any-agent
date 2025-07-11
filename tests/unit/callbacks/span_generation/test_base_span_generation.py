@@ -101,8 +101,10 @@ def test_set_tool_input() -> None:
     span_generation = _SpanGeneration()
     span_generation._set_tool_input(context, name="foo", args={})
     # Check that set_attributes was called with the correct arguments
-    context.current_span.set_attributes.assert_called_with({
-        GenAI.OPERATION_NAME: "execute_tool",
-        GenAI.TOOL_NAME: "foo",
-        GenAI.TOOL_ARGS: "{}",
-    })
+    context.current_span.set_attributes.assert_called_with(
+        {
+            GenAI.OPERATION_NAME: "execute_tool",
+            GenAI.TOOL_NAME: "foo",
+            GenAI.TOOL_ARGS: "{}",
+        }
+    )
