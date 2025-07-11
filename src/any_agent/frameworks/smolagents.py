@@ -1,9 +1,11 @@
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
+from any_agent.tools.final_output import prepare_final_output
 
 try:
     from smolagents import FinalAnswerTool, LiteLLMModel, ToolCallingAgent
@@ -71,28 +73,45 @@ class SmolagentsAgent(AnyAgent):
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
         if self.config.output_type:
-            output_type = self.config.output_type
+            instructions, final_output_function = prepare_final_output(
+                self.config.output_type, self.config.instructions
+            )
 
-            class CustomFinalAnswerTool(FinalAnswerTool):  # type: ignore[no-untyped-call]
-                inputs = {  # noqa: RUF012
-                    "answer": {
-                        "type": "string",
-                        "description": f"The final answer to the problem. The input must be a string that conforms to the{output_type.__name__} object.",
+            # Create a custom tool for smolagents that wraps our final output function
+            class FinalAnswerToolWrapper(FinalAnswerTool):  # type: ignore[no-untyped-call]
+                def __init__(
+                    self, final_output_func: Callable[[str], dict[str, str | bool]]
+                ):
+                    super().__init__()  # type: ignore[no-untyped-call]
+                    self.final_output_func = final_output_func
+                    # Copying the __doc__ relies upon the final_output_func having a single str parameter called "answer"
+                    if (
+                        not self.final_output_func.__code__.co_varnames[0] == "answer"
+                        or not self.final_output_func.__doc__
+                    ):
+                        msg = "The final_output_func must have a single parameter of type str"
+                        raise ValueError(msg)
+
+                    self.inputs = {
+                        "answer": {
+                            "type": "string",
+                            "description": self.final_output_func.__doc__,
+                        }
                     }
-                }
 
                 def forward(self, answer: str) -> Any:
-                    output_type.model_validate_json(answer)
-                    return answer
+                    result = self.final_output_func(answer)
+                    if result.get("success"):
+                        return result["result"]
+                    raise ValueError(result["result"])
 
-            self._agent.tools["final_answer"] = CustomFinalAnswerTool()  # type: ignore[no-untyped-call]
+            self._agent.tools["final_answer"] = FinalAnswerToolWrapper(
+                final_output_function
+            )
 
-            self._agent.prompt_templates[
-                "system_prompt"
-            ] += f"""\n\nYour final answer must be a {self.config.output_type.__name__} object.
-            This object must match the following schema:
-            {self.config.output_type.model_json_schema()}
-            """
+            # Update the system prompt with the modified instructions
+            if instructions:
+                self._agent.prompt_templates["system_prompt"] = instructions
         assert self._agent
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
