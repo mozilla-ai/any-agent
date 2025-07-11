@@ -3,12 +3,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
     from langchain_core.messages import BaseMessage
-    from litellm.types.utils import Usage, ChatCompletionMessageToolCall
+    from litellm.types.utils import ChatCompletionMessageToolCall, Usage
 
     from any_agent.callbacks.context import Context
 
