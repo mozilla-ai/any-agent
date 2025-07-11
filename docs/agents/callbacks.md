@@ -40,11 +40,14 @@ while True:
 
 Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.
 
+## Context
+
 During the agent run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`agent.run`][any_agent.AnyAgent.run] ), a unique [`Context`][any_agent.callbacks.context.Context] object is created and shared across all callbacks.
 
 `any-agent` populates the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
-property so that callbacks can access information in a framework-agnostic way. You can check the attributes available
-for LLM Calls and Tool Executions in the [example spans](../tracing.md#spans).
+property so that callbacks can access information in a framework-agnostic way.
+
+You can see what attributes are available for LLM Calls and Tool Executions by examining the [`GenAI`][any_agent.tracing.attributes.GenAI] class.
 
 ## Implementing Callbacks
 
@@ -55,12 +58,13 @@ to be reused across callbacks:
 
 ```python
 from any_agent.callbacks import Callback, Context
+from any_agent.tracing.attributes import GenAI
 
 class CountSearchWeb(Callback):
     def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         if "search_web_count" not in context.shared:
             context.shared["search_web_count"] = 0
-        if context.current_span.attributes["gen_ai.tool.name"] == "search_web":
+        if context.current_span.attributes[GenAI.TOOL_NAME] == "search_web":
             context.shared["search_web_count"] += 1
 ```
 
@@ -125,8 +129,9 @@ Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agen
             tools=[search_web, visit_webpage],
             callbacks=[
                 CountSearchWeb(),
-                LimitSearchWeb(max_calls=3)
-            ] + get_default_callbacks()
+                LimitSearchWeb(max_calls=3),
+                *get_default_callbacks()
+            ]
         ),
     )
     ```
@@ -182,7 +187,7 @@ from pathlib import Path
 
 from any_agent.callbacks.base import Callback
 from any_agent.callbacks.context import Context
-
+from any_agent.tracing.attributes import GenAI
 
 class SensitiveDataOffloader(Callback):
 
@@ -194,13 +199,16 @@ class SensitiveDataOffloader(Callback):
 
         span = context.current_span
 
-        if input_messages := span.attributes.get("gen_ai.input.messages"):
+        if input_messages := span.attributes.get(GenAI.INPUT_MESSAGES):
             output_file = self.output_dir / f"{span.get_span_context().trace_id}.txt"
             output_file.write_text(str(input_messages))
 
-            span.set_attribute("gen_ai.input.messages", json.dumps(
-                {"ref": str(output_file)}
-            ))
+            span.set_attribute(
+                GenAI.INPUT_MESSAGES,
+                json.dumps(
+                    {"ref": str(output_file)}
+                )
+            )
 
         return context
 ```
