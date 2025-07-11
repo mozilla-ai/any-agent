@@ -1,4 +1,4 @@
-# mypy: disable-error-code="method-assign,no-untyped-def,no-untyped-call,union-attr"
+# mypy: disable-error-code="method-assign,misc,no-untyped-call,no-untyped-def,union-attr"
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from opentelemetry.trace import get_current_span
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from uuid import UUID
 
     from langchain_core.messages import BaseMessage
@@ -19,7 +20,7 @@ class _LangChainWrapper:
     def __init__(self) -> None:
         self.callback_context: dict[int, Context] = {}
         self._original_ainvoke: Any | None = None
-        self._original_call_model: Any | None = None
+        self._original_llm_call: Callable[..., Any] | None = None
 
     async def wrap(self, agent: LangchainAgent) -> None:
         from langchain_core.callbacks.base import BaseCallbackHandler
@@ -126,7 +127,7 @@ class _LangChainWrapper:
         agent._agent.ainvoke = wrap_ainvoke
 
         # Wrap call_model to capture litellm calls during structured output processing
-        self._original_call_model = agent.call_model
+        self._original_llm_call = agent.call_model
 
         async def wrap_call_model(**kwargs):
             context = self.callback_context[
@@ -136,11 +137,7 @@ class _LangChainWrapper:
             for callback in agent.config.callbacks:
                 context = callback.before_llm_call(context, **kwargs)
 
-            if self._original_call_model is None:
-                msg = "Original call_model method is None"
-                raise RuntimeError(msg)
-
-            output = await self._original_call_model(**kwargs)
+            output = await self._original_llm_call(**kwargs)
 
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, output)
@@ -153,5 +150,5 @@ class _LangChainWrapper:
         if self._original_ainvoke is not None:
             agent._agent.ainvoke = self._original_ainvoke
 
-        if self._original_call_model is not None:
-            agent.call_model = self._original_call_model
+        if self._original_llm_call is not None:
+            agent.call_model = self._original_llm_call

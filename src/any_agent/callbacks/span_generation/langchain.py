@@ -3,46 +3,30 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
     from langchain_core.messages import BaseMessage
+    from litellm.types.utils import Usage, ChatCompletionMessageToolCall
 
     from any_agent.callbacks.context import Context
 
 
 class _LangchainSpanGeneration(_SpanGeneration):
     def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
-        # Handle both cases: messages as positional args (normal LangChain callback)
-        # or messages as keyword args (when called via call_model wrapper)
-        messages: list[list[BaseMessage]] | list[dict[str, Any]] | None = None
+        # Handle direct dict format (from call_model wrapper)
+        if "messages" in kwargs and isinstance(kwargs["messages"], list):
+            input_messages = [kwargs["messages"][-1]]
+            if not input_messages:
+                return context
+            model_id = kwargs.get("model", "No model")
+        # Handle LangChain callback format
+        elif len(args) >= 2 and isinstance(args[1], list):
+            messages: list[list[BaseMessage]] = args[1]
+            if not messages or not messages[0]:
+                return context
 
-        if len(args) > 1:
-            # Normal LangChain callback case
-            messages = args[1]
-        elif "messages" in kwargs:
-            # call_model wrapper case - messages are already in dict format
-            messages = kwargs["messages"]
-
-        if not messages:
-            return context
-
-        model_id = kwargs.get("invocation_params", {}).get("model") or kwargs.get(
-            "model", "No model"
-        )
-
-        # Handle both BaseMessage objects and dict messages
-        if messages and isinstance(messages[0], dict):
-            # Messages are already in dict format (from call_model)
-            input_messages = [
-                {
-                    "role": str(msg.get("role", "")),
-                    "content": str(msg.get("content", "")),
-                }
-                for msg in messages
-            ]
-        else:
-            # Messages are BaseMessage objects (from normal LangChain callback)
             input_messages = [
                 {
                     "role": str(message.type).replace("human", "user"),
@@ -50,24 +34,57 @@ class _LangchainSpanGeneration(_SpanGeneration):
                 }
                 for message in messages[0]
             ]
+            model_id = kwargs.get("invocation_params", {}).get("model", "No model")
+        else:
+            msg = "Unexpected Scenario"
+            raise ValueError(msg)
 
         return self._set_llm_input(context, model_id, input_messages)
 
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
-        if not args:
-            return context
-
         response = args[0]
 
-        # Handle LangChain LLMResult vs litellm response
-        if hasattr(response, "generations") and response.generations:
-            # LangChain LLMResult case
-            if not response.generations[0]:
+        # Handle litellm ModelResponse (from call_model wrapper)
+        if hasattr(response, "choices") and hasattr(response, "model_extra"):
+            if not response.choices:
+                return context
+
+            message = getattr(response.choices[0], "message", None)
+            if not message:
+                return context
+
+            output: str | list[dict[str, Any]]
+            if content := getattr(message, "content", None):
+                output = content
+
+            tool_calls: list[ChatCompletionMessageToolCall] | None
+            if tool_calls := getattr(message, "tool_calls", None):
+                output = [
+                    {
+                        "tool.name": getattr(tool_call.function, "name", "No name"),
+                        "tool.args": getattr(
+                            tool_call.function, "arguments", "No name"
+                        ),
+                    }
+                    for tool_call in tool_calls
+                    if tool_call.function
+                ]
+
+            input_tokens = 0
+            output_tokens = 0
+            token_usage: Usage | None
+            if token_usage := getattr(response, "model_extra", {}).get("usage"):
+                if token_usage:
+                    input_tokens = token_usage.prompt_tokens
+                    output_tokens = token_usage.completion_tokens
+
+        # Handle LangChain LLMResult
+        elif hasattr(response, "generations"):
+            if not response.generations or not response.generations[0]:
                 return context
 
             generation = response.generations[0][0]
 
-            output: str | list[dict[str, Any]] = ""
             if text := generation.text:
                 output = text
             elif message := getattr(generation, "message", None):
@@ -86,36 +103,10 @@ class _LangchainSpanGeneration(_SpanGeneration):
                 if token_usage := llm_output.get("token_usage", None):
                     input_tokens = token_usage.prompt_tokens
                     output_tokens = token_usage.completion_tokens
+        else:
+            return context
 
-            return self._set_llm_output(context, output, input_tokens, output_tokens)
-        if hasattr(response, "choices") and response.choices:
-            # litellm response case (from call_model wrapper)
-            choice = response.choices[0]
-            message = choice.message
-
-            litellm_output: str | list[dict[str, Any]] = ""
-            if hasattr(message, "tool_calls") and message.tool_calls:
-                litellm_output = [
-                    {
-                        "tool.name": tool_call.function.name,
-                        "tool.args": tool_call.function.arguments,
-                    }
-                    for tool_call in message.tool_calls
-                ]
-            else:
-                litellm_output = message.content or message.get("content", "")
-
-            input_tokens = 0
-            output_tokens = 0
-            if hasattr(response, "usage") and response.usage:
-                input_tokens = response.usage.prompt_tokens
-                output_tokens = response.usage.completion_tokens
-
-            return self._set_llm_output(
-                context, litellm_output, input_tokens, output_tokens
-            )
-
-        return context
+        return self._set_llm_output(context, output, input_tokens, output_tokens)
 
     def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         serialized: dict[str, Any] = args[0]
