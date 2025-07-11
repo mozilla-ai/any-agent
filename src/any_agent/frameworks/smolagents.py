@@ -84,6 +84,20 @@ class SmolagentsAgent(AnyAgent):
                 ):
                     super().__init__()  # type: ignore[no-untyped-call]
                     self.final_output_func = final_output_func
+                    # Copying the __doc__ relies upon the final_output_func having a single str parameter called "answer"
+                    if (
+                        not self.final_output_func.__code__.co_varnames[0] == "answer"
+                        or not self.final_output_func.__doc__
+                    ):
+                        msg = "The final_output_func must have a single parameter of type str"
+                        raise ValueError(msg)
+
+                    self.inputs = {
+                        "answer": {
+                            "type": "string",
+                            "description": self.final_output_func.__doc__,
+                        }
+                    }
 
                 def forward(self, answer: str) -> Any:
                     result = self.final_output_func(answer)
