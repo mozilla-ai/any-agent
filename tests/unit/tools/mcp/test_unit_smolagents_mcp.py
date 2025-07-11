@@ -50,7 +50,7 @@ async def test_smolagents_mcp_streamablehttp_integration(
     smolagents_mcp_server.assert_called_once_with(
         {"url": mcp_streamablehttp_params_no_tools.url, "transport": "streamable-http"},
         adapter_kwargs={
-            "client_session_timeout_seconds": mcp_sse_params_no_tools.client_session_timeout_seconds
+            "client_session_timeout_seconds": mcp_streamablehttp_params_no_tools.client_session_timeout_seconds
         },
 
     )
@@ -110,7 +110,7 @@ async def test_smolagents_mcp_sse_timeout() -> None:
 
         mock_client.assert_called_once()
         call_args = mock_client.call_args_list[0]
-        assert call_args[0][0] == {"url": mcp_sse_params.url}
+        assert call_args[0][0] == {"url": mcp_sse_params.url, "transport": "sse"}
         assert (
             call_args[1]["adapter_kwargs"]["client_session_timeout_seconds"]
             == custom_timeout
