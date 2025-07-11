@@ -146,3 +146,46 @@ class GoogleAgent(AnyAgent):
         )
         assert session, "Session should not be None"
         return str(session.state.get("response"))
+
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
+
+        # If agent is already loaded, we need to recreate it with the new output type
+        # The Google ADK agent requires output_type to be set during construction
+        if self._agent:
+            # Store current tools (excluding any existing final_output tool)
+            current_tools = [
+                tool
+                for tool in self._tools
+                if not (hasattr(tool, "__name__") and tool.__name__ == "final_output")
+            ]
+
+            # Prepare instructions and tools for the new output type
+            instructions = self.config.instructions or ""
+            if output_type:
+                instructions, final_output_tool = prepare_final_output(
+                    output_type, instructions
+                )
+                current_tools.append(final_output_tool)
+
+            # Recreate the agent with the new configuration
+            agent_type = self.config.agent_type or LlmAgent
+            self._agent = agent_type(
+                name=self.config.name,
+                instruction=instructions,
+                model=self._get_model(self.config),
+                tools=current_tools,
+                **self.config.agent_args or {},
+                output_key="response",
+            )
+
+            # Update the tools list
+            self._tools = current_tools

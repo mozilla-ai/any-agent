@@ -92,3 +92,37 @@ class OpenAIAgent(AnyAgent):
             raise ValueError(error_message)
         result = await Runner.run(self._agent, prompt, **kwargs)
         return result.final_output  # type: ignore[no-any-return]
+
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
+
+        # If agent is already loaded, we need to recreate it with the new output type
+        # The OpenAI agents library requires output_type to be set during construction
+        if self._agent:
+            # Store current state
+            current_tools = self._tools
+            current_mcp_servers = self._mcp_servers
+
+            # Recreate the agent with the new output type
+            kwargs_ = self.config.agent_args or {}
+            if self.config.model_args:
+                kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
+            if output_type:
+                kwargs_["output_type"] = output_type
+
+            self._agent = Agent(
+                name=self.config.name,
+                instructions=self.config.instructions,
+                model=self._get_model(self.config),
+                tools=current_tools,
+                mcp_servers=[mcp_server.server for mcp_server in current_mcp_servers],
+                **kwargs_,
+            )
