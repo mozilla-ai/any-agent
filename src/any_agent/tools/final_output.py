@@ -4,7 +4,7 @@ from collections.abc import Callable
 from pydantic import BaseModel, ValidationError
 
 
-def prepare_final_output_config_function(
+def prepare_final_output(
     output_type: type[BaseModel], instructions: str | None = None
 ) -> tuple[str, Callable[[str], dict[str, str | bool]]]:
     """Prepare instructions and tools for structured output, returning the function directly.
