@@ -44,7 +44,12 @@ class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):
             args=list(self.mcp_tool.args),
             env=self.mcp_tool.env,
         )
-        self._client = MCPClient(server_parameters)
+        adapter_kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            adapter_kwargs["client_session_timeout_seconds"] = (
+                self.mcp_tool.client_session_timeout_seconds
+            )
+        self._client = MCPClient(server_parameters, adapter_kwargs=adapter_kwargs)
         return await super().list_tools()
 
 
@@ -56,7 +61,12 @@ class SmolagentsMCPSseConnection(SmolagentsMCPConnection):
         server_parameters = {
             "url": self.mcp_tool.url,
         }
-        self._client = MCPClient(server_parameters)
+        adapter_kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            adapter_kwargs["client_session_timeout_seconds"] = (
+                self.mcp_tool.client_session_timeout_seconds
+            )
+        self._client = MCPClient(server_parameters, adapter_kwargs=adapter_kwargs)
 
         return await super().list_tools()
 
