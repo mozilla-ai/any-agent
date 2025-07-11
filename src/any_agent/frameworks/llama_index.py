@@ -6,7 +6,7 @@ from pydantic import BaseModel, ValidationError
 
 from any_agent import AgentConfig, AgentFramework
 from any_agent.logging import logger
-from any_agent.tools.final_output import prepare_final_output_config_function
+from any_agent.tools.final_output import prepare_final_output
 
 from .any_agent import AnyAgent
 
@@ -67,7 +67,7 @@ class LlamaIndexAgent(AnyAgent):
         instructions = self.config.instructions
         tools_to_use = list(self.config.tools)
         if self.config.output_type:
-            instructions, final_output_function = prepare_final_output_config_function(
+            instructions, final_output_function = prepare_final_output(
                 self.config.output_type, instructions
             )
             tools_to_use.append(final_output_function)

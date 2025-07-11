@@ -4,7 +4,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.tools.final_output import prepare_final_output_config_function
+from any_agent.tools.final_output import prepare_final_output
 
 from .any_agent import AnyAgent
 
@@ -61,7 +61,7 @@ class GoogleAgent(AnyAgent):
 
         instructions = self.config.instructions or ""
         if self.config.output_type:
-            instructions, final_output_tool = prepare_final_output_config_function(
+            instructions, final_output_tool = prepare_final_output(
                 self.config.output_type, instructions
             )
             tools.append(final_output_tool)

@@ -1,5 +1,5 @@
 from .a2a import a2a_tool, a2a_tool_async
-from .final_output import prepare_final_output_config_function
+from .final_output import prepare_final_output
 from .mcp import (
     MCPServer,
     _get_mcp_server,
@@ -22,7 +22,7 @@ __all__ = [
     "a2a_tool",
     "a2a_tool_async",
     "ask_user_verification",
-    "prepare_final_output_config_function",
+    "prepare_final_output",
     "search_tavily",
     "search_web",
     "send_console_message",

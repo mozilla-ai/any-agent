@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
-from any_agent.tools.final_output import prepare_final_output_config_function
+from any_agent.tools.final_output import prepare_final_output
 
 try:
     from smolagents import FinalAnswerTool, LiteLLMModel, ToolCallingAgent
@@ -73,7 +73,7 @@ class SmolagentsAgent(AnyAgent):
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
         if self.config.output_type:
-            instructions, final_output_function = prepare_final_output_config_function(
+            instructions, final_output_function = prepare_final_output(
                 self.config.output_type, self.config.instructions
             )
 
