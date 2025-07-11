@@ -231,7 +231,7 @@ class TinyAgent(AnyAgent):
                         completion_params["response_format"] = self.config.output_type
                     if len(completion_params["tools"]) > 0:
                         completion_params["tool_choice"] = "none"
-                    response = await litellm.acompletion(**completion_params)
+                    response = await self.call_model(**completion_params)
                     return self.config.output_type.model_validate_json(
                         response.choices[0].message["content"]  # type: ignore[union-attr]
                     )
