@@ -21,21 +21,25 @@ if TYPE_CHECKING:
 def add_cost_info(span: Span) -> None:
     """Use litellm to compute cost and add it to span attributes."""
     attributes: Mapping[str, AttributeValue] = span.attributes
-    try:
-        cost_prompt, cost_completion = cost_per_token(
-            model=str(attributes.get(GenAI.REQUEST_MODEL, "")),
-            prompt_tokens=int(attributes.get(GenAI.USAGE_INPUT_TOKENS, 0)),  # type: ignore[arg-type]
-            completion_tokens=int(attributes.get(GenAI.USAGE_OUTPUT_TOKENS, 0)),  # type: ignore[arg-type]
-        )
-        span.set_attributes(
-            {
-                GenAI.USAGE_INPUT_COST: cost_prompt,
-                GenAI.USAGE_OUTPUT_COST: cost_completion,
-            }
-        )
-    except Exception as e:
-        msg = f"Error computing cost_per_token: {e}"
-        logger.warning(msg)
+    if any(
+        key in attributes
+        for key in ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"]
+    ):
+        try:
+            cost_prompt, cost_completion = cost_per_token(
+                model=str(attributes.get(GenAI.REQUEST_MODEL, "")),
+                prompt_tokens=int(attributes.get(GenAI.USAGE_INPUT_TOKENS, 0)),  # type: ignore[arg-type]
+                completion_tokens=int(attributes.get(GenAI.USAGE_OUTPUT_TOKENS, 0)),  # type: ignore[arg-type]
+            )
+            span.set_attributes(
+                {
+                    GenAI.USAGE_INPUT_COST: cost_prompt,
+                    GenAI.USAGE_OUTPUT_COST: cost_completion,
+                }
+            )
+        except Exception as e:
+            msg = f"Error computing cost_per_token: {e}"
+            logger.warning(msg)
 
 
 class AddCostInfo(Callback):

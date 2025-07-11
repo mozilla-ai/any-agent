@@ -80,6 +80,4 @@ def test_span_cost_missing_all() -> None:
 
     callback.after_llm_call(context)
 
-    call_args = context.current_span.set_attributes.call_args[0][0]
-    assert call_args[GenAI.USAGE_INPUT_COST] == 0
-    assert call_args[GenAI.USAGE_OUTPUT_COST] == 0
+    context.current_span.set_attributes.assert_not_called()
