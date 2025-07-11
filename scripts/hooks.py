@@ -1,7 +1,7 @@
 """Generate llms.txt and llms-full.txt files for the documentation.
 
 It also serves markdown files as text files for LLM consumption.
-It was initiallywritten in collaboration with Claude 4 Sonnet.
+It was initially written in collaboration with Claude 4 Sonnet.
 """
 
 import os
