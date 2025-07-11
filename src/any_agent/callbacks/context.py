@@ -23,7 +23,7 @@ class Context:
     """You can use the span in your callbacks to get information consistently across frameworks.
 
     You can find information about the attributes (available under `current_span.attributes`) in
-    [Attributes Reference](./tracing.md#any_agent.tracing.span_attrs).
+    [Attributes Reference](./tracing.md#any_agent.tracing.attributes).
     """
 
     trace: AgentTrace

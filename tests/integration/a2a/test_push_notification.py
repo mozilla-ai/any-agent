@@ -30,8 +30,8 @@ from any_agent.frameworks.tinyagent import TinyAgent
 from any_agent.serving import A2AServingConfig
 from any_agent.serving.a2a.envelope import A2AEnvelope
 from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID, wait_for_server_async
-from any_agent.tracing import span_attrs
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+from any_agent.tracing.attributes import GenAI
 from any_agent.tracing.otel_types import (
     Resource,
     SpanContext,
@@ -82,13 +82,13 @@ class MockConversationAgent(TinyAgent):
                 status=Status(),
                 context=SpanContext(span_id=123),
                 attributes={
-                    span_attrs.OPERATION: "call_llm",
-                    span_attrs.MODEL_ID: "mock-model",
-                    span_attrs.INPUT_MESSAGES: json.dumps(
+                    GenAI.OPERATION_NAME: "call_llm",
+                    GenAI.REQUEST_MODEL: "mock-model",
+                    GenAI.INPUT_MESSAGES: json.dumps(
                         [{"role": "user", "content": prompt}]
                     ),
-                    span_attrs.OUTPUT: agent_response,
-                    span_attrs.OUTPUT_TYPE: "json",
+                    GenAI.OUTPUT: agent_response,
+                    GenAI.OUTPUT_TYPE: "json",
                 },
                 links=[],
                 events=[],

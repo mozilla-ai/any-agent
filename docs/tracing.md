@@ -6,7 +6,7 @@ An [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] is returned when cal
 
 !!! info
 
-    Check the [Attributes Reference](./api/tracing.md#any_agent.tracing.span_attrs).
+    Check the exposed attributes in [`GenAI`][any_agent.tracing.attributes.GenAI]
 
 You can try to 🔍 find 🔍 the subtle differences (regarding the content) across frameworks in the examples below.
 

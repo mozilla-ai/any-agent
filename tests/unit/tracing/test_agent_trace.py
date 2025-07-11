@@ -1,6 +1,6 @@
 from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID
-from any_agent.tracing import span_attrs
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+from any_agent.tracing.attributes import GenAI
 from any_agent.tracing.otel_types import Resource, SpanContext, SpanKind, Status
 
 
@@ -12,9 +12,9 @@ def create_llm_span(input_tokens: int = 100, output_tokens: int = 50) -> AgentSp
         status=Status(),
         context=SpanContext(span_id=123),
         attributes={
-            span_attrs.OPERATION: "call_llm",
-            span_attrs.INPUT_TOKENS: input_tokens,
-            span_attrs.OUTPUT_TOKENS: output_tokens,
+            GenAI.OPERATION_NAME: "call_llm",
+            GenAI.USAGE_INPUT_TOKENS: input_tokens,
+            GenAI.USAGE_OUTPUT_TOKENS: output_tokens,
         },
         links=[],
         events=[],

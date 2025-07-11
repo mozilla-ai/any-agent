@@ -7,7 +7,7 @@ from litellm.cost_calculator import cost_per_token
 
 from any_agent.callbacks.base import Callback
 from any_agent.logging import logger
-from any_agent.tracing import span_attrs
+from any_agent.tracing.attributes import GenAI
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -21,24 +21,21 @@ if TYPE_CHECKING:
 def add_cost_info(span: Span) -> None:
     """Use litellm to compute cost and add it to span attributes."""
     attributes: Mapping[str, AttributeValue] = span.attributes
-    if any(
-        key in attributes for key in [span_attrs.INPUT_TOKENS, span_attrs.OUTPUT_TOKENS]
-    ):
-        try:
-            cost_prompt, cost_completion = cost_per_token(
-                model=str(attributes.get(span_attrs.MODEL_ID, "")),
-                prompt_tokens=int(attributes.get(span_attrs.INPUT_TOKENS, 0)),  # type: ignore[arg-type]
-                completion_tokens=int(attributes.get(span_attrs.OUTPUT_TOKENS, 0)),  # type: ignore[arg-type]
-            )
-            span.set_attributes(
-                {
-                    span_attrs.INPUT_COST: cost_prompt,
-                    span_attrs.OUTPUT_COST: cost_completion,
-                }
-            )
-        except Exception as e:
-            msg = f"Error computing cost_per_token: {e}"
-            logger.warning(msg)
+    try:
+        cost_prompt, cost_completion = cost_per_token(
+            model=str(attributes.get(GenAI.REQUEST_MODEL, "")),
+            prompt_tokens=int(attributes.get(GenAI.USAGE_INPUT_TOKENS, 0)),  # type: ignore[arg-type]
+            completion_tokens=int(attributes.get(GenAI.USAGE_OUTPUT_TOKENS, 0)),  # type: ignore[arg-type]
+        )
+        span.set_attributes(
+            {
+                GenAI.USAGE_INPUT_COST: cost_prompt,
+                GenAI.USAGE_OUTPUT_COST: cost_completion,
+            }
+        )
+    except Exception as e:
+        msg = f"Error computing cost_per_token: {e}"
+        logger.warning(msg)
 
 
 class AddCostInfo(Callback):
