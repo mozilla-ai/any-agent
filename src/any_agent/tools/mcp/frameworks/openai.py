@@ -5,13 +5,16 @@ from typing import TYPE_CHECKING, Literal
 
 from pydantic import Field, PrivateAttr
 
-from any_agent.config import AgentFramework, MCPSse, MCPStdio
+from any_agent.config import AgentFramework, MCPSse, MCPStdio, MCPStreamableHttp
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
 from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
 if TYPE_CHECKING:
     from agents.mcp import MCPServerSse as OpenAIInternalMCPServerSse
     from agents.mcp import MCPServerStdio as OpenAIInternalMCPServerStdio
+    from agents.mcp import (
+        MCPServerStreamableHttp as OpenAIInternalMCPServerStreamableHttp,
+    )
     from agents.mcp.server import MCPServer
 
 mcp_available = False
@@ -24,6 +27,12 @@ with suppress(ImportError):
     from agents.mcp import (
         MCPServerStdioParams as OpenAIInternalMCPServerStdioParams,
     )
+    from agents.mcp import (
+        MCPServerStreamableHttp as OpenAIInternalMCPServerStreamableHttp,
+    )
+    from agents.mcp import (
+        MCPServerStreamableHttpParams as OpenAIInternalMCPServerStreamableHttpParams,
+    )
     from mcp.types import Tool as MCPTool  # noqa: TC002
 
     mcp_available = True
@@ -32,8 +41,8 @@ with suppress(ImportError):
 class OpenAIMCPConnection(_MCPConnection["MCPTool"], ABC):
     """Base class for OpenAI MCP connections."""
 
-    _server: "OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | None" = (
-        PrivateAttr(default=None)
+    _server: "OpenAIInternalMCPServerStdio | OpenAIInternalMCPServerSse | OpenAIInternalMCPServerStreamableHttp | None" = PrivateAttr(
+        default=None
     )
 
     @abstractmethod
@@ -96,6 +105,22 @@ class OpenAIMCPSseConnection(OpenAIMCPConnection):
         return await super().list_tools()
 
 
+class OpenAIMCPStreamableHttpConnection(OpenAIMCPConnection):
+    mcp_tool: MCPStreamableHttp
+
+    async def list_tools(self) -> list["MCPTool"]:
+        """List tools from the MCP server."""
+        params = OpenAIInternalMCPServerStreamableHttpParams(url=self.mcp_tool.url)
+
+        self._server = OpenAIInternalMCPServerStreamableHttp(
+            name="OpenAI MCP Server",
+            params=params,
+            client_session_timeout_seconds=self.mcp_tool.client_session_timeout_seconds,
+        )
+
+        return await super().list_tools()
+
+
 class OpenAIMCPServerBase(_MCPServerBase["MCPTool"], ABC):
     framework: Literal[AgentFramework.OPENAI] = AgentFramework.OPENAI
     tools: Sequence["MCPTool"] = Field(default_factory=list)
@@ -131,4 +156,18 @@ class OpenAIMCPServerSse(OpenAIMCPServerBase):
         await super()._setup_tools(mcp_connection)
 
 
-OpenAIMCPServer = OpenAIMCPServerStdio | OpenAIMCPServerSse
+class OpenAIMCPServerStreamableHttp(OpenAIMCPServerBase):
+    mcp_tool: MCPStreamableHttp
+
+    async def _setup_tools(
+        self, mcp_connection: _MCPConnection["MCPTool"] | None = None
+    ) -> None:
+        mcp_connection = mcp_connection or OpenAIMCPStreamableHttpConnection(
+            mcp_tool=self.mcp_tool
+        )
+        await super()._setup_tools(mcp_connection)
+
+
+OpenAIMCPServer = (
+    OpenAIMCPServerStdio | OpenAIMCPServerSse | OpenAIMCPServerStreamableHttp
+)

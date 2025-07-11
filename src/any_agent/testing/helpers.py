@@ -1,11 +1,13 @@
 import asyncio
 import time
+from collections.abc import Sequence
 from typing import Any
 
 import httpx
 import requests
 
 from any_agent.config import AgentFramework
+from any_agent.tracing.agent_trace import AgentSpan
 
 DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
 
@@ -100,3 +102,23 @@ async def wait_for_server_async(
             if attempts >= max_attempts:
                 msg = f"Could not connect to {server_url}. Tried {max_attempts} times with {poll_interval} second interval."
                 raise ConnectionError(msg)
+
+
+def group_spans(
+    spans: Sequence[AgentSpan],
+) -> tuple[Sequence[AgentSpan], Sequence[AgentSpan], Sequence[AgentSpan]]:
+    """Group spans into agent invocations, llm calls and tool executions."""
+    agent_invocations = []
+    llm_calls = []
+    tool_executions = []
+    for span in spans:
+        if span.is_agent_invocation():
+            agent_invocations.append(span)
+        elif span.is_llm_call():
+            llm_calls.append(span)
+        elif span.is_tool_execution():
+            tool_executions.append(span)
+        else:
+            msg = f"Unexpected span: {span}"
+            raise AssertionError(msg)
+    return agent_invocations, llm_calls, tool_executions

@@ -4,6 +4,8 @@
 
 ::: any_agent.config.MCPStdio
 
+::: any_agent.config.MCPStreamableHttp
+
 ::: any_agent.config.MCPSse
 
 ::: any_agent.serving.A2AServingConfig

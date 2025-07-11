@@ -22,6 +22,7 @@ from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.testing.helpers import (
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
+    group_spans,
 )
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
 from any_agent.tracing.attributes import GenAI
@@ -59,19 +60,7 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
         assert isinstance(agent_trace, AgentTrace)
         assert agent_trace.final_output
 
-    agent_invocations = []
-    llm_calls = []
-    tool_executions = []
-    for span in agent_trace.spans:
-        if span.is_agent_invocation():
-            agent_invocations.append(span)
-        elif span.is_llm_call():
-            llm_calls.append(span)
-        elif span.is_tool_execution():
-            tool_executions.append(span)
-        else:
-            msg = f"Unexpected span: {span}"
-            raise AssertionError(msg)
+    agent_invocations, llm_calls, tool_executions = group_spans(agent_trace.spans)
 
     assert len(agent_invocations) == 1
 

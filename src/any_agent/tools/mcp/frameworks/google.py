@@ -8,6 +8,7 @@ from any_agent.config import (
     AgentFramework,
     MCPSse,
     MCPStdio,
+    MCPStreamableHttp,
 )
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
 from any_agent.tools.mcp.mcp_server import _MCPServerBase
@@ -19,6 +20,9 @@ try:
         SseConnectionParams as GoogleSseServerParameters,
     )
     from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
+    from google.adk.tools.mcp_tool.mcp_session_manager import (
+        StreamableHTTPConnectionParams as GoogleStreamableHTTPServerParameters,
+    )
     from mcp import (
         StdioServerParameters as GoogleStdioServerParameters,
     )
@@ -31,7 +35,7 @@ except ImportError:
 class GoogleMCPConnection(_MCPConnection["GoogleMCPTool"], ABC):
     """Base class for Google MCP connections."""
 
-    _params: "GoogleStdioServerParameters | GoogleSseServerParameters | StdioConnectionParams | None" = PrivateAttr(
+    _params: "GoogleStdioServerParameters | GoogleSseServerParameters | GoogleStreamableHTTPServerParameters | StdioConnectionParams | None" = PrivateAttr(
         default=None
     )
 
@@ -90,6 +94,18 @@ class GoogleMCPSseConnection(GoogleMCPConnection):
         return await super().list_tools()
 
 
+class GoogleMCPStreamableHttpConnection(GoogleMCPConnection):
+    mcp_tool: MCPStreamableHttp
+
+    async def list_tools(self) -> list["GoogleMCPTool"]:
+        """List tools from the MCP server."""
+        self._params = GoogleStreamableHTTPServerParameters(
+            url=self.mcp_tool.url,
+            headers=dict(self.mcp_tool.headers or {}),
+        )
+        return await super().list_tools()
+
+
 class GoogleMCPServerBase(_MCPServerBase["GoogleMCPTool"], ABC):
     framework: Literal[AgentFramework.GOOGLE] = AgentFramework.GOOGLE
     tools: Sequence["GoogleMCPTool"] = Field(default_factory=list)
@@ -125,4 +141,18 @@ class GoogleMCPServerSse(GoogleMCPServerBase):
         await super()._setup_tools(mcp_connection)
 
 
-GoogleMCPServer = GoogleMCPServerStdio | GoogleMCPServerSse
+class GoogleMCPServerStreamableHttp(GoogleMCPServerBase):
+    mcp_tool: MCPStreamableHttp
+
+    async def _setup_tools(
+        self, mcp_connection: _MCPConnection["GoogleMCPTool"] | None = None
+    ) -> None:
+        mcp_connection = mcp_connection or GoogleMCPStreamableHttpConnection(
+            mcp_tool=self.mcp_tool
+        )
+        await super()._setup_tools(mcp_connection)
+
+
+GoogleMCPServer = (
+    GoogleMCPServerStdio | GoogleMCPServerSse | GoogleMCPServerStreamableHttp
+)

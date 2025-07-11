@@ -1,6 +1,12 @@
 from typing import assert_never
 
-from any_agent.config import AgentFramework, MCPParams, MCPSse, MCPStdio
+from any_agent.config import (
+    AgentFramework,
+    MCPParams,
+    MCPSse,
+    MCPStdio,
+    MCPStreamableHttp,
+)
 
 from .agno import AgnoMCPServer
 from .google import GoogleMCPServer
@@ -87,11 +93,47 @@ def _get_sse_mcp_server(mcp_tool: MCPSse, agent_framework: AgentFramework) -> MC
     assert_never(agent_framework)
 
 
+def _get_streamablehttp_mcp_server(
+    mcp_tool: MCPStreamableHttp, agent_framework: AgentFramework
+) -> MCPServer:
+    if agent_framework is AgentFramework.AGNO:
+        from .agno import AgnoMCPServerStreamableHttp
+
+        return AgnoMCPServerStreamableHttp(mcp_tool=mcp_tool)
+    if agent_framework is AgentFramework.GOOGLE:
+        from .google import GoogleMCPServerStreamableHttp
+
+        return GoogleMCPServerStreamableHttp(mcp_tool=mcp_tool)
+    if agent_framework is AgentFramework.LANGCHAIN:
+        from .langchain import LangchainMCPServerStreamableHttp
+
+        return LangchainMCPServerStreamableHttp(mcp_tool=mcp_tool)
+    if agent_framework is AgentFramework.LLAMA_INDEX:
+        from .llama_index import LlamaIndexMCPServerStreamableHttp
+
+        return LlamaIndexMCPServerStreamableHttp(mcp_tool=mcp_tool)
+    if agent_framework is AgentFramework.OPENAI:
+        from .openai import OpenAIMCPServerStreamableHttp
+
+        return OpenAIMCPServerStreamableHttp(mcp_tool=mcp_tool)
+    if agent_framework is AgentFramework.SMOLAGENTS:
+        from .smolagents import SmolagentsMCPServerStreamableHttp
+
+        return SmolagentsMCPServerStreamableHttp(mcp_tool=mcp_tool)
+    if agent_framework is AgentFramework.TINYAGENT:
+        from .tinyagent import TinyAgentMCPServerStreamableHttp
+
+        return TinyAgentMCPServerStreamableHttp(mcp_tool=mcp_tool)
+    assert_never(agent_framework)
+
+
 def _get_mcp_server(mcp_tool: MCPParams, agent_framework: AgentFramework) -> MCPServer:
     if isinstance(mcp_tool, MCPStdio):
         return _get_stdio_mcp_server(mcp_tool, agent_framework)
     if isinstance(mcp_tool, MCPSse):
         return _get_sse_mcp_server(mcp_tool, agent_framework)
+    if isinstance(mcp_tool, MCPStreamableHttp):
+        return _get_streamablehttp_mcp_server(mcp_tool, agent_framework)
     assert_never(mcp_tool)
 
 
