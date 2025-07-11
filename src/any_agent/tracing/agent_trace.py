@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from any_agent.logging import logger
 
+from .attributes import GenAI
 from .otel_types import (
     AttributeValue,
     Event,
@@ -129,15 +130,15 @@ class AgentSpan(BaseModel):
 
     def is_agent_invocation(self) -> bool:
         """Check whether this span is an agent invocation (the very first span)."""
-        return self.attributes.get("gen_ai.operation.name") == "invoke_agent"
+        return self.attributes.get(GenAI.OPERATION_NAME) == "invoke_agent"
 
     def is_llm_call(self) -> bool:
         """Check whether this span is a call to an LLM."""
-        return self.attributes.get("gen_ai.operation.name") == "call_llm"
+        return self.attributes.get(GenAI.OPERATION_NAME) == "call_llm"
 
     def is_tool_execution(self) -> bool:
         """Check whether this span is an execution of a tool."""
-        return self.attributes.get("gen_ai.operation.name") == "execute_tool"
+        return self.attributes.get(GenAI.OPERATION_NAME) == "execute_tool"
 
     def get_input_messages(self) -> list[AgentMessage] | None:
         """Extract input messages from an LLM call span.
@@ -150,7 +151,7 @@ class AgentSpan(BaseModel):
             msg = "Span is not an LLM call"
             raise ValueError(msg)
 
-        messages_json = self.attributes.get("gen_ai.input.messages")
+        messages_json = self.attributes.get(GenAI.INPUT_MESSAGES)
         if not messages_json:
             logger.debug("No input messages found in span")
             return None
@@ -178,7 +179,7 @@ class AgentSpan(BaseModel):
             msg = "Span is not an LLM call or tool execution"
             raise ValueError(msg)
 
-        output = self.attributes.get("gen_ai.output")
+        output = self.attributes.get(GenAI.OUTPUT)
         if not output:
             logger.debug("No output found in span")
             return None
@@ -263,8 +264,8 @@ class AgentTrace(BaseModel):
                 # For tool executions, include the result in the conversation
                 output_content = span.get_output_content()
                 if output_content:
-                    tool_name = span.attributes["gen_ai.tool.name"]
-                    tool_args = span.attributes.get("gen_ai.tool.args", "{}")
+                    tool_name = span.attributes[GenAI.TOOL_NAME]
+                    tool_args = span.attributes.get(GenAI.TOOL_ARGS, "{}")
                     messages.append(
                         AgentMessage(
                             role="assistant",
@@ -305,10 +306,8 @@ class AgentTrace(BaseModel):
         sum_output_tokens = 0
         for span in self.spans:
             if span.is_llm_call():
-                sum_input_tokens += span.attributes.get("gen_ai.usage.input_tokens", 0)
-                sum_output_tokens += span.attributes.get(
-                    "gen_ai.usage.output_tokens", 0
-                )
+                sum_input_tokens += span.attributes.get(GenAI.USAGE_INPUT_TOKENS, 0)
+                sum_output_tokens += span.attributes.get(GenAI.USAGE_OUTPUT_TOKENS, 0)
         return TokenInfo(input_tokens=sum_input_tokens, output_tokens=sum_output_tokens)
 
     @cached_property
@@ -318,12 +317,6 @@ class AgentTrace(BaseModel):
         sum_output_cost = 0.0
         for span in self.spans:
             if span.is_llm_call():
-                if any(
-                    key in span.attributes
-                    for key in ["gen_ai.usage.input_cost", "gen_ai.usage.output_cost"]
-                ):
-                    sum_input_cost += span.attributes.get("gen_ai.usage.input_cost", 0)
-                    sum_output_cost += span.attributes.get(
-                        "gen_ai.usage.output_cost", 0
-                    )
+                sum_input_cost += span.attributes.get(GenAI.USAGE_INPUT_COST, 0)
+                sum_output_cost += span.attributes.get(GenAI.USAGE_OUTPUT_COST, 0)
         return CostInfo(input_cost=sum_input_cost, output_cost=sum_output_cost)

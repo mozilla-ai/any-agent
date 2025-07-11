@@ -35,3 +35,10 @@ pip install any-agent[agno,openai]
 ```
 
 Refer to [pyproject.toml](https://github.com/mozilla-ai/any-agent/blob/main/pyproject.toml) for a list of the options available.
+
+## For AI Systems
+
+This documentation is available in two AI-friendly formats:
+
+- **[llms.txt](/llms.txt)** - A structured overview with curated links to key documentation sections
+- **[llms-full.txt](/llms-full.txt)** - Complete documentation content concatenated into a single file
