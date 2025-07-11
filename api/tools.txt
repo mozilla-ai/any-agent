@@ -1,0 +1,5 @@
+<!-- Source: api/tools.md -->
+
+# Tools
+
+::: any_agent.tools

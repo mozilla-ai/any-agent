@@ -1,0 +1,1818 @@
+# any-agent Documentation
+
+> Complete documentation for any-agent - A Python library providing a single interface to different agent frameworks.
+
+This file contains all documentation pages concatenated for easy consumption by AI systems.
+
+---
+
+## index.md
+
+<!-- Source: index.md -->
+
+# any-agent
+
+<p align="center">
+  <picture>
+    <img src="./images/any-agent-logo-mark.png" width="20%" alt="Project logo"/>
+  </picture>
+</p>
+
+`any-agent` is a Python library providing a single interface to different agent frameworks.
+
+!!! warning
+
+    Compared to traditional code-defined workflows, agent frameworks introduce complexity,
+    additional security implications to consider, and demand much more computational power.
+
+    Before jumping to use one, carefully consider and evaluate how much value you
+    would get compared to manually defining a sequence of tools and LLM calls.
+
+## Requirements
+
+- Python 3.11 or newer
+
+## Installation
+
+You can install the bare bones library as follows (only [`TinyAgent`](#./agents/frameworks/tinyagent.md) will be available):
+
+```bash
+pip install any-agent
+```
+
+Or you can install it with the required dependencies for different frameworks:
+
+```bash
+pip install any-agent[agno,openai]
+```
+
+Refer to [pyproject.toml](https://github.com/mozilla-ai/any-agent/blob/main/pyproject.toml) for a list of the options available.
+
+## For AI Systems
+
+This documentation is available in two AI-friendly formats:
+
+- **[llms.txt](/llms.txt)** - A structured overview with curated links to key documentation sections
+- **[llms-full.txt](/llms-full.txt)** - Complete documentation content concatenated into a single file
+
+
+---
+
+## agents/index.md
+
+<!-- Source: agents/index.md -->
+
+# Defining and Running Agents
+
+## Defining Agents
+
+To define any agent system you will always use the same imports:
+
+```python
+from any_agent import AgentConfig, AnyAgent, AgentRunError
+# In these examples, the built-in tools will be used
+from any_agent.tools import search_web, visit_webpage
+```
+
+Check [`AgentConfig`][any_agent.config.AgentConfig] for more info on how to configure agents.
+
+### Single Agent
+
+```python
+agent = AnyAgent.create(
+    "openai",  # See other options under `Frameworks`
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="Use the tools to find an answer",
+        tools=[search_web, visit_webpage]
+    ),
+)
+```
+
+### Multi-Agent
+
+!!! warning
+
+    A multi-agent system introduces even more complexity than a single agent.
+
+    As stated before, carefully consider whether you need to adopt this pattern to
+    solve the task.
+
+Multi-Agent systems can be implemented [using Agent-As-Tools](./tools.md#using-agents-as-tools).
+
+### Framework Specific Arguments
+
+Sometimes, there may be a new feature in a framework that you want to use that isn't yet supported universally in any-agent. The `agent_args` parameter in `AgentConfig` allows you to pass arguments specific to the underlying framework that the agent instance is built on.
+
+**Example-1**: To pass the `output_guardrails` parameter, when using the OpenAI Agents SDK:
+
+```python
+from pydantic import BaseModel
+from any_agent import AgentConfig, AgentFramework, AnyAgent
+from agents import (
+    Agent,
+    GuardrailFunctionOutput,
+    OutputGuardrailTripwireTriggered,
+    RunContextWrapper,
+    Runner,
+    output_guardrail,
+)
+
+class MessageOutput(BaseModel):
+    response: str
+
+class MathOutput(BaseModel):
+    reasoning: str
+    is_math: bool
+
+guardrail_agent = Agent(
+    name="Guardrail check",
+    instructions="Check if the output includes any math.",
+    output_type=MathOutput,
+)
+
+@output_guardrail
+async def math_guardrail(
+    ctx: RunContextWrapper, agent: Agent, output: MessageOutput
+) -> GuardrailFunctionOutput:
+    result = await Runner.run(guardrail_agent, output.response, context=ctx.context)
+
+    return GuardrailFunctionOutput(
+        output_info=result.final_output,
+        tripwire_triggered=result.final_output.is_math,
+    )
+
+framework = AgentFramework.OPENAI
+
+agent = AnyAgent.create(
+    framework,
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="Check if the output contains any math",
+        agent_args={
+            "output_guardrails": [math_guardrail]
+        }
+    )
+)
+```
+
+## Running Agents
+
+```python
+try:
+    agent_trace = agent.run("Which Agent Framework is the best??")
+    print(agent_trace.final_output)
+except AgentRunError as are:
+    agent_trace = are.trace
+```
+
+Check [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] for more info on the return type.
+
+Exceptions are wrapped in an [`AgentRunError`][any_agent.AgentRunError], that carries the original exception in the `__cause__` attribute. Additionally, its `trace` property holds the trace containing the spans collected so far.
+
+### Async
+
+If you are running in `async` context, you should use the equivalent [`create_async`][any_agent.AnyAgent.create_async] and [`run_async`][any_agent.AnyAgent.run_async] methods:
+
+```python
+import asyncio
+
+async def main():
+    agent = await AnyAgent.create_async(
+        "openai",
+        AgentConfig(
+            model_id="mistral/mistral-small-latest",
+            instructions="Use the tools to find an answer",
+            tools=[search_web, visit_webpage]
+        )
+    )
+
+    agent_trace = await agent.run_async("Which Agent Framework is the best??")
+    print(agent_trace.final_output)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Batch Processing
+
+While any-agent doesn't provide a dedicated `.run_batch()` API, we recommend using `asyncio.gather` with the [`AnyAgent.run_async`][any_agent.AnyAgent.run_async] API for concurrent processing:
+
+```python
+import asyncio
+from any_agent import AgentConfig, AnyAgent
+
+async def process_batch():
+    agent = await AnyAgent.create_async("tinyagent", AgentConfig(...))
+    inputs = ["Input 1", "Input 2", "Input 3"]
+    tasks = [agent.run_async(input_text) for input_text in inputs]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    return results
+```
+
+### Multi-Turn Conversations
+
+For scenarios where you need to maintain conversation history across multiple agent interactions, you can leverage the [`spans_to_messages`][any_agent.tracing.agent_trace.AgentTrace.spans_to_messages] method built into the AgentTrace. This function converts agent traces into a standardized message format that can be used to provide context in subsequent conversations.
+
+
+!!! tip "When to Use Each Approach"
+
+    - **Multi-turn with `spans_to_messages`**: When you need to maintain context across separate agent invocations or implement complex conversation management logic
+    - **User interaction tools**: When you want the agent to naturally interact with users during its execution, asking questions as needed to complete its task
+    - **Hybrid approach**: Combine both patterns for sophisticated agents that maintain long-term context while also gathering real-time user input
+
+
+#### Basic Multi-Turn Example
+
+```python
+from any_agent import AgentConfig, AnyAgent
+
+# Create your agent
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="You are a helpful assistant. Use previous conversation context when available.",
+    )
+)
+
+response1 = agent.run("What's the capital of California?")
+print(f"Agent: {response1.final_output}")
+conversation_history = response1.spans_to_messages()
+# Convert previous conversation to readable format
+history_text = "\n".join([
+    f"{msg.role.capitalize()}: {msg.content}"
+    for msg in conversation_history
+    if msg.role != "system"
+])
+
+user_message = "What's the closest national park to that city"
+
+full_prompt = f"""Previous conversation:
+{history_text}
+
+Current user message: {user_message}
+
+Please respond taking into account the conversation history above."""
+
+response2 = agent.run(full_prompt)
+print(f"Agent: {response2.final_output}")  # Agent will understand "that city" refers to Sacramento
+```
+
+#### Design Philosophy: Thoughtful Message History Management
+
+You may notice that the `agent.run()` method doesn't accept a `messages` parameter directly. This is an intentional design choice to encourage thoughtful handling of conversation history by developers. Rather than automatically managing message history, any-agent empowers you to:
+
+- **Choose your context strategy**: Decide what parts of conversation history are relevant
+- **Manage token usage**: Control how much context you include to optimize costs and performance
+- **Handle complex scenarios**: Implement custom logic for conversation branching, summarization, or context windowing
+
+This approach ensures that conversation context is handled intentionally rather than automatically, leading to more efficient and purposeful agent interactions.
+
+#### Using User Interaction Tools for Regular Conversations
+
+For scenarios where you need regular, back-and-forth interaction with users, we recommend using or building your own **user interaction tools** rather than managing conversation history manually. This pattern allows the agent to naturally ask follow-up questions and gather information as needed. We provide a default `send_console_message` tool which uses console inputs and outputs, but you may need to use a more advanced tool (such as a Slack MCP Server) to handle user interaction.
+
+```python
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tools.user_interaction import send_console_message
+
+# Create agent with user interaction capabilities
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="You are a helpful travel assistant. Send console messages to ask more questions. Do not stop until you've answered the question.",
+        tools=[send_console_message]
+    )
+)
+
+# The agent can now naturally ask questions during its execution
+prompt = """
+I'm planning a trip and need help finding accommodations.
+Please ask me some questions to understand my preferences, then provide recommendations.
+"""
+
+agent_trace = agent.run(prompt)
+print(f"Final recommendations: {agent_trace.final_output}")
+```
+
+This approach is demonstrated in our [MCP Agent cookbook example](../cookbook/mcp_agent.ipynb), where an agent uses user interaction tools to gather trip planning information dynamically. The agent can ask clarifying questions, get user preferences, and provide personalized recommendations all within a single `run()` call.
+
+
+---
+
+## agents/callbacks.md
+
+<!-- Source: agents/callbacks.md -->
+
+# Agent Callbacks
+
+For greater control when running your agent, `any-agent` includes support for custom [`Callbacks`][any_agent.callbacks.base.Callback] that
+will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.run]:
+
+```py
+# pseudocode of an Agent run
+
+history = [system_prompt, user_prompt]
+context = Context()
+
+while True:
+
+    for callback in agent.config.callbacks:
+        context = callback.before_llm_call(context)
+
+    response = CALL_LLM(history)
+
+    for callback in agent.config.callbacks:
+        context = callback.after_llm_call(context)
+
+    history.append(response)
+
+    if response.tool_executions:
+        for tool_execution in tool_executions:
+
+            for callback in agent.config.callbacks:
+                context = callback.before_tool_execution(context)
+
+            tool_response = EXECUTE_TOOL(tool_execution)
+
+            for callback in agent.config.callbacks:
+                context = callback.after_tool_execution(context)
+
+            history.append(tool_response)
+
+    else:
+        return response
+```
+
+Advanced designs such as safety guardrails or custom side-effects can be integrated into your agentic system using this functionality.
+
+During the agent run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`agent.run`][any_agent.AnyAgent.run] ), a unique [`Context`][any_agent.callbacks.context.Context] object is created and shared across all callbacks.
+
+`any-agent` populates the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
+property so that callbacks can access information in a framework-agnostic way. You can check the attributes available
+for LLM Calls and Tool Executions in the [example spans](../tracing.md#spans).
+
+## Implementing Callbacks
+
+All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and can choose to implement any subset of the available callback methods.
+
+You can use [`Context.shared`][any_agent.callbacks.context.Context.shared] to store information meant
+to be reused across callbacks:
+
+```python
+from any_agent.callbacks import Callback, Context
+
+class CountSearchWeb(Callback):
+    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        if "search_web_count" not in context.shared:
+            context.shared["search_web_count"] = 0
+        if context.current_span.attributes["gen_ai.tool.name"] == "search_web":
+            context.shared["search_web_count"] += 1
+```
+
+Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:
+
+```python
+class LimitSearchWeb(Callback):
+    def __init__(self, max_calls: int):
+        self.max_calls = max_calls
+
+    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        if context.shared["search_web_count"] > self.max_calls:
+            raise RuntimeError("Reached limit of `search_web` calls.")
+```
+
+!!! warning
+
+    Raising exceptions in callbacks will terminate the agent run immediately. Use this feature carefully to implement safety measures or validation logic.
+
+## Default Callbacks
+
+`any-agent` comes with a set of default callbacks that will be used by default (if you don't pass a value to `AgentConfig.callbacks`):
+
+- [`AddCostInfo`][any_agent.callbacks.span_cost.AddCostInfo]
+- [`ConsolePrintSpan`][any_agent.callbacks.span_print.ConsolePrintSpan]
+
+If you want to disable these default callbacks, you can pass an empty list:
+
+```python
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tools import search_web, visit_webpage
+
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="Use the tools to find an answer",
+        tools=[search_web, visit_webpage],
+        callbacks=[]
+    ),
+)
+```
+
+## Providing your own Callbacks
+
+Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agent.AgentConfig.callbacks] property.
+
+=== "Alongside the default callbacks"
+
+    You can use [`get_default_callbacks`][any_agent.callbacks.get_default_callbacks]:
+
+    ```py
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.callbacks import get_default_callbacks
+    from any_agent.tools import search_web, visit_webpage
+
+    agent = AnyAgent.create(
+        "tinyagent",
+        AgentConfig(
+            model_id="gpt-4.1-nano",
+            instructions="Use the tools to find an answer",
+            tools=[search_web, visit_webpage],
+            callbacks=[
+                CountSearchWeb(),
+                LimitSearchWeb(max_calls=3)
+            ] + get_default_callbacks()
+        ),
+    )
+    ```
+
+=== "Override the default callbacks"
+
+    ```py
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.tools import search_web, visit_webpage
+
+    agent = AnyAgent.create(
+        "tinyagent",
+        AgentConfig(
+            model_id="gpt-4.1-nano",
+            instructions="Use the tools to find an answer",
+            tools=[search_web, visit_webpage],
+            callbacks=[
+                CountSearchWeb(),
+                LimitSearchWeb(max_calls=3)
+            ]
+        ),
+    )
+    ```
+
+!!! warning
+
+    Callbacks will be called in the order that they are added, so it is important to pay attention to the order
+    in which you set the callback configuration.
+
+    In the above example, passing:
+
+    ```py
+        callbacks=[
+            LimitSearchWeb(max_calls=3)
+            CountSearchWeb()
+        ]
+    ```
+
+    Would fail because `context.shared["search_web_count"]`
+    was not set yet.
+
+## Example: Offloading sensitive information
+
+Some inputs and/or outputs in your traces might contain sensitive information that you don't want
+to be exposed in the [traces](#../tracing.md).
+
+You can use callbacks to offload the sensitive information to an external location and replace the span
+attributes with a reference to that location:
+
+```python
+import json
+from pathlib import Path
+
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+
+
+class SensitiveDataOffloader(Callback):
+
+    def __init__(self, output_dir: str) -> None:
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(exist_ok=True, parents=True)
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+
+        span = context.current_span
+
+        if input_messages := span.attributes.get("gen_ai.input.messages"):
+            output_file = self.output_dir / f"{span.get_span_context().trace_id}.txt"
+            output_file.write_text(str(input_messages))
+
+            span.set_attribute("gen_ai.input.messages", json.dumps(
+                {"ref": str(output_file)}
+            ))
+
+        return context
+```
+
+You can find a working example in the [Callbacks Cookbook](../cookbook/callbacks.ipynb).
+
+
+---
+
+## agents/frameworks/agno.md
+
+<!-- Source: agents/frameworks/agno.md -->
+
+# Agno
+
+[https://github.com/agno-agi/agno](https://github.com/agno-agi/agno)
+
+## Default Agent Type
+
+We use [`agno.agent.Agent`](https://docs.agno.com/reference/agents/agent) as default.
+Check the reference to find additional supported `agent_args`.
+
+## Default Model Type
+
+We use [`agno.models.litellm.LiteLLM`](https://docs.agno.com/models/litellm) as default.
+Check the reference to find additional supported `model_args`.
+
+## Examples
+
+### Limiting the number of steps
+
+```python
+from any_agent import AnyAgent, AgentConfig
+from any_agent.tools import search_web, visit_webpage
+
+agent = AnyAgent.create(
+    "agno",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="You must use the available tools to find an answer",
+        tools=[search_web, visit_webpage]
+    ),
+    agent_args={
+        "tool_call_limit": 3
+    }
+)
+agent.run("Which Agent Framework is the best??")
+```
+
+
+---
+
+## agents/frameworks/google_adk.md
+
+<!-- Source: agents/frameworks/google_adk.md -->
+
+# Google Agent Development Kit (ADK)
+
+[https://github.com/google/adk-python](https://github.com/google/adk-python)
+
+## Default Agent Type
+
+We use [`google.adk.agents.llm_agent.LlmAgent`](https://google.github.io/adk-docs/agents/llm-agents/) as default.
+Check the reference to find additional supported `agent_args`.
+
+## Default Model Type
+
+We use [`google.adk.models.lite_llm.LiteLLM`](https://google.github.io/adk-docs/agents/models/#using-cloud-proprietary-models-via-litellm) as default.
+Check the reference to find additional supported `model_args`.
+
+## Run args
+
+Check [`RunConfig`](https://google.github.io/adk-docs/runtime/runconfig/) to find additional supported `AnyAgent.run` args.
+
+## Examples
+
+### Limiting the number of steps
+
+```python
+from any_agent import AnyAgent, AgentConfig
+from any_agent.tools import search_web, visit_webpage
+from google.adk.agents.run_config import RunConfig
+
+agent = AnyAgent.create(
+    "google",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="You must use the available tools to find an answer",
+        tools=[search_web, visit_webpage]
+    )
+)
+
+agent.run(
+    "Which Agent Framework is the best??",
+    run_config=RunConfig(
+        max_llm_calls=3
+    )
+)
+```
+
+
+---
+
+## agents/frameworks/langchain.md
+
+<!-- Source: agents/frameworks/langchain.md -->
+
+# LangChain
+
+[https://github.com/langchain-ai/langchain](https://github.com/langchain-ai/langchain)
+
+[https://github.com/langchain-ai/langgraph](https://github.com/langchain-ai/langgraph)
+
+## Default Agent Type
+
+We use [`langgraph.prebuilt.create_react_agent`](https://langchain-ai.github.io/langgraph/reference/agents/?h=create_rea#langgraph.prebuilt.chat_agent_executor.create_react_agent) as default.
+Check the reference to find additional supported `agent_args`.
+
+## Default Model Type
+
+We use [`langchain_litellm.ChatLiteLLM`](https://python.langchain.com/docs/integrations/chat/litellm/#chatlitellm)
+Check the reference to find additional supported `model_args`.
+
+## Run args
+
+Check [`RunnableConfig`](https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.config.RunnableConfig.html) to find additional supported `AnyAgent.run` args.
+
+## Examples
+
+### Limiting the number of steps
+
+```python
+from any_agent import AnyAgent, AgentConfig
+from any_agent.tools import search_web, visit_webpage
+from langchain_core.runnables import RunnableConfig
+
+agent = AnyAgent.create(
+    "langchain",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="You must use the available tools to find an answer",
+        tools=[search_web, visit_webpage]
+    )
+)
+
+agent.run(
+    "Which Agent Framework is the best??",
+    config=RunnableConfig(
+        recursion_limit=3
+    )
+)
+```
+
+
+---
+
+## agents/frameworks/llama_index.md
+
+<!-- Source: agents/frameworks/llama_index.md -->
+
+# LlamaIndex
+
+[https://github.com/run-llama/llama_index](https://github.com/run-llama/llama_index)
+
+## Default Agent Type
+
+We use [`llama_index.core.agent.workflow.react_agent.FunctionAgent`](https://docs.llamaindex.ai/en/stable/api_reference/agent/#llama_index.core.agent.workflow.FunctionAgent) as default.
+However, this agent requires that tools are used. If no tools are used, any-agent will default to [`llama_index.core.agent.workflow.react_agent.ReActAgent`](https://docs.llamaindex.ai/en/stable/api_reference/agent/#llama_index.core.agent.workflow.ReActAgent).
+Check the reference to find additional supported `agent_args`.
+
+## Default Model Type
+
+We use [`llama_index.llms.litellm.LiteLLM`](https://docs.llamaindex.ai/en/stable/examples/llm/litellm/) as default.
+Check the reference to find additional supported `model_args`.
+
+## Examples
+
+### Limiting the number of steps
+
+Pending on https://github.com/run-llama/llama_index/issues/18535
+
+
+---
+
+## agents/frameworks/openai.md
+
+<!-- Source: agents/frameworks/openai.md -->
+
+# OpenAI Agents SDK
+
+[https://github.com/openai/openai-agents-python](https://github.com/openai/openai-agents-python)
+
+## Default Agent Type
+
+We use [`agents.Agent`](ttps://openai.github.io/openai-agents-python/ref/agent/#agents.agent.Agent) as default.
+Check the reference to find additional supported `agent_args`.
+
+## Default Model Type
+
+We use [`agents.extensions.models.litellm_model.LitellmModel`](https://openai.github.io/openai-agents-python/ref/extensions/litellm/) as default.
+Check the reference to find additional supported `model_args`.
+
+## Run args
+
+Check [`agents.run.Runner.run`](https://openai.github.io/openai-agents-python/ref/run/#agents.run.Runner.run) to find additional supported `AnyAgent.run` args.
+
+## Examples
+
+### Limiting the number of steps
+
+```python
+from any_agent import AnyAgent, AgentConfig
+from any_agent.tools import search_web, visit_webpage
+
+agent = AnyAgent.create(
+    "openai",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="You must use the available tools to find an answer",
+        tools=[search_web, visit_webpage]
+    )
+)
+
+agent.run(
+    "Which Agent Framework is the best??",
+    max_turns=3
+)
+```
+
+
+---
+
+## agents/frameworks/smolagents.md
+
+<!-- Source: agents/frameworks/smolagents.md -->
+
+# smolagents
+
+[https://github.com/huggingface/smolagents](https://github.com/huggingface/smolagents)
+
+## Default Agent Type
+
+We use [`smolagents.ToolCallingAgent`](https://huggingface.co/docs/smolagents/reference/agents#smolagents.ToolCallingAgent) as default.
+Check the reference to find additional supported `agent_args`.
+
+## Default Model Type
+
+We use [`smolagents.LiteLLMModel`](https://huggingface.co/docs/smolagents/reference/models#smolagents.LiteLLMModel) as default.
+Check the reference to find additional supported `model_args`.
+
+## Run args
+
+Check [`smolagents.MultiStepAgent.run`](https://huggingface.co/docs/smolagents/main/en/reference/agents#smolagents.MultiStepAgent.run) to find additional supported `AnyAgent.run` args.
+
+## Examples
+
+### Limiting the number of steps
+
+```python
+from any_agent import AnyAgent, AgentConfig
+from any_agent.tools import search_web, visit_webpage
+
+agent = AnyAgent.create(
+    "smolagents",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="You must use the available tools to find an answer",
+        tools=[search_web, visit_webpage]
+    )
+)
+
+agent.run(
+    "Which Agent Framework is the best??",
+    max_steps=3
+)
+```
+
+
+---
+
+## agents/frameworks/tinyagent.md
+
+<!-- Source: agents/frameworks/tinyagent.md -->
+
+# TinyAgent
+
+As part of the bare bones library, we provide our own Python implementation based on [HuggingFace Tiny Agents](https://huggingface.co/blog/tiny-agents).
+
+You can find it in [`any_agent.frameworks.tinyagent`](https://github.com/mozilla-ai/any-agent/blob/main/src/any_agent/frameworks/tinyagent.py).
+
+## Examples
+
+### Use MCP Tools
+
+```python
+from any_agent import AnyAgent, AgentConfig
+from any_agent.config import MCPStdio
+
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        instructions="You must use the available tools to find an answer",
+        tools=[
+            MCPStdio(
+                command="uvx",
+                args=["duckduckgo-mcp-server"]
+            )
+        ]
+    )
+)
+
+result = agent.run(
+    "Which Agent Framework is the best??"
+)
+print(result.final_output)
+```
+
+
+---
+
+## agents/tools.md
+
+<!-- Source: agents/tools.md -->
+
+# Agent Tools
+
+`any-agent` provides 2 options to specify what `tools` are available to your agent: `Callables` and `MCP` ([Model Context Protocol](https://modelcontextprotocol.io/introduction)). In order to support multi-agent systems, any agents served via A2A can also be integrated by wrapping the A2A connection in a callable function tool as described [below](#a2a-tools).
+
+You can use any combination of options within the same agent.
+
+## Callables
+
+Any Python callable can be directly passed as tools.
+You can define them in the same script, import it from an external package, etc.
+
+Under the hood, `any-agent` takes care of wrapping the
+tool so it becomes usable by the selected framework.
+
+!!! tip
+
+    Check all the [built-in callable tools](#../api/tools.md) that any-agent provides.
+
+```python
+from any_agent import AgentConfig
+from any_agent.tools import search_web
+
+main_agent = AgentConfig(
+    model_id="mistral/mistral-small-latest",
+    tools=[search_web]
+)
+```
+
+
+## MCP
+
+MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can connect to an MCP that is running elsewhere ([MCPSse][any_agent.config.MCPSse]).
+
+!!! tip
+
+    There are tools like [SuperGateway](https://github.com/supercorp-ai/supergateway) providing an easy way to turn a Stdio server into an SSE server.
+
+=== "MCP (Stdio)"
+
+    See the [MCPStdio][any_agent.config.MCPStdio] API Reference.
+
+    ```python
+    from any_agent import AgentConfig
+    from any_agent.config import MCPStdio
+
+    main_agent = AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[
+            MCPStdio(
+                command="docker",
+                args=["run", "-i", "--rm", "mcp/fetch"],
+                tools=["fetch"]
+            ),
+        ]
+    )
+    ```
+
+=== "MCP (SSE)"
+
+    See the [MCPSse][any_agent.config.MCPSse] API Reference.
+
+    ```python
+    from any_agent import AgentConfig
+    from any_agent.config import MCPSse
+
+    main_agent = AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[
+            MCPSse(
+                url="http://localhost:8000/sse"
+            ),
+        ]
+    )
+    ```
+
+## Using Agents-As-Tools
+
+To directly use one agent as a tool for another agent, `any-agent` provides 3 different approaches:
+
+The agent to be used as a tool can be defined as usual:
+
+```py
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tools import search_web
+
+google_agent = await AnyAgent.create_async(
+    "google",
+    AgentConfig(
+        name="google_expert",
+        model_id="mistral/mistral-small-latest",
+        instructions="Use the available tools to answer questions about the Google ADK",
+        description="An agent that can answer questions about the Google Agents Development Kit (ADK).",
+        tools=[search_web]
+    )
+)
+```
+
+You can then choose to wrap the agent using different approaches:
+
+=== "Agent as Callable"
+
+    ```py
+    async def google_agent_as_tool(query: str) -> str:
+        agent_trace = await google_agent.run_async(prompt=query)
+        return str(agent_trace.final_output)
+
+    google_agent_as_tool.__doc__ = google_agent.config.description
+    ```
+
+=== "Agent as MCP"
+
+    ```py
+    from any_agent.config import MCPSse
+    from any_agent.serving import MCPServingConfig
+
+    mcp_handle = await google_agent.serve_async(
+        MCPServingConfig(port=5001, endpoint="/google-agent"))
+
+    google_agent_as_tool = MCPSse(
+        url="http://localhost:5001/google-agent/sse")
+    ```
+
+=== "Agent as A2A"
+
+    ```py
+    from any_agent.serving import A2AServingConfig
+    from any_agent.tools import a2a_tool_async
+
+    a2a_handle = await google_agent.serve_async(
+        A2AServingConfig(port=5001, endpoint="/google-agent"))
+
+    google_agent_as_tool = await a2a_tool_async(
+        url="http://localhost:5001/google-agent")
+    ```
+
+Finally, regardless of the option chosen above, you can pass the agent as a tool to another agent:
+
+```py
+main_agent = await AnyAgent.create_async(
+    "tinyagent",
+    AgentConfig(
+        name="main_agent",
+        model_id="mistral-small-latest",
+        instructions="Use the available tools to obtain additional information to answer the query.",
+        tools=[google_agent_as_tool],
+    )
+)
+```
+
+
+---
+
+## tracing.md
+
+<!-- Source: tracing.md -->
+
+# Agent Tracing
+
+An [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] is returned when calling [`agent.run`][any_agent.AnyAgent.run] or [`agent.run_async`][any_agent.AnyAgent.run_async].
+
+`any-agent` generates standardized (regarding the structure) [OpenTelemetry](https://opentelemetry.io/) traces regardless of the framework used, based on the [Semantic conventions for generative AI systems](https://opentelemetry.io/docs/specs/semconv/gen-ai/). This means that any OpenTelemetry exporter compatible with the Python SDK can be added. More information can be found [below](#adding-an-opentelemetry-exporter).
+
+You can try to 🔍 find 🔍 the subtle differences (regarding the content) across frameworks in the examples below.
+
+!!! tip
+
+    The following are real traces generated by executing [one of our integration tests](https://github.com/mozilla-ai/any-agent/blob/main/tests/integration/test_load_and_run_agent.py).
+
+## Console
+
+Here is what the console output looks like:
+
+=== "AGNO"
+
+    {% include "../tests/assets/AGNO_trace.html" %}
+
+=== "GOOGLE"
+
+    {% include "../tests/assets/GOOGLE_trace.html" %}
+
+=== "LANGCHAIN"
+
+    {% include "../tests/assets/LANGCHAIN_trace.html" %}
+
+=== "LLAMA_INDEX"
+
+    {% include "../tests/assets/LLAMA_INDEX_trace.html" %}
+
+=== "OPENAI"
+
+    {% include "../tests/assets/OPENAI_trace.html" %}
+
+=== "SMOLAGENTS"
+
+    {% include "../tests/assets/SMOLAGENTS_trace.html" %}
+
+=== "TINYAGENT"
+
+    {% include "../tests/assets/TINYAGENT_trace.html" %}
+
+!!! tip
+
+    The spans are printed to the console by default, using the `callback` mechanism.
+
+    See [Default Callbacks](./agents/callbacks.md#default-callbacks) for more information
+    and how to disable this behavior.
+
+## Spans
+
+Here's what the returned [`agent_trace.spans`][any_agent.AgentTrace.spans] look like when [dumped to JSON format](#dumping-to-file):
+
+=== "AGNO"
+    ~~~json
+    {% include "../tests/assets/AGNO_trace.json" %}
+    ~~~
+
+=== "GOOGLE"
+    ~~~json
+    {% include "../tests/assets/GOOGLE_trace.json" %}
+    ~~~
+
+=== "LANGCHAIN"
+    ~~~json
+    {% include "../tests/assets/LANGCHAIN_trace.json" %}
+    ~~~
+
+=== "LLAMA_INDEX"
+    ~~~json
+    {% include "../tests/assets/LLAMA_INDEX_trace.json" %}
+    ~~~
+
+=== "OPENAI"
+    ~~~json
+    {% include "../tests/assets/OPENAI_trace.json" %}
+    ~~~
+
+=== "SMOLAGENTS"
+    ~~~json
+    {% include "../tests/assets/SMOLAGENTS_trace.json" %}
+    ~~~
+
+=== "TINYAGENT"
+    ~~~json
+    {% include "../tests/assets/TINYAGENT_trace.json" %}
+    ~~~
+
+## Dumping to File
+
+The AgentTrace object is a pydantic model and can be saved to disk via standard pydantic practices:
+
+```python
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tools import search_web
+
+agent = AnyAgent.create(
+    "openai",
+    agent_config=AgentConfig(
+            model_id="mistral/mistral-small-latest",
+            tools=[search_web],
+    )
+)
+agent_trace = agent.run("Which agent framework is the best?")
+with open("agent_trace.json", "w", encoding="utf-8") as f:
+  f.write(agent_trace.model_dump_json(indent=2))
+```
+
+## Adding an OpenTelemetry exporter
+
+Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed. Note that this does not affect the existing processor that returns the traces to the user, and optionally prints them on `stdout`.
+
+The following code will use the OpenTelemetry Python SDK to send the agent traces to an additional endpoint using OTLP over HTTP in the indicated URL:
+
+```python
+from opentelemetry.trace import get_tracer_provider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+
+tp = get_tracer_provider()
+http_exporter = OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces")
+tp.add_span_processor(SimpleSpanProcessor(http_exporter))
+```
+
+
+---
+
+## evaluation.md
+
+<!-- Source: evaluation.md -->
+
+# Agent Evaluation
+
+The any-agent evaluation module encourages three approaches for evaluating agent traces:
+
+1. **Custom Code Evaluation**: Direct programmatic inspection of traces for deterministic checks
+2. **[`LlmJudge`][any_agent.evaluation.LlmJudge]**: LLM-as-a-judge for evaluations that can be answered with a direct LLM call alongside a custom context
+3. **[`AgentJudge`][any_agent.evaluation.AgentJudge]**: Complex LLM-based evaluations that utilize built-in and customizable tools to inspect specific parts of the trace or other custom information provided to the agent as a tool
+
+## Choosing the Right Evaluation Method
+
+| Method | Best For | Pros | Cons |
+|--------|----------|------|------|
+| **Custom Code** | Deterministic checks, performance metrics, specific criteria | Fast, reliable, cost-effective, precise control | Requires manual coding, limited to predefined checks |
+| **LlmJudge** | Simple qualitative assessments, text-based evaluations | Easy to set up, flexible questions, good for subjective evaluation | Can be inconsistent, costs tokens, slower than code |
+| **AgentJudge** | Complex multi-step evaluations, tool usage analysis | Most flexible, can support tool access to custom additional information sources | Highest cost, slowest, most complex setup |
+
+Both judges work with any-agent's unified tracing format and return structured evaluation results.
+
+## Custom Code Evaluation
+
+Before automatically using an LLM based approach, it is worthwhile to consider whether it is necessary. For deterministic evaluations where you know exactly what to check, you may not want an LLM-based judge at all. Writing a custom evaluation function that directly examines the trace can be more efficient, reliable, and cost-effective. the any-agent [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] provides a few helpful methods that can be used to extract common information.
+
+### Example: Custom Evaluation Function
+
+```python
+from any_agent.tracing.agent_trace import AgentTrace
+
+def evaluate_efficiency(trace: AgentTrace) -> dict:
+    """Custom evaluation function for efficiency criteria."""
+
+    # Direct access to trace properties
+    token_count = trace.tokens.total_tokens
+    step_count = len(trace.spans)
+    final_output = trace.final_output
+
+    # Apply your specific criteria
+    results = {
+        "token_efficient": token_count < 1000,
+        "step_efficient": step_count <= 5,
+        "has_output": final_output is not None,
+        "token_count": token_count,
+        "step_count": step_count
+    }
+
+    # Calculate overall pass/fail
+    results["passed"] = all([
+        results["token_efficient"],
+        results["step_efficient"],
+        results["has_output"]
+    ])
+
+    return results
+
+# Usage
+from any_agent import AgentConfig, AnyAgent
+from any_agent.evaluation import LlmJudge
+from any_agent.tools import search_web
+
+# First, run an agent to get a trace
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[search_web]
+    ),
+)
+trace = agent.run("What is the capital of France?")
+evaluation = evaluate_efficiency(trace)
+print(f"Evaluation results: {evaluation}")
+```
+
+### Working with Trace Messages
+
+You can also examine the conversation flow directly:
+
+```python
+def check_tool_usage(trace: AgentTrace, required_tool: str) -> bool:
+    """Check if a specific tool was used in the trace."""
+    messages = trace.spans_to_messages()
+
+    for message in messages:
+        if message.role == "tool" and required_tool in message.content:
+            return True
+    return False
+
+# Usage
+used_search = check_tool_usage(trace, "search_web")
+print(f"Used web search: {used_search}")
+```
+
+## LlmJudge
+
+The `LlmJudge` is ideal for straightforward evaluation questions that can be answered by examining the complete trace text. It's efficient and works well for:
+
+- Basic pass/fail assessments
+- Simple criteria checking
+- Text-based evaluations
+
+### Example: Evaluating Response Quality and Helpfulness
+
+```python
+from any_agent import AnyAgent, AgentConfig
+from any_agent.tools import search_web
+from any_agent.evaluation import LlmJudge
+# Run an agent on a customer support task
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[search_web]
+    ),
+)
+
+trace = agent.run(
+    "A customer is asking about setting up a new email account on the latest version of iOS. "
+    "They mention they're not very tech-savvy and seem frustrated. "
+    "Help them with clear, step-by-step instructions."
+)
+
+# Evaluate the quality of the agent's response multiple times
+judge = LlmJudge(model_id="mistral/mistral-small-latest")
+evaluation_questions = [
+    "Did it provide clear, step-by-step instructions?",
+    "Was the tone empathetic and appropriate for a frustrated, non-technical customer?",
+    "Did it avoid using technical jargon without explanation?",
+    "Was the response complete and actionable?",
+    "Does the description specify which version of iOS this works with?"
+]
+
+
+# Run evaluation 4 times to check consistency
+results = []
+for evaluation_question in evaluation_questions:
+    question = f"Evaluate whether the agent's response demonstrates good customer service by considering: {evaluation_question}."
+    result = judge.run(context=str(trace.spans_to_messages()), question=evaluation_question)
+    results.append(result)
+
+# Print all results
+for i, result in enumerate(results, 1):
+    print(f"Run {i} - Passed: {result.passed}")
+    print(f"Run {i} - Reasoning: {result.reasoning}")
+    print("-" * 50)
+```
+
+!!! tip "Async Usage"
+    For async applications, use `judge.run_async()` instead of `judge.run()`.
+
+## AgentJudge
+
+The `AgentJudge` is designed for complex evaluations that require inspecting specific aspects of the trace. It comes equipped with evaluation tools and can accept additional custom tools for specialized assessments.
+
+### Built-in Evaluation Tools
+
+The `AgentJudge` automatically has access to these evaluation tools:
+
+- `get_final_output()`: Get the agent's final output
+- `get_tokens_used()`: Get total token usage
+- `get_steps_taken()`: Get number of steps taken
+- `get_messages_from_trace()`: Get formatted trace messages
+- `get_duration()`: Get the duration in seconds of the trace
+
+### Example: Agent Judge with Tool Access
+
+```python
+from any_agent.evaluation import AgentJudge
+
+# Create an agent judge
+judge = AgentJudge(model_id="mistral/mistral-small-latest")
+
+# Evaluate with access to trace inspection tools
+eval_trace = judge.run(
+    trace=trace,
+    question="Does the final answer provided by the trace mention and correctly specify the most recent major version of iOS? You may need to do a web search to determine the most recent version of iOS. If the final answer does not mention the version at all, this criteria should fail",
+    additional_tools=[search_web]
+)
+
+result = eval_trace.final_output
+print(f"Passed: {result.passed}")
+print(f"Reasoning: {result.reasoning}")
+```
+
+!!! tip "Async Usage"
+    For async applications, use `judge.run_async()` instead of `judge.run()`.
+
+### Adding Custom Tools
+
+You can extend the `AgentJudge` with additional tools for specialized evaluations:
+
+```python
+def current_ios_version() -> str:
+    """Custom tool to retrieve the most recent version of iOS
+
+    Returns:
+        The version of iOS
+    """
+    return "iOS 18.5"
+
+judge = AgentJudge(model_id="mistral/mistral-small-latest")
+eval_trace = judge.run(
+    trace=trace,
+    question="Does the final answer provided by the trace mention and correctly specify the most recent major version of iOS? If the final answer does not mention the version at all, this criteria should fail",
+    additional_tools=[current_ios_version]
+)
+```
+
+## Custom Output Types
+
+Both judges support custom output schemas using Pydantic models:
+
+```python
+from pydantic import BaseModel
+
+class DetailedEvaluation(BaseModel):
+    passed: bool
+    reasoning: str
+    confidence_score: float
+    suggestions: list[str]
+
+judge = LlmJudge(
+    model_id="mistral/mistral-small-latest",
+    output_type=DetailedEvaluation
+)
+
+result = judge.run(trace=trace, question="Evaluate the agent's performance")
+print(f"Confidence: {result.confidence_score}")
+print(f"Suggestions: {result.suggestions}")
+```
+
+
+---
+
+## serving.md
+
+<!-- Source: serving.md -->
+
+# Serving
+
+`any-agent` provides a simple way of serving agents from any of the supported frameworks using the
+[Agent2Agent Protocol (A2A)](https://google.github.io/A2A/), via the [A2A Python SDK](https://github.com/google-a2a/a2a-python), or using the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification/2025-03-26), via the [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk). You can refer to the links for more information on
+these protocols, as explaining them is out of the scope of this page.
+
+!!! warning
+
+    The A2A protocol is in early stages of development and so is the functionality provided by `any-agent` here.
+
+In order to use A2A serving, you must first install the 'a2a' extra: `pip install 'any-agent[a2a]'`
+
+You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] and the [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
+
+## Running Async Servers in Sync Environments
+
+Since `any-agent` uses async/await patterns for better performance and resource management, the serving functions are async by default. However, you can easily run async servers in sync environments using Python's `asyncio` utilities:
+
+### Using `asyncio.run()`
+
+The simplest approach is to wrap your async code in `asyncio.run()`:
+
+```python
+import asyncio
+from any_agent import AgentConfig, AnyAgent
+from any_agent.serving import A2AServingConfig
+
+async def main():
+    agent = await AnyAgent.create_async(
+        "tinyagent",
+        AgentConfig(
+            name="my_agent",
+            model_id="mistral/mistral-small-latest",
+            description="A helpful agent"
+        )
+    )
+
+    server_handle = await agent.serve_async(A2AServingConfig(port=8080))
+
+    try:
+        # Keep the server running
+        await server_handle.task
+    except KeyboardInterrupt:
+        await server_handle.shutdown()
+
+asyncio.run(main())
+```
+
+## Serving via A2A
+
+### Example
+
+For illustrative purposes, we are going to define 2 separate scripts, each defining an agent to answer questions about a specific agent framework (either OpenAI Agents SDK or Google ADK):
+
+
+=== "Google Expert"
+
+    ```python
+    # google_expert.py
+    import asyncio
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.serving import A2AServingConfig
+    from any_agent.tools import search_web
+
+    async def main():
+        agent = await AnyAgent.create_async(
+            "google",
+            AgentConfig(
+                name="google_expert",
+                model_id="mistral/mistral-small-latest",
+                description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
+                tools=[search_web]
+            )
+        )
+
+        server_handle = await agent.serve_async(A2AServingConfig(port=5001))
+        await server_handle.task
+
+    asyncio.run(main())
+    ```
+
+=== "OpenAI Expert"
+
+    ```python
+    # openai_expert.py
+    import asyncio
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.serving import A2AServingConfig
+    from any_agent.tools import search_web
+
+    async def main():
+        agent = await AnyAgent.create_async(
+            "openai",
+            AgentConfig(
+                name="openai_expert",
+                model_id="mistral/mistral-small-latest",
+                instructions="You can answer questions about the OpenAI Agents SDK but nothing else.",
+                description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
+                tools=[search_web]
+            )
+        )
+
+        server_handle = await agent.serve_async(A2AServingConfig(port=5002))
+        await server_handle.task
+
+    asyncio.run(main())
+    ```
+
+We can then run each of the scripts in a separate terminal and leave them running in the background.
+
+Now, using a simple python script that implements the A2A client, we can communicate with these agents! For this example,
+we use the [A2A Python SDK](https://github.com/google-a2a/a2a-python)
+
+
+```python
+from uuid import uuid4
+import asyncio
+import httpx
+from a2a.client import A2ACardResolver, A2AClient
+from a2a.types import AgentCard, MessageSendParams, SendMessageRequest
+
+async def main():
+    async with httpx.AsyncClient() as httpx_client:
+        agent_card: AgentCard = await A2ACardResolver(
+            httpx_client,
+            base_url="http://localhost:5001",
+        ).get_agent_card(http_kwargs=None)
+        client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)
+        send_message_payload = {
+            "message": {
+                "role": "user",
+                "parts": [{"kind": "text", "text": "What do you know about the Google ADK?"}],
+                "messageId": uuid4().hex,
+            },
+        }
+        request = SendMessageRequest(params=MessageSendParams(**send_message_payload))
+        response = await client.send_message(request, http_kwargs={"timeout": 60})
+        print(f" Response from first agent: {response.model_dump_json(indent=2)}")
+
+        agent_card: AgentCard = await A2ACardResolver(
+            httpx_client,
+            base_url="http://localhost:5002",
+        ).get_agent_card(http_kwargs=None)
+        client = A2AClient(httpx_client=httpx_client, agent_card=agent_card)
+        send_message_payload = {
+            "message": {
+                "role": "user",
+                "parts": [{"kind": "text", "text": "What do you know about the Google ADK?"}],
+                "messageId": uuid4().hex,
+            },
+        }
+        request = SendMessageRequest(params=MessageSendParams(**send_message_payload))
+        response = await client.send_message(request, http_kwargs={"timeout": 60})
+        print(f" Response from second agent: {response.model_dump_json(indent=2)}")
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+You will see that the first agent answered the question, but the second agent did not answer the question.
+This is because the question was about Google ADK,
+but the agent was told it could only answer questions about the OpenAI Agents SDK.
+
+### Advanced Configuration
+
+#### Custom Skills
+
+By default, an agent's skills are automatically inferred from its tools. However, you can explicitly define skills for more control over the agent card:
+
+```python
+from a2a.types import AgentSkill
+from any_agent.serving import A2AServingConfig
+
+# Define custom skills
+custom_skills = [
+    AgentSkill(
+        id="web-search",
+        name="search_web",
+        description="Search the web for current information",
+        tags=["search", "web", "information"]
+    ),
+    AgentSkill(
+        id="data-analysis",
+        name="analyze_data",
+        description="Analyze datasets and provide insights",
+        tags=["analysis", "data", "insights"]
+    )
+]
+
+config = A2AServingConfig(
+    port=8080,
+    skills=custom_skills
+)
+```
+
+### More Examples
+
+Check out our cookbook example for building and serving an agent via A2A:
+
+👉 [Serve an Agent with A2A (Jupyter Notebook)](./cookbook/serve_a2a.ipynb)
+
+### Accessing an A2A agent using tools
+
+As described in the [tools section](./agents/tools.md#a2a-tools), an agent can request actions from other agents by using the `a2a_tool`  or `a2a_tool_async` function. It retrieves the agent card, and builds another function that relays the request via the A2A protocol and unpacks the result.
+
+## Serving via MCP
+
+### Example
+
+In a similar way to [the A2A example](#example), we are going to define two agents served over MCP:
+
+=== "Google Expert"
+
+    ```python
+    # google_expert.py
+    import asyncio
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.serving import MCPServingConfig
+    from any_agent.tools import search_web
+
+    async def main():
+        agent = await AnyAgent.create_async(
+            "google",
+            AgentConfig(
+                name="google_expert",
+                model_id="mistral/mistral-small-latest",
+                description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
+                tools=[search_web]
+            )
+        )
+
+        server_handle = await agent.serve_async(MCPServingConfig(port=5001, endpoint="/google"))
+        await server_handle.task
+
+    asyncio.run(main())
+    ```
+
+=== "OpenAI Expert"
+
+    ```python
+    # openai_expert.py
+    import asyncio
+    from any_agent import AgentConfig, AnyAgent
+    from any_agent.serving import MCPServingConfig
+    from any_agent.tools import search_web
+
+    async def main():
+        agent = await AnyAgent.create_async(
+            "openai",
+            AgentConfig(
+                name="openai_expert",
+                model_id="mistral/mistral-small-latest",
+                instructions="You can provide information about the OpenAI Agents SDK but nothing else (specially, nothing about the Google SDK).",
+                description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
+                tools=[search_web]
+            )
+        )
+
+        server_handle = await agent.serve_async(MCPServingConfig(port=5002, endpoint="/openai"))
+        await server_handle.task
+
+    asyncio.run(main())
+    ```
+
+We can then run each of the scripts in a separate terminal and leave them running in the background.
+
+Then, we run another python script containing the main agent that will contact one of the other two via MCP:
+
+```python
+# Main agent
+
+from uuid import uuid4
+import asyncio
+from any_agent.config import MCPSse
+from any_agent import AgentConfig, AgentFramework, AnyAgent
+
+async def main():
+    prompt = "What do you know about the Google ADK?"
+    google_server_url = f"http://localhost:5001/google/sse"
+    openai_server_url = f"http://localhost:5002/openai/sse"
+
+    main_agent_cfg = AgentConfig(
+        instructions="Use the available tools to obtain additional information to answer the query.",
+        description="The orchestrator that can use other agents via tools using the MCP protocol.",
+        tools=[
+            MCPSse(url=google_server_url, client_session_timeout_seconds=300),
+            MCPSse(url=openai_server_url, client_session_timeout_seconds=300),
+        ],
+        model_id="mistral/mistral-small-latest",
+    )
+
+    main_agent = await AnyAgent.create_async(
+        agent_framework=AgentFramework.OPENAI,
+        agent_config=main_agent_cfg,
+    )
+
+    agent_trace = await main_agent.run_async(prompt)
+
+    print(agent_trace)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+
+---
+
+## api/agent.md
+
+<!-- Source: api/agent.md -->
+
+## Agent
+
+::: any_agent.AnyAgent
+
+::: any_agent.AgentRunError
+
+
+---
+
+## api/callbacks.md
+
+<!-- Source: api/callbacks.md -->
+
+# Callbacks
+
+::: any_agent.callbacks.base.Callback
+
+::: any_agent.callbacks.context.Context
+
+::: any_agent.callbacks.span_cost.AddCostInfo
+
+::: any_agent.callbacks.span_print.ConsolePrintSpan
+
+::: any_agent.callbacks.get_default_callbacks
+
+
+---
+
+## api/config.md
+
+<!-- Source: api/config.md -->
+
+# Config
+
+::: any_agent.config.AgentConfig
+
+::: any_agent.config.MCPStdio
+
+::: any_agent.config.MCPSse
+
+::: any_agent.serving.A2AServingConfig
+
+::: any_agent.serving.MCPServingConfig
+
+::: any_agent.config.AgentFramework
+
+
+---
+
+## api/evaluation.md
+
+<!-- Source: api/evaluation.md -->
+
+# Evaluation
+
+::: any_agent.evaluation.LlmJudge
+
+::: any_agent.evaluation.AgentJudge
+
+
+---
+
+## api/logging.md
+
+<!-- Source: api/logging.md -->
+
+# Logging with `any-agent`
+
+ `any-agent` comes with a logger powered by [Rich](https://github.com/Textualize/rich)
+
+## Quick Start
+
+By default, logging is set up for you. But if you want to customize it, you can call:
+
+```python
+from any_agent.logging import setup_logger
+
+setup_logger()
+```
+
+## Customizing the Logger
+
+View the docstring in [`setup_logger`][any_agent.logging.setup_logger] for a description of the arguments available .
+
+### Example: Set Log Level to DEBUG
+
+```python
+from any_agent.logging import setup_logger
+import logging
+
+setup_logger(level=logging.DEBUG)
+```
+
+### Example: Custom Log Format
+
+```python
+setup_logger(log_format="%(asctime)s - %(levelname)s - %(message)s")
+```
+
+### Example: Propagate Logs
+
+```python
+setup_logger(propagate=True)
+```
+
+::: any_agent.logging.setup_logger
+
+
+---
+
+## api/serving.md
+
+<!-- Source: api/serving.md -->
+
+# Serving
+
+::: any_agent.serving.ServerHandle
+
+
+---
+
+## api/tools.md
+
+<!-- Source: api/tools.md -->
+
+# Tools
+
+::: any_agent.tools
+
+
+---
+
+## api/tracing.md
+
+<!-- Source: api/tracing.md -->
+
+# Tracing
+
+::: any_agent.tracing.agent_trace.AgentTrace
+
+::: any_agent.tracing.agent_trace.AgentSpan
+
+::: any_agent.tracing.agent_trace.CostInfo
+
+::: any_agent.tracing.agent_trace.TokenInfo
+
+
+---
