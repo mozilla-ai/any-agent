@@ -136,6 +136,10 @@ class _LangChainWrapper:
             for callback in agent.config.callbacks:
                 context = callback.before_llm_call(context, **kwargs)
 
+            if self._original_call_model is None:
+                msg = "Original call_model method is None"
+                raise RuntimeError(msg)
+
             output = await self._original_call_model(**kwargs)
 
             for callback in agent.config.callbacks:

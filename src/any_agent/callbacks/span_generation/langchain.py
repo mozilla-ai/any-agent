@@ -34,7 +34,13 @@ class _LangchainSpanGeneration(_SpanGeneration):
         # Handle both BaseMessage objects and dict messages
         if messages and isinstance(messages[0], dict):
             # Messages are already in dict format (from call_model)
-            input_messages = messages
+            input_messages = [
+                {
+                    "role": str(msg.get("role", "")),
+                    "content": str(msg.get("content", "")),
+                }
+                for msg in messages
+            ]
         else:
             # Messages are BaseMessage objects (from normal LangChain callback)
             input_messages = [
@@ -61,7 +67,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
             generation = response.generations[0][0]
 
-            output: str | list[dict[str, Any]]
+            output: str | list[dict[str, Any]] = ""
             if text := generation.text:
                 output = text
             elif message := getattr(generation, "message", None):
@@ -87,9 +93,9 @@ class _LangchainSpanGeneration(_SpanGeneration):
             choice = response.choices[0]
             message = choice.message
 
-            output: str | list[dict[str, Any]]
+            litellm_output: str | list[dict[str, Any]] = ""
             if hasattr(message, "tool_calls") and message.tool_calls:
-                output = [
+                litellm_output = [
                     {
                         "tool.name": tool_call.function.name,
                         "tool.args": tool_call.function.arguments,
@@ -97,7 +103,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
                     for tool_call in message.tool_calls
                 ]
             else:
-                output = message.content or message.get("content", "")
+                litellm_output = message.content or message.get("content", "")
 
             input_tokens = 0
             output_tokens = 0
@@ -105,7 +111,9 @@ class _LangchainSpanGeneration(_SpanGeneration):
                 input_tokens = response.usage.prompt_tokens
                 output_tokens = response.usage.completion_tokens
 
-            return self._set_llm_output(context, output, input_tokens, output_tokens)
+            return self._set_llm_output(
+                context, litellm_output, input_tokens, output_tokens
+            )
 
         return context
 
