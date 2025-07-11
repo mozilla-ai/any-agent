@@ -80,7 +80,10 @@ class SmolagentsAgent(AnyAgent):
             # Create a custom tool for smolagents that wraps our final output function
             class FinalAnswerToolWrapper(FinalAnswerTool):  # type: ignore[no-untyped-call]
                 def __init__(
-                    self, final_output_func: Callable[[str], dict[str, str | bool]]
+                    self,
+                    final_output_func: Callable[
+                        [str], dict[str, str | bool | dict[str, Any] | list[Any]]
+                    ],
                 ):
                     super().__init__()  # type: ignore[no-untyped-call]
                     self.final_output_func = final_output_func
@@ -102,7 +105,7 @@ class SmolagentsAgent(AnyAgent):
                 def forward(self, answer: str) -> Any:
                     result = self.final_output_func(answer)
                     if result.get("success"):
-                        return result["result"]
+                        return answer
                     raise ValueError(result["result"])
 
             self._agent.tools["final_answer"] = FinalAnswerToolWrapper(

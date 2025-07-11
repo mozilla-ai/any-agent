@@ -1,12 +1,13 @@
 import json
 from collections.abc import Callable
+from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
 
 def prepare_final_output(
     output_type: type[BaseModel], instructions: str | None = None
-) -> tuple[str, Callable[[str], dict[str, str | bool]]]:
+) -> tuple[str, Callable[[str], dict[str, str | bool | dict[str, Any] | list[Any]]]]:
     """Prepare instructions and tools for structured output, returning the function directly.
 
     Args:
@@ -25,10 +26,12 @@ def prepare_final_output(
         f"{output_type.model_json_schema()}"
     )
 
-    def final_output_tool(answer: str) -> dict[str, str | bool]:
+    def final_output_tool(
+        answer: str,
+    ) -> dict[str, str | bool | dict[str, Any] | list[Any]]:
         # First check if it's valid JSON
         try:
-            json.loads(answer)
+            parsed_answer = json.loads(answer)
         except json.JSONDecodeError as json_err:
             return {
                 "success": False,
@@ -43,7 +46,7 @@ def prepare_final_output(
                 "result": f"Please fix this validation error: {e}. The format must conform to {output_type.model_json_schema()}",
             }
         else:
-            return {"success": True, "result": answer}
+            return {"success": True, "result": parsed_answer}
 
     # Set the function name and docstring
     final_output_tool.__name__ = tool_name
