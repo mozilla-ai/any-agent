@@ -24,6 +24,7 @@ from any_agent.testing.helpers import (
     get_default_agent_model_args,
 )
 from any_agent.tracing.agent_trace import AgentSpan, AgentTrace, CostInfo, TokenInfo
+from any_agent.tracing.attributes import GenAI
 
 
 def uvx_installed() -> bool:
@@ -41,9 +42,7 @@ def uvx_installed() -> bool:
 def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> None:
     def assert_first_llm_call(llm_call: AgentSpan) -> None:
         """Checks the `_set_llm_inputs` implemented by each framework's instrumentation."""
-        assert llm_call.attributes.get("gen_ai.input.messages", None) is not None
-        # input.messages should be a valid JSON string (list of dicts)
-        input_messages_raw = llm_call.attributes.get("gen_ai.input.messages")
+        input_messages_raw = llm_call.attributes.get(GenAI.INPUT_MESSAGES)
         assert input_messages_raw is not None
         input_messages = json.loads(input_messages_raw)
         assert input_messages[0]["role"] == "system"
@@ -51,9 +50,9 @@ def assert_trace(agent_trace: AgentTrace, agent_framework: AgentFramework) -> No
 
     def assert_first_tool_execution(tool_execution: AgentSpan) -> None:
         """Checks the tools setup implemented by each framework's instrumentation."""
-        assert tool_execution.attributes.get("gen_ai.tool.args", None) is not None
+        assert tool_execution.attributes.get(GenAI.TOOL_ARGS, None) is not None
         # tool.args should be a JSON string (dict)
-        tool_args_raw = tool_execution.attributes.get("gen_ai.tool.args")
+        tool_args_raw = tool_execution.attributes.get(GenAI.TOOL_ARGS)
         assert tool_args_raw is not None
         args = json.loads(tool_args_raw)
         assert "timezone" in args

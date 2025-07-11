@@ -10,6 +10,7 @@ from any_agent.testing.helpers import (
 )
 from any_agent.tools import a2a_tool_async
 from any_agent.tracing.agent_trace import AgentTrace
+from any_agent.tracing.attributes import GenAI
 
 from .conftest import (
     DATE_PROMPT,
@@ -29,7 +30,7 @@ def _assert_has_date_agent_tool_call(agent_trace: AgentTrace) -> None:
     """Assert that the agent trace contains a tool execution span for the date agent."""
     assert any(
         span.is_tool_execution()
-        and span.attributes.get("gen_ai.tool.name", None) == "call_date_agent"
+        and span.attributes.get(GenAI.TOOL_NAME, None) == "call_date_agent"
         for span in agent_trace.spans
     )
 

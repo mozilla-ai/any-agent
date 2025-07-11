@@ -20,11 +20,10 @@ class Context:
     """
 
     current_span: Span
-    """Always contain the current span.
+    """You can use the span in your callbacks to get information consistently across frameworks.
 
-    The span attributes are defined following OpenTelemetry's [Semantic Conventions for Generative AI](https://opentelemetry.io/docs/specs/semconv/gen-ai/)
-
-    You can use the span in your callbacks to get information consistently across frameworks.
+    You can find information about the attributes (available under `current_span.attributes`) in
+    [Attributes Reference](./tracing.md#any_agent.tracing.attributes).
     """
 
     trace: AgentTrace
