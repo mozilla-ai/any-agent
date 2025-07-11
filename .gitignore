@@ -151,9 +151,6 @@ venv.bak/
 
 # mkdocs documentation
 /site
-# Generated llms files (dynamically created at build time)
-llms.txt
-llms-full.txt
 
 # mypy
 .mypy_cache/
