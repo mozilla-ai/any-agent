@@ -12,12 +12,14 @@ __all__ = [
 
 try:
     from .a2a.config_a2a import A2AServingConfig
+    from .a2a.envelope import A2AEnvelope
     from .a2a.server_a2a import (
         _get_a2a_app_async,
         serve_a2a_async,
     )
 
     __all__ += [
+        "A2AEnvelope",
         "A2AServingConfig",
         "_get_a2a_app_async",
         "serve_a2a_async",

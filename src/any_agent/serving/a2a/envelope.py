@@ -10,14 +10,6 @@ if TYPE_CHECKING:
     from any_agent import AnyAgent
 
 
-class _DefaultBody(BaseModel):
-    """Default payload when the user does not supply one."""
-
-    result: str
-
-    model_config = ConfigDict(extra="forbid")
-
-
 # Define a TypeVar for the body type
 BodyType = TypeVar("BodyType", bound=BaseModel)
 
@@ -37,6 +29,7 @@ class A2AEnvelope(BaseModel, Generic[BodyType]):
 
 
 def _is_a2a_envelope(typ: type[BaseModel] | None) -> bool:
+    """Check if a type is an A2A envelope."""
     if typ is None:
         return False
     fields: Any = getattr(typ, "model_fields", None)
@@ -48,40 +41,20 @@ def _is_a2a_envelope(typ: type[BaseModel] | None) -> bool:
     return "task_status" in fields and "data" in fields
 
 
-def _create_a2a_envelope(body_type: type[BaseModel]) -> type[A2AEnvelope[Any]]:
-    """Return a *new* Pydantic model that wraps *body_type* with TaskState + data."""
-    # Ensure body forbids extra keys (OpenAI response_format requirement)
-    if hasattr(body_type, "model_config"):
-        body_type.model_config["extra"] = "forbid"
-    else:
-        body_type.model_config = ConfigDict(extra="forbid")
+def validate_a2a_output_type(agent: AnyAgent) -> None:
+    """Validate that the agent's output_type is properly set up for A2A serving.
 
-    class EnvelopeInstance(A2AEnvelope[body_type]):  # type: ignore[valid-type]
-        pass
+    Args:
+        agent: The agent to validate.
 
-    EnvelopeInstance.__name__ = f"{body_type.__name__}Return"
-    EnvelopeInstance.__qualname__ = f"{body_type.__qualname__}Return"
-    return EnvelopeInstance
+    Raises:
+        ValueError: If the output_type is not properly configured for A2A serving.
 
-
-async def prepare_agent_for_a2a_async(agent: AnyAgent) -> AnyAgent:
-    """Async counterpart of :pyfunc:`prepare_agent_for_a2a`.
-
-    This function preserves MCP servers from the original agent to avoid
-    connection timeouts.
     """
-    if _is_a2a_envelope(agent.config.output_type):
-        return agent
-
-    body_type = agent.config.output_type or _DefaultBody
-    new_output_type = _create_a2a_envelope(body_type)
-
-    original_callbacks = agent.config.callbacks
-    agent.config.callbacks = []
-    new_config = agent.config.model_copy(deep=True)
-    new_config.output_type = new_output_type
-    new_config.callbacks = original_callbacks
-    agent.config.callbacks = original_callbacks
-
-    # Create the new agent with the wrapped config, preserving MCP servers and tools
-    return await agent._recreate_with_config_async(new_config)
+    if not _is_a2a_envelope(agent.config.output_type):
+        msg = "Agent output_type must inherit from A2AEnvelope for A2A serving. "
+        msg += f"Current output_type: {agent.config.output_type}. "
+        msg += (
+            "Please set up your output_type to inherit from A2AEnvelope[YourDataType]."
+        )
+        raise ValueError(msg)

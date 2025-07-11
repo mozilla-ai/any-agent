@@ -12,6 +12,35 @@ In order to use A2A serving, you must first install the 'a2a' extra: `pip instal
 
 You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] and the [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
 
+## A2A Output Type Requirements
+
+When serving an agent via A2A, you **must** configure your agent's `output_type` to inherit from [`A2AEnvelope`][any_agent.serving.A2AEnvelope]. This is required because A2A responses need to include task status information along with the actual response data.
+
+### Setting up A2A Output Types
+
+Your output type should inherit from `A2AEnvelope[YourDataType]` where `YourDataType` is the actual data structure you want to return. For example:
+
+```python
+from pydantic import BaseModel
+from any_agent.serving.a2a.envelope import A2AEnvelope
+
+# Define your response data structure
+class MyResponse(BaseModel):
+    result: str
+    confidence: float
+
+# Use it in your agent config
+agent = await AnyAgent.create_async(
+    "tinyagent",
+    AgentConfig(
+        name="my_agent",
+        model_id="mistral/mistral-small-latest",
+        description="A helpful agent",
+        output_type=A2AEnvelope[MyResponse]  # Required for A2A serving
+    )
+)
+await agent.serve_async()
+```
 ## Running Async Servers in Sync Environments
 
 Since `any-agent` uses async/await patterns for better performance and resource management, the serving functions are async by default. However, you can easily run async servers in sync environments using Python's `asyncio` utilities:
@@ -24,6 +53,12 @@ The simplest approach is to wrap your async code in `asyncio.run()`:
 import asyncio
 from any_agent import AgentConfig, AnyAgent
 from any_agent.serving import A2AServingConfig
+from any_agent.serving.a2a.envelope import A2AEnvelope
+from pydantic import BaseModel
+
+class SimpleResponse(BaseModel):
+    result: str
+
 
 async def main():
     agent = await AnyAgent.create_async(
@@ -31,7 +66,8 @@ async def main():
         AgentConfig(
             name="my_agent",
             model_id="mistral/mistral-small-latest",
-            description="A helpful agent"
+            description="A helpful agent",
+            output_type=A2AEnvelope[SimpleResponse]
         )
     )
 
@@ -58,9 +94,15 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
     ```python
     # google_expert.py
     import asyncio
+    from pydantic import BaseModel
     from any_agent import AgentConfig, AnyAgent
     from any_agent.serving import A2AServingConfig
+    from any_agent.serving.a2a.envelope import A2AEnvelope
     from any_agent.tools import search_web
+
+    class GoogleExpertResponse(BaseModel):
+        answer: str
+        sources: list[str]
 
     async def main():
         agent = await AnyAgent.create_async(
@@ -69,6 +111,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
                 name="google_expert",
                 model_id="mistral/mistral-small-latest",
                 description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK). Reject questions about anything else.",
+                output_type=A2AEnvelope[GoogleExpertResponse],
                 tools=[search_web]
             )
         )
@@ -84,9 +127,15 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
     ```python
     # openai_expert.py
     import asyncio
+    from pydantic import BaseModel
     from any_agent import AgentConfig, AnyAgent
     from any_agent.serving import A2AServingConfig
+    from any_agent.serving.a2a.envelope import A2AEnvelope
     from any_agent.tools import search_web
+
+    class OpenAIExpertResponse(BaseModel):
+        answer: str
+        sources: list[str]
 
     async def main():
         agent = await AnyAgent.create_async(
@@ -96,6 +145,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
                 model_id="mistral/mistral-small-latest",
                 instructions="You can answer questions about the OpenAI Agents SDK but nothing else.",
                 description="An agent that can answer questions specifically about the OpenAI Agents SDK.",
+                output_type=A2AEnvelope[OpenAIExpertResponse],
                 tools=[search_web]
             )
         )
