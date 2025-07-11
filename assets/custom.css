@@ -1,3 +1,12 @@
+/* Import Roboto font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+/* Change header title font to Roboto */
+.md-header__title,
+.md-header__topic {
+  font-family: 'Roboto', sans-serif !important;
+} */
+
 .jp-OutputArea-output, .output, .cell_output {
   max-height: 300px;
 }
