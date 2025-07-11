@@ -58,9 +58,7 @@ class SmolagentsMCPSseConnection(SmolagentsMCPConnection):
 
     async def list_tools(self) -> list["SmolagentsTool"]:
         """List tools from the MCP server."""
-        server_parameters = {
-            "url": self.mcp_tool.url,  "transport": "sse"
-        }
+        server_parameters = {"url": self.mcp_tool.url, "transport": "sse"}
         adapter_kwargs = {}
         if self.mcp_tool.client_session_timeout_seconds:
             adapter_kwargs["client_session_timeout_seconds"] = (
@@ -69,7 +67,6 @@ class SmolagentsMCPSseConnection(SmolagentsMCPConnection):
         self._client = MCPClient(server_parameters, adapter_kwargs=adapter_kwargs)
 
         return await super().list_tools()
-
 
 
 class SmolagentsMCPStreamableHttpConnection(SmolagentsMCPConnection):
@@ -86,7 +83,6 @@ class SmolagentsMCPStreamableHttpConnection(SmolagentsMCPConnection):
         self._client = MCPClient(server_parameters, adapter_kwargs=adapter_kwargs)
 
         return await super().list_tools()
-
 
 
 class SmolagentsMCPServerBase(_MCPServerBase["SmolagentsTool"], ABC):

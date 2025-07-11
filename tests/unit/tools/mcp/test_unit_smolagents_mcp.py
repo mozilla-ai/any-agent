@@ -52,7 +52,6 @@ async def test_smolagents_mcp_streamablehttp_integration(
         adapter_kwargs={
             "client_session_timeout_seconds": mcp_streamablehttp_params_no_tools.client_session_timeout_seconds
         },
-
     )
 
 
