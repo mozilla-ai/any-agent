@@ -47,7 +47,7 @@ During the agent run ( [`agent.run_async`][any_agent.AnyAgent.run_async] or [`ag
 `any-agent` populates the [`Context.current_span`][any_agent.callbacks.context.Context.current_span]
 property so that callbacks can access information in a framework-agnostic way.
 
-You can check the attributes available for LLM Calls and Tool Executions in the [`GenAI`][any_agent.tracing.attributes.GenAI].
+You can see what attributes are available for LLM Calls and Tool Executions by examining the [`GenAI`][any_agent.tracing.attributes.GenAI] class.
 
 ## Implementing Callbacks
 
