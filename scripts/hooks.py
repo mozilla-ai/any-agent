@@ -8,7 +8,6 @@ import os
 import re
 from pathlib import Path
 
-# Constants
 MARKDOWN_EXTENSION = ".md"
 BASE_URL = (
     "https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/"
@@ -47,7 +46,6 @@ def get_all_markdown_files(docs_dir):
     """Get all markdown files in the documentation directory."""
     all_md_files = []
     for root, dirs, files in os.walk(docs_dir):
-        # Skip hidden directories and __pycache__
         dirs[:] = [d for d in dirs if not d.startswith(".") and d != "__pycache__"]
 
         for file in files:
@@ -62,13 +60,11 @@ def get_ordered_files(nav_config, docs_dir):
     nav_files = get_nav_files(nav_config)
     all_md_files = get_all_markdown_files(docs_dir)
 
-    # Combine nav files with any additional files, maintaining nav order
     ordered_files = []
     for file in nav_files:
         if file in all_md_files:
             ordered_files.append(file)
 
-    # Add any remaining files not in navigation
     for file in all_md_files:
         if file not in ordered_files:
             ordered_files.append(file)
@@ -85,7 +81,6 @@ def clean_markdown_content(content, file_path):
     # Convert relative md links to section references where possible
     content = re.sub(MARKDOWN_LINK_PATTERN, MARKDOWN_LINK_REPLACEMENT, content)
 
-    # Add file path as a comment for reference
     return f"<!-- Source: {file_path} -->\n\n{content}"
 
 
@@ -101,20 +96,16 @@ def extract_description_from_markdown(content):
     for line in lines:
         stripped = line.strip()
 
-        # Skip empty lines
         if not stripped:
             continue
 
-        # Look for the main title (first H1)
         if stripped.startswith("# ") and not title_found:
             title_found = True
             continue
 
-        # Skip if we haven't found the title yet
         if not title_found:
             continue
 
-        # Skip common non-description elements
         if (
             stripped.startswith("!!! ")  # Admonitions  # noqa: PIE810
             or stripped.startswith("<")  # HTML tags
@@ -126,20 +117,17 @@ def extract_description_from_markdown(content):
             or stripped.startswith("- ")  # Lists
             or stripped.startswith("* ")  # Lists
             or (stripped.startswith("[") and stripped.endswith("]"))  # Standalone links
-            or re.match(r"^\d+\.", stripped)
-        ):  # Numbered lists
+            or re.match(r"^\d+\.", stripped)  # Numbered lists
+        ):
             continue
 
-        # If we found substantial text, use it as description
         if len(stripped) > 20:  # Minimum length for a meaningful description
             description_lines.append(stripped)
             # For now, just take the first good paragraph
             break
 
     if description_lines:
-        # Clean up markdown syntax from the description
         description = " ".join(description_lines)
-        # Remove markdown formatting
         description = re.sub(r"\*\*([^*]+)\*\*", r"\1", description)  # Bold
         description = re.sub(r"\*([^*]+)\*", r"\1", description)  # Italic
         description = re.sub(r"`([^`]+)`", r"\1", description)  # Code
@@ -170,7 +158,6 @@ def read_file_content(file_path):
 
 def write_file_content(file_path, content):
     """Safely write file content with error handling."""
-    # Ensure directory exists
     file_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(file_path, "w", encoding=ENCODING) as f:
@@ -194,30 +181,24 @@ def generate_llms_txt(docs_dir, site_dir, nav_config):
     """Generate llms.txt file following llmstxt.org standards."""
     ordered_files = get_ordered_files(nav_config, docs_dir)
 
-    # Generate llms.txt content
     llms_txt_content = []
 
-    # Add header following MCP format
     llms_txt_content.append("# any-agent")
     llms_txt_content.append("")
     llms_txt_content.append("## Docs")
     llms_txt_content.append("")
 
-    # Add individual file entries with better formatting
     for file_path in ordered_files:
-        # Convert markdown path to .txt file path with full URL
         txt_url = f"{BASE_URL}{file_path}"
 
         title = create_file_title(file_path)
         description = get_file_description(file_path, docs_dir)
 
-        # Format entry like MCP, but link to .txt files with full URLs
         if description:
             llms_txt_content.append(f"- [{title}]({txt_url}): {description}")
         else:
             llms_txt_content.append(f"- [{title}]({txt_url})")
 
-    # Write the llms.txt file
     llms_txt_dest = site_dir / "llms.txt"
     write_file_content(llms_txt_dest, "\n".join(llms_txt_content))
 
@@ -226,10 +207,8 @@ def generate_llms_full_txt(docs_dir, site_dir, nav_config):
     """Generate llms-full.txt by concatenating all markdown documentation."""
     ordered_files = get_ordered_files(nav_config, docs_dir)
 
-    # Generate the llms-full.txt content
     llms_full_content = []
 
-    # Add header
     llms_full_content.extend(
         [
             "# any-agent Documentation",
@@ -243,14 +222,12 @@ def generate_llms_full_txt(docs_dir, site_dir, nav_config):
         ]
     )
 
-    # Process each markdown file
     for file_path in ordered_files:
         full_path = docs_dir / file_path
 
         if full_path.exists():
             content = read_file_content(full_path)
             if content is not None:
-                # Clean and process content
                 cleaned_content = clean_markdown_content(content, file_path)
 
                 # Add section separator
@@ -258,7 +235,6 @@ def generate_llms_full_txt(docs_dir, site_dir, nav_config):
                     [f"## {file_path}", "", cleaned_content, "", "---", ""]
                 )
 
-    # Write the combined content to llms-full.txt
     llms_full_txt_dest = site_dir / "llms-full.txt"
     write_file_content(llms_full_txt_dest, "\n".join(llms_full_content))
 
@@ -268,11 +244,8 @@ def on_post_build(config, **kwargs):
     docs_dir = Path(config["docs_dir"])
     site_dir = Path(config["site_dir"])
 
-    # Get navigation configuration
     nav_config = config.get("nav", [])
 
-    # Generate llms.txt file
     generate_llms_txt(docs_dir, site_dir, nav_config)
 
-    # Generate complete llms-full.txt
     generate_llms_full_txt(docs_dir, site_dir, nav_config)
