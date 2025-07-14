@@ -12,7 +12,6 @@ MARKDOWN_EXTENSION = ".md"
 BASE_URL = (
     "https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/"
 )
-ENCODING = "utf-8"
 EXCLUDED_DIRS = {".", "__pycache__"}
 TOC_PATTERN = r"^\s*\[\[TOC\]\]\s*$"
 MARKDOWN_LINK_PATTERN = r"\[([^\]]+)\]\(([^)]+\.md)\)"
@@ -143,25 +142,11 @@ def get_file_description(file_path, docs_dir):
     if not full_path.exists():
         return ""
 
-    content = read_file_content(full_path)
+    content = full_path.read_text()
     if content is None:
         return ""
 
     return extract_description_from_markdown(content)
-
-
-def read_file_content(file_path):
-    """Safely read file content with error handling."""
-    with open(file_path, encoding=ENCODING) as f:
-        return f.read()
-
-
-def write_file_content(file_path, content):
-    """Safely write file content with error handling."""
-    file_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(file_path, "w", encoding=ENCODING) as f:
-        f.write(content)
 
 
 def create_file_title(file_path):
@@ -200,7 +185,7 @@ def generate_llms_txt(docs_dir, site_dir, nav_config):
             llms_txt_content.append(f"- [{title}]({txt_url})")
 
     llms_txt_dest = site_dir / "llms.txt"
-    write_file_content(llms_txt_dest, "\n".join(llms_txt_content))
+    llms_txt_dest.write_text("\n".join(llms_txt_content))
 
 
 def generate_llms_full_txt(docs_dir, site_dir, nav_config):
@@ -226,7 +211,7 @@ def generate_llms_full_txt(docs_dir, site_dir, nav_config):
         full_path = docs_dir / file_path
 
         if full_path.exists():
-            content = read_file_content(full_path)
+            content = full_path.read_text()
             if content is not None:
                 cleaned_content = clean_markdown_content(content, file_path)
 
@@ -236,7 +221,7 @@ def generate_llms_full_txt(docs_dir, site_dir, nav_config):
                 )
 
     llms_full_txt_dest = site_dir / "llms-full.txt"
-    write_file_content(llms_full_txt_dest, "\n".join(llms_full_content))
+    llms_full_txt_dest.write_text("\n".join(llms_full_content))
 
 
 def on_post_build(config, **kwargs):
