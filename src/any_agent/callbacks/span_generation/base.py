@@ -25,17 +25,14 @@ class _SpanGeneration(Callback):
         except (TypeError, ValueError):
             return str(data)
 
-    def _determine_output_type(self, output: Any) -> tuple[str, str]:
-        """Determine output type and serialize the output for attributes."""
+    def _determine_output_type(self, output: Any) -> str:
+        """Determine output type based on the output content."""
         if isinstance(output, str):
             try:
                 json.loads(output)
             except json.JSONDecodeError:
-                return output, "text"
-            else:
-                return output, "json"
-        else:
-            return self._serialize_for_attribute(output), "json"
+                return "text"
+        return "json"
 
     def _set_llm_input(
         self, context: Context, model_id: str, input_messages: list[dict[str, str]]
@@ -67,7 +64,8 @@ class _SpanGeneration(Callback):
         output_tokens: int,
     ) -> Context:
         span = context.current_span
-        output_attr, output_type = self._determine_output_type(output)
+        output_type = self._determine_output_type(output)
+        output_attr = self._serialize_for_attribute(output)
 
         span.set_attributes(
             {
@@ -108,9 +106,11 @@ class _SpanGeneration(Callback):
         context.current_span = span
         return context
 
-    def _determine_tool_status(self, tool_output: str) -> Status | StatusCode:
-        """Determine the status based on tool output content."""
-        if "Error calling tool:" in tool_output:
+    def _determine_tool_status(
+        self, tool_output: str, output_type: str
+    ) -> Status | StatusCode:
+        """Determine the status based on tool output content and type."""
+        if output_type == "text" and "Error calling tool:" in tool_output:
             return Status(StatusCode.ERROR, description=tool_output)
         return StatusCode.OK
 
@@ -120,12 +120,9 @@ class _SpanGeneration(Callback):
         if tool_output is None:
             tool_output = "{}"
 
-        output_attr, output_type = self._determine_output_type(tool_output)
-        status = (
-            self._determine_tool_status(output_attr)
-            if output_type == "text"
-            else StatusCode.OK
-        )
+        output_type = self._determine_output_type(tool_output)
+        output_attr = self._serialize_for_attribute(tool_output)
+        status = self._determine_tool_status(output_attr, output_type)
 
         span.set_attributes({GenAI.OUTPUT: output_attr, GenAI.OUTPUT_TYPE: output_type})
         span.set_status(status)

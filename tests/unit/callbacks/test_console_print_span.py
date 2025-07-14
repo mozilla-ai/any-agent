@@ -77,27 +77,6 @@ def test_get_output_panel(
             json_mock.assert_called_once()
             panel_mock.assert_called_once()
 
-    # Skip frameworks that end with a tool call or now return JSON in final LLM call
-    if request.node.callspec.id not in (
-        "AGNO_trace",
-        "GOOGLE_trace",
-        "LANGCHAIN_trace",
-        "LLAMA_INDEX_trace",
-        "OPENAI_trace",
-        "SMOLAGENTS_trace",
-        "TINYAGENT_trace",
-    ):
-        # Final LLM call returns string
-        panel_mock = MagicMock()
-        json_mock = MagicMock()
-        with (
-            patch("any_agent.callbacks.span_print.Panel", panel_mock),
-            patch("any_agent.callbacks.span_print.JSON", json_mock),
-        ):
-            _get_output_panel(readable_spans[-2])
-            json_mock.assert_not_called()
-            panel_mock.assert_called_once()
-
     # AGENT invocation has no output
     panel_mock = MagicMock()
     json_mock = MagicMock()
