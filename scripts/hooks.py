@@ -10,8 +10,9 @@ from pathlib import Path
 
 # Constants
 MARKDOWN_EXTENSION = ".md"
-TEXT_EXTENSION = ".txt"
-BASE_URL = "https://mozilla-ai.github.io/any-agent/"
+BASE_URL = (
+    "https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/"
+)
 ENCODING = "utf-8"
 EXCLUDED_DIRS = {".", "__pycache__"}
 TOC_PATTERN = r"^\s*\[\[TOC\]\]\s*$"
@@ -176,27 +177,6 @@ def write_file_content(file_path, content):
         f.write(content)
 
 
-def serve_markdown_as_text(docs_dir, site_dir, nav_config):
-    """Serve markdown files as .txt files for LLM consumption."""
-    ordered_files = get_ordered_files(nav_config, docs_dir)
-
-    # Create .txt versions of markdown files
-    for file_path in ordered_files:
-        full_path = docs_dir / file_path
-
-        if full_path.exists():
-            content = read_file_content(full_path)
-            if content is not None:
-                # Clean content for text version
-                cleaned_content = clean_markdown_content(content, file_path)
-
-                # Create .txt version in site directory
-                txt_file_path = file_path.replace(MARKDOWN_EXTENSION, TEXT_EXTENSION)
-                txt_dest = site_dir / txt_file_path
-
-                write_file_content(txt_dest, cleaned_content)
-
-
 def create_file_title(file_path):
     """Create a clean title from file path."""
     if file_path == "index.md":
@@ -226,7 +206,7 @@ def generate_llms_txt(docs_dir, site_dir, nav_config):
     # Add individual file entries with better formatting
     for file_path in ordered_files:
         # Convert markdown path to .txt file path with full URL
-        txt_url = f"{BASE_URL}{file_path.replace(MARKDOWN_EXTENSION, TEXT_EXTENSION)}"
+        txt_url = f"{BASE_URL}{file_path}"
 
         title = create_file_title(file_path)
         description = get_file_description(file_path, docs_dir)
@@ -290,9 +270,6 @@ def on_post_build(config, **kwargs):
 
     # Get navigation configuration
     nav_config = config.get("nav", [])
-
-    # Serve markdown files as text
-    serve_markdown_as_text(docs_dir, site_dir, nav_config)
 
     # Generate llms.txt file
     generate_llms_txt(docs_dir, site_dir, nav_config)
