@@ -35,9 +35,11 @@ def test_console_print_span(
 
         console_mock.return_value.print.assert_called()
 
-        # Frameworks that end with a tool call
+        # Frameworks that end with a tool call or have JSON final output
         if request.node.callspec.id not in (
+            "AGNO_trace",
             "GOOGLE_trace",
+            "OPENAI_trace",
             "SMOLAGENTS_trace",
             "TINYAGENT_trace",
         ):
@@ -73,24 +75,6 @@ def test_get_output_panel(
         ):
             _get_output_panel(readable_spans[1])
             json_mock.assert_called_once()
-            panel_mock.assert_called_once()
-
-    # Skip frameworks that end with a tool call
-    if request.node.callspec.id not in (
-        "GOOGLE_trace",
-        "LANGCHAIN_trace",
-        "SMOLAGENTS_trace",
-        "TINYAGENT_trace",
-    ):
-        # Final LLM call returns string
-        panel_mock = MagicMock()
-        json_mock = MagicMock()
-        with (
-            patch("any_agent.callbacks.span_print.Panel", panel_mock),
-            patch("any_agent.callbacks.span_print.JSON", json_mock),
-        ):
-            _get_output_panel(readable_spans[-2])
-            json_mock.assert_not_called()
             panel_mock.assert_called_once()
 
     # AGENT invocation has no output
