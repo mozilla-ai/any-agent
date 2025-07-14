@@ -114,8 +114,11 @@ class LangchainAgent(AnyAgent):
             if supports_response_schema(model=self.config.model_id):
                 completion_params["response_format"] = self.config.output_type
 
-            response = await litellm.acompletion(**completion_params)
+            response = await self.call_model(**completion_params)
             return self.config.output_type.model_validate_json(
                 response.choices[0].message["content"]
             )
         return str(result["messages"][-1].content)
+
+    async def call_model(self, **kwargs: Any) -> Any:
+        return await litellm.acompletion(**kwargs)

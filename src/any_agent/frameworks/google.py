@@ -4,7 +4,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.tools.final_output import FinalOutputTool
+from any_agent.tools.final_output import prepare_final_output
 
 from .any_agent import AnyAgent
 
@@ -61,13 +61,10 @@ class GoogleAgent(AnyAgent):
 
         instructions = self.config.instructions or ""
         if self.config.output_type:
-            instructions += (
-                "You must call the final_output tool when finished."
-                "The 'answer' argument passed to the final_output tool must be a JSON string that matches the following schema:\n"
-                f"{self.config.output_type.model_json_schema()}"
+            instructions, final_output_tool = prepare_final_output(
+                self.config.output_type, instructions
             )
-            output_fn = FinalOutputTool(self.config.output_type)
-            tools.append(output_fn)
+            tools.append(final_output_tool)
 
         self._agent = agent_type(
             name=self.config.name,

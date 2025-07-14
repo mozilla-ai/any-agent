@@ -82,9 +82,10 @@ print(agent_trace)
 
 Get started quickly with these practical examples:
 
-- **[Creating your first agent](https://mozilla-ai.github.io/any-agent/cookbook/your_first_agent/)** - Build a simple agent with web search capabilities
-- **[Creating an agent with MCP](https://mozilla-ai.github.io/any-agent/cookbook/mcp_agent/)** - Integrate Model Context Protocol tools
-- **[Serve an Agent with A2A](https://mozilla-ai.github.io/any-agent/cookbook/serve_a2a/)** - Deploy agents with Agent-to-Agent communication
+- **[Creating your first agent](https://mozilla-ai.github.io/any-agent/cookbook/your_first_agent/)** - Build a simple agent with web search capabilities.
+- **[Using Callbacks](https://mozilla-ai.github.io/any-agent/cookbook/callbacks/)** - Implement and use custom callbacks.
+- **[Creating an agent with MCP](https://mozilla-ai.github.io/any-agent/cookbook/mcp_agent/)** - Integrate Model Context Protocol tools.
+- **[Serve an Agent with A2A](https://mozilla-ai.github.io/any-agent/cookbook/serve_a2a/)** - Deploy agents with Agent-to-Agent communication.
 - **[Building Multi-Agent Systems with A2A](https://mozilla-ai.github.io/any-agent/cookbook/a2a_as_tool/)** - Using an agent as a tool for another agent to interact with.
 
 ## Contributions
