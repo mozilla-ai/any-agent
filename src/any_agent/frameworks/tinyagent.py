@@ -231,8 +231,7 @@ class TinyAgent(AnyAgent):
                     }
                     messages.append(structured_output_message)
                     completion_params["messages"] = messages
-                    if supports_response_schema(model=self.config.model_id):
-                        completion_params["response_format"] = self.config.output_type
+                    completion_params["response_format"] = self.config.output_type
                     if len(completion_params["tools"]) > 0:
                         completion_params["tool_choice"] = "none"
                     response = await self.call_model(**completion_params)
