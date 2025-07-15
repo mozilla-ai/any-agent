@@ -61,6 +61,10 @@ all = [
   "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
 ]
 
+any_llm = [
+  "any-llm-sdk",
+]
+
 [project.urls]
 Documentation = "https://mozilla-ai.github.io/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"

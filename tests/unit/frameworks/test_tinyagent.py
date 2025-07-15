@@ -1,3 +1,6 @@
+import importlib
+import importlib.util
+import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -5,7 +8,7 @@ from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.frameworks.tinyagent import TinyAgent, ToolExecutor
-from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID, LITELLM_IMPORT_PATHS
 
 
 class SampleOutput(BaseModel):
@@ -161,9 +164,51 @@ def test_structured_output_without_tools() -> None:
         # Get the call arguments for the second call (structured output)
         second_call_args = mock_acompletion.call_args_list[1][1]
 
-        # tool choice should not be set to none when no tools are present
-        assert second_call_args["tool_choice"] == "auto"
+        # tool choice should not be set when no tools are present
+        assert "tool_choice" not in second_call_args
 
         # Verify that response_format is set for structured output
         assert "response_format" in second_call_args
         assert second_call_args["response_format"] == SampleOutput
+
+
+@pytest.mark.asyncio
+async def test_any_llm() -> None:
+    if not importlib.util.find_spec("any_llm"):
+        pytest.skip("any-llm is not installed, skipping")
+
+    output = "An LLM (Large Language Model) is a type of artificial intelligence model."
+
+    # Set environment variable to use any_llm
+    os.environ["USE_ANY_LLM"] = "true"
+
+    try:
+        agent_config = AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
+        agent = await AnyAgent.create_async("tinyagent", agent_config=agent_config)
+
+        with patch("any_llm.completion") as mock_completion:
+            # Create a mock response object that matches the expected structure
+            mock_response = MagicMock()
+            mock_message = MagicMock()
+            mock_message.content = output
+            mock_message.tool_calls = []
+            mock_message.model_dump.return_value = {
+                "content": output,
+                "role": "assistant",
+                "tool_calls": None,
+                "function_call": None,
+                "annotations": [],
+            }
+            mock_response.choices = [MagicMock(message=mock_message)]
+            mock_completion.return_value = mock_response
+
+            result = await agent.run_async("What's an LLM")
+
+            # Assert that any_llm.completion was called
+            mock_completion.assert_called_once()
+
+            # Assert the result
+            assert result.final_output == output
+
+    finally:
+        os.environ.pop("USE_ANY_LLM", None)
