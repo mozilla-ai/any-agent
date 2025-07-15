@@ -12,7 +12,6 @@ BASE_URL = (
     "https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/"
 )
 EXCLUDED_DIRS = {".", "__pycache__"}
-TOC_PATTERN = r"^\s*\[\[TOC\]\]\s*$"
 MARKDOWN_LINK_PATTERN = r"\[([^\]]+)\]\(([^)]+\.md)\)"
 MARKDOWN_LINK_REPLACEMENT = r"[\1](#\2)"
 
@@ -59,9 +58,6 @@ def get_ordered_files(nav_config, docs_dir):
 
 def clean_markdown_content(content, file_path):
     """Clean markdown content for better concatenation."""
-    # Remove mkdocs-specific directives
-    content = re.sub(TOC_PATTERN, "", content, flags=re.MULTILINE)
-
     # Remove or replace relative links that won't work in concatenated format
     # Convert relative md links to section references where possible
     content = re.sub(MARKDOWN_LINK_PATTERN, MARKDOWN_LINK_REPLACEMENT, content)
