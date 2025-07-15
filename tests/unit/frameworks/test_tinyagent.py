@@ -161,8 +161,8 @@ def test_structured_output_without_tools() -> None:
         # Get the call arguments for the second call (structured output)
         second_call_args = mock_acompletion.call_args_list[1][1]
 
-        # tool choice should not be set to none when no tools are present
-        assert second_call_args["tool_choice"] == "auto"
+        # tool choice should not be set when no tools are present
+        assert "tool_choice" not in second_call_args
 
         # Verify that response_format is set for structured output
         assert "response_format" in second_call_args
