@@ -242,7 +242,7 @@ class TinyAgent(AnyAgent):
                     response = await self.call_model(**completion_params)
                     if self.use_any_llm:
                         return self.config.output_type.model_validate_json(
-                            response.choices[0].message.content
+                            response.choices[0].message.content  # type: ignore[arg-type, union-attr]
                         )
                     return self.config.output_type.model_validate_json(
                         response.choices[0].message["content"]  # type: ignore[union-attr]
@@ -255,9 +255,9 @@ class TinyAgent(AnyAgent):
         if self.use_any_llm:
             from any_llm import completion
 
-            return completion(**completion_params)
+            return completion(**completion_params)  # type: ignore[return-value, arg-type]
         # otherwise use litellm
-        return await litellm.acompletion(**completion_params)
+        return await litellm.acompletion(**completion_params)  # type: ignore[no-any-return]
 
     @property
     def framework(self) -> AgentFramework:
