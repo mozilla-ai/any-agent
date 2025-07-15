@@ -39,10 +39,10 @@ def get_nav_files(nav_config):
     return files
 
 
-def get_ordered_files(nav_config, docs_dir):
+def get_ordered_files(nav_config, docs_dir: Path):
     """Get ordered list of markdown files based on navigation and additional files."""
     nav_files = get_nav_files(nav_config)
-    all_md_files = [str(f.relative_to(docs_dir)) for f in Path(docs_dir).rglob("*.md")]
+    all_md_files = [str(f.relative_to(docs_dir)) for f in docs_dir.rglob("*.md")]
     ordered_files = []
     for file in nav_files:
         if file in all_md_files:
