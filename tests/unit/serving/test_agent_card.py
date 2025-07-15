@@ -10,8 +10,7 @@ from any_agent.tools.wrappers import WRAPPERS
 
 # Skip entire module if a2a dependencies are not available
 pytest.importorskip("a2a.types")
-pytest.importorskip("any_agent.serving.agent_card")
-pytest.importorskip("typing.override")
+pytest.importorskip("any_agent.serving.a2a.agent_card")
 
 
 from a2a.types import AgentSkill

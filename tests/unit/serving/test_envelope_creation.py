@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 # Skip entire module if a2a dependencies are not available
 pytest.importorskip("a2a.types")
-pytest.importorskip("any_agent.serving.envelope")
+pytest.importorskip("any_agent.serving.a2a.envelope")
 
 from a2a.types import TaskState
 
