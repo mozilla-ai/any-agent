@@ -11,7 +11,7 @@ from pathlib import Path
 # Constants
 MARKDOWN_EXTENSION = ".md"
 TEXT_EXTENSION = ".txt"
-BASE_URL = "https://mozilla-ai.github.io/"
+BASE_URL = "https://mozilla-ai.github.io/any-agent/"
 ENCODING = "utf-8"
 EXCLUDED_DIRS = {".", "__pycache__"}
 TOC_PATTERN = r"^\s*\[\[TOC\]\]\s*$"
