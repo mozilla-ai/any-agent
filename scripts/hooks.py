@@ -83,6 +83,7 @@ def get_file_description(file_path, docs_dir):
         if line.startswith("## ")
     )
 
+
 def create_file_title(file_path):
     """Create a clean title from file path."""
     if file_path == "index.md":
