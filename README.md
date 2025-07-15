@@ -19,7 +19,7 @@ A single interface to use and evaluate different agent frameworks.
 ## [Documentation](https://mozilla-ai.github.io/any-agent/)
 
 - [Agents](https://mozilla-ai.github.io/any-agent/agents/)
-- [Tools](https://mozilla-ai.github.io/any-agent/tools/)
+- [Tools](https://mozilla-ai.github.io/any-agent/agents/tools/)
 - [Tracing](https://mozilla-ai.github.io/any-agent/tracing/)
 - [Serving](https://mozilla-ai.github.io/any-agent/serving/)
 - [Evaluation](https://mozilla-ai.github.io/any-agent/evaluation/)
@@ -51,7 +51,7 @@ To define any agent system you will always use the same imports:
 ```python
 from any_agent import AgentConfig, AnyAgent
 ```
-For this example we use a model hosted by openai, but you may need to set the relevant API key for whichever provider being used.
+For this example we use a model hosted by Mistral, but you may need to set the relevant API key for whichever provider being used.
 See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
 
 ```bash
