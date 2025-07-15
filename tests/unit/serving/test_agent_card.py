@@ -9,9 +9,7 @@ from any_agent.tools.mcp import _get_mcp_server
 from any_agent.tools.wrappers import WRAPPERS
 
 # Skip entire module if a2a dependencies are not available
-pytest.importorskip("a2a.types")
-pytest.importorskip("any_agent.serving.agent_card")
-pytest.importorskip("typing.override")
+pytest.importorskip("a2a")
 
 
 from a2a.types import AgentSkill
@@ -33,7 +31,7 @@ def test_get_agent_card(agent_framework: AgentFramework) -> None:
     assert agent_card.skills[0].name == "search_web"
     assert "Perform a duckduckgo web search" in agent_card.skills[0].description
     assert not agent_card.capabilities.streaming
-    assert not agent_card.capabilities.pushNotifications
+    assert agent_card.capabilities.pushNotifications
     assert not agent_card.capabilities.stateTransitionHistory
     assert agent_card.url == "http://localhost:5000/"
 
