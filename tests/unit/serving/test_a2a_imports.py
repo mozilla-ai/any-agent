@@ -1,7 +1,7 @@
 import pytest
 
 # Skip entire module if a2a dependencies are not available
-pytest.importorskip("any_agent.serving.a2a.config_a2a")
+pytest.importorskip("a2a")
 
 
 @pytest.mark.asyncio
