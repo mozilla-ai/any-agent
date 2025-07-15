@@ -6,7 +6,7 @@ from pydantic import BaseModel, ValidationError
 
 from any_agent import AgentConfig, AgentFramework
 from any_agent.logging import logger
-from any_agent.tools.final_output import FinalOutputTool
+from any_agent.tools.final_output import prepare_final_output
 
 from .any_agent import AnyAgent
 
@@ -67,13 +67,10 @@ class LlamaIndexAgent(AnyAgent):
         instructions = self.config.instructions
         tools_to_use = list(self.config.tools)
         if self.config.output_type:
-            instructions = instructions or ""
-            instructions += f"""You must return a {self.config.output_type.__name__} JSON string.
-            This object must match the following schema:
-            {self.config.output_type.model_json_schema()}
-            You can use the 'final_output' tool to help verify your output
-            """
-            tools_to_use.append(FinalOutputTool(self.config.output_type))
+            instructions, final_output_function = prepare_final_output(
+                self.config.output_type, instructions
+            )
+            tools_to_use.append(final_output_function)
         imported_tools, _ = await self._load_tools(tools_to_use)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         # if agent type is FunctionAgent but there are no tools, throw an error
@@ -126,8 +123,11 @@ class LlamaIndexAgent(AnyAgent):
                 ]
                 if supports_response_schema(model=self.config.model_id):
                     completion_params["response_format"] = self.config.output_type
-                response = await acompletion(**completion_params)
+                response = await self.call_model(**completion_params)
                 return self.config.output_type.model_validate_json(
                     response.choices[0].message["content"]
                 )
         return result.response.blocks[0].text
+
+    async def call_model(self, **kwargs: Any) -> Any:
+        return await acompletion(**kwargs)

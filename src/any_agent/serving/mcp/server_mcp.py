@@ -13,7 +13,6 @@ from starlette.responses import Response
 from starlette.routing import Mount, Route
 
 from any_agent.serving.server_handle import ServerHandle
-from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
     from starlette.requests import Request
@@ -101,22 +100,3 @@ async def serve_mcp_async(
     while not uv_server.started:  # noqa: ASYNC110
         await asyncio.sleep(0.1)
     return ServerHandle(task=task, server=uv_server)
-
-
-def serve_mcp(
-    agent: AnyAgent,
-    host: str,
-    port: int,
-    endpoint: str,
-    log_level: str = "warning",
-) -> None:
-    """Serve the MCP server."""
-
-    # Note that the task should be kept somewhere
-    # because the loop only keeps weak refs to tasks
-    # https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
-    async def run() -> None:
-        server_handle = await serve_mcp_async(agent, host, port, endpoint, log_level)
-        await server_handle.task
-
-    return run_async_in_sync(run())

@@ -56,7 +56,9 @@ async def a2a_tool_async(
     if "timeout" not in http_kwargs:
         http_kwargs["timeout"] = 30.0
 
-    async with httpx.AsyncClient(follow_redirects=True) as resolver_client:
+    async with httpx.AsyncClient(
+        follow_redirects=True, **http_kwargs
+    ) as resolver_client:
         a2a_agent_card: AgentCard = await (
             A2ACardResolver(httpx_client=resolver_client, base_url=url)
         ).get_agent_card()

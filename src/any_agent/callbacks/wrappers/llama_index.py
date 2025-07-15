@@ -1,4 +1,4 @@
-# mypy: disable-error-code="method-assign,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="method-assign,misc,no-untyped-call,no-untyped-def,union-attr"
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -15,6 +15,7 @@ class _LlamaIndexWrapper:
         self.callback_context: dict[int, Context] = {}
         self._original_take_step: Any | None = None
         self._original_acalls: dict[str, Any] = {}
+        self._original_llm_call: Any | None = None
 
     async def wrap(self, agent: LlamaIndexAgent) -> None:
         self._original_take_step = agent._agent.take_step
@@ -72,9 +73,31 @@ class _LlamaIndexWrapper:
             wrapped = WrappedAcall(tool.metadata, tool.acall)
             tool.acall = wrapped.acall
 
+        # Wrap call_model to capture litellm calls during structured output processing
+        self._original_llm_call = agent.call_model
+
+        async def wrap_call_model(**kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
+
+            for callback in agent.config.callbacks:
+                context = callback.before_llm_call(context, **kwargs)
+
+            output = await self._original_llm_call(**kwargs)
+
+            for callback in agent.config.callbacks:
+                context = callback.after_llm_call(context, output)
+
+            return output
+
+        agent.call_model = wrap_call_model
+
     async def unwrap(self, agent: LlamaIndexAgent) -> None:
         if self._original_take_step:
             agent._agent.take_step = self._original_take_step
         if self._original_acalls:
             for tool in agent._agent.tools:
                 tool.acall = self._original_acalls[str(tool.metadata.name)]
+        if self._original_llm_call is not None:
+            agent.call_model = self._original_llm_call

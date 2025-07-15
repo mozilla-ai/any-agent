@@ -1,3 +1,6 @@
+# Cookbook generated files
+docs/cookbook/sensitive-info
+
 uv.lock
 output/
 traces/

@@ -38,26 +38,37 @@ nav:
 
 theme:
   name: material
+  font:
+    text: Noto Sans
+    code: Noto Sans Mono
   palette:
-    - scheme: default
-      primary: black
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue gray
       toggle:
         icon: material/lightbulb
         name: Switch to dark mode
-    - scheme: slate
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
       primary: grey
       toggle:
         icon: material/lightbulb-outline
         name: Switch to light mode
+    - accent: blue
   logo: images/any-agent-logo-mark.png
   favicon: images/any-agent_favicon.png
   features:
     - content.code.copy
     - content.tabs.link
     - content.action.edit
+    - navigation.expand
+    - navigation.footer
 
 extra_css:
   - assets/custom.css
+
+extra_javascript:
+  - assets/custom.js
 
 markdown_extensions:
   - admonition
@@ -83,5 +94,8 @@ plugins:
         options:
           show_root_heading: true
           heading_level: 3
+
+hooks:
+  - scripts/hooks.py
 
 edit_uri: edit/main/docs/

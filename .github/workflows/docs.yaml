@@ -7,11 +7,13 @@ on:
       - mkdocs.yml
       - 'docs/**'
       - 'src/**'
+      - 'scripts/hooks.py'
   pull_request:
     paths:
       - mkdocs.yml
       - 'docs/**'
       - 'src/**'
+      - 'scripts/hooks.py'
   workflow_dispatch:
 
 jobs:
