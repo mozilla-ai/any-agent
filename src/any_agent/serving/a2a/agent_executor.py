@@ -23,7 +23,7 @@ else:
     # with the same type constraints (basically,
     # because it's the same function), and that
     # the decorator doesn't require any extra info
-    def overrides(func: F, /) -> F:  # noqa: D103
+    def override(func: F, /) -> F:  # noqa: D103
         return func
 
 
