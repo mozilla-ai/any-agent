@@ -1,7 +1,0 @@
-<!-- Source: api/agent.md -->
-
-## Agent
-
-::: any_agent.AnyAgent
-
-::: any_agent.AgentRunError

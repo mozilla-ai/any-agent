@@ -2,25 +2,25 @@
 
 ## Docs
 
-- [Introduction](https://mozilla-ai.github.io/index.txt): any-agent is a Python library providing a single interface to different agent frameworks.
-- [Agents - Index](https://mozilla-ai.github.io/agents/index.txt): To define any agent system you will always use the same imports:
-- [Agents - Callbacks](https://mozilla-ai.github.io/agents/callbacks.txt): For greater control when running your agent, any-agent includes support for custom [Callbacks][any_agent.callbacks.base.Callback] that
-- [Agents - Frameworks - Agno](https://mozilla-ai.github.io/agents/frameworks/agno.txt): https://github.com/agno-agi/agno
-- [Agents - Frameworks - Google Adk](https://mozilla-ai.github.io/agents/frameworks/google_adk.txt): https://github.com/google/adk-python
-- [Agents - Frameworks - Langchain](https://mozilla-ai.github.io/agents/frameworks/langchain.txt): https://github.com/langchain-ai/langchain
-- [Agents - Frameworks - Llama Index](https://mozilla-ai.github.io/agents/frameworks/llama_index.txt): https://github.com/run-llama/llama_index
-- [Agents - Frameworks - Openai](https://mozilla-ai.github.io/agents/frameworks/openai.txt): https://github.com/openai/openai-agents-python
-- [Agents - Frameworks - Smolagents](https://mozilla-ai.github.io/agents/frameworks/smolagents.txt): https://github.com/huggingface/smolagents
-- [Agents - Frameworks - Tinyagent](https://mozilla-ai.github.io/agents/frameworks/tinyagent.txt): As part of the bare bones library, we provide our own Python implementation based on HuggingFace Tiny Agents.
-- [Agents - Tools](https://mozilla-ai.github.io/agents/tools.txt): any-agent provides 2 options to specify what tools are available to your agent: Callables and MCP (Model Context Protocol). In order to support multi-agent systems, any agents served via A2A can also be integrated by wrapping the A2A connection in a callable function tool as described below.
-- [Tracing](https://mozilla-ai.github.io/tracing.txt): An [AgentTrace][any_agent.tracing.agent_trace.AgentTrace] is returned when calling [agent.run][any_agent.AnyAgent.run] or [agent.run_async][any_agent.AnyAgent.run_async].
-- [Evaluation](https://mozilla-ai.github.io/evaluation.txt): The any-agent evaluation module encourages three approaches for evaluating agent traces:
-- [Serving](https://mozilla-ai.github.io/serving.txt): any-agent provides a simple way of serving agents from any of the supported frameworks using the
-- [Api - Agent](https://mozilla-ai.github.io/api/agent.txt)
-- [Api - Callbacks](https://mozilla-ai.github.io/api/callbacks.txt)
-- [Api - Config](https://mozilla-ai.github.io/api/config.txt)
-- [Api - Evaluation](https://mozilla-ai.github.io/api/evaluation.txt)
-- [Api - Logging](https://mozilla-ai.github.io/api/logging.txt): any-agent comes with a logger powered by Rich
-- [Api - Serving](https://mozilla-ai.github.io/api/serving.txt)
-- [Api - Tools](https://mozilla-ai.github.io/api/tools.txt)
-- [Api - Tracing](https://mozilla-ai.github.io/api/tracing.txt)
+- [Introduction](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/index.md): any-agent is a Python library providing a single interface to different agent frameworks.
+- [Agents - Index](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/index.md): To define any agent system you will always use the same imports:
+- [Agents - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/callbacks.md): For greater control when running your agent, any-agent includes support for custom [Callbacks][any_agent.callbacks.base.Callback] that
+- [Agents - Frameworks - Agno](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/agno.md): https://github.com/agno-agi/agno
+- [Agents - Frameworks - Google Adk](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/google_adk.md): https://github.com/google/adk-python
+- [Agents - Frameworks - Langchain](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/langchain.md): https://github.com/langchain-ai/langchain
+- [Agents - Frameworks - Llama Index](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/llama_index.md): https://github.com/run-llama/llama_index
+- [Agents - Frameworks - Openai](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/openai.md): https://github.com/openai/openai-agents-python
+- [Agents - Frameworks - Smolagents](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/smolagents.md): https://github.com/huggingface/smolagents
+- [Agents - Frameworks - Tinyagent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/tinyagent.md): As part of the bare bones library, we provide our own Python implementation based on HuggingFace Tiny Agents.
+- [Agents - Tools](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/tools.md): any-agent provides 2 options to specify what tools are available to your agent: Callables and MCP (Model Context Protocol). In order to support multi-agent systems, any agents served via A2A can also be integrated by wrapping the A2A connection in a callable function tool as described below.
+- [Tracing](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/tracing.md): An [AgentTrace][any_agent.tracing.agent_trace.AgentTrace] is returned when calling [agent.run][any_agent.AnyAgent.run] or [agent.run_async][any_agent.AnyAgent.run_async].
+- [Evaluation](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/evaluation.md): The any-agent evaluation module encourages three approaches for evaluating agent traces:
+- [Serving](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/serving.md): any-agent provides a simple way of serving agents from any of the supported frameworks using the
+- [Api - Agent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/agent.md)
+- [Api - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/callbacks.md)
+- [Api - Config](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/config.md)
+- [Api - Evaluation](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/evaluation.md)
+- [Api - Logging](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/logging.md): any-agent comes with a logger powered by Rich
+- [Api - Serving](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/serving.md)
+- [Api - Tools](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/tools.md)
+- [Api - Tracing](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/tracing.md)
