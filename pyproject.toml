@@ -61,6 +61,10 @@ all = [
   "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
 ]
 
+any_llm = [
+  "any-llm-sdk",
+]
+
 [project.urls]
 Documentation = "https://mozilla-ai.github.io/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
@@ -153,16 +157,12 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 timeout = 120
 
-[tool.uv.sources]
-any-llm = { path = "../any-llm", editable = true }
-
 
 [dependency-groups]
 dev = [
   { include-group = "docs" },
   { include-group = "lint" },
   { include-group = "tests" },
-  "any-llm",
 ]
 
 docs = [

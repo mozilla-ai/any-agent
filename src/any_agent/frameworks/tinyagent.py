@@ -4,11 +4,11 @@ import asyncio
 import inspect
 import json
 from contextlib import suppress
+import os
 from typing import TYPE_CHECKING, Any
 
 import litellm
 from litellm.utils import supports_response_schema
-from any_llm import completion
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -113,7 +113,7 @@ class TinyAgent(AnyAgent):
             self.completion_params["api_base"] = self.config.api_base
 
         # Initialize providers client if gateway provider is set
-        self.use_any_llm = True
+        self.use_any_llm = os.getenv("USE_ANY_LLM")
 
     async def _load_agent(self) -> None:
         """Load the agent and its tools."""
@@ -231,9 +231,14 @@ class TinyAgent(AnyAgent):
                     }
                     messages.append(structured_output_message)
                     completion_params["messages"] = messages
-                    completion_params["response_format"] = self.config.output_type
-                    if len(completion_params["tools"]) > 0:
-                        completion_params["tool_choice"] = "none"
+                    if self.use_any_llm or supports_response_schema(
+                        model=self.config.model_id
+                    ):
+                        completion_params["response_format"] = self.config.output_type
+                    if "tools" in completion_params:
+                        completion_params.pop("tools")
+                        completion_params.pop("tool_choice", None)
+                        completion_params.pop("parallel_tool_calls", None)
                     response = await self.call_model(**completion_params)
                     if self.use_any_llm:
                         return self.config.output_type.model_validate_json(
@@ -248,10 +253,10 @@ class TinyAgent(AnyAgent):
 
     async def call_model(self, **completion_params: dict[str, Any]) -> ModelResponse:
         if self.use_any_llm:
+            from any_llm import completion
             return completion(**completion_params)
         # otherwise use litellm
-        response: ModelResponse = await litellm.acompletion(**completion_params)
-        return response
+        return await litellm.acompletion(**completion_params)
 
     @property
     def framework(self) -> AgentFramework:
