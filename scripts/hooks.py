@@ -4,7 +4,6 @@ It also serves markdown files as text files for LLM consumption.
 It was initially written in collaboration with Claude 4 Sonnet.
 """
 
-import os
 import re
 from pathlib import Path
 
@@ -41,23 +40,10 @@ def get_nav_files(nav_config):
     return files
 
 
-def get_all_markdown_files(docs_dir):
-    """Get all markdown files in the documentation directory."""
-    all_md_files = []
-    for root, dirs, files in os.walk(docs_dir):
-        dirs[:] = [d for d in dirs if not d.startswith(".") and d != "__pycache__"]
-
-        for file in files:
-            if file.endswith(MARKDOWN_EXTENSION):
-                rel_path = os.path.relpath(os.path.join(root, file), docs_dir)
-                all_md_files.append(rel_path)
-    return all_md_files
-
-
 def get_ordered_files(nav_config, docs_dir):
     """Get ordered list of markdown files based on navigation and additional files."""
     nav_files = get_nav_files(nav_config)
-    all_md_files = get_all_markdown_files(docs_dir)
+    all_md_files = [f.relative_to(docs_dir) for f in Path(docs_dir).rglob("*.md")]
 
     ordered_files = []
     for file in nav_files:
@@ -176,7 +162,7 @@ def generate_llms_txt(docs_dir, site_dir, nav_config):
     for file_path in ordered_files:
         txt_url = f"{BASE_URL}{file_path}"
 
-        title = create_file_title(file_path)
+        title = create_file_title(str(file_path))
         description = get_file_description(file_path, docs_dir)
 
         if description:
