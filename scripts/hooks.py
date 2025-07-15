@@ -42,8 +42,7 @@ def get_nav_files(nav_config):
 def get_ordered_files(nav_config, docs_dir):
     """Get ordered list of markdown files based on navigation and additional files."""
     nav_files = get_nav_files(nav_config)
-    all_md_files = [f.relative_to(docs_dir) for f in Path(docs_dir).rglob("*.md")]
-
+    all_md_files = [str(f.relative_to(docs_dir)) for f in Path(docs_dir).rglob("*.md")]
     ordered_files = []
     for file in nav_files:
         if file in all_md_files:
@@ -65,58 +64,6 @@ def clean_markdown_content(content, file_path):
     return f"<!-- Source: {file_path} -->\n\n{content}"
 
 
-def extract_description_from_markdown(content):
-    """Extract a description from markdown content."""
-    if not content:
-        return ""
-
-    lines = content.split("\n")
-    title_found = False
-    description_lines = []
-
-    for line in lines:
-        stripped = line.strip()
-
-        if not stripped:
-            continue
-
-        if stripped.startswith("# ") and not title_found:
-            title_found = True
-            continue
-
-        if not title_found:
-            continue
-
-        if (
-            stripped.startswith("!!! ")  # Admonitions  # noqa: PIE810
-            or stripped.startswith("<")  # HTML tags
-            or stripped.startswith(":::")  # API references
-            or stripped.startswith("##")  # Subheadings
-            or stripped.startswith("```")  # Code blocks
-            or stripped.startswith("---")  # Horizontal rules
-            or stripped.startswith("|")  # Tables
-            or stripped.startswith("- ")  # Lists
-            or stripped.startswith("* ")  # Lists
-            or (stripped.startswith("[") and stripped.endswith("]"))  # Standalone links
-            or re.match(r"^\d+\.", stripped)  # Numbered lists
-        ):
-            continue
-
-        if len(stripped) > 20:  # Minimum length for a meaningful description
-            description_lines.append(stripped)
-            # For now, just take the first good paragraph
-            break
-
-    if description_lines:
-        description = " ".join(description_lines)
-        description = re.sub(r"\*\*([^*]+)\*\*", r"\1", description)  # Bold
-        description = re.sub(r"\*([^*]+)\*", r"\1", description)  # Italic
-        description = re.sub(r"`([^`]+)`", r"\1", description)  # Code
-        return re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", description)  # Links
-
-    return ""
-
-
 def get_file_description(file_path, docs_dir):
     """Get descriptive text extracted from the actual file."""
     full_path = docs_dir / file_path
@@ -128,7 +75,13 @@ def get_file_description(file_path, docs_dir):
     if content is None:
         return ""
 
-    return extract_description_from_markdown(content)
+    # Assume subheadings are a good enough description
+    # or at least better than the first characters in the file.
+    return " - ".join(
+        line.replace("## ", "").strip()
+        for line in content.split("\n")
+        if line.startswith("## ")
+    )
 
 
 def create_file_title(file_path):
@@ -158,7 +111,7 @@ def generate_llms_txt(docs_dir, site_dir, nav_config):
     for file_path in ordered_files:
         txt_url = f"{BASE_URL}{file_path}"
 
-        title = create_file_title(str(file_path))
+        title = create_file_title(file_path)
         description = get_file_description(file_path, docs_dir)
 
         if description:
