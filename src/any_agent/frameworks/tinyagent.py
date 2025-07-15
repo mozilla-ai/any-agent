@@ -3,8 +3,8 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
-from contextlib import suppress
 import os
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 import litellm
@@ -254,6 +254,7 @@ class TinyAgent(AnyAgent):
     async def call_model(self, **completion_params: dict[str, Any]) -> ModelResponse:
         if self.use_any_llm:
             from any_llm import completion
+
             return completion(**completion_params)
         # otherwise use litellm
         return await litellm.acompletion(**completion_params)

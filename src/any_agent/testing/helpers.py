@@ -7,7 +7,7 @@ import requests
 
 from any_agent.config import AgentFramework
 
-DEFAULT_SMALL_MODEL_ID = "ollama/mistral-small3.2:latest"
+DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
 
 # Google ADK uses a different import path for LiteLLM, and smolagents uses the sync call
 LITELLM_IMPORT_PATHS = {
