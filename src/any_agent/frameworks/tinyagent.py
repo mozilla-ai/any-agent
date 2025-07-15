@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 import litellm
 from litellm.utils import supports_response_schema
-from llm_squid import completion
+from any_llm import completion
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -113,7 +113,7 @@ class TinyAgent(AnyAgent):
             self.completion_params["api_base"] = self.config.api_base
 
         # Initialize providers client if gateway provider is set
-        self.use_llm_squid = True
+        self.use_any_llm = True
 
     async def _load_agent(self) -> None:
         """Load the agent and its tools."""
@@ -235,7 +235,7 @@ class TinyAgent(AnyAgent):
                     if len(completion_params["tools"]) > 0:
                         completion_params["tool_choice"] = "none"
                     response = await self.call_model(**completion_params)
-                    if self.use_llm_squid:
+                    if self.use_any_llm:
                         return self.config.output_type.model_validate_json(
                             response.choices[0].message.content
                         )
@@ -247,7 +247,7 @@ class TinyAgent(AnyAgent):
         return "Max turns reached"
 
     async def call_model(self, **completion_params: dict[str, Any]) -> ModelResponse:
-        if self.use_llm_squid:
+        if self.use_any_llm:
             return completion(**completion_params)
         # otherwise use litellm
         response: ModelResponse = await litellm.acompletion(**completion_params)

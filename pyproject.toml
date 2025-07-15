@@ -154,7 +154,7 @@ asyncio_default_fixture_loop_scope = "session"
 timeout = 120
 
 [tool.uv.sources]
-llm-squid = { path = "../llm-squid", editable = true }
+any-llm = { path = "../any-llm", editable = true }
 
 
 [dependency-groups]
@@ -162,7 +162,7 @@ dev = [
   { include-group = "docs" },
   { include-group = "lint" },
   { include-group = "tests" },
-  "llm-squid",
+  "any-llm",
 ]
 
 docs = [

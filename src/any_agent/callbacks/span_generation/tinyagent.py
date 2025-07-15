@@ -56,7 +56,7 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
             if token_usage:
                 input_tokens = token_usage.prompt_tokens
                 output_tokens = token_usage.completion_tokens
-        # else it's llm-squid
+        # else it's any-llm
         else:
             if token_usage := getattr(response, "usage", None):
                 if token_usage:
