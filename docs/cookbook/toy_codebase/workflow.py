@@ -2,7 +2,6 @@ from pathlib import Path
 
 from loguru import logger
 from rapidfuzz import process
-
 from structured_qa.model_loaders import LlamaModel
 
 
@@ -108,7 +107,6 @@ def find_retrieve_answer(
                 current_info = None
                 sections_names.remove(current_section)
                 continue
-            else:
-                return response, sections_checked
+            return response, sections_checked
 
     return "NOT FOUND", sections_checked

@@ -3,8 +3,7 @@ from pathlib import Path
 import yaml
 from fire import Fire
 from loguru import logger
-
-from structured_qa.config import Config, ANSWER_PROMPT, FIND_PROMPT
+from structured_qa.config import ANSWER_PROMPT, FIND_PROMPT, Config
 from structured_qa.model_loaders import load_llama_cpp_model
 from structured_qa.preprocessing import document_to_sections_dir
 from structured_qa.workflow import find_retrieve_answer

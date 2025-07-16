@@ -1,8 +1,7 @@
-from typing_extensions import Annotated
+from typing import Annotated
 
 from pydantic import BaseModel, DirectoryPath, FilePath
 from pydantic.functional_validators import AfterValidator
-
 
 FIND_PROMPT = """
 You are given two pieces of information:
