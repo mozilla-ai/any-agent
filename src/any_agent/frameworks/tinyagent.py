@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
+import os
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
@@ -110,6 +111,9 @@ class TinyAgent(AnyAgent):
             self.completion_params["api_key"] = self.config.api_key
         if self.config.api_base:
             self.completion_params["api_base"] = self.config.api_base
+
+        # Initialize providers client if gateway provider is set
+        self.use_any_llm = os.getenv("USE_ANY_LLM")
 
     async def _load_agent(self) -> None:
         """Load the agent and its tools."""
@@ -227,11 +231,19 @@ class TinyAgent(AnyAgent):
                     }
                     messages.append(structured_output_message)
                     completion_params["messages"] = messages
-                    if supports_response_schema(model=self.config.model_id):
+                    if self.use_any_llm or supports_response_schema(
+                        model=self.config.model_id
+                    ):
                         completion_params["response_format"] = self.config.output_type
-                    if len(completion_params["tools"]) > 0:
-                        completion_params["tool_choice"] = "none"
+                    if "tools" in completion_params:
+                        completion_params.pop("tools")
+                        completion_params.pop("tool_choice", None)
+                        completion_params.pop("parallel_tool_calls", None)
                     response = await self.call_model(**completion_params)
+                    if self.use_any_llm:
+                        return self.config.output_type.model_validate_json(
+                            response.choices[0].message.content  # type: ignore[arg-type, union-attr]
+                        )
                     return self.config.output_type.model_validate_json(
                         response.choices[0].message["content"]  # type: ignore[union-attr]
                     )
@@ -240,8 +252,12 @@ class TinyAgent(AnyAgent):
         return "Max turns reached"
 
     async def call_model(self, **completion_params: dict[str, Any]) -> ModelResponse:
-        response: ModelResponse = await litellm.acompletion(**completion_params)
-        return response
+        if self.use_any_llm:
+            from any_llm import completion
+
+            return completion(**completion_params)  # type: ignore[return-value, arg-type]
+        # otherwise use litellm
+        return await litellm.acompletion(**completion_params)  # type: ignore[no-any-return]
 
     @property
     def framework(self) -> AgentFramework:
