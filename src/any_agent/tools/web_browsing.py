@@ -41,12 +41,14 @@ def search_web(query: str) -> str:
     )
 
 
-def visit_webpage(url: str, timeout: int = 30) -> str:
+def visit_webpage(url: str, timeout: int = 30, max_length: int = 10000) -> str:
     """Visits a webpage at the given url and reads its content as a markdown string. Use this to browse webpages.
 
     Args:
         url: The url of the webpage to visit.
         timeout: The timeout in seconds for the request.
+        max_length: The maximum number of characters of text that can be returned (default=10000).
+                    If max_length==-1, text is not truncated and the full webpage is returned.
 
     """
     try:
@@ -57,7 +59,9 @@ def visit_webpage(url: str, timeout: int = 30) -> str:
 
         markdown_content = re.sub(r"\n{2,}", "\n", markdown_content)
 
-        return _truncate_content(markdown_content, 10000)
+        if max_length == -1:
+            return str(markdown_content)
+        return _truncate_content(markdown_content, max_length)
     except RequestException as e:
         return f"Error fetching the webpage: {e!s}"
     except Exception as e:
