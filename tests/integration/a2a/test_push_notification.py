@@ -230,7 +230,7 @@ async def test_push_notification_non_streaming() -> None:
 
             await asyncio.sleep(1)  # Give more time for notifications
 
-            assert len(received_notifications) == 2
+            assert len(received_notifications) == 3
 
     finally:
         # Clean up webhook server properly

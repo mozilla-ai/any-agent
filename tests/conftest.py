@@ -59,10 +59,38 @@ SSE_MCP_SERVER_SCRIPT = dedent(
 )
 
 
+STRHTTP_MCP_SERVER_SCRIPT = dedent(
+    '''
+        from zoneinfo import ZoneInfo
+        from mcp.server.fastmcp import FastMCP
+        from mcp.shared.exceptions import McpError
+        from datetime import datetime
+
+        def get_zoneinfo(timezone_name: str) -> ZoneInfo:
+            try:
+                return ZoneInfo(timezone_name)
+            except Exception as e:
+                msg = "Invalid timezone: " + str(e)
+                raise McpError(msg)
+
+        mcp = FastMCP("Dates Server", host="127.0.0.1", port={port})
+
+        @mcp.tool()
+        def get_current_time(timezone: str) -> str:
+            """Get current time in specified timezone"""
+            timezone_info = get_zoneinfo(timezone)
+            current_time = datetime.now(timezone_info)
+
+            return(current_time.isoformat(timespec="seconds"))
+        mcp.run("streamable-http")
+        '''
+)
+
+
 @pytest.fixture(
     scope="session"
 )  # This means it only gets created once per test session
-async def echo_sse_server() -> AsyncGenerator[dict[str, str], None]:
+async def echo_sse_server() -> AsyncGenerator[dict[str, Any]]:
     """This fixture runs a FastMCP server in a subprocess.
     I thought about trying to mock all the individual mcp client calls,
     but I went with this because this way we don't need to actually mock anything.
@@ -81,6 +109,36 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, str], None]:
 
     try:
         yield {"url": "http://127.0.0.1:8000/sse"}
+    finally:
+        # Clean up the process when test is done
+        process.kill()
+        await process.wait()
+
+
+@pytest.fixture(scope="session")
+async def date_streamable_http_server(worker_id: str) -> AsyncGenerator[dict[str, Any]]:
+    """This fixture runs a FastMCP server in a subprocess.
+    I thought about trying to mock all the individual mcp client calls,
+    but I went with this because this way we don't need to actually mock anything.
+    This is similar to what MCPAdapt does in their testing https://github.com/grll/mcpadapt/blob/main/tests/test_core.py
+    """
+    import asyncio
+
+    port = 19010
+    if worker_id and "gw" in worker_id:
+        port += int(worker_id.strip("gw"))
+
+    process = await asyncio.create_subprocess_exec(
+        "python",
+        "-c",
+        STRHTTP_MCP_SERVER_SCRIPT.format(port=port),
+    )
+
+    # Smart ping instead of hardcoded sleep
+    await wait_for_server_async(f"http://127.0.0.1:{port}")
+
+    try:
+        yield {"url": f"http://127.0.0.1:{port}/mcp", "port": port}
     finally:
         # Clean up the process when test is done
         process.kill()

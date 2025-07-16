@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from contextlib import suppress
 from datetime import timedelta
 from typing import Literal
@@ -10,6 +10,7 @@ from any_agent.config import (
     AgentFramework,
     MCPSse,
     MCPStdio,
+    MCPStreamableHttp,
 )
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
 from any_agent.tools.mcp.mcp_server import _MCPServerBase
@@ -19,6 +20,7 @@ with suppress(ImportError):
     from agno.tools.mcp import MCPTools as AgnoMCPTools
     from mcp import ClientSession
     from mcp.client.sse import sse_client
+    from mcp.client.streamable_http import streamablehttp_client
 
     mcp_available = True
 
@@ -73,13 +75,47 @@ class AgnoMCPSseConnection(AgnoMCPConnection):
             headers=dict(self.mcp_tool.headers or {}),
         )
         sse_transport = await self._exit_stack.enter_async_context(client)
-        stdio, write = sse_transport
+        read_stream, write_stream = sse_transport
         kwargs = {}
         if self.mcp_tool.client_session_timeout_seconds:
             kwargs["read_timeout_seconds"] = timedelta(
                 seconds=self.mcp_tool.client_session_timeout_seconds
             )
-        client_session = ClientSession(stdio, write, **kwargs)  # type: ignore[arg-type]
+        client_session = ClientSession(read_stream, write_stream, **kwargs)  # type: ignore[arg-type]
+        session = await self._exit_stack.enter_async_context(client_session)
+        await session.initialize()
+        self._server = AgnoMCPTools(
+            session=session,
+            include_tools=list(self.mcp_tool.tools) if self.mcp_tool.tools else None,
+        )
+        return await super().list_tools()
+
+
+class AgnoMCPStreamableHttpConnection(AgnoMCPConnection):
+    mcp_tool: MCPStreamableHttp
+    _get_session_id_callback: Callable[[], str | None] | None = None
+
+    def get_session_id(self) -> str | None:
+        """Retrieve session ID, if it has been established."""
+        if self._get_session_id_callback:
+            return self._get_session_id_callback()
+        return None
+
+    async def list_tools(self) -> list["AgnoMCPTools"]:
+        """List tools from the MCP server."""
+        client = streamablehttp_client(
+            url=self.mcp_tool.url,
+            headers=dict(self.mcp_tool.headers or {}),
+        )
+        streamablehttp_transport = await self._exit_stack.enter_async_context(client)
+        read_stream, write_stream, get_session_id_callback = streamablehttp_transport
+        self._get_session_id_callback = get_session_id_callback
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["read_timeout_seconds"] = timedelta(
+                seconds=self.mcp_tool.client_session_timeout_seconds
+            )
+        client_session = ClientSession(read_stream, write_stream, **kwargs)  # type: ignore[arg-type]
         session = await self._exit_stack.enter_async_context(client_session)
         await session.initialize()
         self._server = AgnoMCPTools(
@@ -122,4 +158,16 @@ class AgnoMCPServerSse(AgnoMCPServerBase):
         await super()._setup_tools(mcp_connection)
 
 
-AgnoMCPServer = AgnoMCPServerStdio | AgnoMCPServerSse
+class AgnoMCPServerStreamableHttp(AgnoMCPServerBase):
+    mcp_tool: MCPStreamableHttp
+
+    async def _setup_tools(
+        self, mcp_connection: _MCPConnection["AgnoMCPTools"] | None = None
+    ) -> None:
+        mcp_connection = mcp_connection or AgnoMCPStreamableHttpConnection(
+            mcp_tool=self.mcp_tool
+        )
+        await super()._setup_tools(mcp_connection)
+
+
+AgnoMCPServer = AgnoMCPServerStdio | AgnoMCPServerSse | AgnoMCPServerStreamableHttp

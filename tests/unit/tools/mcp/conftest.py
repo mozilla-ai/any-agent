@@ -9,7 +9,7 @@ from mcp import Tool as MCPTool
 from pydantic import Field
 from pytest_lazy_fixtures import lf
 
-from any_agent.config import MCPParams, MCPSse, MCPStdio, Tool
+from any_agent.config import MCPParams, MCPSse, MCPStdio, MCPStreamableHttp, Tool
 from any_agent.tools import _MCPConnection
 
 
@@ -26,6 +26,14 @@ def tools() -> list[Tool]:
 def mcp_sse_params_no_tools() -> MCPSse:
     return MCPSse(
         url="http://localhost:8000/sse",
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+
+@pytest.fixture
+def mcp_streamablehttp_params_no_tools() -> MCPStreamableHttp:
+    return MCPStreamableHttp(
+        url="http://localhost:8000/mcp",
         headers={"Authorization": "Bearer test-token"},
     )
 
@@ -51,6 +59,13 @@ def mcp_sse_params_with_tools(
     mcp_sse_params_no_tools: MCPSse, tools: Sequence[Tool]
 ) -> MCPSse:
     return mcp_sse_params_no_tools.model_copy(update={"tools": tools})
+
+
+@pytest.fixture
+def mcp_streamablehttp_params_with_tools(
+    mcp_streamablehttp_params_no_tools: MCPStreamableHttp, tools: Sequence[Tool]
+) -> MCPStreamableHttp:
+    return mcp_streamablehttp_params_no_tools.model_copy(update={"tools": tools})
 
 
 @pytest.fixture

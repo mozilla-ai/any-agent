@@ -29,11 +29,15 @@ main_agent = AgentConfig(
 
 ## MCP
 
-MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can connect to an MCP that is running elsewhere ([MCPSse][any_agent.config.MCPSse]).
+MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can connect to an MCP that is running elsewhere (using either [MCPSse][any_agent.config.MCPSse] or [MCPStreamableHttp][any_agent.config.MCPStreamableHttp]).
 
 !!! tip
 
     There are tools like [SuperGateway](https://github.com/supercorp-ai/supergateway) providing an easy way to turn a Stdio server into an SSE server.
+
+!!! warning
+
+    The SSE remote transport has been deprecated as of [MCP specification version 2025-03-26](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http ). Please use the HTTP Stream Transport instead.
 
 === "MCP (Stdio)"
 
@@ -50,6 +54,24 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
                 command="docker",
                 args=["run", "-i", "--rm", "mcp/fetch"],
                 tools=["fetch"]
+            ),
+        ]
+    )
+    ```
+
+=== "MCP (Streamable HTTP)"
+
+    See the [MCPStreamableHttp][any_agent.config.MCPStreamableHttp] API Reference.
+
+    ```python
+    from any_agent import AgentConfig
+    from any_agent.config import MCPStreamableHttp
+
+    main_agent = AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[
+            MCPStreamableHttp(
+                url="http://localhost:8000/mcp"
             ),
         ]
     )
