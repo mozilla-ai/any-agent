@@ -1,8 +1,9 @@
+import warnings
 from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from enum import StrEnum, auto
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from any_agent.callbacks import get_default_callbacks
 from any_agent.callbacks.base import Callback
@@ -66,6 +67,37 @@ class MCPStdio(BaseModel):
 
 
 class MCPSse(BaseModel):
+    @model_validator(mode="before")
+    @classmethod
+    def sse_deprecation(cls, data: Any) -> Any:
+        warnings.warn(
+            "SSE is deprecated in the MCP specification in favor of Streamable HTTP as of version 2025-03-26",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return data
+
+    url: str
+    """The URL of the server."""
+
+    headers: Mapping[str, str] | None = None
+    """The headers to send to the server."""
+
+    tools: Sequence[str] | None = None
+    """List of tool names to use from the MCP Server.
+
+    Use it to limit the tools accessible by the agent.
+    For example, if you use [`mcp/filesystem`](https://hub.docker.com/r/mcp/filesystem),
+    you can pass `tools=["read_file", "list_directory"]` to limit the agent to read-only operations.
+    """
+
+    client_session_timeout_seconds: float | None = 5
+    """the read timeout passed to the MCP ClientSession."""
+
+    model_config = ConfigDict(frozen=True)
+
+
+class MCPStreamableHttp(BaseModel):
     url: str
     """The URL of the server."""
 
@@ -109,7 +141,7 @@ class ServingConfig(BaseModel):
     version: str = "0.1.0"
 
 
-MCPParams = MCPStdio | MCPSse
+MCPParams = MCPStdio | MCPSse | MCPStreamableHttp
 
 Tool = str | MCPParams | Callable[..., Any]
 

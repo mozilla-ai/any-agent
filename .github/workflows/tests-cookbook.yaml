@@ -33,3 +33,8 @@ jobs:
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
         run: |
           pytest tests/cookbooks -v -n 4
+
+      - name: Upload finished cookbooks
+        uses: actions/upload-artifact@v4
+        with:
+          path: "docs/cookbook/*.ipynb"

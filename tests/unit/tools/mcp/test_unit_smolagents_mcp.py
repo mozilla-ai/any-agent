@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from any_agent.config import AgentFramework, MCPSse, MCPStdio, Tool
+from any_agent.config import AgentFramework, MCPSse, MCPStdio, MCPStreamableHttp, Tool
 from any_agent.tools import _get_mcp_server
 
 
@@ -28,11 +28,29 @@ async def test_smolagents_mcp_sse_integration(
 
     await server._setup_tools()
 
-    # Check that MCPClient was called with server parameters and adapter_kwargs
     smolagents_mcp_server.assert_called_once_with(
-        {"url": mcp_sse_params_no_tools.url},
+        {"url": mcp_sse_params_no_tools.url, "transport": "sse"},
         adapter_kwargs={
             "client_session_timeout_seconds": mcp_sse_params_no_tools.client_session_timeout_seconds
+        },
+    )
+
+
+@pytest.mark.asyncio
+async def test_smolagents_mcp_streamablehttp_integration(
+    mcp_streamablehttp_params_no_tools: MCPStreamableHttp,
+    smolagents_mcp_server: MagicMock,
+) -> None:
+    server = _get_mcp_server(
+        mcp_streamablehttp_params_no_tools, AgentFramework.SMOLAGENTS
+    )
+
+    await server._setup_tools()
+
+    smolagents_mcp_server.assert_called_once_with(
+        {"url": mcp_streamablehttp_params_no_tools.url, "transport": "streamable-http"},
+        adapter_kwargs={
+            "client_session_timeout_seconds": mcp_streamablehttp_params_no_tools.client_session_timeout_seconds
         },
     )
 
@@ -91,7 +109,7 @@ async def test_smolagents_mcp_sse_timeout() -> None:
 
         mock_client.assert_called_once()
         call_args = mock_client.call_args_list[0]
-        assert call_args[0][0] == {"url": mcp_sse_params.url}
+        assert call_args[0][0] == {"url": mcp_sse_params.url, "transport": "sse"}
         assert (
             call_args[1]["adapter_kwargs"]["client_session_timeout_seconds"]
             == custom_timeout
