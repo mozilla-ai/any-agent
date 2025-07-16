@@ -3,7 +3,6 @@ from collections import defaultdict
 from pathlib import Path
 
 import pymupdf4llm
-
 from loguru import logger
 
 
