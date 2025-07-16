@@ -22,6 +22,7 @@ nav:
   - Serving: serving.md
   - Cookbook:
       - Your First Agent: cookbook/your_first_agent.ipynb
+      - Your First Agent Evaluation: cookbook/your_first_agent_evaluation.ipynb
       - Using Callbacks: cookbook/callbacks.ipynb
       - MCP Agent: cookbook/mcp_agent.ipynb
       - Serve with A2A: cookbook/serve_a2a.ipynb
