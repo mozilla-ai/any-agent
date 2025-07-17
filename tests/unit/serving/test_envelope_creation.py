@@ -37,7 +37,7 @@ class MockAgent(AnyAgent):
     async def update_output_type_async(
         self, output_type: type[BaseModel] | None
     ) -> None:
-        pass
+        self.config.output_type = output_type
 
     @property
     def framework(self) -> AgentFramework:
