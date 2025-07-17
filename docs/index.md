@@ -40,5 +40,5 @@ Refer to [pyproject.toml](https://github.com/mozilla-ai/any-agent/blob/main/pypr
 
 This documentation is available in two AI-friendly formats:
 
-- **[llms.txt](/llms.txt)** - A structured overview with curated links to key documentation sections
-- **[llms-full.txt](/llms-full.txt)** - Complete documentation content concatenated into a single file
+- **[llms.txt](https://mozilla-ai.github.io/any-agent/llms.txt)** - A structured overview with curated links to key documentation sections
+- **[llms-full.txt](https://mozilla-ai.github.io/any-agent/llms-full.txt)** - Complete documentation content concatenated into a single file

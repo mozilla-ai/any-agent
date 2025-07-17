@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import Field, PrivateAttr
 
-from any_agent.config import AgentFramework, MCPSse, MCPStdio
+from any_agent.config import AgentFramework, MCPSse, MCPStdio, MCPStreamableHttp
 from any_agent.tools.mcp.mcp_connection import _MCPConnection
 from any_agent.tools.mcp.mcp_server import _MCPServerBase
 
@@ -75,6 +75,21 @@ class LlamaIndexMCPSseConnection(LlamaIndexMCPConnection):
         return await super().list_tools()
 
 
+class LlamaIndexMCPStreamableConnection(LlamaIndexMCPConnection):
+    mcp_tool: MCPStreamableHttp
+
+    async def list_tools(self) -> list["LlamaIndexFunctionTool"]:
+        """List tools from the MCP server."""
+        kwargs = {}
+        if self.mcp_tool.client_session_timeout_seconds:
+            kwargs["timeout"] = self.mcp_tool.client_session_timeout_seconds
+        self._client = LlamaIndexMCPClient(
+            command_or_url=self.mcp_tool.url,
+            **kwargs,  # type: ignore[arg-type]
+        )
+        return await super().list_tools()
+
+
 class LlamaIndexMCPServerBase(_MCPServerBase["LlamaIndexFunctionTool"], ABC):
     framework: Literal[AgentFramework.LLAMA_INDEX] = AgentFramework.LLAMA_INDEX
     tools: Sequence["LlamaIndexFunctionTool"] = Field(default_factory=list)
@@ -110,4 +125,20 @@ class LlamaIndexMCPServerSse(LlamaIndexMCPServerBase):
         await super()._setup_tools(mcp_connection)
 
 
-LlamaIndexMCPServer = LlamaIndexMCPServerStdio | LlamaIndexMCPServerSse
+class LlamaIndexMCPServerStreamableHttp(LlamaIndexMCPServerBase):
+    mcp_tool: MCPStreamableHttp
+
+    async def _setup_tools(
+        self, mcp_connection: _MCPConnection["LlamaIndexFunctionTool"] | None = None
+    ) -> None:
+        mcp_connection = mcp_connection or LlamaIndexMCPStreamableConnection(
+            mcp_tool=self.mcp_tool
+        )
+        await super()._setup_tools(mcp_connection)
+
+
+LlamaIndexMCPServer = (
+    LlamaIndexMCPServerStdio
+    | LlamaIndexMCPServerSse
+    | LlamaIndexMCPServerStreamableHttp
+)

@@ -2,8 +2,7 @@ import pytest
 from pydantic import BaseModel
 
 # Skip entire module if a2a dependencies are not available
-pytest.importorskip("a2a.types")
-pytest.importorskip("any_agent.serving.envelope")
+pytest.importorskip("a2a")
 
 from a2a.types import TaskState
 
@@ -34,6 +33,11 @@ class MockAgent(AnyAgent):
 
     async def _run_async(self, prompt: str, **kwargs: object) -> str:
         return "mock result"
+
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        pass
 
     @property
     def framework(self) -> AgentFramework:

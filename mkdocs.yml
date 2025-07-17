@@ -22,6 +22,7 @@ nav:
   - Serving: serving.md
   - Cookbook:
       - Your First Agent: cookbook/your_first_agent.ipynb
+      - Your First Agent Evaluation: cookbook/your_first_agent_evaluation.ipynb
       - Using Callbacks: cookbook/callbacks.ipynb
       - MCP Agent: cookbook/mcp_agent.ipynb
       - Serve with A2A: cookbook/serve_a2a.ipynb
@@ -38,23 +39,31 @@ nav:
 
 theme:
   name: material
+  font:
+    text: Noto Sans
+    code: Noto Sans Mono
   palette:
-    - scheme: default
-      primary: black
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue gray
       toggle:
         icon: material/lightbulb
         name: Switch to dark mode
-    - scheme: slate
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
       primary: grey
       toggle:
         icon: material/lightbulb-outline
         name: Switch to light mode
+    - accent: blue
   logo: images/any-agent-logo-mark.png
   favicon: images/any-agent_favicon.png
   features:
     - content.code.copy
     - content.tabs.link
     - content.action.edit
+    - navigation.expand
+    - navigation.footer
 
 extra_css:
   - assets/custom.css
