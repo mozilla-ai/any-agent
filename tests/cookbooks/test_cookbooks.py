@@ -22,6 +22,7 @@ def test_cookbook_notebook(
             env={
                 "MISTRAL_API_KEY": os.environ["MISTRAL_API_KEY"],
                 "TAVILY_API_KEY": os.environ["TAVILY_API_KEY"],
+                "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
                 "PATH": os.environ["PATH"],
                 "IN_PYTEST": "1",  # For mcp_agent notebook which needs to mock input
             },
