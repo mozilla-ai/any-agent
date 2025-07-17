@@ -2180,7 +2180,7 @@ Cost (USD): 0.000197
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -2194,6 +2194,16 @@ Cost (USD): 0.000197
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tracing.agent_trace</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentTrace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tracing.attributes</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenAI</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">check_tool_usage</span><span class="p">(</span><span class="n">trace</span><span class="p">:</span> <span class="n">AgentTrace</span><span class="p">,</span> <span class="n">required_tool</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Check if a specific tool was used in the trace."""</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">GenAI</span><span class="o">.</span><span class="n">TOOL_NAME</span><span class="p">]</span> <span class="o">==</span> <span class="n">required_tool</span>
+        <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">trace</span><span class="o">.</span><span class="n">spans</span>
+        <span class="k">if</span> <span class="n">span</span><span class="o">.</span><span class="n">is_tool_execution</span><span class="p">()</span>
+    <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_web_search_efficiency</span><span class="p">(</span><span class="n">trace</span><span class="p">:</span> <span class="n">AgentTrace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
@@ -2204,15 +2214,8 @@ Cost (USD): 0.000197
     <span class="n">final_output</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">final_output</span>
     <span class="n">duration</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
     <span class="c1"># Check if web search tools were used</span>
-    <span class="n">messages</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">spans_to_messages</span><span class="p">()</span>
-    <span class="n">used_search</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
-        <span class="n">message</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">"assistant"</span> <span class="ow">and</span> <span class="s2">"search_tavily"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">messages</span>
-    <span class="p">)</span>
-    <span class="n">used_visit</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
-        <span class="n">message</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">"assistant"</span> <span class="ow">and</span> <span class="s2">"visit_webpage"</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">messages</span>
-    <span class="p">)</span>
+    <span class="n">used_search</span> <span class="o">=</span> <span class="n">check_tool_usage</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s2">"search_tavily"</span><span class="p">)</span>
+    <span class="n">used_visit</span> <span class="o">=</span> <span class="n">check_tool_usage</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s2">"visit_webpage"</span><span class="p">)</span>
     <span class="c1"># Apply quantitative criteria</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">"token_efficient"</span><span class="p">:</span> <span class="n">token_count</span>
@@ -2238,6 +2241,16 @@ Cost (USD): 0.000197
     <span class="k">return</span> <span class="n">results</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">from any_agent.tracing.agent_trace import AgentTrace
+from any_agent.tracing.attributes import GenAI
+
+
+def check_tool_usage(trace: AgentTrace, required_tool: str) -&gt; bool:
+    """Check if a specific tool was used in the trace."""
+    return any(
+        span.attributes[GenAI.TOOL_NAME] == required_tool
+        for span in trace.spans
+        if span.is_tool_execution()
+    )
 
 
 def evaluate_web_search_efficiency(trace: AgentTrace) -&gt; dict:
@@ -2248,15 +2261,8 @@ def evaluate_web_search_efficiency(trace: AgentTrace) -&gt; dict:
     final_output = trace.final_output
     duration = trace.duration.total_seconds()
     # Check if web search tools were used
-    messages = trace.spans_to_messages()
-    used_search = any(
-        message.role == "assistant" and "search_tavily" in str(message.content)
-        for message in messages
-    )
-    used_visit = any(
-        message.role == "assistant" and "visit_webpage" in str(message.content)
-        for message in messages
-    )
+    used_search = check_tool_usage(trace, "search_tavily")
+    used_visit = check_tool_usage(trace, "visit_webpage")
     # Apply quantitative criteria
     results = {
         "token_efficient": token_count
