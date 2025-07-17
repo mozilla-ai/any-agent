@@ -69,7 +69,7 @@ evaluation = evaluate_efficiency(trace)
 print(f"Evaluation results: {evaluation}")
 ```
 
-### Working with Trace Messages
+### Working with Trace Spans
 
 You can also examine the conversation flow directly:
 
