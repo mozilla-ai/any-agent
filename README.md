@@ -11,6 +11,10 @@
 [![Docs](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/docs.yaml/)
 [![Tests](https://github.com/mozilla-ai/any-agent/actions/workflows/tests-integration.yaml/badge.svg)](https://github.com/mozilla-ai/any-agent/actions/workflows/tests-integration.yaml/)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)
+[![PyPI](https://img.shields.io/pypi/v/any-agent)](https://pypi.org/project/any-agent/)
+<a href="https://discord.gg/4gf3zXrQUc">
+    <img src="https://img.shields.io/static/v1?label=Chat%20on&message=Discord&color=blue&logo=Discord&style=flat-square" alt="Discord">
+</a>
 
 A single interface to use and evaluate different agent frameworks.
 
@@ -19,7 +23,7 @@ A single interface to use and evaluate different agent frameworks.
 ## [Documentation](https://mozilla-ai.github.io/any-agent/)
 
 - [Agents](https://mozilla-ai.github.io/any-agent/agents/)
-- [Tools](https://mozilla-ai.github.io/any-agent/tools/)
+- [Tools](https://mozilla-ai.github.io/any-agent/agents/tools/)
 - [Tracing](https://mozilla-ai.github.io/any-agent/tracing/)
 - [Serving](https://mozilla-ai.github.io/any-agent/serving/)
 - [Evaluation](https://mozilla-ai.github.io/any-agent/evaluation/)
@@ -51,7 +55,7 @@ To define any agent system you will always use the same imports:
 ```python
 from any_agent import AgentConfig, AnyAgent
 ```
-For this example we use a model hosted by openai, but you may need to set the relevant API key for whichever provider being used.
+For this example we use a model hosted by Mistral, but you may need to set the relevant API key for whichever provider being used.
 See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
 
 ```bash
@@ -82,9 +86,11 @@ print(agent_trace)
 
 Get started quickly with these practical examples:
 
-- **[Creating your first agent](https://mozilla-ai.github.io/any-agent/cookbook/your_first_agent/)** - Build a simple agent with web search capabilities
-- **[Creating an agent with MCP](https://mozilla-ai.github.io/any-agent/cookbook/mcp_agent/)** - Integrate Model Context Protocol tools
-- **[Serve an Agent with A2A](https://mozilla-ai.github.io/any-agent/cookbook/serve_a2a/)** - Deploy agents with Agent-to-Agent communication
+- **[Creating your first agent](https://mozilla-ai.github.io/any-agent/cookbook/your_first_agent/)** - Build a simple agent with web search capabilities.
+- **[Creating your first agent evaluation](https://mozilla-ai.github.io/any-agent/cookbook/your_first_agent_evaluation/)** - Evaluate that simple web search agent using 3 different methods.
+- **[Using Callbacks](https://mozilla-ai.github.io/any-agent/cookbook/callbacks/)** - Implement and use custom callbacks.
+- **[Creating an agent with MCP](https://mozilla-ai.github.io/any-agent/cookbook/mcp_agent/)** - Integrate Model Context Protocol tools.
+- **[Serve an Agent with A2A](https://mozilla-ai.github.io/any-agent/cookbook/serve_a2a/)** - Deploy agents with Agent-to-Agent communication.
 - **[Building Multi-Agent Systems with A2A](https://mozilla-ai.github.io/any-agent/cookbook/a2a_as_tool/)** - Using an agent as a tool for another agent to interact with.
 
 ## Contributions

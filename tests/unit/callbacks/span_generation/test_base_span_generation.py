@@ -5,6 +5,7 @@ import pytest
 from opentelemetry.trace import StatusCode
 
 from any_agent.callbacks.span_generation.base import _SpanGeneration
+from any_agent.tracing.attributes import GenAI
 
 
 class FooClass:
@@ -30,7 +31,10 @@ def test_set_tool_output(
     _SpanGeneration()._set_tool_output(context, tool_output)
 
     context.current_span.set_attributes.assert_called_with(
-        {"gen_ai.output": expected_output, "gen_ai.output.type": expected_output_type}
+        {
+            GenAI.OUTPUT: expected_output,
+            GenAI.OUTPUT_TYPE: expected_output_type,
+        }
     )
     context.current_span.set_status.assert_called_with(StatusCode.OK)
 
@@ -43,7 +47,7 @@ def test_set_tool_output_error() -> None:
         _SpanGeneration()._set_tool_output(context, error)
 
         context.current_span.set_attributes.assert_called_with(
-            {"gen_ai.output": error, "gen_ai.output.type": "text"}
+            {GenAI.OUTPUT: error, GenAI.OUTPUT_TYPE: "text"}
         )
         context.current_span.set_status.assert_called_with(
             status_mock(status_code=StatusCode.ERROR, description=error)
@@ -55,7 +59,7 @@ def test_set_llm_input() -> None:
 
     span_generation = _SpanGeneration()
     span_generation._set_llm_input(context, model_id="gpt-5", input_messages=[])
-    context.current_span.set_attribute.assert_called_with("gen_ai.input.messages", "[]")
+    context.current_span.set_attribute.assert_called_with(GenAI.INPUT_MESSAGES, "[]")
 
     # first_llm_call logic should avoid logging input_messages
     # on subsequent calls.
@@ -70,18 +74,22 @@ def test_set_llm_output() -> None:
     span_generation._set_llm_output(
         context, output="foo", input_tokens=0, output_tokens=0
     )
-    context.current_span.set_attributes.assert_any_call(
+    context.current_span.set_attributes.assert_called_with(
         {
-            "gen_ai.output": "foo",
-            "gen_ai.output.type": "text",
+            GenAI.OUTPUT: "foo",
+            GenAI.OUTPUT_TYPE: "text",
+            GenAI.USAGE_INPUT_TOKENS: 0,
+            GenAI.USAGE_OUTPUT_TOKENS: 0,
         }
     )
 
     span_generation._set_llm_output(context, output=[], input_tokens=0, output_tokens=0)
-    context.current_span.set_attributes.assert_any_call(
+    context.current_span.set_attributes.assert_called_with(
         {
-            "gen_ai.output": "[]",
-            "gen_ai.output.type": "json",
+            GenAI.OUTPUT: "[]",
+            GenAI.OUTPUT_TYPE: "json",
+            GenAI.USAGE_INPUT_TOKENS: 0,
+            GenAI.USAGE_OUTPUT_TOKENS: 0,
         }
     )
 
@@ -91,4 +99,10 @@ def test_set_tool_input() -> None:
 
     span_generation = _SpanGeneration()
     span_generation._set_tool_input(context, name="foo", args={})
-    context.current_span.set_attribute.assert_called_with("gen_ai.tool.args", "{}")
+    context.current_span.set_attributes.assert_called_with(
+        {
+            GenAI.OPERATION_NAME: "execute_tool",
+            GenAI.TOOL_NAME: "foo",
+            GenAI.TOOL_ARGS: "{}",
+        }
+    )

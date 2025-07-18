@@ -80,3 +80,36 @@ class AgnoAgent(AnyAgent):
             raise ValueError(error_message)
         result: RunResponse = await self._agent.arun(prompt, **kwargs)
         return result.content  # type: ignore[return-value]
+
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
+
+        # If agent is already loaded, we need to recreate it with the new output type
+        # The AGNO agent requires response_model to be set during construction
+        if self._agent:
+            # Rebuild tools list from original config
+            tools, _ = await self._load_tools(self.config.tools)
+
+            # Recreate the agent with the new configuration
+            agent_args = self.config.agent_args or {}
+            if output_type:
+                agent_args["response_model"] = output_type
+
+            self._agent = Agent(
+                name=self.config.name,
+                instructions=self.config.instructions,
+                model=self._get_model(self.config),
+                tools=tools,
+                **agent_args,
+            )
+
+            # Update the tools list
+            self._tools = self._unpack_tools(tools)

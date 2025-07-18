@@ -4,7 +4,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.tools.final_output import FinalOutputTool
+from any_agent.tools.final_output import prepare_final_output
 
 from .any_agent import AnyAgent
 
@@ -61,13 +61,10 @@ class GoogleAgent(AnyAgent):
 
         instructions = self.config.instructions or ""
         if self.config.output_type:
-            instructions += (
-                "You must call the final_output tool when finished."
-                "The 'answer' argument passed to the final_output tool must be a JSON string that matches the following schema:\n"
-                f"{self.config.output_type.model_json_schema()}"
+            instructions, final_output_tool = prepare_final_output(
+                self.config.output_type, instructions
             )
-            output_fn = FinalOutputTool(self.config.output_type)
-            tools.append(output_fn)
+            tools.append(final_output_tool)
 
         self._agent = agent_type(
             name=self.config.name,
@@ -101,7 +98,7 @@ class GoogleAgent(AnyAgent):
             final_output = None
             final_output_attempts = 0
             # We allow for two retries: one to make it a proper json string, and one to make it a valid pydantic model
-            max_output_attepts = 3
+            max_output_attempts = 3
 
             async for event in runner.run_async(
                 user_id=user_id,
@@ -123,17 +120,17 @@ class GoogleAgent(AnyAgent):
                         if part.function_response.response.get("success"):
                             final_output = part.function_response.response.get("result")
                             break
-                        if final_output_attempts >= max_output_attepts:
+                        if final_output_attempts >= max_output_attempts:
                             msg = f"Final output failed after {final_output_attempts} attempts"
                             raise ValueError(msg)
 
-                if final_output or final_output_attempts >= max_output_attepts:
+                if final_output or final_output_attempts >= max_output_attempts:
                     break
 
             if not final_output:
                 msg = "No final response found"
                 raise ValueError(msg)
-            return self.config.output_type.model_validate_json(final_output)
+            return self.config.output_type.model_validate(final_output)
 
         async for _ in runner.run_async(
             user_id=user_id,
@@ -149,3 +146,46 @@ class GoogleAgent(AnyAgent):
         )
         assert session, "Session should not be None"
         return str(session.state.get("response"))
+
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
+
+        # If agent is already loaded, we need to recreate it with the new output type
+        # The Google ADK agent requires output_type to be set during construction
+        if self._agent:
+            # Store current tools (excluding any existing final_output tool)
+            current_tools = [
+                tool
+                for tool in self._tools
+                if not (hasattr(tool, "__name__") and tool.__name__ == "final_output")
+            ]
+
+            # Prepare instructions and tools for the new output type
+            instructions = self.config.instructions or ""
+            if output_type:
+                instructions, final_output_tool = prepare_final_output(
+                    output_type, instructions
+                )
+                current_tools.append(final_output_tool)
+
+            # Recreate the agent with the new configuration
+            agent_type = self.config.agent_type or LlmAgent
+            self._agent = agent_type(
+                name=self.config.name,
+                instruction=instructions,
+                model=self._get_model(self.config),
+                tools=current_tools,
+                **self.config.agent_args or {},
+                output_key="response",
+            )
+
+            # Update the tools list
+            self._tools = current_tools

@@ -4,6 +4,10 @@ An [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] is returned when cal
 
 `any-agent` generates standardized (regarding the structure) [OpenTelemetry](https://opentelemetry.io/) traces regardless of the framework used, based on the [Semantic conventions for generative AI systems](https://opentelemetry.io/docs/specs/semconv/gen-ai/). This means that any OpenTelemetry exporter compatible with the Python SDK can be added. More information can be found [below](#adding-an-opentelemetry-exporter).
 
+!!! info
+
+    Check the exposed attributes in [`GenAI`][any_agent.tracing.attributes.GenAI]
+
 You can try to 🔍 find 🔍 the subtle differences (regarding the content) across frameworks in the examples below.
 
 !!! tip

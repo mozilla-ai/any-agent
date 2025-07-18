@@ -114,8 +114,22 @@ class LangchainAgent(AnyAgent):
             if supports_response_schema(model=self.config.model_id):
                 completion_params["response_format"] = self.config.output_type
 
-            response = await litellm.acompletion(**completion_params)
+            response = await self.call_model(**completion_params)
             return self.config.output_type.model_validate_json(
                 response.choices[0].message["content"]
             )
         return str(result["messages"][-1].content)
+
+    async def call_model(self, **kwargs: Any) -> Any:
+        return await litellm.acompletion(**kwargs)
+
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
