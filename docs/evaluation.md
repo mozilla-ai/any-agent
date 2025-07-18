@@ -69,19 +69,19 @@ evaluation = evaluate_efficiency(trace)
 print(f"Evaluation results: {evaluation}")
 ```
 
-### Working with Trace Messages
+### Working with Trace Spans
 
 You can also examine the conversation flow directly:
 
 ```python
+from any_agent.tracing.attributes import GenAI
+
 def check_tool_usage(trace: AgentTrace, required_tool: str) -> bool:
     """Check if a specific tool was used in the trace."""
-    messages = trace.spans_to_messages()
-
-    for message in messages:
-        if message.role == "tool" and required_tool in message.content:
-            return True
-    return False
+    return any(
+        span.attributes[GenAI.TOOL_NAME] == required_tool
+        for span in trace.spans if span.is_tool_execution()
+    )
 
 # Usage
 used_search = check_tool_usage(trace, "search_web")

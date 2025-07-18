@@ -36,14 +36,13 @@ def test_files_all(fpath: pathlib.Path) -> None:
 def test_evaluation_md() -> None:
     mock_trace = MagicMock()
     mock_trace.tokens.total_tokens = 500
-    mock_trace.spans = [1, 2, 3]
+    mock_trace.spans = [MagicMock()]
     mock_trace.final_output = "Paris"
     mock_trace.spans_to_messages.return_value = []
 
     mock_agent = MagicMock()
     mock_agent.run.return_value = mock_trace
     mock_create = MagicMock(return_value=mock_agent)
-    mock_a2a_tool = AsyncMock()
 
     def mock_run_method(*args: Any, **kwargs: Any) -> Any:
         mock_result = MagicMock()
@@ -61,7 +60,6 @@ def test_evaluation_md() -> None:
         patch("builtins.open", new_callable=MagicMock),
         patch("any_agent.AnyAgent.create", mock_create),
         patch("any_agent.AnyAgent.create_async", mock_create_async),
-        patch("any_agent.tools.a2a_tool_async", mock_a2a_tool),
         patch("any_agent.evaluation.LlmJudge", return_value=mock_judge),
         patch("any_agent.evaluation.AgentJudge", return_value=mock_judge),
     ):

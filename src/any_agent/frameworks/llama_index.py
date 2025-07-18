@@ -129,5 +129,50 @@ class LlamaIndexAgent(AnyAgent):
                 )
         return result.response.blocks[0].text
 
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
+
+        # If agent is already loaded, we need to recreate it with the new output type
+        # The LlamaIndex agent requires output_type tools to be set during construction
+        if self._agent:
+            # Prepare instructions and tools for the new output type
+            instructions = self.config.instructions
+            tools_to_use = list(self.config.tools)
+            if output_type:
+                instructions, final_output_function = prepare_final_output(
+                    output_type, instructions
+                )
+                tools_to_use.append(final_output_function)
+
+            # Recreate the agent with the new configuration
+            agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+            # if agent type is FunctionAgent but there are no tools, throw an error
+            if agent_type == FunctionAgent and not tools_to_use:
+                logger.warning(
+                    "FunctionAgent requires tools and none were provided. Using ReActAgent instead."
+                )
+                agent_type = ReActAgent
+
+            # We need to reload the tools since they might have changed
+            imported_tools, _ = await self._load_tools(tools_to_use)
+            self._tools = imported_tools
+
+            self._agent = agent_type(
+                name=self.config.name,
+                tools=imported_tools,
+                description=self.config.description or "The main agent",
+                llm=self._get_model(self.config),
+                system_prompt=instructions,
+                **self.config.agent_args or {},
+            )
+
     async def call_model(self, **kwargs: Any) -> Any:
         return await acompletion(**kwargs)

@@ -122,14 +122,6 @@ def test_tool_error_llm_mocked(
         choices=[StreamingChoices(delta=Delta(tool_calls=[tool_call]))]
     )
 
-    def fake_iter_msgs() -> Iterator[ModelResponse]:
-        yield fake_tool_fail_response
-        yield fake_give_up_response
-
-    def fake_smol_iter_msgs() -> Iterator[ModelResponse]:
-        yield fake_tool_fail_response
-        yield fake_smolagents_final_answer_response
-
     async def async_fake_tool_fail_chunk() -> AsyncIterator[ModelResponseStream]:
         yield fake_tool_fail_chunk
 
@@ -151,9 +143,23 @@ def test_tool_error_llm_mocked(
         if agent_framework in (AgentFramework.LLAMA_INDEX):
             litellm_mock.side_effect = streaming.next
         elif agent_framework in (AgentFramework.SMOLAGENTS):
-            litellm_mock.side_effect = fake_smol_iter_msgs()
+            # For smolagents, we need to handle the ReAct pattern properly
+            # First call should be the tool failure, then final_answer calls
+            def smolagents_mock_generator() -> Iterator[ModelResponse]:
+                yield fake_tool_fail_response
+                # After tool failure, keep returning final_answer until agent terminates
+                while True:
+                    yield fake_smolagents_final_answer_response
+
+            litellm_mock.side_effect = smolagents_mock_generator()
         else:
-            litellm_mock.side_effect = fake_iter_msgs()
+            # For other frameworks, just use the simple approach
+            def other_mock_generator() -> Iterator[ModelResponse]:
+                yield fake_tool_fail_response
+                while True:
+                    yield fake_give_up_response
+
+            litellm_mock.side_effect = other_mock_generator()
 
         agent_trace = agent.run(
             "Check in the web which agent framework is the best.",

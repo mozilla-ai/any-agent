@@ -48,36 +48,27 @@ class SmolagentsAgent(AnyAgent):
         }
         return model_type(**kwargs)
 
-    async def _load_agent(self) -> None:
-        """Load the Smolagents agent with the given configuration."""
-        if not smolagents_available:
-            msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
-            raise ImportError(msg)
+    def _setup_output_type(self, output_type: type[BaseModel] | None) -> None:
+        """Set up the output type handling for the agent.
 
-        tools, _ = await self._load_tools(self.config.tools)
+        Args:
+            output_type: The output type to set up, or None to remove output type constraint
 
-        main_agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+        """
+        if not self._agent:
+            return
 
-        agent_args = self.config.agent_args or {}
-
-        self._tools = tools
-        self._agent = main_agent_type(
-            name=self.config.name,
-            model=self._get_model(self.config),
-            tools=tools,
-            verbosity_level=-1,  # OFF
-            **agent_args,
-        )
+        if "final_answer" in self._agent.tools:
+            del self._agent.tools["final_answer"]
 
         if self.config.instructions:
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 
-        if self.config.output_type:
+        if output_type:
             instructions, final_output_function = prepare_final_output(
-                self.config.output_type, self.config.instructions
+                output_type, self.config.instructions
             )
 
-            # Create a custom tool for smolagents that wraps our final output function
             class FinalAnswerToolWrapper(FinalAnswerTool):  # type: ignore[no-untyped-call]
                 def __init__(
                     self,
@@ -115,6 +106,34 @@ class SmolagentsAgent(AnyAgent):
             # Update the system prompt with the modified instructions
             if instructions:
                 self._agent.prompt_templates["system_prompt"] = instructions
+
+    async def _load_agent(self) -> None:
+        """Load the Smolagents agent with the given configuration."""
+        if not smolagents_available:
+            msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
+            raise ImportError(msg)
+
+        tools, _ = await self._load_tools(self.config.tools)
+
+        main_agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
+
+        agent_args = self.config.agent_args or {}
+
+        self._tools = tools
+        self._agent = main_agent_type(
+            name=self.config.name,
+            model=self._get_model(self.config),
+            tools=tools,
+            verbosity_level=-1,  # OFF
+            **agent_args,
+        )
+
+        if self.config.instructions:
+            self._agent.prompt_templates["system_prompt"] = self.config.instructions
+
+        # Set up output type handling
+        self._setup_output_type(self.config.output_type)
+
         assert self._agent
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
@@ -125,3 +144,17 @@ class SmolagentsAgent(AnyAgent):
         if self.config.output_type:
             return self.config.output_type.model_validate_json(result)
         return str(result)
+
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
+
+        # If agent is already loaded, update its output handling
+        self._setup_output_type(output_type)

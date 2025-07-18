@@ -259,6 +259,17 @@ class TinyAgent(AnyAgent):
         # otherwise use litellm
         return await litellm.acompletion(**completion_params)  # type: ignore[no-any-return]
 
+    async def update_output_type_async(
+        self, output_type: type[BaseModel] | None
+    ) -> None:
+        """Update the output type of the agent in-place.
+
+        Args:
+            output_type: The new output type to use, or None to remove output type constraint
+
+        """
+        self.config.output_type = output_type
+
     @property
     def framework(self) -> AgentFramework:
         return AgentFramework.TINYAGENT
