@@ -10,7 +10,6 @@ requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
   "duckduckgo_search",
-  "fire",
   "litellm>=1.74.0",
   "markdownify",
   "mcp>=1.5.0",
