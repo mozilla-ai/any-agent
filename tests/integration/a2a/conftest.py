@@ -75,6 +75,7 @@ class A2AServedAgent:
         self,
         agent: AnyAgent,
         serving_config: A2AServingConfig | None = None,
+        instrument: bool = True,
     ):
         self.agent = agent
         self.serving_config = serving_config or A2AServingConfig(port=0)
