@@ -120,3 +120,8 @@ class A2AServingConfig(BaseModel):
 
     If not provided, a default in-memory task store will be used.
     """
+
+    instrument_server: bool = False
+    """Whether to instrument the server to receive and use OpenTelemetry tracing.
+
+    If not provided, OpenTelemetry instrumentation is disabled."""

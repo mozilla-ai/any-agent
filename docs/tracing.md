@@ -123,3 +123,11 @@ tp = get_tracer_provider()
 http_exporter = OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces")
 tp.add_span_processor(SimpleSpanProcessor(http_exporter))
 ```
+
+## Distributed tracing
+
+### A2A
+
+When serving an agent via A2A, the server can be instrumented so that any W3C trace and parent span IDs received are included in the OpenTelemetry traces used by the served agent. It is only enabled if the `instrument_server` parameter is set to `True` in the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] passed when serving the agent.
+
+Likewise, an agent using an A2A served agent with the [`a2a_tool`][any_agent.tools.a2a_tool] or [`a2a_tool_async`][any_agent.tools.a2a_tool_async] functions can set the `instrument_client` parameter to `True` to inject OpenTelemetry trace and parent span IDs into the A2A HTTP calls.

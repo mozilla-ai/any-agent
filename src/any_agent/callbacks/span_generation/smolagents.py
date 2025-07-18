@@ -19,7 +19,7 @@ class _SmolagentsSpanGeneration(_SpanGeneration):
         messages: list[ChatMessage] = args[0]
         input_messages = [
             {
-                "role": message.role.value,  # type: ignore[attr-defined]
+                "role": message.role.value,
                 "content": message.content[0]["text"],  # type: ignore[index]
             }
             for message in messages

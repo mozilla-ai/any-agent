@@ -48,6 +48,15 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
 
+    # Uncomment for distributed tracing
+    """
+    # Add another trace exporter
+    tp = get_tracer_provider()
+    # full_exporter = ConsoleSpanExporter()
+    http_exporter = OTLPSpanExporter(endpoint="http://localhost:4318/v1/traces")
+    tp.add_span_processor(SimpleSpanProcessor(http_exporter))
+    """
+
     env_check = validate_environment(DEFAULT_SMALL_MODEL_ID)
     if not env_check["keys_in_environment"]:
         pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
@@ -72,6 +81,8 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
         port=0,
         endpoint=f"/{tool_agent_endpoint}",
         log_level="info",
+        # Uncomment for distributed tracing
+        # instrument_server=True
     )
 
     async with a2a_client_from_agent(date_agent, serving_config) as (_, server_url):
@@ -80,7 +91,14 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             instructions="Use the available tools to obtain additional information to answer the query.",
             description="The orchestrator that can use other agents via tools using the A2A protocol.",
             model_id=DEFAULT_SMALL_MODEL_ID,
-            tools=[await a2a_tool_async(server_url, http_kwargs=DEFAULT_HTTP_KWARGS)],
+            tools=[
+                await a2a_tool_async(
+                    server_url,
+                    http_kwargs=DEFAULT_HTTP_KWARGS,
+                    # Uncomment for distributed tracing
+                    # instrument_client=True
+                )
+            ],
             model_args=get_default_agent_model_args(agent_framework),
         )
 

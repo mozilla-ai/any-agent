@@ -252,6 +252,7 @@ class AnyAgent(ABC):
             port=serving_config.port,
             endpoint=serving_config.endpoint,
             log_level=serving_config.log_level,
+            instrument_server=serving_config.instrument_server,
         )
 
     async def _serve_mcp_async(self, serving_config: MCPServingConfig) -> ServerHandle:
