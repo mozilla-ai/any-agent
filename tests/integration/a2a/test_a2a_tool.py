@@ -51,7 +51,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
 
     env_check = validate_environment(DEFAULT_SMALL_MODEL_ID)
     if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+        pytest.skip(f"{env_check['missing_keys']} needed for {DEFAULT_SMALL_MODEL_ID}")
 
     # Create date agent
     date_agent_cfg = AgentConfig(
