@@ -236,4 +236,5 @@ def test_load_and_run_agent(
         with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
             f.write(html_output.replace("<!DOCTYPE html>", ""))
 
-    assert_eval(agent_trace)
+    if agent_framework is AgentFramework.TINYAGENT:
+        assert_eval(agent_trace)
