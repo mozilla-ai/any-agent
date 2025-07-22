@@ -30,7 +30,7 @@ def test_runtime_error(
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+        pytest.skip(f"{env_check['missing_keys']} needed for {kwargs['model_id']}")
 
     exc_reason = "It's a trap!"
 
@@ -90,7 +90,7 @@ def test_tool_error(
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+        pytest.skip(f"{env_check['missing_keys']} needed for {kwargs['model_id']}")
 
     agent_config = AgentConfig(
         model_id=kwargs["model_id"],

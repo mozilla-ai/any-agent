@@ -66,10 +66,9 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
     kwargs = {}
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
-    agent_model = kwargs["model_id"]
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+        pytest.skip(f"{env_check['missing_keys']} needed for {kwargs['model_id']}")
 
     main_agent = None
     server_handle = None
@@ -89,7 +88,7 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
         date_agent_cfg = AgentConfig(
             instructions="Use the available tools to obtain additional information to answer the query.",
             name="date_agent",
-            model_id=agent_model,
+            model_id=kwargs["model_id"],
             description=date_agent_description,
             tools=[get_datetime],
             model_args=get_default_agent_model_args(agent_framework),

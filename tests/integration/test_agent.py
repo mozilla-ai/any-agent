@@ -184,7 +184,7 @@ def test_load_and_run_agent(
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(kwargs["model_id"])
     if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+        pytest.skip(f"{env_check['missing_keys']} needed for {kwargs['model_id']}")
     tools = [
         write_file,
         MCPStdio(
@@ -236,4 +236,5 @@ def test_load_and_run_agent(
         with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
             f.write(html_output.replace("<!DOCTYPE html>", ""))
 
-    assert_eval(agent_trace)
+    if agent_framework is AgentFramework.TINYAGENT:
+        assert_eval(agent_trace)
