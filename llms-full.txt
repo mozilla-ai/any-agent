@@ -523,6 +523,52 @@ class SensitiveDataOffloader(Callback):
 
 You can find a working example in the [Callbacks Cookbook](../cookbook/callbacks.ipynb).
 
+## Example: Limit the number of steps
+
+Some agent frameworks allow to limit how many steps an agent can take and some don't. In addition,
+each framework defines a `step` differently: some count the llm calls, some the tool executions,
+and some the sum of both.
+
+You can use callbacks to limit how many steps an agent can take, and you can decide what to count
+as a `step`:
+
+```python
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+
+class LimitLLMCalls(Callback):
+    def __init__(self, max_llm_calls: int) -> None:
+        self.max_llm_calls = max_llm_calls
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+
+        if "n_llm_calls" not in context.shared:
+            context.shared["n_llm_calls"] = 0
+
+        context.shared["n_llm_calls"] += 1
+
+        if context.shared["n_llm_calls"] > self.max_llm_calls:
+            raise RuntimeError("Reached limit of LLM Calls")
+
+        return context
+
+class LimitToolExecutions(Callback):
+    def __init__(self, max_tool_executions: int) -> None:
+        self.max_tool_executions = max_tool_executions
+
+    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+
+        if "n_tool_executions" not in context.shared:
+            context.shared["n_tool_executions"] = 0
+
+        context.shared["n_tool_executions"] += 1
+
+        if context.shared["n_tool_executions"] > self.max_tool_executions:
+            raise RuntimeError("Reached limit of Tool Executions")
+
+        return context
+```
+
 
 ---
 
@@ -543,28 +589,6 @@ Check the reference to find additional supported `agent_args`.
 
 We use [`agno.models.litellm.LiteLLM`](https://docs.agno.com/models/litellm) as default.
 Check the reference to find additional supported `model_args`.
-
-## Examples
-
-### Limiting the number of steps
-
-```python
-from any_agent import AnyAgent, AgentConfig
-from any_agent.tools import search_web, visit_webpage
-
-agent = AnyAgent.create(
-    "agno",
-    AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        instructions="You must use the available tools to find an answer",
-        tools=[search_web, visit_webpage]
-    ),
-    agent_args={
-        "tool_call_limit": 3
-    }
-)
-agent.run("Which Agent Framework is the best??")
-```
 
 
 ---
@@ -590,32 +614,6 @@ Check the reference to find additional supported `model_args`.
 ## Run args
 
 Check [`RunConfig`](https://google.github.io/adk-docs/runtime/runconfig/) to find additional supported `AnyAgent.run` args.
-
-## Examples
-
-### Limiting the number of steps
-
-```python
-from any_agent import AnyAgent, AgentConfig
-from any_agent.tools import search_web, visit_webpage
-from google.adk.agents.run_config import RunConfig
-
-agent = AnyAgent.create(
-    "google",
-    AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        instructions="You must use the available tools to find an answer",
-        tools=[search_web, visit_webpage]
-    )
-)
-
-agent.run(
-    "Which Agent Framework is the best??",
-    run_config=RunConfig(
-        max_llm_calls=3
-    )
-)
-```
 
 
 ---
@@ -644,32 +642,6 @@ Check the reference to find additional supported `model_args`.
 
 Check [`RunnableConfig`](https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.config.RunnableConfig.html) to find additional supported `AnyAgent.run` args.
 
-## Examples
-
-### Limiting the number of steps
-
-```python
-from any_agent import AnyAgent, AgentConfig
-from any_agent.tools import search_web, visit_webpage
-from langchain_core.runnables import RunnableConfig
-
-agent = AnyAgent.create(
-    "langchain",
-    AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        instructions="You must use the available tools to find an answer",
-        tools=[search_web, visit_webpage]
-    )
-)
-
-agent.run(
-    "Which Agent Framework is the best??",
-    config=RunnableConfig(
-        recursion_limit=3
-    )
-)
-```
-
 
 ---
 
@@ -691,12 +663,6 @@ Check the reference to find additional supported `agent_args`.
 
 We use [`llama_index.llms.litellm.LiteLLM`](https://docs.llamaindex.ai/en/stable/examples/llm/litellm/) as default.
 Check the reference to find additional supported `model_args`.
-
-## Examples
-
-### Limiting the number of steps
-
-Pending on https://github.com/run-llama/llama_index/issues/18535
 
 
 ---
@@ -723,29 +689,6 @@ Check the reference to find additional supported `model_args`.
 
 Check [`agents.run.Runner.run`](https://openai.github.io/openai-agents-python/ref/run/#agents.run.Runner.run) to find additional supported `AnyAgent.run` args.
 
-## Examples
-
-### Limiting the number of steps
-
-```python
-from any_agent import AnyAgent, AgentConfig
-from any_agent.tools import search_web, visit_webpage
-
-agent = AnyAgent.create(
-    "openai",
-    AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        instructions="You must use the available tools to find an answer",
-        tools=[search_web, visit_webpage]
-    )
-)
-
-agent.run(
-    "Which Agent Framework is the best??",
-    max_turns=3
-)
-```
-
 
 ---
 
@@ -770,29 +713,6 @@ Check the reference to find additional supported `model_args`.
 ## Run args
 
 Check [`smolagents.MultiStepAgent.run`](https://huggingface.co/docs/smolagents/main/en/reference/agents#smolagents.MultiStepAgent.run) to find additional supported `AnyAgent.run` args.
-
-## Examples
-
-### Limiting the number of steps
-
-```python
-from any_agent import AnyAgent, AgentConfig
-from any_agent.tools import search_web, visit_webpage
-
-agent = AnyAgent.create(
-    "smolagents",
-    AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        instructions="You must use the available tools to find an answer",
-        tools=[search_web, visit_webpage]
-    )
-)
-
-agent.run(
-    "Which Agent Framework is the best??",
-    max_steps=3
-)
-```
 
 
 ---

@@ -4,13 +4,13 @@
 
 - [Introduction](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/index.md): Requirements - Installation - For AI Systems
 - [Agents - Index](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/index.md): Defining Agents - Running Agents
-- [Agents - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/callbacks.md): Context - Implementing Callbacks - Default Callbacks - Providing your own Callbacks - Example: Offloading sensitive information
-- [Agents - Frameworks - Agno](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/agno.md): Default Agent Type - Default Model Type - Examples
-- [Agents - Frameworks - Google Adk](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/google_adk.md): Default Agent Type - Default Model Type - Run args - Examples
-- [Agents - Frameworks - Langchain](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/langchain.md): Default Agent Type - Default Model Type - Run args - Examples
-- [Agents - Frameworks - Llama Index](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/llama_index.md): Default Agent Type - Default Model Type - Examples
-- [Agents - Frameworks - Openai](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/openai.md): Default Agent Type - Default Model Type - Run args - Examples
-- [Agents - Frameworks - Smolagents](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/smolagents.md): Default Agent Type - Default Model Type - Run args - Examples
+- [Agents - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/callbacks.md): Context - Implementing Callbacks - Default Callbacks - Providing your own Callbacks - Example: Offloading sensitive information - Example: Limit the number of steps
+- [Agents - Frameworks - Agno](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/agno.md): Default Agent Type - Default Model Type
+- [Agents - Frameworks - Google Adk](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/google_adk.md): Default Agent Type - Default Model Type - Run args
+- [Agents - Frameworks - Langchain](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/langchain.md): Default Agent Type - Default Model Type - Run args
+- [Agents - Frameworks - Llama Index](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/llama_index.md): Default Agent Type - Default Model Type
+- [Agents - Frameworks - Openai](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/openai.md): Default Agent Type - Default Model Type - Run args
+- [Agents - Frameworks - Smolagents](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/smolagents.md): Default Agent Type - Default Model Type - Run args
 - [Agents - Frameworks - Tinyagent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/tinyagent.md): Examples
 - [Agents - Tools](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/tools.md): Callables - MCP - Using Agents-As-Tools
 - [Tracing](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/tracing.md): Console - Spans - Dumping to File - Adding an OpenTelemetry exporter
