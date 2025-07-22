@@ -1,13 +1,25 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     from opentelemetry.trace import Span, Tracer
 
     from any_agent.tracing.agent_trace import AgentTrace
 
+
+@dataclass
+class ToolCall:
+    id: int
+    name: str
+    args: str | None = None
+
+@dataclass
+class Message:
+    id: int
+    role: Literal["system", "user", "assistant", "tool"]
+    content: str | list[ToolCall]
 
 @dataclass
 class Context:
@@ -25,6 +37,9 @@ class Context:
     You can find information about the attributes (available under `current_span.attributes`) in
     [Attributes Reference](./tracing.md#any_agent.tracing.attributes).
     """
+
+    messages: list[Message]
+    """"""
 
     trace: AgentTrace
     tracer: Tracer

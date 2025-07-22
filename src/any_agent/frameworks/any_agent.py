@@ -188,6 +188,7 @@ class AnyAgent(ABC):
                     trace_id = invoke_span.get_span_context().trace_id
                     self._wrapper.callback_context[trace_id] = Context(
                         current_span=invoke_span,
+                        messages=[],
                         trace=AgentTrace(),
                         tracer=self._tracer,
                         shared={},
