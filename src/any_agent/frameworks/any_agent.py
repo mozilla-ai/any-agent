@@ -222,11 +222,13 @@ class AnyAgent(ABC):
             async with self._lock:
                 if len(self._wrapper.callback_context) == 1:
                     await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-                if context := self._wrapper.callback_context.pop(trace_id, None):
-                    trace = context.trace
+                if wrapped_context := self._wrapper.callback_context.pop(
+                    trace_id, None
+                ):
+                    trace = wrapped_context.trace
                     for callback in self.config.callbacks:
-                        context = callback.after_agent_invocation(
-                            context, prompt, **kwargs
+                        wrapped_context = callback.after_agent_invocation(
+                            wrapped_context, prompt, **kwargs
                         )
 
             trace.add_span(invoke_span)
@@ -235,10 +237,12 @@ class AnyAgent(ABC):
         async with self._lock:
             if len(self._wrapper.callback_context) == 1:
                 await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-            if context := self._wrapper.callback_context.pop(trace_id, None):
-                trace = context.trace
+            if wrapped_context := self._wrapper.callback_context.pop(trace_id, None):
+                trace = wrapped_context.trace
                 for callback in self.config.callbacks:
-                    context = callback.after_agent_invocation(context, prompt, **kwargs)
+                    wrapped_context = callback.after_agent_invocation(
+                        wrapped_context, prompt, **kwargs
+                    )
 
         trace.add_span(invoke_span)
         trace.final_output = final_output
