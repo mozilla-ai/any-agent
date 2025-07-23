@@ -15,7 +15,7 @@
 - [Agents - Tools](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/tools.md): Callables - MCP - Using Agents-As-Tools
 - [Tracing](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/tracing.md): Console - Spans - Dumping to File - Adding an OpenTelemetry exporter
 - [Evaluation](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/evaluation.md): Choosing the Right Evaluation Method - Custom Code Evaluation - LlmJudge - AgentJudge - Custom Output Types
-- [Serving](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/serving.md): Running Async Servers in Sync Environments - Serving via A2A - Serving via MCP
+- [Serving](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/serving.md): Configuring and Serving Agents - Using the served agents - More Examples
 - [Api - Agent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/agent.md): Agent
 - [Api - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/callbacks.md)
 - [Api - Config](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/api/config.md)
