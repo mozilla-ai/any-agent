@@ -210,23 +210,35 @@ class AnyAgent(ABC):
                     }
                 )
 
+                context = self._wrapper.callback_context[trace_id]
+                for callback in self.config.callbacks:
+                    context = callback.before_agent_invocation(
+                        context, prompt, **kwargs
+                    )
+
                 final_output = await self._run_async(prompt, **kwargs)
+
         except Exception as e:
             async with self._lock:
                 if len(self._wrapper.callback_context) == 1:
                     await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-                if wrapped_context := self._wrapper.callback_context.pop(
-                    trace_id, None
-                ):
-                    trace = wrapped_context.trace
+                if context := self._wrapper.callback_context.pop(trace_id, None):
+                    trace = context.trace
+                    for callback in self.config.callbacks:
+                        context = callback.after_agent_invocation(
+                            context, prompt, **kwargs
+                        )
+
             trace.add_span(invoke_span)
             raise AgentRunError(trace, e) from e
 
         async with self._lock:
             if len(self._wrapper.callback_context) == 1:
                 await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-            if wrapped_context := self._wrapper.callback_context.pop(trace_id, None):
-                trace = wrapped_context.trace
+            if context := self._wrapper.callback_context.pop(trace_id, None):
+                trace = context.trace
+                for callback in self.config.callbacks:
+                    context = callback.after_agent_invocation(context, prompt, **kwargs)
 
         trace.add_span(invoke_span)
         trace.final_output = final_output

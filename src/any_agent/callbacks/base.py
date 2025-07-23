@@ -10,12 +10,20 @@ if TYPE_CHECKING:
 class Callback:
     """Base class for AnyAgent callbacks."""
 
+    def before_agent_invocation(self, context: Context, *args, **kwargs) -> Context:
+        """Will be called before the Agent invocation starts."""
+        return context
+
     def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         """Will be called before any LLM Call starts."""
         return context
 
     def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         """Will be called before any Tool Execution starts."""
+        return context
+
+    def after_agent_invocation(self, context: Context, *args, **kwargs) -> Context:
+        """Will be called once the Agent invocation ends."""
         return context
 
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
