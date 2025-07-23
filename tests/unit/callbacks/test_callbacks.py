@@ -60,7 +60,7 @@ class ExceptionCallback(SampleCallback):
         self.exception_message = exception_message
         super().__init__()
 
-    def before_llm_call(self, context, *args, **kwargs):
+    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
         context = super().before_llm_call(context, *args, **kwargs)
         raise RuntimeError(self.exception_message)
 
