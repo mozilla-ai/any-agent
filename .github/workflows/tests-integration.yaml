@@ -28,6 +28,8 @@ jobs:
       # Run the tinyagent test first to get an early signal of issues with the codebase.
       - name: Run TINYAGENT test
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
         run: pytest -v tests/integration/test_agent.py -k "TINYAGENT"
 

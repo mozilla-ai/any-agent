@@ -4,6 +4,7 @@ import subprocess
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 import pytest
 from litellm.utils import validate_environment
@@ -158,10 +159,20 @@ class Steps(BaseModel):
     steps: list[Step]
 
 
+@pytest.mark.parametrize(
+    "model_id", ["gemini/gemini-2.5-pro", "openai/gpt-4.1-mini", DEFAULT_SMALL_MODEL_ID]
+)
 def test_load_and_run_agent(
-    agent_framework: AgentFramework, tmp_path: Path, request: pytest.FixtureRequest
+    model_id: str,
+    agent_framework: AgentFramework,
+    tmp_path: Path,
+    request: pytest.FixtureRequest,
 ) -> None:
-    kwargs = {}
+    if (
+        model_id != DEFAULT_SMALL_MODEL_ID
+        and agent_framework is not AgentFramework.TINYAGENT
+    ):
+        pytest.skip("We only test multiple providers with TINYAGENT")
 
     tmp_file = "tmp.txt"
 
@@ -181,10 +192,14 @@ def test_load_and_run_agent(
         with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
             f.write(text)
 
-    kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
-    env_check = validate_environment(kwargs["model_id"])
+    env_check = validate_environment(model_id)
     if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {kwargs['model_id']}")
+        pytest.skip(f"{env_check['missing_keys']} needed for {model_id}")
+
+    model_args = get_default_agent_model_args(agent_framework)
+    if "gemini" in model_id:
+        model_args["drop_params"] = True
+
     tools = [
         write_file,
         MCPStdio(
@@ -197,11 +212,11 @@ def test_load_and_run_agent(
     ]
 
     agent_config = AgentConfig(
+        model_id=model_id,
         tools=tools,  # type: ignore[arg-type]
         instructions="Use the available tools to answer.",
-        model_args=get_default_agent_model_args(agent_framework),
+        model_args=model_args,
         output_type=Steps,
-        **kwargs,  # type: ignore[arg-type]
     )
     agent = AnyAgent.create(agent_framework, agent_config)
     update_trace = request.config.getoption("--update-trace-assets")
@@ -236,5 +251,8 @@ def test_load_and_run_agent(
         with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
             f.write(html_output.replace("<!DOCTYPE html>", ""))
 
-    if agent_framework is AgentFramework.TINYAGENT:
+    if (
+        agent_framework is AgentFramework.TINYAGENT
+        and model_id == DEFAULT_SMALL_MODEL_ID
+    ):
         assert_eval(agent_trace)
