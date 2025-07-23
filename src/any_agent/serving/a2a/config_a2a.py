@@ -86,6 +86,35 @@ class A2AServingConfig(BaseModel):
     """List of skills to be used by the agent.
 
     If not provided, the skills will be inferred from the tools.
+
+    By default, an agent's skills are automatically inferred from its tools.
+    However, you can explicitly define skills for more control over the agent card:
+
+    ```python
+    from a2a.types import AgentSkill
+    from any_agent.serving import A2AServingConfig
+
+    # Define custom skills
+    custom_skills = [
+        AgentSkill(
+            id="web-search",
+            name="search_web",
+            description="Search the web for current information",
+            tags=["search", "web", "information"]
+        ),
+        AgentSkill(
+            id="data-analysis",
+            name="analyze_data",
+            description="Analyze datasets and provide insights",
+            tags=["analysis", "data", "insights"]
+        )
+    ]
+
+    config = A2AServingConfig(
+        port=8080,
+        skills=custom_skills
+    )
+    ```
     """
 
     version: str = "0.1.0"
