@@ -20,7 +20,9 @@ class SampleCallback(Callback):
         self.before_tool_called = False
         self.after_tool_called = False
 
-    def after_agent_invocation(self, context, *args, **kwargs):
+    def after_agent_invocation(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         self.after_agent_invocation_called = True
         return context
 
@@ -34,7 +36,9 @@ class SampleCallback(Callback):
         self.after_tool_called = True
         return context
 
-    def before_agent_invocation(self, context, *args, **kwargs):
+    def before_agent_invocation(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         self.before_agent_invocation_called = True
         return context
 
