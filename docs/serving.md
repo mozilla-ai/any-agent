@@ -157,4 +157,5 @@ if __name__ == "__main__":
 Check out our cookbook example for building and serving an agent via A2A:
 
 👉 [Serve an Agent with A2A (Jupyter Notebook)](./cookbook/serve_a2a.ipynb)
+
 👉 [Use an A2a Agent as a tool (Jupyter Notebook)](./cookbook/serve_a2a.ipynb)
