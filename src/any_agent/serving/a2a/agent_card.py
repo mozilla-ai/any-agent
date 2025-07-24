@@ -38,6 +38,7 @@ def _get_agent_card(agent: AnyAgent, serving_config: A2AServingConfig) -> AgentC
         msg = "Agent description is not set. Please set the `description` field in the `AgentConfig`."
         raise ValueError(msg)
     endpoint = serving_config.endpoint.lstrip("/")
+    streaming = serving_config.stream_tool_usage
     return AgentCard(
         name=agent.config.name,
         description=agent.config.description,
@@ -46,7 +47,7 @@ def _get_agent_card(agent: AnyAgent, serving_config: A2AServingConfig) -> AgentC
         defaultOutputModes=["text"],
         url=f"http://{serving_config.host}:{serving_config.port}/{endpoint}",
         capabilities=AgentCapabilities(
-            streaming=False, pushNotifications=True, stateTransitionHistory=False
+            streaming=streaming, pushNotifications=True, stateTransitionHistory=False
         ),
         skills=skills,
     )

@@ -10,7 +10,7 @@ from uuid import uuid4
 import httpx
 import pytest
 from a2a.client import A2AClient
-from a2a.types import MessageSendParams, SendMessageRequest
+from a2a.types import MessageSendParams, SendMessageRequest, SendStreamingMessageRequest
 
 from any_agent import AnyAgent
 from any_agent.serving import A2AServingConfig
@@ -66,6 +66,23 @@ class A2ATestHelpers:
         )
 
         return SendMessageRequest(id=str(uuid4()), params=MessageSendParams(**payload))
+
+    @staticmethod
+    def create_send_streaming_message_request(
+        text: dict[str, Any],
+        message_id: str | None = None,
+        context_id: str | None = None,
+        task_id: str | None = None,
+    ) -> SendStreamingMessageRequest:
+        """Create a SendStreamingMessageRequest with standard payload."""
+        payload = A2ATestHelpers.create_message_payload(
+            text=text,
+            message_id=message_id,
+            context_id=context_id,
+            task_id=task_id,
+        )
+
+        return SendStreamingMessageRequest(id=str(uuid4()), params=MessageSendParams(**payload))
 
 
 class A2AServedAgent:

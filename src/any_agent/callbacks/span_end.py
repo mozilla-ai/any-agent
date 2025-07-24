@@ -12,8 +12,8 @@ def _span_end(context: Context) -> Context:
 class SpanEndCallback(Callback):
     """End the current span and add it to the corresponding `AgentTrace`."""
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         return _span_end(context)
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         return _span_end(context)

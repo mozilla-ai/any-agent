@@ -30,7 +30,7 @@ else:
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
 from a2a.server.tasks import TaskUpdater
-from a2a.types import Part, TextPart
+from a2a.types import Part, TextPart, DataPart, TaskState
 from a2a.utils import (
     new_agent_parts_message,
     new_task,
@@ -40,24 +40,79 @@ from pydantic import BaseModel
 from any_agent.logging import logger
 from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.a2a.envelope import A2AEnvelope
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
 
 
+class ToolUpdaterCallback(Callback):
+    def __init__(self, updater: TaskUpdater, context_id, task_id):
+        self.context_id = context_id
+        self.task_id = task_id
+        self.updater = updater
+
+    async def before_tool_execution(self, context, *args, **kwargs):
+        request: dict[str, Any] = args[0]
+        tool_call = {}
+        tool_call["name"] = request.get("name", "No name")
+        tool_call["description"] = ""
+        tool_call["args"] = request.get("arguments", {})
+
+        await self.updater.update_status(
+            TaskState.working,
+            message=new_agent_parts_message(
+                [Part(root=DataPart(data={"event_type": "tool_started", "payload": tool_call}))],
+                self.context_id,
+                self.task_id,
+            ),
+            final=False,
+        )
+        context.shared["current_tool_call"] = tool_call
+        return context
+
+
+
+
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        """Will be called after any LLM Call is completed."""
+        tool_output = args[0]
+        output_type = self._determine_output_type(tool_output)
+        output_attr = self._serialize_for_attribute(tool_output)
+        tool_call = context.shared["current_tool_call"]
+        tool_call["output_type"] = output_type
+        tool_call["output_attr"] = output_attr
+        tool_call["status"] = self._determine_tool_status(output_attr, output_type)
+        await self.updater.update_status(
+            TaskState.working,
+            message=new_agent_parts_message(
+                [Part(root=DataPart(data={"event_type": "tool_finished", "payload": tool_call}))],
+                self.context_id,
+                self.task_id,
+            ),
+            final=False,
+        )
+        return context
+
+
+
 class AnyAgentExecutor(AgentExecutor):
     """AnyAgentExecutor Implementation with task management for multi-turn conversations."""
 
-    def __init__(self, agent: "AnyAgent", context_manager: ContextManager):
+    def __init__(self, agent: "AnyAgent", context_manager: ContextManager, stream_tool_usage: bool):
         """Initialize the AnyAgentExecutor.
 
         Args:
             agent: The agent to execute
             context_manager: context manager to use for context management
+            stream_tool_usage: whether to stream tool execution results
 
         """
         self.agent = agent
         self.context_manager = context_manager
+        self.stream_tool_usage = stream_tool_usage
 
     @override
     async def execute(
@@ -84,15 +139,25 @@ class AnyAgentExecutor(AgentExecutor):
                 raise ValueError(msg)
         else:
             logger.info("Task already exists: %s", task.model_dump_json(indent=2))
+
         updater = TaskUpdater(event_queue, task.id, task.contextId)
+        tool_updater = ToolUpdaterCallback(updater=updater, context_id=task.contextId, task_id=task.id)
 
         formatted_query = self.context_manager.format_query_with_history(
             context_id,  # type: ignore[arg-type]
             query,
         )
 
+        # Put a callback here to record tool calling and send updates
+        if self.stream_tool_usage:
+            self.agent.config.callbacks.append(tool_updater)
+
         # This agent always produces Task objects.
         agent_trace = await self.agent.run_async(formatted_query)
+
+        # Remove the tool recording callback
+        if self.stream_tool_usage:
+            self.agent.config.callbacks.pop(-1)
 
         # Update task with new trace, passing the original query (not formatted)
         self.context_manager.update_context_trace(context_id, agent_trace, query)  # type: ignore[arg-type]

@@ -1,7 +1,7 @@
 # pylint: disable=missing-function-docstring
 # pylint: disable=missing-class-docstring
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Awaitable
 from unittest.mock import patch
 
 import pytest
@@ -18,23 +18,23 @@ class SampleCallback(Callback):
         self.before_tool_called = False
         self.after_tool_called = False
 
-    def after_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+    async def after_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Awaitable[Context]:
         self.after_llm_called = True
         return context
 
-    def after_tool_execution(
+    async def after_tool_execution(
         self, context: Context, *args: Any, **kwargs: Any
-    ) -> Context:
+    ) -> Awaitable[Context]:
         self.after_tool_called = True
         return context
 
-    def before_tool_execution(
+    async def before_tool_execution(
         self, context: Context, *args: Any, **kwargs: Any
-    ) -> Context:
+    ) -> Awaitable[Context]:
         self.before_tool_called = True
         return context
 
-    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+    async def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Awaitable[Context]:
         self.before_llm_called = True
         return context
 
@@ -45,7 +45,7 @@ class ExceptionCallback(Callback):
     def __init__(self, exception_message: str = "Callback exception") -> None:
         self.exception_message = exception_message
 
-    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+    async def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
         raise RuntimeError(self.exception_message)
 
 

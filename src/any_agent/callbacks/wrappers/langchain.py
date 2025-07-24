@@ -26,33 +26,33 @@ class _LangChainWrapper:
         from langchain_core.callbacks.base import BaseCallbackHandler
         from langchain_core.runnables import RunnableConfig
 
-        def before_llm_call(*args, **kwargs):
+        async def before_llm_call(*args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = await callback.before_llm_call(context, *args, **kwargs)
 
-        def before_tool_execution(*args, **kwargs):
+        async def before_tool_execution(*args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, *args, **kwargs)
+                context = await callback.before_tool_execution(context, *args, **kwargs)
 
-        def after_llm_call(*args, **kwargs):
+        async def after_llm_call(*args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, *args, **kwargs)
+                context = await callback.after_llm_call(context, *args, **kwargs)
 
-        def after_tool_execution(*args, **kwargs):
+        async def after_tool_execution(*args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(context, *args, **kwargs)
+                context = await callback.after_tool_execution(context, *args, **kwargs)
 
         class _LangChainTracingCallback(BaseCallbackHandler):
             def on_chat_model_start(

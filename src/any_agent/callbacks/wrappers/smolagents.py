@@ -22,37 +22,37 @@ class _SmolagentsWrapper:
     async def wrap(self, agent: SmolagentsAgent) -> None:
         self._original_llm_call = agent._agent.model.generate
 
-        def wrap_generate(*args, **kwargs):
+        async def wrap_generate(*args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             context.shared["model_id"] = str(agent._agent.model.model_id)
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = await callback.before_llm_call(context, *args, **kwargs)
 
             output = self._original_llm_call(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+                context = await callback.after_llm_call(context, output)
 
             return output
 
         agent._agent.model.generate = wrap_generate
 
-        def wrapped_tool_execution(original_tool, original_call, *args, **kwargs):
+        async def wrapped_tool_execution(original_tool, original_call, *args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             context.shared["original_tool"] = original_tool
 
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, *args, **kwargs)
+                context = await callback.before_tool_execution(context, *args, **kwargs)
 
             output = original_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(
+                context = await callback.after_tool_execution(
                     context, output, *args, **kwargs
                 )
 

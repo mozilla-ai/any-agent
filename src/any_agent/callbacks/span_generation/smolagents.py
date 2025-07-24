@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class _SmolagentsSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         model_id = context.shared["model_id"]
 
         messages: list[ChatMessage] = args[0]
@@ -28,7 +28,7 @@ class _SmolagentsSpanGeneration(_SpanGeneration):
 
         return self._set_llm_input(context, model_id, input_messages)
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         response: ChatMessage = args[0]
         output: str | list[dict[str, Any]]
         if content := response.content:
@@ -51,12 +51,12 @@ class _SmolagentsSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         tool: Tool = context.shared["original_tool"]
 
         return self._set_tool_input(
             context, name=tool.name, description=tool.description, args=kwargs
         )
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         return self._set_tool_output(context, args[0])
