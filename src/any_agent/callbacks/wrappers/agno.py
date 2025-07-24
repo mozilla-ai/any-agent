@@ -26,12 +26,12 @@ class _AgnoWrapper:
             context.shared["model_id"] = agent._agent.model.id
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = await callback.before_llm_call(context, *args, **kwargs)
 
             result = await self._original_aprocess_model(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, result, *args, **kwargs)
+                context = await callback.after_llm_call(context, result, *args, **kwargs)
 
             return result
 
@@ -48,12 +48,12 @@ class _AgnoWrapper:
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, *args, **kwargs)
+                context = await callback.before_tool_execution(context, *args, **kwargs)
 
             result = await self._original_arun_function_call(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(
+                context = await callback.after_tool_execution(
                     context, result, *args, **kwargs
                 )
 

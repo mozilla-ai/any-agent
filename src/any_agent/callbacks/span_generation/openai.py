@@ -57,28 +57,9 @@ class _OpenAIAgentsSpanGeneration(_SpanGeneration):
 
     async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         tool: FunctionTool = context.shared["original_tool"]
-
-        context.shared["current_tool_call"] = {}
-        context.shared["current_tool_call"]["name"] = tool.name
-        context.shared["current_tool_call"]["description"] = tool.description
-        context.shared["current_tool_call"]["args"] = args[1]
-
-        print("--> Storing in tool info...")
-        print(f"--> {context.shared}")
-
         return self._set_tool_input(
             context, name=tool.name, description=tool.description, args=args[1]
         )
 
     async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        tool_output = args[0]
-        output_type = self._determine_output_type(tool_output)
-        output_attr = self._serialize_for_attribute(tool_output)
-        context.shared["current_tool_call"]["output_type"] = output_type
-        context.shared["current_tool_call"]["output_attr"] = output_attr
-        context.shared["current_tool_call"]["status"] = self._determine_tool_status(output_attr, output_type)
-
-        print("--> Storing out tool info...")
-        print(f"--> {context.shared}")
-
         return self._set_tool_output(context, args[0])

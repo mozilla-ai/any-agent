@@ -41,6 +41,11 @@ from any_agent.logging import logger
 from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.a2a.envelope import A2AEnvelope
 from any_agent.callbacks.base import Callback
+from any_agent.callbacks.helpers import (
+    serialize_for_attribute,
+    determine_output_type,
+    determine_tool_status
+)
 from any_agent.callbacks.context import Context
 
 
@@ -79,12 +84,12 @@ class ToolUpdaterCallback(Callback):
     async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         """Will be called after any LLM Call is completed."""
         tool_output = args[0]
-        output_type = self._determine_output_type(tool_output)
-        output_attr = self._serialize_for_attribute(tool_output)
+        output_type = determine_output_type(tool_output)
+        output_attr = serialize_for_attribute(tool_output)
         tool_call = context.shared["current_tool_call"]
         tool_call["output_type"] = output_type
         tool_call["output_attr"] = output_attr
-        tool_call["status"] = self._determine_tool_status(output_attr, output_type)
+        tool_call["status"] = determine_tool_status(output_attr, output_type)
         await self.updater.update_status(
             TaskState.working,
             message=new_agent_parts_message(

@@ -28,7 +28,7 @@ async def test_serve_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> 
         ),
     )
 
-    # Use the   ontext manager for proper cleanup
+    # Use the context manager for proper cleanup
     async with a2a_client_from_agent(agent, A2AServingConfig(port=test_port)) as (
         client,
         server_url,
