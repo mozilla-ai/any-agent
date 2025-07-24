@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class _LlamaIndexSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         # Handle direct dict format (from call_model wrapper)
         if "messages" in kwargs and isinstance(kwargs["messages"], list):
             input_messages = kwargs["messages"]
@@ -38,7 +38,7 @@ class _LlamaIndexSpanGeneration(_SpanGeneration):
 
         return self._set_llm_input(context, model_id, input_messages)
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         response = args[0]
         token_usage: Usage | None
         # Handle litellm ModelResponse (from call_model wrapper)
@@ -108,14 +108,14 @@ class _LlamaIndexSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         meta: ToolMetadata = context.shared["metadata"]
 
         return self._set_tool_input(
             context, name=str(meta.name), description=meta.description, args=kwargs
         )
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         output = args[0]
 
         if raw_output := getattr(output, "raw_output", None):

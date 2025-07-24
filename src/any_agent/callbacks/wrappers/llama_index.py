@@ -34,7 +34,7 @@ class _LlamaIndexWrapper:
             )
 
             for callback in agent.config.callbacks:
-                context = await allback.after_llm_call(context, output)
+                context = await callback.after_llm_call(context, output)
 
             return output
 
