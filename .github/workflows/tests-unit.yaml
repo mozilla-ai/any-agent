@@ -38,6 +38,7 @@ jobs:
       - run: pytest tests/unit -v --cov --cov-branch --cov-report=xml
 
       - name: Upload coverage reports to Codecov
+        if: always()
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

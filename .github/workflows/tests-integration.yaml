@@ -46,6 +46,7 @@ jobs:
         run: pytest tests/integration -v -n auto -k "not test_load_and_run_agent[TINYAGENT]" --cov --cov-branch --cov-report=xml --cov-append
 
       - name: Upload coverage reports to Codecov
+        if: always()
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
