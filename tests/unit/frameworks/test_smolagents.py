@@ -92,7 +92,7 @@ def test_load_smolagent_final_answer() -> None:
             ),
         )
 
-        assert isinstance(agent._agent.tools["final_answer"], FinalAnswerTool)
+        assert isinstance(agent._agent.tools["final_answer"], FinalAnswerTool)  # type: ignore[attr-defined]
 
 
 def test_run_smolagent_custom_args() -> None:
