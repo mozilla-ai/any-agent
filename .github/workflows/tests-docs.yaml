@@ -8,12 +8,14 @@ on:
       - 'tests/**'
       - 'docs/**'
       - '.github/workflows/**'
+      - 'pyproject.toml'
   pull_request:
     paths:
       - 'src/**'
       - 'tests/**'
       - 'docs/**'
       - '.github/workflows/**'
+      - 'pyproject.toml'
   workflow_dispatch:
 
 jobs:
