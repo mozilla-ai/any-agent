@@ -158,7 +158,9 @@ timeout = 120
 
 [tool.coverage.run]
 branch = true
-omit = "src/any_agent/vendor/*"
+omit = [
+  "src/any_agent/vendor/*"
+]
 
 [dependency-groups]
 dev = [
