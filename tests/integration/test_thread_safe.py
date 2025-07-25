@@ -40,7 +40,7 @@ async def test_run_agent_concurrently(agent_framework: AgentFramework) -> None:
         AgentConfig(
             model_id=model_id,
             instructions="You must use the tools to find an answer",
-            model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
+            model_args=get_default_agent_model_args(agent_framework),
             tools=[mock_capital],
         ),
     )
