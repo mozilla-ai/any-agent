@@ -34,7 +34,7 @@ jobs:
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          pytest tests/cookbooks -v -n 4 --cov --cov-branch --cov-report=xml
+          pytest tests/cookbooks -v -n 4 --cov --cov-report=xml
 
       - name: Upload finished cookbooks
         uses: actions/upload-artifact@v4

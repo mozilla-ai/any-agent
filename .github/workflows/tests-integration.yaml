@@ -32,7 +32,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-        run: pytest tests/integration/test_agent.py -v -k "TINYAGENT" --cov --cov-branch --cov-report=xml
+        run: pytest tests/integration/test_agent.py -v -k "TINYAGENT" --cov --cov-report=xml
 
       - name: Run Snapshot tests
         run: pytest -v tests/snapshots
@@ -44,7 +44,7 @@ jobs:
       - name: Run Integration tests (parallel with xdist)
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-        run: pytest tests/integration -v -n auto -k "not test_load_and_run_agent[TINYAGENT]" --cov --cov-branch --cov-report=xml --cov-append
+        run: pytest tests/integration -v -n auto -k "not test_load_and_run_agent[TINYAGENT]" --cov --cov-report=xml --cov-append
 
       - name: Upload coverage reports to Codecov
         if: always()
