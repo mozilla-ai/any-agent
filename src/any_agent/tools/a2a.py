@@ -6,6 +6,8 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Optional
 from uuid import uuid4
 
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+
 from any_agent.utils.asyncio_sync import run_async_in_sync
 
 if TYPE_CHECKING:
@@ -31,7 +33,10 @@ with suppress(ImportError):
 
 
 async def a2a_tool_async(
-    url: str, toolname: Optional[str] = None, http_kwargs: dict[str, Any] | None = None
+    url: str,
+    toolname: Optional[str] = None,
+    http_kwargs: dict[str, Any] | None = None,
+    instrument_client: bool = True,
 ) -> Callable[[str, Optional[str], Optional[str]], Coroutine[Any, Any, dict[str, Any]]]:
     """Perform a query using A2A to another agent.
 
@@ -40,6 +45,7 @@ async def a2a_tool_async(
         toolname (str): The name for the created tool. Defaults to `call_{agent name in card}`.
             Leading and trailing whitespace are removed. Whitespace in the middle is replaced by `_`.
         http_kwargs (dict): Additional kwargs to pass to the httpx client.
+        instrument_client (bool): Whether to instrument via OTel the httpx client used.
 
     Returns:
         An async `Callable` that takes a query and returns the agent response.
@@ -59,6 +65,8 @@ async def a2a_tool_async(
     async with httpx.AsyncClient(
         follow_redirects=True, **http_kwargs
     ) as resolver_client:
+        if instrument_client:
+            HTTPXClientInstrumentor.instrument_client(resolver_client)
         a2a_agent_card: AgentCard = await (
             A2ACardResolver(httpx_client=resolver_client, base_url=url)
         ).get_agent_card()
@@ -71,6 +79,8 @@ async def a2a_tool_async(
         query: str, task_id: Optional[str] = None, context_id: Optional[str] = None
     ) -> dict[str, Any]:
         async with httpx.AsyncClient(follow_redirects=True) as query_client:
+            if instrument_client:
+                HTTPXClientInstrumentor.instrument_client(query_client)
             client = A2AClient(httpx_client=query_client, agent_card=a2a_agent_card)
             send_message_payload = SendMessageRequest(
                 id=str(uuid4()),
@@ -173,7 +183,10 @@ async def a2a_tool_async(
 
 
 def a2a_tool(
-    url: str, toolname: Optional[str] = None, http_kwargs: dict[str, Any] | None = None
+    url: str,
+    toolname: Optional[str] = None,
+    http_kwargs: dict[str, Any] | None = None,
+    instrument_client: bool = True,
 ) -> Callable[[str, Optional[str], Optional[str]], str]:
     """Perform a query using A2A to another agent (synchronous version).
 
@@ -182,6 +195,7 @@ def a2a_tool(
         toolname (str): The name for the created tool. Defaults to `call_{agent name in card}`.
             Leading and trailing whitespace are removed. Whitespace in the middle is replaced by `_`.
         http_kwargs (dict): Additional kwargs to pass to the httpx client.
+        instrument_client (bool): Whether to instrument via OTel the httpx client used.
 
     Returns:
         A sync `Callable` that takes a query and returns the agent response.
@@ -192,7 +206,9 @@ def a2a_tool(
         raise ImportError(msg)
 
     # Fetch the async tool upfront to get proper name and documentation (otherwise the tool doesn't have the right name and documentation)
-    async_tool = run_async_in_sync(a2a_tool_async(url, toolname, http_kwargs))
+    async_tool = run_async_in_sync(
+        a2a_tool_async(url, toolname, http_kwargs, instrument_client)
+    )
 
     def sync_wrapper(
         query: str, task_id: Optional[str] = None, context_id: Optional[str] = None

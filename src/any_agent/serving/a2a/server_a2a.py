@@ -4,6 +4,7 @@ import asyncio
 from typing import TYPE_CHECKING
 
 import httpx
+import opentelemetry.instrumentation.starlette as otel_starlette
 import uvicorn
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
@@ -50,11 +51,14 @@ def _create_server(
     host: str,
     port: int,
     endpoint: str,
+    instrument_server: bool,
     log_level: str = "warning",
 ) -> uvicorn.Server:
     root = endpoint.lstrip("/").rstrip("/")
     a2a_app = app.build()
     internal_router = Starlette(routes=[Mount(f"/{root}", routes=a2a_app.routes)])
+    if instrument_server:
+        otel_starlette.StarletteInstrumentor.instrument_app(internal_router)
 
     config = uvicorn.Config(internal_router, host=host, port=port, log_level=log_level)
     return uvicorn.Server(config)
@@ -66,9 +70,12 @@ async def serve_a2a_async(
     port: int,
     endpoint: str,
     log_level: str = "warning",
+    instrument_server: bool = False,
 ) -> ServerHandle:
     """Provide an A2A server to be used in an event loop."""
-    uv_server = _create_server(server, host, port, endpoint, log_level)
+    uv_server = _create_server(
+        server, host, port, endpoint, instrument_server, log_level
+    )
     task = asyncio.create_task(uv_server.serve())
     while not uv_server.started:  # noqa: ASYNC110
         await asyncio.sleep(0.1)
