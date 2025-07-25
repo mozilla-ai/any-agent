@@ -159,7 +159,8 @@ timeout = 120
 [tool.coverage.run]
 branch = true
 omit = [
-  "src/any_agent/vendor/*"
+  "src/any_agent/vendor/*",
+  "tests/"
 ]
 
 [dependency-groups]
