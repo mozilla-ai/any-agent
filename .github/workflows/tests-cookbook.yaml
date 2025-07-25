@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'docs/cookbook/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
