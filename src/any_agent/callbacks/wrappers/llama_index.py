@@ -8,6 +8,7 @@ from opentelemetry.trace import get_current_span
 if TYPE_CHECKING:
     from any_agent.callbacks.context import Context
     from any_agent.frameworks.llama_index import LlamaIndexAgent
+    from llama_index.core.tools import ToolMetadata
 
 
 class _LlamaIndexWrapper:
@@ -48,13 +49,30 @@ class _LlamaIndexWrapper:
             ]
             context.shared["metadata"] = metadata
 
+            meta: ToolMetadata = context.shared["metadata"]
+
+            # Extract (pre) tool information
+            current_tool_call = {}
+            current_tool_call["name"] = str(meta.name)
+            current_tool_call["description"] = meta.description
+            current_tool_call["args"] = kwargs
+            current_tool_call["call_id"] = None
+            context.shared["current_tool_call"] = current_tool_call
+
             for callback in agent.config.callbacks:
                 context = await callback.before_tool_execution(context, *args, **kwargs)
 
             output = await original_call(**kwargs)
 
+            if raw_output := getattr(output, "raw_output", None):
+                if content := getattr(raw_output, "content", None):
+                    current_tool_call["result"] = content[0].text
+                else:
+                    current_tool_call["result"] = raw_output
+            else:
+                current_tool_call["result"] = output
             for callback in agent.config.callbacks:
-                context = await callback.after_tool_execution(context, output)
+                context = await callback.after_tool_execution(context)
 
             return output
 

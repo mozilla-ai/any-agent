@@ -2,7 +2,7 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-from opentelemetry.trace import StatusCode
+from opentelemetry.trace import Status, StatusCode
 
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 from any_agent.tracing.attributes import GenAI
@@ -43,7 +43,7 @@ def test_set_tool_output_error() -> None:
     error = "Error calling tool: It's a trap!"
     context = MagicMock()
     status_mock = MagicMock()
-    with patch("any_agent.callbacks.span_generation.base.Status", status_mock):
+    with patch("any_agent.callbacks.helpers.Status", status_mock):
         _SpanGeneration()._set_tool_output(context, error)
 
         context.current_span.set_attributes.assert_called_with(

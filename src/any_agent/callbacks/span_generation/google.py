@@ -64,17 +64,16 @@ class _GoogleSpanGeneration(_SpanGeneration):
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
     async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        tool: BaseTool = kwargs["tool"]
-        tool_args: dict[str, Any] = kwargs["args"]
-        tool_context: ToolContext = kwargs["tool_context"]
+        current_tool_call = context.shared["current_tool_call"]
 
         return self._set_tool_input(
             context,
-            tool.name,
-            tool.description,
-            tool_args,
-            tool_context.function_call_id,
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
     async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        return self._set_tool_output(context, kwargs["tool_response"])
+        current_tool_call = context.shared["current_tool_call"]
+        return self._set_tool_output(context, current_tool_call["result"])

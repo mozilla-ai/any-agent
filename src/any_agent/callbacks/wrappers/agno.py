@@ -8,6 +8,7 @@ from opentelemetry.trace import get_current_span
 if TYPE_CHECKING:
     from any_agent.callbacks.context import Context
     from any_agent.frameworks.agno import AgnoAgent
+    from agno.tools.function import FunctionCall
 
 
 class _AgnoWrapper:
@@ -47,14 +48,27 @@ class _AgnoWrapper:
                 get_current_span().get_span_context().trace_id
             ]
 
+            # Extract (pre) tool information
+            function_call: FunctionCall = args[0]
+            function = function_call.function
+            current_tool_call = {}
+            current_tool_call["name"] = function.name
+            current_tool_call["description"] = function.description
+            current_tool_call["args"] = function_call.arguments
+            current_tool_call["call_id"] = function_call.call_id
+            context.shared["current_tool_call"] = current_tool_call
+
             for callback in agent.config.callbacks:
                 context = await callback.before_tool_execution(context, *args, **kwargs)
 
             result = await self._original_arun_function_call(*args, **kwargs)
 
+            # Extract (post) tool information
+            current_tool_call["result"] = result[2].result
+
             for callback in agent.config.callbacks:
                 context = await callback.after_tool_execution(
-                    context, result, *args, **kwargs
+                    context
                 )
 
             return result

@@ -164,6 +164,7 @@ def test_tool_error_llm_mocked(
         agent_trace = agent.run(
             "Check in the web which agent framework is the best.",
         )
+        print(agent_trace.spans)
         assert any(
             span.is_tool_execution()
             and span.status.status_code == StatusCode.ERROR

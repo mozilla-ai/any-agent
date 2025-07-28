@@ -108,17 +108,19 @@ class _LangchainSpanGeneration(_SpanGeneration):
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
     async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        serialized: dict[str, Any] = args[0]
+        current_tool_call = context.shared["current_tool_call"]
+
         return self._set_tool_input(
             context,
-            name=serialized.get("name", "No name"),
-            description=serialized.get("description"),
-            args=kwargs.get("inputs"),
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
     async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        output = args[0]
-        if content := getattr(output, "content", None):
+        current_tool_call = context.shared["current_tool_call"]
+        if content := current_tool_call.get("result", None):
             return self._set_tool_output(context, content)
 
         return context

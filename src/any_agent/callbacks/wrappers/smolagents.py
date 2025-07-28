@@ -4,6 +4,8 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
+from any_agent.utils import run_async_in_sync
+
 from opentelemetry.trace import get_current_span
 
 if TYPE_CHECKING:
@@ -22,9 +24,9 @@ class _SmolagentsWrapper:
     async def wrap(self, agent: SmolagentsAgent) -> None:
         self._original_llm_call = agent._agent.model.generate
 
-        async def wrap_generate(*args, **kwargs):
+        async def wrap_generate(trace_id, *args, **kwargs):
             context = self.callback_context[
-                get_current_span().get_span_context().trace_id
+                trace_id
             ]
             context.shared["model_id"] = str(agent._agent.model.model_id)
 
@@ -37,12 +39,16 @@ class _SmolagentsWrapper:
                 context = await callback.after_llm_call(context, output)
 
             return output
+        
+        def wrap_generate_sync(*args, **kwargs):
+            trace_id = get_current_span().get_span_context().trace_id
+            return(run_async_in_sync(wrap_generate(trace_id, *args, **kwargs)))
 
-        agent._agent.model.generate = wrap_generate
+        agent._agent.model.generate = wrap_generate_sync
 
-        async def wrapped_tool_execution(original_tool, original_call, *args, **kwargs):
+        async def wrapped_tool_execution(trace_id, original_tool, original_call, *args, **kwargs):
             context = self.callback_context[
-                get_current_span().get_span_context().trace_id
+                trace_id
             ]
             context.shared["original_tool"] = original_tool
 
@@ -58,13 +64,17 @@ class _SmolagentsWrapper:
 
             return output
 
+        def wrapped_tool_execution_sync(original_tool, original_call, *args, **kwargs):
+            trace_id = get_current_span().get_span_context().trace_id
+            return(run_async_in_sync(wrapped_tool_execution(trace_id, original_tool, original_call, *args, **kwargs)))
+
         class WrappedToolCall:
             def __init__(self, original_tool, original_forward):
                 self.original_tool = original_tool
                 self.original_forward = original_forward
 
             def forward(self, *args, **kwargs):
-                return wrapped_tool_execution(
+                return wrapped_tool_execution_sync(
                     self.original_tool, self.original_forward, *args, **kwargs
                 )
 

@@ -37,6 +37,15 @@ class _LangChainWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+            # Extract (pre) tool information
+            current_tool_call = {}
+            serialized: dict[str, Any] = args[0]
+            current_tool_call["name"] = serialized.get("name", "No name")
+            current_tool_call["description"] = serialized.get("description")
+            current_tool_call["args"] = kwargs.get("inputs")
+            current_tool_call["call_id"] = None
+            context.shared["current_tool_call"] = current_tool_call
+
             for callback in agent.config.callbacks:
                 context = await callback.before_tool_execution(context, *args, **kwargs)
 
@@ -51,6 +60,11 @@ class _LangChainWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+            current_tool_call = context.shared["current_tool_call"]
+
+            # Extract (post) tool information
+            output = args[0]
+            current_tool_call["result"] = getattr(output, "content", None)
             for callback in agent.config.callbacks:
                 context = await callback.after_tool_execution(context, *args, **kwargs)
 

@@ -49,17 +49,16 @@ class _AgnoSpanGeneration(_SpanGeneration):
         return context
 
     async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        function_call: FunctionCall = args[0]
-        function = function_call.function
+        current_tool_call = context.shared["current_tool_call"]
 
         return self._set_tool_input(
             context,
-            name=function.name,
-            description=function.description,
-            args=function_call.arguments,
-            call_id=function_call.call_id,
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
     async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        function_call: FunctionCall = args[1]
-        return self._set_tool_output(context, function_call.result)
+        current_tool_call = context.shared["current_tool_call"]
+        return self._set_tool_output(context, current_tool_call["result"])

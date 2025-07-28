@@ -8,6 +8,8 @@ from opentelemetry.trace import get_current_span
 if TYPE_CHECKING:
     from any_agent.callbacks.context import Context
     from any_agent.frameworks.google import GoogleAgent
+    from google.adk.tools.base_tool import BaseTool
+    from google.adk.tools.tool_context import ToolContext
 
 
 class _GoogleADKWrapper:
@@ -57,6 +59,17 @@ class _GoogleADKWrapper:
                 get_current_span().get_span_context().trace_id
             ]
 
+            # Extract (pre) tool information
+            current_tool_call = {}
+            tool: BaseTool = kwargs["tool"]
+            tool_args: dict[str, Any] = kwargs["args"]
+            tool_context: ToolContext = kwargs["tool_context"]
+            current_tool_call["name"] = tool.name
+            current_tool_call["description"] = tool.description
+            current_tool_call["args"] = tool_args
+            current_tool_call["call_id"] = tool_context.function_call_id
+            context.shared["current_tool_call"] = current_tool_call
+
             for callback in agent.config.callbacks:
                 context = await callback.before_tool_execution(context, *args, **kwargs)
 
@@ -69,16 +82,20 @@ class _GoogleADKWrapper:
 
         self._original["after_tool"] = agent._agent.after_tool_callback
 
-        async def after_tool_callback(*args, **kwarg) -> Any | None:
+        async def after_tool_callback(*args, **kwargs) -> Any | None:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+            current_tool_call = context.shared["current_tool_call"]
+
+            # Extract (post) tool information
+            current_tool_call["result"] = kwargs["tool_response"]
 
             for callback in agent.config.callbacks:
-                context = await callback.after_tool_execution(context, *args, **kwarg)
+                context = await callback.after_tool_execution(context, *args, **kwargs)
 
             if callable(self._original["after_tool"]):
-                return self._original["after_tool"](*args, **kwarg)
+                return self._original["after_tool"](*args, **kwargs)
 
             return None
 

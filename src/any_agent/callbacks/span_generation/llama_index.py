@@ -109,17 +109,17 @@ class _LlamaIndexSpanGeneration(_SpanGeneration):
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
     async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        meta: ToolMetadata = context.shared["metadata"]
+        current_tool_call = context.shared["current_tool_call"]
 
         return self._set_tool_input(
-            context, name=str(meta.name), description=meta.description, args=kwargs
+            context,
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
     async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        output = args[0]
-
-        if raw_output := getattr(output, "raw_output", None):
-            if content := getattr(raw_output, "content", None):
-                return self._set_tool_output(context, content[0].text)
-            return self._set_tool_output(context, raw_output)
-        return self._set_tool_output(context, output)
+        current_tool_call = context.shared["current_tool_call"]
+        if content := current_tool_call.get("result", None):
+            return self._set_tool_output(context, content)

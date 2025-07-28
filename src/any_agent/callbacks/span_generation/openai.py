@@ -56,10 +56,17 @@ class _OpenAIAgentsSpanGeneration(_SpanGeneration):
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
     async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        tool: FunctionTool = context.shared["original_tool"]
+        current_tool_call = context.shared["current_tool_call"]
+
         return self._set_tool_input(
-            context, name=tool.name, description=tool.description, args=args[1]
+            context,
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
     async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        return self._set_tool_output(context, args[0])
+        current_tool_call = context.shared["current_tool_call"]
+        if content := current_tool_call.get("result", None):
+            return self._set_tool_output(context, content)
