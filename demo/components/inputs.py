@@ -11,7 +11,6 @@ from pydantic import BaseModel, ConfigDict
 from any_agent import AgentFramework
 from any_agent.evaluation import EvaluationCase
 from any_agent.evaluation.schemas import CheckpointCriteria
-from any_agent.tracing.trace import _is_tracing_supported
 
 
 class UserInputs(BaseModel):
@@ -74,13 +73,9 @@ def get_user_inputs() -> UserInputs:
         )
     date = datetime.combine(date, time)
 
-    supported_frameworks = [
-        framework for framework in AgentFramework if _is_tracing_supported(framework)
-    ]
-
     framework = st.selectbox(
         "Select the agent framework to use",
-        supported_frameworks,
+        list(AgentFramework),
         index=2,
         format_func=lambda x: x.name,
     )

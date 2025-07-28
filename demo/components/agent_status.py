@@ -18,16 +18,14 @@ if TYPE_CHECKING:
 class StreamlitExporter(SpanExporter):
     """Build an `AgentTrace` and export to the different outputs."""
 
-    def __init__(  # noqa: D107
-        self, agent_framework: AgentFramework, callback: Callable
-    ):
+    def __init__(self, agent_framework: AgentFramework, callback: Callable):
         self.agent_framework = agent_framework
         self.processor: TracingProcessor | None = TracingProcessor.create(
             agent_framework
         )
         self.callback = callback
 
-    def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:  # noqa: D102
+    def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:
         if not self.processor:
             return SpanExportResult.SUCCESS
 
