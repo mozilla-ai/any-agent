@@ -9,6 +9,9 @@ will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.ru
 history = [system_prompt, user_prompt]
 context = Context()
 
+for callback in agent.config.callbacks:
+    context = callback.before_agent_invocation(context)
+
 while True:
 
     for callback in agent.config.callbacks:
@@ -35,6 +38,8 @@ while True:
             history.append(tool_response)
 
     else:
+        for callback in agent.config.callbacks:
+            context = callback.after_agent_invocation(context)
         return response
 ```
 

@@ -13,10 +13,18 @@ from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
 
 class SampleCallback(Callback):
     def __init__(self) -> None:
+        self.before_agent_invocation_called = False
+        self.after_agent_invocation_called = False
         self.before_llm_called = False
         self.after_llm_called = False
         self.before_tool_called = False
         self.after_tool_called = False
+
+    def after_agent_invocation(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        self.after_agent_invocation_called = True
+        return context
 
     def after_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
         self.after_llm_called = True
@@ -26,6 +34,12 @@ class SampleCallback(Callback):
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
         self.after_tool_called = True
+        return context
+
+    def before_agent_invocation(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        self.before_agent_invocation_called = True
         return context
 
     def before_tool_execution(
@@ -39,13 +53,15 @@ class SampleCallback(Callback):
         return context
 
 
-class ExceptionCallback(Callback):
+class ExceptionCallback(SampleCallback):
     """Callback that throws an exception in before_llm_call."""
 
     def __init__(self, exception_message: str = "Callback exception") -> None:
         self.exception_message = exception_message
+        super().__init__()
 
     def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+        context = super().before_llm_call(context, *args, **kwargs)
         raise RuntimeError(self.exception_message)
 
 
@@ -110,6 +126,8 @@ def test_callbacks(mock_litellm_response: Any) -> None:
     )
 
     # Verify that the callback methods were called
+    assert callback.before_agent_invocation_called
+    assert callback.after_agent_invocation_called
     assert callback.before_llm_called
     assert callback.after_llm_called
     assert callback.before_tool_called is False
@@ -131,6 +149,8 @@ def test_tool_execution_callbacks(mock_litellm_tool_call_response: Any) -> None:
     )
 
     # Verify that all callback methods were called
+    assert callback.before_agent_invocation_called
+    assert callback.after_agent_invocation_called
     assert callback.before_llm_called
     assert callback.after_llm_called
     assert callback.before_tool_called
@@ -153,22 +173,9 @@ def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> Non
         exception_message="Test callback exception",
     )
 
-
-def test_tool_callback_exception_causes_agent_exit(
-    mock_litellm_tool_call_response: Any,
-) -> None:
-    """Test that throwing an exception in a tool execution callback results in the agent exiting."""
-    callback = ExceptionCallback("Test tool callback exception")
-    agent = create_agent(
-        instructions="You must use the search_web tool to find information",
-        callbacks=[callback],
-        tools=[search_web],
-    )
-
-    run_agent_with_mock(
-        agent=agent,
-        prompt="Search for information about the latest AI developments",
-        mock_response=mock_litellm_tool_call_response,
-        expected_exception=AgentRunError,
-        exception_message="Test tool callback exception",
-    )
+    assert callback.before_agent_invocation_called
+    assert callback.after_agent_invocation_called
+    assert callback.before_llm_called
+    assert callback.after_llm_called is False
+    assert callback.before_tool_called is False
+    assert callback.after_tool_called is False

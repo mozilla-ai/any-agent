@@ -46,7 +46,7 @@ class SmolagentsMCPStdioConnection(SmolagentsMCPConnection):
         )
         adapter_kwargs = {}
         if self.mcp_tool.client_session_timeout_seconds:
-            adapter_kwargs["client_session_timeout_seconds"] = (
+            adapter_kwargs["connect_timeout"] = (
                 self.mcp_tool.client_session_timeout_seconds
             )
         self._client = MCPClient(server_parameters, adapter_kwargs=adapter_kwargs)
@@ -61,7 +61,7 @@ class SmolagentsMCPSseConnection(SmolagentsMCPConnection):
         server_parameters = {"url": self.mcp_tool.url, "transport": "sse"}
         adapter_kwargs = {}
         if self.mcp_tool.client_session_timeout_seconds:
-            adapter_kwargs["client_session_timeout_seconds"] = (
+            adapter_kwargs["connect_timeout"] = (
                 self.mcp_tool.client_session_timeout_seconds
             )
         self._client = MCPClient(server_parameters, adapter_kwargs=adapter_kwargs)
@@ -77,7 +77,7 @@ class SmolagentsMCPStreamableHttpConnection(SmolagentsMCPConnection):
         server_parameters = {"url": self.mcp_tool.url, "transport": "streamable-http"}
         adapter_kwargs = {}
         if self.mcp_tool.client_session_timeout_seconds:
-            adapter_kwargs["client_session_timeout_seconds"] = (
+            adapter_kwargs["connect_timeout"] = (
                 self.mcp_tool.client_session_timeout_seconds
             )
         self._client = MCPClient(server_parameters, adapter_kwargs=adapter_kwargs)
