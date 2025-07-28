@@ -156,6 +156,12 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 timeout = 120
 
+[tool.coverage.run]
+branch = true
+omit = [
+  "src/any_agent/vendor/*",
+  "tests/"
+]
 
 [dependency-groups]
 dev = [

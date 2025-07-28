@@ -8,12 +8,14 @@ on:
       - 'docs/**'
       - 'src/**'
       - 'scripts/hooks.py'
+      - 'pyproject.toml'
   pull_request:
     paths:
       - mkdocs.yml
       - 'docs/**'
       - 'src/**'
       - 'scripts/hooks.py'
+      - 'pyproject.toml'
   workflow_dispatch:
 
 jobs:
