@@ -2,7 +2,7 @@ import sys
 
 PYTHONEGT312 = sys.version_info >= (3, 12)
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if PYTHONEGT312:
     from typing import override
