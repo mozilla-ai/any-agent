@@ -69,7 +69,7 @@ class A2ATestHelpers:
 
     @staticmethod
     def create_send_streaming_message_request(
-        text: dict[str, Any],
+        text: str,
         message_id: str | None = None,
         context_id: str | None = None,
         task_id: str | None = None,
@@ -82,7 +82,9 @@ class A2ATestHelpers:
             task_id=task_id,
         )
 
-        return SendStreamingMessageRequest(id=str(uuid4()), params=MessageSendParams(**payload))
+        return SendStreamingMessageRequest(
+            id=str(uuid4()), params=MessageSendParams(**payload)
+        )
 
 
 class A2AServedAgent:

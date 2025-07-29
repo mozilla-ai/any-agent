@@ -6,9 +6,10 @@ from typing import TYPE_CHECKING, Any
 from opentelemetry.trace import get_current_span
 
 if TYPE_CHECKING:
+    from llama_index.core.tools import ToolMetadata
+
     from any_agent.callbacks.context import Context
     from any_agent.frameworks.llama_index import LlamaIndexAgent
-    from llama_index.core.tools import ToolMetadata
 
 
 class _LlamaIndexWrapper:
@@ -52,7 +53,7 @@ class _LlamaIndexWrapper:
             meta: ToolMetadata = context.shared["metadata"]
 
             # Extract (pre) tool information
-            current_tool_call = {}
+            current_tool_call: dict[str, Any] = {}
             current_tool_call["name"] = str(meta.name)
             current_tool_call["description"] = meta.description
             current_tool_call["args"] = kwargs
@@ -100,12 +101,12 @@ class _LlamaIndexWrapper:
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, **kwargs)
+                context = await callback.before_llm_call(context, **kwargs)
 
             output = await self._original_llm_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+                context = await callback.after_llm_call(context, output)
 
             return output
 

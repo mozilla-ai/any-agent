@@ -24,5 +24,4 @@ try:
     ]
 except ImportError as e:
     msg = "You need to `pip install 'any-agent[a2a]'` to use this method."
-    print(e)
     raise ImportError(msg) from e

@@ -30,38 +30,41 @@ else:
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
 from a2a.server.tasks import TaskUpdater
-from a2a.types import Part, TextPart, DataPart, TaskState
+from a2a.types import DataPart, Part, TaskState, TextPart
 from a2a.utils import (
     new_agent_parts_message,
     new_task,
 )
 from pydantic import BaseModel
 
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+from any_agent.callbacks.helpers import (
+    determine_output_type,
+    determine_tool_status,
+    serialize_for_attribute,
+)
 from any_agent.logging import logger
 from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.a2a.envelope import A2AEnvelope
-from any_agent.callbacks.base import Callback
-from any_agent.callbacks.helpers import (
-    serialize_for_attribute,
-    determine_output_type,
-    determine_tool_status
-)
-from any_agent.callbacks.context import Context
-
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
 
 
-class ToolUpdaterCallback(Callback):
-    def __init__(self, updater: TaskUpdater, context_id, task_id):
+class _ToolUpdaterCallback(Callback):
+    """Sends events to a taskupdater about tool execution."""
+
+    def __init__(self, updater: TaskUpdater, context_id: str, task_id: str) -> None:
         self.context_id = context_id
         self.task_id = task_id
         self.updater = updater
 
-    async def before_tool_execution(self, context, *args, **kwargs):
+    async def before_tool_execution(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         request: dict[str, Any] = args[0]
-        tool_call = {}
+        tool_call: dict[str, Any] = {}
         tool_call["name"] = request.get("name", "No name")
         tool_call["description"] = ""
         tool_call["args"] = request.get("arguments", {})
@@ -69,7 +72,13 @@ class ToolUpdaterCallback(Callback):
         await self.updater.update_status(
             TaskState.working,
             message=new_agent_parts_message(
-                [Part(root=DataPart(data={"event_type": "tool_started", "payload": tool_call}))],
+                [
+                    Part(
+                        root=DataPart(
+                            data={"event_type": "tool_started", "payload": tool_call}
+                        )
+                    )
+                ],
                 self.context_id,
                 self.task_id,
             ),
@@ -78,10 +87,9 @@ class ToolUpdaterCallback(Callback):
         context.shared["current_tool_call"] = tool_call
         return context
 
-
-
-
-    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def after_tool_execution(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         """Will be called after any LLM Call is completed."""
         tool_output = args[0]
         output_type = determine_output_type(tool_output)
@@ -93,7 +101,13 @@ class ToolUpdaterCallback(Callback):
         await self.updater.update_status(
             TaskState.working,
             message=new_agent_parts_message(
-                [Part(root=DataPart(data={"event_type": "tool_finished", "payload": tool_call}))],
+                [
+                    Part(
+                        root=DataPart(
+                            data={"event_type": "tool_finished", "payload": tool_call}
+                        )
+                    )
+                ],
                 self.context_id,
                 self.task_id,
             ),
@@ -102,11 +116,15 @@ class ToolUpdaterCallback(Callback):
         return context
 
 
-
 class AnyAgentExecutor(AgentExecutor):
     """AnyAgentExecutor Implementation with task management for multi-turn conversations."""
 
-    def __init__(self, agent: "AnyAgent", context_manager: ContextManager, stream_tool_usage: bool):
+    def __init__(
+        self,
+        agent: "AnyAgent",
+        context_manager: ContextManager,
+        stream_tool_usage: bool,
+    ):
         """Initialize the AnyAgentExecutor.
 
         Args:
@@ -146,7 +164,9 @@ class AnyAgentExecutor(AgentExecutor):
             logger.info("Task already exists: %s", task.model_dump_json(indent=2))
 
         updater = TaskUpdater(event_queue, task.id, task.contextId)
-        tool_updater = ToolUpdaterCallback(updater=updater, context_id=task.contextId, task_id=task.id)
+        tool_updater = _ToolUpdaterCallback(
+            updater=updater, context_id=task.contextId, task_id=task.id
+        )
 
         formatted_query = self.context_manager.format_query_with_history(
             context_id,  # type: ignore[arg-type]

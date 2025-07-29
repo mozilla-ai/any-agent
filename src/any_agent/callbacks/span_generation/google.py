@@ -8,14 +8,14 @@ from any_agent.callbacks.span_generation.base import _SpanGeneration
 if TYPE_CHECKING:
     from google.adk.models.llm_request import LlmRequest
     from google.adk.models.llm_response import LlmResponse
-    from google.adk.tools.base_tool import BaseTool
-    from google.adk.tools.tool_context import ToolContext
 
     from any_agent.callbacks.context import Context
 
 
 class _GoogleSpanGeneration(_SpanGeneration):
-    async def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+    async def before_llm_call(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         llm_request: LlmRequest = kwargs["llm_request"]
 
         messages = []

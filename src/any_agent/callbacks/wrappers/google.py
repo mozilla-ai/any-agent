@@ -6,10 +6,11 @@ from typing import TYPE_CHECKING, Any
 from opentelemetry.trace import get_current_span
 
 if TYPE_CHECKING:
-    from any_agent.callbacks.context import Context
-    from any_agent.frameworks.google import GoogleAgent
     from google.adk.tools.base_tool import BaseTool
     from google.adk.tools.tool_context import ToolContext
+
+    from any_agent.callbacks.context import Context
+    from any_agent.frameworks.google import GoogleAgent
 
 
 class _GoogleADKWrapper:
@@ -60,7 +61,7 @@ class _GoogleADKWrapper:
             ]
 
             # Extract (pre) tool information
-            current_tool_call = {}
+            current_tool_call: dict[str, Any] = {}
             tool: BaseTool = kwargs["tool"]
             tool_args: dict[str, Any] = kwargs["args"]
             tool_context: ToolContext = kwargs["tool_context"]

@@ -130,8 +130,6 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
 
         agent_trace = await main_agent.run_async(DATE_PROMPT)
 
-        print(agent_trace.spans)
-
         _assert_valid_agent_trace(agent_trace)
         _assert_contains_current_date_info(str(agent_trace.final_output))
         _assert_has_tool_date_agent_call(agent_trace)

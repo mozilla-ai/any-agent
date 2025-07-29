@@ -94,7 +94,9 @@ class _LangChainWrapper:
                 inputs: dict[str, Any] | None = None,
                 **kwargs: Any,
             ) -> Any:
-                await before_tool_execution(serialized, input_str, inputs=inputs, **kwargs)
+                await before_tool_execution(
+                    serialized, input_str, inputs=inputs, **kwargs
+                )
 
             async def on_llm_end(
                 self,
@@ -149,12 +151,12 @@ class _LangChainWrapper:
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, **kwargs)
+                context = await callback.before_llm_call(context, **kwargs)
 
             output = await self._original_llm_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+                context = await callback.after_llm_call(context, output, **kwargs)
 
             return output
 

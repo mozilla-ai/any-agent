@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-import json
 from typing import TYPE_CHECKING, Any
 
-from opentelemetry.trace import Status, StatusCode
+from opentelemetry.trace import StatusCode
 
 from any_agent.callbacks.base import Callback
 from any_agent.callbacks.helpers import (
-    serialize_for_attribute,
     determine_output_type,
-    determine_tool_status
+    determine_tool_status,
+    serialize_for_attribute,
 )
 from any_agent.tracing.attributes import GenAI
 

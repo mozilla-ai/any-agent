@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
-    from agents import FunctionTool, ModelResponse
+    from agents import ModelResponse
 
     from any_agent.callbacks.context import Context
 
@@ -70,3 +70,4 @@ class _OpenAIAgentsSpanGeneration(_SpanGeneration):
         current_tool_call = context.shared["current_tool_call"]
         if content := current_tool_call.get("result", None):
             return self._set_tool_output(context, content)
+        return context

@@ -1,12 +1,10 @@
 # mypy: disable-error-code="no-untyped-def"
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Awaitable
 import json
-from opentelemetry.trace import Status, StatusCode
+from typing import Any
 
-if TYPE_CHECKING:
-    from .context import Context
+from opentelemetry.trace import Status, StatusCode
 
 
 def serialize_for_attribute(data: Any) -> str:
@@ -18,6 +16,7 @@ def serialize_for_attribute(data: Any) -> str:
     except (TypeError, ValueError):
         return str(data)
 
+
 def determine_output_type(output: Any) -> str:
     """Determine output type based on the output content."""
     if isinstance(output, str):
@@ -27,9 +26,8 @@ def determine_output_type(output: Any) -> str:
             return "text"
     return "json"
 
-def determine_tool_status(
-    tool_output: str, output_type: str
-) -> Status | StatusCode:
+
+def determine_tool_status(tool_output: str, output_type: str) -> Status | StatusCode:
     """Determine the status based on tool output content and type."""
     if output_type == "text" and "Error calling tool:" in tool_output:
         return Status(StatusCode.ERROR, description=tool_output)

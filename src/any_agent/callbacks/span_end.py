@@ -1,4 +1,5 @@
-# mypy: disable-error-code="no-untyped-def"
+from typing import Any
+
 from any_agent.callbacks.base import Callback
 from any_agent.callbacks.context import Context
 
@@ -12,8 +13,12 @@ def _span_end(context: Context) -> Context:
 class SpanEndCallback(Callback):
     """End the current span and add it to the corresponding `AgentTrace`."""
 
-    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         return _span_end(context)
 
-    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def after_tool_execution(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         return _span_end(context)

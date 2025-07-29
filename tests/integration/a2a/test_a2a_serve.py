@@ -41,8 +41,11 @@ async def test_serve_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> 
         response = await client.send_message(request, http_kwargs=DEFAULT_HTTP_KWARGS)
         assert response is not None
 
+
 @pytest.mark.asyncio
-async def test_serve_streaming_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> None:
+async def test_serve_streaming_async(
+    test_port: int, a2a_test_helpers: A2ATestHelpers
+) -> None:
     # Create and serve the agent
     agent = await AnyAgent.create_async(
         "tinyagent",
@@ -56,7 +59,9 @@ async def test_serve_streaming_async(test_port: int, a2a_test_helpers: A2ATestHe
     )
 
     # Use the context manager for proper cleanup
-    async with a2a_client_from_agent(agent, A2AServingConfig(port=test_port, stream_tool_usage=True)) as (
+    async with a2a_client_from_agent(
+        agent, A2AServingConfig(port=test_port, stream_tool_usage=True)
+    ) as (
         client,
         server_url,
     ):
@@ -66,7 +71,8 @@ async def test_serve_streaming_async(test_port: int, a2a_test_helpers: A2ATestHe
             message_id=uuid4().hex,
         )
         responses = []
-        async for response in client.send_message_streaming(request, http_kwargs=DEFAULT_HTTP_KWARGS):
+        async for response in client.send_message_streaming(
+            request, http_kwargs=DEFAULT_HTTP_KWARGS
+        ):
             responses.append(response)
             assert response is not None
-        print(responses)

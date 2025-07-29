@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from litellm.types.utils import ChatCompletionMessageToolCall, Usage
     from llama_index.core.agent.workflow.workflow_events import AgentOutput
     from llama_index.core.base.llms.types import ChatMessage
-    from llama_index.core.tools import ToolMetadata
 
     from any_agent.callbacks.context import Context
 
@@ -123,3 +122,4 @@ class _LlamaIndexSpanGeneration(_SpanGeneration):
         current_tool_call = context.shared["current_tool_call"]
         if content := current_tool_call.get("result", None):
             return self._set_tool_output(context, content)
+        return context

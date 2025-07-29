@@ -7,7 +7,6 @@ from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
     from agno.models.message import Message, MessageMetrics
-    from agno.tools.function import FunctionCall
 
     from any_agent.callbacks.context import Context
 

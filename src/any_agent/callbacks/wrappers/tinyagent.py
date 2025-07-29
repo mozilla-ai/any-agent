@@ -26,7 +26,6 @@ class _TinyAgentWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
-            print(agent.config.callbacks)
             for callback in agent.config.callbacks:
                 context = await callback.before_llm_call(context, **kwargs)
 
