@@ -10,7 +10,6 @@ requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
   "duckduckgo_search",
-  "fire",
   "litellm>=1.74.0",
   "markdownify",
   "mcp>=1.5.0",
@@ -38,7 +37,7 @@ langchain = [
 ]
 
 llama_index = [
-  "llama-index",
+  "llama-index>=0.12.52, <1",
   "llama-index-llms-litellm",
   "llama-index-tools-mcp>=0.2.5",
   "platformdirs>=4.3.7",
@@ -157,6 +156,12 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 timeout = 120
 
+[tool.coverage.run]
+branch = true
+omit = [
+  "src/any_agent/vendor/*",
+  "tests/"
+]
 
 [dependency-groups]
 dev = [
@@ -180,6 +185,7 @@ lint = [
 
 tests = [
   "pytest>=8,<9",
+  "pytest-cov>=6.2.1,<7",
   "pytest-sugar>=0.9.6",
   "pytest-asyncio>=0.26.0",
   "pytest-lazy-fixtures>=1.1.2",

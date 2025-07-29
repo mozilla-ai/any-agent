@@ -6,10 +6,14 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
+      - '.github/workflows/**'
+      - 'pyproject.toml'
   pull_request:
     paths:
       - 'src/**'
       - 'tests/**'
+      - '.github/workflows/**'
+      - 'pyproject.toml'
   workflow_dispatch:
 
 jobs:
@@ -35,4 +39,10 @@ jobs:
       - run: |
           uv sync --group tests --extra all --extra a2a
 
-      - run: pytest -v tests/unit
+      - run: pytest tests/unit -v --cov --cov-report=xml
+
+      - name: Upload coverage reports to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

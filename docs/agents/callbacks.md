@@ -9,6 +9,9 @@ will be called at different points of the [`AnyAgent.run`][any_agent.AnyAgent.ru
 history = [system_prompt, user_prompt]
 context = Context()
 
+for callback in agent.config.callbacks:
+    context = callback.before_agent_invocation(context)
+
 while True:
 
     for callback in agent.config.callbacks:
@@ -35,6 +38,8 @@ while True:
             history.append(tool_response)
 
     else:
+        for callback in agent.config.callbacks:
+            context = callback.after_agent_invocation(context)
         return response
 ```
 
@@ -214,3 +219,49 @@ class SensitiveDataOffloader(Callback):
 ```
 
 You can find a working example in the [Callbacks Cookbook](../cookbook/callbacks.ipynb).
+
+## Example: Limit the number of steps
+
+Some agent frameworks allow to limit how many steps an agent can take and some don't. In addition,
+each framework defines a `step` differently: some count the llm calls, some the tool executions,
+and some the sum of both.
+
+You can use callbacks to limit how many steps an agent can take, and you can decide what to count
+as a `step`:
+
+```python
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+
+class LimitLLMCalls(Callback):
+    def __init__(self, max_llm_calls: int) -> None:
+        self.max_llm_calls = max_llm_calls
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+
+        if "n_llm_calls" not in context.shared:
+            context.shared["n_llm_calls"] = 0
+
+        context.shared["n_llm_calls"] += 1
+
+        if context.shared["n_llm_calls"] > self.max_llm_calls:
+            raise RuntimeError("Reached limit of LLM Calls")
+
+        return context
+
+class LimitToolExecutions(Callback):
+    def __init__(self, max_tool_executions: int) -> None:
+        self.max_tool_executions = max_tool_executions
+
+    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+
+        if "n_tool_executions" not in context.shared:
+            context.shared["n_tool_executions"] = 0
+
+        context.shared["n_tool_executions"] += 1
+
+        if context.shared["n_tool_executions"] > self.max_tool_executions:
+            raise RuntimeError("Reached limit of Tool Executions")
+
+        return context
+```

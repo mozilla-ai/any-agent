@@ -31,7 +31,7 @@ async def test_smolagents_mcp_sse_integration(
     smolagents_mcp_server.assert_called_once_with(
         {"url": mcp_sse_params_no_tools.url, "transport": "sse"},
         adapter_kwargs={
-            "client_session_timeout_seconds": mcp_sse_params_no_tools.client_session_timeout_seconds
+            "connect_timeout": mcp_sse_params_no_tools.client_session_timeout_seconds
         },
     )
 
@@ -50,7 +50,7 @@ async def test_smolagents_mcp_streamablehttp_integration(
     smolagents_mcp_server.assert_called_once_with(
         {"url": mcp_streamablehttp_params_no_tools.url, "transport": "streamable-http"},
         adapter_kwargs={
-            "client_session_timeout_seconds": mcp_streamablehttp_params_no_tools.client_session_timeout_seconds
+            "connect_timeout": mcp_streamablehttp_params_no_tools.client_session_timeout_seconds
         },
     )
 
@@ -88,10 +88,7 @@ async def test_smolagents_mcp_stdio_timeout() -> None:
     with patch("any_agent.tools.mcp.frameworks.smolagents.MCPClient", mocked_class):
         await mcp_server._setup_tools()
         call_args = mocked_class.call_args_list[0]
-        assert (
-            call_args[1]["adapter_kwargs"]["client_session_timeout_seconds"]
-            == custom_timeout
-        )
+        assert call_args[1]["adapter_kwargs"]["connect_timeout"] == custom_timeout
 
 
 @pytest.mark.asyncio
@@ -110,7 +107,4 @@ async def test_smolagents_mcp_sse_timeout() -> None:
         mock_client.assert_called_once()
         call_args = mock_client.call_args_list[0]
         assert call_args[0][0] == {"url": mcp_sse_params.url, "transport": "sse"}
-        assert (
-            call_args[1]["adapter_kwargs"]["client_session_timeout_seconds"]
-            == custom_timeout
-        )
+        assert call_args[1]["adapter_kwargs"]["connect_timeout"] == custom_timeout

@@ -74,6 +74,27 @@ def test_load_smolagents_agent_missing() -> None:
             )
 
 
+def test_load_smolagent_final_answer() -> None:
+    """Regression test for https://github.com/mozilla-ai/any-agent/issues/662"""
+    from smolagents import FinalAnswerTool
+
+    mock_model = MagicMock()
+    mock_tool = MagicMock()
+
+    with (
+        patch("any_agent.frameworks.smolagents.DEFAULT_MODEL_TYPE", mock_model),
+        patch("smolagents.tool", mock_tool),
+    ):
+        agent = AnyAgent.create(
+            AgentFramework.SMOLAGENTS,
+            AgentConfig(
+                model_id="openai/o3-mini",
+            ),
+        )
+
+        assert isinstance(agent._agent.tools["final_answer"], FinalAnswerTool)  # type: ignore[attr-defined]
+
+
 def test_run_smolagent_custom_args() -> None:
     mock_agent = MagicMock()
     mock_agent.return_value = MagicMock()

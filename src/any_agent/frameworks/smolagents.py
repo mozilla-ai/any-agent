@@ -58,9 +58,6 @@ class SmolagentsAgent(AnyAgent):
         if not self._agent:
             return
 
-        if "final_answer" in self._agent.tools:
-            del self._agent.tools["final_answer"]
-
         if self.config.instructions:
             self._agent.prompt_templates["system_prompt"] = self.config.instructions
 

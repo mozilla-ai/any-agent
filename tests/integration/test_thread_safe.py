@@ -33,14 +33,14 @@ async def test_run_agent_concurrently(agent_framework: AgentFramework) -> None:
     model_id = DEFAULT_SMALL_MODEL_ID
     env_check = validate_environment(model_id)
     if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {agent_framework}")
+        pytest.skip(f"{env_check['missing_keys']} needed for {model_id}")
 
     agent = await AnyAgent.create_async(
         agent_framework,
         AgentConfig(
             model_id=model_id,
             instructions="You must use the tools to find an answer",
-            model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
+            model_args=get_default_agent_model_args(agent_framework),
             tools=[mock_capital],
         ),
     )
