@@ -68,7 +68,7 @@ class ExceptionCallback(SampleCallback):
     async def before_llm_call(
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
-        context = super().before_llm_call(context, *args, **kwargs)
+        context = await super().before_llm_call(context, *args, **kwargs)
         raise RuntimeError(self.exception_message)
 
 
@@ -164,7 +164,7 @@ def test_tool_execution_callbacks(mock_litellm_tool_call_response: Any) -> None:
     assert callback.after_tool_called
 
 
-def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> None:
+async def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> None:
     """Test that throwing an exception in a callback results in the agent exiting."""
     callback = ExceptionCallback("Test callback exception")
     agent = create_agent(
