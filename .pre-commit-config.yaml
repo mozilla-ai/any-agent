@@ -25,7 +25,7 @@ repos:
         args:
           - "--fix"
           - "--exit-non-zero-on-fix"
-        exclude: src/any_agent/vendor|docs/cookbook/toy_codebase
+        exclude: src/any_agent/vendor
       - id: ruff-format
 
   - repo: local
@@ -45,7 +45,6 @@ repos:
           - types-requests
           - types-pyyaml
         types: [python]
-        exclude: docs/cookbook/toy_codebase
         # use require_serial so that script is only called once per commit
         require_serial: true
         # Print the number of files as a sanity-check
