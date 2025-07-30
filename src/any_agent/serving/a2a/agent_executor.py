@@ -166,7 +166,8 @@ class AnyAgentExecutor(AgentExecutor):
         try:
             agent_trace = await self.agent.run_async(formatted_query)
         except AgentRunError as e:
-            logger.error(f"Served request failed: {e!s}")
+            logger.exception(f"Served request failed: {e!s}")
+            agent_trace = e.trace
 
         # Remove the tool recording callback
         if self.stream_tool_usage:

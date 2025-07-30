@@ -13,6 +13,7 @@ from any_agent.testing.helpers import (
     get_default_agent_model_args,
     wait_for_server_async,
 )
+from sse_starlette.sse import AppStatus
 
 from .conftest import DATE_PROMPT, A2ATestHelpers, a2a_client_from_agent, get_datetime
 
@@ -80,4 +81,5 @@ async def test_serve_streaming_async(
         ):
             responses.append(response)
             assert response is not None
-        print(responses)
+        assert len(responses) == 4
+        AppStatus.get_or_create_exit_event().set()
