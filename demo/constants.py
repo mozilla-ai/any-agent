@@ -1,6 +1,6 @@
 import os
 
-from surf_spot_finder.tools import (
+from tools import (
     get_area_lat_lon,
     get_wave_forecast,
     get_wind_forecast,
