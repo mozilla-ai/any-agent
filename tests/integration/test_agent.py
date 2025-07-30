@@ -161,7 +161,12 @@ class Steps(BaseModel):
 
 @pytest.mark.parametrize(
     "model_id",
-    ["gemini/gemini-2.5-flash", "openai/gpt-4.1-nano", DEFAULT_SMALL_MODEL_ID],
+    [
+        "anthropic/claude-3-5-haiku-latest",
+        "gemini/gemini-2.5-flash",
+        "openai/gpt-4.1-nano",
+        DEFAULT_SMALL_MODEL_ID,
+    ],
 )
 def test_load_and_run_agent(
     model_id: str,

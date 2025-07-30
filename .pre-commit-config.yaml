@@ -19,13 +19,13 @@ repos:
         exclude: \.ambr$
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.12.5"
+    rev: "v0.12.7"
     hooks:
       - id: ruff
         args:
           - "--fix"
           - "--exit-non-zero-on-fix"
-        exclude: src/any_agent/vendor
+        exclude: src/any_agent/vendor|demo
       - id: ruff-format
 
   - repo: local
