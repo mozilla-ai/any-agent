@@ -6,11 +6,10 @@ import requests
 
 def _extract_hourly_data(data: dict) -> list[dict]:
     hourly_data = data["hourly"]
-    result = [
-        {k: v for k, v in zip(hourly_data.keys(), values, strict=False)}
+    return [
+        dict(zip(hourly_data.keys(), values, strict=False))
         for values in zip(*hourly_data.values(), strict=False)
     ]
-    return result
 
 
 def _filter_by_date(
@@ -71,7 +70,8 @@ def get_wave_forecast(lat: float, lon: float, date: str) -> list[dict]:
         date = datetime.fromisoformat(date)
         hourly_data = _filter_by_date(date, hourly_data)
     if len(hourly_data) == 0:
-        raise ValueError("No data found for the given date")
+        msg = "No data found for the given date"
+        raise ValueError(msg)
     return hourly_data
 
 
@@ -113,5 +113,6 @@ def get_wind_forecast(lat: float, lon: float, date: str) -> list[dict]:
     date = datetime.fromisoformat(date)
     hourly_data = _filter_by_date(date, hourly_data)
     if len(hourly_data) == 0:
-        raise ValueError("No data found for the given date")
+        msg = "No data found for the given date"
+        raise ValueError(msg)
     return hourly_data

@@ -26,12 +26,13 @@ at {DATE}?"
 def validate_prompt(value) -> str:
     for placeholder in ("{LOCATION}", "{MAX_DRIVING_HOURS}", "{DATE}"):
         if placeholder not in value:
-            raise ValueError(f"prompt must contain {placeholder}")
+            msg = f"prompt must contain {placeholder}"
+            raise ValueError(msg)
     return value
 
 
 def ask_framework() -> AgentFramework:
-    """Ask the user which framework they would like to use. They must select one of the Agent Frameworks"""
+    """Ask the user which framework they would like to use. They must select one of the Agent Frameworks."""
     frameworks = [framework.name for framework in AgentFramework]
     frameworks_str = "\n".join(
         [f"{i}: {framework}" for i, framework in enumerate(frameworks)]
@@ -41,10 +42,12 @@ def ask_framework() -> AgentFramework:
     try:
         choice = int(choice)
         if choice < 0 or choice >= len(frameworks):
-            raise ValueError("Invalid choice")
+            msg = "Invalid choice"
+            raise ValueError(msg)
         return AgentFramework[frameworks[choice]]
     except ValueError:
-        raise ValueError("Invalid choice")
+        msg = "Invalid choice"
+        raise ValueError(msg)
 
 
 def date_picker() -> FutureDatetime:
@@ -56,10 +59,10 @@ def date_picker() -> FutureDatetime:
     date_str = Prompt.ask(prompt, default=default_val)
     try:
         year, month, day, hour = map(int, date_str.split("-"))
-        date = datetime(year, month, day, hour)
-        return date
+        return datetime(year, month, day, hour)
     except ValueError:
-        raise ValueError("Invalid date format. Please use YYYY-MM-DD-HH.")
+        msg = "Invalid date format. Please use YYYY-MM-DD-HH."
+        raise ValueError(msg)
 
 
 def location_picker() -> str:
@@ -69,7 +72,8 @@ def location_picker() -> str:
     default_val = f"{g.city} {g.state}, {g.country}"
     location = Prompt.ask(prompt, default=default_val)
     if not location:
-        raise ValueError("location cannot be empty")
+        msg = "location cannot be empty"
+        raise ValueError(msg)
     return location
 
 
@@ -81,14 +85,16 @@ def max_driving_hours_picker() -> int:
     try:
         max_driving_hours = int(max_driving_hours)
         if max_driving_hours <= 0:
-            raise ValueError("Invalid choice")
+            msg = "Invalid choice"
+            raise ValueError(msg)
         return max_driving_hours
     except ValueError:
-        raise ValueError("Invalid choice")
+        msg = "Invalid choice"
+        raise ValueError(msg)
 
 
 def get_litellm_model_id(agent_name) -> str:
-    """Ask the user to input a model_id string. Validate it using the litellm.validate_environment function"""
+    """Ask the user to input a model_id string. Validate it using the litellm.validate_environment function."""
     from litellm.utils import validate_environment
 
     prompt = f"Enter a valid model_id for agent {agent_name} using LiteLLM syntax"
@@ -215,7 +221,7 @@ class Config(BaseModel):
     def from_yaml(cls, yaml_path: str) -> "Config":
         """With open(yaml_path, "r") as f:
             data = yaml.safe_load(f)
-        return cls(**data)    yaml_path: Path to the YAML configuration file
+        return cls(**data)    yaml_path: Path to the YAML configuration file.
 
         Returns:
             Config: A new Config instance populated with values from the YAML file
