@@ -37,13 +37,9 @@ from a2a.utils import (
 )
 from pydantic import BaseModel
 
+from any_agent import AgentRunError
 from any_agent.callbacks.base import Callback
 from any_agent.callbacks.context import Context
-from any_agent.callbacks.helpers import (
-    determine_output_type,
-    determine_tool_status,
-    serialize_for_attribute,
-)
 from any_agent.logging import logger
 from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.a2a.envelope import A2AEnvelope
@@ -63,11 +59,7 @@ class _ToolUpdaterCallback(Callback):
     async def before_tool_execution(
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
-        request: dict[str, Any] = args[0]
-        tool_call: dict[str, Any] = {}
-        tool_call["name"] = request.get("name", "No name")
-        tool_call["description"] = ""
-        tool_call["args"] = request.get("arguments", {})
+        tool_call = context.shared["current_tool_call"]
 
         await self.updater.update_status(
             TaskState.working,
@@ -84,20 +76,13 @@ class _ToolUpdaterCallback(Callback):
             ),
             final=False,
         )
-        context.shared["current_tool_call"] = tool_call
         return context
 
     async def after_tool_execution(
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
         """Will be called after any LLM Call is completed."""
-        tool_output = args[0]
-        output_type = determine_output_type(tool_output)
-        output_attr = serialize_for_attribute(tool_output)
         tool_call = context.shared["current_tool_call"]
-        tool_call["output_type"] = output_type
-        tool_call["output_attr"] = output_attr
-        tool_call["status"] = determine_tool_status(output_attr, output_type)
         await self.updater.update_status(
             TaskState.working,
             message=new_agent_parts_message(
@@ -178,7 +163,10 @@ class AnyAgentExecutor(AgentExecutor):
             self.agent.config.callbacks.append(tool_updater)
 
         # This agent always produces Task objects.
-        agent_trace = await self.agent.run_async(formatted_query)
+        try:
+            agent_trace = await self.agent.run_async(formatted_query)
+        except AgentRunError as e:
+            logger.error(f"Served request failed: {e!s}")
 
         # Remove the tool recording callback
         if self.stream_tool_usage:

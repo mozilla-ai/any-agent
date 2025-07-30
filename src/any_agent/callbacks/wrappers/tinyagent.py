@@ -42,13 +42,23 @@ class _TinyAgentWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+            # Extract (pre) tool information
+            current_tool_call = {}
+            current_tool_call["name"] = request.get("name", "No name")
+            current_tool_call["description"] = None
+            current_tool_call["args"] = request.get("arguments", {})
+            current_tool_call["call_id"] = None
+            context.shared["current_tool_call"] = current_tool_call
+
             for callback in agent.config.callbacks:
-                context = await callback.before_tool_execution(context, request)
+                context = await callback.before_tool_execution(context)
 
             output = await original_call(request)
 
+            current_tool_call["result"] = output
+
             for callback in agent.config.callbacks:
-                context = await callback.after_tool_execution(context, output)
+                context = await callback.after_tool_execution(context)
 
             return output
 

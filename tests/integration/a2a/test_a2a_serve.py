@@ -1,9 +1,11 @@
 from uuid import uuid4
 
 import pytest
+import logging
 
 # Import your agent and config
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.logging import setup_logger
 from any_agent.serving import A2AServingConfig
 from any_agent.testing.helpers import (
     DEFAULT_HTTP_KWARGS,
@@ -46,6 +48,8 @@ async def test_serve_async(test_port: int, a2a_test_helpers: A2ATestHelpers) -> 
 async def test_serve_streaming_async(
     test_port: int, a2a_test_helpers: A2ATestHelpers
 ) -> None:
+    logging.getLogger("a2a.server.apps.jsonrcp.starlette_app").setLevel(logging.DEBUG)
+    setup_logger(level=logging.INFO)
     # Create and serve the agent
     agent = await AnyAgent.create_async(
         "tinyagent",
@@ -76,3 +80,4 @@ async def test_serve_streaming_async(
         ):
             responses.append(response)
             assert response is not None
+        print(responses)

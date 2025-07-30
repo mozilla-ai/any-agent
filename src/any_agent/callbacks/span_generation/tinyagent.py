@@ -1,7 +1,7 @@
 # mypy: disable-error-code="method-assign,no-untyped-def"
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
@@ -66,12 +66,18 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
     async def before_tool_execution(self, context, *args, **kwargs):
-        request: dict[str, Any] = args[0]
+        current_tool_call = context.shared["current_tool_call"]
+
         return self._set_tool_input(
             context,
-            name=request.get("name", "No name"),
-            args=request.get("arguments", {}),
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
     async def after_tool_execution(self, context, *args, **kwargs):
-        return self._set_tool_output(context, args[0])
+        current_tool_call = context.shared["current_tool_call"]
+        if content := current_tool_call.get("result", None):
+            return self._set_tool_output(context, content)
+        return context
