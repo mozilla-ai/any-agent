@@ -153,12 +153,10 @@ class AgentSpan(BaseModel):
 
         messages_json = self.attributes.get(GenAI.INPUT_MESSAGES)
         if not messages_json:
-            logger.debug("No input messages found in span")
             return None
 
         try:
             parsed_messages = json.loads(messages_json)
-            # Ensure it's a list of dicts
         except (json.JSONDecodeError, TypeError) as e:
             msg = "Failed to parse input messages from span"
             logger.error(msg)
@@ -236,9 +234,7 @@ class AgentTrace(BaseModel):
 
         for span in filtered_spans:
             if span.is_llm_call():
-                # Extract input messages from the span
-                input_messages = span.get_input_messages()
-                if input_messages:
+                if input_messages := span.get_input_messages():
                     for msg in input_messages:
                         if not any(
                             existing.role == msg.role
@@ -247,9 +243,7 @@ class AgentTrace(BaseModel):
                         ):
                             messages.append(msg)
 
-                # Add the assistant's response
-                output_content = span.get_output_content()
-                if output_content:
+                if output_content := span.get_output_content():
                     # Avoid duplicate assistant messages
                     if not (
                         messages

@@ -12,7 +12,6 @@ from litellm.utils import supports_response_schema
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.logging import logger
 
 from .any_agent import AnyAgent
 
@@ -168,7 +167,6 @@ class TinyAgent(AnyAgent):
             )
 
             self.clients[tool_name] = ToolExecutor(tool)
-            logger.debug("Registered tool: %s", tool_name)
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         messages = [
