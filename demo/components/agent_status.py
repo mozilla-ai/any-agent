@@ -8,8 +8,6 @@ from opentelemetry.sdk.trace.export import (
 )
 
 from any_agent import AgentFramework, AnyAgent
-from any_agent.tracing import TracingProcessor
-from any_agent.tracing.trace import AgentSpan
 
 if TYPE_CHECKING:
     from opentelemetry.sdk.trace import ReadableSpan
@@ -20,9 +18,6 @@ class StreamlitExporter(SpanExporter):
 
     def __init__(self, agent_framework: AgentFramework, callback: Callable):
         self.agent_framework = agent_framework
-        self.processor: TracingProcessor | None = TracingProcessor.create(
-            agent_framework
-        )
         self.callback = callback
 
     def export(self, spans: Sequence["ReadableSpan"]) -> SpanExportResult:
@@ -31,8 +26,7 @@ class StreamlitExporter(SpanExporter):
 
         for readable_span in spans:
             # Check if this span belongs to our run
-            span = AgentSpan.from_readable_span(readable_span)
-            self.callback(span)
+            self.callback(readable_span)
 
         return SpanExportResult.SUCCESS
 

@@ -3,16 +3,13 @@ import json
 import streamlit as st
 from components.agent_status import export_logs
 from components.inputs import UserInputs
-from constants import DEFAULT_TOOLS
-from surf_spot_finder.config import Config
+from constants import DEFAULT_TOOLS, INPUT_PROMPT_TEMPLATE
 
-from any_agent import AgentConfig, AgentFramework, AnyAgent, TracingConfig
-from any_agent.evaluation import TraceEvaluationResult, evaluate
+from any_agent import AgentConfig, AgentFramework, AgentTrace, AnyAgent
 from any_agent.tracing.otel_types import StatusCode
-from any_agent.tracing.trace import AgentSpan, AgentTrace
 
 
-async def display_evaluation_results(result: TraceEvaluationResult):
+async def display_evaluation_results(result):
     if result.ground_truth_result is not None:
         all_results = [*result.checkpoint_results, result.ground_truth_result]
     else:
@@ -44,9 +41,7 @@ async def display_evaluation_results(result: TraceEvaluationResult):
         st.markdown(f"**{percentage:.1f}%**")
 
 
-async def evaluate_agent(
-    config: Config, agent_trace: AgentTrace
-) -> TraceEvaluationResult:
+async def evaluate_agent(config, agent_trace):
     assert len(config.evaluation_cases) == 1, (
         "Only one evaluation case is supported in the demo"
     )
@@ -54,7 +49,7 @@ async def evaluate_agent(
 
     with st.spinner("Evaluating results..."):
         case = config.evaluation_cases[0]
-        result: TraceEvaluationResult = evaluate(
+        result = evaluate(
             evaluation_case=case,
             trace=agent_trace,
             agent_framework=config.framework,
@@ -62,44 +57,16 @@ async def evaluate_agent(
     return result
 
 
-async def configure_agent(user_inputs: UserInputs) -> tuple[AnyAgent, Config]:
-    if "huggingface" in user_inputs.model_id:
-        model_args = {
-            "extra_headers": {"X-HF-Bill-To": "mozilla-ai"},
-            "temperature": 0.0,
-        }
-    else:
-        model_args = {}
-
-    if user_inputs.framework == AgentFramework.AGNO:
-        agent_args = {"tool_call_limit": 20}
-    else:
-        agent_args = {}
-
+async def configure_agent(user_inputs: UserInputs) -> AnyAgent:
     agent_config = AgentConfig(
         model_id=user_inputs.model_id,
-        model_args=model_args,
-        agent_args=agent_args,
         tools=DEFAULT_TOOLS,
     )
 
-    config = Config(
-        location=user_inputs.location,
-        max_driving_hours=user_inputs.max_driving_hours,
-        date=user_inputs.date,
-        framework=user_inputs.framework,
-        main_agent=agent_config,
-        managed_agents=[],
-        evaluation_cases=[user_inputs.evaluation_case],
+    return await AnyAgent.create_async(
+        agent_framework=user_inputs.framework,
+        agent_config=agent_config,
     )
-
-    agent = await AnyAgent.create_async(
-        agent_framework=config.framework,
-        agent_config=config.main_agent,
-        managed_agents=config.managed_agents,
-        tracing=TracingConfig(console=True, cost_info=True),
-    )
-    return agent, config
 
 
 async def display_output(agent_trace: AgentTrace):
@@ -155,7 +122,7 @@ async def display_output(agent_trace: AgentTrace):
 async def run_agent(agent, config) -> AgentTrace:
     st.markdown("#### 🔍 Running Surf Spot Finder with query")
 
-    query = config.input_prompt_template.format(
+    query = INPUT_PROMPT_TEMPLATE.format(
         LOCATION=config.location,
         MAX_DRIVING_HOURS=config.max_driving_hours,
         DATE=config.date,

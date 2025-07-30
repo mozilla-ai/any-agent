@@ -4,7 +4,8 @@ import nest_asyncio
 import streamlit as st
 from components.sidebar import ssf_sidebar
 from constants import DEFAULT_TOOLS
-from services.agent import (
+
+from demo.agent import (
     configure_agent,
     display_evaluation_results,
     display_output,
@@ -92,14 +93,6 @@ async def main():
         for tool in web_tools:
             with st.expander(f"🌐 {tool.__name__}"):
                 st.markdown(tool.__doc__ or "No description available")
-
-        # add a check that all tools were listed
-        if len(weather_tools) + len(location_tools) + len(web_tools) != len(
-            DEFAULT_TOOLS
-        ):
-            st.warning(
-                "Some tools are not listed. Please check the code for more details."
-            )
 
         # Add Custom Evaluation explanation section
         st.markdown("### 📊 Custom Evaluation")
