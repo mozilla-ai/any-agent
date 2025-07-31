@@ -25,6 +25,9 @@ def test_runtime_error(
 
     The `AgentRunError.trace` should be retrieved.
     """
+    if agent_framework == AgentFramework.SMOLAGENTS:
+        pytest.skip("SmolAgents wrappers cannot work already inside an event loop")
+
     kwargs = {}
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
