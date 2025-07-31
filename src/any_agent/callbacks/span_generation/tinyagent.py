@@ -33,6 +33,7 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
         if not message:
             return context
 
+        output: str | list[dict[str, str]] = ""
         if content := getattr(message, "content", None):
             output = content
 
