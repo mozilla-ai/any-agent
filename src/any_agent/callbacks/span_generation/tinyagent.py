@@ -16,14 +16,14 @@ if TYPE_CHECKING:
 
 
 class _TinyAgentSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         return self._set_llm_input(
             context,
             model_id=kwargs.get("model", "No model"),
             input_messages=kwargs.get("messages", []),
         )
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         response: ModelResponse = args[0]
 
         if not response.choices:
@@ -65,7 +65,7 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context, *args, **kwargs):
+    async def before_tool_execution(self, context, *args, **kwargs):
         request: dict[str, Any] = args[0]
         return self._set_tool_input(
             context,
@@ -73,5 +73,5 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
             args=request.get("arguments", {}),
         )
 
-    def after_tool_execution(self, context, *args, **kwargs):
+    async def after_tool_execution(self, context, *args, **kwargs):
         return self._set_tool_output(context, args[0])

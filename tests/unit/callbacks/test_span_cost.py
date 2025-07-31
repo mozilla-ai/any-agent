@@ -5,7 +5,7 @@ from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID
 from any_agent.tracing.attributes import GenAI
 
 
-def test_span_cost() -> None:
+async def test_span_cost() -> None:
     context = MagicMock()
     current_span = MagicMock()
 
@@ -19,14 +19,14 @@ def test_span_cost() -> None:
 
     callback = AddCostInfo()
 
-    callback.after_llm_call(context)
+    await callback.after_llm_call(context)
 
     call_args = context.current_span.set_attributes.call_args[0][0]
     assert call_args[GenAI.USAGE_INPUT_COST] > 0
     assert call_args[GenAI.USAGE_OUTPUT_COST] > 0
 
 
-def test_span_cost_missing_input() -> None:
+async def test_span_cost_missing_input() -> None:
     context = MagicMock()
     current_span = MagicMock()
 
@@ -39,14 +39,14 @@ def test_span_cost_missing_input() -> None:
 
     callback = AddCostInfo()
 
-    callback.after_llm_call(context)
+    await callback.after_llm_call(context)
 
     call_args = context.current_span.set_attributes.call_args[0][0]
     assert call_args[GenAI.USAGE_INPUT_COST] == 0
     assert call_args[GenAI.USAGE_OUTPUT_COST] > 0
 
 
-def test_span_cost_missing_output() -> None:
+async def test_span_cost_missing_output() -> None:
     context = MagicMock()
     current_span = MagicMock()
 
@@ -59,14 +59,14 @@ def test_span_cost_missing_output() -> None:
 
     callback = AddCostInfo()
 
-    callback.after_llm_call(context)
+    await callback.after_llm_call(context)
 
     call_args = context.current_span.set_attributes.call_args[0][0]
     assert call_args[GenAI.USAGE_INPUT_COST] > 0
     assert call_args[GenAI.USAGE_OUTPUT_COST] == 0
 
 
-def test_span_cost_missing_all() -> None:
+async def test_span_cost_missing_all() -> None:
     context = MagicMock()
     current_span = MagicMock()
 
@@ -78,6 +78,6 @@ def test_span_cost_missing_all() -> None:
 
     callback = AddCostInfo()
 
-    callback.after_llm_call(context)
+    await callback.after_llm_call(context)
 
     context.current_span.set_attributes.assert_not_called()

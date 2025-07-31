@@ -107,9 +107,8 @@ class A2AServedAgent:
     ) -> None:
         """Clean up the server."""
         if self.server:
-            await self.server.shutdown()
+            self.server.should_exit = True
         if self.task:
-            self.task.cancel()
             try:
                 await self.task
             except asyncio.CancelledError:
