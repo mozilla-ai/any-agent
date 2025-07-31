@@ -70,8 +70,8 @@ class AnyAgentExecutor(AgentExecutor):
 
         # We will assume context.message will not be None
         context_id = context.message.contextId  # type: ignore[union-attr]
-        if not self.context_manager.get_context(context_id):
-            self.context_manager.add_context(context_id)
+        if not self.context_manager.get_context(context_id):  # ignore: type[arg-type]
+            self.context_manager.add_context(context_id)  # ignore: type[arg-type]
 
         # Extract or create task ID
         if not task:
@@ -87,7 +87,7 @@ class AnyAgentExecutor(AgentExecutor):
         updater = TaskUpdater(event_queue, task.id, task.contextId)
 
         formatted_query = self.context_manager.format_query_with_history(
-            context_id,
+            context_id,  # ignore: type[arg-type]
             query,
         )
 
@@ -95,7 +95,9 @@ class AnyAgentExecutor(AgentExecutor):
         agent_trace = await self.agent.run_async(formatted_query)
 
         # Update task with new trace, passing the original query (not formatted)
-        self.context_manager.update_context_trace(context_id, agent_trace, query)
+        self.context_manager.update_context_trace(
+            context_id, agent_trace, query
+        )  # ignore: type[arg-type]
 
         # Validate & interpret the envelope produced by the agent
         final_output = agent_trace.final_output
