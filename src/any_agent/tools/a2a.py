@@ -79,9 +79,9 @@ async def a2a_tool_async(
                         role=Role.user,
                         parts=[Part(root=TextPart(text=query))],
                         # the id is not currently tracked
-                        messageId=str(uuid4().hex),
-                        taskId=task_id,
-                        contextId=context_id,
+                        message_id=str(uuid4().hex),
+                        task_id=task_id,
+                        context_id=context_id,
                     )
                 ),
             )
