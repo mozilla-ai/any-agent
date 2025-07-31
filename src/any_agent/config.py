@@ -170,7 +170,7 @@ class AgentConfig(BaseModel):
     instructions: str | None = None
     """Specify the instructions for the agent (often also referred to as a `system_prompt`)."""
 
-    tools: Sequence[Tool] = Field(default_factory=list)
+    tools: list[Tool] = Field(default_factory=list)
     """List of tools to be used by the agent.
 
     See more info at [Tools](../agents/tools.md).

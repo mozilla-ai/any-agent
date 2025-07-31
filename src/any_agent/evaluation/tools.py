@@ -10,7 +10,7 @@ class TraceTools:
     def __init__(self, trace: AgentTrace):
         self.trace = trace
 
-    def get_all_tools(self) -> list[Callable[[], Any]]:
+    def get_all_tools(self) -> list[Callable[..., Any]]:
         """Get all tool functions from this class.
 
         Returns:

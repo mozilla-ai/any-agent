@@ -64,15 +64,8 @@ def test_run_tinyagent_agent_custom_args() -> None:
         mock_response = MagicMock()
         mock_message = MagicMock()
         mock_message.content = output
+        mock_message.role = "assistant"
         mock_message.tool_calls = []  # No tool calls in this response
-        mock_message.model_dump.return_value = {
-            "content": output,
-            "role": "assistant",
-            "tool_calls": None,
-            "function_call": None,
-            "annotations": [],
-        }
-
         mock_response.choices = [MagicMock(message=mock_message)]
 
         # Make the acompletion function return this response
@@ -95,6 +88,7 @@ def test_output_type_completion_params_isolation() -> None:
         """Helper to create mock responses."""
         mock_message = MagicMock()
         mock_message.content = content
+        mock_message.role = "assistant"
         mock_message.tool_calls = []
         mock_message.model_dump.return_value = {
             "content": content,
@@ -134,6 +128,7 @@ def test_structured_output_without_tools() -> None:
         """Helper to create mock responses."""
         mock_message = MagicMock()
         mock_message.content = content
+        mock_message.role = "assistant"
         mock_message.tool_calls = []
         mock_message.model_dump.return_value = {
             "content": content,

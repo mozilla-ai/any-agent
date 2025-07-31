@@ -84,6 +84,11 @@ class ToolExecutor:
             return f"Error executing tool: {e}"
 
 
+def final_answer(answer: str) -> str:
+    """Return the final answer to the user."""
+    return answer
+
+
 class TinyAgent(AnyAgent):
     """A lightweight agent implementation using litellm.
 
@@ -100,12 +105,17 @@ class TinyAgent(AnyAgent):
         """
         super().__init__(config)
         self.clients: dict[str, ToolExecutor] = {}
+
         self.completion_params = {
             "model": self.config.model_id,
             "tools": [],
-            "tool_choice": "auto",
+            "tool_choice": "required",
             **(self.config.model_args or {}),
         }
+
+        if self.completion_params["tool_choice"] == "required":
+            self.config.tools.append(final_answer)
+
         if self.config.api_key:
             self.completion_params["api_key"] = self.config.api_key
         if self.config.api_base:
@@ -186,6 +196,7 @@ class TinyAgent(AnyAgent):
 
         while num_of_turns < max_turns:
             completion_params["messages"] = messages
+
             response = await self.call_model(**completion_params)
 
             message: LiteLLMMessage = response.choices[0].message  # type: ignore[union-attr]
@@ -204,7 +215,7 @@ class TinyAgent(AnyAgent):
 
                     if tool_name not in self.clients:
                         tool_message["content"] = (
-                            f"Error: No tool found with name: {tool_name}"
+                            f"Error calling tool: No tool found with name: {tool_name}"
                         )
                         continue
 
@@ -219,35 +230,54 @@ class TinyAgent(AnyAgent):
                     tool_message["content"] = result
                     messages.append(tool_message)  # type: ignore[arg-type]
 
-            num_of_turns += 1
-            current_last = messages[-1]
-            if current_last.get("role") == "assistant" and current_last.get("content"):
+                    if tool_name == "final_answer":
+                        if self.config.output_type:
+                            return await self._return_output_type(
+                                str(result), completion_params
+                            )
+                        return str(result)
+
+            elif message.role == "assistant" and message.content:
                 if self.config.output_type:
-                    structured_output_message = {
-                        "role": "user",
-                        "content": f"Please conform your output to the following schema: {self.config.output_type.model_json_schema()}.",
-                    }
-                    messages.append(structured_output_message)
-                    completion_params["messages"] = messages
-                    if self.use_any_llm or supports_response_schema(
-                        model=self.config.model_id
-                    ):
-                        completion_params["response_format"] = self.config.output_type
-                    if "tools" in completion_params:
-                        completion_params.pop("tools")
-                        completion_params.pop("tool_choice", None)
-                        completion_params.pop("parallel_tool_calls", None)
-                    response = await self.call_model(**completion_params)
-                    if self.use_any_llm:
-                        return self.config.output_type.model_validate_json(
-                            response.choices[0].message.content  # type: ignore[arg-type, union-attr]
-                        )
-                    return self.config.output_type.model_validate_json(
-                        response.choices[0].message["content"]  # type: ignore[union-attr]
+                    return await self._return_output_type(
+                        str(message.content), completion_params
                     )
-                return str(current_last["content"])
+                return str(message.content)
+
+            num_of_turns += 1
 
         return "Max turns reached"
+
+    async def _return_output_type(
+        self, output: str, completion_params: dict[str, Any]
+    ) -> str | BaseModel:
+        if not self.config.output_type:
+            return output
+        completion_params["messages"] = [
+            {
+                "role": "system",
+                "content": "You are an expert that can convert raw text into structured JSON.",
+            },
+            {
+                "role": "user",
+                "content": f"Please conform this output:\n{output}\nTo match the following schema:\n{self.config.output_type.model_json_schema()}.",
+            },
+        ]
+
+        if self.use_any_llm or supports_response_schema(model=self.config.model_id):
+            completion_params["response_format"] = self.config.output_type
+        if "tools" in completion_params:
+            completion_params.pop("tools")
+            completion_params.pop("tool_choice", None)
+            completion_params.pop("parallel_tool_calls", None)
+        response = await self.call_model(**completion_params)
+        if self.use_any_llm:
+            return self.config.output_type.model_validate_json(
+                response.choices[0].message.content  # type: ignore[arg-type, union-attr]
+            )
+        return self.config.output_type.model_validate_json(
+            response.choices[0].message["content"]  # type: ignore[union-attr]
+        )
 
     async def call_model(self, **completion_params: dict[str, Any]) -> ModelResponse:
         if self.use_any_llm:
