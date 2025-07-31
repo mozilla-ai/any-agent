@@ -26,13 +26,6 @@ jobs:
 
       - uses: actions/cache@v4
         with:
-          path: .mypy_cache
-          key: ${{ runner.os }}-mypy-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-mypy-
-
-      - uses: actions/cache@v4
-        with:
           path: ~/.cache/pre-commit
           key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
