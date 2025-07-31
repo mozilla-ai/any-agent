@@ -4,8 +4,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -14,15 +14,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494934125859000,
-      "end_time": 1752494934623475000,
+      "start_time": 1753956701619085639,
+      "end_time": 1753956702615168070,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 9550086832136734483,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 5290427881000787287,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -38,9 +38,9 @@
         "gen_ai.output": "[{\"tool.name\": \"get_current_time\", \"tool.args\": \"{}\"}]",
         "gen_ai.output.type": "json",
         "gen_ai.usage.input_tokens": 203,
-        "gen_ai.usage.output_tokens": 37,
+        "gen_ai.usage.output_tokens": 34,
         "gen_ai.usage.input_cost": 0.0000203,
-        "gen_ai.usage.output_cost": 0.000011099999999999999
+        "gen_ai.usage.output_cost": 0.000010199999999999999
       },
       "links": [],
       "events": [],
@@ -48,7 +48,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -58,8 +58,8 @@
       "name": "execute_tool get_current_time",
       "kind": "internal",
       "parent": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -68,15 +68,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494934624388000,
-      "end_time": 1752494934853823000,
+      "start_time": 1753956702616401904,
+      "end_time": 1753956703020971927,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 8829449506325049096,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 9682337060848947750,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -90,7 +90,7 @@
         "gen_ai.tool.name": "get_current_time",
         "gen_ai.tool.description": "Get current time in a specific timezones",
         "gen_ai.tool.args": "{\"timezone\": \"America/New_York\"}",
-        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-14T08:08:54-04:00\",\n  \"is_dst\": true\n}",
+        "gen_ai.output": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-07-31T06:11:42-04:00\",\n  \"is_dst\": true\n}",
         "gen_ai.output.type": "json"
       },
       "links": [],
@@ -99,7 +99,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -109,8 +109,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -119,15 +119,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494934854678000,
-      "end_time": 1752494935205567000,
+      "start_time": 1753956703022202436,
+      "end_time": 1753956707538516147,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 8637576039515737230,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 15919484083486427769,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -141,10 +141,10 @@
         "gen_ai.request.model": "mistral/mistral-small-latest",
         "gen_ai.output": "[{\"tool.name\": \"write_file\", \"tool.args\": \"{}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 297,
-        "gen_ai.usage.output_tokens": 33,
-        "gen_ai.usage.input_cost": 0.0000297,
-        "gen_ai.usage.output_cost": 9.9e-6
+        "gen_ai.usage.input_tokens": 294,
+        "gen_ai.usage.output_tokens": 32,
+        "gen_ai.usage.input_cost": 0.0000294,
+        "gen_ai.usage.output_cost": 9.6e-6
       },
       "links": [],
       "events": [],
@@ -152,7 +152,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -162,8 +162,8 @@
       "name": "execute_tool write_file",
       "kind": "internal",
       "parent": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -172,15 +172,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494935206089000,
-      "end_time": 1752494935206949000,
+      "start_time": 1753956707539528146,
+      "end_time": 1753956707540940295,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3814433069978128781,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 10334326967720909573,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -203,7 +203,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -213,8 +213,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -223,15 +223,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494935207426000,
-      "end_time": 1752494935879171000,
+      "start_time": 1753956707542283766,
+      "end_time": 1753956708106606758,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 9103015691252978772,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 9864782696754778464,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -245,10 +245,10 @@
         "gen_ai.request.model": "mistral/mistral-small-latest",
         "gen_ai.output": "[{\"tool.name\": \"final_output\", \"tool.args\": \"{}\"}]",
         "gen_ai.output.type": "json",
-        "gen_ai.usage.input_tokens": 320,
-        "gen_ai.usage.output_tokens": 96,
-        "gen_ai.usage.input_cost": 0.000032,
-        "gen_ai.usage.output_cost": 0.0000288
+        "gen_ai.usage.input_tokens": 316,
+        "gen_ai.usage.output_tokens": 97,
+        "gen_ai.usage.input_cost": 0.000031599999999999996,
+        "gen_ai.usage.output_cost": 0.0000291
       },
       "links": [],
       "events": [],
@@ -256,7 +256,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -266,8 +266,8 @@
       "name": "execute_tool final_output",
       "kind": "internal",
       "parent": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -276,15 +276,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494935879730000,
-      "end_time": 1752494935880948000,
+      "start_time": 1753956708107627721,
+      "end_time": 1753956708109654553,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 7995561545845967729,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 15137473511972157904,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -307,7 +307,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -317,8 +317,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -327,15 +327,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494935881413000,
-      "end_time": 1752494936369059000,
+      "start_time": 1753956708110959618,
+      "end_time": 1753956708561024634,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 14755491724255999313,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 15248869613111570480,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -349,9 +349,9 @@
         "gen_ai.request.model": "mistral/mistral-small-latest",
         "gen_ai.output": "Here are the steps I have taken:\n\n1. Get current time in the America/New_York timezone.\n2. Write the year (2025) to a file.",
         "gen_ai.output.type": "text",
-        "gen_ai.usage.input_tokens": 444,
+        "gen_ai.usage.input_tokens": 441,
         "gen_ai.usage.output_tokens": 34,
-        "gen_ai.usage.input_cost": 0.000044399999999999995,
+        "gen_ai.usage.input_cost": 0.0000441,
         "gen_ai.usage.output_cost": 0.000010199999999999999
       },
       "links": [],
@@ -360,7 +360,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -370,8 +370,8 @@
       "name": "call_llm mistral/mistral-small-latest",
       "kind": "internal",
       "parent": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -380,15 +380,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494936370994000,
-      "end_time": 1752494937958559000,
+      "start_time": 1753956708564212232,
+      "end_time": 1753956774436865839,
       "status": {
         "status_code": "ok",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 5910039255939696255,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 11513290835760213242,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -413,7 +413,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
@@ -433,15 +433,15 @@
           "entries": {}
         }
       },
-      "start_time": 1752494934124244000,
-      "end_time": 1752494937958983000,
+      "start_time": 1753956701615664857,
+      "end_time": 1753956774437125485,
       "status": {
         "status_code": "unset",
         "description": null
       },
       "context": {
-        "trace_id": 211389727683138987992717353838941752407,
-        "span_id": 3577328038177543435,
+        "trace_id": 87218943738446111919151017891041767495,
+        "span_id": 14865299837854495390,
         "is_remote": false,
         "trace_flags": {
           "value": 0
@@ -462,7 +462,7 @@
         "attributes": {
           "telemetry.sdk.language": "python",
           "telemetry.sdk.name": "opentelemetry",
-          "telemetry.sdk.version": "1.35.0",
+          "telemetry.sdk.version": "1.36.0",
           "service.name": "unknown_service"
         },
         "schema_url": ""
