@@ -105,16 +105,16 @@ class TinyAgent(AnyAgent):
         """
         super().__init__(config)
         self.clients: dict[str, ToolExecutor] = {}
+
         self.completion_params = {
             "model": self.config.model_id,
             "tools": [],
+            "tool_choice": "required",
             **(self.config.model_args or {}),
         }
-        if "tool_choice" in self.completion_params:
-            logger.warning("`tinyagent` always uses `tool_choice=required`.")
 
-        self.completion_params["tool_choice"] = "required"
-        self.config.tools.append(final_answer)
+        if self.completion_params["tool_choice"] == "required":
+            self.config.tools.append(final_answer)
 
         if self.config.api_key:
             self.completion_params["api_key"] = self.config.api_key
