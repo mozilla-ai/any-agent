@@ -8,14 +8,14 @@ from any_agent.callbacks.span_generation.base import _SpanGeneration
 if TYPE_CHECKING:
     from google.adk.models.llm_request import LlmRequest
     from google.adk.models.llm_response import LlmResponse
-    from google.adk.tools.base_tool import BaseTool
-    from google.adk.tools.tool_context import ToolContext
 
     from any_agent.callbacks.context import Context
 
 
 class _GoogleSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+    async def before_llm_call(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         llm_request: LlmRequest = kwargs["llm_request"]
 
         messages = []
@@ -36,7 +36,7 @@ class _GoogleSpanGeneration(_SpanGeneration):
 
         return self._set_llm_input(context, str(llm_request.model), messages)
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         llm_response: LlmResponse = kwargs["llm_response"]
 
         content = llm_response.content
@@ -63,18 +63,17 @@ class _GoogleSpanGeneration(_SpanGeneration):
                 output_tokens = candidates_token
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        tool: BaseTool = kwargs["tool"]
-        tool_args: dict[str, Any] = kwargs["args"]
-        tool_context: ToolContext = kwargs["tool_context"]
+    async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        current_tool_call = context.shared["current_tool_call"]
 
         return self._set_tool_input(
             context,
-            tool.name,
-            tool.description,
-            tool_args,
-            tool_context.function_call_id,
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        return self._set_tool_output(context, kwargs["tool_response"])
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        current_tool_call = context.shared["current_tool_call"]
+        return self._set_tool_output(context, current_tool_call["result"])

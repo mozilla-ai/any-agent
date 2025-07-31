@@ -189,11 +189,11 @@ async def test_push_notification_non_streaming() -> None:
                             )
                         )
                     ],
-                    messageId=first_message_id,
+                    message_id=first_message_id,
                 ),
                 configuration=MessageSendConfiguration(
-                    acceptedOutputModes=["text"],
-                    pushNotificationConfig=PushNotificationConfig(url=webhook_url),
+                    accepted_output_modes=["text"],
+                    push_notification_config=PushNotificationConfig(url=webhook_url),
                 ),
             )
 

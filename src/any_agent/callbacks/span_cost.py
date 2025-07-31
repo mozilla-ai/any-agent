@@ -50,7 +50,7 @@ class AddCostInfo(Callback):
         - gen_ai.usage.output_cost
     """
 
-    def after_llm_call(self, context: Context, *args, **kwargs):
+    async def after_llm_call(self, context: Context, *args, **kwargs):
         span = context.current_span
         add_cost_info(span)
         return context

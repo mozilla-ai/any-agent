@@ -43,7 +43,7 @@ class ConsolePrintSpan(Callback):
         """
         self.console = console or Console()
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         span = context.current_span
 
         operation_name = span.attributes.get(GenAI.OPERATION_NAME, "")
@@ -85,7 +85,7 @@ class ConsolePrintSpan(Callback):
 
         return context
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         span = context.current_span
 
         operation_name = span.attributes.get(GenAI.OPERATION_NAME, "")

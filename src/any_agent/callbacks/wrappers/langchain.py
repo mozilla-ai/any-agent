@@ -23,39 +23,53 @@ class _LangChainWrapper:
         self._original_llm_call: Callable[..., Any] | None = None
 
     async def wrap(self, agent: LangchainAgent) -> None:
-        from langchain_core.callbacks.base import BaseCallbackHandler
+        from langchain_core.callbacks.base import AsyncCallbackHandler
         from langchain_core.runnables import RunnableConfig
 
-        def before_llm_call(*args, **kwargs):
+        async def before_llm_call(*args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = await callback.before_llm_call(context, *args, **kwargs)
 
-        def before_tool_execution(*args, **kwargs):
+        async def before_tool_execution(*args, **kwargs):
+            context = self.callback_context[
+                get_current_span().get_span_context().trace_id
+            ]
+            # Extract (pre) tool information
+            current_tool_call = {}
+            serialized: dict[str, Any] = args[0]
+            current_tool_call["name"] = serialized.get("name", "No name")
+            current_tool_call["description"] = serialized.get("description")
+            current_tool_call["args"] = kwargs.get("inputs")
+            current_tool_call["call_id"] = None
+            context.shared["current_tool_call"] = current_tool_call
+
+            for callback in agent.config.callbacks:
+                context = await callback.before_tool_execution(context, *args, **kwargs)
+
+        async def after_llm_call(*args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, *args, **kwargs)
+                context = await callback.after_llm_call(context, *args, **kwargs)
 
-        def after_llm_call(*args, **kwargs):
+        async def after_tool_execution(*args, **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
-            for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, *args, **kwargs)
+            current_tool_call = context.shared["current_tool_call"]
 
-        def after_tool_execution(*args, **kwargs):
-            context = self.callback_context[
-                get_current_span().get_span_context().trace_id
-            ]
+            # Extract (post) tool information
+            output = args[0]
+            current_tool_call["result"] = getattr(output, "content", None)
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(context, *args, **kwargs)
+                context = await callback.after_tool_execution(context, *args, **kwargs)
 
-        class _LangChainTracingCallback(BaseCallbackHandler):
-            def on_chat_model_start(
+        class _LangChainTracingCallback(AsyncCallbackHandler):
+            async def on_chat_model_start(
                 self,
                 serialized: dict[str, Any],
                 messages: list[list[BaseMessage]],
@@ -66,9 +80,9 @@ class _LangChainWrapper:
                 metadata: dict[str, Any] | None = None,
                 **kwargs: Any,
             ) -> Any:
-                before_llm_call(serialized, messages, **kwargs)
+                await before_llm_call(serialized, messages, **kwargs)
 
-            def on_tool_start(
+            async def on_tool_start(
                 self,
                 serialized: dict[str, Any],
                 input_str: str,
@@ -80,9 +94,11 @@ class _LangChainWrapper:
                 inputs: dict[str, Any] | None = None,
                 **kwargs: Any,
             ) -> Any:
-                before_tool_execution(serialized, input_str, inputs=inputs, **kwargs)
+                await before_tool_execution(
+                    serialized, input_str, inputs=inputs, **kwargs
+                )
 
-            def on_llm_end(
+            async def on_llm_end(
                 self,
                 response: LLMResult,
                 *,
@@ -90,9 +106,9 @@ class _LangChainWrapper:
                 parent_run_id: UUID | None = None,
                 **kwargs: Any,
             ) -> Any:
-                after_llm_call(response, **kwargs)
+                await after_llm_call(response, **kwargs)
 
-            def on_tool_end(
+            async def on_tool_end(
                 self,
                 output: Any,
                 *,
@@ -100,7 +116,7 @@ class _LangChainWrapper:
                 parent_run_id: UUID | None = None,
                 **kwargs: Any,
             ) -> Any:
-                after_tool_execution(output, **kwargs)
+                await after_tool_execution(output, **kwargs)
 
         tracing_callback = _LangChainTracingCallback()
 
@@ -135,12 +151,12 @@ class _LangChainWrapper:
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, **kwargs)
+                context = await callback.before_llm_call(context, **kwargs)
 
             output = await self._original_llm_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+                context = await callback.after_llm_call(context, output, **kwargs)
 
             return output
 

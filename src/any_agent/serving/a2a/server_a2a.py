@@ -36,7 +36,9 @@ async def _get_a2a_app_async(
     )
 
     request_handler = DefaultRequestHandler(
-        agent_executor=AnyAgentExecutor(agent, task_manager),
+        agent_executor=AnyAgentExecutor(
+            agent, task_manager, serving_config.stream_tool_usage
+        ),
         task_store=serving_config.task_store_type(),
         push_config_store=push_notification_config_store,
         push_sender=push_notification_sender,

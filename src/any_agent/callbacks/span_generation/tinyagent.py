@@ -1,7 +1,7 @@
 # mypy: disable-error-code="method-assign,no-untyped-def"
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
@@ -16,14 +16,14 @@ if TYPE_CHECKING:
 
 
 class _TinyAgentSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         return self._set_llm_input(
             context,
             model_id=kwargs.get("model", "No model"),
             input_messages=kwargs.get("messages", []),
         )
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         response: ModelResponse = args[0]
 
         if not response.choices:
@@ -66,13 +66,19 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context, *args, **kwargs):
-        request: dict[str, Any] = args[0]
+    async def before_tool_execution(self, context, *args, **kwargs):
+        current_tool_call = context.shared["current_tool_call"]
+
         return self._set_tool_input(
             context,
-            name=request.get("name", "No name"),
-            args=request.get("arguments", {}),
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
-    def after_tool_execution(self, context, *args, **kwargs):
-        return self._set_tool_output(context, args[0])
+    async def after_tool_execution(self, context, *args, **kwargs):
+        current_tool_call = context.shared["current_tool_call"]
+        if content := current_tool_call.get("result", None):
+            return self._set_tool_output(context, content)
+        return context

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class _LangchainSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         # Handle direct dict format (from call_model wrapper)
         if "messages" in kwargs and isinstance(kwargs["messages"], list):
             input_messages = [kwargs["messages"][-1]]
@@ -40,7 +40,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
         return self._set_llm_input(context, model_id, input_messages)
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         response = args[0]
 
         # Handle litellm ModelResponse (from call_model wrapper)
@@ -107,18 +107,20 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        serialized: dict[str, Any] = args[0]
+    async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        current_tool_call = context.shared["current_tool_call"]
+
         return self._set_tool_input(
             context,
-            name=serialized.get("name", "No name"),
-            description=serialized.get("description"),
-            args=kwargs.get("inputs"),
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        output = args[0]
-        if content := getattr(output, "content", None):
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        current_tool_call = context.shared["current_tool_call"]
+        if content := current_tool_call.get("result", None):
             return self._set_tool_output(context, content)
 
         return context

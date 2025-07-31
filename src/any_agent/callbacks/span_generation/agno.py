@@ -7,13 +7,12 @@ from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
     from agno.models.message import Message, MessageMetrics
-    from agno.tools.function import FunctionCall
 
     from any_agent.callbacks.context import Context
 
 
 class _AgnoSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs):
+    async def before_llm_call(self, context: Context, *args, **kwargs):
         messages: list[Message] = kwargs.get("messages", [])
         input_messages = [
             {"role": message.role, "content": str(message.content)}
@@ -21,7 +20,7 @@ class _AgnoSpanGeneration(_SpanGeneration):
         ]
         return self._set_llm_input(context, context.shared["model_id"], input_messages)
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         output: str | list[dict[str, Any]] = ""
         if assistant_message := kwargs.get("assistant_message"):
             if content := getattr(assistant_message, "content", None):
@@ -48,18 +47,17 @@ class _AgnoSpanGeneration(_SpanGeneration):
 
         return context
 
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        function_call: FunctionCall = args[0]
-        function = function_call.function
+    async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        current_tool_call = context.shared["current_tool_call"]
 
         return self._set_tool_input(
             context,
-            name=function.name,
-            description=function.description,
-            args=function_call.arguments,
-            call_id=function_call.call_id,
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        function_call: FunctionCall = args[1]
-        return self._set_tool_output(context, function_call.result)
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        current_tool_call = context.shared["current_tool_call"]
+        return self._set_tool_output(context, current_tool_call["result"])

@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, Any
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
-    from agents import FunctionTool, ModelResponse
+    from agents import ModelResponse
 
     from any_agent.callbacks.context import Context
 
 
 class _OpenAIAgentsSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         model_id = context.shared["model_id"]
 
         user_input = kwargs.get("input", ["No input"])[0]
@@ -23,7 +23,7 @@ class _OpenAIAgentsSpanGeneration(_SpanGeneration):
         ]
         return self._set_llm_input(context, model_id, input_messages)
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         from openai.types.responses import (
             ResponseFunctionToolCall,
             ResponseOutputMessage,
@@ -55,12 +55,19 @@ class _OpenAIAgentsSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        tool: FunctionTool = context.shared["original_tool"]
+    async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        current_tool_call = context.shared["current_tool_call"]
 
         return self._set_tool_input(
-            context, name=tool.name, description=tool.description, args=args[1]
+            context,
+            name=current_tool_call["name"],
+            description=current_tool_call["description"],
+            args=current_tool_call["args"],
+            call_id=current_tool_call["call_id"],
         )
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        return self._set_tool_output(context, args[0])
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        current_tool_call = context.shared["current_tool_call"]
+        if content := current_tool_call.get("result", None):
+            return self._set_tool_output(context, content)
+        return context

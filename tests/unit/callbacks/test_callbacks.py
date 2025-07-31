@@ -2,6 +2,7 @@
 # pylint: disable=missing-class-docstring
 from collections.abc import Callable
 from typing import Any
+from collections.abc import Awaitable
 from unittest.mock import patch
 
 import pytest
@@ -26,11 +27,13 @@ class SampleCallback(Callback):
         self.after_agent_invocation_called = True
         return context
 
-    def after_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+    async def after_llm_call(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         self.after_llm_called = True
         return context
 
-    def after_tool_execution(
+    async def after_tool_execution(
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
         self.after_tool_called = True
@@ -42,13 +45,15 @@ class SampleCallback(Callback):
         self.before_agent_invocation_called = True
         return context
 
-    def before_tool_execution(
+    async def before_tool_execution(
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
         self.before_tool_called = True
         return context
 
-    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+    async def before_llm_call(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
         self.before_llm_called = True
         return context
 
@@ -60,8 +65,10 @@ class ExceptionCallback(SampleCallback):
         self.exception_message = exception_message
         super().__init__()
 
-    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
-        context = super().before_llm_call(context, *args, **kwargs)
+    async def before_llm_call(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        context = await super().before_llm_call(context, *args, **kwargs)
         raise RuntimeError(self.exception_message)
 
 
@@ -157,7 +164,7 @@ def test_tool_execution_callbacks(mock_litellm_tool_call_response: Any) -> None:
     assert callback.after_tool_called
 
 
-def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> None:
+async def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> None:
     """Test that throwing an exception in a callback results in the agent exiting."""
     callback = ExceptionCallback("Test callback exception")
     agent = create_agent(

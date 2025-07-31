@@ -29,12 +29,12 @@ class _OpenAIAgentsWrapper:
             context.shared["model_id"] = getattr(agent._agent.model, "model", None)
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = await callback.before_llm_call(context, *args, **kwargs)
 
             output = await self._original_llm_call(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(
+                context = await callback.after_llm_call(
                     context,
                     output,
                 )
@@ -52,17 +52,24 @@ class _OpenAIAgentsWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
-            context.shared["original_tool"] = original_tool
+            # Extract (pre) tool information
+            current_tool_call = {}
+            current_tool_call["name"] = original_tool.name
+            current_tool_call["description"] = original_tool.description
+            current_tool_call["args"] = args[1]
+            current_tool_call["call_id"] = None
+            context.shared["current_tool_call"] = current_tool_call
 
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, *args, **kwargs)
+                context = await callback.before_tool_execution(context, *args, **kwargs)
 
             output = await original_invoke(*args, **kwargs)
 
+            # Extract (post) tool information
+            current_tool_call["result"] = output
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(
+                context = await callback.after_tool_execution(
                     context,
-                    output,
                 )
 
             return output
