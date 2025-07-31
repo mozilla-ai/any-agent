@@ -24,12 +24,5 @@ jobs:
       - name: Install pre-commit
         run: uv sync --group lint
 
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit
-          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pre-commit-
-
       - name: pre-commit
         run: uv run pre-commit run --all-files --verbose
