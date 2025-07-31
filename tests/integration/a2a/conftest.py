@@ -9,8 +9,9 @@ from uuid import uuid4
 
 import httpx
 import pytest
-from a2a.client import A2AClient
-from a2a.types import MessageSendParams, SendMessageRequest
+from a2a.client import A2AClient, A2ACardResolver
+from a2a.utils import AGENT_CARD_WELL_KNOWN_PATH
+from a2a.types import MessageSendParams, SendMessageRequest, AgentCard
 
 from any_agent import AnyAgent
 from any_agent.serving import A2AServingConfig
@@ -22,6 +23,18 @@ if TYPE_CHECKING:
 # Constants
 DEFAULT_TIMEOUT = 10.0
 DEFAULT_LONG_TIMEOUT = 1500
+
+
+async def get_client_from_agent_card_url(  # type: ignore[no-untyped-def]
+    httpx_client: httpx.AsyncClient,
+    base_url: str,
+    agent_card_path: str = AGENT_CARD_WELL_KNOWN_PATH,
+    http_kwargs: dict[str, Any] | None = None,
+):
+    agent_card: AgentCard = await A2ACardResolver(
+        httpx_client, base_url=base_url, agent_card_path=agent_card_path
+    ).get_agent_card(http_kwargs=http_kwargs)
+    return A2AClient(httpx_client=httpx_client, agent_card=agent_card)
 
 
 class A2ATestHelpers:
@@ -125,7 +138,7 @@ async def a2a_client_from_agent(
     """Context manager that serves an agent and provides an A2A client for it."""
     async with A2AServedAgent(agent, serving_config) as served_agent:
         async with httpx.AsyncClient(timeout=http_timeout) as httpx_client:
-            client = await A2AClient.get_client_from_agent_card_url(
+            client = await get_client_from_agent_card_url(
                 httpx_client, served_agent.server_url
             )
             yield client, served_agent.server_url

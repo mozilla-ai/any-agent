@@ -39,6 +39,8 @@ from any_agent.tracing.otel_types import (
     Status,
 )
 
+from .conftest import get_client_from_agent_card_url
+
 if TYPE_CHECKING:
     from typing import Any
 
@@ -216,9 +218,7 @@ async def test_a2a_tool_multiturn() -> None:
 
     try:
         async with httpx.AsyncClient(timeout=1500) as httpx_client:
-            client = await A2AClient.get_client_from_agent_card_url(
-                httpx_client, server_url
-            )
+            client = await get_client_from_agent_card_url(httpx_client, server_url)
 
             # First interaction - establish context
             first_message_id = str(uuid4())
