@@ -252,7 +252,7 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_1.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
+                response_1.root.result.status.message.parts[0].root.text
             )
             assert result.name == "Alice"
             assert result.job.lower() == "software engineer"
@@ -285,7 +285,7 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_2.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
+                response_2.root.result.status.message.parts[0].root.text
             )
             assert result.name == "Alice"
             assert result.job.lower() == "software engineer"
@@ -315,7 +315,7 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_3.root.error.message}, Code: {response_3.root.error.code}, Data: {response_3.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_3.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
+                response_3.root.result.status.message.parts[0].root.text
             )
             assert response_3.root.result.status.state == TaskState.completed
             assert result.age == 30

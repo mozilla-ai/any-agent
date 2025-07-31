@@ -84,7 +84,7 @@ class AnyAgentExecutor(AgentExecutor):
                 raise ValueError(msg)
         else:
             logger.info("Task already exists: %s", task.model_dump_json(indent=2))
-        updater = TaskUpdater(event_queue, task.id, task.contextId)
+        updater = TaskUpdater(event_queue, task.id, task.context_id)
 
         formatted_query = self.context_manager.format_query_with_history(
             context_id,
