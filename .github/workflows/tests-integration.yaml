@@ -56,7 +56,7 @@ jobs:
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: pytest tests/integration/frameworks -v -k "not TINYAGENT" --cov --cov-report=xml --cov-append
+        run: pytest tests/integration/frameworks -n auto -v -k "not TINYAGENT" --cov --cov-report=xml --cov-append
 
       - name: Run Tool tests
         run: pytest -v tests/integration/tools --cov --cov-report=xml --cov-append
@@ -110,7 +110,7 @@ jobs:
 
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-        run: pytest tests/integration/mcp -v --cov --cov-report=xml --cov-append
+        run: pytest tests/integration/mcp -n auto -v --cov --cov-report=xml --cov-append
 
       - name: Upload coverage reports to Codecov
         if: always()
