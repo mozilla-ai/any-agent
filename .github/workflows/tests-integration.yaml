@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-integration-tests:
+  run-integration-tinyagent:
     timeout-minutes: 30
     runs-on: ubuntu-latest
 
@@ -23,31 +23,91 @@ jobs:
           python-version: 3.13
           activate-environment: true
 
-      - name: Install barebones
-        run: |
-          uv sync --group tests
+      - run: uv sync --group tests
 
-      # Run the tinyagent test first to get an early signal of issues with the codebase.
       - name: Run TINYAGENT test
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: pytest tests/integration/test_agent.py -v -k "TINYAGENT" --cov --cov-report=xml
+        run: pytest tests/integration/frameworks -v -k "TINYAGENT" --cov --cov-report=xml --cov-append
 
-      - name: Run Snapshot tests
-        run: pytest -v tests/snapshots
+      - name: Upload coverage reports to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Install extras
-        run: |
-          uv sync --group tests --extra all --extra a2a
+  run-integration-all:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
 
-      - name: Run Integration tests (parallel with xdist)
-        env:
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: 3.13
+          activate-environment: true
+
+      - run: uv sync --group tests --extra all
+
+      - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: pytest tests/integration -v -n auto -k "not test_load_and_run_agent[TINYAGENT]" --cov --cov-report=xml --cov-append
+        run: pytest tests/integration/frameworks -v -k "not TINYAGENT" --cov --cov-report=xml --cov-append
+
+      - name: Run Snapshot tests
+        run: pytest -v tests/snapshots --cov --cov-report=xml --cov-append
+
+      - name: Upload coverage reports to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  run-integration-a2a:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: 3.13
+          activate-environment: true
+
+      - run: uv sync --group tests --extra all --extra a2a
+
+      - env:
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+        run: pytest tests/integration/a2a -v --cov --cov-report=xml --cov-append
+
+      - name: Upload coverage reports to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  run-integration-mcp:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: 3.13
+          activate-environment: true
+
+      - run: uv sync --group tests --extra all
+
+      - env:
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+        run: pytest tests/integration/mcp -v --cov --cov-report=xml --cov-append
 
       - name: Upload coverage reports to Codecov
         if: always()
