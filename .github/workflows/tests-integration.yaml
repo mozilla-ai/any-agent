@@ -58,6 +58,9 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: pytest tests/integration/frameworks -v -k "not TINYAGENT" --cov --cov-report=xml --cov-append
 
+      - name: Run Tool tests
+        run: pytest -v tests/integration/tools --cov --cov-report=xml --cov-append
+
       - name: Run Snapshot tests
         run: pytest -v tests/snapshots --cov --cov-report=xml --cov-append
 
