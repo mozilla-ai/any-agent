@@ -27,12 +27,12 @@ class _TinyAgentWrapper:
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, **kwargs)
+                context = await callback.before_llm_call(context, **kwargs)
 
             output = await self._original_llm_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+                context = await callback.after_llm_call(context, output)
 
             return output
 
@@ -43,12 +43,12 @@ class _TinyAgentWrapper:
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, request)
+                context = await callback.before_tool_execution(context, request)
 
             output = await original_call(request)
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(context, output)
+                context = await callback.after_tool_execution(context, output)
 
             return output
 

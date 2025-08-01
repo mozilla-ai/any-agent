@@ -18,13 +18,13 @@ class _GoogleADKWrapper:
     async def wrap(self, agent: GoogleAgent) -> None:
         self._original["before_model"] = agent._agent.before_model_callback
 
-        def before_model_callback(*args, **kwargs) -> Any | None:
+        async def before_model_callback(*args, **kwargs) -> Any | None:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = await callback.before_llm_call(context, *args, **kwargs)
 
             if callable(self._original["before_model"]):
                 return self._original["before_model"](*args, **kwargs)
@@ -35,13 +35,13 @@ class _GoogleADKWrapper:
 
         self._original["after_model"] = agent._agent.after_model_callback
 
-        def after_model_callback(*args, **kwargs) -> Any | None:
+        async def after_model_callback(*args, **kwargs) -> Any | None:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, *args, **kwargs)
+                context = await callback.after_llm_call(context, *args, **kwargs)
 
             if callable(self._original["after_model"]):
                 return self._original["after_model"](*args, **kwargs)
@@ -52,13 +52,13 @@ class _GoogleADKWrapper:
 
         self._original["before_tool"] = agent._agent.before_tool_callback
 
-        def before_tool_callback(*args, **kwargs) -> Any | None:
+        async def before_tool_callback(*args, **kwargs) -> Any | None:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, *args, **kwargs)
+                context = await callback.before_tool_execution(context, *args, **kwargs)
 
             if callable(self._original["before_tool"]):
                 return self._original["before_tool"](*args, **kwargs)
@@ -69,13 +69,13 @@ class _GoogleADKWrapper:
 
         self._original["after_tool"] = agent._agent.after_tool_callback
 
-        def after_tool_callback(*args, **kwarg) -> Any | None:
+        async def after_tool_callback(*args, **kwarg) -> Any | None:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(context, *args, **kwarg)
+                context = await callback.after_tool_execution(context, *args, **kwarg)
 
             if callable(self._original["after_tool"]):
                 return self._original["after_tool"](*args, **kwarg)

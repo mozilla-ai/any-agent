@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class _LangchainSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         # Handle direct dict format (from call_model wrapper)
         if "messages" in kwargs and isinstance(kwargs["messages"], list):
             input_messages = [kwargs["messages"][-1]]
@@ -40,7 +40,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
         return self._set_llm_input(context, model_id, input_messages)
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         response = args[0]
 
         # Handle litellm ModelResponse (from call_model wrapper)
@@ -107,7 +107,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         serialized: dict[str, Any] = args[0]
         return self._set_tool_input(
             context,
@@ -116,7 +116,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
             args=kwargs.get("inputs"),
         )
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         output = args[0]
         if content := getattr(output, "content", None):
             return self._set_tool_output(context, content)

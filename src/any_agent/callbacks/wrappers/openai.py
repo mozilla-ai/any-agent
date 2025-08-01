@@ -29,12 +29,12 @@ class _OpenAIAgentsWrapper:
             context.shared["model_id"] = getattr(agent._agent.model, "model", None)
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = await callback.before_llm_call(context, *args, **kwargs)
 
             output = await self._original_llm_call(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(
+                context = await callback.after_llm_call(
                     context,
                     output,
                 )
@@ -55,12 +55,12 @@ class _OpenAIAgentsWrapper:
             context.shared["original_tool"] = original_tool
 
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, *args, **kwargs)
+                context = await callback.before_tool_execution(context, *args, **kwargs)
 
             output = await original_invoke(*args, **kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(
+                context = await callback.after_tool_execution(
                     context,
                     output,
                 )

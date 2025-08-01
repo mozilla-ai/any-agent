@@ -12,7 +12,7 @@ def readable_spans(agent_trace: AgentTrace) -> list[ReadableSpan]:
     return [span.to_readable_span() for span in agent_trace.spans]
 
 
-def test_console_print_span(
+async def test_console_print_span(
     agent_trace: AgentTrace, request: pytest.FixtureRequest
 ) -> None:
     console_mock = MagicMock()
@@ -29,9 +29,9 @@ def test_console_print_span(
         for span in agent_trace.spans:
             context.current_span = span.to_readable_span()
             if span.is_llm_call():
-                callback.after_llm_call(context)
+                await callback.after_llm_call(context)
             elif span.is_tool_execution():
-                callback.after_tool_execution(context)
+                await callback.after_tool_execution(context)
 
         console_mock.return_value.print.assert_called()
 

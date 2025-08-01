@@ -65,7 +65,7 @@ class CostInfo(BaseModel):
 class AgentMessage(BaseModel):
     """A message that can be exported to JSON or printed to the console."""
 
-    role: Literal["user", "assistant", "system", "tool"]
+    role: Literal["user", "assistant", "system", "tool", "tool-call"]
     content: str
 
     model_config = ConfigDict(extra="forbid")

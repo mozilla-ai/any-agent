@@ -27,14 +27,14 @@ class _LlamaIndexWrapper:
             context.shared["model_id"] = getattr(agent._agent.llm, "model", "No model")
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = await callback.before_llm_call(context, *args, **kwargs)
 
             output = await self._original_take_step(  # type: ignore[misc]
                 *args, **kwargs
             )
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+                context = await callback.after_llm_call(context, output)
 
             return output
 
@@ -49,12 +49,12 @@ class _LlamaIndexWrapper:
             context.shared["metadata"] = metadata
 
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, *args, **kwargs)
+                context = await callback.before_tool_execution(context, *args, **kwargs)
 
             output = await original_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(context, output)
+                context = await callback.after_tool_execution(context, output)
 
             return output
 
@@ -82,12 +82,12 @@ class _LlamaIndexWrapper:
             ]
 
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, **kwargs)
+                context = await callback.before_llm_call(context, **kwargs)
 
             output = await self._original_llm_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+                context = await callback.after_llm_call(context, output)
 
             return output
 

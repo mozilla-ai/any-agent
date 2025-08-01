@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class _AgnoSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs):
+    async def before_llm_call(self, context: Context, *args, **kwargs):
         messages: list[Message] = kwargs.get("messages", [])
         input_messages = [
             {"role": message.role, "content": str(message.content)}
@@ -21,7 +21,7 @@ class _AgnoSpanGeneration(_SpanGeneration):
         ]
         return self._set_llm_input(context, context.shared["model_id"], input_messages)
 
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    async def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         output: str | list[dict[str, Any]] = ""
         if assistant_message := kwargs.get("assistant_message"):
             if content := getattr(assistant_message, "content", None):
@@ -48,7 +48,7 @@ class _AgnoSpanGeneration(_SpanGeneration):
 
         return context
 
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         function_call: FunctionCall = args[0]
         function = function_call.function
 
@@ -60,6 +60,6 @@ class _AgnoSpanGeneration(_SpanGeneration):
             call_id=function_call.call_id,
         )
 
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+    async def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         function_call: FunctionCall = args[1]
         return self._set_tool_output(context, function_call.result)
