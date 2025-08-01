@@ -86,7 +86,7 @@ jobs:
 
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-        run: pytest tests/integration/a2a -v --cov --cov-report=xml --cov-append
+        run: pytest tests/integration/a2a -n auto -v --cov --cov-report=xml --cov-append
 
       - name: Upload coverage reports to Codecov
         if: always()
@@ -106,7 +106,7 @@ jobs:
           python-version: 3.13
           activate-environment: true
 
-      - run: uv sync --group tests --extra all
+      - run: uv sync --group tests --extra all --extra a2a  # TODO https://github.com/mozilla-ai/any-agent/issues/665
 
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
