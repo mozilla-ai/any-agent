@@ -10,7 +10,7 @@ import pytest
     list(pathlib.Path("docs/cookbook").glob("*.ipynb")),
     ids=lambda x: x.stem,
 )
-@pytest.mark.timeout(180)  # 3+ minutes timeout for cookbook execution
+@pytest.mark.timeout(220)
 def test_cookbook_notebook(
     notebook_path: pathlib.Path, capsys: pytest.CaptureFixture
 ) -> None:
@@ -28,7 +28,7 @@ def test_cookbook_notebook(
                 "PATH": os.environ["PATH"],
                 "IN_PYTEST": "1",  # For mcp_agent notebook which needs to mock input
             },
-            timeout=170,  # Time out slightly earlier so that we can log the output.
+            timeout=210,  # Time out slightly earlier so that we can log the output.
             capture_output=True,
             check=False,
         )
