@@ -10,16 +10,16 @@ from any_agent.evaluation.tools import TraceTools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.utils.asyncio_sync import run_async_in_sync
 
-AGENT_INSTRUCTIONS = """You are a helpful assistant that will be used to evaluate the correctness of an agent trace.
-Given a specific question regarding the quality of something about the agent, \
+AGENT_INSTRUCTIONS = """
+You are a helpful assistant that will be used to evaluate the correctness of an agent trace.
+Given a specific question regarding the quality of something about the agent,
 you may utilize tools as needed in order to check if the trace satisfies the question.
 
-Answer with:
-1. "passed": true or false (true if the trace satisfies the question, false otherwise)
-2. "reasoning": Brief explanation for your decision (2-3 sentences max)
+Whenever you have all the information needed, you must use the `final_answer` tool
+to answer with:
 
-Your output must match the following JSON schema:
-{response_schema}"""
+1. "passed": true or false (true if the trace satisfies the question, false otherwise)
+2. "reasoning": Brief explanation for your decision (2-3 sentences max)"""
 
 
 class AgentJudge:
