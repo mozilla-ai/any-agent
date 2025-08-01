@@ -200,7 +200,7 @@ def test_load_and_run_agent(
     if update_trace:
         trace_path = Path(__file__).parent.parent / "assets" / agent_framework.name
         with open(f"{trace_path}_trace.json", "w", encoding="utf-8") as f:
-            f.write(agent_trace.model_dump_json(indent=2))
+            f.write(agent_trace.model_dump_json(indent=2, serialize_as_any=True))
             f.write("\n")
         html_output = console.export_html(inline_styles=True)
         with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
