@@ -109,8 +109,13 @@ agent = AnyAgent.create(
 )
 agent_trace = agent.run("Which agent framework is the best?")
 with open("agent_trace.json", "w", encoding="utf-8") as f:
-  f.write(agent_trace.model_dump_json(indent=2))
+  f.write(agent_trace.model_dump_json(indent=2, serialize_as_any=True))
 ```
+
+!!! tip
+
+    Passing `serialize_as_any=True` makes sure that the `final_output` gets dumped
+    even when [`AgentConfig.output_type`][any_agent.AgentConfig.output_type] is used.
 
 ## Adding an OpenTelemetry exporter
 
