@@ -298,7 +298,7 @@ async def test_a2a_tool_multiturn() -> None:
                     "role": "user",
                     "parts": [{"kind": "text", "text": THIRD_TURN_PROMPT}],
                     "messageId": str(uuid4()),
-                    "contextId": response_2.root.result.contextId,  # Same context to continue conversation
+                    "contextId": response_2.root.result.context_id,
                     "taskId": response_2.root.result.id,
                 },
             }
