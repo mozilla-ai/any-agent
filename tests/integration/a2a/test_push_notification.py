@@ -205,8 +205,8 @@ async def test_push_notification_non_streaming() -> None:
             if isinstance(response_1.root.result, Task):
                 task_id = response_1.root.result.id
             else:  # Message
-                task_id = response_1.root.result.messageId
-            params.message.taskId = task_id
+                task_id = response_1.root.result.message_id
+            params.message.task_id = task_id
 
             # Send another message to the same task to trigger notifications
             request_1 = SendMessageRequest(id=str(uuid4()), params=params)
@@ -217,7 +217,7 @@ async def test_push_notification_non_streaming() -> None:
             if isinstance(response_1.root.result, Task):
                 assert response_1.root.result.id == task_id
             else:  # Message
-                assert response_1.root.result.messageId == task_id
+                assert response_1.root.result.message_id == task_id
 
             response_2 = await client.send_message(request_1)
             if hasattr(response_2.root, "error"):
@@ -226,7 +226,7 @@ async def test_push_notification_non_streaming() -> None:
             if isinstance(response_2.root.result, Task):
                 assert response_2.root.result.id == task_id
             else:  # Message
-                assert response_2.root.result.messageId == task_id
+                assert response_2.root.result.message_id == task_id
 
             await asyncio.sleep(1)  # Give more time for notifications
 

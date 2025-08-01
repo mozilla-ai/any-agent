@@ -215,8 +215,8 @@ async def test_handles_task_response() -> None:
         # Verify the result is the expected dictionary format
         if task_response.status.message:
             expected_result = {
-                "task_id": task_response.status.message.taskId,
-                "context_id": task_response.status.message.contextId,
+                "task_id": task_response.status.message.task_id,
+                "context_id": task_response.status.message.context_id,
                 "timestamp": task_response.status.timestamp,
                 "status": task_response.status.state,
                 "message": {"Task completed successfully"},

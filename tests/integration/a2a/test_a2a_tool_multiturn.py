@@ -39,6 +39,8 @@ from any_agent.tracing.otel_types import (
     Status,
 )
 
+from .conftest import get_client_from_agent_card_url
+
 if TYPE_CHECKING:
     from typing import Any
 
@@ -216,9 +218,7 @@ async def test_a2a_tool_multiturn() -> None:
 
     try:
         async with httpx.AsyncClient(timeout=1500) as httpx_client:
-            client = await A2AClient.get_client_from_agent_card_url(
-                httpx_client, server_url
-            )
+            client = await get_client_from_agent_card_url(httpx_client, server_url)
 
             # First interaction - establish context
             first_message_id = str(uuid4())
@@ -252,7 +252,7 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_1.root.error.message}, Code: {response_1.root.error.code}, Data: {response_1.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_1.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
+                response_1.root.result.status.message.parts[0].root.text
             )
             assert result.name == "Alice"
             assert result.job.lower() == "software engineer"
@@ -267,7 +267,7 @@ async def test_a2a_tool_multiturn() -> None:
                         }
                     ],
                     "messageId": str(uuid4()),
-                    "contextId": response_1.root.result.contextId,  # Same context to continue conversation
+                    "contextId": response_1.root.result.context_id,  # Same context to continue conversation
                 },
             }
 
@@ -285,7 +285,7 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_2.root.error.message}, Code: {response_2.root.error.code}, Data: {response_2.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_2.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
+                response_2.root.result.status.message.parts[0].root.text
             )
             assert result.name == "Alice"
             assert result.job.lower() == "software engineer"
@@ -298,7 +298,7 @@ async def test_a2a_tool_multiturn() -> None:
                     "role": "user",
                     "parts": [{"kind": "text", "text": THIRD_TURN_PROMPT}],
                     "messageId": str(uuid4()),
-                    "contextId": response_2.root.result.contextId,  # Same context to continue conversation
+                    "contextId": response_2.root.result.context_id,
                     "taskId": response_2.root.result.id,
                 },
             }
@@ -315,7 +315,7 @@ async def test_a2a_tool_multiturn() -> None:
                 msg = f"Error: {response_3.root.error.message}, Code: {response_3.root.error.code}, Data: {response_3.root.error.data}"
                 raise RuntimeError(msg)
             result = UserInfo.model_validate_json(
-                response_3.root.result.status.message.parts[0].root.text  # type: ignore[union-attr]
+                response_3.root.result.status.message.parts[0].root.text
             )
             assert response_3.root.result.status.state == TaskState.completed
             assert result.age == 30

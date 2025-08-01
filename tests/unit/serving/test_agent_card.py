@@ -31,8 +31,8 @@ def test_get_agent_card(agent_framework: AgentFramework) -> None:
     assert agent_card.skills[0].name == "search_web"
     assert "Perform a duckduckgo web search" in agent_card.skills[0].description
     assert not agent_card.capabilities.streaming
-    assert agent_card.capabilities.pushNotifications
-    assert not agent_card.capabilities.stateTransitionHistory
+    assert agent_card.capabilities.push_notifications
+    assert not agent_card.capabilities.state_transition_history
     assert agent_card.url == "http://localhost:5000/"
 
 
