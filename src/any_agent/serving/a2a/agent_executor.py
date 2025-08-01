@@ -87,7 +87,7 @@ class AnyAgentExecutor(AgentExecutor):
         updater = TaskUpdater(event_queue, task.id, task.context_id)
 
         formatted_query = self.context_manager.format_query_with_history(
-            context_id,  # ignore: type[arg-type]
+            context_id,  # type: ignore[arg-type]
             query,
         )
 
@@ -95,9 +95,7 @@ class AnyAgentExecutor(AgentExecutor):
         agent_trace = await self.agent.run_async(formatted_query)
 
         # Update task with new trace, passing the original query (not formatted)
-        self.context_manager.update_context_trace(
-            context_id, agent_trace, query
-        )  # ignore: type[arg-type]
+        self.context_manager.update_context_trace(context_id, agent_trace, query)  # type: ignore[arg-type]
 
         # Validate & interpret the envelope produced by the agent
         final_output = agent_trace.final_output
