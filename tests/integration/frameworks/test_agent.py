@@ -153,7 +153,7 @@ def test_load_and_run_agent(
         pytest.skip(f"{env_check['missing_keys']} needed for {model_id}")
 
     model_args = get_default_agent_model_args(agent_framework)
-    if "gemini" in model_id:
+    if "gemini" in model_id or "xai" in model_id:
         model_args["drop_params"] = True
 
     tools = [
