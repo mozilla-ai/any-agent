@@ -114,6 +114,7 @@ class Steps(BaseModel):
         "anthropic/claude-3-5-haiku-latest",
         "gemini/gemini-2.5-flash",
         "openai/gpt-4.1-nano",
+        "xai/grok-3-mini-latest",
         DEFAULT_SMALL_MODEL_ID,
     ],
 )
