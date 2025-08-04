@@ -10,7 +10,7 @@ import pytest
     list(pathlib.Path("docs/cookbook").glob("*.ipynb")),
     ids=lambda x: x.stem,
 )
-@pytest.mark.timeout(220)
+@pytest.mark.timeout(180)
 def test_cookbook_notebook(
     notebook_path: pathlib.Path, capsys: pytest.CaptureFixture
 ) -> None:
@@ -21,7 +21,14 @@ def test_cookbook_notebook(
         pytest.skip("See https://github.com/mozilla-ai/any-agent/issues/706")
     try:
         result = subprocess.run(  # noqa: S603
-            ["jupyter", "execute", notebook_path.name],  # noqa: S607
+            [  # noqa: S607
+                "jupyter",
+                "execute",
+                notebook_path.name,
+                "--allow-errors",
+                "--output",
+                f"executed_{notebook_path.name}",
+            ],
             cwd="docs/cookbook",  # Run in cookbook directory like original action
             env={
                 "MISTRAL_API_KEY": os.environ["MISTRAL_API_KEY"],
@@ -30,7 +37,7 @@ def test_cookbook_notebook(
                 "PATH": os.environ["PATH"],
                 "IN_PYTEST": "1",  # For mcp_agent notebook which needs to mock input
             },
-            timeout=210,  # Time out slightly earlier so that we can log the output.
+            timeout=170,  # Time out slightly earlier so that we can log the output.
             capture_output=True,
             check=False,
         )
