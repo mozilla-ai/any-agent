@@ -156,10 +156,11 @@ async def a2a_tool_async(
 
         Args:
             query (str): The query to send to the agent.
-            task_id (str, optional): Task ID for continuing an incomplete task. Use the same
-                task_id from a previous response with TaskState.input_required to resume the task. If you want to start a new task, you should not provide a task id.
-            context_id (str, optional): Context ID for conversation continuity. Provides the
-                agent with conversation history. Omit to start a fresh conversation. If you want to start a new conversation, you should not provide a context id.
+            task_id (str, optional): Task ID for continuing an incomplete task.
+                If you want to start a new task, you should not provide a task_id (pass `task_id=None`).
+                If you want to resume a task, use the same task_id from a previous response with TaskState.input_required.
+            context_id (str, optional): Context ID for conversation continuity.
+                If you want to start a new conversation, you should not provide a context_id (pass `context_id=None`).
 
         Returns:
             dict: Response from the A2A agent containing:
