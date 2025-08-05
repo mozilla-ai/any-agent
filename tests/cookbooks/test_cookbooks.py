@@ -15,8 +15,6 @@ def test_cookbook_notebook(
     notebook_path: pathlib.Path, capsys: pytest.CaptureFixture
 ) -> None:
     """Test that cookbook notebooks execute without errors using jupyter execute."""
-    if notebook_path.stem == "agent_with_local_llm":
-        pytest.skip("Need to set up ollama to run this test")
     if notebook_path.stem == "mcp_agent":
         pytest.skip("See https://github.com/mozilla-ai/any-agent/issues/706")
     try:
@@ -34,6 +32,8 @@ def test_cookbook_notebook(
                 "MISTRAL_API_KEY": os.environ["MISTRAL_API_KEY"],
                 "TAVILY_API_KEY": os.environ["TAVILY_API_KEY"],
                 "OPENAI_API_KEY": os.environ["OPENAI_API_KEY"],
+                "HF_TOKEN": os.environ["HF_TOKEN"],
+                "HF_ENDPOINT": os.environ["HF_ENDPOINT"],
                 "PATH": os.environ["PATH"],
                 "IN_PYTEST": "1",  # For mcp_agent notebook which needs to mock input
             },
