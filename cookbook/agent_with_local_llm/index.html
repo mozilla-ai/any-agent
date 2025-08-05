@@ -9,6 +9,10 @@
       
       
       
+        <link rel="prev" href="../a2a_as_tool/">
+      
+      
+        <link rel="next" href="../../api/agent/">
       
       
       <link rel="icon" href="../../images/any-agent_favicon.png">
@@ -16,7 +20,7 @@
     
     
       
-        <title>Fully offline Agent! - any-agent</title>
+        <title>Local Agent - any-agent</title>
       
     
     
@@ -72,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#fully-offline-agent" class="md-skip">
+        <a href="#local-agent" class="md-skip">
           Skip to content
         </a>
       
@@ -107,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Fully offline Agent!
+              Local Agent
             
           </span>
         </div>
@@ -668,20 +672,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
           <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
@@ -697,7 +701,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             Cookbook
@@ -837,6 +841,173 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Local Agent
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Local Agent
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#install-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install Dependencies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-up-your-own-llm-locally" class="md-nav__link">
+    <span class="md-ellipsis">
+      Set up your own LLM locally
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Set up your own LLM locally">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ollama-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ollama setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#picking-an-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Picking an LLM
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serving-the-model-with-the-appropriate-context-length" class="md-nav__link">
+    <span class="md-ellipsis">
+      Serving the model with the appropriate context length
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#load-the-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Load the model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-the-agent-and-the-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configure the Agent and the Tools
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configure the Agent and the Tools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pick-which-tools-to-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pick which tools to use
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-the-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run the Agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-the-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      View the results
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1674,7 +1845,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="fully-offline-agent">Fully offline Agent!<a class="anchor-link" href="#fully-offline-agent">¶</a></h1><p><em>(no Google Colab for this one since it is meant to be run entirely locally)</em></p>
+<h1 id="local-agent">Local Agent<a class="anchor-link" href="#local-agent">¶</a></h1><p><em>(no Google Colab for this one since it is meant to be run entirely locally)</em></p>
 <p>This tutorial will guide on how to run agent, fully locally / offline i.e., running with a local LLM and a couple of local tools (Callable Python functions), so no data will leave your machine!</p>
 <p>This can be especially useful for privacy-sensitive applications or when you want to avoid any cloud dependencies.</p>
 <p>In this example, we will showcase how to let an agent read and write in your local filesystem! Specifically,
@@ -2569,6 +2740,44 @@ Duration: 7.08 seconds
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../a2a_as_tool/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Use an Agent as a tool for another agent.">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Use an Agent as a tool for another agent.
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../api/agent/" class="md-footer__link md-footer__link--next" aria-label="Next: Agent">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Agent
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
