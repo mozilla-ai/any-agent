@@ -35,7 +35,7 @@ def test_cookbook_notebook(
                 "HF_TOKEN": os.environ["HF_TOKEN"],
                 "HF_ENDPOINT": os.environ["HF_ENDPOINT"],
                 "PATH": os.environ["PATH"],
-                "IN_PYTEST": "1",  # For mcp_agent notebook which needs to mock input
+                "IN_PYTEST": "1",  # Signal local_llm and mcp_agent notebooks that we are running an automated test.
             },
             timeout=170,  # Time out slightly earlier so that we can log the output.
             capture_output=True,
