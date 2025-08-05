@@ -113,6 +113,7 @@ class Steps(BaseModel):
     [
         "anthropic/claude-3-5-haiku-latest",
         "gemini/gemini-2.5-flash",
+        "huggingface/tgi",  # This is a Qwen/Qwen3-1.7B hosted in https://endpoints.huggingface.co/mozilla-ai/endpoints/dedicated
         "openai/gpt-4.1-nano",
         "xai/grok-3-mini-latest",
         DEFAULT_SMALL_MODEL_ID,
@@ -148,13 +149,18 @@ def test_load_and_run_agent(
         with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
             f.write(text)
 
-    env_check = validate_environment(model_id)
-    if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {model_id}")
+    # TODO: https://github.com/mozilla-ai/any-agent/issues/714
+    if "huggingface" not in model_id:
+        env_check = validate_environment(model_id)
+        if not env_check["keys_in_environment"]:
+            pytest.skip(f"{env_check['missing_keys']} needed for {model_id}")
 
     model_args = get_default_agent_model_args(agent_framework)
     if "gemini" in model_id or "xai" in model_id:
         model_args["drop_params"] = True
+
+    if "huggingface" in model_id:
+        model_args["api_base"] = os.environ["HF_ENDPOINT"]
 
     tools = [
         write_file,
@@ -195,7 +201,8 @@ def test_load_and_run_agent(
 
     assert_trace(agent_trace, agent_framework)
     assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
-    assert_cost(agent_trace)
+    if "huggingface" not in model_id:
+        assert_cost(agent_trace)
     assert_tokens(agent_trace)
 
     if update_trace:
