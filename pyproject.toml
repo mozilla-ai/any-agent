@@ -9,9 +9,7 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
-  "duckduckgo_search",
   "litellm>=1.74.0",
-  "markdownify",
   "mcp>=1.5.0",
   "opentelemetry-sdk",
   "pydantic",

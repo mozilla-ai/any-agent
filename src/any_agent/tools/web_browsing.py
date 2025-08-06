@@ -2,16 +2,7 @@ import os
 import re
 
 import requests
-from duckduckgo_search import DDGS
-from markdownify import markdownify
 from requests.exceptions import RequestException
-
-try:
-    from tavily.tavily import TavilyClient
-
-    tavily_available = True
-except ImportError:
-    tavily_available = False
 
 
 def _truncate_content(content: str, max_length: int) -> str:
@@ -34,6 +25,12 @@ def search_web(query: str) -> str:
         The top search results.
 
     """
+    try:
+        from duckduckgo_search import DDGS
+    except ImportError as e:
+        msg = "You need to `pip install 'duckduckgo_search'` to use this tool"
+        raise ImportError(msg) from e
+
     ddgs = DDGS()
     results = ddgs.text(query, max_results=10)
     return "\n".join(
@@ -51,6 +48,12 @@ def visit_webpage(url: str, timeout: int = 30, max_length: int = 10000) -> str:
                     If max_length==-1, text is not truncated and the full webpage is returned.
 
     """
+    try:
+        from markdownify import markdownify
+    except ImportError as e:
+        msg = "You need to `pip install 'markdownify'` to use this tool"
+        raise ImportError(msg) from e
+
     try:
         response = requests.get(url, timeout=timeout)
         response.raise_for_status()
@@ -81,9 +84,12 @@ def search_tavily(query: str, include_images: bool = False) -> str:
         The top search results as a formatted string.
 
     """
-    if not tavily_available:
+    try:
+        from tavily.tavily import TavilyClient
+    except ImportError as e:
         msg = "You need to `pip install 'tavily-python'` to use this tool"
-        raise ImportError(msg)
+        raise ImportError(msg) from e
+
     api_key = os.getenv("TAVILY_API_KEY")
     if not api_key:
         return "TAVILY_API_KEY environment variable not set."
