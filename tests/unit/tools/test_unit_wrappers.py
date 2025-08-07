@@ -109,7 +109,7 @@ def test_wrap_tool_smolagents_builtin_tools() -> None:
 
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
-        _wrap_tool_smolagents(UserInputTool())
+        _wrap_tool_smolagents(UserInputTool())  # type: ignore[no-untyped-call]
         wrapper.assert_not_called()
 
 
