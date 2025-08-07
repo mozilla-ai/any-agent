@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from litellm.utils import validate_environment
 from sse_starlette.sse import AppStatus
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
@@ -66,9 +65,6 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
     kwargs = {}
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
-    env_check = validate_environment(kwargs["model_id"])
-    if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {kwargs['model_id']}")
 
     main_agent = None
     server_handle = None
