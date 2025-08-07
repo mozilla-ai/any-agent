@@ -13,7 +13,6 @@ from uuid import uuid4
 
 import httpx
 import pytest
-from a2a.client import A2AClient
 from a2a.types import MessageSendParams, SendMessageRequest, TaskState
 from pydantic import BaseModel
 

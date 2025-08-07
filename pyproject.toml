@@ -49,12 +49,12 @@ smolagents = [
 ]
 
 a2a = [
-  "a2a-sdk>=0.2.11",
+  "a2a-sdk>=0.3.0",
   "httpx",
 ]
 
 all = [
-  "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
+  "any-agent[a2a,agno,google,langchain,llama_index,openai,smolagents]",
 ]
 
 any_llm = [
