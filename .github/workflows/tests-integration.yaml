@@ -109,7 +109,7 @@ jobs:
           python-version: 3.13
           activate-environment: true
 
-      - run: uv sync --group tests --extra all --extra a2a  # TODO https://github.com/mozilla-ai/any-agent/issues/665
+      - run: uv sync --group tests --extra all
 
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}

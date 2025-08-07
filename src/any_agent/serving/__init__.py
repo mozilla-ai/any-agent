@@ -23,5 +23,16 @@ try:
         "serve_a2a_async",
     ]
 except ImportError:
-    msg = "You need to `pip install 'any-agent[a2a]'` to use this method."
-    raise ImportError(msg) from None
+
+    def _raise(*args, **kwargs):  # type: ignore[no-untyped-def]
+        msg = "You need to `pip install 'any-agent[a2a]'` to use this method."
+        raise ImportError(msg)
+
+    A2AServingConfig = _raise  # type: ignore[assignment,misc]
+    _get_a2a_app_async = _raise
+    serve_a2a_async = _raise
+    __all__ += [
+        "A2AServingConfig",
+        "_get_a2a_app_async",
+        "serve_a2a_async",
+    ]
