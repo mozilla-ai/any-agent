@@ -26,7 +26,7 @@ def search_web(query: str) -> str:
 
     """
     try:
-        from duckduckgo_search import DDGS
+        from duckduckgo_search import DDGS  # type: ignore[import-not-found]
     except ImportError as e:
         msg = "You need to `pip install 'duckduckgo_search'` to use this tool"
         raise ImportError(msg) from e
@@ -49,7 +49,7 @@ def visit_webpage(url: str, timeout: int = 30, max_length: int = 10000) -> str:
 
     """
     try:
-        from markdownify import markdownify
+        from markdownify import markdownify  # type: ignore[import-not-found]
     except ImportError as e:
         msg = "You need to `pip install 'markdownify'` to use this tool"
         raise ImportError(msg) from e
@@ -58,7 +58,7 @@ def visit_webpage(url: str, timeout: int = 30, max_length: int = 10000) -> str:
         response = requests.get(url, timeout=timeout)
         response.raise_for_status()
 
-        markdown_content = markdownify(response.text).strip()  # type: ignore[no-untyped-call]
+        markdown_content = markdownify(response.text).strip()
 
         markdown_content = re.sub(r"\n{2,}", "\n", markdown_content)
 
