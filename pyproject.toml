@@ -54,7 +54,7 @@ a2a = [
 ]
 
 all = [
-  "any-agent[a2a,agno,google,langchain,llama_index,openai,smolagents]",
+  "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
 ]
 
 any_llm = [
