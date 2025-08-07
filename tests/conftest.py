@@ -232,11 +232,3 @@ def agent_trace(request: pytest.FixtureRequest) -> AgentTrace:
     with open(trace_path, encoding="utf-8") as f:
         trace = json.load(f)
     return AgentTrace.model_validate(trace)
-
-
-@pytest.fixture(autouse=True, scope="session")
-def ensure_use_any_llm_unset() -> None:
-    """Ensure USE_ANY_LLM is unset for tests."""
-
-    # Unset the variable for the entire test session
-    os.environ.pop("USE_ANY_LLM", None)
