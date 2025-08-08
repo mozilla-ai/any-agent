@@ -57,9 +57,7 @@ def test_run_tinyagent_agent_custom_args() -> None:
     agent = AnyAgent.create(
         AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-small-latest")
     )
-    with patch(
-        "any_agent.frameworks.tinyagent.litellm.acompletion"
-    ) as mock_acompletion:
+    with patch(LITELLM_IMPORT_PATHS[AgentFramework.TINYAGENT]) as mock_acompletion:
         # Create a mock response object that properly mocks the LiteLLM response structure
         mock_response = MagicMock()
         mock_message = MagicMock()
@@ -101,9 +99,7 @@ def test_output_type_completion_params_isolation() -> None:
             mock_message.__getitem__.return_value = content
         return MagicMock(choices=[MagicMock(message=mock_message)])
 
-    with patch(
-        "any_agent.frameworks.tinyagent.litellm.acompletion"
-    ) as mock_acompletion:
+    with patch(LITELLM_IMPORT_PATHS[AgentFramework.TINYAGENT]) as mock_acompletion:
         # Mock responses: 2 calls per run (regular + structured output)
         mock_acompletion.side_effect = [
             create_mock_response("First response"),  # First run, regular call
