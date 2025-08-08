@@ -112,7 +112,7 @@ def run_agent_with_mock(
             agent.run(prompt)
 
 
-def test_callbacks(mock_litellm_response: Any) -> None:
+def test_callbacks(mock_any_llm_response: Any) -> None:
     callback = SampleCallback()
     agent = create_agent(
         instructions="Use the available tools to find information when needed",
@@ -121,8 +121,8 @@ def test_callbacks(mock_litellm_response: Any) -> None:
 
     run_agent_with_mock(
         agent=agent,
-        prompt="Search for information about the latest AI developments and summarize what you find",
-        mock_response=mock_litellm_response,
+        prompt="Hello!",
+        mock_response=mock_any_llm_response,
     )
 
     # Verify that the callback methods were called
@@ -134,7 +134,7 @@ def test_callbacks(mock_litellm_response: Any) -> None:
     assert callback.after_tool_called is False
 
 
-def test_tool_execution_callbacks(mock_litellm_tool_call_response: Any) -> None:
+def test_tool_execution_callbacks(mock_any_llm_tool_call_response: Any) -> None:
     callback = SampleCallback()
     agent = create_agent(
         instructions="You must use the search_web tool to find information",
@@ -144,8 +144,8 @@ def test_tool_execution_callbacks(mock_litellm_tool_call_response: Any) -> None:
 
     run_agent_with_mock(
         agent=agent,
-        prompt="Search for information about the latest AI developments",
-        mock_response=mock_litellm_tool_call_response,
+        prompt="Hello!",
+        mock_response=mock_any_llm_tool_call_response,
     )
 
     # Verify that all callback methods were called
