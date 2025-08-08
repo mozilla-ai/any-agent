@@ -150,7 +150,11 @@ def test_load_and_run_agent(
 
     model_args = get_default_agent_model_args(agent_framework)
 
+    if "google" in model_id:
+        model_args.pop("parallel_tool_calls", None)
+
     if "huggingface" in model_id:
+        model_args.pop("parallel_tool_calls", None)
         model_args["api_base"] = os.environ["HF_ENDPOINT"]
 
     tools = [
