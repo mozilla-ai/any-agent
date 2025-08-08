@@ -8,8 +8,8 @@ from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from any_llm.api import ChatCompletion
 from litellm.types.utils import ModelResponse
+from openai.types.chat.chat_completion import ChatCompletion
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
