@@ -33,7 +33,6 @@ def get_default_agent_model_args(agent_framework: AgentFramework) -> dict[str, A
         dict[str, Any]: The default model arguments for the agent framework.
 
     """
-    # use a function to avoid passing by reference
     model_args: dict[str, Any] = (
         {"parallel_tool_calls": False}
         if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
