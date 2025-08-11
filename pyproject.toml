@@ -41,7 +41,7 @@ llama_index = [
 ]
 
 openai = [
-  "openai<1.99.2",
+  "openai<1.99.7",
   "openai-agents>=0.2.0",
 ]
 
