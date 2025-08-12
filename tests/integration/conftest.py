@@ -48,16 +48,7 @@ def _get_deterministic_port(test_name: str, framework_name: str) -> int:
 
     # Generate a hash and convert to a port number in the range 6000-9999
     hash_value = int(hashlib.md5(unique_string.encode()).hexdigest()[:4], 16)  # noqa: S324
-    return 6000 + (hash_value % 4000)
-
-
-@pytest.fixture
-def test_port(request: pytest.FixtureRequest, agent_framework: AgentFramework) -> int:
-    """Single fixture that provides a unique, deterministic port for each test."""
-    test_name = request.node.name
-    framework_name = agent_framework.value
-
-    port = _get_deterministic_port(test_name, framework_name)
+    port = 6000 + (hash_value % 4000)
 
     # Ensure the port is available, if not, try nearby ports
     original_port = port
@@ -71,3 +62,12 @@ def test_port(request: pytest.FixtureRequest, agent_framework: AgentFramework) -
         raise RuntimeError(msg)
 
     return port
+
+
+@pytest.fixture
+def test_port(request: pytest.FixtureRequest, agent_framework: AgentFramework) -> int:
+    """Single fixture that provides a unique, deterministic port for each test."""
+    test_name = request.node.name
+    framework_name = agent_framework.value
+
+    return _get_deterministic_port(test_name, framework_name)
