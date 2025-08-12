@@ -60,6 +60,7 @@ class _ToolUpdaterCallback(Callback):
     def before_tool_execution(
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
+        payload = dict(getattr(context.current_span, "attributes", {}))
         run_async_in_sync(
             self.updater.update_status(
                 TaskState.working,
@@ -69,7 +70,7 @@ class _ToolUpdaterCallback(Callback):
                             root=DataPart(
                                 data={
                                     "event_type": "tool_started",
-                                    "payload": dict(context.current_span.attributes),
+                                    "payload": payload,
                                 }
                             )
                         )
@@ -86,6 +87,7 @@ class _ToolUpdaterCallback(Callback):
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
         """Will be called after any LLM Call is completed."""
+        payload = dict(getattr(context.current_span, "attributes", {}))
         run_async_in_sync(
             self.updater.update_status(
                 TaskState.working,
@@ -95,7 +97,7 @@ class _ToolUpdaterCallback(Callback):
                             root=DataPart(
                                 data={
                                     "event_type": "tool_finished",
-                                    "payload": dict(context.current_span.attributes),
+                                    "payload": payload,
                                 }
                             )
                         )
@@ -140,7 +142,7 @@ class AnyAgentExecutor(AgentExecutor):
         task = context.current_task
 
         # We will assume context.message will not be None
-        context_id = context.message.context_id  # type: ignore[union-attr]
+        context_id = context.message.context_id or "" # type: ignore[union-attr]
         if not self.context_manager.get_context(context_id):
             self.context_manager.add_context(context_id)
 
