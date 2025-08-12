@@ -1386,6 +1386,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#any_agent.serving.A2AServingConfig.stream_tool_usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      stream_tool_usage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#any_agent.serving.A2AServingConfig.task_cleanup_interval_minutes" class="md-nav__link">
     <span class="md-ellipsis">
       task_cleanup_interval_minutes
@@ -1987,6 +1996,15 @@
   <a href="#any_agent.serving.A2AServingConfig.skills" class="md-nav__link">
     <span class="md-ellipsis">
       skills
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#any_agent.serving.A2AServingConfig.stream_tool_usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      stream_tool_usage
     </span>
   </a>
   
@@ -3336,7 +3354,10 @@ you can pass <code>tools=["read_file", "list_directory"]</code> to limit the age
 <span class="normal"><a href="#__codelineno-0-148">148</a></span>
 <span class="normal"><a href="#__codelineno-0-149">149</a></span>
 <span class="normal"><a href="#__codelineno-0-150">150</a></span>
-<span class="normal"><a href="#__codelineno-0-151">151</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">class</span><span class="w"> </span><span class="nc">A2AServingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-151">151</a></span>
+<span class="normal"><a href="#__codelineno-0-152">152</a></span>
+<span class="normal"><a href="#__codelineno-0-153">153</a></span>
+<span class="normal"><a href="#__codelineno-0-154">154</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">class</span><span class="w"> </span><span class="nc">A2AServingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 </span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for serving an agent using the Agent2Agent Protocol (A2A).</span>
 </span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a>
 </span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    Example:</span>
@@ -3436,6 +3457,9 @@ you can pass <code>tools=["read_file", "list_directory"]</code> to limit the age
 </span><span id="__span-0-149"><a id="__codelineno-0-149" name="__codelineno-0-149"></a>
 </span><span id="__span-0-150"><a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">    If not provided, a default in-memory task store will be used.</span>
 </span><span id="__span-0-151"><a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="__span-0-152"><a id="__codelineno-0-152" name="__codelineno-0-152"></a>
+</span><span id="__span-0-153"><a id="__codelineno-0-153" name="__codelineno-0-153"></a>    <span class="n">stream_tool_usage</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-0-154"><a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;whether to stream tool execution results&quot;&quot;&quot;</span>
 </span></code></pre></div></td></tr></table></div>
               </details>
 
@@ -3681,6 +3705,29 @@ However, you can explicitly define skills for more control over the agent card:<
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">skills</span><span class="o">=</span><span class="n">custom_skills</span>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="p">)</span>
 </span></code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="any_agent.serving.A2AServingConfig.stream_tool_usage" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">stream_tool_usage</span> <span class="o">=</span> <span class="kc">False</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>whether to stream tool execution results</p>
 
     </div>
 
