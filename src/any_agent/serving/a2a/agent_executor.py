@@ -142,7 +142,7 @@ class AnyAgentExecutor(AgentExecutor):
         task = context.current_task
 
         # We will assume context.message will not be None
-        context_id = context.message.context_id or "" # type: ignore[union-attr]
+        context_id = context.message.context_id or ""  # type: ignore[union-attr]
         if not self.context_manager.get_context(context_id):
             self.context_manager.add_context(context_id)
 
