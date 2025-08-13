@@ -84,8 +84,13 @@ class _OpenAIAgentsWrapper:
                 original_invoke = original_tool.on_invoke_tool
                 self._original_invokes[original_tool.name] = original_invoke
 
-                wrapped_tool = WrappedTool(original_tool, original_invoke)
-                original_tool.on_invoke_tool = wrapped_tool.on_invoke_tool
+                # check if the original tool invocation comes from a WrappedTool, if not wrap it
+                if (
+                    not hasattr(original_tool.on_invoke_tool, "__qualname__")
+                    or "WrappedTool" not in original_tool.on_invoke_tool.__qualname__
+                ):
+                    wrapped_tool = WrappedTool(original_tool, original_invoke)
+                    original_tool.on_invoke_tool = wrapped_tool.on_invoke_tool
 
             return all_tools
 
