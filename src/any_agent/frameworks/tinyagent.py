@@ -12,6 +12,7 @@ from litellm.utils import supports_response_schema
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
+from any_agent.logging import logger
 
 from .any_agent import AnyAgent
 
@@ -31,9 +32,6 @@ Once you have a final answer, you MUST call the `final_answer` tool.
 
 You MUST plan extensively before each function call, and reflect extensively on the outcomes of the previous function calls.
 """.strip()
-
-
-DEFAULT_MAX_NUM_TURNS = 10
 
 
 class ToolExecutor:
@@ -191,11 +189,13 @@ class TinyAgent(AnyAgent):
             },
         ]
 
-        num_of_turns = 0
-        max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
+        if kwargs.pop("max_turns", None):
+            logger.warning(
+                "`max_turns` is deprecated and has no effect. See https://mozilla-ai.github.io/any-agent/agents/callbacks/#example-limit-the-number-of-steps"
+            )
         completion_params = self.completion_params.copy()
 
-        while num_of_turns < max_turns:
+        while True:
             completion_params["messages"] = messages
 
             response = await self.call_model(**completion_params)
@@ -244,10 +244,6 @@ class TinyAgent(AnyAgent):
                         str(message.content), completion_params
                     )
                 return str(message.content)
-
-            num_of_turns += 1
-
-        return "Max turns reached"
 
     async def _return_output_type(
         self, output: str, completion_params: dict[str, Any]
