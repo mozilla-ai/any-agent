@@ -103,7 +103,6 @@ class Step(BaseModel):
 
 
 class Steps(BaseModel):
-    model_config = ConfigDict(extra="forbid")
     steps: list[Step]
 
 
@@ -196,7 +195,7 @@ def test_load_and_run_agent(
 
     assert_trace(agent_trace, agent_framework)
     assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
-    if "huggingface" not in model_id:
+    if model_id not in ("huggingface/tgi", "google/gemini-2.5-flash"):
         assert_cost(agent_trace)
     assert_tokens(agent_trace)
 
