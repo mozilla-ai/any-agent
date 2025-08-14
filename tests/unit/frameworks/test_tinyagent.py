@@ -185,6 +185,7 @@ async def test_any_llm() -> None:
             # Create a mock response object that matches the expected structure
             mock_response = MagicMock()
             mock_message = MagicMock()
+            mock_message.role = "assistant"
             mock_message.content = output
             mock_message.tool_calls = []
             mock_message.model_dump.return_value = {
