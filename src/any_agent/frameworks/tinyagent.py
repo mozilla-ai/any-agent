@@ -17,7 +17,7 @@ from .any_agent import AnyAgent
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from openai.types.chat.chat_completion import ChatCompletion
+    from any_llm.types.completion import ChatCompletion
     from pydantic import BaseModel
 
 
