@@ -58,13 +58,9 @@ def test_model_args(
 
     agent = create_agent_with_model_args(agent_framework)
 
-    # Patch the appropriate litellm import path for this framework
     import_path = LITELLM_IMPORT_PATHS[agent_framework]
     with patch(import_path, return_value=mock_litellm_response) as mock_litellm:
-        # Run the agent
         result = agent.run(TEST_QUERY)
-
-        # Verify results
         assert EXPECTED_OUTPUT == result.final_output
         assert mock_litellm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
         assert mock_litellm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
