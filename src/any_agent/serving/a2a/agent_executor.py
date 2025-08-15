@@ -2,7 +2,7 @@ import sys
 
 PYTHONEGT312 = sys.version_info >= (3, 12)
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if PYTHONEGT312:
     from typing import override
@@ -30,34 +30,107 @@ else:
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
 from a2a.server.tasks import TaskUpdater
-from a2a.types import Part, TextPart
+from a2a.types import DataPart, Part, TaskState, TextPart
 from a2a.utils import (
     new_agent_parts_message,
     new_task,
 )
 from pydantic import BaseModel
 
+from any_agent import AgentRunError
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
 from any_agent.logging import logger
 from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.a2a.envelope import A2AEnvelope
+from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
 
 
+class _ToolUpdaterCallback(Callback):
+    """Sends events to a taskupdater about tool execution."""
+
+    def __init__(self, updater: TaskUpdater, context_id: str, task_id: str) -> None:
+        self.context_id = context_id
+        self.task_id = task_id
+        self.updater = updater
+
+    def before_tool_execution(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        payload = dict(getattr(context.current_span, "attributes", {}))
+        run_async_in_sync(
+            self.updater.update_status(
+                TaskState.working,
+                message=new_agent_parts_message(
+                    [
+                        Part(
+                            root=DataPart(
+                                data={
+                                    "event_type": "tool_started",
+                                    "payload": payload,
+                                }
+                            )
+                        )
+                    ],
+                    self.context_id,
+                    self.task_id,
+                ),
+                final=False,
+            )
+        )
+        return context
+
+    def after_tool_execution(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        """Will be called after any LLM Call is completed."""
+        payload = dict(getattr(context.current_span, "attributes", {}))
+        run_async_in_sync(
+            self.updater.update_status(
+                TaskState.working,
+                message=new_agent_parts_message(
+                    [
+                        Part(
+                            root=DataPart(
+                                data={
+                                    "event_type": "tool_finished",
+                                    "payload": payload,
+                                }
+                            )
+                        )
+                    ],
+                    self.context_id,
+                    self.task_id,
+                ),
+                final=False,
+            )
+        )
+        return context
+
+
 class AnyAgentExecutor(AgentExecutor):
     """AnyAgentExecutor Implementation with task management for multi-turn conversations."""
 
-    def __init__(self, agent: "AnyAgent", context_manager: ContextManager):
+    def __init__(
+        self,
+        agent: "AnyAgent",
+        context_manager: ContextManager,
+        stream_tool_usage: bool,
+    ):
         """Initialize the AnyAgentExecutor.
 
         Args:
             agent: The agent to execute
             context_manager: context manager to use for context management
+            stream_tool_usage: whether to stream tool execution results
 
         """
         self.agent = agent
         self.context_manager = context_manager
+        self.stream_tool_usage = stream_tool_usage
 
     @override
     async def execute(
@@ -69,9 +142,9 @@ class AnyAgentExecutor(AgentExecutor):
         task = context.current_task
 
         # We will assume context.message will not be None
-        context_id = context.message.context_id  # type: ignore[union-attr]
-        if not self.context_manager.get_context(context_id):  # type: ignore[arg-type]
-            self.context_manager.add_context(context_id)  # type: ignore[arg-type]
+        context_id = context.message.context_id or ""  # type: ignore[union-attr]
+        if not self.context_manager.get_context(context_id):
+            self.context_manager.add_context(context_id)
 
         # Extract or create task ID
         if not task:
@@ -84,18 +157,34 @@ class AnyAgentExecutor(AgentExecutor):
                 raise ValueError(msg)
         else:
             logger.info("Task already exists: %s", task.model_dump_json(indent=2))
+
         updater = TaskUpdater(event_queue, task.id, task.context_id)
+        tool_updater = _ToolUpdaterCallback(
+            updater=updater, context_id=task.context_id, task_id=task.id
+        )
 
         formatted_query = self.context_manager.format_query_with_history(
-            context_id,  # type: ignore[arg-type]
+            context_id,
             query,
         )
 
+        # Put a callback here to record tool calling and send updates
+        if self.stream_tool_usage:
+            self.agent.config.callbacks.append(tool_updater)
+
         # This agent always produces Task objects.
-        agent_trace = await self.agent.run_async(formatted_query)
+        try:
+            agent_trace = await self.agent.run_async(formatted_query)
+        except AgentRunError as e:
+            logger.exception(f"Served request failed: {e!s}")
+            agent_trace = e.trace
+
+        # Remove the tool recording callback
+        if self.stream_tool_usage:
+            self.agent.config.callbacks.pop(-1)
 
         # Update task with new trace, passing the original query (not formatted)
-        self.context_manager.update_context_trace(context_id, agent_trace, query)  # type: ignore[arg-type]
+        self.context_manager.update_context_trace(context_id, agent_trace, query)
 
         # Validate & interpret the envelope produced by the agent
         final_output = agent_trace.final_output

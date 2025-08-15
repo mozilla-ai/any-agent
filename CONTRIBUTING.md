@@ -26,25 +26,44 @@ We welcome all kinds of contributions, from improving customization, to extendin
 
 ### **Submit Pull Requests** 💻
 - Fork the repository and create a new branch for your changes.
-- Install [pre-commit](https://pre-commit.com/) to ensure the code is formatted and standardized correctly, by running `uv sync --group lint` and then `pre-commit install`.
-- Ensure your branch is up-to-date with the main branch before submitting the PR
+- Follow the [Guidelines for Contributions](#guidelines-for-contributions)
+- Ensure your branch is up-to-date with the main branch before submitting the PR.
 - Please follow the PR template, adding as much detail as possible, including how to test the changes
 
 ---
 
-### **Guidelines for Contributions**
+## **Guidelines for Contributions**
 
-**Coding Standards**
-- Follow PEP 8 for Python formatting.
-- Use clear variable and function names and add comments to improve readability.
+**Install**
+
+We recommend to use [uv](https://docs.astral.sh/uv/getting-started/installation/):
+
+```
+uv venv
+source .venv/bin/activate
+uv sync --dev --extra all
+```
+
+**Linting**
+
+Ensure all the checks pass:
+
+```bash
+pre-commit run --all-files
+```
 
 **Testing**
-- Test changes locally to ensure functionality.
-- Install the package using development dependencies before testing: `uv sync --group dev --extra all`
-- Integration tests need the following environment variables to be set:
-  ```
-  MISTRAL_API_KEY="YOUR API KEY"
-  ```
+
+Test changes locally to ensure functionality.
+
+```bash
+pytest -v tests
+```
 
 **Documentation**
-- Update docs for changes to functionality and maintain consistency with existing docs.
+
+Update docs for changes to functionality and maintain consistency with existing docs.
+
+```bash
+mkdocs serve
+```
