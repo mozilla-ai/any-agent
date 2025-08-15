@@ -200,7 +200,8 @@ class TinyAgent(AnyAgent):
 
             if message.tool_calls:
                 for tool_call in message.tool_calls:
-                    tool_name = tool_call.function.name
+                    f = tool_call.function  # type: ignore[union-attr]
+                    tool_name = f.name
                     tool_message = {
                         "role": "tool",
                         "tool_call_id": tool_call.id,
@@ -215,8 +216,8 @@ class TinyAgent(AnyAgent):
                         continue
 
                     tool_args = {}
-                    if tool_call.function.arguments:
-                        tool_args = json.loads(tool_call.function.arguments)
+                    if f.arguments:
+                        tool_args = json.loads(f.arguments)
 
                     client = self.clients[tool_name]
                     result = await client.call_tool(
