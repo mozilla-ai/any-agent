@@ -8,9 +8,11 @@ from .user_interaction import (
     show_plan,
 )
 from .web_browsing import search_tavily, search_web, visit_webpage
+from .wrappers import _wrap_tools
 
 __all__ = [
     "MCPClient",
+    "_wrap_tools",
     "a2a_tool",
     "a2a_tool_async",
     "ask_user_verification",

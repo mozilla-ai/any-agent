@@ -128,7 +128,9 @@ class MCPClient(BaseModel):
 
         return [name_to_tool[name] for name in requested_tools]
 
-    def _convert_tools_to_callables(self, tools: list[MCPTool]) -> list[Callable[..., Any]]:
+    def _convert_tools_to_callables(
+        self, tools: list[MCPTool]
+    ) -> list[Callable[..., Any]]:
         """Convert MCP tools to callable functions that work with any framework."""
         if not self._session:
             msg = "Session not available for tool conversion"
@@ -153,23 +155,31 @@ class MCPClient(BaseModel):
             required = input_schema.get("required", [])
 
             for param_name, param_info in properties.items():
-                param_type = self._schema_type_to_python_type(param_info.get("type", "string"))
+                param_type = self._schema_type_to_python_type(
+                    param_info.get("type", "string")
+                )
                 annotations[param_name] = param_type
 
                 if param_name not in required:
                     param = inspect.Parameter(
-                        param_name, inspect.Parameter.KEYWORD_ONLY,
-                        default=None, annotation=param_type
+                        param_name,
+                        inspect.Parameter.KEYWORD_ONLY,
+                        default=None,
+                        annotation=param_type,
                     )
                 else:
                     param = inspect.Parameter(
-                        param_name, inspect.Parameter.KEYWORD_ONLY, annotation=param_type
+                        param_name,
+                        inspect.Parameter.KEYWORD_ONLY,
+                        annotation=param_type,
                     )
                 parameters.append(param)
 
         # Create signature and enhanced docstring
         signature = inspect.Signature(parameters, return_annotation=str)
-        enhanced_description = self._create_enhanced_description(description, input_schema)
+        enhanced_description = self._create_enhanced_description(
+            description, input_schema
+        )
 
         # Create the actual function
         async def mcp_tool_function(**kwargs: Any) -> str:
@@ -215,11 +225,15 @@ class MCPClient(BaseModel):
             if properties:
                 param_descriptions = []
                 for param_name, param_info in properties.items():
-                    param_desc = param_info.get("description", f"Parameter {param_name}")
+                    param_desc = param_info.get(
+                        "description", f"Parameter {param_name}"
+                    )
                     param_descriptions.append(f"    {param_name}: {param_desc}")
 
                 if param_descriptions:
-                    enhanced_description += "\n\nArgs:\n" + "\n".join(param_descriptions)
+                    enhanced_description += "\n\nArgs:\n" + "\n".join(
+                        param_descriptions
+                    )
         return enhanced_description
 
     async def disconnect(self) -> None:

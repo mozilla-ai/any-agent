@@ -10,7 +10,7 @@ from pydantic import Field
 from pytest_lazy_fixtures import lf
 
 from any_agent.config import MCPParams, MCPSse, MCPStdio, MCPStreamableHttp, Tool
-from any_agent.tools import _MCPConnection
+from any_agent.tools import MCPClient
 
 
 class Toolset(Protocol):
@@ -133,17 +133,43 @@ def sse_params_echo_server(
     return MCPSse(url=echo_sse_server["url"], tools=tools)
 
 
-class FakeMCPConnection(_MCPConnection[Any]):
-    mcp_tool: None = None  # type: ignore[assignment]
+class FakeMCPClient(MCPClient):
     tools: Sequence[Tool] = Field(default_factory=list)
+
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        # Mock the private session attribute
+        self._session = True
 
     async def list_tools(self) -> list[Tool]:
         return list(self.tools)
 
+    async def list_raw_tools(self) -> list[MCPTool]:
+        return [
+            MCPTool(name=tool, inputSchema={"type": "object", "properties": {}})
+            for tool in self.tools
+        ]
+
+    async def connect(self) -> None:
+        pass
+
+    async def disconnect(self) -> None:
+        pass
+
+    def _convert_tools_to_callables(self, tools: list[MCPTool]) -> list[Any]:
+        # Simple mock implementation for testing
+        return [lambda **kwargs: f"Mock result for {tool.name}" for tool in tools]
+
 
 @pytest.fixture
-def mcp_connection(tools: Sequence[Tool]) -> _MCPConnection[Any]:
-    return FakeMCPConnection(tools=tools)
+def mcp_client(tools: Sequence[Tool]) -> MCPClient:
+    from any_agent.config import AgentFramework, MCPSse
+
+    return FakeMCPClient(
+        config=MCPSse(url="http://localhost:8000/sse"),
+        framework=AgentFramework.OPENAI,
+        tools=tools,
+    )
 
 
 @pytest.fixture(
