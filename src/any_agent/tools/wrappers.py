@@ -5,7 +5,7 @@ from functools import wraps
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from any_agent.config import AgentFramework, MCPParams, Tool
-from any_agent.tools.mcp.mcp_client import MCPClient
+from any_agent.tools.mcp import MCPClient, SmolagentsMCPClient
 
 if TYPE_CHECKING:
     from agents import Tool as AgentTool
@@ -145,18 +145,29 @@ async def _wrap_tools(
     for tool in tools:
         # if it's MCPStdio or MCPSse, we need to wrap it in a client
         if isinstance(tool, MCPParams):
-            # Create and connect MCP client
-            mcp_client = MCPClient(config=tool, framework=agent_framework)
+            # Use SmolagentsMCPClient for smolagents framework, regular MCPClient for others
+            if agent_framework == AgentFramework.SMOLAGENTS:
+                mcp_client: MCPClient = SmolagentsMCPClient(
+                    config=tool, framework=agent_framework
+                )
+            else:
+                mcp_client = MCPClient(config=tool, framework=agent_framework)
+
             await mcp_client.connect()
 
             # Get tools as callables (universal format)
             callable_tools = await mcp_client.list_tools()
 
-            # Wrap each callable tool with the framework wrapper
-            for callable_tool in callable_tools:
-                wrapped_tools.append(
-                    framework_wrapper(_wrap_no_exception(callable_tool))
-                )
+            # For smolagents, the tools are already SmolagentsTool objects, so we don't need to wrap them
+            if agent_framework == AgentFramework.SMOLAGENTS:
+                for callable_tool in callable_tools:
+                    wrapped_tools.append(callable_tool)  # type: ignore[arg-type]
+            else:
+                # Wrap each callable tool with the framework wrapper
+                for callable_tool in callable_tools:
+                    wrapped_tools.append(
+                        framework_wrapper(_wrap_no_exception(callable_tool))
+                    )
 
             mcp_clients.append(mcp_client)
         elif callable(tool):

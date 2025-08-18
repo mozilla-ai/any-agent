@@ -33,8 +33,11 @@ async def test_mcp_tool_wrapping(
         return_value=[create_mock_tool(str(tool)) for tool in tools]
     )
 
-    # Mock the MCPClient constructor to return our mock
-    with patch("any_agent.tools.wrappers.MCPClient", return_value=mock_client):
+    # Mock both MCPClient and SmolagentsMCPClient constructors to return our mock
+    with (
+        patch("any_agent.tools.wrappers.MCPClient", return_value=mock_client),
+        patch("any_agent.tools.wrappers.SmolagentsMCPClient", return_value=mock_client),
+    ):
         mcp_config = MCPSse(
             url="http://localhost:8000/sse", tools=[str(tool) for tool in tools]
         )
