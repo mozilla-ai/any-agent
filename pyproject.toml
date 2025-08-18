@@ -11,6 +11,7 @@ dynamic = ["version"]
 dependencies = [
   "any-llm-sdk>=0.13.0,<1",
   "litellm>=1.74.0",
+  "openai==1.99.9", # Until https://github.com/openai/openai-python/issues/2564 is resolved
   "mcp>=1.5.0",
   "opentelemetry-sdk",
   "pydantic",
