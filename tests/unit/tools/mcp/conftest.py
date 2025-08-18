@@ -134,19 +134,21 @@ def sse_params_echo_server(
 
 
 class FakeMCPClient(MCPClient):
-    tools: Sequence[Tool] = Field(default_factory=list)
+    tools: Sequence[str] = Field(default_factory=list)
 
     def __init__(self, **data: Any):
         super().__init__(**data)
         # Mock the private session attribute
-        self._session = True
+        self._session = None
 
-    async def list_tools(self) -> list[Tool]:
-        return list(self.tools)
+    async def list_tools(self) -> list[Any]:
+        return [
+            lambda tool=tool, **kwargs: f"Mock result for {tool}" for tool in self.tools
+        ]
 
     async def list_raw_tools(self) -> list[MCPTool]:
         return [
-            MCPTool(name=tool, inputSchema={"type": "object", "properties": {}})
+            MCPTool(name=str(tool), inputSchema={"type": "object", "properties": {}})
             for tool in self.tools
         ]
 
@@ -158,11 +160,13 @@ class FakeMCPClient(MCPClient):
 
     def _convert_tools_to_callables(self, tools: list[MCPTool]) -> list[Any]:
         # Simple mock implementation for testing
-        return [lambda **kwargs: f"Mock result for {tool.name}" for tool in tools]
+        return [
+            lambda tool=tool, **kwargs: f"Mock result for {tool.name}" for tool in tools
+        ]
 
 
 @pytest.fixture
-def mcp_client(tools: Sequence[Tool]) -> MCPClient:
+def mcp_client(tools: Sequence[str]) -> MCPClient:
     from any_agent.config import AgentFramework, MCPSse
 
     return FakeMCPClient(

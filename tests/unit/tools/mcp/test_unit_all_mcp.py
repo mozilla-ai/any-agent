@@ -17,7 +17,7 @@ async def test_mcp_tool_wrapping(
     from unittest.mock import AsyncMock, patch
 
     # Create proper mock functions with docstrings for framework compatibility
-    def create_mock_tool(tool_name: str):
+    def create_mock_tool(tool_name: str) -> Any:
         def mock_tool() -> str:
             """Mock tool for testing."""
             return f"mock_result_{tool_name}"
@@ -30,12 +30,14 @@ async def test_mcp_tool_wrapping(
     mock_client = AsyncMock()
     mock_client.connect = AsyncMock()
     mock_client.list_tools = AsyncMock(
-        return_value=[create_mock_tool(tool) for tool in tools]
+        return_value=[create_mock_tool(str(tool)) for tool in tools]
     )
 
     # Mock the MCPClient constructor to return our mock
     with patch("any_agent.tools.wrappers.MCPClient", return_value=mock_client):
-        mcp_config = MCPSse(url="http://localhost:8000/sse", tools=list(tools))
+        mcp_config = MCPSse(
+            url="http://localhost:8000/sse", tools=[str(tool) for tool in tools]
+        )
         wrapped_tools, mcp_clients = await _wrap_tools([mcp_config], agent_framework)
 
         # Should have wrapped tools and the MCP client
