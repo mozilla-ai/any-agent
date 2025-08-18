@@ -159,7 +159,11 @@ class AnyAgent(ABC):
         return tools, mcp_servers
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
-        """Run the agent with the given prompt."""
+        """Run the agent with the given prompt synchronously.
+
+        Note: This is a synchronous method. Do not use 'await' with it.
+        For async usage, use 'run_async' instead.
+        """
         return run_async_in_sync(self.run_async(prompt, **kwargs))
 
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
