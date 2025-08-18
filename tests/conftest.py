@@ -9,6 +9,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from litellm.types.utils import ModelResponse
+from openai.types.chat.chat_completion import ChatCompletion
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
@@ -164,10 +165,72 @@ def mock_litellm_response() -> ModelResponse:
 
 
 @pytest.fixture
+def mock_any_llm_response() -> ChatCompletion:
+    """Fixture to create a standard mock any-llm response"""
+    return ChatCompletion.model_validate(
+        {
+            "id": "44bb9c60ab374897825da5edfbd15126",
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "index": 0,
+                    "message": {
+                        "content": "Hello! 😊 How can I assist you today?",
+                        "role": "assistant",
+                    },
+                }
+            ],
+            "created": 1754648476,
+            "model": "mistral-small-latest",
+            "object": "chat.completion",
+            "usage": {"completion_tokens": 13, "prompt_tokens": 5, "total_tokens": 18},
+        }
+    )
+
+
+@pytest.fixture
 def mock_litellm_tool_call_response() -> ModelResponse:
     """Fixture to create a mock LiteLLM response that includes tool calls"""
     return ModelResponse.model_validate_json(
-        '{"id":"chatcmpl-tool-call","created":1747157127,"model":"gpt-4o-2024-08-06","object":"chat.completion","choices":[{"finish_reason":"tool_calls","index":0,"message":{"content":null,"role":"assistant","tool_calls":[{"id":"call_123","type":"function","function":{"name":"search_web","arguments":"{\\"query\\":\\"latest AI developments\\"}"}}]}}],"usage":{"completion_tokens":20,"prompt_tokens":150,"total_tokens":170}}'
+        '{"id":"chatcmpl-tool-call","created":1747157127,"model":"gpt-4o-2024-08-06","object":"chat.completion","choices":[{"finish_reason":"tool_calls","index":0,"message":{"content":null,"role":"assistant","tool_calls":[{"id":"call_123","type":"function","function":{"name":"final_answer","arguments":"{\\"query\\":\\"latest AI developments\\"}"}}]}}],"usage":{"completion_tokens":20,"prompt_tokens":150,"total_tokens":170}}'
+    )
+
+
+@pytest.fixture
+def mock_any_llm_tool_call_response() -> ChatCompletion:
+    """Fixture to create a mock any-llm response that includes tool calls"""
+    return ChatCompletion.model_validate(
+        {
+            "id": "c98f3cbc69ae4781a863d71b75bcd699",
+            "choices": [
+                {
+                    "finish_reason": "tool_calls",
+                    "index": 0,
+                    "message": {
+                        "content": "",
+                        "role": "assistant",
+                        "tool_calls": [
+                            {
+                                "id": "HscflevQB",
+                                "function": {
+                                    "arguments": '{"answer": "Hello! How can I assist you today?"}',
+                                    "name": "final_answer",
+                                },
+                                "type": "function",
+                            }
+                        ],
+                    },
+                }
+            ],
+            "created": 1754649356,
+            "model": "mistral-small-latest",
+            "object": "chat.completion",
+            "usage": {
+                "completion_tokens": 19,
+                "prompt_tokens": 84,
+                "total_tokens": 103,
+            },
+        }
     )
 
 
@@ -232,11 +295,3 @@ def agent_trace(request: pytest.FixtureRequest) -> AgentTrace:
     with open(trace_path, encoding="utf-8") as f:
         trace = json.load(f)
     return AgentTrace.model_validate(trace)
-
-
-@pytest.fixture(autouse=True, scope="session")
-def ensure_use_any_llm_unset() -> None:
-    """Ensure USE_ANY_LLM is unset for tests."""
-
-    # Unset the variable for the entire test session
-    os.environ.pop("USE_ANY_LLM", None)

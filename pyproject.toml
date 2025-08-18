@@ -9,11 +9,9 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
-  "duckduckgo_search",
+  "any-llm-sdk>=0.13.0,<1",
   "litellm>=1.74.0",
-  "markdownify",
   "mcp>=1.5.0",
-  "opentelemetry-exporter-otlp",
   "opentelemetry-sdk",
   "pydantic",
   "requests",
@@ -44,7 +42,7 @@ llama_index = [
 ]
 
 openai = [
-  "openai-agents>=0.2.0",
+  "openai-agents>=0.2.6, <1",
 ]
 
 smolagents = [
@@ -52,7 +50,7 @@ smolagents = [
 ]
 
 a2a = [
-  "a2a-sdk>=0.2.11",
+  "a2a-sdk>=0.3.0",
   "httpx",
 ]
 
@@ -179,7 +177,7 @@ docs = [
 ]
 
 lint = [
-  "pre-commit==4.2.0",
+  "pre-commit==4.3.0",
   "pre-commit-uv==4.1.4",
 ]
 
@@ -194,6 +192,7 @@ tests = [
   "debugpy>=1.8.13",
   "mktestdocs>=0.2.4",
   "syrupy>=4.9.1",
+  "any-llm-sdk[anthropic,google,huggingface,mistral,xai]>=0.13.0,<1",
 ]
 
 # For completeness, but 'uv sync --group dev' currently installs the others too.

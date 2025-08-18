@@ -119,9 +119,14 @@ with open("agent_trace.json", "w", encoding="utf-8") as f:
 
 ## Adding an OpenTelemetry exporter
 
-Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed. Note that this does not affect the existing processor that returns the traces to the user, and optionally prints them on `stdout`.
+Before starting to use the library, you can add new OpenTelemetry exporters and processors as needed.
 
 The following code will use the OpenTelemetry Python SDK to send the agent traces to an additional endpoint using OTLP over HTTP in the indicated URL:
+
+!!! tip
+
+    To use custom exporters you need to install their required dependencies,
+    In this example, it would be `pip install opentelemetry-exporter-otlp`.
 
 ```python
 from opentelemetry.trace import get_tracer_provider

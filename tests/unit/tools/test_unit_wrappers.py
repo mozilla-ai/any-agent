@@ -105,11 +105,11 @@ def test_wrap_tool_smolagents_already_wrapped() -> None:
 
 
 def test_wrap_tool_smolagents_builtin_tools() -> None:
-    from smolagents import DuckDuckGoSearchTool
+    from smolagents import UserInputTool
 
     wrapper = MagicMock()
     with patch("smolagents.tool", wrapper):
-        _wrap_tool_smolagents(DuckDuckGoSearchTool())
+        _wrap_tool_smolagents(UserInputTool())  # type: ignore[no-untyped-call]
         wrapper.assert_not_called()
 
 

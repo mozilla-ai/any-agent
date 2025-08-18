@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any
-
-from uvicorn import Server as UvicornServer  # noqa: TC002
+from typing import TYPE_CHECKING
 
 from any_agent.logging import logger
+
+if TYPE_CHECKING:
+    from typing import Any
+
+    from uvicorn import Server as UvicornServer
 
 
 @dataclass

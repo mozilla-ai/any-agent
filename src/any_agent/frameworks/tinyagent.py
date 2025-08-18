@@ -3,23 +3,21 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
-import os
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
-import litellm
-from litellm.utils import supports_response_schema
+from any_llm import completion
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
+from any_agent.logging import logger
 
 from .any_agent import AnyAgent
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from litellm.types.utils import Message as LiteLLMMessage
-    from litellm.types.utils import ModelResponse
+    from any_llm.types.completion import ChatCompletion
     from pydantic import BaseModel
 
 
@@ -31,9 +29,6 @@ Once you have a final answer, you MUST call the `final_answer` tool.
 
 You MUST plan extensively before each function call, and reflect extensively on the outcomes of the previous function calls.
 """.strip()
-
-
-DEFAULT_MAX_NUM_TURNS = 10
 
 
 class ToolExecutor:
@@ -122,9 +117,6 @@ class TinyAgent(AnyAgent):
         if self.config.api_base:
             self.completion_params["api_base"] = self.config.api_base
 
-        # Initialize providers client if gateway provider is set
-        self.use_any_llm = os.getenv("USE_ANY_LLM")
-
     async def _load_agent(self) -> None:
         """Load the agent and its tools."""
         wrapped_tools, mcp_servers = await self._load_tools(self.config.tools)
@@ -191,22 +183,25 @@ class TinyAgent(AnyAgent):
             },
         ]
 
-        num_of_turns = 0
-        max_turns = kwargs.get("max_turns", DEFAULT_MAX_NUM_TURNS)
+        if kwargs.pop("max_turns", None):
+            logger.warning(
+                "`max_turns` is deprecated and has no effect. See https://mozilla-ai.github.io/any-agent/agents/callbacks/#example-limit-the-number-of-steps"
+            )
         completion_params = self.completion_params.copy()
 
-        while num_of_turns < max_turns:
+        while True:
             completion_params["messages"] = messages
 
-            response = await self.call_model(**completion_params)
+            response: ChatCompletion = await self.call_model(**completion_params)
 
-            message: LiteLLMMessage = response.choices[0].message  # type: ignore[union-attr]
+            message = response.choices[0].message
 
             messages.append(message.model_dump())
 
             if message.tool_calls:
                 for tool_call in message.tool_calls:
-                    tool_name = tool_call.function.name
+                    f = tool_call.function  # type: ignore[union-attr]
+                    tool_name = f.name
                     tool_message = {
                         "role": "tool",
                         "tool_call_id": tool_call.id,
@@ -221,15 +216,15 @@ class TinyAgent(AnyAgent):
                         continue
 
                     tool_args = {}
-                    if tool_call.function.arguments:
-                        tool_args = json.loads(tool_call.function.arguments)
+                    if f.arguments:
+                        tool_args = json.loads(f.arguments)
 
                     client = self.clients[tool_name]
                     result = await client.call_tool(
                         {"name": tool_name, "arguments": tool_args}
                     )
                     tool_message["content"] = result
-                    messages.append(tool_message)  # type: ignore[arg-type]
+                    messages.append(tool_message)
 
                     if tool_name == "final_answer":
                         if self.config.output_type:
@@ -244,10 +239,6 @@ class TinyAgent(AnyAgent):
                         str(message.content), completion_params
                     )
                 return str(message.content)
-
-            num_of_turns += 1
-
-        return "Max turns reached"
 
     async def _return_output_type(
         self, output: str, completion_params: dict[str, Any]
@@ -265,28 +256,18 @@ class TinyAgent(AnyAgent):
             },
         ]
 
-        if self.use_any_llm or supports_response_schema(model=self.config.model_id):
-            completion_params["response_format"] = self.config.output_type
+        completion_params["response_format"] = self.config.output_type
         if "tools" in completion_params:
             completion_params.pop("tools")
             completion_params.pop("tool_choice", None)
             completion_params.pop("parallel_tool_calls", None)
         response = await self.call_model(**completion_params)
-        if self.use_any_llm:
-            return self.config.output_type.model_validate_json(
-                response.choices[0].message.content  # type: ignore[arg-type, union-attr]
-            )
         return self.config.output_type.model_validate_json(
-            response.choices[0].message["content"]  # type: ignore[union-attr]
+            response.choices[0].message.content  # type: ignore[arg-type]
         )
 
-    async def call_model(self, **completion_params: dict[str, Any]) -> ModelResponse:
-        if self.use_any_llm:
-            from any_llm import completion
-
-            return completion(**completion_params)  # type: ignore[return-value, arg-type]
-        # otherwise use litellm
-        return await litellm.acompletion(**completion_params)  # type: ignore[no-any-return]
+    async def call_model(self, **completion_params: dict[str, Any]) -> ChatCompletion:
+        return completion(**completion_params)  # type: ignore[return-value, arg-type]
 
     async def update_output_type_async(
         self, output_type: type[BaseModel] | None

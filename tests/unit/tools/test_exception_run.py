@@ -17,6 +17,7 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.tracing.otel_types import StatusCode
+from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
 
 
 class StreamingEndpoint:
@@ -132,13 +133,8 @@ def test_tool_error_llm_mocked(
         [async_fake_tool_fail_chunk(), async_fake_give_up_chunk()]
     )
 
-    patch_function = "litellm.acompletion"
-    if agent_framework is AgentFramework.GOOGLE:
-        patch_function = "google.adk.models.lite_llm.acompletion"
-    if agent_framework is AgentFramework.SMOLAGENTS:
-        patch_function = "litellm.completion"
     with (
-        patch(patch_function) as litellm_mock,
+        patch(LITELLM_IMPORT_PATHS[agent_framework]) as litellm_mock,
     ):
         if agent_framework in (AgentFramework.LLAMA_INDEX):
             litellm_mock.side_effect = streaming.next

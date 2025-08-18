@@ -1,5 +1,4 @@
 import pytest
-from litellm.utils import validate_environment
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.serving import A2AServingConfig
@@ -49,11 +48,6 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             f"Framework {agent_framework}, reason: {skip_reason[agent_framework]}"
         )
 
-    env_check = validate_environment(DEFAULT_SMALL_MODEL_ID)
-    if not env_check["keys_in_environment"]:
-        pytest.skip(f"{env_check['missing_keys']} needed for {DEFAULT_SMALL_MODEL_ID}")
-
-    # Create date agent
     date_agent_cfg = AgentConfig(
         instructions="Use the available tools to obtain additional information to answer the query.",
         name="date_agent",

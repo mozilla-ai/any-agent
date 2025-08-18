@@ -149,3 +149,6 @@ class A2AServingConfig(BaseModel):
 
     If not provided, a default in-memory task store will be used.
     """
+
+    stream_tool_usage: bool = False
+    """whether to stream tool execution results"""

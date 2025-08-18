@@ -27,6 +27,7 @@ nav:
       - MCP Agent: cookbook/mcp_agent.ipynb
       - Serve with A2A: cookbook/serve_a2a.ipynb
       - Use an Agent as a tool for another agent (A2A): cookbook/a2a_as_tool.ipynb
+      - Local Agent: cookbook/agent_with_local_llm.ipynb
   - API Reference:
     - Agent: api/agent.md
     - Callbacks: api/callbacks.md
