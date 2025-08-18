@@ -1,11 +1,6 @@
 from .a2a import a2a_tool, a2a_tool_async
 from .final_output import prepare_final_output
-from .mcp import (
-    MCPServer,
-    _get_mcp_server,
-    _MCPConnection,
-    _MCPServerBase,
-)
+from .mcp.mcp_client import MCPClient
 from .user_interaction import (
     ask_user_verification,
     send_console_message,
@@ -15,10 +10,7 @@ from .user_interaction import (
 from .web_browsing import search_tavily, search_web, visit_webpage
 
 __all__ = [
-    "MCPServer",
-    "_MCPConnection",
-    "_MCPServerBase",
-    "_get_mcp_server",
+    "MCPClient",
     "a2a_tool",
     "a2a_tool_async",
     "ask_user_verification",

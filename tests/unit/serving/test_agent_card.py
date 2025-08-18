@@ -46,7 +46,7 @@ async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
     server = _get_mcp_server(MCPSse(url=echo_sse_server["url"]), agent_framework)
     await server._setup_tools()
     if agent_framework is AgentFramework.AGNO:
-        agent._tools = list(server.tools[0].functions.values())  # type: ignore[union-attr]
+        agent._tools = list(server.tools[0].functions.values())
     else:
         agent._tools = server.tools
 

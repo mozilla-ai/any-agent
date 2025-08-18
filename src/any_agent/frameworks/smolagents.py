@@ -110,7 +110,7 @@ class SmolagentsAgent(AnyAgent):
             msg = "You need to `pip install 'any-agent[smolagents]'` to use this agent"
             raise ImportError(msg)
 
-        tools, _ = await self._load_tools(self.config.tools)
+        tools = await self._load_tools(self.config.tools)
 
         main_agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
 

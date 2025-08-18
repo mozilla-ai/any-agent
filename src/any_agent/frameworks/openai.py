@@ -58,8 +58,7 @@ class OpenAIAgent(AnyAgent):
             msg = "You need to `pip install openai-agents` to use this agent"
             raise ImportError(msg)
 
-        tools, mcp_servers = await self._load_tools(self.config.tools)
-        tools = self._filter_mcp_tools(tools, mcp_servers)
+        tools = await self._load_tools(self.config.tools)
 
         kwargs_ = self.config.agent_args or {}
         if self.config.model_args:
@@ -73,18 +72,16 @@ class OpenAIAgent(AnyAgent):
             instructions=self.config.instructions,
             model=self._get_model(self.config),
             tools=tools,
-            mcp_servers=[mcp_server.server for mcp_server in mcp_servers],
+            mcp_servers=[],  # No longer needed with unified approach
             **kwargs_,
         )
 
-    def _filter_mcp_tools(self, tools: list[Any], mcp_servers: list[Any]) -> list[Any]:
+    def _filter_mcp_tools(self, tools: list[Any], mcp_clients: list[Any]) -> list[Any]:
         """OpenAI framework doesn't expect the mcp tool to be included in `tools`."""
-        non_mcp_tools = []
-        for tool in tools:
-            if any(tool in mcp_server.tools for mcp_server in mcp_servers):
-                continue
-            non_mcp_tools.append(tool)
-        return non_mcp_tools
+        # With the new MCPClient approach, MCP tools are already converted to regular callables
+        # and included in the tools list, so we don't need to filter them out anymore.
+        # The OpenAI framework can handle them as regular tools.
+        return tools
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
         if not self._agent:
@@ -109,7 +106,6 @@ class OpenAIAgent(AnyAgent):
         if self._agent:
             # Store current state
             current_tools = self._tools
-            current_mcp_servers = self._mcp_servers
 
             # Recreate the agent with the new output type
             kwargs_ = self.config.agent_args or {}
@@ -123,6 +119,6 @@ class OpenAIAgent(AnyAgent):
                 instructions=self.config.instructions,
                 model=self._get_model(self.config),
                 tools=current_tools,
-                mcp_servers=[mcp_server.server for mcp_server in current_mcp_servers],
+                mcp_servers=[],  # No longer needed with unified approach
                 **kwargs_,
             )

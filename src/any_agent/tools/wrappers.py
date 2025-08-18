@@ -1,14 +1,11 @@
 import asyncio
 import inspect
-from collections.abc import Callable, MutableSequence, Sequence
+from collections.abc import Callable, Sequence
 from functools import wraps
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from any_agent.config import AgentFramework, MCPParams, Tool
-from any_agent.tools import (
-    _get_mcp_server,
-    _MCPServerBase,
-)
+from any_agent.tools.mcp.mcp_client import MCPClient
 
 if TYPE_CHECKING:
     from agents import Tool as AgentTool
@@ -20,14 +17,14 @@ if TYPE_CHECKING:
 
 def _wrap_no_exception(tool: Any) -> Any:
     @wraps(tool)
-    def wrapped_function(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+    def wrapped_function(*args: Any, **kwargs: Any) -> Any:
         try:
             return tool(*args, **kwargs)
         except Exception as e:
             return f"Error calling tool: {e}"
 
     @wraps(tool)
-    async def wrapped_coroutine(*args, **kwargs) -> Any:  # type: ignore[no-untyped-def]
+    async def wrapped_coroutine(*args: Any, **kwargs: Any) -> Any:
         try:
             return await tool(*args, **kwargs)
         except Exception as e:
@@ -139,20 +136,29 @@ T_co = TypeVar("T_co", covariant=True)
 async def _wrap_tools(
     tools: Sequence[T_co],
     agent_framework: AgentFramework,
-) -> tuple[list[T_co], list[_MCPServerBase[T_co]]]:
+) -> tuple[list[T_co], list[MCPClient]]:
     framework_wrapper = WRAPPERS[agent_framework]
 
     wrapped_tools = list[T_co]()
-    mcp_servers: MutableSequence[_MCPServerBase[T_co]] = []
+    mcp_clients: list[MCPClient] = []
+
     for tool in tools:
-        # if it's MCPStdio or MCPSse, we need to wrap it in a server
+        # if it's MCPStdio or MCPSse, we need to wrap it in a client
         if isinstance(tool, MCPParams):
-            # MCP adapters are usually implemented as context managers.
-            # We wrap the server using `MCPServerBase` so the
-            # tools can be used as any other callable.
-            mcp_server = _get_mcp_server(tool, agent_framework)
-            await mcp_server._setup_tools()
-            mcp_servers.append(mcp_server)  # type: ignore[arg-type]
+            # Create and connect MCP client
+            mcp_client = MCPClient(config=tool, framework=agent_framework)
+            await mcp_client.connect()
+
+            # Get tools as callables (universal format)
+            callable_tools = await mcp_client.list_tools()
+
+            # Wrap each callable tool with the framework wrapper
+            for callable_tool in callable_tools:
+                wrapped_tools.append(
+                    framework_wrapper(_wrap_no_exception(callable_tool))
+                )
+
+            mcp_clients.append(mcp_client)
         elif callable(tool):
             verify_callable(tool)
             wrapped_tools.append(framework_wrapper(_wrap_no_exception(tool)))
@@ -160,4 +166,4 @@ async def _wrap_tools(
             msg = f"Tool {tool} needs to be of type `MCPStdio` or `callable` but is {type(tool)}"
             raise ValueError(msg)
 
-    return wrapped_tools, mcp_servers  # type: ignore[return-value]
+    return wrapped_tools, mcp_clients

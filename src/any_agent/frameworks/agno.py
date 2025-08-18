@@ -59,7 +59,7 @@ class AgnoAgent(AnyAgent):
             msg = "You need to `pip install 'any-agent[agno]'` to use this agent"
             raise ImportError(msg)
 
-        tools, _ = await self._load_tools(self.config.tools)
+        tools = await self._load_tools(self.config.tools)
 
         self._tools = self._unpack_tools(tools)
 
@@ -96,7 +96,7 @@ class AgnoAgent(AnyAgent):
         # The AGNO agent requires response_model to be set during construction
         if self._agent:
             # Rebuild tools list from original config
-            tools, _ = await self._load_tools(self.config.tools)
+            tools = await self._load_tools(self.config.tools)
 
             # Recreate the agent with the new configuration
             agent_args = self.config.agent_args or {}
