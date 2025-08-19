@@ -78,8 +78,6 @@ agent_trace = agent.run("Which Agent Framework is the best??")
 print(agent_trace)
 ```
 
-> [!NOTE]
-> **Important**: The `run()` method is synchronous - don't use it in an async context. For async usage, use `run_async()` instead. See [Common Issues](https://mozilla-ai.github.io/any-agent/#common-issues) for more details.
 
 
 > [!TIP]
