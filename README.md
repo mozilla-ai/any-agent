@@ -79,7 +79,6 @@ print(agent_trace)
 ```
 
 
-
 > [!TIP]
 > Multi-agent can be implemented [using Agents-As-Tools](https://mozilla-ai.github.io/any-agent/agents/tools/#using-agents-as-tools).
 
