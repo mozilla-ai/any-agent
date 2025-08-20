@@ -9,7 +9,7 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
-  "any-llm-sdk>=0.13.0,<1",
+  "any-llm-sdk>=0.14.1,<1",
   "openai<1.100",
   "litellm>=1.74.0",
   "mcp>=1.5.0",
