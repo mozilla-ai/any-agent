@@ -197,44 +197,6 @@ def mock_litellm_tool_call_response() -> ModelResponse:
 
 
 @pytest.fixture
-def mock_any_llm_tool_call_response() -> ChatCompletion:
-    """Fixture to create a mock any-llm response that includes tool calls"""
-    return ChatCompletion.model_validate(
-        {
-            "id": "c98f3cbc69ae4781a863d71b75bcd699",
-            "choices": [
-                {
-                    "finish_reason": "tool_calls",
-                    "index": 0,
-                    "message": {
-                        "content": "",
-                        "role": "assistant",
-                        "tool_calls": [
-                            {
-                                "id": "HscflevQB",
-                                "function": {
-                                    "arguments": '{"answer": "Hello! How can I assist you today?"}',
-                                    "name": "final_answer",
-                                },
-                                "type": "function",
-                            }
-                        ],
-                    },
-                }
-            ],
-            "created": 1754649356,
-            "model": "mistral-small-latest",
-            "object": "chat.completion",
-            "usage": {
-                "completion_tokens": 19,
-                "prompt_tokens": 84,
-                "total_tokens": 103,
-            },
-        }
-    )
-
-
-@pytest.fixture
 def mock_litellm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
     """
     Create a fixture that returns an async generator function to mock streaming responses.

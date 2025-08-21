@@ -50,17 +50,19 @@ async def test_serve_async(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "model_id", ["openai:gpt-5-nano", "mistral:mistral-medium-latest"]
+)
 async def test_serve_streaming_async(
-    request: pytest.FixtureRequest, a2a_test_helpers: A2ATestHelpers
+    request: pytest.FixtureRequest, a2a_test_helpers: A2ATestHelpers, model_id: str
 ) -> None:
     agent = await AnyAgent.create_async(
         "tinyagent",
         AgentConfig(
-            model_id=DEFAULT_SMALL_MODEL_ID,
+            model_id=model_id,
             instructions="Use the available tools to obtain additional information to answer the query.",
             tools=[get_datetime],
             description="I'm an agent to help.",
-            model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
         ),
     )
 
@@ -86,6 +88,6 @@ async def test_serve_streaming_async(
             responses.append(response)
             assert response is not None
 
-        # 4 responses are for tool calls: 2 for get_datetime and 2 for final_answer
-        assert len(responses) == 6
+        # 2 responses are for get_datetime tool_call
+        assert len(responses) == 4
         AppStatus.get_or_create_exit_event().set()

@@ -7,7 +7,9 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from any_llm import completion
+from any_llm.provider import ProviderFactory, ProviderName
 from mcp.types import CallToolResult, TextContent
+from pydantic import ValidationError
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.logging import logger
@@ -29,6 +31,19 @@ Once you have a final answer, you MUST call the `final_answer` tool.
 
 You MUST plan extensively before each function call, and reflect extensively on the outcomes of the previous function calls.
 """.strip()
+
+FINAL_ANSWER_TOOL = "provide_final_answer"
+
+
+def _parse_output_type(
+    output_type: type[BaseModel], answer: str | Any
+) -> BaseModel | str:
+    try:
+        if isinstance(answer, str):
+            return output_type.model_validate_json(answer)
+        return output_type.model_validate(answer)
+    except ValidationError:
+        return str(answer)
 
 
 class ToolExecutor:
@@ -80,11 +95,6 @@ class ToolExecutor:
             return f"Error executing tool: {e}"
 
 
-def final_answer(answer: str) -> str:
-    """Return the final answer to the user."""
-    return answer
-
-
 class TinyAgent(AnyAgent):
     """A lightweight agent implementation using litellm.
 
@@ -105,12 +115,18 @@ class TinyAgent(AnyAgent):
         self.completion_params = {
             "model": self.config.model_id,
             "tools": [],
-            "tool_choice": "required",
             **(self.config.model_args or {}),
         }
 
-        if self.completion_params["tool_choice"] == "required":
-            self.config.tools.append(final_answer)
+        provider_name, _ = ProviderFactory.split_model_provider(self.config.model_id)
+        self.uses_openai = provider_name == ProviderName.OPENAI
+
+        user_tool_choice = self.completion_params.get("tool_choice")
+        if user_tool_choice and user_tool_choice != "required" and not self.uses_openai:
+            logger.warning(
+                "TinyAgent framework only works with tool_choice=required."
+                f"Provided option will be ignored: {user_tool_choice}"
+            )
 
         if self.config.api_key:
             self.completion_params["api_key"] = self.config.api_key
@@ -146,8 +162,7 @@ class TinyAgent(AnyAgent):
                         "type": "string",
                         "description": f"Parameter {param_name}",
                     }
-
-                    if param.default == inspect.Parameter.empty:
+                    if param.default == inspect.Parameter.empty or self.uses_openai:
                         required.append(param_name)
 
                 input_schema = {
@@ -158,20 +173,56 @@ class TinyAgent(AnyAgent):
             else:
                 input_schema = tool.__input_schema__
 
-            self.completion_params["tools"].append(
-                {
-                    "type": "function",
-                    "function": {
-                        "name": tool_name,
-                        "description": tool_desc,
-                        "parameters": input_schema,
-                    },
-                }
-            )
+            function_def = {
+                "type": "function",
+                "function": {
+                    "name": tool_name,
+                    "description": tool_desc,
+                    "parameters": input_schema,
+                },
+            }
+            if self.uses_openai:
+                function_def["function"]["parameters"]["additionalProperties"] = False  # type: ignore[index]
+                function_def["function"]["strict"] = True  # type: ignore[index]
+
+            self.completion_params["tools"].append(function_def)
 
             self.clients[tool_name] = ToolExecutor(tool)
 
+    def add_final_answer_tool(self) -> None:
+        if self.config.output_type:
+            description = (
+                "Provide the final answer to the user. Must follow the schema:\n"
+                f"{self.config.output_type.model_json_schema()}"
+            )
+        else:
+            description = "Provide the final answer to the user."
+        self.completion_params["tools"].append(
+            {
+                "type": "function",
+                "function": {
+                    "name": FINAL_ANSWER_TOOL,
+                    "description": description,
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "answer": {"type": "string", "description": description}
+                        },
+                        "required": ["answer"],
+                    },
+                },
+            }
+        )
+
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+        if self.uses_openai:
+            self.completion_params["tool_choice"] = "auto"
+            if self.config.output_type is not None:
+                self.completion_params["response_format"] = self.config.output_type
+        else:
+            self.completion_params["tool_choice"] = "required"
+            self.add_final_answer_tool()
+
         messages = [
             {
                 "role": "system",
@@ -202,6 +253,18 @@ class TinyAgent(AnyAgent):
                 for tool_call in message.tool_calls:
                     f = tool_call.function  # type: ignore[union-attr]
                     tool_name = f.name
+
+                    if tool_name == FINAL_ANSWER_TOOL:
+                        if isinstance(f.arguments, str):
+                            answer = json.loads(f.arguments)
+                        else:
+                            answer = f.arguments
+                        if self.config.output_type:
+                            return _parse_output_type(
+                                self.config.output_type, answer.get("answer")
+                            )
+                        return str(answer.get("answer"))
+
                     tool_message = {
                         "role": "tool",
                         "tool_call_id": tool_call.id,
@@ -226,45 +289,10 @@ class TinyAgent(AnyAgent):
                     tool_message["content"] = result
                     messages.append(tool_message)
 
-                    if tool_name == "final_answer":
-                        if self.config.output_type:
-                            return await self._return_output_type(
-                                str(result), completion_params
-                            )
-                        return str(result)
-
             elif message.role == "assistant" and message.content:
                 if self.config.output_type:
-                    return await self._return_output_type(
-                        str(message.content), completion_params
-                    )
+                    return _parse_output_type(self.config.output_type, message.content)
                 return str(message.content)
-
-    async def _return_output_type(
-        self, output: str, completion_params: dict[str, Any]
-    ) -> str | BaseModel:
-        if not self.config.output_type:
-            return output
-        completion_params["messages"] = [
-            {
-                "role": "system",
-                "content": "You are an expert that can convert raw text into structured JSON.",
-            },
-            {
-                "role": "user",
-                "content": f"Please conform this output:\n{output}\nTo match the following schema:\n{self.config.output_type.model_json_schema()}.",
-            },
-        ]
-
-        completion_params["response_format"] = self.config.output_type
-        if "tools" in completion_params:
-            completion_params.pop("tools")
-            completion_params.pop("tool_choice", None)
-            completion_params.pop("parallel_tool_calls", None)
-        response = await self.call_model(**completion_params)
-        return self.config.output_type.model_validate_json(
-            response.choices[0].message.content  # type: ignore[arg-type]
-        )
 
     async def call_model(self, **completion_params: dict[str, Any]) -> ChatCompletion:
         return completion(**completion_params)  # type: ignore[return-value, arg-type]

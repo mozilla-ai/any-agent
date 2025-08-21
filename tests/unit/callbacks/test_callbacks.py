@@ -2,9 +2,10 @@
 # pylint: disable=missing-class-docstring
 from collections.abc import Callable
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import pytest
+from any_llm.types.completion import ChatCompletion
 
 from any_agent import AgentConfig, AgentFramework, AgentRunError, AnyAgent
 from any_agent.callbacks import Callback, Context
@@ -104,7 +105,7 @@ def run_agent_with_mock(
     """Helper function to run agent with mocked response and optional exception handling."""
     import_path = LITELLM_IMPORT_PATHS[AgentFramework.TINYAGENT]
 
-    with patch(import_path, return_value=mock_response):
+    with patch(import_path, mock_response):
         if expected_exception:
             with pytest.raises(expected_exception, match=exception_message):
                 agent.run(prompt)
@@ -119,10 +120,13 @@ def test_callbacks(mock_any_llm_response: Any) -> None:
         callbacks=[callback],
     )
 
+    mock_response = MagicMock()
+    mock_response.return_value = mock_any_llm_response
+
     run_agent_with_mock(
         agent=agent,
         prompt="Hello!",
-        mock_response=mock_any_llm_response,
+        mock_response=mock_response,
     )
 
     # Verify that the callback methods were called
@@ -134,7 +138,7 @@ def test_callbacks(mock_any_llm_response: Any) -> None:
     assert callback.after_tool_called is False
 
 
-def test_tool_execution_callbacks(mock_any_llm_tool_call_response: Any) -> None:
+def test_tool_execution_callbacks() -> None:
     callback = SampleCallback()
     agent = create_agent(
         instructions="You must use the search_web tool to find information",
@@ -142,10 +146,81 @@ def test_tool_execution_callbacks(mock_any_llm_tool_call_response: Any) -> None:
         tools=[search_web],
     )
 
+    # Mock that first return an actual tool call and then a final answer
+    tool_call = ChatCompletion.model_validate(
+        {
+            "id": "c98f3cbc69ae4781a863d71b75bcd699",
+            "choices": [
+                {
+                    "finish_reason": "tool_calls",
+                    "index": 0,
+                    "message": {
+                        "content": "",
+                        "role": "assistant",
+                        "tool_calls": [
+                            {
+                                "id": "HscflevQB",
+                                "function": {
+                                    "arguments": '{"query": "How o say hello?"}',
+                                    "name": "search_web",
+                                },
+                                "type": "function",
+                            }
+                        ],
+                    },
+                }
+            ],
+            "created": 1754649356,
+            "model": "mistral-small-latest",
+            "object": "chat.completion",
+            "usage": {
+                "completion_tokens": 19,
+                "prompt_tokens": 84,
+                "total_tokens": 103,
+            },
+        }
+    )
+    provide_final_answer_call = ChatCompletion.model_validate(
+        {
+            "id": "c98f3cbc69ae4781a863d71b75bcd699",
+            "choices": [
+                {
+                    "finish_reason": "tool_calls",
+                    "index": 0,
+                    "message": {
+                        "content": "",
+                        "role": "assistant",
+                        "tool_calls": [
+                            {
+                                "id": "HscflevQB",
+                                "function": {
+                                    "arguments": '{"answer": "Hello! How can I assist you today?"}',
+                                    "name": "provide_final_answer",
+                                },
+                                "type": "function",
+                            }
+                        ],
+                    },
+                }
+            ],
+            "created": 1754649356,
+            "model": "mistral-small-latest",
+            "object": "chat.completion",
+            "usage": {
+                "completion_tokens": 19,
+                "prompt_tokens": 84,
+                "total_tokens": 103,
+            },
+        }
+    )
+
+    mock_response = MagicMock()
+    mock_response.side_effect = [tool_call, provide_final_answer_call]
+
     run_agent_with_mock(
         agent=agent,
         prompt="Hello!",
-        mock_response=mock_any_llm_tool_call_response,
+        mock_response=mock_response,
     )
 
     # Verify that all callback methods were called
@@ -157,7 +232,7 @@ def test_tool_execution_callbacks(mock_any_llm_tool_call_response: Any) -> None:
     assert callback.after_tool_called
 
 
-def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> None:
+def test_callback_exception_causes_agent_exit(mock_any_llm_response: Any) -> None:
     """Test that throwing an exception in a callback results in the agent exiting."""
     callback = ExceptionCallback("Test callback exception")
     agent = create_agent(
@@ -165,10 +240,13 @@ def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> Non
         callbacks=[callback],
     )
 
+    mock_response = MagicMock()
+    mock_response.return_value = mock_any_llm_response
+
     run_agent_with_mock(
         agent=agent,
         prompt="Search for information about the latest AI developments and summarize what you find",
-        mock_response=mock_litellm_response,
+        mock_response=mock_response,
         expected_exception=AgentRunError,
         exception_message="Test callback exception",
     )
