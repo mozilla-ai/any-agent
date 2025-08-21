@@ -5,13 +5,14 @@ from datetime import datetime, timedelta
 import pandas as pd
 import requests
 import streamlit as st
-from constants import DEFAULT_EVALUATION_CASE, MODEL_OPTIONS
+from constants import (
+    DEFAULT_EVALUATION_CRITERIA,
+    DEFAULT_EVALUATION_MODEL,
+    MODEL_OPTIONS,
+)
 from pydantic import BaseModel, ConfigDict
 
 from any_agent import AgentFramework
-from any_agent.evaluation import EvaluationCase
-from any_agent.evaluation.schemas import CheckpointCriteria
-from any_agent.tracing.trace import _is_tracing_supported
 
 
 class UserInputs(BaseModel):
@@ -21,7 +22,8 @@ class UserInputs(BaseModel):
     max_driving_hours: int
     date: datetime
     framework: str
-    evaluation_case: EvaluationCase
+    evaluation_model: str
+    evaluation_criteria: list[dict[str, str]]
     run_evaluation: bool
 
 
@@ -66,7 +68,6 @@ def get_user_inputs() -> UserInputs:
             "Select a date in the future", value=datetime.now() + timedelta(days=1)
         )
     with col_time:
-        # default to 9am
         time = st.selectbox(
             "Select a time",
             [datetime.strptime(f"{i:02d}:00", "%H:%M").time() for i in range(24)],
@@ -74,9 +75,7 @@ def get_user_inputs() -> UserInputs:
         )
     date = datetime.combine(date, time)
 
-    supported_frameworks = [
-        framework for framework in AgentFramework if _is_tracing_supported(framework)
-    ]
+    supported_frameworks = [framework for framework in AgentFramework]
 
     framework = st.selectbox(
         "Select the agent framework to use",
@@ -92,7 +91,6 @@ def get_user_inputs() -> UserInputs:
         format_func=lambda x: "/".join(x.split("/")[-3:]),
     )
 
-    # Add evaluation case section
     with st.expander("Custom Evaluation"):
         evaluation_model_id = st.selectbox(
             "Select the model to use for LLM-as-a-Judge evaluation",
@@ -100,48 +98,35 @@ def get_user_inputs() -> UserInputs:
             index=2,
             format_func=lambda x: "/".join(x.split("/")[-3:]),
         )
-        evaluation_case = copy.deepcopy(DEFAULT_EVALUATION_CASE)
-        evaluation_case.llm_judge = evaluation_model_id
-        # make this an editable json section
-        # convert the checkpoints to a df series so that it can be edited
-        checkpoints = evaluation_case.checkpoints
-        checkpoints_df = pd.DataFrame(
-            [checkpoint.model_dump() for checkpoint in checkpoints]
-        )
-        checkpoints_df = st.data_editor(
-            checkpoints_df,
+
+        evaluation_criteria = copy.deepcopy(DEFAULT_EVALUATION_CRITERIA)
+
+        criteria_df = pd.DataFrame(evaluation_criteria)
+        criteria_df = st.data_editor(
+            criteria_df,
             column_config={
-                "points": st.column_config.NumberColumn(label="Points"),
                 "criteria": st.column_config.TextColumn(label="Criteria"),
             },
             hide_index=True,
             num_rows="dynamic",
         )
-        # for each checkpoint, convert it back to a CheckpointCriteria object
-        new_ckpts = []
 
-        # don't let a user add more than 20 checkpoints
-        if len(checkpoints_df) > 20:
-            st.error(
-                "You can only add up to 20 checkpoints for the purpose of this demo."
-            )
-            checkpoints_df = checkpoints_df[:20]
+        new_criteria = []
 
-        for _, row in checkpoints_df.iterrows():
+        if len(criteria_df) > 20:
+            st.error("You can only add up to 20 criteria for the purpose of this demo.")
+            criteria_df = criteria_df[:20]
+
+        for _, row in criteria_df.iterrows():
             if row["criteria"] == "":
                 continue
             try:
-                # Don't let people write essays for criteria in this demo
                 if len(row["criteria"].split(" ")) > 100:
                     msg = "Criteria is too long"
                     raise ValueError(msg)
-                new_crit = CheckpointCriteria(
-                    criteria=row["criteria"], points=row["points"]
-                )
-                new_ckpts.append(new_crit)
+                new_criteria.append({"criteria": row["criteria"]})
             except Exception as e:
-                st.error(f"Error creating checkpoint: {e}")
-        evaluation_case.checkpoints = new_ckpts
+                st.error(f"Error creating criterion: {e}")
 
     return UserInputs(
         model_id=model_id,
@@ -149,6 +134,7 @@ def get_user_inputs() -> UserInputs:
         max_driving_hours=max_driving_hours,
         date=date,
         framework=framework,
-        evaluation_case=evaluation_case,
+        evaluation_model=evaluation_model_id,
+        evaluation_criteria=new_criteria,
         run_evaluation=st.checkbox("Run Evaluation", value=True),
     )

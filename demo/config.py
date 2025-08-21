@@ -13,7 +13,6 @@ from rich.prompt import Prompt
 
 from any_agent import AgentFramework
 from any_agent.config import AgentConfig
-from any_agent.evaluation import EvaluationCase
 from any_agent.logging import logger
 
 INPUT_PROMPT_TEMPLATE = """
@@ -139,9 +138,9 @@ class Config(BaseModel):
     framework: AgentFramework
 
     main_agent: AgentConfig
-    managed_agents: list[AgentConfig] | None = None
 
-    evaluation_cases: list[EvaluationCase] | None = None
+    evaluation_model: str | None = None
+    evaluation_criteria: list[dict[str, str]] | None = None
 
     @classmethod
     def from_dict(cls, data: dict) -> "Config":
@@ -174,24 +173,6 @@ class Config(BaseModel):
                 mcp_tool = set_mcp_settings(tool)
                 callables.append(mcp_tool)
         data["main_agent"]["tools"] = callables
-        for agent in data.get("managed_agents", []):
-            if agent.get("model_id") is None:
-                agent["model_id"] = get_litellm_model_id(
-                    agent.get("name", "managed_agent")
-                )
-            else:
-                logger.info(f"Agent {agent['name']} using model_id {agent['model_id']}")
-            callables = []
-            for tool in agent.get("tools", []):
-                if isinstance(tool, str):
-                    module_name, func_name = tool.rsplit(".", 1)
-                    module = __import__(module_name, fromlist=[func_name])
-                    callables.append(getattr(module, func_name))
-                else:
-                    # this means it must be an MCPStdioParams
-                    mcp_tool = set_mcp_settings(tool)
-                    callables.append(mcp_tool)
-            agent["tools"] = callables
         if not data.get("framework"):
             data["framework"] = ask_framework()
         else:

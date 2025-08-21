@@ -14,14 +14,11 @@ from services.agent import (
 
 nest_asyncio.apply()
 
-# Set page config
 st.set_page_config(page_title="Surf Spot Finder", page_icon="🏄", layout="wide")
 
-# Allow a user to resize the sidebar to take up most of the screen to make editing eval cases easier
 st.markdown(
     """
     <style>
-        /* When sidebar is expanded, adjust main content */
         section[data-testid="stSidebar"][aria-expanded="true"] {
             max-width: 99% !important;
         }
@@ -36,18 +33,16 @@ with st.sidebar:
     run_button = st.button("Run Agent 🤖", disabled=not is_valid, type="primary")
 
 
-# Main content
 async def main():
-    # Handle agent execution button click
     if run_button:
         agent, agent_config = await configure_agent(user_inputs)
         agent_trace = await run_agent(agent, agent_config)
 
         await display_output(agent_trace)
 
-        evaluation_result = await evaluate_agent(agent_config, agent_trace)
-
-        await display_evaluation_results(evaluation_result)
+        if user_inputs.run_evaluation:
+            evaluation_results = await evaluate_agent(agent_config, agent_trace)
+            await display_evaluation_results(evaluation_results)
     else:
         st.title("🏄 Surf Spot Finder")
         st.markdown(
@@ -57,7 +52,6 @@ async def main():
             "👈 Configure your search parameters in the sidebar and click Run to start!"
         )
 
-        # Display tools in a more organized way
         st.markdown("### 🛠️ Available Tools")
 
         st.markdown("""
@@ -93,7 +87,6 @@ async def main():
             with st.expander(f"🌐 {tool.__name__}"):
                 st.markdown(tool.__doc__ or "No description available")
 
-        # add a check that all tools were listed
         if len(weather_tools) + len(location_tools) + len(web_tools) != len(
             DEFAULT_TOOLS
         ):
@@ -101,7 +94,6 @@ async def main():
                 "Some tools are not listed. Please check the code for more details."
             )
 
-        # Add Custom Evaluation explanation section
         st.markdown("### 📊 Custom Evaluation")
         st.markdown("""
         The Surf Spot Finder includes a powerful evaluation system that allows you to customize how the agent's performance is assessed.
