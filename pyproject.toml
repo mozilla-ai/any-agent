@@ -12,7 +12,6 @@ dependencies = [
   "any-llm-sdk>=0.14.1,<1",
   "openai<1.100",
   "litellm>=1.74.0",
-  "openai==1.99.6",
   "mcp>=1.5.0",
   "opentelemetry-sdk",
   "pydantic",

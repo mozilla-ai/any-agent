@@ -3,7 +3,7 @@
 import inspect
 import os
 from collections.abc import Callable, Sequence
-from contextlib import AsyncExitStack, suppress
+from contextlib import AsyncExitStack
 from datetime import timedelta
 from textwrap import dedent
 from typing import Any, Optional
@@ -18,16 +18,15 @@ from any_agent.config import (
     MCPStreamableHttp,
 )
 
-# Check for MCP dependencies
-mcp_available = False
-with suppress(ImportError):
+missing_mcp_error = None
+try:
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.sse import sse_client
     from mcp.client.stdio import stdio_client
     from mcp.client.streamable_http import streamablehttp_client
     from mcp.types import Tool as MCPTool
-
-    mcp_available = True
+except ImportError as e:
+    missing_mcp_error = e
 
 
 class MCPClient(BaseModel):
@@ -47,9 +46,9 @@ class MCPClient(BaseModel):
 
     def model_post_init(self, __context: Any, /) -> None:
         """Initialize the MCP client and check dependencies."""
-        if not mcp_available:
+        if missing_mcp_error:
             msg = "You need to `pip install 'any-agent[mcp]'` to use MCP."
-            raise ImportError(msg)
+            raise ImportError(msg) from missing_mcp_error
 
     async def connect(self) -> None:
         """Connect using the appropriate transport type."""
@@ -203,24 +202,19 @@ class MCPClient(BaseModel):
 
         return mcp_tool_function
 
+    TYPE_MAPPING = {
+        "string": str,
+        "integer": int,
+        "number": float,
+        "boolean": bool,
+        "array": list,
+        "object": dict,
+    }
+
     def _json_schema_to_python_type(self, schema: dict[str, Any]) -> type:
         """Convert JSON schema to Python type using robust conversion."""
         schema_type = schema.get("type", "string")
-
-        # Handle basic types
-        if schema_type == "string":
-            return str
-        if schema_type == "integer":
-            return int
-        if schema_type == "number":
-            return float
-        if schema_type == "boolean":
-            return bool
-        if schema_type == "array":
-            return list
-        if schema_type == "object":
-            return dict
-        return str
+        return self.TYPE_MAPPING.get(schema_type, str)
 
     def _create_enhanced_description(self, description: str, input_schema: Any) -> str:
         """Create enhanced docstring with parameter descriptions."""
