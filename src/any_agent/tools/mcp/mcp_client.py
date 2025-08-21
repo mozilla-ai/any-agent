@@ -6,7 +6,7 @@ from collections.abc import Callable, Sequence
 from contextlib import AsyncExitStack, suppress
 from datetime import timedelta
 from textwrap import dedent
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 
@@ -88,12 +88,6 @@ class MCPClient(BaseModel):
         self._session = await self._exit_stack.enter_async_context(client_session)
         await self._session.initialize()
 
-    def get_session_id(self) -> str | None:
-        """Get session ID for streamable HTTP connections."""
-        if self._get_session_id_callback:
-            return self._get_session_id_callback()
-        return None
-
     async def list_raw_tools(self) -> list[MCPTool]:
         """Get raw MCP tools from the server."""
         if not self._session:
@@ -155,23 +149,28 @@ class MCPClient(BaseModel):
             required = input_schema.get("required", [])
 
             for param_name, param_info in properties.items():
-                param_type = self._schema_type_to_python_type(
-                    param_info.get("type", "string")
-                )
-                annotations[param_name] = param_type
+                # Use the improved schema conversion
+                base_param_type = self._json_schema_to_python_type(param_info)
 
                 if param_name not in required:
+                    # For optional parameters, use Optional[T] for better framework compatibility
+                    # Note: We use Optional instead of X | Y syntax because some frameworks
+                    # (like Google) don't handle the union syntax properly
+                    optional_param_type: Any = Optional[base_param_type]  # noqa: UP045
+                    annotations[param_name] = optional_param_type
                     param = inspect.Parameter(
                         param_name,
                         inspect.Parameter.KEYWORD_ONLY,
                         default=None,
-                        annotation=param_type,
+                        annotation=optional_param_type,
                     )
                 else:
+                    required_param_type: Any = base_param_type
+                    annotations[param_name] = required_param_type
                     param = inspect.Parameter(
                         param_name,
                         inspect.Parameter.KEYWORD_ONLY,
-                        annotation=param_type,
+                        annotation=required_param_type,
                     )
                 parameters.append(param)
 
@@ -201,21 +200,27 @@ class MCPClient(BaseModel):
         mcp_tool_function.__doc__ = enhanced_description
         mcp_tool_function.__signature__ = signature  # type: ignore[attr-defined]
         mcp_tool_function.__annotations__ = {**annotations, "return": str}
-        mcp_tool_function.__input_schema__ = input_schema  # type: ignore[attr-defined]
 
         return mcp_tool_function
 
-    def _schema_type_to_python_type(self, schema_type: str) -> type:
-        """Convert JSON schema type to Python type."""
-        type_mapping = {
-            "string": str,
-            "integer": int,
-            "number": float,
-            "boolean": bool,
-            "array": list,
-            "object": dict,
-        }
-        return type_mapping.get(schema_type, str)
+    def _json_schema_to_python_type(self, schema: dict[str, Any]) -> type:
+        """Convert JSON schema to Python type using robust conversion."""
+        schema_type = schema.get("type", "string")
+
+        # Handle basic types
+        if schema_type == "string":
+            return str
+        if schema_type == "integer":
+            return int
+        if schema_type == "number":
+            return float
+        if schema_type == "boolean":
+            return bool
+        if schema_type == "array":
+            return list
+        if schema_type == "object":
+            return dict
+        return str
 
     def _create_enhanced_description(self, description: str, input_schema: Any) -> str:
         """Create enhanced docstring with parameter descriptions."""
