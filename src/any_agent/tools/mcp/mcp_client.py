@@ -6,7 +6,7 @@ from collections.abc import Callable, Sequence
 from contextlib import AsyncExitStack
 from datetime import timedelta
 from textwrap import dedent
-from typing import Any, Optional
+from typing import Any, ClassVar, Optional
 
 from pydantic import BaseModel, ConfigDict, PrivateAttr
 
@@ -202,7 +202,7 @@ class MCPClient(BaseModel):
 
         return mcp_tool_function
 
-    TYPE_MAPPING = {
+    TYPE_MAPPING: ClassVar[dict[str, type]] = {
         "string": str,
         "integer": int,
         "number": float,
