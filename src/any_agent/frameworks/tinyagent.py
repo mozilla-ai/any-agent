@@ -7,6 +7,7 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from any_llm import completion
+from any_llm.provider import ProviderFactory, ProviderName
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -109,7 +110,9 @@ class TinyAgent(AnyAgent):
             **(self.config.model_args or {}),
         }
 
-        if self.completion_params["tool_choice"] == "required":
+        provider_name, _ = ProviderFactory.split_model_provider(self.config.model_id)
+        self.uses_openai = provider_name == ProviderName.OPENAI
+        if not self.uses_openai and self.completion_params["tool_choice"] == "required":
             self.config.tools.append(final_answer)
 
         if self.config.api_key:
@@ -147,7 +150,7 @@ class TinyAgent(AnyAgent):
                         "description": f"Parameter {param_name}",
                     }
 
-                    if param.default == inspect.Parameter.empty:
+                    if param.default == inspect.Parameter.empty or self.uses_openai:
                         required.append(param_name)
 
                 input_schema = {
@@ -158,20 +161,27 @@ class TinyAgent(AnyAgent):
             else:
                 input_schema = tool.__input_schema__
 
-            self.completion_params["tools"].append(
-                {
-                    "type": "function",
-                    "function": {
-                        "name": tool_name,
-                        "description": tool_desc,
-                        "parameters": input_schema,
-                    },
-                }
-            )
+            function_def = {
+                "type": "function",
+                "function": {
+                    "name": tool_name,
+                    "description": tool_desc,
+                    "parameters": input_schema,
+                },
+            }
+            if self.uses_openai:
+                function_def["function"]["parameters"]["additionalProperties"] = False  # type: ignore[index]
+                function_def["function"]["strict"] = True  # type: ignore[index]
 
+            self.completion_params["tools"].append(function_def)
             self.clients[tool_name] = ToolExecutor(tool)
 
     async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+        if self.uses_openai:
+            self.completion_params["tool_choice"] = "auto"
+            if self.config.output_type:
+                self.completion_params["response_format"] = self.config.output_type
+
         messages = [
             {
                 "role": "system",
@@ -245,6 +255,10 @@ class TinyAgent(AnyAgent):
     ) -> str | BaseModel:
         if not self.config.output_type:
             return output
+
+        if self.uses_openai:
+            return self.config.output_type.model_validate_json(output)
+
         completion_params["messages"] = [
             {
                 "role": "system",
