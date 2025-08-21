@@ -129,12 +129,20 @@ class AnyAgent(ABC):
         agent_config: AgentConfig,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
-        return run_async_in_sync(
-            cls.create_async(
-                agent_framework=agent_framework,
-                agent_config=agent_config,
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            # No running event loop - this is what we want for sync execution
+            return run_async_in_sync(
+                cls.create_async(
+                    agent_framework=agent_framework,
+                    agent_config=agent_config,
+                )
             )
-        )
+
+        # If we get here, there IS a running loop
+        msg = "Cannot call 'create()' from an async context. Use 'create_async()' instead."
+        raise RuntimeError(msg)
 
     @classmethod
     async def create_async(
@@ -160,7 +168,15 @@ class AnyAgent(ABC):
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
-        return run_async_in_sync(self.run_async(prompt, **kwargs))
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            # No running event loop - this is what we want for sync execution
+            return run_async_in_sync(self.run_async(prompt, **kwargs))
+
+        # If we get here, there IS a running loop
+        msg = "Cannot call 'run()' from an async context. Use 'run_async()' instead."
+        raise RuntimeError(msg)
 
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.
