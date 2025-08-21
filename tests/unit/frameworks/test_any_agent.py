@@ -92,3 +92,27 @@ def test_model_args_streaming(
         assert mock_litellm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
         assert mock_litellm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
         assert mock_litellm.call_count > 0
+
+
+@pytest.mark.asyncio
+async def test_create_sync_in_async_context() -> None:
+    with pytest.raises(
+        RuntimeError,
+        match=r"Cannot call 'create\(\)' from an async context\. Use 'create_async\(\)' instead\.",
+    ):
+        AnyAgent.create(
+            AgentFramework.TINYAGENT,
+            AgentConfig(model_id="mistral/mistral-small-latest"),
+        )
+
+
+@pytest.mark.asyncio
+async def test_run_sync_in_async_context() -> None:
+    agent = await AnyAgent.create_async(
+        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-small-latest")
+    )
+    with pytest.raises(
+        RuntimeError,
+        match=r"Cannot call 'run\(\)' from an async context\. Use 'run_async\(\)' instead\.",
+    ):
+        agent.run(TEST_QUERY)
