@@ -49,7 +49,6 @@ def ask_framework() -> AgentFramework:
 def date_picker() -> FutureDatetime:
     """Ask the user to select a date in the future. The date must be at least 1 day in the future."""
     prompt = "Select a date in the future (YYYY-MM-DD-HH)"
-    # the default should be the current date + 1 day
     now = datetime.now()
     default_val = (now + timedelta(days=1)).strftime("%Y-%m-%d-%H")
     date_str = Prompt.ask(prompt, default=default_val)
@@ -93,9 +92,7 @@ def get_litellm_model_id(agent_name) -> str:
     prompt = f"Enter a valid model_id for agent {agent_name} using LiteLLM syntax"
     default_val = "openai/gpt-4o"
     model_id = Prompt.ask(prompt, default=default_val)
-    # make a call to validate the model id: this will throw an error if the model id is not valid
     get_llm_provider(model=model_id)
-    # make a call to validate that the environment is correct for the model id
     env_check = validate_environment(model_id)
     if not env_check["keys_in_environment"]:
         msg = f"{env_check['missing_keys']} needed for {model_id}"
@@ -153,7 +150,6 @@ class Config(BaseModel):
             Config: A new Config instance populated with values from the dictionary.
 
         """
-        # for each tool listed in main_agent.tools, use import lib to import it and replace the str with the callable
         callables = []
         if data.get("main_agent") is None:
             data["main_agent"] = {}
@@ -167,9 +163,6 @@ class Config(BaseModel):
                 module = __import__(module_name, fromlist=[func_name])
                 callables.append(getattr(module, func_name))
             else:
-                # this means it must be an MCPStdioParams
-                # For the purposes of this demo, currently we just look for the filesystem MCP which we have a placeholder
-                # for the path variable (which controls which dirs the MCP will have access to).
                 mcp_tool = set_mcp_settings(tool)
                 callables.append(mcp_tool)
         data["main_agent"]["tools"] = callables
