@@ -85,21 +85,6 @@ def max_driving_hours_picker() -> int:
         raise ValueError("Invalid choice")
 
 
-def get_litellm_model_id(agent_name) -> str:
-    """Ask the user to input a model_id string. Validate it using the litellm.validate_environment function"""
-    from litellm.utils import validate_environment
-
-    prompt = f"Enter a valid model_id for agent {agent_name} using LiteLLM syntax"
-    default_val = "openai/gpt-4o"
-    model_id = Prompt.ask(prompt, default=default_val)
-    get_llm_provider(model=model_id)
-    env_check = validate_environment(model_id)
-    if not env_check["keys_in_environment"]:
-        msg = f"{env_check['missing_keys']} needed for {model_id}"
-        raise ValueError(msg)
-    return model_id
-
-
 def set_mcp_settings(tool):
     logger.info(
         f"This MCP uses {tool['command']}. If you don't have this set up this will not work"
@@ -138,63 +123,3 @@ class Config(BaseModel):
 
     evaluation_model: str | None = None
     evaluation_criteria: list[dict[str, str]] | None = None
-
-    @classmethod
-    def from_dict(cls, data: dict) -> "Config":
-        """Create a Config instance from a dictionary.
-
-        Args:
-            data (dict): A dictionary containing the configuration data.
-
-        Returns:
-            Config: A new Config instance populated with values from the dictionary.
-
-        """
-        callables = []
-        if data.get("main_agent") is None:
-            data["main_agent"] = {}
-        if not data["main_agent"].get("model_id"):
-            data["main_agent"]["model_id"] = get_litellm_model_id("main_agent")
-        else:
-            logger.info(f"Main agent using model_id {data['main_agent']['model_id']}")
-        for tool in data["main_agent"].get("tools", []):
-            if isinstance(tool, str):
-                module_name, func_name = tool.rsplit(".", 1)
-                module = __import__(module_name, fromlist=[func_name])
-                callables.append(getattr(module, func_name))
-            else:
-                mcp_tool = set_mcp_settings(tool)
-                callables.append(mcp_tool)
-        data["main_agent"]["tools"] = callables
-        if not data.get("framework"):
-            data["framework"] = ask_framework()
-        else:
-            logger.info(f"Using framework {data['framework']}")
-        if not data.get("location"):
-            data["location"] = location_picker()
-        else:
-            logger.info(f"Using location {data['location']}")
-        if not data.get("max_driving_hours"):
-            data["max_driving_hours"] = max_driving_hours_picker()
-        else:
-            logger.info(f"Using max driving hours {data['max_driving_hours']}")
-        if not data.get("date"):
-            data["date"] = date_picker()
-        else:
-            logger.info(f"Using date {data['date']}")
-
-        return cls(**data)
-
-    @classmethod
-    def from_yaml(cls, yaml_path: str) -> "Config":
-        """With open(yaml_path, "r") as f:
-            data = yaml.safe_load(f)
-        return cls(**data)    yaml_path: Path to the YAML configuration file
-
-        Returns:
-            Config: A new Config instance populated with values from the YAML file
-
-        """
-        with open(yaml_path) as f:
-            data = yaml.safe_load(f)
-        return cls.from_dict(data)
