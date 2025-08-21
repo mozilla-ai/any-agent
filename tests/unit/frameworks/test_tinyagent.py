@@ -27,7 +27,7 @@ async def sample_tool_function(arg1: int, arg2: str) -> str:
 @pytest.mark.asyncio
 async def test_tool_argument_casting() -> None:
     agent: TinyAgent = await AnyAgent.create_async(
-        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-small-latest")
+        AgentFramework.TINYAGENT, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
     )  # type: ignore[assignment]
 
     # Register the sample tool function
@@ -55,7 +55,7 @@ def test_run_tinyagent_agent_custom_args() -> None:
     output = "The state capital of Pennsylvania is Harrisburg."
 
     agent = AnyAgent.create(
-        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-small-latest")
+        AgentFramework.TINYAGENT, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
     )
     with patch(LITELLM_IMPORT_PATHS[AgentFramework.TINYAGENT]) as mock_acompletion:
         # Create a mock response object that properly mocks the LiteLLM response structure
@@ -78,7 +78,7 @@ def test_run_tinyagent_agent_custom_args() -> None:
 
 def test_output_type_completion_params_isolation() -> None:
     """Test that completion_params are not polluted between calls when using output_type."""
-    config = AgentConfig(model_id="gpt-4o", output_type=SampleOutput)
+    config = AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID, output_type=SampleOutput)
     agent: TinyAgent = AnyAgent.create(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
     original_completion_params = agent.completion_params.copy()
 
@@ -117,7 +117,7 @@ def test_output_type_completion_params_isolation() -> None:
 
 def test_structured_output_without_tools() -> None:
     """Test that structured output works correctly when no tools are present and tool_choice is not set."""
-    config = AgentConfig(model_id="gpt-4.1-mini", output_type=SampleOutput)
+    config = AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID, output_type=SampleOutput)
     agent: TinyAgent = AnyAgent.create(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
 
     def create_mock_response(content: str, is_structured: bool = False) -> MagicMock:
