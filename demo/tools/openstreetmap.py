@@ -60,37 +60,3 @@ def get_lat_lon_center(bounds: dict) -> tuple[float, float]:
         (bounds["minlat"] + bounds["maxlat"]) / 2,
         (bounds["minlon"] + bounds["maxlon"]) / 2,
     )
-
-
-def get_surfing_spots(
-    lat: float, lon: float, radius: int
-) -> list[tuple[str, tuple[float, float]]]:
-    """Get surfing spots around a given latitude and longitude.
-
-    Uses the [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API).
-
-    Args:
-        lat: The latitude.
-        lon: The longitude.
-        radius: The radius in meters.
-
-    Returns:
-        The surfing places found.
-
-    """
-    overpass_url = "https://overpass-api.de/api/interpreter"
-    query = "[out:json];("
-    query += f'nwr["natural"="beach"](around:{radius},{lat},{lon});'
-    query += f'nwr["natural"="reef"](around:{radius},{lat},{lon});'
-    query += ");out body geom;"
-    params = {"data": query}
-    response = requests.get(
-        overpass_url, params=params, headers={"User-Agent": "Mozilla/5.0"}
-    )
-    response.raise_for_status()
-    elements = response.json()["elements"]
-    return [
-        (element.get("tags", {}).get("name", ""), get_lat_lon_center(element["bounds"]))
-        for element in elements
-        if "surfing" in element.get("tags", {}).get("sport", "") and "bounds" in element
-    ]

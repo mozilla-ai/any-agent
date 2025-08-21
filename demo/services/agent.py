@@ -7,9 +7,9 @@ from constants import DEFAULT_TOOLS
 from config import Config
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.evaluation import AgentJudge, LlmJudge
+from any_agent.evaluation import LlmJudge
 from any_agent.evaluation.schemas import EvaluationOutput
-from any_agent.tracing.agent_trace import AgentSpan, AgentTrace
+from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.attributes import GenAI
 from any_agent.tracing.otel_types import StatusCode
 
