@@ -1,4 +1,4 @@
-streamlit
-openai-agents>=0.0.14
 any-agent[all]>=1.4.0
+geocoder
 nest_asyncio
+streamlit
