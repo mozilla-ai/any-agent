@@ -1,6 +1,6 @@
 # TinyAgent
 
-As part of the bare bones library, we provide our own Python implementation based on [HuggingFace Tiny Agents](https://huggingface.co/blog/tiny-agents). This implementation is based on our own [any-llm](https://github.com/mozilla-ai/any-llm) library which provides a unified interface to different LLM providers. See the [any-llm documentation](https://mozilla-ai.github.io/any-llm/providers) for a complete list of supported providers.
+As part of the bare bones library, we provide our own Python implementation based on [HuggingFace Tiny Agents](https://huggingface.co/blog/tiny-agents).
 
 You can find it in [`any_agent.frameworks.tinyagent`](https://github.com/mozilla-ai/any-agent/blob/main/src/any_agent/frameworks/tinyagent.py).
 
