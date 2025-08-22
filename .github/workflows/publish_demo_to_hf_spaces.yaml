@@ -1,0 +1,34 @@
+name: Publish demo to Hugging Face Spaces
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  sync-space:
+    runs-on: ubuntu-latest
+    env:
+      REPO_NAME: mozilla-ai/any-agent-demo
+      HTTPS_REPO: https://${{ secrets.HF_USERNAME }}:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/mozilla-ai/any-agent-demo
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: git clone ${{ env.HTTPS_REPO}} hf-space
+
+      - run: |
+          cp -rT demo hf-space
+
+      - run: |
+          cd hf-space
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          git commit -m "Sync with https://github.com/${{ env.REPO_NAME }}"
+
+      - name: Push to Hugging Face
+        run: |
+          cd hf-space
+          git push ${{ env.HTTPS_REPO}} main
