@@ -6,7 +6,7 @@ import json
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
-from any_llm import completion
+from any_llm import acompletion
 from any_llm.provider import ProviderFactory, ProviderName
 from mcp.types import CallToolResult, TextContent
 
@@ -278,7 +278,7 @@ class TinyAgent(AnyAgent):
         )
 
     async def call_model(self, **completion_params: dict[str, Any]) -> ChatCompletion:
-        return completion(**completion_params)  # type: ignore[return-value, arg-type]
+        return await acompletion(**completion_params)  # type: ignore[return-value, arg-type]
 
     async def update_output_type_async(
         self, output_type: type[BaseModel] | None

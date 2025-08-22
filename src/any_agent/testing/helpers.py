@@ -15,7 +15,7 @@ DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
 LITELLM_IMPORT_PATHS = {
     AgentFramework.GOOGLE: "google.adk.models.lite_llm.acompletion",
     AgentFramework.LANGCHAIN: "litellm.acompletion",
-    AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.completion",
+    AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.acompletion",
     AgentFramework.AGNO: "litellm.acompletion",
     AgentFramework.OPENAI: "litellm.acompletion",
     AgentFramework.SMOLAGENTS: "litellm.completion",
