@@ -122,10 +122,7 @@ class TinyAgent(AnyAgent):
 
     async def _load_agent(self) -> None:
         """Load the agent and its tools."""
-        wrapped_tools, mcp_servers = await self._load_tools(self.config.tools)
-        self._mcp_servers = (
-            mcp_servers  # Store servers so that they don't get garbage collected
-        )
+        wrapped_tools = await self._load_tools(self.config.tools)
 
         self._tools = wrapped_tools
 

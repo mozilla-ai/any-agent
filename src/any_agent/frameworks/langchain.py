@@ -57,7 +57,7 @@ class LangchainAgent(AnyAgent):
             msg = "You need to `pip install 'any-agent[langchain]'` to use this agent"
             raise ImportError(msg)
 
-        imported_tools, _ = await self._load_tools(self.config.tools)
+        imported_tools = await self._load_tools(self.config.tools)
 
         self._tools = imported_tools
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE

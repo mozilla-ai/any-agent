@@ -53,7 +53,7 @@ class GoogleAgent(AnyAgent):
             msg = "You need to `pip install 'any-agent[google]'` to use this agent"
             raise ImportError(msg)
 
-        tools, _ = await self._load_tools(self.config.tools)
+        tools = await self._load_tools(self.config.tools)
 
         agent_type = self.config.agent_type or LlmAgent
 

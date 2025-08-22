@@ -71,7 +71,7 @@ class LlamaIndexAgent(AnyAgent):
                 self.config.output_type, instructions
             )
             tools_to_use.append(final_output_function)
-        imported_tools, _ = await self._load_tools(tools_to_use)
+        imported_tools = await self._load_tools(tools_to_use)
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         # if agent type is FunctionAgent but there are no tools, throw an error
         if agent_type == FunctionAgent and not imported_tools:
@@ -162,7 +162,7 @@ class LlamaIndexAgent(AnyAgent):
                 agent_type = ReActAgent
 
             # We need to reload the tools since they might have changed
-            imported_tools, _ = await self._load_tools(tools_to_use)
+            imported_tools = await self._load_tools(tools_to_use)
             self._tools = imported_tools
 
             self._agent = agent_type(

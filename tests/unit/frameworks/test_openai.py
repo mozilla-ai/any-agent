@@ -86,8 +86,6 @@ def test_openai_with_api_key() -> None:
 def test_load_openai_with_mcp_server() -> None:
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()
-    mock_mcp_server = MagicMock()
-    mock_mcp_server.server = MagicMock()
     mock_litellm_model = MagicMock()
     mock_wrap_tools = MagicMock()
 
@@ -98,11 +96,12 @@ def test_load_openai_with_mcp_server() -> None:
         patch.object(AnyAgent, "_load_tools", mock_wrap_tools),
     ):
 
-        async def side_effect(self):  # type: ignore[no-untyped-def]
-            return (
-                [mock_function_tool(search_web)],  # tools
-                [mock_mcp_server],  # mcp_servers
-            )
+        async def side_effect(tools):  # type: ignore[no-untyped-def]
+            # _load_tools returns just the tools list (MCP clients are stored internally)
+            return [
+                mock_function_tool(search_web),
+                mock_function_tool("mcp_fetch_tool"),
+            ]
 
         mock_wrap_tools.side_effect = side_effect
 
@@ -120,13 +119,17 @@ def test_load_openai_with_mcp_server() -> None:
             ),
         )
 
-        # Verify Agent was called with the MCP server
+        # Verify Agent was called with tools (including converted MCP tools)
+        # No separate MCP servers with new architecture
         mock_agent.assert_called_once_with(
             name="any_agent",
             model=mock_litellm_model.return_value,
             instructions=None,
-            tools=[mock_function_tool(search_web)],
-            mcp_servers=[mock_mcp_server.server],
+            tools=[
+                mock_function_tool(search_web),
+                mock_function_tool("mcp_fetch_tool"),
+            ],
+            mcp_servers=[],
         )
 
 

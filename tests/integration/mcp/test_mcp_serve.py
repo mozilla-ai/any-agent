@@ -131,8 +131,9 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
 
     finally:
         if main_agent:
-            if mcp_conn := main_agent._mcp_servers[0].mcp_connection:
-                await mcp_conn._exit_stack.aclose()
+            # Clean up MCP clients
+            for mcp_client in main_agent._mcp_clients:
+                await mcp_client.disconnect()
         AppStatus.get_or_create_exit_event().set()
         if server_handle:
             await server_handle.shutdown()
