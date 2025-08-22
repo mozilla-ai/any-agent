@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from pydantic import BaseModel
 
     from any_agent.serving import A2AServingConfig, MCPServingConfig, ServerHandle
-    from any_agent.tools.mcp.mcp_server import _MCPServerBase
+    from any_agent.tools.mcp.mcp_client import MCPClient
 
 
 class AgentRunError(Exception):
@@ -68,7 +68,7 @@ class AnyAgent(ABC):
     def __init__(self, config: AgentConfig):
         self.config = config
 
-        self._mcp_servers: list[_MCPServerBase[Any]] = []
+        self._mcp_clients: list[MCPClient] = []
         self._tools: list[Any] = []
 
         self._add_span_callbacks()
@@ -156,15 +156,11 @@ class AnyAgent(ABC):
         await agent._load_agent()
         return agent
 
-    async def _load_tools(
-        self, tools: Sequence[Tool]
-    ) -> tuple[list[Any], list[_MCPServerBase[Any]]]:
-        tools, mcp_servers = await _wrap_tools(tools, self.framework)
+    async def _load_tools(self, tools: Sequence[Tool]) -> list[Any]:
+        tools, mcp_clients = await _wrap_tools(tools, self.framework)
         # Add to agent so that it doesn't get garbage collected
-        self._mcp_servers.extend(mcp_servers)
-        for mcp_server in mcp_servers:
-            tools.extend(mcp_server.tools)
-        return tools, mcp_servers
+        self._mcp_clients.extend(mcp_clients)
+        return tools
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""

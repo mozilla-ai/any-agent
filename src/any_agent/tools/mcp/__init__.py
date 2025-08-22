@@ -1,13 +1,7 @@
-from .frameworks import (
-    MCPServer,
-    _get_mcp_server,
-)
-from .mcp_connection import _MCPConnection
-from .mcp_server import _MCPServerBase
+from .mcp_client import MCPClient
+from .smolagents_client import SmolagentsMCPClient
 
 __all__ = [
-    "MCPServer",
-    "_MCPConnection",
-    "_MCPServerBase",
-    "_get_mcp_server",
+    "MCPClient",
+    "SmolagentsMCPClient",
 ]
