@@ -31,3 +31,10 @@ class Context:
 
     shared: dict[str, Any]
     """Can be used to store arbitrary information for sharing across callbacks."""
+
+    runtime_context: dict[str, Any] | None = None
+    """Runtime-specific objects passed when the agent runs.
+    
+    This allows callbacks to access objects that only exist at runtime,
+    such as task updaters, user sessions, or other request-specific data.
+    """
