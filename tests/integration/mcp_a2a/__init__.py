@@ -1,0 +1,1 @@
+"""Integration tests for MCP to A2A bridge."""
