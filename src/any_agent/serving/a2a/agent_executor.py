@@ -169,7 +169,12 @@ class AnyAgentExecutor(AgentExecutor):
         )
 
         # Put a callback here to record tool calling and send updates
+        # Store original callbacks to restore later
+        original_callbacks = None
         if self.stream_tool_usage:
+            original_callbacks = self.agent.config.callbacks
+            # Create a copy to avoid mutating the shared list
+            self.agent.config.callbacks = original_callbacks.copy()
             self.agent.config.callbacks.append(tool_updater)
 
         # This agent always produces Task objects.
@@ -178,10 +183,10 @@ class AnyAgentExecutor(AgentExecutor):
         except AgentRunError as e:
             logger.exception(f"Served request failed: {e!s}")
             agent_trace = e.trace
-
-        # Remove the tool recording callback
-        if self.stream_tool_usage:
-            self.agent.config.callbacks.pop(-1)
+        finally:
+            # Always restore original callbacks to prevent accumulation
+            if self.stream_tool_usage and original_callbacks is not None:
+                self.agent.config.callbacks = original_callbacks
 
         # Update task with new trace, passing the original query (not formatted)
         self.context_manager.update_context_trace(context_id, agent_trace, query)
