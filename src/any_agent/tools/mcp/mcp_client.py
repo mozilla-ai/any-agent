@@ -41,6 +41,7 @@ class MCPClient(BaseModel):
     _get_session_id_callback: Callable[[], str | None] | None = PrivateAttr(
         default=None
     )
+    _connected: bool = PrivateAttr(default=False)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -50,8 +51,16 @@ class MCPClient(BaseModel):
             msg = "You need to `pip install 'any-agent[mcp]'` to use MCP."
             raise ImportError(msg) from missing_mcp_error
 
+    async def _ensure_connected(self) -> None:
+        """Ensure the client is connected, connecting if necessary."""
+        if not self._connected:
+            await self.connect()
+
     async def connect(self) -> None:
         """Connect using the appropriate transport type."""
+        if self._connected:
+            return
+        
         if isinstance(self.config, MCPStdio):
             server_params = StdioServerParameters(
                 command=self.config.command,
@@ -86,11 +95,14 @@ class MCPClient(BaseModel):
         client_session = ClientSession(read, write, timeout)
         self._session = await self._exit_stack.enter_async_context(client_session)
         await self._session.initialize()
+        self._connected = True
 
     async def list_raw_tools(self) -> list[MCPTool]:
         """Get raw MCP tools from the server."""
+        await self._ensure_connected()
+        
         if not self._session:
-            msg = "Not connected to MCP server. Call connect() first."
+            msg = "Failed to establish MCP session"
             raise ValueError(msg)
 
         available_tools = await self._session.list_tools()
@@ -240,3 +252,4 @@ class MCPClient(BaseModel):
         await self._exit_stack.aclose()
         self._session = None
         self._client = None
+        self._connected = False
