@@ -11,12 +11,11 @@ from any_agent.tracing.agent_trace import AgentSpan
 
 DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
 
-# Google ADK uses a different import path for LiteLLM, and smolagents uses the sync call
-LITELLM_IMPORT_PATHS = {
+LLM_IMPORT_PATHS = {
     AgentFramework.GOOGLE: "google.adk.models.lite_llm.acompletion",
     AgentFramework.LANGCHAIN: "litellm.acompletion",
     AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.acompletion",
-    AgentFramework.AGNO: "litellm.acompletion",
+    AgentFramework.AGNO: "any_agent.frameworks.agno.acompletion",
     AgentFramework.OPENAI: "litellm.acompletion",
     AgentFramework.SMOLAGENTS: "litellm.completion",
     AgentFramework.LLAMA_INDEX: "litellm.acompletion",

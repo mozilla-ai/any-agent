@@ -17,7 +17,7 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.tracing.otel_types import StatusCode
-from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import LLM_IMPORT_PATHS
 
 
 class StreamingEndpoint:
@@ -134,7 +134,7 @@ def test_tool_error_llm_mocked(
     )
 
     with (
-        patch(LITELLM_IMPORT_PATHS[agent_framework]) as litellm_mock,
+        patch(LLM_IMPORT_PATHS[agent_framework]) as litellm_mock,
     ):
         if agent_framework in (AgentFramework.LLAMA_INDEX):
             litellm_mock.side_effect = streaming.next

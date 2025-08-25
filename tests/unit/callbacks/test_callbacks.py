@@ -8,7 +8,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AgentRunError, AnyAgent
 from any_agent.callbacks import Callback, Context
-from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import LLM_IMPORT_PATHS
 
 
 class SampleCallback(Callback):
@@ -102,7 +102,7 @@ def run_agent_with_mock(
     exception_message: str | None = None,
 ) -> None:
     """Helper function to run agent with mocked response and optional exception handling."""
-    import_path = LITELLM_IMPORT_PATHS[AgentFramework.TINYAGENT]
+    import_path = LLM_IMPORT_PATHS[AgentFramework.TINYAGENT]
 
     with patch(import_path, return_value=mock_response):
         if expected_exception:

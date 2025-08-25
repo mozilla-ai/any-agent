@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import LLM_IMPORT_PATHS
 
 TEST_TEMPERATURE = 0.54321
 TEST_PENALTY = 0.5
@@ -58,13 +58,9 @@ def test_model_args(
 
     agent = create_agent_with_model_args(agent_framework)
 
-    # Patch the appropriate litellm import path for this framework
-    import_path = LITELLM_IMPORT_PATHS[agent_framework]
+    import_path = LLM_IMPORT_PATHS[agent_framework]
     with patch(import_path, return_value=mock_litellm_response) as mock_litellm:
-        # Run the agent
         result = agent.run(TEST_QUERY)
-
-        # Verify results
         assert EXPECTED_OUTPUT == result.final_output
         assert mock_litellm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
         assert mock_litellm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
@@ -80,7 +76,7 @@ def test_model_args_streaming(
     agent = create_agent_with_model_args(agent_framework)
 
     # Patch the appropriate litellm import path for LlamaIndex
-    import_path = LITELLM_IMPORT_PATHS[agent_framework]
+    import_path = LLM_IMPORT_PATHS[agent_framework]
     with patch(import_path, side_effect=mock_litellm_streaming) as mock_litellm:
         # Run the agent
         result = agent.run(TEST_QUERY)
