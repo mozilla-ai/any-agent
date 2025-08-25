@@ -32,6 +32,9 @@ class SmolagentsMCPClient(MCPClient):
 
     async def connect(self) -> None:
         """Connect using smolagents MCP client."""
+        if self._connected:
+            return
+            
         if isinstance(self.config, MCPStdio):
             server_params = StdioServerParameters(
                 command=self.config.command,
@@ -78,11 +81,15 @@ class SmolagentsMCPClient(MCPClient):
         else:
             msg = f"Unsupported MCP config type: {type(self.config)}"
             raise ValueError(msg)
+        
+        self._connected = True
 
     async def list_tools(self) -> list[Any]:
         """Get tools as SmolagentsTool objects wrapped as callables."""
+        await self._ensure_connected()
+        
         if not self._smolagents_client:
-            msg = "Not connected to MCP server. Call connect() first."
+            msg = "Failed to establish MCP connection"
             raise ValueError(msg)
 
         smolagents_tools = self._smolagents_client.get_tools()
@@ -115,3 +122,4 @@ class SmolagentsMCPClient(MCPClient):
         if self._smolagents_client:
             self._smolagents_client.disconnect()
         self._smolagents_client = None
+        self._connected = False

@@ -153,9 +153,8 @@ async def _wrap_tools(
             else:
                 mcp_client = MCPClient(config=tool, framework=agent_framework)
 
-            await mcp_client.connect()
-
             # Get tools as callables (universal format)
+            # Connection will be established automatically when needed
             callable_tools = await mcp_client.list_tools()
 
             # For smolagents, the tools are already SmolagentsTool objects, so we don't need to wrap them
