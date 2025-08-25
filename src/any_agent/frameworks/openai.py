@@ -1,3 +1,4 @@
+import math
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
@@ -87,6 +88,8 @@ class OpenAIAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
+        if not kwargs.get("max_turns"):
+            kwargs["max_turns"] = math.inf
         result = await Runner.run(self._agent, prompt, **kwargs)
         return result.final_output  # type: ignore[no-any-return]
 

@@ -1,3 +1,4 @@
+import math
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -158,4 +159,23 @@ def test_run_openai_with_custom_args() -> None:
         agent.run("foo", max_turns=30)
         mock_runner.run.assert_called_once_with(
             mock_agent.return_value, "foo", max_turns=30
+        )
+
+
+def test_run_openai_with_inf_max_turns() -> None:
+    mock_agent = MagicMock()
+    mock_runner = AsyncMock()
+
+    with (
+        patch("any_agent.frameworks.openai.Runner", mock_runner),
+        patch("any_agent.frameworks.openai.Agent", mock_agent),
+        patch("agents.function_tool"),
+        patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE"),
+    ):
+        agent = AnyAgent.create(
+            AgentFramework.OPENAI, AgentConfig(model_id="mistral/mistral-small-latest")
+        )
+        agent.run("foo")
+        mock_runner.run.assert_called_once_with(
+            mock_agent.return_value, "foo", max_turns=math.inf
         )
