@@ -162,24 +162,30 @@ class AnyAgent(ABC):
         self._mcp_clients.extend(mcp_clients)
         return tools
 
-    def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
+    def run(
+        self, prompt: str, *, runtime_context: dict[str, Any] | None = None, **kwargs: Any
+    ) -> AgentTrace:
         """Run the agent with the given prompt."""
         try:
             asyncio.get_running_loop()
         except RuntimeError:
             # No running event loop - this is what we want for sync execution
-            return run_async_in_sync(self.run_async(prompt, **kwargs))
+            return run_async_in_sync(self.run_async(prompt, runtime_context=runtime_context, **kwargs))
 
         # If we get here, there IS a running loop
         msg = "Cannot call 'run()' from an async context. Use 'run_async()' instead."
         raise RuntimeError(msg)
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
+    async def run_async(
+        self, prompt: str, *, runtime_context: dict[str, Any] | None = None, **kwargs: Any
+    ) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.
 
         Args:
             prompt: The user prompt to be passed to the agent.
-
+            runtime_context: Optional runtime-specific objects to pass to callbacks.
+                Useful for passing objects like task updaters, user sessions, or other
+                request-specific data that callbacks need access to.
             kwargs: Will be passed to the underlying runner used
                 by the framework.
 
@@ -203,6 +209,7 @@ class AnyAgent(ABC):
                         trace=AgentTrace(),
                         tracer=self._tracer,
                         shared={},
+                        runtime_context=runtime_context,
                     )
 
                     if len(self._wrapper.callback_context) == 1:
