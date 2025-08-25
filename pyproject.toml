@@ -131,6 +131,7 @@ extend-select = ["ALL"]
 "src/any_agent/tools/a2a.py" = ["UP045"]  # Use `X | Y` for type unions - disabled for Google ADK compatibility
 "tests/**" = ["D", "F401", "I001"]
 "*.ipynb" = ["T201"]
+"scripts/**" = ["D", "T201"]
 
 [tool.mypy]
 strict = true
