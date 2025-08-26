@@ -10,8 +10,7 @@ requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
   "any-llm-sdk>=0.15.0,<1",
-  "openai<1.100",
-  "litellm>=1.74.0",
+  "litellm>=1.75.8",
   "mcp>=1.5.0",
   "opentelemetry-sdk",
   "pydantic",
