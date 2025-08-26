@@ -32,6 +32,13 @@ A single interface to use and evaluate different agent frameworks.
 
 [![TinyAgent](https://img.shields.io/badge/TinyAgent-ffcb3a?logo=huggingface&logoColor=white)](https://huggingface.co/blog/tiny-agents) [![Google ADK](https://img.shields.io/badge/Google%20ADK-4285F4?logo=google&logoColor=white)](https://github.com/google/adk-python) [![LangChain](https://img.shields.io/badge/LangChain-1e4545?logo=langchain&logoColor=white)](https://github.com/langchain-ai/langgraph) [![LlamaIndex](https://img.shields.io/badge/🦙%20LlamaIndex-fbcfe2)](https://github.com/run-llama/llama_index) [![OpenAI Agents](https://img.shields.io/badge/OpenAI%20Agents-black?logo=openai)](https://github.com/openai/openai-agents-python) [![Smolagents](https://img.shields.io/badge/Smolagents-ffcb3a?logo=huggingface&logoColor=white)](https://github.com/huggingface/smolagents) [![Agno AI](https://img.shields.io/badge/Agno-ff4017)](https://github.com/agno-agi/agno)
 
+## Protocol Bridging
+
+any-agent supports bridging between different agent communication protocols:
+
+- **MCP → A2A**: Expose Model Context Protocol servers as Google's Agent-to-Agent services
+- **MCP → ACP**: Expose Model Context Protocol servers as Linux Foundation AGNTCY's Agent Connect Protocol services with W3C DID identity support
+
 
 
 ### Planned for Support (Contributions Welcome!)
@@ -93,6 +100,7 @@ Get started quickly with these practical examples:
 - **[Creating an agent with MCP](https://mozilla-ai.github.io/any-agent/cookbook/mcp_agent/)** - Integrate Model Context Protocol tools.
 - **[Serve an Agent with A2A](https://mozilla-ai.github.io/any-agent/cookbook/serve_a2a/)** - Deploy agents with Agent-to-Agent communication.
 - **[Building Multi-Agent Systems with A2A](https://mozilla-ai.github.io/any-agent/cookbook/a2a_as_tool/)** - Using an agent as a tool for another agent to interact with.
+- **[Bridge MCP servers to ACP](https://mozilla-ai.github.io/any-agent/cookbook/mcp_acp_bridge/)** - Expose MCP tools as ACP-compatible services with AGNTCY Identity support.
 
 ## Contributions
 

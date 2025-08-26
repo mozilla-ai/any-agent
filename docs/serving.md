@@ -7,6 +7,8 @@
 
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification/2025-03-26), via the [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk).
 
+- **MCP to ACP Bridge**: Expose MCP servers as ACP-compatible services with AGNTCY Identity support. Requires ACP SDK: `pip install 'agntcy-acp'`.
+
 ## Configuring and Serving Agents
 
 You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] or [`MCPServingConfig`][any_agent.serving.MCPServingConfig] and the [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
@@ -152,10 +154,92 @@ if __name__ == "__main__":
 
 ```
 
+## Bridging MCP to ACP
+
+any-agent provides a bridge that allows you to expose MCP servers as ACP-compatible services. This enables:
+
+- **Protocol Interoperability**: Make MCP tools available to Linux Foundation's AGNTCY ecosystem
+- **Enterprise Integration**: Connect local tools with enterprise agent systems  
+- **Identity Support**: Leverage AGNTCY Identity (W3C DIDs) for secure tool access
+- **Standards Compliance**: Support for W3C Decentralized Identifiers and Verifiable Credentials
+
+### Basic MCP-ACP Bridge Example
+
+```python
+import asyncio
+from any_agent.config import MCPStdio
+from any_agent.serving import (
+    MCPToACPBridgeConfig,
+    serve_mcp_as_acp_async,
+)
+
+async def bridge_mcp_server():
+    # Configure MCP server
+    mcp_config = MCPStdio(
+        command="uvx",
+        args=["mcp-server-time"],
+        tools=["get_current_time"],
+    )
+    
+    # Configure bridge with AGNTCY Identity
+    bridge_config = MCPToACPBridgeConfig(
+        mcp_config=mcp_config,
+        port=8090,
+        endpoint="/time-bridge",
+        server_name="time-server",
+        identity_id="did:agntcy:example123",  # Optional W3C DID
+        organization="my-org",
+        version="1.0.0",
+    )
+    
+    # Start the bridge
+    bridge_handle = await serve_mcp_as_acp_async(mcp_config, bridge_config)
+    print(f"MCP server bridged to ACP at: http://localhost:8090/time-bridge")
+    print(f"ACP agents endpoint: http://localhost:8090/time-bridge/agents")
+    
+    # Keep running
+    await bridge_handle.task
+
+if __name__ == "__main__":
+    asyncio.run(bridge_mcp_server())
+```
+
+### Using the Bridged MCP Tool via ACP
+
+Once bridged, the MCP tool can be accessed via ACP protocol:
+
+```python
+from agntcy_acp import ACPAsyncClient, RunCreateStateless
+
+async def use_bridged_tool():
+    # Create ACP client
+    client = ACPAsyncClient(base_url="http://localhost:8090/time-bridge")
+    
+    # List available agents (our bridge)
+    agents = await client.list_agents()
+    print(f"Available agents: {agents}")
+    
+    # Create a stateless run
+    run_request = RunCreateStateless(
+        config={
+            "tool": "get_current_time",
+            "args": {}
+        }
+    )
+    
+    result = await client.create_stateless_run(
+        agent_id="mcp-bridge-time-server",
+        run_request=run_request
+    )
+    print(f"Result: {result.output}")
+```
+
 ## More Examples
 
-Check out our cookbook example for building and serving an agent via A2A:
+Check out our cookbook examples:
 
 👉 [Serve an Agent with A2A (Jupyter Notebook)](./cookbook/serve_a2a.ipynb)
 
-👉 [Use an A2a Agent as a tool (Jupyter Notebook)](./cookbook/serve_a2a.ipynb)
+👉 [Use an A2A Agent as a tool (Jupyter Notebook)](./cookbook/a2a_as_tool.ipynb)
+
+👉 [Bridge MCP servers to ACP (Jupyter Notebook)](./cookbook/mcp_acp_bridge.ipynb)

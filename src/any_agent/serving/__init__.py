@@ -11,6 +11,19 @@ __all__ = [
 ]
 
 try:
+    from .mcp_acp_bridge import (
+        MCPToACPBridgeConfig,
+        serve_mcp_as_acp_async,
+    )
+    
+    __all__ += [
+        "MCPToACPBridgeConfig",
+        "serve_mcp_as_acp_async",
+    ]
+except ImportError:
+    pass
+
+try:
     from .a2a.config_a2a import A2AServingConfig
     from .a2a.server_a2a import (
         _get_a2a_app_async,
