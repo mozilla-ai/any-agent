@@ -63,3 +63,9 @@ class GenAI:
 
     USAGE_OUTPUT_TOKENS = GEN_AI_USAGE_OUTPUT_TOKENS
     """The number of tokens used in the GenAI response (completion)."""
+
+    USAGE_REASONING_TOKENS = "gen_ai.usage.reasoning_tokens"
+    """The number of tokens used for internal reasoning/thinking by the model."""
+
+    USAGE_CACHED_TOKENS = "gen_ai.usage.cached_tokens"
+    """The number of cached tokens used (OpenAI prompt caching)."""

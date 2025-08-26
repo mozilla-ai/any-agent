@@ -13,6 +13,32 @@ if TYPE_CHECKING:
 
 
 class _LangchainSpanGeneration(_SpanGeneration):
+    def _extract_token_details(self, token_usage: Usage) -> tuple[int, int]:
+        """Extract reasoning and cached tokens from token usage.
+
+        Safely extracts OpenAI-specific token details using getattr to handle
+        missing attributes gracefully. Returns 0 for any missing values.
+
+        Args:
+            token_usage: Usage object from LiteLLM or LangChain
+
+        Returns:
+            tuple of (reasoning_tokens, cached_tokens)
+
+        """
+        reasoning_tokens = 0
+        cached_tokens = 0
+
+        # Check for detailed token breakdowns (OpenAI)
+        if completion_details := getattr(token_usage, "completion_tokens_details", None):
+            reasoning_tokens = getattr(completion_details, "reasoning_tokens", 0)
+
+        # Check for prompt caching (OpenAI)
+        if prompt_details := getattr(token_usage, "prompt_tokens_details", None):
+            cached_tokens = getattr(prompt_details, "cached_tokens", 0)
+
+        return reasoning_tokens, cached_tokens
+
     def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
         # Handle direct dict format (from call_model wrapper)
         if "messages" in kwargs and isinstance(kwargs["messages"], list):
@@ -71,14 +97,25 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
             input_tokens = 0
             output_tokens = 0
+            reasoning_tokens = 0
+            cached_tokens = 0
             token_usage: Usage | None
             if token_usage := getattr(response, "model_extra", {}).get("usage"):
                 if token_usage:
                     input_tokens = token_usage.prompt_tokens
                     output_tokens = token_usage.completion_tokens
 
+                    # Extract additional token details
+                    reasoning_tokens, cached_tokens = self._extract_token_details(token_usage)
+
+            return self._set_llm_output(
+                context, output, input_tokens, output_tokens,
+                reasoning_tokens=reasoning_tokens,
+                cached_tokens=cached_tokens
+            )
+
         # Handle LangChain LLMResult
-        elif hasattr(response, "generations"):
+        if hasattr(response, "generations"):
             if not response.generations or not response.generations[0]:
                 return context
 
@@ -98,14 +135,22 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
             input_tokens = 0
             output_tokens = 0
+            reasoning_tokens = 0
+            cached_tokens = 0
             if llm_output := getattr(response, "llm_output", None):
                 if token_usage := llm_output.get("token_usage", None):
                     input_tokens = token_usage.prompt_tokens
                     output_tokens = token_usage.completion_tokens
+                    # Extract additional token details
+                    reasoning_tokens, cached_tokens = self._extract_token_details(token_usage)
         else:
             return context
 
-        return self._set_llm_output(context, output, input_tokens, output_tokens)
+        return self._set_llm_output(
+            context, output, input_tokens, output_tokens,
+            reasoning_tokens=reasoning_tokens,
+            cached_tokens=cached_tokens
+        )
 
     def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         serialized: dict[str, Any] = args[0]

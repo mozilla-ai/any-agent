@@ -163,6 +163,7 @@ dev = [
   { include-group = "docs" },
   { include-group = "lint" },
   { include-group = "tests" },
+  "ruff>=0.12.10",
 ]
 
 docs = [

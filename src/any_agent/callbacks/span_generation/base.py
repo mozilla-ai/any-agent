@@ -62,20 +62,27 @@ class _SpanGeneration(Callback):
         output: str | list[dict[str, str]],
         input_tokens: int,
         output_tokens: int,
+        reasoning_tokens: int = 0,
+        cached_tokens: int = 0,
     ) -> Context:
         span = context.current_span
         output_type = self._determine_output_type(output)
         output_attr = self._serialize_for_attribute(output)
 
-        span.set_attributes(
-            {
-                GenAI.OUTPUT: output_attr,
-                GenAI.OUTPUT_TYPE: output_type,
-                GenAI.USAGE_INPUT_TOKENS: input_tokens,
-                GenAI.USAGE_OUTPUT_TOKENS: output_tokens,
-            }
-        )
+        attributes = {
+            GenAI.OUTPUT: output_attr,
+            GenAI.OUTPUT_TYPE: output_type,
+            GenAI.USAGE_INPUT_TOKENS: input_tokens,
+            GenAI.USAGE_OUTPUT_TOKENS: output_tokens,
+        }
 
+        # Only set optional token counts if they're present
+        if reasoning_tokens > 0:
+            attributes[GenAI.USAGE_REASONING_TOKENS] = reasoning_tokens
+        if cached_tokens > 0:
+            attributes[GenAI.USAGE_CACHED_TOKENS] = cached_tokens
+
+        span.set_attributes(attributes)
         span.set_status(StatusCode.OK)
         return context
 

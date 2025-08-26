@@ -56,12 +56,15 @@ class _GoogleSpanGeneration(_SpanGeneration):
             ]
         input_tokens = 0
         output_tokens = 0
+        reasoning_tokens = 0
         if resp_meta := llm_response.usage_metadata:
             if prompt_tokens := resp_meta.prompt_token_count:
                 input_tokens = prompt_tokens
             if candidates_token := resp_meta.candidates_token_count:
                 output_tokens = candidates_token
-        return self._set_llm_output(context, output, input_tokens, output_tokens)
+            # Check for thinking/reasoning tokens (Gemini 2.5 models)
+            reasoning_tokens = getattr(resp_meta, "thoughts_token_count", 0)
+        return self._set_llm_output(context, output, input_tokens, output_tokens, reasoning_tokens)
 
     def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         tool: BaseTool = kwargs["tool"]
