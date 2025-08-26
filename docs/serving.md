@@ -7,6 +7,8 @@
 
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification/2025-03-26), via the [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk).
 
+- **MCP to A2A Bridge**: Expose MCP servers as A2A-compatible services, enabling protocol interoperability. Requires both extras: `pip install 'any-agent[mcp,a2a]'`.
+
 ## Configuring and Serving Agents
 
 You can configure and serve an agent using the [`A2AServingConfig`][any_agent.serving.A2AServingConfig] or [`MCPServingConfig`][any_agent.serving.MCPServingConfig] and the [`AnyAgent.serve_async`][any_agent.AnyAgent.serve_async] method.
@@ -152,10 +154,86 @@ if __name__ == "__main__":
 
 ```
 
+## Bridging MCP to A2A
+
+any-agent provides a bridge that allows you to expose MCP servers as A2A-compatible services. This enables:
+
+- **Protocol Interoperability**: Make MCP tools available to Google's A2A ecosystem
+- **Enterprise Integration**: Connect local tools with enterprise agent systems
+- **Identity Support**: Leverage AGNTCY Identity for secure tool access
+
+### Basic Bridge Example
+
+```python
+import asyncio
+from any_agent.config import MCPStdio
+from any_agent.serving import (
+    MCPToA2ABridgeConfig,
+    serve_mcp_as_a2a_async,
+)
+
+async def bridge_mcp_server():
+    # Configure MCP server
+    mcp_config = MCPStdio(
+        command="uvx",
+        args=["mcp-server-time"],
+        tools=["get_current_time"],
+    )
+    
+    # Configure bridge
+    bridge_config = MCPToA2ABridgeConfig(
+        mcp_config=mcp_config,
+        port=8080,
+        endpoint="/time-bridge",
+        server_name="time-server",
+    )
+    
+    # Start the bridge
+    bridge_handle = await serve_mcp_as_a2a_async(mcp_config, bridge_config)
+    print(f"MCP server bridged to A2A at: http://localhost:8080/time-bridge")
+    
+    # Keep running
+    await bridge_handle.task
+
+if __name__ == "__main__":
+    asyncio.run(bridge_mcp_server())
+```
+
+### Using the Bridged MCP Tool
+
+Once bridged, the MCP tool can be accessed via A2A protocol:
+
+```python
+from any_agent import AgentConfig, AnyAgent
+from any_agent.tools import a2a_tool_async
+
+async def use_bridged_tool():
+    # Create A2A tool from bridged MCP server
+    time_tool = await a2a_tool_async(
+        "http://localhost:8080/time-bridge",
+        toolname="get_time_via_bridge",
+    )
+    
+    # Use in an agent
+    agent = await AnyAgent.create_async(
+        "tinyagent",
+        AgentConfig(
+            model_id="mistral/mistral-small-latest",
+            instructions="Use tools to answer questions.",
+            tools=[time_tool],
+        ),
+    )
+    
+    result = await agent.run_async("What time is it?")
+    print(result.final_output)
+```
+
 ## More Examples
 
-Check out our cookbook example for building and serving an agent via A2A:
+Check out our cookbook examples:
 
 👉 [Serve an Agent with A2A (Jupyter Notebook)](./cookbook/serve_a2a.ipynb)
 
-👉 [Use an A2a Agent as a tool (Jupyter Notebook)](./cookbook/serve_a2a.ipynb)
+👉 [Use an A2A Agent as a tool (Jupyter Notebook)](./cookbook/a2a_as_tool.ipynb)
+
+👉 [Bridge MCP servers to A2A (Jupyter Notebook)](./cookbook/mcp_a2a_bridge.ipynb)

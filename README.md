@@ -93,6 +93,7 @@ Get started quickly with these practical examples:
 - **[Creating an agent with MCP](https://mozilla-ai.github.io/any-agent/cookbook/mcp_agent/)** - Integrate Model Context Protocol tools.
 - **[Serve an Agent with A2A](https://mozilla-ai.github.io/any-agent/cookbook/serve_a2a/)** - Deploy agents with Agent-to-Agent communication.
 - **[Building Multi-Agent Systems with A2A](https://mozilla-ai.github.io/any-agent/cookbook/a2a_as_tool/)** - Using an agent as a tool for another agent to interact with.
+- **[Bridge MCP servers to A2A](https://mozilla-ai.github.io/any-agent/cookbook/mcp_a2a_bridge/)** - Expose MCP tools as A2A-compatible services for protocol interoperability.
 
 ## Contributions
 
