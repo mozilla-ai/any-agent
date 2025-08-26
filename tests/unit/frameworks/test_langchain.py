@@ -6,7 +6,7 @@ from langchain_core.messages import AIMessage
 from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.testing.helpers import LITELLM_IMPORT_PATHS
+from any_agent.testing.helpers import LLM_IMPORT_PATHS
 
 if TYPE_CHECKING:
     from any_agent.frameworks.langchain import LangchainAgent
@@ -98,7 +98,7 @@ def test_structured_output_without_tools() -> None:
         )
         return MagicMock(choices=[MagicMock(message=mock_message)])
 
-    with patch(LITELLM_IMPORT_PATHS[AgentFramework.LANGCHAIN]) as mock_acompletion:
+    with patch(LLM_IMPORT_PATHS[AgentFramework.LANGCHAIN]) as mock_acompletion:
         mock_acompletion.return_value = create_mock_response(
             '{"answer": "Structured answer", "confidence": 0.95}'
         )

@@ -10,8 +10,7 @@ requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
   "any-llm-sdk>=0.15.0,<1",
-  "openai<1.100",
-  "litellm>=1.74.0",
+  "litellm>=1.75.8",
   "mcp>=1.5.0",
   "opentelemetry-sdk",
   "pydantic",
@@ -131,6 +130,7 @@ extend-select = ["ALL"]
 "src/any_agent/tools/a2a.py" = ["UP045"]  # Use `X | Y` for type unions - disabled for Google ADK compatibility
 "tests/**" = ["D", "F401", "I001"]
 "*.ipynb" = ["T201"]
+"scripts/**" = ["D", "T201"]
 
 [tool.mypy]
 strict = true

@@ -25,6 +25,10 @@ jobs:
 
       - run: uv sync --group tests
 
+      - env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/wake_up_hf_endpoint.py --retry=10
+
       - name: Run TINYAGENT test
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
