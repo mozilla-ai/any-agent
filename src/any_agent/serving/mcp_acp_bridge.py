@@ -72,12 +72,19 @@ class MCPBridgeExecutor:
         self.mcp_client = mcp_client
         self.bridge_config = bridge_config
         self._mcp_tools: dict[str, Any] = {}
+        self._callable_tools: list[Any] = []
+        self._tool_map: dict[str, Any] = {}
         self._agent_manifest: Optional[dict[str, Any]] = None
 
     async def initialize(self) -> None:
         """Initialize by loading MCP tools and creating ACP manifest."""
         raw_tools = await self.mcp_client.list_raw_tools()
         self._mcp_tools = {tool.name: tool for tool in raw_tools}
+        
+        # Cache callable tools for performance
+        self._callable_tools = await self.mcp_client.list_tools()
+        self._tool_map = {tool.__name__: tool for tool in self._callable_tools}
+        
         logger.info(f"Loaded {len(self._mcp_tools)} MCP tools")
         
         # Create ACP manifest
@@ -176,9 +183,8 @@ class MCPBridgeExecutor:
             # Call MCP tool
             logger.info(f"Calling MCP tool '{tool_name}' with args: {args}")
             
-            # Get the callable tool
-            tools = await self.mcp_client.list_tools()
-            tool_func = next((t for t in tools if t.__name__ == tool_name), None)
+            # Get the callable tool from cache (O(1) lookup)
+            tool_func = self._tool_map.get(tool_name)
             
             if not tool_func:
                 raise ValueError(f"Tool {tool_name} not found in callable tools")
