@@ -4,6 +4,7 @@ import asyncio
 import inspect
 import json
 from contextlib import suppress
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from any_llm import acompletion
@@ -12,6 +13,7 @@ from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.logging import logger
+from any_agent.tools.wrappers import ToolError
 
 from .any_agent import AnyAgent
 
@@ -78,7 +80,13 @@ class ToolExecutor:
             return str(result)
 
         except Exception as e:
-            return f"Error executing tool: {e}"
+            return ToolError(
+                message=str(e),
+                error_type=type(e).__name__,
+                tool_name=request.get("name", "unknown_tool"),
+                framework=AgentFramework.TINYAGENT,
+                timestamp=datetime.now().isoformat()
+            )
 
 
 def final_answer(answer: str) -> str:
@@ -217,9 +225,14 @@ class TinyAgent(AnyAgent):
                     }
 
                     if tool_name not in self.clients:
-                        tool_message["content"] = (
-                            f"Error calling tool: No tool found with name: {tool_name}"
+                        error = ToolError(
+                            message=f"No tool found with name: {tool_name}",
+                            error_type="ToolNotFoundError",
+                            tool_name=tool_name,
+                            framework=AgentFramework.TINYAGENT,
+                            timestamp=datetime.now().isoformat()
                         )
+                        tool_message["content"] = str(error)
                         continue
 
                     tool_args = {}
