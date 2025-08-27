@@ -163,21 +163,31 @@ class AnyAgent(ABC):
         return tools
 
     def run(
-        self, prompt: str, *, runtime_context: dict[str, Any] | None = None, **kwargs: Any
+        self,
+        prompt: str,
+        *,
+        runtime_context: dict[str, Any] | None = None,
+        **kwargs: Any,
     ) -> AgentTrace:
         """Run the agent with the given prompt."""
         try:
             asyncio.get_running_loop()
         except RuntimeError:
             # No running event loop - this is what we want for sync execution
-            return run_async_in_sync(self.run_async(prompt, runtime_context=runtime_context, **kwargs))
+            return run_async_in_sync(
+                self.run_async(prompt, runtime_context=runtime_context, **kwargs)
+            )
 
         # If we get here, there IS a running loop
         msg = "Cannot call 'run()' from an async context. Use 'run_async()' instead."
         raise RuntimeError(msg)
 
     async def run_async(
-        self, prompt: str, *, runtime_context: dict[str, Any] | None = None, **kwargs: Any
+        self,
+        prompt: str,
+        *,
+        runtime_context: dict[str, Any] | None = None,
+        **kwargs: Any,
     ) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.
 
@@ -209,7 +219,6 @@ class AnyAgent(ABC):
                         trace=AgentTrace(),
                         tracer=self._tracer,
                         shared={},
-                        runtime_context=runtime_context,
                     )
 
                     if len(self._wrapper.callback_context) == 1:

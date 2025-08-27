@@ -46,7 +46,7 @@ class ToolExecutor:
         """
         self.tool_function = tool_function
 
-    async def call_tool(self, request: dict[str, Any]) -> str:
+    async def call_tool(self, request: dict[str, Any]) -> str | ToolError:
         """Call the tool function.
 
         Args:
@@ -85,7 +85,7 @@ class ToolExecutor:
                 error_type=type(e).__name__,
                 tool_name=request.get("name", "unknown_tool"),
                 framework=AgentFramework.TINYAGENT,
-                timestamp=datetime.now().isoformat()
+                timestamp=datetime.now().isoformat(),
             )
 
 
@@ -230,7 +230,7 @@ class TinyAgent(AnyAgent):
                             error_type="ToolNotFoundError",
                             tool_name=tool_name,
                             framework=AgentFramework.TINYAGENT,
-                            timestamp=datetime.now().isoformat()
+                            timestamp=datetime.now().isoformat(),
                         )
                         tool_message["content"] = str(error)
                         continue

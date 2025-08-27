@@ -108,33 +108,31 @@ class _SpanGeneration(Callback):
         return context
 
     def _determine_tool_status(
-        self, tool_output: Any, output_type: str
+        self, tool_output: str | ToolError | Any, output_type: str
     ) -> Status | StatusCode:
         """Determine the status based on tool output content and type."""
-        # Check for structured ToolError first
         if isinstance(tool_output, ToolError):
             error_description = f"{tool_output.error_type}: {tool_output.message}"
-            if tool_output.tool_name != 'unknown_tool':
-                error_description = f"Tool '{tool_output.tool_name}' failed - {error_description}"
+            if tool_output.tool_name != "unknown_tool":
+                error_description = (
+                    f"Tool '{tool_output.tool_name}' failed - {error_description}"
+                )
             return Status(StatusCode.ERROR, description=error_description)
-        
-        # Fallback to string-based detection for backward compatibility
         if output_type == "text" and isinstance(tool_output, str):
             if "Error calling tool:" in tool_output:
                 return Status(StatusCode.ERROR, description=tool_output)
         return StatusCode.OK
 
-    def _set_tool_output(self, context: Context, tool_output: Any) -> Context:
+    def _set_tool_output(
+        self, context: Context, tool_output: str | ToolError | Any
+    ) -> Context:
         span = context.current_span
 
         if tool_output is None:
             tool_output = "{}"
 
-        # Determine status before serialization to preserve ToolError structure
         output_type = self._determine_output_type(tool_output)
         status = self._determine_tool_status(tool_output, output_type)
-        
-        # Serialize for attributes (ToolError will be converted to string representation)
         output_attr = self._serialize_for_attribute(tool_output)
 
         span.set_attributes({GenAI.OUTPUT: output_attr, GenAI.OUTPUT_TYPE: output_type})

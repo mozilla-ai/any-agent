@@ -31,4 +31,3 @@ class Context:
 
     shared: dict[str, Any]
     """Can be used to store arbitrary information for sharing across callbacks."""
-

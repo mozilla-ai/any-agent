@@ -20,16 +20,16 @@ if TYPE_CHECKING:
 @dataclass
 class ToolError:
     """Structured error information for tool execution failures."""
-    
+
     message: str
     error_type: str
     tool_name: str
     framework: AgentFramework
     timestamp: str
     traceback: str | None = None
-    
+
     def __str__(self) -> str:
-        """String representation for backward compatibility."""
+        """Return string representation for backward compatibility."""
         return f"Error calling tool: {self.message}"
 
 
@@ -42,9 +42,9 @@ def _wrap_no_exception(tool: Any, framework: AgentFramework) -> Any:
             return ToolError(
                 message=str(e),
                 error_type=type(e).__name__,
-                tool_name=getattr(tool, '__name__', 'unknown_tool'),
+                tool_name=getattr(tool, "__name__", "unknown_tool"),
                 framework=framework,
-                timestamp=datetime.now().isoformat()
+                timestamp=datetime.now().isoformat(),
             )
 
     @wraps(tool)
@@ -55,9 +55,9 @@ def _wrap_no_exception(tool: Any, framework: AgentFramework) -> Any:
             return ToolError(
                 message=str(e),
                 error_type=type(e).__name__,
-                tool_name=getattr(tool, '__name__', 'unknown_tool'),
+                tool_name=getattr(tool, "__name__", "unknown_tool"),
                 framework=framework,
-                timestamp=datetime.now().isoformat()
+                timestamp=datetime.now().isoformat(),
             )
 
     if asyncio.iscoroutinefunction(tool):
@@ -196,13 +196,17 @@ async def _wrap_tools(
                 # Wrap each callable tool with the framework wrapper
                 for callable_tool in callable_tools:
                     wrapped_tools.append(
-                        framework_wrapper(_wrap_no_exception(callable_tool, agent_framework))
+                        framework_wrapper(
+                            _wrap_no_exception(callable_tool, agent_framework)
+                        )
                     )
 
             mcp_clients.append(mcp_client)
         elif callable(tool):
             verify_callable(tool)
-            wrapped_tools.append(framework_wrapper(_wrap_no_exception(tool, agent_framework)))
+            wrapped_tools.append(
+                framework_wrapper(_wrap_no_exception(tool, agent_framework))
+            )
         else:
             msg = f"Tool {tool} needs to be of type `MCPStdio` or `callable` but is {type(tool)}"
             raise ValueError(msg)
