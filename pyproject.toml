@@ -25,7 +25,7 @@ agno = [
 ]
 
 google = [
-  "google-adk>=1.4.1, <2"
+  "google-adk>=1.4.1, <1.13.0" # Pinned until https://github.com/mozilla-ai/any-agent/issues/780
 ]
 
 langchain = [
