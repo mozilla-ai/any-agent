@@ -1,6 +1,7 @@
 import types
 from typing import Any, Union, get_args, get_origin
 
+
 def safe_cast_argument(value: Any, arg_type: Any) -> Any:
     """Safely cast an argument to the specified type, handling union types.
 
