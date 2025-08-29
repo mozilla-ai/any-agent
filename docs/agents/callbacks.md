@@ -56,10 +56,18 @@ You can see what attributes are available for LLM Calls and Tool Executions by e
 
 ## Implementing Callbacks
 
-All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and can choose to implement any subset of the available callback methods.
+All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and can choose to implement any subset of the available callback methods. These methods include:
 
-You can use [`Context.shared`][any_agent.callbacks.context.Context.shared] to store information meant
-to be reused across callbacks:
+| Callback Method | Description |
+|:----------------:|:------------:|
+| before_agent_invocation | Should be used to check the Context before the agent is invoked. |
+| befor_llm_call | Should be used before the chat history hits the LLM. |
+| after_llm_call | Should be used once LLM output is generated, before it appends to the chat history. |
+| before_tool_execution | Should be used to check the Context before tool execution. |
+| after_tool_execution | Should be used once tool has been executed, before the output is appended to chat history. |
+| after_agent_invocation | Should be used before a response is returned from an agent. |
+
+Note that each method operates on Context and that this is the order the methods will be called. You can use [`Context.shared`][any_agent.callbacks.context.Context.shared] to store information meant to be reused across callbacks:
 
 ```python
 from any_agent.callbacks import Callback, Context
