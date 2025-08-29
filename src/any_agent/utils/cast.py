@@ -2,6 +2,21 @@ import types
 from typing import Any, Union, get_args, get_origin
 
 
+def _is_optional_type(arg_type: Any) -> bool:
+    """Check if a type is optional (contains None as a union member)."""
+    # Handle modern union types (e.g., int | str | None)
+    if isinstance(arg_type, types.UnionType):
+        union_args = get_args(arg_type)
+        return type(None) in union_args
+
+    # Handle typing.Union (older style)
+    if get_origin(arg_type) is Union:
+        union_args = get_args(arg_type)
+        return type(None) in union_args
+
+    return False
+
+
 def safe_cast_argument(value: Any, arg_type: Any) -> Any:
     """Safely cast an argument to the specified type, handling union types.
 
@@ -15,6 +30,10 @@ def safe_cast_argument(value: Any, arg_type: Any) -> Any:
     """
     # Handle None values for optional types
     if value is None:
+        return None
+
+    # If you get an empty str and None is an option, return it as None
+    if value == "" and _is_optional_type(arg_type):
         return None
 
     # Handle modern union types (e.g., int | str | None)

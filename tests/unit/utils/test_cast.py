@@ -108,6 +108,17 @@ def test_edge_cases() -> None:
     assert safe_cast_argument("False", bool) == True  # Non-empty string is truthy
 
 
+def test_empty_string_to_none_conversion() -> None:
+    """Test that empty strings are converted to None for optional types."""
+    assert safe_cast_argument("", str | None) is None
+
+    assert safe_cast_argument("", Union[str, None]) is None
+    assert safe_cast_argument("", Union[int, None]) is None
+    assert safe_cast_argument("", Optional[float]) is None
+    assert safe_cast_argument("", int | str | None) is None
+    assert safe_cast_argument("", Union[int, str, None]) is None
+
+
 def test_type_already_correct() -> None:
     """Test when the value is already the correct type."""
     assert safe_cast_argument(42, int) == 42
@@ -145,6 +156,16 @@ def test_all_union_casts_fail() -> None:
         ("42", Union[int, str], 42),
         ("hello", Union[int, str], "hello"),
         ("invalid", int, "invalid"),
+        # Empty string to None conversion tests
+        ("", str | None, None),
+        ("", int | None, None),
+        ("", Optional[str], None),
+        ("", Union[str, None], None),
+        ("", Union[int, str, None], None),
+        # Empty string should remain empty for non-optional types
+        ("", str, ""),
+        ("", int | str, ""),
+        ("", Union[int, str], ""),
     ],
 )
 def test_parametrized_casting(value: Any, target_type: Any, expected: Any) -> None:
