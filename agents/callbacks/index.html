@@ -1368,13 +1368,46 @@ will be called at different points of the <a class="autorefs autorefs-internal" 
 property so that callbacks can access information in a framework-agnostic way.</p>
 <p>You can see what attributes are available for LLM Calls and Tool Executions by examining the <a class="autorefs autorefs-internal" title="any_agent.tracing.attributes.GenAI" href="../../api/tracing/#any_agent.tracing.attributes.GenAI"><code>GenAI</code></a> class.</p>
 <h2 id="implementing-callbacks">Implementing Callbacks</h2>
-<p>All callbacks must inherit from the base <a class="autorefs autorefs-internal" title="any_agent.callbacks.base.Callback" href="../../api/callbacks/#any_agent.callbacks.base.Callback"><code>Callback</code></a> class and can choose to implement any subset of the available callback methods.</p>
-<p>You can use <a class="autorefs autorefs-internal" title="shared
+<p>All callbacks must inherit from the base <a class="autorefs autorefs-internal" title="any_agent.callbacks.base.Callback" href="../../api/callbacks/#any_agent.callbacks.base.Callback"><code>Callback</code></a> class and can choose to implement any subset of the available callback methods. These methods include:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Callback Method</th>
+<th style="text-align: center;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">before_agent_invocation</td>
+<td style="text-align: center;">Should be used to check the Context before the agent is invoked.</td>
+</tr>
+<tr>
+<td style="text-align: center;">befor_llm_call</td>
+<td style="text-align: center;">Should be used before the chat history hits the LLM.</td>
+</tr>
+<tr>
+<td style="text-align: center;">after_llm_call</td>
+<td style="text-align: center;">Should be used once LLM output is generated, before it appends to the chat history.</td>
+</tr>
+<tr>
+<td style="text-align: center;">before_tool_execution</td>
+<td style="text-align: center;">Should be used to check the Context before tool execution.</td>
+</tr>
+<tr>
+<td style="text-align: center;">after_tool_execution</td>
+<td style="text-align: center;">Should be used once tool has been executed, before the output is appended to chat history.</td>
+</tr>
+<tr>
+<td style="text-align: center;">after_agent_invocation</td>
+<td style="text-align: center;">Should be used before a response is returned from an agent.</td>
+</tr>
+</tbody>
+</table>
+<p>Note that each method operates on Context and that this is the order the methods will be called. You can use <a class="autorefs autorefs-internal" title="shared
 
   
       instance-attribute
-  " href="../../api/callbacks/#any_agent.callbacks.context.Context.shared"><code>Context.shared</code></a> to store information meant
-to be reused across callbacks:</p>
+  " href="../../api/callbacks/#any_agent.callbacks.context.Context.shared"><code>Context.shared</code></a> to store information meant to be reused across callbacks:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span><span class="p">,</span> <span class="n">Context</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tracing.attributes</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenAI</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
