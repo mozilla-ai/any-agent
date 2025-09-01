@@ -94,7 +94,7 @@ def test_model_args_streaming(
 async def test_create_sync_in_async_context() -> None:
     with pytest.raises(
         RuntimeError,
-        match=r"Cannot call 'create\(\)' from an async context\. Use 'create_async\(\)' instead\.",
+        match="Cannot use the `sync` API in an `async` context. Use the `async` API instead",
     ):
         AnyAgent.create(
             AgentFramework.TINYAGENT,
@@ -109,6 +109,6 @@ async def test_run_sync_in_async_context() -> None:
     )
     with pytest.raises(
         RuntimeError,
-        match=r"Cannot call 'run\(\)' from an async context\. Use 'run_async\(\)' instead\.",
+        match="Cannot use the `sync` API in an `async` context. Use the `async` API instead",
     ):
         agent.run(TEST_QUERY)
