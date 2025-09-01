@@ -3,6 +3,7 @@ from typing import Any
 
 import pytest
 from agents.tool import Tool as OpenaiClass
+from any_llm.utils.aio import run_async_in_sync
 from google.adk.tools import FunctionTool as GoogleClass
 from langchain_core.tools import BaseTool as LangchainClass
 from llama_index.core.tools import FunctionTool as LlamaindexClass
@@ -12,7 +13,6 @@ from any_agent import AgentFramework
 from any_agent.config import Tool
 from any_agent.tools import search_web, visit_webpage
 from any_agent.tools.wrappers import _wrap_tools
-from any_agent.utils import run_async_in_sync
 
 
 def wrap_sync(

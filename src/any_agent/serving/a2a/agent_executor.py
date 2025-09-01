@@ -1,3 +1,4 @@
+import builtins
 import sys
 
 PYTHONEGT312 = sys.version_info >= (3, 12)
@@ -35,6 +36,7 @@ from a2a.utils import (
     new_agent_parts_message,
     new_task,
 )
+from any_llm.utils.aio import run_async_in_sync
 from pydantic import BaseModel
 
 from any_agent import AgentRunError
@@ -43,10 +45,11 @@ from any_agent.callbacks.context import Context
 from any_agent.logging import logger
 from any_agent.serving.a2a.context_manager import ContextManager
 from any_agent.serving.a2a.envelope import A2AEnvelope
-from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
     from any_agent import AnyAgent
+
+INSIDE_NOTEBOOK = hasattr(builtins, "__IPYTHON__")
 
 
 class _ToolUpdaterCallback(Callback):
@@ -79,7 +82,8 @@ class _ToolUpdaterCallback(Callback):
                     self.task_id,
                 ),
                 final=False,
-            )
+            ),
+            allow_running_loop=INSIDE_NOTEBOOK,
         )
         return context
 
@@ -106,7 +110,8 @@ class _ToolUpdaterCallback(Callback):
                     self.task_id,
                 ),
                 final=False,
-            )
+            ),
+            allow_running_loop=INSIDE_NOTEBOOK,
         )
         return context
 

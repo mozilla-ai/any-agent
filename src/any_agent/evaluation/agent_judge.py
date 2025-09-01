@@ -1,6 +1,8 @@
+import builtins
 from collections.abc import Callable
 from typing import Any
 
+from any_llm.utils.aio import run_async_in_sync
 from pydantic import BaseModel
 
 from any_agent import AgentConfig, AnyAgent
@@ -8,7 +10,8 @@ from any_agent.config import AgentFramework
 from any_agent.evaluation.schemas import EvaluationOutput
 from any_agent.evaluation.tools import TraceTools
 from any_agent.tracing.agent_trace import AgentTrace
-from any_agent.utils.asyncio_sync import run_async_in_sync
+
+INSIDE_NOTEBOOK = hasattr(builtins, "__IPYTHON__")
 
 AGENT_INSTRUCTIONS = """
 You are a helpful assistant that will be used to evaluate the correctness of an agent trace.
@@ -58,7 +61,10 @@ class AgentJudge:
         """
         if additional_tools is None:
             additional_tools = []
-        return run_async_in_sync(self.run_async(trace, question, additional_tools))
+        return run_async_in_sync(
+            self.run_async(trace, question, additional_tools),
+            allow_running_loop=INSIDE_NOTEBOOK,
+        )
 
     async def run_async(
         self,

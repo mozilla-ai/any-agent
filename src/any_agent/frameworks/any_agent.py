@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import builtins
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, assert_never, overload
 
+from any_llm.utils.aio import run_async_in_sync
 from opentelemetry import trace as otel_trace
 
 from any_agent.callbacks.context import Context
@@ -18,7 +20,6 @@ from any_agent.config import (
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.attributes import GenAI
-from any_agent.utils import run_async_in_sync
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -28,6 +29,9 @@ if TYPE_CHECKING:
 
     from any_agent.serving import A2AServingConfig, MCPServingConfig, ServerHandle
     from any_agent.tools.mcp.mcp_client import MCPClient
+
+
+INSIDE_NOTEBOOK = hasattr(builtins, "__IPYTHON__")
 
 
 class AgentRunError(Exception):
@@ -129,20 +133,13 @@ class AnyAgent(ABC):
         agent_config: AgentConfig,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            # No running event loop - this is what we want for sync execution
-            return run_async_in_sync(
-                cls.create_async(
-                    agent_framework=agent_framework,
-                    agent_config=agent_config,
-                )
-            )
-
-        # If we get here, there IS a running loop
-        msg = "Cannot call 'create()' from an async context. Use 'create_async()' instead."
-        raise RuntimeError(msg)
+        return run_async_in_sync(
+            cls.create_async(
+                agent_framework=agent_framework,
+                agent_config=agent_config,
+            ),
+            allow_running_loop=INSIDE_NOTEBOOK,
+        )
 
     @classmethod
     async def create_async(
@@ -164,15 +161,9 @@ class AnyAgent(ABC):
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            # No running event loop - this is what we want for sync execution
-            return run_async_in_sync(self.run_async(prompt, **kwargs))
-
-        # If we get here, there IS a running loop
-        msg = "Cannot call 'run()' from an async context. Use 'run_async()' instead."
-        raise RuntimeError(msg)
+        return run_async_in_sync(
+            self.run_async(prompt, **kwargs), allow_running_loop=INSIDE_NOTEBOOK
+        )
 
     async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.

@@ -1,12 +1,15 @@
+import builtins
 from typing import Any
 
+from any_llm.utils.aio import run_async_in_sync
 from litellm import acompletion
 from litellm.utils import supports_response_schema
 from pydantic import BaseModel
 
 from any_agent.config import AgentFramework
 from any_agent.evaluation.schemas import EvaluationOutput
-from any_agent.utils.asyncio_sync import run_async_in_sync
+
+INSIDE_NOTEBOOK = hasattr(builtins, "__IPYTHON__")
 
 DEFAULT_PROMPT_TEMPLATE = """Please answer the evaluation question given the following contextual information:
 
@@ -82,7 +85,10 @@ class LlmJudge:
             The evaluation result
 
         """
-        return run_async_in_sync(self.run_async(context, question, prompt_template))
+        return run_async_in_sync(
+            self.run_async(context, question, prompt_template),
+            allow_running_loop=INSIDE_NOTEBOOK,
+        )
 
     async def run_async(
         self,

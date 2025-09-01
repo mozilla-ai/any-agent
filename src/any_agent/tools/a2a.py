@@ -1,12 +1,12 @@
 # adapted from https://github.com/google/a2a-python/blob/main/examples/helloworld/test_client.py
-
+import builtins
 import re
 from collections.abc import Callable, Coroutine
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Optional
 from uuid import uuid4
 
-from any_agent.utils.asyncio_sync import run_async_in_sync
+from any_llm.utils.aio import run_async_in_sync
 
 if TYPE_CHECKING:
     from a2a.types import AgentCard
@@ -28,6 +28,8 @@ with suppress(ImportError):
     )
 
     a2a_tool_available = True
+
+INSIDE_NOTEBOOK = hasattr(builtins, "__IPYTHON__")
 
 
 async def a2a_tool_async(
@@ -193,13 +195,17 @@ def a2a_tool(
         raise ImportError(msg)
 
     # Fetch the async tool upfront to get proper name and documentation (otherwise the tool doesn't have the right name and documentation)
-    async_tool = run_async_in_sync(a2a_tool_async(url, toolname, http_kwargs))
+    async_tool = run_async_in_sync(
+        a2a_tool_async(url, toolname, http_kwargs), allow_running_loop=INSIDE_NOTEBOOK
+    )
 
     def sync_wrapper(
         query: str, task_id: Optional[str] = None, context_id: Optional[str] = None
     ) -> Any:
         """Execute the A2A tool query synchronously."""
-        return run_async_in_sync(async_tool(query, task_id, context_id))
+        return run_async_in_sync(
+            async_tool(query, task_id, context_id), allow_running_loop=INSIDE_NOTEBOOK
+        )
 
     # Copy essential metadata from the async tool
     sync_wrapper.__name__ = async_tool.__name__
