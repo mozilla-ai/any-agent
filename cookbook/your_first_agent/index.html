@@ -1864,7 +1864,7 @@ Note: you may need to restart the kernel to use updated packages.
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -1883,7 +1883,7 @@ Note: you may need to restart the kernel to use updated packages.
 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"MISTRAL_API_KEY"</span><span class="p">,</span> <span class="s2">"TAVILY_API_KEY"</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> not found in environment!"</span><span class="p">)</span>
-        <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">"Please enter your MISTRAL_API_KEY: "</span><span class="p">)</span>
+        <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Please enter your </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: "</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_key</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> set for this session!"</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1895,7 +1895,7 @@ from getpass import getpass
 for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
     if key not in os.environ:
         print(f"{key} not found in environment!")
-        api_key = getpass("Please enter your MISTRAL_API_KEY: ")
+        api_key = getpass(f"Please enter your {key}: ")
         os.environ[key] = api_key
         print(f"{key} set for this session!")
     else:
