@@ -9,7 +9,7 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
-  "any-llm-sdk>=0.17.1,<1",
+  "any-llm-sdk>=0.17.2,<1",
   "litellm>=1.75.8",
   "mcp>=1.5.0",
   "opentelemetry-sdk",
