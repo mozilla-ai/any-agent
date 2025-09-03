@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
-from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from any_llm import acompletion
@@ -62,10 +61,12 @@ class ToolExecutor:
                 func_args = self.tool_function.__annotations__
                 for arg_name, arg_type in func_args.items():
                     if arg_name in arguments:
-                        with suppress(Exception):
+                        try:
                             arguments[arg_name] = safe_cast_argument(
                                 arguments[arg_name], arg_type
                             )
+                        except Exception as e:
+                            logger.warning(f"Failed to cast argument '{arg_name}': {e}")
 
             if asyncio.iscoroutinefunction(self.tool_function):
                 result = await self.tool_function(**arguments)
