@@ -66,6 +66,9 @@ jobs:
         run: pytest tests/integration/frameworks -n auto -v -k "not TINYAGENT" --cov --cov-report=xml --cov-append
 
       - name: Run Tool tests
+        env:
+          COMPOSIO_API_KEY: ${{ secrets.COMPOSIO_API_KEY }}
+          COMPOSIO_USER_ID: ${{ secrets.COMPOSIO_USER_ID }}
         run: pytest -v tests/integration/tools --cov --cov-report=xml --cov-append
 
       - name: Run Snapshot tests
