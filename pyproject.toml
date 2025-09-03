@@ -59,7 +59,7 @@ composio = [
 ]
 
 all = [
-  "any-agent[agno,google,langchain,llama_index,openai,smolagents,composio]",
+  "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
 ]
 
 [project.urls]
