@@ -54,8 +54,12 @@ a2a = [
   "httpx",
 ]
 
+composio = [
+  "composio>=0.8.9,<1"
+]
+
 all = [
-  "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
+  "any-agent[agno,google,langchain,llama_index,openai,smolagents,composio]",
 ]
 
 [project.urls]
