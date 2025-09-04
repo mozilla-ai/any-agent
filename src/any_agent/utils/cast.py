@@ -1,5 +1,8 @@
+import json
 import types
 from typing import Any, Union, get_args, get_origin
+
+from any_agent.logging import logger
 
 
 def _is_optional_type(arg_type: Any) -> bool:
@@ -36,6 +39,26 @@ def safe_cast_argument(value: Any, arg_type: Any) -> Any:
     if value == "" and _is_optional_type(arg_type):
         return None
 
+    # Handle JSON string parsing for complex types
+    if isinstance(value, str) and value.strip():
+        # Try to parse JSON strings for list and dict types
+        if arg_type in (list, dict) or (
+            hasattr(arg_type, "__origin__") and arg_type.__origin__ in (list, dict)
+        ):
+            try:
+                parsed = json.loads(value)
+                if arg_type is list and isinstance(parsed, list):
+                    return parsed
+                if arg_type is dict and isinstance(parsed, dict):
+                    return parsed
+                if hasattr(arg_type, "__origin__"):
+                    if arg_type.__origin__ is list and isinstance(parsed, list):
+                        return parsed
+                    if arg_type.__origin__ is dict and isinstance(parsed, dict):
+                        return parsed
+            except (json.JSONDecodeError, TypeError):
+                pass
+
     # Handle modern union types (e.g., int | str | None)
     if isinstance(arg_type, types.UnionType):
         union_args = get_args(arg_type)
@@ -43,15 +66,15 @@ def safe_cast_argument(value: Any, arg_type: Any) -> Any:
         non_none_types = [t for t in union_args if t is not type(None)]
 
         if len(non_none_types) == 1:
-            try:
-                return non_none_types[0](value)
-            except (ValueError, TypeError):
-                return value
+            # Recursively try to cast to the single non-None type
+            return safe_cast_argument(value, non_none_types[0])
 
         # For multiple types, try each one until one works
         for cast_type in non_none_types:
             try:
-                return cast_type(value)
+                result = safe_cast_argument(value, cast_type)
+                if result != value:  # If casting actually changed the value, use it
+                    return result
             except (ValueError, TypeError):
                 continue
         return value
@@ -64,20 +87,33 @@ def safe_cast_argument(value: Any, arg_type: Any) -> Any:
 
         # If only one non-None type, try to cast to it
         if len(non_none_types) == 1:
-            try:
-                return non_none_types[0](value)
-            except (ValueError, TypeError):
-                return value
+            # Recursively try to cast to the single non-None type
+            return safe_cast_argument(value, non_none_types[0])
 
         # For multiple types, try each one until one works
         for cast_type in non_none_types:
             try:
-                return cast_type(value)
+                result = safe_cast_argument(value, cast_type)
+                if result != value:  # If casting actually changed the value, use it
+                    return result
             except (ValueError, TypeError):
                 continue
+        return value
+
+    # Handle direct type casting for simple types
+    if arg_type in (list, dict):
+        # If we got here, it means JSON parsing failed above, so return as-is
+        logger.warning("Failed to parse JSON string for type %s: %s", arg_type, value)
+        return value
+
+    # Handle parameterized generic types (e.g., list[str], dict[str, int])
+    if hasattr(arg_type, "__origin__") and arg_type.__origin__ in (list, dict):
+        # If we got here, it means JSON parsing failed above, so return as-is
+        logger.warning("Failed to parse JSON string for type %s: %s", arg_type, value)
         return value
 
     try:
         return arg_type(value)
     except (ValueError, TypeError):
+        logger.warning("Failed to cast value %s to type %s", value, arg_type)
         return value
