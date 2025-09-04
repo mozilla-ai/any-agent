@@ -1,6 +1,10 @@
 # Agent Tools
 
-`any-agent` provides 2 options to specify what `tools` are available to your agent: `Callables` and `MCP` ([Model Context Protocol](https://modelcontextprotocol.io/introduction)). In order to support multi-agent systems, any agents served via A2A can also be integrated by wrapping the A2A connection in a callable function tool as described [below](#a2a-tools).
+`any-agent` provides 2 options to specify what `tools` are available to your agent: `Callables` and `MCP` ([Model Context Protocol](https://modelcontextprotocol.io/introduction)).
+
+!!! tip
+
+    Multi-agent can be implemented [using Agents-As-Tools](https://mozilla-ai.github.io/any-agent/agents/tools/#using-agents-as-tools).
 
 You can use any combination of options within the same agent.
 
@@ -26,76 +30,33 @@ main_agent = AgentConfig(
 )
 ```
 
+### Composio
 
-## MCP
-
-MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can connect to an MCP that is running elsewhere (using either [MCPSse][any_agent.config.MCPSse] or [MCPStreamableHttp][any_agent.config.MCPStreamableHttp]).
+We have a custom [Composio](https://github.com/ComposioHQ/composio) provider that allows to use
+any [Composio tools](https://docs.composio.dev/toolkits/introduction) in `any-agent`:
 
 !!! tip
 
-    There are tools like [SuperGateway](https://github.com/supercorp-ai/supergateway) providing an easy way to turn a Stdio server into an SSE server.
+    Check the different options for [Fetching and Filtering Composio Tools](https://docs.composio.dev/docs/fetching-tools).
 
-!!! warning
 
-    The SSE remote transport has been deprecated as of [MCP specification version 2025-03-26](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http ). Please use the HTTP Stream Transport instead.
+```python
+from any_agent import AgentConfig
+from any_agent.tools.composio import CallableProvider
+from composio import Composio
 
-=== "MCP (Stdio)"
+cpo = Composio(CallableProvider())
 
-    See the [MCPStdio][any_agent.config.MCPStdio] API Reference.
-
-    ```python
-    from any_agent import AgentConfig
-    from any_agent.config import MCPStdio
-
-    main_agent = AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        tools=[
-            MCPStdio(
-                command="docker",
-                args=["run", "-i", "--rm", "mcp/fetch"],
-                tools=["fetch"]
-            ),
-        ]
+main_agent = AgentConfig(
+    model_id="mistral/mistral-small-latest",
+    tools=cpo.tools.get(
+        user_id=user_id,
+        toolkits=["GITHUB", "HACKERNEWS"],
     )
-    ```
+)
+```
 
-=== "MCP (Streamable HTTP)"
-
-    See the [MCPStreamableHttp][any_agent.config.MCPStreamableHttp] API Reference.
-
-    ```python
-    from any_agent import AgentConfig
-    from any_agent.config import MCPStreamableHttp
-
-    main_agent = AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        tools=[
-            MCPStreamableHttp(
-                url="http://localhost:8000/mcp"
-            ),
-        ]
-    )
-    ```
-
-=== "MCP (SSE)"
-
-    See the [MCPSse][any_agent.config.MCPSse] API Reference.
-
-    ```python
-    from any_agent import AgentConfig
-    from any_agent.config import MCPSse
-
-    main_agent = AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        tools=[
-            MCPSse(
-                url="http://localhost:8000/sse"
-            ),
-        ]
-    )
-    ```
-
-## Using Agents-As-Tools
+### Using Agents-As-Tools
 
 To directly use one agent as a tool for another agent, `any-agent` provides 3 different approaches:
 
@@ -168,3 +129,71 @@ main_agent = await AnyAgent.create_async(
     )
 )
 ```
+
+## MCP
+
+MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can connect to an MCP that is running elsewhere (using either [MCPSse][any_agent.config.MCPSse] or [MCPStreamableHttp][any_agent.config.MCPStreamableHttp]).
+
+!!! tip
+
+    There are tools like [SuperGateway](https://github.com/supercorp-ai/supergateway) providing an easy way to turn a Stdio server into an SSE server.
+
+!!! warning
+
+    The SSE remote transport has been deprecated as of [MCP specification version 2025-03-26](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http ). Please use the HTTP Stream Transport instead.
+
+=== "MCP (Stdio)"
+
+    See the [MCPStdio][any_agent.config.MCPStdio] API Reference.
+
+    ```python
+    from any_agent import AgentConfig
+    from any_agent.config import MCPStdio
+
+    main_agent = AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[
+            MCPStdio(
+                command="docker",
+                args=["run", "-i", "--rm", "mcp/fetch"],
+                tools=["fetch"]
+            ),
+        ]
+    )
+    ```
+
+=== "MCP (Streamable HTTP)"
+
+    See the [MCPStreamableHttp][any_agent.config.MCPStreamableHttp] API Reference.
+
+    ```python
+    from any_agent import AgentConfig
+    from any_agent.config import MCPStreamableHttp
+
+    main_agent = AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[
+            MCPStreamableHttp(
+                url="http://localhost:8000/mcp"
+            ),
+        ]
+    )
+    ```
+
+=== "MCP (SSE)"
+
+    See the [MCPSse][any_agent.config.MCPSse] API Reference.
+
+    ```python
+    from any_agent import AgentConfig
+    from any_agent.config import MCPSse
+
+    main_agent = AgentConfig(
+        model_id="mistral/mistral-small-latest",
+        tools=[
+            MCPSse(
+                url="http://localhost:8000/sse"
+            ),
+        ]
+    )
+    ```
