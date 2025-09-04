@@ -1,5 +1,5 @@
 # ruff: noqa: E712, E721, UP007, UP045, PT006
-
+# mypy: disable-error-code="type-arg"
 from typing import Any, Optional, Union
 
 import pytest
@@ -166,6 +166,102 @@ def test_all_union_casts_fail() -> None:
         ("", str, ""),
         ("", int | str, ""),
         ("", Union[int, str], ""),
+        # JSON parsing tests - lists
+        ('["a", "b"]', list, ["a", "b"]),
+        ('["a", "b", "c"]', list, ["a", "b", "c"]),
+        (
+            '[{"insertText": {"location": {"index": 1}, "text": "Hello"}}]',
+            list,
+            [{"insertText": {"location": {"index": 1}, "text": "Hello"}}],
+        ),
+        ("[]", list, []),
+        ("[1, 2, 3]", list[int], [1, 2, 3]),
+        ('["a", "b", "c"]', list[str], ["a", "b", "c"]),
+        ('[{"id": 1}, {"id": 2}]', list[dict], [{"id": 1}, {"id": 2}]),
+        # JSON parsing tests - dicts
+        ('{"key": "value"}', dict, {"key": "value"}),
+        ('{"key": "value", "number": 42}', dict, {"key": "value", "number": 42}),
+        ('{"outer": {"inner": "value"}}', dict, {"outer": {"inner": "value"}}),
+        ("{}", dict, {}),
+        ('{"a": 1, "b": 2}', dict[str, int], {"a": 1, "b": 2}),
+        (
+            '{"key1": "value1", "key2": "value2"}',
+            dict[str, str],
+            {"key1": "value1", "key2": "value2"},
+        ),
+        (
+            '{"string": "value", "number": 42, "bool": true}',
+            dict[str, Any],
+            {"string": "value", "number": 42, "bool": True},
+        ),
+        (
+            '{"a": 1, "b": 2, "c": "three"}',
+            dict[str, int | str],
+            {"a": 1, "b": 2, "c": "three"},
+        ),
+        # Invalid JSON should return original
+        ('["invalid json"', list, '["invalid json"'),
+        ('{"invalid": json}', dict, '{"invalid": json}'),
+        ("not json", list, "not json"),
+        ("not json", dict, "not json"),
+        # Type mismatches should return original
+        ('["not", "a", "dict"]', dict, '["not", "a", "dict"]'),
+        ('{"not": "a list"}', list, '{"not": "a list"}'),
+        ('["list"]', dict, '["list"]'),
+        ('{"dict": "value"}', list, '{"dict": "value"}'),
+        # Union with complex types
+        ('["a", "b"]', list | str, ["a", "b"]),
+        ('"plain string"', list | str, '"plain string"'),
+        ("plain string", list | str, "plain string"),
+        ('{"key": "value"}', dict | str, {"key": "value"}),
+        ("plain string", dict | str, "plain string"),
+        ('["item"]', list | None, ["item"]),
+        # Whitespace handling
+        ('  ["a", "b", "c"]  ', list, ["a", "b", "c"]),
+        ("", list, ""),
+        ("   ", list, "   "),
+        # Already correct types
+        (["a", "b", "c"], list, ["a", "b", "c"]),
+        ({"key": "value"}, dict, {"key": "value"}),
+        # Complex data types with None as valid option
+        ('["a", "b", "c"]', list[str] | None, ["a", "b", "c"]),
+        (None, list[str] | None, None),
+        ("", list[str] | None, None),
+        ("invalid json", list[str] | None, "invalid json"),
+        ('{"key": "value"}', dict[str, str] | None, {"key": "value"}),
+        (None, dict[str, str] | None, None),
+        ("", dict[str, str] | None, None),
+        ("invalid json", dict[str, str] | None, "invalid json"),
+        ("[1, 2, 3]", list[int] | None, [1, 2, 3]),
+        (None, list[int] | None, None),
+        ("", list[int] | None, None),
+        ('{"a": 1, "b": 2}', dict[str, int] | None, {"a": 1, "b": 2}),
+        (None, dict[str, int] | None, None),
+        ("", dict[str, int] | None, None),
+        # Using Union syntax for complex types with None
+        ('["x", "y"]', Union[list[str], None], ["x", "y"]),
+        (None, Union[list[str], None], None),
+        ("", Union[list[str], None], None),
+        ('{"id": 42}', Union[dict[str, int], None], {"id": 42}),
+        (None, Union[dict[str, int], None], None),
+        ("", Union[dict[str, int], None], None),
+        # Optional complex types
+        ('[{"name": "test"}]', Optional[list[dict]], [{"name": "test"}]),
+        (None, Optional[list[dict]], None),
+        ("", Optional[list[dict]], None),
+        (
+            '{"nested": {"value": "data"}}',
+            Optional[dict[str, dict]],
+            {"nested": {"value": "data"}},
+        ),
+        (None, Optional[dict[str, dict]], None),
+        ("", Optional[dict[str, dict]], None),
+        # Multi-type unions with complex types and None
+        ('["item1", "item2"]', list[str] | dict[str, str] | None, ["item1", "item2"]),
+        ('{"key": "value"}', list[str] | dict[str, str] | None, {"key": "value"}),
+        (None, list[str] | dict[str, str] | None, None),
+        ("", list[str] | dict[str, str] | None, None),
+        ("invalid", list[str] | dict[str, str] | None, "invalid"),
     ],
 )
 def test_parametrized_casting(value: Any, target_type: Any, expected: Any) -> None:
