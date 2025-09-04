@@ -29,6 +29,7 @@ def test_files_all(fpath: pathlib.Path) -> None:
         patch("any_agent.AnyAgent.create", mock_create),
         patch("any_agent.AnyAgent.create_async", mock_create_async),
         patch("any_agent.tools.a2a_tool_async", mock_a2a_tool),
+        patch("composio.Composio", MagicMock()),
     ):
         check_md_file(fpath=fpath, memory=True)
 
