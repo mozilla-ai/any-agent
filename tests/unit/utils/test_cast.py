@@ -1,5 +1,5 @@
 # ruff: noqa: E712, E721, UP007, UP045, PT006
-
+# mypy: disable-error-code="type-arg"
 from typing import Any, Optional, Union
 
 import pytest
