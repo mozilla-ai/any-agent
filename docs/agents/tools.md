@@ -50,7 +50,7 @@ cpo = Composio(CallableProvider())
 main_agent = AgentConfig(
     model_id="mistral/mistral-small-latest",
     tools=cpo.tools.get(
-        user_id=user_id,
+        user_id="daavoo",
         toolkits=["GITHUB", "HACKERNEWS"],
     )
 )
