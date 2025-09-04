@@ -35,7 +35,7 @@ jobs:
 
       - name: Install
         run: |
-          uv sync --group tests --extra all --extra a2a
+          uv sync --group tests --extra all --extra a2a --extra composio
           uv pip install opentelemetry-exporter-otlp
 
       - name: Run Documentation tests
