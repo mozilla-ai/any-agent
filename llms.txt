@@ -12,7 +12,7 @@
 - [Agents - Frameworks - Openai](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/openai.md): Default Agent Type - Default Model Type - Run args
 - [Agents - Frameworks - Smolagents](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/smolagents.md): Default Agent Type - Default Model Type - Run args
 - [Agents - Frameworks - Tinyagent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/tinyagent.md): Examples
-- [Agents - Tools](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/tools.md): Callables - MCP - Using Agents-As-Tools
+- [Agents - Tools](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/tools.md): Callables - MCP
 - [Tracing](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/tracing.md): Console - Spans - Dumping to File - Adding an OpenTelemetry exporter
 - [Evaluation](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/evaluation.md): Choosing the Right Evaluation Method - Custom Code Evaluation - LlmJudge - AgentJudge - Custom Output Types
 - [Serving](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/serving.md): Configuring and Serving Agents - Using the served agents - More Examples
