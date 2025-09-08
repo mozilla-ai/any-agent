@@ -1,4 +1,3 @@
-import builtins
 import sys
 
 PYTHONEGT312 = sys.version_info >= (3, 12)
@@ -49,8 +48,6 @@ from any_agent.serving.a2a.envelope import A2AEnvelope
 if TYPE_CHECKING:
     from any_agent import AnyAgent
 
-INSIDE_NOTEBOOK = hasattr(builtins, "__IPYTHON__")
-
 
 class _ToolUpdaterCallback(Callback):
     """Sends events to a taskupdater about tool execution."""
@@ -83,7 +80,7 @@ class _ToolUpdaterCallback(Callback):
                 ),
                 final=False,
             ),
-            allow_running_loop=INSIDE_NOTEBOOK,
+            allow_running_loop=True,
         )
         return context
 
@@ -111,7 +108,7 @@ class _ToolUpdaterCallback(Callback):
                 ),
                 final=False,
             ),
-            allow_running_loop=INSIDE_NOTEBOOK,
+            allow_running_loop=True,
         )
         return context
 
