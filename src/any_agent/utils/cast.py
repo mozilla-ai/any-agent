@@ -100,6 +100,18 @@ def safe_cast_argument(value: Any, arg_type: Any) -> Any:
                 continue
         return value
 
+    # Explicit handling for booleans to avoid bool("False") == True
+    if arg_type is bool:
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.lower().lstrip() == "true"
+        try:
+            return bool(value)
+        except Exception:
+            logger.warning("Failed to cast value %s to type %s", value, arg_type)
+            return value
+
     # Handle direct type casting for simple types
     if arg_type in (list, dict):
         # If we got here, it means JSON parsing failed above, so return as-is

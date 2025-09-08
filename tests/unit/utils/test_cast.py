@@ -13,7 +13,7 @@ def test_basic_type_casting() -> None:
     assert safe_cast_argument(42, str) == "42"
     assert safe_cast_argument("3.14", float) == 3.14
     assert safe_cast_argument("true", bool) == True
-    assert safe_cast_argument("false", bool) == True  # Any non-empty string is truthy
+    assert safe_cast_argument("false", bool) == False
     assert safe_cast_argument("", bool) == False
     assert safe_cast_argument(0, bool) == False
     assert safe_cast_argument(1, bool) == True
@@ -105,7 +105,7 @@ def test_edge_cases() -> None:
     assert safe_cast_argument(True, str) == "True"
     assert safe_cast_argument(False, str) == "False"
     assert safe_cast_argument("True", bool) == True
-    assert safe_cast_argument("False", bool) == True  # Non-empty string is truthy
+    assert safe_cast_argument("False", bool) == False
 
 
 def test_empty_string_to_none_conversion() -> None:
