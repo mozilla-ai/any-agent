@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from any_agent.callbacks.span_generation.base import _SpanGeneration
+from any_agent.utils.cast import safe_cast_argument
 
 if TYPE_CHECKING:
     from litellm.types.utils import (
@@ -66,13 +67,34 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context, *args, **kwargs):
+    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         request: dict[str, Any] = args[0]
+
+        # Get the raw arguments
+        raw_args = request.get("arguments", {})
+
+        # If we have access to the tool function, process the arguments to show
+        # what will actually be passed to the tool (after casting)
+        processed_args = raw_args.copy()
+        if "tool_function" in kwargs and hasattr(
+            kwargs["tool_function"], "__annotations__"
+        ):
+            func_args = kwargs["tool_function"].__annotations__
+            for arg_name, arg_type in func_args.items():
+                if arg_name in processed_args:
+                    try:
+                        processed_args[arg_name] = safe_cast_argument(
+                            processed_args[arg_name], arg_type
+                        )
+                    except (ValueError, TypeError, AttributeError):
+                        # If casting fails, keep the original value, just how we do in the tinyagent framework itself
+                        pass
+
         return self._set_tool_input(
             context,
             name=request.get("name", "No name"),
-            args=request.get("arguments", {}),
+            args=processed_args,
         )
 
-    def after_tool_execution(self, context, *args, **kwargs):
+    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         return self._set_tool_output(context, args[0])
