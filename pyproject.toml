@@ -9,7 +9,7 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
-  "any-llm-sdk>=0.17.2,<1",
+  "any-llm-sdk>=0.19.0,<1",
   "litellm>=1.75.8",
   "mcp>=1.5.0",
   "opentelemetry-sdk",
@@ -193,7 +193,7 @@ tests = [
   "debugpy>=1.8.13",
   "mktestdocs>=0.2.4",
   "syrupy>=4.9.1",
-  "any-llm-sdk[anthropic,google,huggingface,mistral,xai]>=0.15.0,<1",
+  "any-llm-sdk[anthropic,gemini,huggingface,mistral,xai]>=0.19.0,<1",
 ]
 
 # For completeness, but 'uv sync --group dev' currently installs the others too.
