@@ -100,6 +100,15 @@ def safe_cast_argument(value: Any, arg_type: Any) -> Any:
                 continue
         return value
 
+    if arg_type is bool and isinstance(value, str):
+        lower_value = value.lower().strip()
+        if lower_value in ("true", "1", "yes"):
+            return True
+        if lower_value in ("false", "0"):
+            return False
+        logger.warning("Unexpected boolean string value: %s", value)
+        return bool(value)
+
     # Handle direct type casting for simple types
     if arg_type in (list, dict):
         # If we got here, it means JSON parsing failed above, so return as-is
