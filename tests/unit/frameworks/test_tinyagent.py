@@ -1,6 +1,3 @@
-import importlib
-import importlib.util
-import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -19,31 +16,124 @@ class SampleOutput(BaseModel):
 
 
 async def sample_tool_function(arg1: int, arg2: str) -> str:
+    """Sample tool function for testing argument casting."""
     assert isinstance(arg1, int), "arg1 should be an int"
     assert isinstance(arg2, str), "arg2 should be a str"
     return f"Received int: {arg1}, str: {arg2}"
 
 
 @pytest.mark.asyncio
-async def test_tool_argument_casting() -> None:
+async def test_tool_argument_casting_in_agent_flow() -> None:
+    """Test that argument casting happens in the main agent flow during tool execution."""
+    config = AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID, tools=[sample_tool_function])
+    agent: TinyAgent = await AnyAgent.create_async(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
+
+    def create_mock_tool_response() -> MagicMock:
+        """Create a mock LLM response that calls our tool with string arguments."""
+        mock_message = MagicMock()
+        mock_message.content = None
+        mock_message.role = "assistant"
+
+        mock_tool_call = MagicMock()
+        mock_tool_call.id = "call_123"
+        mock_function = MagicMock()
+        mock_function.name = "sample_tool_function"
+        mock_function.arguments = (
+            '{"arg1": "42", "arg2": 100}'  # String and int that need casting
+        )
+        mock_tool_call.function = mock_function
+        mock_message.tool_calls = [mock_tool_call]
+
+        mock_message.model_dump.return_value = {
+            "content": None,
+            "role": "assistant",
+            "tool_calls": [
+                {
+                    "id": "call_123",
+                    "function": {
+                        "name": "sample_tool_function",
+                        "arguments": '{"arg1": "42", "arg2": 100}',
+                    },
+                    "type": "function",
+                }
+            ],
+        }
+        return MagicMock(choices=[MagicMock(message=mock_message)])
+
+    def create_mock_final_response() -> MagicMock:
+        """Create a mock final answer response."""
+        mock_message = MagicMock()
+        mock_message.content = None
+        mock_message.role = "assistant"
+
+        mock_tool_call = MagicMock()
+        mock_tool_call.id = "call_final"
+        mock_function = MagicMock()
+        mock_function.name = "final_answer"
+        mock_function.arguments = '{"answer": "Task completed successfully"}'
+        mock_tool_call.function = mock_function
+        mock_message.tool_calls = [mock_tool_call]
+
+        mock_message.model_dump.return_value = {
+            "content": None,
+            "role": "assistant",
+            "tool_calls": [
+                {
+                    "id": "call_final",
+                    "function": {
+                        "name": "final_answer",
+                        "arguments": '{"answer": "Task completed successfully"}',
+                    },
+                    "type": "function",
+                }
+            ],
+        }
+        return MagicMock(choices=[MagicMock(message=mock_message)])
+
+    with patch(LLM_IMPORT_PATHS[AgentFramework.TINYAGENT]) as mock_acompletion:
+        # First call returns tool call, second call returns final answer
+        mock_acompletion.side_effect = [
+            create_mock_tool_response(),
+            create_mock_final_response(),
+        ]
+
+        result = await agent.run_async("Test the casting")
+
+        assert result.final_output == "Task completed successfully"
+
+        assert mock_acompletion.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_tool_executor_without_casting() -> None:
+    """Test that ToolExecutor no longer does casting - demonstrates the change."""
     agent: TinyAgent = await AnyAgent.create_async(
         AgentFramework.TINYAGENT, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
     )  # type: ignore[assignment]
 
-    # Register the sample tool function
     agent.clients["sample_tool"] = ToolExecutor(sample_tool_function)
 
-    request = {
+    request_uncast = {
         "name": "sample_tool",
         "arguments": {
-            "arg1": "42",  # This should be cast to int
-            "arg2": 100,  # This should be cast to str
+            "arg1": "42",  # String instead of int
+            "arg2": 100,  # Int instead of str
         },
     }
 
-    # Call the tool and get the result
-    result = await agent.clients["sample_tool"].call_tool(request)
-    # Check the result
+    result = await agent.clients["sample_tool"].call_tool(request_uncast)
+    assert "Error executing tool" in result
+    assert "arg1 should be an int" in result
+
+    request_typed = {
+        "name": "sample_tool",
+        "arguments": {
+            "arg1": 42,
+            "arg2": "100",
+        },
+    }
+
+    result = await agent.clients["sample_tool"].call_tool(request_typed)
     assert result == "Received int: 42, str: 100"
 
 
@@ -58,21 +148,17 @@ def test_run_tinyagent_agent_custom_args() -> None:
         AgentFramework.TINYAGENT, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
     )
     with patch(LLM_IMPORT_PATHS[AgentFramework.TINYAGENT]) as mock_acompletion:
-        # Create a mock response object that properly mocks the LiteLLM response structure
         mock_response = MagicMock()
         mock_message = MagicMock()
         mock_message.content = output
         mock_message.role = "assistant"
-        mock_message.tool_calls = []  # No tool calls in this response
+        mock_message.tool_calls = []
         mock_response.choices = [MagicMock(message=mock_message)]
 
-        # Make the acompletion function return this response
         mock_acompletion.return_value = mock_response
 
-        # Call run which will eventually call _process_single_turn_with_tools
         result = agent.run("what's the state capital of Pennsylvania", debug=True)
 
-        # Assert that the result contains the expected content
         assert output == result.final_output
 
 

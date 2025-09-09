@@ -38,14 +38,12 @@ class _TinyAgentWrapper:
 
         agent.call_model = wrap_call_model
 
-        async def wrapped_tool_execution(original_call, request, tool_function=None):
+        async def wrapped_tool_execution(original_call, request):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(
-                    context, request, tool_function=tool_function
-                )
+                context = callback.before_tool_execution(context, request)
 
             output = await original_call(request)
 
@@ -55,19 +53,16 @@ class _TinyAgentWrapper:
             return output
 
         class WrappedCallTool:
-            def __init__(self, original_call_tool, tool_function):
+            def __init__(self, original_call_tool):
                 self.original_call_tool = original_call_tool
-                self.tool_function = tool_function
 
             async def call_tool(self, request: dict[str, Any]):
-                return await wrapped_tool_execution(
-                    self.original_call_tool, request, tool_function=self.tool_function
-                )
+                return await wrapped_tool_execution(self.original_call_tool, request)
 
         self._original_clients = deepcopy(agent.clients)
         wrapped_tools = {}
         for key, tool in agent.clients.items():
-            wrapped = WrappedCallTool(tool.call_tool, tool.tool_function)
+            wrapped = WrappedCallTool(tool.call_tool)
             tool.call_tool = wrapped.call_tool
             wrapped_tools[key] = tool
         agent.clients = wrapped_tools
