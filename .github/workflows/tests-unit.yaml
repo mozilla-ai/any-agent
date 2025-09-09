@@ -37,7 +37,7 @@ jobs:
           activate-environment: true
 
       - run: |
-          uv sync --group tests --extra all --extra a2a
+          uv sync -U --group tests --extra all --extra a2a
 
       - run: pytest tests/unit -v --cov --cov-report=xml
 

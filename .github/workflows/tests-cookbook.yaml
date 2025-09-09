@@ -27,7 +27,7 @@ jobs:
 
       - name: Install
         run: |
-          uv sync --group tests --extra all --extra a2a
+          uv sync -U --group tests --extra all --extra a2a
 
       - name: Run Cookbook Tests
         env:

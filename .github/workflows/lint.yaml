@@ -22,7 +22,7 @@ jobs:
           activate-environment: true
 
       - name: Install pre-commit
-        run: uv sync --group lint
+        run: uv sync -U --group lint
 
       - uses: actions/cache@v4
         with:
