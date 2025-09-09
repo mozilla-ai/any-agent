@@ -62,7 +62,7 @@ class _TinyAgentWrapper:
         self._original_clients = deepcopy(agent.clients)
         wrapped_tools = {}
         for key, tool in agent.clients.items():
-            wrapped = WrappedCallTool(tool.call_tool)  # type: ignore[no-untyped-call]
+            wrapped = WrappedCallTool(tool.call_tool)
             tool.call_tool = wrapped.call_tool
             wrapped_tools[key] = tool
         agent.clients = wrapped_tools

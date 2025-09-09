@@ -57,17 +57,6 @@ class ToolExecutor:
         try:
             arguments = request.get("arguments", {})
 
-            if hasattr(self.tool_function, "__annotations__"):
-                func_args = self.tool_function.__annotations__
-                for arg_name, arg_type in func_args.items():
-                    if arg_name in arguments:
-                        try:
-                            arguments[arg_name] = safe_cast_argument(
-                                arguments[arg_name], arg_type
-                            )
-                        except Exception as e:
-                            logger.warning(f"Failed to cast argument '{arg_name}': {e}")
-
             if asyncio.iscoroutinefunction(self.tool_function):
                 result = await self.tool_function(**arguments)
             else:
@@ -231,6 +220,20 @@ class TinyAgent(AnyAgent):
                         tool_args = json.loads(f.arguments)
 
                     client = self.clients[tool_name]
+
+                    if hasattr(client.tool_function, "__annotations__"):
+                        func_args = client.tool_function.__annotations__
+                        for arg_name, arg_type in func_args.items():
+                            if arg_name in tool_args:
+                                try:
+                                    tool_args[arg_name] = safe_cast_argument(
+                                        tool_args[arg_name], arg_type
+                                    )
+                                except Exception as e:
+                                    logger.warning(
+                                        f"Failed to cast argument '{arg_name}': {e}"
+                                    )
+
                     result = await client.call_tool(
                         {"name": tool_name, "arguments": tool_args}
                     )
