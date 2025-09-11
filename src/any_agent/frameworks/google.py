@@ -60,7 +60,7 @@ class AnyLlm(BaseLlm):
 
     def __init__(self, model: str, **kwargs: Any) -> None:
         super().__init__(model=model)
-        self.kwargs = kwargs
+        self.kwargs = kwargs or {}
 
     @staticmethod
     def _messages_from_content(llm_request: LlmRequest) -> list[dict[str, Any]]:
