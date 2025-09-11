@@ -57,7 +57,7 @@ def _safe_json_serialize(obj: Any) -> str:
 class AnyLlm(BaseLlm):
     """Wrapper around any-llm."""
 
-    _kwargs: dict[str, Any] = None
+    _kwargs: dict[str, Any]
 
     def __init__(self, model: str, **kwargs: Any) -> None:
         super().__init__(model=model)
