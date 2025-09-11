@@ -51,7 +51,7 @@ async def test_get_agent_card_with_mcp(  # type: ignore[no-untyped-def]
 
     # Use new MCP architecture
     mcp_config = MCPSse(url=echo_sse_server["url"])
-    wrapped_tools, mcp_clients = await _wrap_tools([mcp_config], agent_framework)
+    wrapped_tools, _ = await _wrap_tools([mcp_config], agent_framework)
     agent._tools = wrapped_tools
 
     agent_card = _get_agent_card(agent, A2AServingConfig())

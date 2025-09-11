@@ -172,7 +172,7 @@ async def test_push_notification_non_streaming() -> None:
         # Use the helper context manager for agent serving and client setup
         async with a2a_client_from_agent(
             agent, serving_config, http_timeout=DEFAULT_LONG_TIMEOUT
-        ) as (client, server_url):
+        ) as (client, _):
             # Generate IDs for the conversation
             first_message_id = str(uuid4())
 
