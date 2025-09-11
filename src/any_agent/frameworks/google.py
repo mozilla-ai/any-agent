@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from any_llm import acompletion
@@ -25,7 +25,6 @@ except ImportError:
 
 if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
-    from typing import Any
 
     from any_llm.types.completion import ChatCompletion, ChatCompletionMessage
     from google.adk.models.llm_request import LlmRequest
@@ -58,9 +57,11 @@ def _safe_json_serialize(obj: Any) -> str:
 class AnyLlm(BaseLlm):
     """Wrapper around any-llm."""
 
+    _kwargs: dict[str, Any] = None
+
     def __init__(self, model: str, **kwargs: Any) -> None:
         super().__init__(model=model)
-        self.kwargs = kwargs or {}
+        self._kwargs = kwargs or {}
 
     @staticmethod
     def _messages_from_content(llm_request: LlmRequest) -> list[dict[str, Any]]:
@@ -233,7 +234,7 @@ class AnyLlm(BaseLlm):
             if stop := config.stop_sequences:
                 completion_args["stop"] = stop
 
-        return {**self.kwargs, **completion_args}
+        return {**self._kwargs, **completion_args}
 
     def _completion_to_llm_response(self, completion: ChatCompletion) -> LlmResponse:
         llm_response = self._message_to_response(completion.choices[0].message)
