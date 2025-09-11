@@ -1,7 +1,11 @@
+# mypy: disable-error-code="union-attr"
+from __future__ import annotations
+
+import json
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from pydantic import BaseModel
+from any_llm import acompletion
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.tools.final_output import prepare_final_output
@@ -10,17 +14,286 @@ from .any_agent import AnyAgent
 
 try:
     from google.adk.agents.llm_agent import LlmAgent
-    from google.adk.models.lite_llm import LiteLlm
+    from google.adk.models.base_llm import BaseLlm
+    from google.adk.models.llm_response import LlmResponse
     from google.adk.runners import InMemoryRunner
     from google.genai import types
 
-    DEFAULT_MODEL_TYPE = LiteLlm
     adk_available = True
 except ImportError:
     adk_available = False
 
 if TYPE_CHECKING:
-    from google.adk.models.base_llm import BaseLlm
+    from collections.abc import AsyncGenerator
+    from typing import Any
+
+    from any_llm.types.completion import ChatCompletion, ChatCompletionMessage
+    from google.adk.models.llm_request import LlmRequest
+    from pydantic import BaseModel
+
+ADK_TO_ANY_LLM_ROLE: dict[str, str] = {
+    "user": "user",
+    "assistant": "assistant",
+    "model": "assistant",
+}
+
+
+def _safe_json_serialize(obj: Any) -> str:
+    """Convert any Python object to a JSON-serializable type or string.
+
+    Args:
+    obj: The object to serialize.
+
+    Returns:
+        The JSON-serialized object string or string.
+
+    """
+    try:
+        # Try direct JSON serialization first
+        return json.dumps(obj, ensure_ascii=False)
+    except (TypeError, OverflowError):
+        return str(obj)
+
+
+class AnyLlm(BaseLlm):
+    """Wrapper around any-llm."""
+
+    def __init__(self, model: str, **kwargs: Any) -> None:
+        super().__init__(model=model)
+        self.kwargs = kwargs
+
+    @staticmethod
+    def _messages_from_content(llm_request: LlmRequest) -> list[dict[str, Any]]:
+        messages: list[dict[str, Any]] = []
+        for content in llm_request.contents:
+            message: dict[str, Any] = {
+                "role": ADK_TO_ANY_LLM_ROLE[str(content.role)],
+            }
+            message_content: list[Any] = []
+            tool_calls: list[Any] = []
+            if parts := content.parts:
+                for part in parts:
+                    if part.function_response:
+                        messages.append(
+                            {
+                                "role": "tool",
+                                "tool_call_id": part.function_response.id,
+                                "content": _safe_json_serialize(
+                                    part.function_response.response
+                                ),
+                            }
+                        )
+                    elif part.text:
+                        message_content.append({"type": "text", "text": part.text})
+                    elif (
+                        part.inline_data
+                        and part.inline_data.data
+                        and part.inline_data.mime_type
+                    ):
+                        # TODO Handle multimodal input
+                        msg = f"Part of type {part.inline_data.mime_type} is not supported."
+                        raise NotImplementedError(msg)
+                    elif part.function_call:
+                        tool_calls.append(
+                            {
+                                "type": "function",
+                                "id": part.function_call.id,
+                                "function": {
+                                    "name": part.function_call.name,
+                                    "arguments": _safe_json_serialize(
+                                        part.function_call.args
+                                    ),
+                                },
+                            }
+                        )
+
+            message["content"] = message_content or None
+            message["tool_calls"] = tool_calls or None
+            # messages from function_response were directly appended before
+            if message["content"] or message["tool_calls"]:
+                messages.append(message)
+
+        return messages
+
+    def _schema_to_dict(self, schema: types.Schema) -> dict[str, Any]:
+        """Recursively converts a types.Schema to a pure-python dict.
+
+        All enum values will be written as lower-case strings.
+
+        Args:
+            schema: The schema to convert.
+
+        Returns:
+            The dictionary representation of the schema.
+
+        """
+        # Dump without json encoding so we still get Enum members
+        schema_dict = schema.model_dump(exclude_none=True)
+
+        # ---- normalise this level ------------------------------------------------
+        if "type" in schema_dict:
+            # schema_dict["type"] can be an Enum or a str
+            t = schema_dict["type"]
+            schema_dict["type"] = (t.value if isinstance(t, types.Type) else t).lower()
+
+        # ---- recurse into `items` -----------------------------------------------
+        if "items" in schema_dict:
+            schema_dict["items"] = self._schema_to_dict(
+                schema.items
+                if isinstance(schema.items, types.Schema)
+                else types.Schema.model_validate(schema_dict["items"])
+            )
+
+        # ---- recurse into `properties` ------------------------------------------
+        if "properties" in schema_dict:
+            new_props = {}
+            for key, value in schema_dict["properties"].items():
+                # value is a dict → rebuild a Schema object and recurse
+                if isinstance(value, dict):
+                    new_props[key] = self._schema_to_dict(
+                        types.Schema.model_validate(value)
+                    )
+                # value is already a Schema instance
+                elif isinstance(value, types.Schema):
+                    new_props[key] = self._schema_to_dict(value)
+                # plain dict without nested schemas
+                else:
+                    new_props[key] = value
+                    if "type" in new_props[key]:
+                        new_props[key]["type"] = new_props[key]["type"].lower()
+            schema_dict["properties"] = new_props
+
+        return schema_dict
+
+    def _function_declaration_to_tool_param(
+        self,
+        function_declaration: types.FunctionDeclaration,
+    ) -> dict[str, Any]:
+        """Convert a types.FunctionDeclaration to a openapi spec dictionary.
+
+        Args:
+            function_declaration: The function declaration to convert.
+
+        Returns:
+            The openapi spec dictionary representation of the function declaration.
+
+        """
+        assert function_declaration.name
+
+        properties = {}
+        if (
+            function_declaration.parameters
+            and function_declaration.parameters.properties
+        ):
+            for key, value in function_declaration.parameters.properties.items():
+                properties[key] = self._schema_to_dict(value)
+
+        return {
+            "type": "function",
+            "function": {
+                "name": function_declaration.name,
+                "description": function_declaration.description or "",
+                "parameters": {
+                    "type": "object",
+                    "properties": properties,
+                },
+            },
+        }
+
+    def _llm_request_to_completion_args(
+        self, llm_request: LlmRequest
+    ) -> dict[str, Any]:
+        messages = self._messages_from_content(llm_request)
+        if llm_request.config.system_instruction:
+            messages.insert(
+                0, {"role": "system", "content": llm_request.config.system_instruction}
+            )
+
+        completion_args: dict[str, Any] = {"messages": messages, "model": self.model}
+
+        if config := llm_request.config:
+            if config.tools and config.tools[0].function_declarations:
+                completion_args["tools"] = [
+                    self._function_declaration_to_tool_param(tool)
+                    for tool in config.tools[0].function_declarations
+                ]
+
+            for name in (
+                "frequency_penalty",
+                "presence_penalty",
+                "response_formattemperature",
+                "top_k",
+                "top_p",
+            ):
+                if attr := getattr(config, name, None):
+                    completion_args[name] = attr
+
+            if max_tokens := config.max_output_tokens:
+                completion_args["max_tokens"] = max_tokens
+            if stop := config.stop_sequences:
+                completion_args["stop"] = stop
+
+        return {**self.kwargs, **completion_args}
+
+    def _completion_to_llm_response(self, completion: ChatCompletion) -> LlmResponse:
+        llm_response = self._message_to_response(completion.choices[0].message)
+        if usage := completion.usage:
+            llm_response.usage_metadata = types.GenerateContentResponseUsageMetadata(
+                prompt_token_count=usage.prompt_tokens,
+                candidates_token_count=usage.completion_tokens,
+                total_token_count=usage.total_tokens,
+            )
+        return llm_response
+
+    def _message_to_response(
+        self, message: ChatCompletionMessage, is_partial: bool = False
+    ) -> LlmResponse:
+        parts = []
+        if content := message.content:
+            parts.append(types.Part.from_text(text=content))
+
+        if tool_calls := message.tool_calls:
+            for tool_call in tool_calls:
+                if tool_call.type == "function":
+                    part = types.Part.from_function_call(
+                        name=tool_call.function.name,
+                        args=json.loads(tool_call.function.arguments or "{}"),
+                    )
+                    part.function_call.id = tool_call.id
+                    parts.append(part)
+
+        return LlmResponse(
+            content=types.Content(role="model", parts=parts), partial=is_partial
+        )
+
+    async def generate_content_async(
+        self, llm_request: LlmRequest, stream: bool = False
+    ) -> AsyncGenerator[LlmResponse, None]:
+        """Generate one content from the given contents and tools.
+
+        Args:
+          llm_request: LlmRequest, the request to send to the LLM.
+          stream: bool = False, whether to do streaming call.
+
+        Yields:
+          a generator of types.Content.
+
+          For non-streaming call, it will only yield one Content.
+
+          For streaming call, it may yield more than one content, but all yielded
+          contents should be treated as one content by merging the
+          parts list.
+
+        """
+        completion_args = self._llm_request_to_completion_args(llm_request)
+        if stream:
+            pass
+        else:
+            completion = await acompletion(**completion_args)
+            yield self._completion_to_llm_response(completion)  # type: ignore[arg-type]
+
+
+DEFAULT_MODEL_TYPE = AnyLlm
 
 
 class GoogleAgent(AnyAgent):
@@ -34,7 +307,7 @@ class GoogleAgent(AnyAgent):
     def framework(self) -> AgentFramework:
         return AgentFramework.GOOGLE
 
-    def _get_model(self, agent_config: AgentConfig) -> "BaseLlm":
+    def _get_model(self, agent_config: AgentConfig) -> BaseLlm:
         """Get the model configuration for a Google agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
         model_args = agent_config.model_args or {}
