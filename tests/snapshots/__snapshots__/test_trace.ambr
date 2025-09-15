@@ -310,6 +310,7 @@
       }),
       dict({
         'attributes': dict({
+          'any_agent.version': '1.2.3',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
@@ -740,6 +741,7 @@
       }),
       dict({
         'attributes': dict({
+          'any_agent.version': '1.2.3',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
@@ -1182,6 +1184,7 @@
       }),
       dict({
         'attributes': dict({
+          'any_agent.version': '1.2.3',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
@@ -1752,6 +1755,7 @@
       }),
       dict({
         'attributes': dict({
+          'any_agent.version': '1.2.3',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
@@ -2160,6 +2164,7 @@
       }),
       dict({
         'attributes': dict({
+          'any_agent.version': '1.2.3',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
@@ -2574,6 +2579,7 @@
       }),
       dict({
         'attributes': dict({
+          'any_agent.version': '1.2.3',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
@@ -3063,6 +3069,7 @@
       }),
       dict({
         'attributes': dict({
+          'any_agent.version': '1.2.3',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',

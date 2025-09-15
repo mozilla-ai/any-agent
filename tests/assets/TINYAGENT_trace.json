@@ -398,7 +398,8 @@
         "gen_ai.operation.name": "invoke_agent",
         "gen_ai.agent.name": "any_agent",
         "gen_ai.agent.description": "No description.",
-        "gen_ai.request.model": "mistral/mistral-small-latest"
+        "gen_ai.request.model": "mistral/mistral-small-latest",
+        "any_agent.version": "1.2.3"
       },
       "links": [],
       "events": [],
