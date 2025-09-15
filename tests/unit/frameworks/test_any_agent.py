@@ -59,12 +59,12 @@ def test_model_args(
     agent = create_agent_with_model_args(agent_framework)
 
     import_path = LLM_IMPORT_PATHS[agent_framework]
-    with patch(import_path, return_value=mock_litellm_response) as mock_litellm:
+    with patch(import_path, return_value=mock_litellm_response) as mock_llm:
         result = agent.run(TEST_QUERY)
         assert EXPECTED_OUTPUT == result.final_output
-        assert mock_litellm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
-        assert mock_litellm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
-        assert mock_litellm.call_count > 0
+        assert mock_llm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
+        assert mock_llm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
+        assert mock_llm.call_count > 0
 
 
 def test_model_args_streaming(
@@ -94,7 +94,7 @@ def test_model_args_streaming(
 async def test_create_sync_in_async_context() -> None:
     with pytest.raises(
         RuntimeError,
-        match="Cannot use the `sync` API in an `async` context. Use the `async` API instead",
+        match=r"Cannot use the `sync` API in an `async` context. Use the `async` API instead",
     ):
         AnyAgent.create(
             AgentFramework.TINYAGENT,
@@ -109,6 +109,6 @@ async def test_run_sync_in_async_context() -> None:
     )
     with pytest.raises(
         RuntimeError,
-        match="Cannot use the `sync` API in an `async` context. Use the `async` API instead",
+        match=r"Cannot use the `sync` API in an `async` context. Use the `async` API instead",
     ):
         agent.run(TEST_QUERY)

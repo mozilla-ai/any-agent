@@ -42,7 +42,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          uv sync --group docs
+          uv sync -U --group docs
 
       - name: Build docs
         if: github.event_name == 'pull_request'

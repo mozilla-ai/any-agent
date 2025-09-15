@@ -6,7 +6,8 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from any_llm import acompletion
-from any_llm.provider import ProviderFactory, ProviderName
+from any_llm.constants import ProviderName
+from any_llm.factory import ProviderFactory
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -56,20 +57,6 @@ class ToolExecutor:
         """
         try:
             arguments = request.get("arguments", {})
-
-            if hasattr(self.tool_function, "__annotations__"):
-                func_args = self.tool_function.__annotations__
-                for arg_name, arg_type in func_args.items():
-                    if arg_name in arguments:
-                        if arg_name == "context_id" or arg_name == "task_id":
-                            if arguments[arg_name] == "None" or arguments[arg_name] == "":
-                                arguments[arg_name] = None
-                        try:
-                            arguments[arg_name] = safe_cast_argument(
-                                arguments[arg_name], arg_type
-                            )
-                        except Exception as e:
-                            logger.warning(f"Failed to cast argument '{arg_name}': {e}")
 
             if asyncio.iscoroutinefunction(self.tool_function):
                 result = await self.tool_function(**arguments)
@@ -235,6 +222,20 @@ class TinyAgent(AnyAgent):
                         tool_args = json.loads(f.arguments)
                     print("tool_args",tool_args)
                     client = self.clients[tool_name]
+
+                    if hasattr(client.tool_function, "__annotations__"):
+                        func_args = client.tool_function.__annotations__
+                        for arg_name, arg_type in func_args.items():
+                            if arg_name in tool_args:
+                                try:
+                                    tool_args[arg_name] = safe_cast_argument(
+                                        tool_args[arg_name], arg_type
+                                    )
+                                except Exception as e:
+                                    logger.warning(
+                                        f"Failed to cast argument '{arg_name}': {e}"
+                                    )
+
                     result = await client.call_tool(
                         {"name": tool_name, "arguments": tool_args}
                     )

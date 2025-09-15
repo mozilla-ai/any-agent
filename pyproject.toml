@@ -9,7 +9,7 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
-  "any-llm-sdk>=0.17.2,<1",
+  "any-llm-sdk>=0.20.2,<1",
   "litellm>=1.75.8",
   "mcp>=1.5.0",
   "opentelemetry-sdk",
@@ -25,7 +25,7 @@ agno = [
 ]
 
 google = [
-  "google-adk>=1.4.1, <1.13.0" # Pinned until https://github.com/mozilla-ai/any-agent/issues/780
+  "google-adk>=1.14.0"
 ]
 
 langchain = [
@@ -113,7 +113,6 @@ ignore = [
   "C901",
   "ERA001",
   "SLF001",
-  "PD901",
   "PLC0415", # We use lazy imports in several places
   "PLR0912",
   "PLR0913",
@@ -179,7 +178,7 @@ docs = [
 
 lint = [
   "pre-commit==4.3.0",
-  "pre-commit-uv==4.1.4",
+  "pre-commit-uv==4.1.5",
 ]
 
 tests = [
@@ -193,7 +192,7 @@ tests = [
   "debugpy>=1.8.13",
   "mktestdocs>=0.2.4",
   "syrupy>=4.9.1",
-  "any-llm-sdk[anthropic,google,huggingface,mistral,xai]>=0.15.0,<1",
+  "any-llm-sdk[anthropic,gemini,huggingface,mistral,xai]>=0.20.2,<1",
 ]
 
 # For completeness, but 'uv sync --group dev' currently installs the others too.

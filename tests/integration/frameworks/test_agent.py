@@ -112,7 +112,7 @@ class Steps(BaseModel):
         # Disabling anthropic until output_type can be handled without relying on `response_format`
         # because that is not supported in some providers.
         # "anthropic/claude-3-5-haiku-latest",
-        "google/gemini-2.5-flash",
+        "gemini/gemini-2.5-flash",
         "huggingface/tgi",  # This is a Qwen/Qwen3-1.7B hosted in https://endpoints.huggingface.co/mozilla-ai/endpoints/dedicated
         "openai/gpt-4.1-nano",
         "xai/grok-3-mini-latest",
@@ -151,7 +151,7 @@ def test_load_and_run_agent(
 
     model_args = get_default_agent_model_args(agent_framework)
 
-    if "google" in model_id:
+    if "gemini" in model_id:
         model_args.pop("parallel_tool_calls", None)
 
     if "huggingface" in model_id:

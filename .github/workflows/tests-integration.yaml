@@ -23,7 +23,7 @@ jobs:
           python-version: 3.13
           activate-environment: true
 
-      - run: uv sync --group tests
+      - run: uv sync -U --group tests
 
       - env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -58,7 +58,7 @@ jobs:
           python-version: 3.13
           activate-environment: true
 
-      - run: uv sync --group tests --extra all --extra composio
+      - run: uv sync -U --group tests --extra all --extra composio
 
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -93,7 +93,7 @@ jobs:
           python-version: 3.13
           activate-environment: true
 
-      - run: uv sync --group tests --extra all --extra a2a
+      - run: uv sync -U --group tests --extra all --extra a2a
 
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -117,7 +117,7 @@ jobs:
           python-version: 3.13
           activate-environment: true
 
-      - run: uv sync --group tests --extra all
+      - run: uv sync -U --group tests --extra all
 
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}

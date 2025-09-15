@@ -66,13 +66,14 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
-    def before_tool_execution(self, context, *args, **kwargs):
+    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         request: dict[str, Any] = args[0]
+
         return self._set_tool_input(
             context,
             name=request.get("name", "No name"),
             args=request.get("arguments", {}),
         )
 
-    def after_tool_execution(self, context, *args, **kwargs):
+    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
         return self._set_tool_output(context, args[0])
