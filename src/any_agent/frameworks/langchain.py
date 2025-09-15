@@ -11,6 +11,7 @@ from .any_agent import AnyAgent
 try:
     from langchain_core.language_models import LanguageModelLike
     from langgraph.prebuilt import create_react_agent
+    from deepagents import create_deep_agent
 
     from any_agent.vendor.langchain_litellm import ChatLiteLLM, _convert_message_to_dict
 
@@ -62,6 +63,7 @@ class LangchainAgent(AnyAgent):
         self._tools = imported_tools
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         agent_args = self.config.agent_args or {}
+        print("agent_args",agent_args)
         self._agent = agent_type(
             name=self.config.name,
             model=self._get_model(self.config),
