@@ -63,11 +63,7 @@ deepagents = [
 ]
 
 all = [
-  "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
-]
-
-all = [
-  "any-agent[agno,google,langchain,llama_index,openai,smolagents]",
+  "any-agent[agno,google,langchain,llama_index,openai,smolagents]"
 ]
 
 [project.urls]
