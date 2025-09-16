@@ -230,3 +230,5 @@ class AgentConfig(BaseModel):
 
     Using this parameter you can define a Pydantic model that will be returned by the agent run methods.
     """
+
+    current_session_id: str = None
