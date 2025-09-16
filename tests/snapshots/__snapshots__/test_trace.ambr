@@ -803,21 +803,17 @@
     ]),
   })
 # ---
-# name: test_agent_trace_snapshot[LANGCHAIN_trace].274716076187802806251779980533319643057
+# name: test_agent_trace_snapshot[LANGCHAIN_trace].115825058289444712299650141807529952578
   dict({
     'final_output': dict({
       'steps': list([
         dict({
-          'description': 'Got the current year in the America/New_York timezone, which is 2025.',
+          'description': 'Found the current time in the America/New_York timezone.',
           'number': 1,
         }),
         dict({
           'description': 'Wrote the year to a file.',
           'number': 2,
-        }),
-        dict({
-          'description': 'Returned the list of steps taken.',
-          'number': 3,
         }),
       ]),
     }),
@@ -826,35 +822,27 @@
         'attributes': dict({
           'gen_ai.input.messages': '[{"role": "system", "content": "Use the available tools to answer."}, {"role": "user", "content": "Find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken."}]',
           'gen_ai.operation.name': 'call_llm',
-          'gen_ai.output': '''
-            Sure, here are the steps I will take:
-            
-            1. Get the current year in the America/New_York timezone.
-            2. Write the year to a file.
-            3. Return the list of steps taken.
-            
-            Let's proceed.
-          ''',
-          'gen_ai.output.type': 'text',
+          'gen_ai.output': '[{"tool.name": "get_current_time", "tool.args": {"timezone": "America/New_York"}}]',
+          'gen_ai.output.type': 'json',
           'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_cost': 2.45e-05,
           'gen_ai.usage.input_tokens': 245,
-          'gen_ai.usage.output_cost': 1.8599999999999998e-05,
-          'gen_ai.usage.output_tokens': 62,
+          'gen_ai.usage.output_cost': 4.8e-06,
+          'gen_ai.usage.output_tokens': 16,
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 7445488571036392346,
+          'span_id': 12072964954527026452,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026588982138000,
+        'end_time': 1758028601275757000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -863,11 +851,11 @@
         'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
-          'span_id': 7676343519673520903,
+          'span_id': 15531323892744358789,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -878,11 +866,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026588278296000,
+        'start_time': 1758028600965362000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -894,7 +882,7 @@
           'gen_ai.output': '''
             {
               "timezone": "America/New_York",
-              "datetime": "2025-09-16T08:43:08-04:00",
+              "datetime": "2025-09-16T09:16:41-04:00",
               "is_dst": true
             }
           ''',
@@ -910,17 +898,17 @@
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 14985283961326356892,
+          'span_id': 17250783977442180996,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026588988122000,
+        'end_time': 1758028601280591000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -929,11 +917,11 @@
         'name': 'execute_tool get_current_time',
         'parent': dict({
           'is_remote': False,
-          'span_id': 7676343519673520903,
+          'span_id': 15531323892744358789,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -944,11 +932,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026588985191000,
+        'start_time': 1758028601277624000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -960,24 +948,24 @@
           'gen_ai.output': '[{"tool.name": "write_file", "tool.args": {"text": "2025"}}]',
           'gen_ai.output.type': 'json',
           'gen_ai.request.model': 'mistral/mistral-small-latest',
-          'gen_ai.usage.input_cost': 3.77e-05,
-          'gen_ai.usage.input_tokens': 377,
+          'gen_ai.usage.input_cost': 3.31e-05,
+          'gen_ai.usage.input_tokens': 331,
           'gen_ai.usage.output_cost': 4.2e-06,
           'gen_ai.usage.output_tokens': 14,
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 14169454406133912480,
+          'span_id': 11409606448387202450,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026589378286000,
+        'end_time': 1758028601516648000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -986,11 +974,11 @@
         'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
-          'span_id': 7676343519673520903,
+          'span_id': 15531323892744358789,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1001,11 +989,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026588989531000,
+        'start_time': 1758028601281821000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1030,17 +1018,17 @@
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 13438446334679470650,
+          'span_id': 18344230493271694625,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026589380741000,
+        'end_time': 1758028601519026000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1049,11 +1037,11 @@
         'name': 'execute_tool write_file',
         'parent': dict({
           'is_remote': False,
-          'span_id': 7676343519673520903,
+          'span_id': 15531323892744358789,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1064,11 +1052,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026589379885000,
+        'start_time': 1758028601518149000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1078,32 +1066,31 @@
         'attributes': dict({
           'gen_ai.operation.name': 'call_llm',
           'gen_ai.output': '''
-            Here is the list of steps I have taken:
+            Here are the steps I have taken:
             
-            1. Got the current year in the America/New_York timezone, which is 2025.
+            1. Found the current time in the America/New_York timezone.
             2. Wrote the year to a file.
-            3. Returned the list of steps taken.
           ''',
           'gen_ai.output.type': 'text',
           'gen_ai.request.model': 'mistral/mistral-small-latest',
-          'gen_ai.usage.input_cost': 4.12e-05,
-          'gen_ai.usage.input_tokens': 412,
-          'gen_ai.usage.output_cost': 1.59e-05,
-          'gen_ai.usage.output_tokens': 53,
+          'gen_ai.usage.input_cost': 3.6599999999999995e-05,
+          'gen_ai.usage.input_tokens': 366,
+          'gen_ai.usage.output_cost': 9.9e-06,
+          'gen_ai.usage.output_tokens': 33,
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 222217919221793669,
+          'span_id': 3673965111321899285,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026589957421000,
+        'end_time': 1758028602113531000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1112,11 +1099,11 @@
         'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
-          'span_id': 7676343519673520903,
+          'span_id': 15531323892744358789,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1127,11 +1114,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026589381994000,
+        'start_time': 1758028601520276000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1145,39 +1132,35 @@
               "steps": [
                 {
                   "number": 1,
-                  "description": "Got the current year in the America/New_York timezone, which is 2025."
+                  "description": "Found the current time in the America/New_York timezone."
                 },
                 {
                   "number": 2,
                   "description": "Wrote the year to a file."
-                },
-                {
-                  "number": 3,
-                  "description": "Returned the list of steps taken."
                 }
               ]
             }
           ''',
           'gen_ai.output.type': 'json',
           'gen_ai.request.model': 'mistral/mistral-small-latest',
-          'gen_ai.usage.input_cost': 3.8599999999999996e-05,
-          'gen_ai.usage.input_tokens': 386,
-          'gen_ai.usage.output_cost': 2.8199999999999998e-05,
-          'gen_ai.usage.output_tokens': 94,
+          'gen_ai.usage.input_cost': 3.2e-05,
+          'gen_ai.usage.input_tokens': 320,
+          'gen_ai.usage.output_cost': 1.8599999999999998e-05,
+          'gen_ai.usage.output_tokens': 62,
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 7264693521967697195,
+          'span_id': 17360679537864909106,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026590869044000,
+        'end_time': 1758028602753586000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1186,11 +1169,11 @@
         'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
-          'span_id': 7676343519673520903,
+          'span_id': 15531323892744358789,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1201,11 +1184,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026589961728000,
+        'start_time': 1758028602115388000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1213,7 +1196,7 @@
       }),
       dict({
         'attributes': dict({
-          'any_agent.version': '1.9.1.dev0+g8e34f9a88.d20250915',
+          'any_agent.version': '1.9.1.dev3+g8bf65aae1.d20250916',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
@@ -1221,17 +1204,17 @@
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 7676343519673520903,
+          'span_id': 15531323892744358789,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 274716076187802806251779980533319643057,
+          'trace_id': 115825058289444712299650141807529952578,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026590869294000,
+        'end_time': 1758028602753668000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1255,11 +1238,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026588273845000,
+        'start_time': 1758028600960730000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.UNSET: 'unset'>,
@@ -1268,16 +1251,16 @@
     ]),
   })
 # ---
-# name: test_agent_trace_snapshot[LLAMA_INDEX_trace].79224142625648164393740459026884204356
+# name: test_agent_trace_snapshot[LLAMA_INDEX_trace].183122279777172322684744876400756953563
   dict({
     'final_output': dict({
       'steps': list([
         dict({
-          'description': 'Find what year it is in the America/New_York timezone',
+          'description': 'Get current time in the America/New_York timezone.',
           'number': 1,
         }),
         dict({
-          'description': 'Write the value (single number) to a file',
+          'description': 'Write the year to a file.',
           'number': 2,
         }),
       ]),
@@ -1297,17 +1280,17 @@
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 12772692773784263794,
+          'span_id': 4679246220570242795,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026591956394000,
+        'end_time': 1758028499914934000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1316,11 +1299,11 @@
         'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
-          'span_id': 14038541650402901009,
+          'span_id': 12253070288137891175,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1331,11 +1314,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026591641453000,
+        'start_time': 1758028498931090000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1347,7 +1330,7 @@
           'gen_ai.output': '''
             {
               "timezone": "America/New_York",
-              "datetime": "2025-09-16T08:43:11-04:00",
+              "datetime": "2025-09-16T09:14:59-04:00",
               "is_dst": true
             }
           ''',
@@ -1361,17 +1344,17 @@
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 8367472014409720341,
+          'span_id': 10228776255392323169,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026591961401000,
+        'end_time': 1758028499919034000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1380,11 +1363,11 @@
         'name': 'execute_tool get_current_time',
         'parent': dict({
           'is_remote': False,
-          'span_id': 14038541650402901009,
+          'span_id': 12253070288137891175,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1395,11 +1378,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026591957287000,
+        'start_time': 1758028499915928000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1413,22 +1396,22 @@
           'gen_ai.request.model': 'mistral/mistral-small-latest',
           'gen_ai.usage.input_cost': 2.62e-05,
           'gen_ai.usage.input_tokens': 262,
-          'gen_ai.usage.output_cost': 9.6e-06,
-          'gen_ai.usage.output_tokens': 32,
+          'gen_ai.usage.output_cost': 9.9e-06,
+          'gen_ai.usage.output_tokens': 33,
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 8442055042836013840,
+          'span_id': 9269503876317208151,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026592226322000,
+        'end_time': 1758028500146680000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1437,11 +1420,11 @@
         'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
-          'span_id': 14038541650402901009,
+          'span_id': 12253070288137891175,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1452,11 +1435,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026591962016000,
+        'start_time': 1758028499920240000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1477,17 +1460,17 @@
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 13928953296571453082,
+          'span_id': 15403562707434381698,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026592229294000,
+        'end_time': 1758028500148457000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1496,11 +1479,11 @@
         'name': 'execute_tool write_file',
         'parent': dict({
           'is_remote': False,
-          'span_id': 14038541650402901009,
+          'span_id': 12253070288137891175,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1511,11 +1494,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026592227372000,
+        'start_time': 1758028500147635000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1524,27 +1507,27 @@
       dict({
         'attributes': dict({
           'gen_ai.operation.name': 'call_llm',
-          'gen_ai.output': '{"steps": [{"number": 1, "description": "Find what year it is in the America/New_York timezone"}, {"number": 2, "description": "Write the value (single number) to a file"}]}',
+          'gen_ai.output': '[{"tool.name": "final_output", "tool.args": "{}"}]',
           'gen_ai.output.type': 'json',
           'gen_ai.request.model': 'mistral/mistral-small-latest',
-          'gen_ai.usage.input_cost': 2.84e-05,
-          'gen_ai.usage.input_tokens': 284,
-          'gen_ai.usage.output_cost': 1.44e-05,
-          'gen_ai.usage.output_tokens': 48,
+          'gen_ai.usage.input_cost': 2.8499999999999998e-05,
+          'gen_ai.usage.input_tokens': 285,
+          'gen_ai.usage.output_cost': 2.8199999999999998e-05,
+          'gen_ai.usage.output_tokens': 94,
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 15548135471590301924,
+          'span_id': 1726412464743061000,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026592912146000,
+        'end_time': 1758028500732051000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1553,11 +1536,11 @@
         'name': 'call_llm mistral/mistral-small-latest',
         'parent': dict({
           'is_remote': False,
-          'span_id': 14038541650402901009,
+          'span_id': 12253070288137891175,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
@@ -1568,11 +1551,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026592230324000,
+        'start_time': 1758028500149729000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.OK: 'ok'>,
@@ -1580,7 +1563,197 @@
       }),
       dict({
         'attributes': dict({
-          'any_agent.version': '1.9.1.dev0+g8e34f9a88.d20250915',
+          'gen_ai.operation.name': 'execute_tool',
+          'gen_ai.output': '{"success": true, "result": {"steps": [{"number": 1, "description": "Get current time in the America/New_York timezone."}, {"number": 2, "description": "Write the year to a file."}]}}',
+          'gen_ai.output.type': 'json',
+          'gen_ai.tool.args': '{"answer": "{\\"steps\\": [{\\"number\\": 1, \\"description\\": \\"Get current time in the America/New_York timezone.\\"}, {\\"number\\": 2, \\"description\\": \\"Write the year to a file.\\"}]}"}',
+          'gen_ai.tool.description': '''
+            final_output(answer: str) -> dict[str, str | bool | dict[str, typing.Any] | list[typing.Any]]
+            This tool is used to validate the final output. It must be called when the final answer is ready in order to ensure that the output is valid.
+          ''',
+          'gen_ai.tool.name': 'final_output',
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 18066273280650095232,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 183122279777172322684744876400756953563,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1758028500734292000,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'execute_tool final_output',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 12253070288137891175,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 183122279777172322684744876400756953563,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.37.0',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1758028500733145000,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'gen_ai.operation.name': 'call_llm',
+          'gen_ai.output': '''
+            Here is the list of steps I have taken:
+            
+            1. Get current time in the America/New_York timezone.
+            2. Write the year to a file.
+          ''',
+          'gen_ai.output.type': 'text',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
+          'gen_ai.usage.input_cost': 4.03e-05,
+          'gen_ai.usage.input_tokens': 403,
+          'gen_ai.usage.output_cost': 9.6e-06,
+          'gen_ai.usage.output_tokens': 32,
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 6597376107037947816,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 183122279777172322684744876400756953563,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1758028502141305000,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'call_llm mistral/mistral-small-latest',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 12253070288137891175,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 183122279777172322684744876400756953563,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.37.0',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1758028500735645000,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'gen_ai.operation.name': 'call_llm',
+          'gen_ai.output': '''
+            {
+              "steps": [
+                {
+                  "number": 1,
+                  "description": "Get current time in the America/New_York timezone."
+                },
+                {
+                  "number": 2,
+                  "description": "Write the year to a file."
+                }
+              ]
+            }
+          ''',
+          'gen_ai.output.type': 'json',
+          'gen_ai.request.model': 'mistral/mistral-small-latest',
+          'gen_ai.usage.input_cost': 1.61e-05,
+          'gen_ai.usage.input_tokens': 161,
+          'gen_ai.usage.output_cost': 1.8e-05,
+          'gen_ai.usage.output_tokens': 60,
+        }),
+        'context': dict({
+          'is_remote': False,
+          'span_id': 15563885816911253146,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 183122279777172322684744876400756953563,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'end_time': 1758028502855627000,
+        'events': list([
+        ]),
+        'kind': <SpanKind.INTERNAL: 'internal'>,
+        'links': list([
+        ]),
+        'name': 'call_llm mistral/mistral-small-latest',
+        'parent': dict({
+          'is_remote': False,
+          'span_id': 12253070288137891175,
+          'trace_flags': dict({
+            'value': 0,
+          }),
+          'trace_id': 183122279777172322684744876400756953563,
+          'trace_state': dict({
+            'entries': dict({
+            }),
+          }),
+        }),
+        'resource': dict({
+          'attributes': dict({
+            'service.name': 'unknown_service',
+            'telemetry.sdk.language': 'python',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': '1.37.0',
+          }),
+          'schema_url': '',
+        }),
+        'start_time': 1758028502143530000,
+        'status': dict({
+          'description': None,
+          'status_code': <StatusCode.OK: 'ok'>,
+        }),
+      }),
+      dict({
+        'attributes': dict({
+          'any_agent.version': '1.9.1.dev3+g8bf65aae1.d20250916',
           'gen_ai.agent.description': 'No description.',
           'gen_ai.agent.name': 'any_agent',
           'gen_ai.operation.name': 'invoke_agent',
@@ -1588,17 +1761,17 @@
         }),
         'context': dict({
           'is_remote': False,
-          'span_id': 14038541650402901009,
+          'span_id': 12253070288137891175,
           'trace_flags': dict({
             'value': 0,
           }),
-          'trace_id': 79224142625648164393740459026884204356,
+          'trace_id': 183122279777172322684744876400756953563,
           'trace_state': dict({
             'entries': dict({
             }),
           }),
         }),
-        'end_time': 1758026592914625000,
+        'end_time': 1758028502855731000,
         'events': list([
         ]),
         'kind': <SpanKind.INTERNAL: 'internal'>,
@@ -1622,11 +1795,11 @@
             'service.name': 'unknown_service',
             'telemetry.sdk.language': 'python',
             'telemetry.sdk.name': 'opentelemetry',
-            'telemetry.sdk.version': '1.36.0',
+            'telemetry.sdk.version': '1.37.0',
           }),
           'schema_url': '',
         }),
-        'start_time': 1758026591638626000,
+        'start_time': 1758028498928802000,
         'status': dict({
           'description': None,
           'status_code': <StatusCode.UNSET: 'unset'>,
