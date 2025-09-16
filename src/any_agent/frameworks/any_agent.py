@@ -83,6 +83,8 @@ class AnyAgent(ABC):
         self._lock = asyncio.Lock()
         self._callback_contexts: dict[int, Context] = {}
 
+        self.current_session_id: str = None
+
     @staticmethod
     def _get_agent_type_by_framework(
         framework_raw: AgentFramework | str,
@@ -131,12 +133,14 @@ class AnyAgent(ABC):
         cls,
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
+        current_session_id: str = None
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
         return run_async_in_sync(
             cls.create_async(
                 agent_framework=agent_framework,
                 agent_config=agent_config,
+                current_session_id=current_session_id
             ),
             allow_running_loop=INSIDE_NOTEBOOK,
         )
@@ -146,8 +150,10 @@ class AnyAgent(ABC):
         cls,
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
+        current_session_id: str = None
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
+        cls.current_session_id = current_session_id
         agent_cls = cls._get_agent_type_by_framework(agent_framework)
         agent = agent_cls(agent_config)
         await agent._load_agent()
@@ -193,7 +199,7 @@ class AnyAgent(ABC):
                         current_span=invoke_span,
                         trace=AgentTrace(),
                         tracer=self._tracer,
-                        shared={},
+                        shared={"_current_session_id":self.current_session_id},
                     )
 
                     if len(self._wrapper.callback_context) == 1:
