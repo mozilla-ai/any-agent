@@ -36,7 +36,6 @@ jobs:
       - name: Install
         run: |
           uv sync --group tests --extra all --extra a2a --extra composio
-          uv pip install opentelemetry-exporter-otlp
 
       - name: Run Documentation tests
         run: pytest tests/docs -v --cov --cov-report=xml
