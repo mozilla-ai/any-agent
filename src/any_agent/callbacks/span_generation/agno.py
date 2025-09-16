@@ -6,7 +6,8 @@ from typing import TYPE_CHECKING, Any
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
-    from agno.models.message import Message, MessageMetrics
+    from agno.models.message import Message
+    from agno.models.metrics import Metrics
     from agno.tools.function import FunctionCall
 
     from any_agent.callbacks.context import Context
@@ -37,7 +38,7 @@ class _AgnoSpanGeneration(_SpanGeneration):
                     for tool in tool_calls
                 ]
 
-            metrics: MessageMetrics | None
+            metrics: Metrics | None
             input_tokens: int = 0
             output_tokens: int = 0
             if metrics := getattr(assistant_message, "metrics", None):
