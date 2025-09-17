@@ -55,7 +55,7 @@ a2a = [
 ]
 
 composio = [
-  "composio>=0.8.9,<0.8.13" # Using 0.8.13 causes circular import errors
+  "composio>=0.8.14"
 ]
 
 all = [
