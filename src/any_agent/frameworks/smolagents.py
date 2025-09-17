@@ -1,6 +1,9 @@
-from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+# mypy: disable-error-code="union-attr"
+import asyncio
+from collections.abc import Callable, Generator
+from typing import TYPE_CHECKING, Any, cast
 
+from any_llm.types.completion import ChatCompletion
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -8,7 +11,12 @@ from any_agent.frameworks.any_agent import AnyAgent
 from any_agent.tools.final_output import prepare_final_output
 
 try:
-    from smolagents import FinalAnswerTool, LiteLLMModel, ToolCallingAgent
+    from smolagents import (
+        FinalAnswerTool,
+        ToolCallingAgent,
+    )
+    from smolagents.models import ApiModel, ChatMessage
+    from smolagents.monitoring import TokenUsage
 
     smolagents_available = True
 except ImportError:
@@ -19,7 +27,109 @@ if TYPE_CHECKING:
 
 
 DEFAULT_AGENT_TYPE = ToolCallingAgent
-DEFAULT_MODEL_TYPE = LiteLLMModel
+
+
+class AnyLLMModel(ApiModel):
+    """Smolagents ApiModel that delegates all requests to the any-llm backend.
+
+    This class purposefully mirrors the methods API of
+    `LiteLLMModel` so that it can be injected anywhere a Smolagents model is
+    expected.
+    Refer: https://github.com/huggingface/smolagents/blob/main/src/smolagents/models.py
+    """
+
+    def __init__(
+        self,
+        model_id: str,
+        api_base: str | None = None,
+        api_key: str | None = None,
+        custom_role_conversions: dict[str, str] | None = None,
+        flatten_messages_as_text: bool | None = None,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(
+            model_id=model_id,
+            custom_role_conversions=custom_role_conversions,
+            flatten_messages_as_text=flatten_messages_as_text,
+            **kwargs,
+        )
+
+        self._anyllm_common_kwargs: dict[str, Any] = {
+            "model": model_id,
+            "api_key": api_key,
+            "api_base": api_base,
+            **kwargs,
+        }
+
+    def create_client(self) -> Any:
+        """Create the AnyLLM client, required method for ApiModel subclasses."""
+        import any_llm
+
+        return any_llm
+
+    def _call_anyllm(
+        self, completion_kwargs: dict[str, Any], stream: bool = False
+    ) -> ChatCompletion:
+        payload = {**self._anyllm_common_kwargs, **completion_kwargs}
+        if stream:
+            payload["stream"] = True
+
+        return cast("ChatCompletion", self.client.completion(**payload))
+
+    def generate(
+        self,
+        messages: list[ChatMessage],
+        stop_sequences: list[str] | None = None,
+        response_format: dict[str, str] | None = None,
+        tools_to_call_from: list[Any] | None = None,
+        **kwargs: Any,
+    ) -> ChatMessage:
+        self._apply_rate_limit()  # type: ignore[no-untyped-call]
+        completion_kwargs = self._prepare_completion_kwargs(
+            messages=messages,  # type: ignore[arg-type]
+            stop_sequences=stop_sequences,
+            response_format=response_format,
+            tools_to_call_from=tools_to_call_from,
+            custom_role_conversions=self.custom_role_conversions,
+            convert_images_to_image_urls=True,
+            **kwargs,
+        )
+        response = self._call_anyllm(completion_kwargs)
+
+        return ChatMessage.from_dict(
+            response.choices[0].message.model_dump(
+                include={"role", "content", "tool_calls"}
+            ),
+            raw=response.model_dump(),
+            token_usage=TokenUsage(
+                input_tokens=response.usage.prompt_tokens,
+                output_tokens=response.usage.completion_tokens,
+            ),
+        )
+
+    def generate_stream(
+        self,
+        messages: list[ChatMessage],
+        stop_sequences: list[str] | None = None,
+        response_format: dict[str, str] | None = None,
+        tools_to_call_from: list[Any] | None = None,
+        **kwargs: Any,
+    ) -> "Generator[Any, None, None]":
+        self._apply_rate_limit()  # type: ignore[no-untyped-call]
+        completion_kwargs = self._prepare_completion_kwargs(
+            messages=messages,  # type: ignore[arg-type]
+            stop_sequences=stop_sequences,
+            response_format=response_format,
+            tools_to_call_from=tools_to_call_from,
+            custom_role_conversions=self.custom_role_conversions,
+            convert_images_to_image_urls=True,
+            **kwargs,
+        )
+        response = self._call_anyllm(completion_kwargs, stream=True)
+        yield from response  # TODO:Transform deltas to be compatible with ChatMessageStreamDelta
+
+
+DEFAULT_MODEL_TYPE = AnyLLMModel
 
 
 class SmolagentsAgent(AnyAgent):
@@ -137,7 +247,10 @@ class SmolagentsAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        result = self._agent.run(prompt, **kwargs)
+        # Run the blocking `self._agent.run` call in a background thread to avoid
+        # calling synchronous code from within the current event loop.
+        result = await asyncio.to_thread(self._agent.run, prompt, **kwargs)
+        # result = self._agent.run(prompt, **kwargs)
         if self.config.output_type:
             return self.config.output_type.model_validate_json(result)
         return str(result)
