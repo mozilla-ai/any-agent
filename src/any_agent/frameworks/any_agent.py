@@ -19,7 +19,7 @@ from any_agent.config import (
 )
 from any_agent.tools.wrappers import _wrap_tools
 from any_agent.tracing.agent_trace import AgentTrace
-from any_agent.tracing.attributes import GenAI
+from any_agent.tracing.attributes import AnyAgentAttributes, GenAI
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -203,6 +203,9 @@ class AnyAgent(ABC):
                             agent=self,  # type: ignore[arg-type]
                         )
 
+                # Importing here to avoid circular import issues
+                from any_agent import __version__ as _ANY_AGENT_VERSION  # noqa: N812
+
                 invoke_span.set_attributes(
                     {
                         GenAI.OPERATION_NAME: "invoke_agent",
@@ -210,6 +213,7 @@ class AnyAgent(ABC):
                         GenAI.AGENT_DESCRIPTION: self.config.description
                         or "No description.",
                         GenAI.REQUEST_MODEL: self.config.model_id,
+                        AnyAgentAttributes.VERSION: _ANY_AGENT_VERSION,
                     }
                 )
 

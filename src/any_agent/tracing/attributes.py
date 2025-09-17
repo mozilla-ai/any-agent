@@ -63,3 +63,10 @@ class GenAI:
 
     USAGE_OUTPUT_TOKENS = GEN_AI_USAGE_OUTPUT_TOKENS
     """The number of tokens used in the GenAI response (completion)."""
+
+
+class AnyAgentAttributes:
+    """Span-attribute keys specific to AnyAgent library."""
+
+    VERSION = "any_agent.version"
+    """The any-agent library version used in the runtime."""
