@@ -46,8 +46,8 @@ class _SmolagentsSpanGeneration(_SpanGeneration):
         output_tokens = 0
         if raw := response.raw:
             if token_usage := raw.get("usage", None):
-                input_tokens = token_usage.prompt_tokens
-                output_tokens = token_usage.completion_tokens
+                input_tokens = token_usage.get("prompt_tokens", None)
+                output_tokens = token_usage.get("completion_tokens", None)
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 
