@@ -1,9 +1,11 @@
 # mypy: disable-error-code="union-attr"
 import asyncio
+import json
 from collections.abc import Callable, Generator
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
+from pydantic.json import pydantic_encoder
 
 from any_agent.config import AgentConfig, AgentFramework
 from any_agent.frameworks.any_agent import AnyAgent
@@ -12,6 +14,7 @@ from any_agent.tools.final_output import prepare_final_output
 try:
     from smolagents import (
         FinalAnswerTool,
+        Tool,
         ToolCallingAgent,
     )
     from smolagents.models import (
@@ -71,6 +74,39 @@ class AnyLLMModel(ApiModel):
         import any_llm
 
         return any_llm
+
+    def _prepare_completion_kwargs(
+        self,
+        messages: list[ChatMessage | dict[str, Any]],
+        stop_sequences: list[str] | None = None,
+        response_format: dict[str, str] | None = None,
+        tools_to_call_from: list[Tool] | None = None,
+        custom_role_conversions: dict[str, str] | None = None,
+        convert_images_to_image_urls: bool = False,
+        tool_choice: str | dict[str, Any] | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Extend _prepare_completion_kwargs, ensuring messages are correctly serialized.
+
+        For example, smolagents returns messages containing enum <MessageRole.ASSISTANT>
+        which is transformed to string "assistant".
+        """
+        completion_kwargs = super()._prepare_completion_kwargs(
+            messages=messages,
+            stop_sequences=stop_sequences,
+            response_format=response_format,
+            tools_to_call_from=tools_to_call_from,
+            custom_role_conversions=custom_role_conversions,
+            convert_images_to_image_urls=convert_images_to_image_urls,
+            tool_choice=tool_choice,
+            **kwargs,
+        )
+        if "messages" in completion_kwargs:
+            messages_json = json.dumps(
+                completion_kwargs["messages"], default=pydantic_encoder
+            )
+            completion_kwargs["messages"] = json.loads(messages_json)
+        return completion_kwargs
 
     def generate(
         self,
