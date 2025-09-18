@@ -34,7 +34,7 @@ def test_runtime_error(
     if agent_framework is AgentFramework.GOOGLE:
         patch_function = "google.adk.models.lite_llm.acompletion"
     elif agent_framework is AgentFramework.SMOLAGENTS:
-        patch_function = "litellm.completion"
+        patch_function = "any_llm.completion"
 
     with patch(patch_function) as litellm_path:
         litellm_path.side_effect = RuntimeError(exc_reason)
