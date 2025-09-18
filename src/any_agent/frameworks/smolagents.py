@@ -1,9 +1,8 @@
 # mypy: disable-error-code="union-attr"
 import asyncio
 from collections.abc import Callable, Generator
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
-from any_llm.types.completion import ChatCompletion
 from pydantic import BaseModel
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -15,7 +14,12 @@ try:
         FinalAnswerTool,
         ToolCallingAgent,
     )
-    from smolagents.models import ApiModel, ChatMessage
+    from smolagents.models import (
+        ApiModel,
+        ChatMessage,
+        ChatMessageStreamDelta,
+        ChatMessageToolCallStreamDelta,
+    )
     from smolagents.monitoring import TokenUsage
 
     smolagents_available = True
@@ -23,6 +27,7 @@ except ImportError:
     smolagents_available = False
 
 if TYPE_CHECKING:
+    from any_llm.types.completion import ChatCompletion, ChatCompletionChunk
     from smolagents import MultiStepAgent
 
 
@@ -67,15 +72,6 @@ class AnyLLMModel(ApiModel):
 
         return any_llm
 
-    def _call_anyllm(
-        self, completion_kwargs: dict[str, Any], stream: bool = False
-    ) -> ChatCompletion:
-        payload = {**self._anyllm_common_kwargs, **completion_kwargs}
-        if stream:
-            payload["stream"] = True
-
-        return cast("ChatCompletion", self.client.completion(**payload))
-
     def generate(
         self,
         messages: list[ChatMessage],
@@ -94,7 +90,8 @@ class AnyLLMModel(ApiModel):
             convert_images_to_image_urls=True,
             **kwargs,
         )
-        response = self._call_anyllm(completion_kwargs)
+        payload = {**self._anyllm_common_kwargs, **completion_kwargs}
+        response: ChatCompletion = self.client.completion(**payload)
 
         return ChatMessage.from_dict(
             response.choices[0].message.model_dump(
@@ -114,7 +111,7 @@ class AnyLLMModel(ApiModel):
         response_format: dict[str, str] | None = None,
         tools_to_call_from: list[Any] | None = None,
         **kwargs: Any,
-    ) -> "Generator[Any, None, None]":
+    ) -> Generator[ChatMessageStreamDelta]:
         self._apply_rate_limit()  # type: ignore[no-untyped-call]
         completion_kwargs = self._prepare_completion_kwargs(
             messages=messages,  # type: ignore[arg-type]
@@ -125,8 +122,48 @@ class AnyLLMModel(ApiModel):
             convert_images_to_image_urls=True,
             **kwargs,
         )
-        response = self._call_anyllm(completion_kwargs, stream=True)
-        yield from response  # TODO:Transform deltas to be compatible with ChatMessageStreamDelta
+
+        # Ensure usage information is included in the streamed chunks when the provider supports it
+        completion_kwargs.setdefault("stream_options", {"include_usage": True})
+
+        payload = {**self._anyllm_common_kwargs, **completion_kwargs, "stream": True}
+        response_iterator: Generator[ChatCompletionChunk] = self.client.completion(
+            **payload
+        )
+
+        for event in response_iterator:
+            if getattr(event, "usage", None):
+                yield ChatMessageStreamDelta(
+                    content="",
+                    token_usage=TokenUsage(
+                        input_tokens=event.usage.prompt_tokens,
+                        output_tokens=event.usage.completion_tokens,
+                    ),
+                )
+
+            if event.choices:
+                choice = event.choices[0]
+                if choice.delta:
+                    tool_calls = None
+                    if choice.delta.tool_calls:
+                        tool_calls = [
+                            ChatMessageToolCallStreamDelta(
+                                index=delta.index,
+                                id=delta.id,
+                                type=delta.type,
+                                function=delta.function,  # type: ignore[arg-type]
+                            )
+                            for delta in choice.delta.tool_calls
+                        ]
+
+                    yield ChatMessageStreamDelta(
+                        content=choice.delta.content,
+                        tool_calls=tool_calls,
+                    )
+                else:
+                    if not getattr(choice, "finish_reason", None):
+                        error_message = f"No content or tool calls in event: {event}"
+                        raise ValueError(error_message)
 
 
 DEFAULT_MODEL_TYPE = AnyLLMModel
