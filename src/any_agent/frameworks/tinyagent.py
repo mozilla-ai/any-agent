@@ -5,9 +5,8 @@ import inspect
 import json
 from typing import TYPE_CHECKING, Any
 
-from any_llm import acompletion
-from any_llm.constants import ProviderName
-from any_llm.factory import ProviderFactory
+from any_llm import AnyLLM, acompletion
+from any_llm.constants import LLMProvider
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -104,8 +103,8 @@ class TinyAgent(AnyAgent):
             **(self.config.model_args or {}),
         }
 
-        provider_name, _ = ProviderFactory.split_model_provider(self.config.model_id)
-        self.uses_openai = provider_name == ProviderName.OPENAI
+        provider_name, _ = AnyLLM.split_model_provider(self.config.model_id)
+        self.uses_openai = provider_name == LLMProvider.OPENAI
         if not self.uses_openai and self.completion_params["tool_choice"] == "required":
             self.config.tools.append(final_answer)
 
