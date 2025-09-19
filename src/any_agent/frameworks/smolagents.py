@@ -1,5 +1,4 @@
 # mypy: disable-error-code="union-attr"
-import asyncio
 import json
 from collections.abc import Callable, Generator
 from typing import TYPE_CHECKING, Any
@@ -320,10 +319,7 @@ class SmolagentsAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        # Run the blocking `self._agent.run` call in a background thread to avoid
-        # calling synchronous code from within the current event loop.
-        result = await asyncio.to_thread(self._agent.run, prompt, **kwargs)
-        # result = self._agent.run(prompt, **kwargs)
+        result = self._agent.run(prompt, **kwargs)
         if self.config.output_type:
             return self.config.output_type.model_validate_json(result)
         return str(result)

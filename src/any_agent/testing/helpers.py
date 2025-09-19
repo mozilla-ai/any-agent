@@ -37,6 +37,9 @@ def get_default_agent_model_args(agent_framework: AgentFramework) -> dict[str, A
         if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
         else {}
     )
+    if agent_framework == AgentFramework.SMOLAGENTS:
+        model_args["allow_running_loop"] = True
+
     model_args["temperature"] = 0.0
     return model_args
 
