@@ -39,8 +39,6 @@ def safe_cast_argument(value: Any, arg_type: Any) -> Any:
     if value == "" and _is_optional_type(arg_type):
         return None
 
-    return value
-
     # Handle JSON string parsing for complex types
     if isinstance(value, str) and value.strip():
         # Try to parse JSON strings for list and dict types
