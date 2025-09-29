@@ -5,8 +5,7 @@ import inspect
 import json
 from typing import TYPE_CHECKING, Any
 
-from any_llm import AnyLLM, acompletion
-from any_llm.constants import LLMProvider
+from any_llm import AnyLLM, LLMProvider, acompletion
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
