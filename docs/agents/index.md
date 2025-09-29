@@ -38,59 +38,9 @@ Multi-Agent systems can be implemented [using Agent-As-Tools](./tools.md#using-a
 
 ### Framework Specific Arguments
 
-Sometimes, there may be a new feature in a framework that you want to use that isn't yet supported universally in any-agent. The `agent_args` parameter in `AgentConfig` allows you to pass arguments specific to the underlying framework that the agent instance is built on.
+Sometimes, there may be a new feature in a framework that you want to use that isn't yet supported universally in any-agent.
 
-**Example-1**: To pass the `output_guardrails` parameter, when using the OpenAI Agents SDK:
-
-```python
-from pydantic import BaseModel
-from any_agent import AgentConfig, AgentFramework, AnyAgent
-from agents import (
-    Agent,
-    GuardrailFunctionOutput,
-    OutputGuardrailTripwireTriggered,
-    RunContextWrapper,
-    Runner,
-    output_guardrail,
-)
-
-class MessageOutput(BaseModel):
-    response: str
-
-class MathOutput(BaseModel):
-    reasoning: str
-    is_math: bool
-
-guardrail_agent = Agent(
-    name="Guardrail check",
-    instructions="Check if the output includes any math.",
-    output_type=MathOutput,
-)
-
-@output_guardrail
-async def math_guardrail(
-    ctx: RunContextWrapper, agent: Agent, output: MessageOutput
-) -> GuardrailFunctionOutput:
-    result = await Runner.run(guardrail_agent, output.response, context=ctx.context)
-
-    return GuardrailFunctionOutput(
-        output_info=result.final_output,
-        tripwire_triggered=result.final_output.is_math,
-    )
-
-framework = AgentFramework.OPENAI
-
-agent = AnyAgent.create(
-    framework,
-    AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        instructions="Check if the output contains any math",
-        agent_args={
-            "output_guardrails": [math_guardrail]
-        }
-    )
-)
-```
+The [`agent_args`][any_agent.config.AgentConfig.agent_args] parameter in `AgentConfig` allows you to pass arguments specific to the underlying framework that the agent instance is built on.
 
 ## Running Agents
 
@@ -98,8 +48,8 @@ agent = AnyAgent.create(
 try:
     agent_trace = agent.run("Which Agent Framework is the best??")
     print(agent_trace.final_output)
-except AgentRunError as are:
-    agent_trace = are.trace
+except AgentRunError as e:
+    agent_trace = e.trace
 ```
 
 Check [`AgentTrace`][any_agent.tracing.agent_trace.AgentTrace] for more info on the return type.
