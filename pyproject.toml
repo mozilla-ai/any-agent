@@ -161,9 +161,6 @@ omit = [
   "tests/"
 ]
 
-[tool.uv.sources]
-any-llm-sdk = { git = "https://github.com/mozilla-ai/any-llm.git", rev = "override-allow-running-loop" }
-
 [dependency-groups]
 dev = [
   { include-group = "docs" },
