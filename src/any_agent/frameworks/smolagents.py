@@ -321,7 +321,12 @@ class SmolagentsAgent(AnyAgent):
             raise ValueError(error_message)
         result = self._agent.run(prompt, **kwargs)
         if self.config.output_type:
-            return self.config.output_type.model_validate_json(result)
+            result_json = (
+                result.model_dump_json()
+                if hasattr(result, "model_dump_json")
+                else str(result)
+            )
+            return self.config.output_type.model_validate_json(result_json)
         return str(result)
 
     async def update_output_type_async(
