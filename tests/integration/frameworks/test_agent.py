@@ -158,6 +158,23 @@ def test_load_and_run_agent(
         model_args.pop("parallel_tool_calls", None)
         model_args["api_base"] = os.environ["HF_ENDPOINT"]
 
+    if (
+        model_id == DEFAULT_SMALL_MODEL_ID
+        and agent_framework == AgentFramework.SMOLAGENTS
+    ):
+        # For mistral-small-latest, the default tool call role conversions in smolagents do not work
+        # See default here: https://github.com/huggingface/smolagents/blob/f76dee172666d7dad178aed06b257c629967733b/src/smolagents/models.py#L237
+        from smolagents.models import MessageRole
+
+        model_args.update(
+            {
+                "custom_role_conversions": {
+                    MessageRole.TOOL_CALL: MessageRole.USER,
+                    MessageRole.TOOL_RESPONSE: MessageRole.USER,
+                }
+            }
+        )
+
     tools = [
         write_file,
         MCPStdio(
