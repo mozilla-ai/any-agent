@@ -1,6 +1,7 @@
 # mypy: disable-error-code="union-attr"
 import json
 from collections.abc import Callable, Generator
+from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
@@ -105,6 +106,13 @@ class AnyLLMModel(ApiModel):
                 completion_kwargs["messages"], default=pydantic_encoder
             )
             completion_kwargs["messages"] = json.loads(messages_json)
+            for message in completion_kwargs["messages"]:
+                # Convert content to plain string from the list of dicts for any-llm processing
+                content = deepcopy(message.get("content", []))
+                message["content"] = ""
+                for item in content:
+                    if item.get("type") == "text":
+                        message["content"] += item["text"] + "\n"
         return completion_kwargs
 
     def generate(
