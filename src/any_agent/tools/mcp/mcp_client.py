@@ -53,23 +53,12 @@ class MCPClient(BaseModel):
     async def connect(self) -> None:
         """Connect using the appropriate transport type."""
         if isinstance(self.config, MCPStdio):
-            default_env = {
-                'NVM_INC': '/Users/phuongnguyen/.nvm/versions/node/v22.16.0/include/node',
-                'NVM_CD_FLAGS': '-q',
-                'CONDA_SHLVL': '0',
-                'USER': 'phuongnguyen',
-                'NVM_DIR': '/Users/phuongnguyen/.nvm',
-                'PATH': '/Users/phuongnguyen/.cache/uv/archive-v0/SxcrnRYQ2TV4kCBmQcEWR/bin:/Users/phuongnguyen/miniconda3/condabin:/Users/phuongnguyen/.nvm/versions/node/v22.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Users/phuongnguyen/.cargo/bin:/Users/phuongnguyen/.local/bin',
-                'LOGNAME': 'phuongnguyen',
-                'NVM_BIN': '/Users/phuongnguyen/.nvm/versions/node/v22.16.0/bin'
-            }
             server_params = StdioServerParameters(
                 command=self.config.command,
                 args=list(self.config.args),
-                env={**os.environ,**self.config.env,**default_env},
+                env={**os.environ,**self.config.env},
             )
-            
-            print("os.environ",{**os.environ,**self.config.env,**default_env})
+            print("os.environ",{**os.environ,**self.config.env})
             self._client = stdio_client(server_params)
             read, write = await self._exit_stack.enter_async_context(self._client)
         elif isinstance(self.config, MCPSse):
