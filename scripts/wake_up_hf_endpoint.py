@@ -1,8 +1,8 @@
 import argparse
 import time
 
-from any_llm import completion
-from huggingface_hub.errors import HfHubHTTPError
+from aiohttp.client_exceptions import ClientResponseError
+from any_llm.api import completion
 
 HF_ENDPOINT = "https://y0okp71n85ezo5nr.us-east-1.aws.endpoints.huggingface.cloud/v1/"
 
@@ -16,7 +16,7 @@ def wake_up_hf_endpoint(retry: int = 0):
                 api_base=HF_ENDPOINT,
             )
             break
-        except HfHubHTTPError as e:
+        except ClientResponseError as e:
             if not retry:
                 print(f"Endpoint not ready, giving up...\n{e}")
                 return
