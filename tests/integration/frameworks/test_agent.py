@@ -149,7 +149,7 @@ def test_load_and_run_agent(
         with open(os.path.join(tmp_path, tmp_file), "w", encoding="utf-8") as f:
             f.write(text)
 
-    model_args = get_default_agent_model_args(agent_framework)
+    model_args = get_default_agent_model_args(agent_framework, model_id=model_id)
 
     if "gemini" in model_id:
         model_args.pop("parallel_tool_calls", None)

@@ -61,7 +61,9 @@ def test_load_and_run_agent_streamable_http(
     agent_config = AgentConfig(
         tools=tools,  # type: ignore[arg-type]
         instructions="Use the available tools to answer.",
-        model_args=get_default_agent_model_args(agent_framework),
+        model_args=get_default_agent_model_args(
+            agent_framework, model_id=kwargs["model_id"]
+        ),
         output_type=Steps,
         **kwargs,  # type: ignore[arg-type]
     )

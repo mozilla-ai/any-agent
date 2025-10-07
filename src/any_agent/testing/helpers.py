@@ -17,16 +17,19 @@ LLM_IMPORT_PATHS = {
     AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.acompletion",
     AgentFramework.AGNO: "any_agent.frameworks.agno.acompletion",
     AgentFramework.OPENAI: "litellm.acompletion",
-    AgentFramework.SMOLAGENTS: "litellm.completion",
+    AgentFramework.SMOLAGENTS: "any_llm.completion",
     AgentFramework.LLAMA_INDEX: "litellm.acompletion",
 }
 
 
-def get_default_agent_model_args(agent_framework: AgentFramework) -> dict[str, Any]:
+def get_default_agent_model_args(
+    agent_framework: AgentFramework, model_id: str | None = None
+) -> dict[str, Any]:
     """Get the default model arguments for an agent framework.
 
     Args:
         agent_framework (AgentFramework): The agent framework to get the default model arguments for.
+        model_id (str, optional): The model ID to get specific model arguments for. Defaults to None.
 
     Returns:
         dict[str, Any]: The default model arguments for the agent framework.
@@ -37,6 +40,19 @@ def get_default_agent_model_args(agent_framework: AgentFramework) -> dict[str, A
         if agent_framework not in [AgentFramework.AGNO, AgentFramework.LLAMA_INDEX]
         else {}
     )
+    if agent_framework == AgentFramework.SMOLAGENTS:
+        model_args["allow_running_loop"] = True
+
+        if model_id == DEFAULT_SMALL_MODEL_ID:
+            # For mistral-small-latest, the default tool call role conversions in smolagents do not work
+            # See default here: https://github.com/huggingface/smolagents/blob/f76dee172666d7dad178aed06b257c629967733b/src/smolagents/models.py#L237
+            from smolagents.models import MessageRole
+
+            model_args["custom_role_conversions"] = {
+                MessageRole.TOOL_CALL: MessageRole.USER,
+                MessageRole.TOOL_RESPONSE: MessageRole.USER,
+            }
+
     model_args["temperature"] = 0.0
     return model_args
 
