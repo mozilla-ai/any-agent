@@ -48,7 +48,7 @@ class AnyllmModel(Model):
     """Enables using any model via AnyLLM.
 
     AnyLLM allows you to access OpenAI, Anthropic, Gemini, Mistral, and many other models.
-    See supported models here: [anyllm providers](https://github.com/mozilla-ai/any-llm).
+    See supported providers/models here: https://mozilla-ai.github.io/any-llm/providers/
     """
 
     def __init__(
@@ -56,12 +56,10 @@ class AnyllmModel(Model):
         model: str,
         base_url: str | None = None,
         api_key: str | None = None,
-        provider: str | None = None,
     ):
         self.model = model
         self.base_url = base_url
         self.api_key = api_key
-        self.provider = provider
 
     async def get_response(
         self,
@@ -296,7 +294,6 @@ class AnyllmModel(Model):
 
         ret = await any_llm.acompletion(
             model=self.model,
-            provider=self.provider,
             messages=converted_messages,  # type: ignore[arg-type]
             tools=converted_tools,  # type: ignore[arg-type]
             temperature=model_settings.temperature,
