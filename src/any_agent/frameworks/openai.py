@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import time
+from collections.abc import AsyncIterator
 from copy import copy
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
@@ -10,12 +11,12 @@ from any_agent.config import AgentConfig, AgentFramework
 from .any_agent import AnyAgent
 
 try:
-    import litellm
+    import any_llm
     from agents import Agent, Model, ModelSettings, Runner, Tool, Usage
-    from agents.extensions.models.litellm_model import LitellmConverter
+
+    # from agents.extensions.models.litellm_model import LitellmConverter
     from agents.items import ModelResponse
     from agents.models.chatcmpl_converter import Converter
-    from agents.models.chatcmpl_helpers import HEADERS
     from agents.models.chatcmpl_stream_handler import ChatCmplStreamHandler
     from agents.models.fake_id import FAKE_RESPONSES_ID
     from agents.tracing import generation_span
@@ -40,16 +41,14 @@ if TYPE_CHECKING:
     from agents.models.interface import ModelTracing
     from agents.tracing.span_data import GenerationSpanData
     from agents.tracing.spans import Span
-    from openai import AsyncStream
-    from openai.types.chat import ChatCompletionChunk
     from pydantic import BaseModel
 
 
-class LitellmModel(Model):
-    """Enables using any model via LiteLLM.
+class AnyllmModel(Model):
+    """Enables using any model via AnyLLM.
 
-    LiteLLM allows you to access OpenAPI, Anthropic, Gemini, Mistral, and many other models.
-    See supported models here: [litellm models](https://docs.litellm.ai/docs/providers).
+    AnyLLM allows you to access OpenAI, Anthropic, Gemini, Mistral, and many other models.
+    See supported models here: [anyllm providers](https://github.com/mozilla-ai/any-llm).
     """
 
     def __init__(
@@ -57,10 +56,12 @@ class LitellmModel(Model):
         model: str,
         base_url: str | None = None,
         api_key: str | None = None,
+        provider: str | None = None,
     ):
         self.model = model
         self.base_url = base_url
         self.api_key = api_key
+        self.provider = provider
 
     async def get_response(
         self,
@@ -78,7 +79,7 @@ class LitellmModel(Model):
         with generation_span(
             model=str(self.model),
             model_config=model_settings.to_json_dict()
-            | {"base_url": str(self.base_url or ""), "model_impl": "litellm"},
+            | {"base_url": str(self.base_url or ""), "model_impl": "anyllm"},
             disabled=tracing.is_disabled(),
         ) as span_generation:
             response = await self._fetch_response(
@@ -94,34 +95,36 @@ class LitellmModel(Model):
                 prompt=prompt,
             )
 
-            assert isinstance(response.choices[0], litellm.types.utils.Choices)
+            assert isinstance(response.choices[0], any_llm.types.completion.Choice)
 
             usage = Usage()
-            if hasattr(response, "usage"):
+            if hasattr(response, "usage") and response.usage:
                 response_usage = response.usage
-                usage = (
-                    Usage(
-                        requests=1,
-                        input_tokens=response_usage.prompt_tokens,
-                        output_tokens=response_usage.completion_tokens,
-                        total_tokens=response_usage.total_tokens,
-                        input_tokens_details=InputTokensDetails(
-                            cached_tokens=getattr(
+                usage = Usage(
+                    requests=1,
+                    input_tokens=response_usage.prompt_tokens,
+                    output_tokens=response_usage.completion_tokens,
+                    total_tokens=response_usage.total_tokens,
+                    input_tokens_details=InputTokensDetails(
+                        cached_tokens=(
+                            getattr(response_usage, "prompt_tokens_details", None)
+                            and getattr(
                                 response_usage.prompt_tokens_details, "cached_tokens", 0
                             )
-                            or 0
-                        ),
-                        output_tokens_details=OutputTokensDetails(
-                            reasoning_tokens=getattr(
+                        )
+                        or 0
+                    ),
+                    output_tokens_details=OutputTokensDetails(
+                        reasoning_tokens=(
+                            getattr(response_usage, "completion_tokens_details", None)
+                            and getattr(
                                 response_usage.completion_tokens_details,
                                 "reasoning_tokens",
                                 0,
                             )
-                            or 0
-                        ),
-                    )
-                    if response.usage
-                    else Usage()
+                        )
+                        or 0
+                    ),
                 )
 
             if tracing.include_data():
@@ -133,9 +136,7 @@ class LitellmModel(Model):
                 "output_tokens": usage.output_tokens,
             }
 
-            items = Converter.message_to_output_items(
-                LitellmConverter.convert_message_to_openai(response.choices[0].message)
-            )
+            items = Converter.message_to_output_items(response.choices[0].message)
 
             return ModelResponse(
                 output=items,
@@ -159,7 +160,7 @@ class LitellmModel(Model):
         with generation_span(
             model=str(self.model),
             model_config=model_settings.to_json_dict()
-            | {"base_url": str(self.base_url or ""), "model_impl": "litellm"},
+            | {"base_url": str(self.base_url or ""), "model_impl": "anyllm"},
             disabled=tracing.is_disabled(),
         ) as span_generation:
             response, stream = await self._fetch_response(
@@ -176,7 +177,7 @@ class LitellmModel(Model):
             )
 
             final_response: Response | None = None
-            async for chunk in ChatCmplStreamHandler.handle_stream(response, stream):
+            async for chunk in ChatCmplStreamHandler.handle_stream(response, stream):  # type: ignore[arg-type]
                 yield chunk
 
                 if chunk.type == "response.completed":
@@ -204,7 +205,9 @@ class LitellmModel(Model):
         tracing: ModelTracing,
         stream: Literal[True],
         prompt: Any | None = None,
-    ) -> tuple[Response, AsyncStream[ChatCompletionChunk]]: ...
+    ) -> tuple[
+        Response, AsyncIterator[any_llm.types.completion.ChatCompletionChunk]
+    ]: ...
 
     @overload
     async def _fetch_response(
@@ -219,7 +222,7 @@ class LitellmModel(Model):
         tracing: ModelTracing,
         stream: Literal[False],
         prompt: Any | None = None,
-    ) -> litellm.types.utils.ModelResponse: ...
+    ) -> any_llm.types.completion.ChatCompletion: ...
 
     async def _fetch_response(
         self,
@@ -234,8 +237,8 @@ class LitellmModel(Model):
         stream: bool = False,
         prompt: Any | None = None,
     ) -> (
-        litellm.types.utils.ModelResponse
-        | tuple[Response, AsyncStream[ChatCompletionChunk]]
+        any_llm.types.completion.ChatCompletion
+        | tuple[Response, AsyncIterator[any_llm.types.completion.ChatCompletionChunk]]
     ):
         converted_messages = Converter.items_to_messages(input)
 
@@ -291,10 +294,11 @@ class LitellmModel(Model):
         if model_settings.extra_args:
             extra_kwargs.update(model_settings.extra_args)
 
-        ret = await litellm.acompletion(
+        ret = await any_llm.acompletion(
             model=self.model,
-            messages=converted_messages,
-            tools=converted_tools or None,
+            provider=self.provider,
+            messages=converted_messages,  # type: ignore[arg-type]
+            tools=converted_tools,  # type: ignore[arg-type]
             temperature=model_settings.temperature,
             top_p=model_settings.top_p,
             frequency_penalty=model_settings.frequency_penalty,
@@ -307,13 +311,12 @@ class LitellmModel(Model):
             stream_options=stream_options,
             reasoning_effort=reasoning_effort,
             top_logprobs=model_settings.top_logprobs,
-            extra_headers={**HEADERS, **(model_settings.extra_headers or {})},
             api_key=self.api_key,
-            base_url=self.base_url,
-            **extra_kwargs,
+            api_base=self.base_url,
+            **extra_kwargs,  # type: ignore[arg-type]
         )
 
-        if isinstance(ret, litellm.types.utils.ModelResponse):
+        if isinstance(ret, any_llm.types.completion.ChatCompletion):
             return ret
 
         response = Response(
@@ -339,7 +342,7 @@ class LitellmModel(Model):
         return value
 
 
-DEFAULT_MODEL_TYPE = LitellmModel
+DEFAULT_MODEL_TYPE = AnyllmModel
 
 
 class OpenAIAgent(AnyAgent):
