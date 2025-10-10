@@ -384,9 +384,13 @@ class OpenAIAgent(AnyAgent):
     ) -> Model:
         """Get the model configuration for an OpenAI agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        model_args = agent_config.model_args or {}
+        base_url = agent_config.api_base or cast(
+            "str | None", model_args.get("api_base")
+        )
         return model_type(
             model=agent_config.model_id,
-            base_url=agent_config.api_base,
+            base_url=base_url,
             api_key=agent_config.api_key,
         )
 
