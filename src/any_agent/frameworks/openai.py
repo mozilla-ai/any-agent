@@ -12,11 +12,12 @@ from .any_agent import AnyAgent
 
 try:
     import any_llm
-    from agents import Agent, Model, ModelSettings, Runner, Tool, Usage
+    from agents import Agent, FunctionTool, Model, ModelSettings, Runner, Tool, Usage
+    from agents.exceptions import UserError
 
-    # from agents.extensions.models.litellm_model import LitellmConverter
+    # from agents.extensions.models.litellm_model import LitellmConverter, LitellmModel
     from agents.items import ModelResponse
-    from agents.models.chatcmpl_converter import Converter
+    from agents.models.chatcmpl_converter import Converter as BaseConverter
     from agents.models.chatcmpl_stream_handler import ChatCmplStreamHandler
     from agents.models.fake_id import FAKE_RESPONSES_ID
     from agents.tracing import generation_span
@@ -41,7 +42,31 @@ if TYPE_CHECKING:
     from agents.models.interface import ModelTracing
     from agents.tracing.span_data import GenerationSpanData
     from agents.tracing.spans import Span
+    from openai.types.chat import ChatCompletionToolParam
     from pydantic import BaseModel
+
+
+class Converter(BaseConverter):
+    """Same converter as agents.models.chatcmpl_converter.Converter but with strict mode enabled."""
+
+    @classmethod
+    def tool_to_openai(cls, tool: Tool) -> ChatCompletionToolParam:
+        if isinstance(tool, FunctionTool):
+            return {
+                "type": "function",
+                "function": {
+                    "name": tool.name,
+                    "description": tool.description or "",
+                    "parameters": tool.params_json_schema,
+                    "strict": tool.strict_json_schema,  # adding missing field in BaseConverter
+                },
+            }
+
+        msg = (
+            "Hosted tools are not supported with the ChatCompletions API."
+            f" Got tool type: {type(tool)}, tool: {tool}"
+        )
+        raise UserError(msg)
 
 
 class AnyllmModel(Model):
