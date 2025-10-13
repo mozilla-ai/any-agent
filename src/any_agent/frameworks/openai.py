@@ -341,6 +341,13 @@ class AnyllmModel(Model):
         if isinstance(ret, any_llm.types.completion.ChatCompletion):
             return ret
 
+        # If we reach here AND stream=False, something went wrong!
+        if not stream:
+            msg = (
+                f"Expected any_llm.types.completion.ChatCompletion but got {type(ret)}"
+            )
+            raise TypeError(msg)
+
         response = Response(
             id=FAKE_RESPONSES_ID,
             created_at=time.time(),
