@@ -90,7 +90,7 @@ def test_tool_error_llm_mocked(
     If you need detailed comparisons or specific recommendations, I can help with that as well. Would you like me to do that?
     """
 
-    # litellm versions with ModelResponse
+    # for frameworks using litellm, we need ModelResponse
     fake_give_up_response = ModelResponse(
         choices=[Choices(message=Message(content=give_up))]
     )
@@ -127,7 +127,7 @@ def test_tool_error_llm_mocked(
         choices=[Choices(message=Message(tool_calls=[tool_call]))]
     )
 
-    # any_llm versions with ChatCompletion
+    # for frameworks using any_llm, we need ChatCompletion
     fake_give_up_response_anyllm = ChatCompletion(
         id="chatcmpl-test",
         choices=[
