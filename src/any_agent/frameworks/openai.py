@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import math
 import time
-from collections.abc import AsyncIterator
 from copy import copy
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
@@ -14,21 +13,20 @@ try:
     import any_llm
     from agents import Agent, FunctionTool, Model, ModelSettings, Runner, Tool, Usage
     from agents.exceptions import UserError
-
-    # from agents.extensions.models.litellm_model import LitellmConverter, LitellmModel
     from agents.items import ModelResponse
     from agents.models.chatcmpl_converter import Converter as BaseConverter
     from agents.models.chatcmpl_stream_handler import ChatCmplStreamHandler
     from agents.models.fake_id import FAKE_RESPONSES_ID
     from agents.tracing import generation_span
     from agents.util._json import _to_dump_compatible
-    from openai import NOT_GIVEN, NotGiven
+    from openai import NOT_GIVEN, NotGiven, Omit
     from openai.types.responses import Response
     from openai.types.responses.response_usage import (
         InputTokensDetails,
         OutputTokensDetails,
     )
 
+    omit = Omit()
     agents_available = True
 except ImportError:
     agents_available = False
@@ -348,15 +346,19 @@ class AnyllmModel(Model):
             )
             raise TypeError(msg)
 
+        tool_choice_value = (
+            cast("Literal['auto', 'required', 'none']", tool_choice)
+            if tool_choice not in (NOT_GIVEN, omit)
+            and not isinstance(tool_choice, (NotGiven, type(omit)))
+            else "auto"
+        )
         response = Response(
             id=FAKE_RESPONSES_ID,
             created_at=time.time(),
             model=self.model,
             object="response",
             output=[],
-            tool_choice=cast("Literal['auto', 'required', 'none']", tool_choice)
-            if tool_choice != NOT_GIVEN
-            else "auto",
+            tool_choice=tool_choice_value,
             top_p=model_settings.top_p,
             temperature=model_settings.temperature,
             tools=[],
@@ -366,7 +368,7 @@ class AnyllmModel(Model):
         return response, ret
 
     def _remove_not_given(self, value: Any) -> Any:
-        if isinstance(value, NotGiven):
+        if isinstance(value, (NotGiven, type(omit))):
             return None
         return value
 
