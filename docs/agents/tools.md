@@ -207,6 +207,7 @@ When using tools where the python process running the agent is also responsible 
 The recommended approach is to use the async context manager pattern, which automatically handles cleanup:
 
 ```python
+import asyncio
 from any_agent import AgentConfig, AnyAgent
 from any_agent.config import MCPStdio
 
@@ -226,7 +227,8 @@ async def main():
         result = await agent.run_async("What time is it?")
         print(result.final_output)
 
-    # Cleanup happens automatically when exiting the context
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 ### Manual Cleanup
@@ -234,17 +236,30 @@ async def main():
 If you can't use a context manager, you can manually clean up resources:
 
 ```python
-agent = await AnyAgent.create_async(
-    "tinyagent",
-    AgentConfig(
-        model_id="mistral/mistral-small-latest",
-        tools=[time_tool],
-    ),
-)
+import asyncio
+from any_agent import AgentConfig, AnyAgent
+from any_agent.config import MCPStdio
 
-try:
-    result = await agent.run_async("What time is it?")
-    print(result.final_output)
-finally:
-    await agent.cleanup_async()
+async def main():
+    time_tool = MCPStdio(
+        command="uvx",
+        args=["mcp-server-time"],
+    )
+
+    agent = await AnyAgent.create_async(
+        "tinyagent",
+        AgentConfig(
+            model_id="mistral/mistral-small-latest",
+            tools=[time_tool],
+        ),
+    )
+
+    try:
+        result = await agent.run_async("What time is it?")
+        print(result.final_output)
+    finally:
+        await agent.cleanup_async()
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
