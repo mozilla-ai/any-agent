@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import builtins
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, assert_never, overload
+from typing import TYPE_CHECKING, Any, Self, assert_never, overload
 
 from any_llm.utils.aio import run_async_in_sync
 from opentelemetry import trace as otel_trace
@@ -169,7 +169,7 @@ class AnyAgent(ABC):
             await client.disconnect()
         self._mcp_clients.clear()
 
-    async def __aenter__(self) -> AnyAgent:
+    async def __aenter__(self) -> Self:
         """Enter the async context manager."""
         return self
 

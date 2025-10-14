@@ -1,7 +1,7 @@
 # pylint: disable=missing-function-docstring
 # pylint: disable=missing-class-docstring
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -112,3 +112,47 @@ async def test_run_sync_in_async_context() -> None:
         match=r"Cannot use the `sync` API in an `async` context. Use the `async` API instead",
     ):
         agent.run(TEST_QUERY)
+
+
+@pytest.mark.asyncio
+async def test_cleanup_async_disconnects_mcp_clients() -> None:
+    mock_mcp_client = Mock()
+    mock_mcp_client.disconnect = AsyncMock()
+
+    agent = await AnyAgent.create_async(
+        AgentFramework.TINYAGENT,
+        AgentConfig(
+            model_id="mistral/mistral-small-latest",
+        ),
+    )
+
+    agent._mcp_clients.append(mock_mcp_client)
+
+    assert len(agent._mcp_clients) == 1
+    assert agent._mcp_clients[0] == mock_mcp_client
+
+    await agent.cleanup_async()
+
+    mock_mcp_client.disconnect.assert_called_once()
+    assert len(agent._mcp_clients) == 0
+
+
+@pytest.mark.asyncio
+async def test_context_manager_automatically_cleans_up() -> None:
+    mock_mcp_client = Mock()
+    mock_mcp_client.disconnect = AsyncMock()
+
+    async with await AnyAgent.create_async(
+        AgentFramework.TINYAGENT,
+        AgentConfig(
+            model_id="mistral/mistral-small-latest",
+        ),
+    ) as agent:
+        agent._mcp_clients.append(mock_mcp_client)
+
+        assert len(agent._mcp_clients) == 1
+        assert agent._mcp_clients[0] == mock_mcp_client
+        mock_mcp_client.disconnect.assert_not_called()
+
+    mock_mcp_client.disconnect.assert_called_once()
+    assert len(agent._mcp_clients) == 0
