@@ -22,6 +22,7 @@ from any_agent.tracing.agent_trace import AgentTrace
 from any_agent.tracing.attributes import AnyAgentAttributes, GenAI
 
 if TYPE_CHECKING:
+    import types
     from collections.abc import Sequence
 
     from opentelemetry.trace import Tracer
@@ -155,9 +156,31 @@ class AnyAgent(ABC):
 
     async def _load_tools(self, tools: Sequence[Tool]) -> list[Any]:
         tools, mcp_clients = await _wrap_tools(tools, self.framework)
-        # Add to agent so that it doesn't get garbage collected
         self._mcp_clients.extend(mcp_clients)
         return tools
+
+    async def cleanup_async(self) -> None:
+        """Clean up resources including MCP client connections.
+
+        This should be called when you're done using the agent to ensure
+        all resources are properly released.
+        """
+        for client in self._mcp_clients:
+            await client.disconnect()
+        self._mcp_clients.clear()
+
+    async def __aenter__(self) -> AnyAgent:
+        """Enter the async context manager."""
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
+    ) -> None:
+        """Exit the async context manager and clean up resources."""
+        await self.cleanup_async()
 
     def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
