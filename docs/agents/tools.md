@@ -225,7 +225,7 @@ async def main():
     ) as agent:
         result = await agent.run_async("What time is it?")
         print(result.final_output)
-    
+
     # Cleanup happens automatically when exiting the context
 ```
 
