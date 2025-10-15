@@ -197,3 +197,69 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
         ]
     )
     ```
+
+## Resource Management
+
+When using tools where the python process running the agent is also responsible for managing the lifetime of the tool process (e.g., `MCPStdio`), the agent creates connections that should be properly cleaned up in order to avoid error messages like `RuntimeError: Attempted to exit cancel scope in a different task than it was entered in`.
+
+### Using Context Manager (Recommended)
+
+The recommended approach is to use the async context manager pattern, which automatically handles cleanup:
+
+```python
+import asyncio
+from any_agent import AgentConfig, AnyAgent
+from any_agent.config import MCPStdio
+
+async def main():
+    time_tool = MCPStdio(
+        command="uvx",
+        args=["mcp-server-time"],
+    )
+
+    async with await AnyAgent.create_async(
+        "tinyagent",
+        AgentConfig(
+            model_id="mistral/mistral-small-latest",
+            tools=[time_tool],
+        ),
+    ) as agent:
+        result = await agent.run_async("What time is it?")
+        print(result.final_output)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Manual Cleanup
+
+If you can't use a context manager, you can manually clean up resources:
+
+```python
+import asyncio
+from any_agent import AgentConfig, AnyAgent
+from any_agent.config import MCPStdio
+
+async def main():
+    time_tool = MCPStdio(
+        command="uvx",
+        args=["mcp-server-time"],
+    )
+
+    agent = await AnyAgent.create_async(
+        "tinyagent",
+        AgentConfig(
+            model_id="mistral/mistral-small-latest",
+            tools=[time_tool],
+        ),
+    )
+
+    try:
+        result = await agent.run_async("What time is it?")
+        print(result.final_output)
+    finally:
+        await agent.cleanup_async()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
