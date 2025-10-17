@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from litellm.types.utils import ModelResponse
-from openai.types.chat.chat_completion import ChatCompletion
+from any_llm.types.completion import ChatCompletion
 
 from any_agent.config import AgentFramework
 from any_agent.logging import setup_logger
@@ -169,21 +169,25 @@ def mock_any_llm_response() -> ChatCompletion:
     """Fixture to create a standard mock any-llm response"""
     return ChatCompletion.model_validate(
         {
-            "id": "44bb9c60ab374897825da5edfbd15126",
+            "id": "chatcmpl-BWnfbHWPsQp05roQ06LAD1mZ9tOjT",
             "choices": [
                 {
                     "finish_reason": "stop",
                     "index": 0,
                     "message": {
-                        "content": "Hello! 😊 How can I assist you today?",
+                        "content": "The state capital of Pennsylvania is Harrisburg.",
                         "role": "assistant",
                     },
                 }
             ],
-            "created": 1754648476,
+            "created": 1747157127,
             "model": "mistral-small-latest",
             "object": "chat.completion",
-            "usage": {"completion_tokens": 13, "prompt_tokens": 5, "total_tokens": 18},
+            "usage": {
+                "completion_tokens": 11,
+                "prompt_tokens": 138,
+                "total_tokens": 149,
+            },
         }
     )
 

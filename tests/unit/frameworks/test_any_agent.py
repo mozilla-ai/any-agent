@@ -52,6 +52,7 @@ def test_create_any_with_invalid_string() -> None:
 def test_model_args(
     agent_framework: AgentFramework,
     mock_litellm_response: Any,
+    mock_any_llm_response: Any,
 ) -> None:
     if agent_framework == AgentFramework.LLAMA_INDEX:
         pytest.skip("LlamaIndex agent uses a litellm streaming syntax")
@@ -59,7 +60,11 @@ def test_model_args(
     agent = create_agent_with_model_args(agent_framework)
 
     import_path = LLM_IMPORT_PATHS[agent_framework]
-    with patch(import_path, return_value=mock_litellm_response) as mock_llm:
+    mock_response = (
+        mock_litellm_response if "litellm" in import_path else mock_any_llm_response
+    )
+
+    with patch(import_path, return_value=mock_response) as mock_llm:
         result = agent.run(TEST_QUERY)
         assert EXPECTED_OUTPUT == result.final_output
         assert mock_llm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
