@@ -19,6 +19,7 @@ try:
     from agents.models.fake_id import FAKE_RESPONSES_ID
     from agents.tracing import generation_span
     from agents.util._json import _to_dump_compatible
+    from any_llm import AnyLLM
     from openai import NOT_GIVEN, NotGiven, Omit
     from openai.types.responses import Response
     from openai.types.responses.response_usage import (
@@ -80,9 +81,12 @@ class AnyllmModel(Model):
         base_url: str | None = None,
         api_key: str | None = None,
     ):
+        provider, model_id = AnyLLM.split_model_provider(model)
         self.model = model
         self.base_url = base_url
         self.api_key = api_key
+        self.llm = AnyLLM.create(provider=provider, api_key=api_key, api_base=base_url)
+        self.model_id = model_id
 
     async def get_response(
         self,
@@ -315,10 +319,10 @@ class AnyllmModel(Model):
         if model_settings.extra_args:
             extra_kwargs.update(model_settings.extra_args)
 
-        ret = await any_llm.acompletion(
-            model=self.model,
+        ret = await self.llm.acompletion(
+            model=self.model_id,
             messages=converted_messages,  # type: ignore[arg-type]
-            tools=converted_tools,  # type: ignore[arg-type]
+            tools=converted_tools,
             temperature=model_settings.temperature,
             top_p=model_settings.top_p,
             frequency_penalty=model_settings.frequency_penalty,
@@ -331,8 +335,6 @@ class AnyllmModel(Model):
             stream_options=stream_options,
             reasoning_effort=reasoning_effort,
             top_logprobs=model_settings.top_logprobs,
-            api_key=self.api_key,
-            api_base=self.base_url,
             **extra_kwargs,  # type: ignore[arg-type]
         )
 
