@@ -15,6 +15,10 @@ from any_agent.tools.final_output import prepare_final_output
 from .any_agent import AnyAgent
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator, Iterator
+
+    from any_llm.types.completion import ChatCompletion as AnyLLMChatCompletion
+    from any_llm.types.completion import ChatCompletionChunk, ChatCompletionMessage
     from llama_index.core.agent.workflow.workflow_events import AgentOutput
     from llama_index.core.llms import LLM
 
@@ -72,10 +76,13 @@ try:
                     content.append(
                         {
                             "type": "image_url",
-                            "image_url": {
-                                "url": str(block.url),
-                                "detail": block.detail or "auto",
-                            },
+                            "image_url": cast(
+                                "Any",
+                                {
+                                    "url": str(block.url),
+                                    "detail": block.detail or "auto",
+                                },
+                            ),
                         }
                     )
                 else:
@@ -84,10 +91,13 @@ try:
                     content.append(
                         {
                             "type": "image_url",
-                            "image_url": {
-                                "url": f"data:{block.image_mimetype};base64,{img_str}",
-                                "detail": block.detail or "auto",
-                            },
+                            "image_url": cast(
+                                "Any",
+                                {
+                                    "url": f"data:{block.image_mimetype};base64,{img_str}",
+                                    "detail": block.detail or "auto",
+                                },
+                            ),
                         }
                     )
             elif isinstance(block, AudioBlock):
@@ -96,10 +106,13 @@ try:
                 content.append(
                     {
                         "type": "input_audio",
-                        "input_audio": {
-                            "data": audio_str,
-                            "format": block.format,
-                        },
+                        "input_audio": cast(
+                            "Any",
+                            {
+                                "data": audio_str,
+                                "format": block.format,
+                            },
+                        ),
                     }
                 )
             elif isinstance(block, DocumentBlock):
@@ -113,9 +126,12 @@ try:
                 content.append(
                     {
                         "type": "file",
-                        "file": {
-                            "file_data": f"data:{mimetype};base64,{b64_string}",
-                        },
+                        "file": cast(
+                            "Any",
+                            {
+                                "file_data": f"data:{mimetype};base64,{b64_string}",
+                            },
+                        ),
                     }
                 )
             else:
@@ -337,7 +353,7 @@ try:
                 if hasattr(provider_class, "get_context_window"):
                     context_window = provider_class.get_context_window(self._model_name)
             except Exception:
-                pass
+                logger.debug("Failed to get context window for %s", self._provider)
 
             is_function_calling = True
             try:
@@ -345,7 +361,9 @@ try:
                 metadata = provider_class.get_provider_metadata()
                 is_function_calling = metadata.completion
             except Exception:
-                pass
+                logger.debug(
+                    "Failed to get function calling metadata for %s", self._provider
+                )
 
             return LLMMetadata(
                 context_window=context_window,
@@ -403,15 +421,15 @@ try:
             tool_calls = response.message.additional_kwargs.get("tool_calls", [])
             if len(tool_calls) < 1:
                 if error_on_no_tool_call:
-                    raise ValueError(
-                        f"Expected at least one tool call, but got {len(tool_calls)} tool calls."
-                    )
+                    msg = f"Expected at least one tool call, but got {len(tool_calls)} tool calls."
+                    raise ValueError(msg)
                 return []
 
             tool_selections = []
             for tool_call in tool_calls:
                 if tool_call["type"] != "function" or "function" not in tool_call:
-                    raise ValueError(f"Invalid tool call of type {tool_call['type']}")
+                    msg = f"Invalid tool call of type {tool_call['type']}"
+                    raise ValueError(msg)
 
                 function = tool_call.get("function", {})
                 tool_name = function.get("name")
@@ -434,7 +452,8 @@ try:
                         )
                     )
             if len(tool_selections) == 0 and error_on_no_tool_call:
-                raise ValueError("No valid tool calls found.")
+                msg = "No valid tool calls found."
+                raise ValueError(msg)
 
             return tool_selections
 
@@ -482,20 +501,21 @@ try:
 
         def _chat(self, messages: Sequence[ChatMessage], **kwargs: Any) -> ChatResponse:
             if not self._client:
-                raise ValueError("Client not initialized.")
+                msg = "Client not initialized."
+                raise ValueError(msg)
 
-            message_dicts = cast(
-                "list[dict[str, Any]]", to_openai_message_dicts(messages)
-            )
+            message_dicts = to_openai_message_dicts(messages)
             all_kwargs = self._get_all_kwargs(**kwargs)
             if "max_tokens" in all_kwargs and all_kwargs["max_tokens"] is None:
                 all_kwargs.pop("max_tokens")
 
-            from any_llm.types.completion import ChatCompletion as AnyLLMChatCompletion
-
             response_result = run_async_in_sync(
                 self._client.acompletion(
-                    messages=message_dicts, stream=False, **all_kwargs
+                    messages=cast(
+                        "list[dict[str, Any] | ChatCompletionMessage]", message_dicts
+                    ),
+                    stream=False,
+                    **all_kwargs,
                 ),
                 allow_running_loop=False,
             )
@@ -515,22 +535,21 @@ try:
             self, messages: Sequence[ChatMessage], **kwargs: Any
         ) -> ChatResponseGen:
             if not self._client:
-                raise ValueError("Client not initialized.")
+                msg = "Client not initialized."
+                raise ValueError(msg)
 
-            message_dicts = cast(
-                "list[dict[str, Any]]", to_openai_message_dicts(messages)
-            )
+            message_dicts = to_openai_message_dicts(messages)
             all_kwargs = self._get_all_kwargs(**kwargs)
             if "max_tokens" in all_kwargs and all_kwargs["max_tokens"] is None:
                 all_kwargs.pop("max_tokens")
 
-            from collections.abc import Iterator
-
-            from any_llm.types.completion import ChatCompletionChunk
-
             stream_result = run_async_in_sync(
                 self._client.acompletion(
-                    messages=message_dicts, stream=True, **all_kwargs
+                    messages=cast(
+                        "list[dict[str, Any] | ChatCompletionMessage]", message_dicts
+                    ),
+                    stream=True,
+                    **all_kwargs,
                 ),
                 allow_running_loop=False,
             )
@@ -609,19 +628,20 @@ try:
             self, messages: Sequence[ChatMessage], **kwargs: Any
         ) -> ChatResponse:
             if not self._client:
-                raise ValueError("Client not initialized.")
+                msg = "Client not initialized."
+                raise ValueError(msg)
 
-            message_dicts = cast(
-                "list[dict[str, Any]]", to_openai_message_dicts(messages)
-            )
+            message_dicts = to_openai_message_dicts(messages)
             all_kwargs = self._get_all_kwargs(**kwargs)
             if "max_tokens" in all_kwargs and all_kwargs["max_tokens"] is None:
                 all_kwargs.pop("max_tokens")
 
-            from any_llm.types.completion import ChatCompletion as AnyLLMChatCompletion
-
             response_result = await self._client.acompletion(
-                messages=message_dicts, stream=False, **all_kwargs
+                messages=cast(
+                    "list[dict[str, Any] | ChatCompletionMessage]", message_dicts
+                ),
+                stream=False,
+                **all_kwargs,
             )
 
             response = cast("AnyLLMChatCompletion", response_result)
@@ -639,21 +659,20 @@ try:
             self, messages: Sequence[ChatMessage], **kwargs: Any
         ) -> ChatResponseAsyncGen:
             if not self._client:
-                raise ValueError("Client not initialized.")
+                msg = "Client not initialized."
+                raise ValueError(msg)
 
-            message_dicts = cast(
-                "list[dict[str, Any]]", to_openai_message_dicts(messages)
-            )
+            message_dicts = to_openai_message_dicts(messages)
             all_kwargs = self._get_all_kwargs(**kwargs)
             if "max_tokens" in all_kwargs and all_kwargs["max_tokens"] is None:
                 all_kwargs.pop("max_tokens")
 
-            from collections.abc import AsyncIterator
-
-            from any_llm.types.completion import ChatCompletionChunk
-
             stream_result = await self._client.acompletion(
-                messages=message_dicts, stream=True, **all_kwargs
+                messages=cast(
+                    "list[dict[str, Any] | ChatCompletionMessage]", message_dicts
+                ),
+                stream=True,
+                **all_kwargs,
             )
 
             stream = cast("AsyncIterator[ChatCompletionChunk]", stream_result)
@@ -694,7 +713,7 @@ try:
 
             return gen()
 
-        def _get_response_token_counts(self, raw_response: Any) -> dict:
+        def _get_response_token_counts(self, raw_response: Any) -> dict[str, Any]:
             if not hasattr(raw_response, "usage") or raw_response.usage is None:
                 return {}
 
