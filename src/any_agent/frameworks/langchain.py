@@ -19,7 +19,6 @@ from .any_agent import AnyAgent
 logger = logging.getLogger(__name__)
 
 try:
-    from langchain.agents import create_agent
     from langchain_core.language_models.chat_models import (
         BaseChatModel,
         agenerate_from_stream,
@@ -49,8 +48,9 @@ try:
         ChatResult,
     )
     from langchain_core.utils.function_calling import convert_to_openai_tool
+    from langgraph.prebuilt import create_react_agent
 
-    DEFAULT_AGENT_TYPE = create_agent
+    DEFAULT_AGENT_TYPE = create_react_agent
 
     langchain_available = True
 except ImportError:
