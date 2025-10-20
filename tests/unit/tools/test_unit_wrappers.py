@@ -58,13 +58,13 @@ def test_wrap_tool_openai() -> None:
     wrapper = MagicMock()
     with patch("agents.function_tool", wrapper):
         _wrap_tool_openai(foo)
-        wrapper.assert_called_with(foo)
+        wrapper.assert_called_with(foo, strict_mode=True)
 
 
 def test_wrap_tool_openai_already_wrapped() -> None:
     from agents import function_tool
 
-    wrapped = function_tool(foo)
+    wrapped = function_tool(foo, strict_mode=True)
     wrapper = MagicMock()
     with patch("agents.function_tool", wrapper):
         _wrap_tool_openai(wrapped)

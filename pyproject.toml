@@ -42,7 +42,7 @@ llama_index = [
 ]
 
 openai = [
-  "openai-agents>=0.2.6, <1",
+  "openai-agents>=0.3.0, <1",
 ]
 
 smolagents = [

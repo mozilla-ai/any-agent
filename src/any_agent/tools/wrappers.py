@@ -43,7 +43,9 @@ def _wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
     if isinstance(tool, AgentTool):  # type: ignore[arg-type, misc]
         return tool  # type: ignore[return-value]
 
-    return function_tool(tool)  # type: ignore[arg-type]
+    # Enabling strict mode required else
+    # throws error "Only strict function tools can be auto-parsed"
+    return function_tool(tool, strict_mode=True)  # type: ignore[arg-type]
 
 
 def _wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
