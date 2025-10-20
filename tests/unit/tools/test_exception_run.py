@@ -15,6 +15,7 @@ from any_llm.types.completion import (
     ChatCompletionMessage,
     ChatCompletionMessageFunctionToolCall,
     Choice,
+    CompletionUsage,
     Function as AnyllmFunction,
 )
 
@@ -140,6 +141,11 @@ def test_tool_error_llm_mocked(
         created=1747157127,
         model="mistral-small-latest",
         object="chat.completion",
+        usage=CompletionUsage(
+            completion_tokens=100,
+            prompt_tokens=50,
+            total_tokens=150,
+        ),
     )
 
     fake_tool_fail_response_anyllm = ChatCompletion(
@@ -166,6 +172,11 @@ def test_tool_error_llm_mocked(
         created=1747157127,
         model="mistral-small-latest",
         object="chat.completion",
+        usage=CompletionUsage(
+            completion_tokens=20,
+            prompt_tokens=50,
+            total_tokens=70,
+        ),
     )
 
     fake_tool_fail_chunk = ModelResponseStream(

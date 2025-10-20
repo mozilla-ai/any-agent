@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
+from any_llm.types.completion import ChatCompletion, ChatCompletionMessage, Choice
 from langchain_core.messages import AIMessage
 from pydantic import BaseModel
 
@@ -80,7 +81,7 @@ class SampleOutput(BaseModel):
 
 def test_structured_output_without_tools() -> None:
     """Test that structured output works correctly when no tools are present and tool-related params are not set."""
-    config = AgentConfig(model_id="gpt-4.1-mini", output_type=SampleOutput)
+    config = AgentConfig(model_id="openai:gpt-4o-mini", output_type=SampleOutput)
     agent: LangchainAgent = AnyAgent.create(AgentFramework.LANGCHAIN, config)  # type: ignore[assignment]
 
     # Patch the agent's _agent to return a mock result for ainvoke
@@ -90,15 +91,22 @@ def test_structured_output_without_tools() -> None:
     }
     agent._agent = mock_agent
 
-    def create_mock_response(content: str) -> MagicMock:
-        mock_message = MagicMock()
-        mock_message.content = content
-        mock_message.__getitem__.side_effect = (
-            lambda key: content if key == "content" else None
+    def create_mock_response(content: str) -> ChatCompletion:
+        return ChatCompletion(
+            id="chatcmpl-test",
+            choices=[
+                Choice(
+                    finish_reason="stop",
+                    index=0,
+                    message=ChatCompletionMessage(content=content, role="assistant"),
+                )
+            ],
+            created=1747157127,
+            model="gpt-4o-mini",
+            object="chat.completion",
         )
-        return MagicMock(choices=[MagicMock(message=mock_message)])
 
-    with patch(LLM_IMPORT_PATHS[AgentFramework.LANGCHAIN]) as mock_acompletion:
+    with patch("any_agent.frameworks.langchain.acompletion") as mock_acompletion:
         mock_acompletion.return_value = create_mock_response(
             '{"answer": "Structured answer", "confidence": 0.95}'
         )
