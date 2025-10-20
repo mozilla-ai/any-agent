@@ -2,12 +2,18 @@ from typing import TYPE_CHECKING
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
-from any_llm.types.completion import ChatCompletion, ChatCompletionMessage, Choice
-from langchain_core.messages import AIMessage
+from any_llm.types.completion import (
+    ChatCompletion,
+    ChatCompletionMessage,
+    Choice,
+    CompletionUsage,
+)
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolCall
+from langchain_core.tools import tool
 from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.testing.helpers import LLM_IMPORT_PATHS
+from any_agent.frameworks.langchain import ChatAnyLLM
 
 if TYPE_CHECKING:
     from any_agent.frameworks.langchain import LangchainAgent
@@ -121,3 +127,129 @@ def test_structured_output_without_tools() -> None:
         # Should include response_format
         assert "response_format" in call_args
         assert call_args["response_format"] == SampleOutput
+
+
+def test_chat_anyllm_create_message_dicts() -> None:
+    """Test that ChatAnyLLM properly converts Langchain messages to API format with correct parameters."""
+    chat_model = ChatAnyLLM(
+        model="gpt-4o",
+        api_key="test-key",
+        api_base="https://test.com",
+        model_kwargs={"temperature": 0.7, "max_tokens": 100},
+    )
+
+    messages = [
+        SystemMessage(content="You are a helpful assistant"),
+        HumanMessage(content="Hello"),
+        AIMessage(
+            content="Hi there!",
+            tool_calls=[
+                ToolCall(id="call_1", name="get_weather", args={"location": "NYC"})
+            ],
+        ),
+    ]
+
+    message_dicts, params = chat_model._create_message_dicts(messages, stop=["END"])
+
+    assert len(message_dicts) == 3
+    assert message_dicts[0] == {
+        "role": "system",
+        "content": "You are a helpful assistant",
+    }
+    assert message_dicts[1] == {"role": "user", "content": "Hello"}
+    assert message_dicts[2]["role"] == "assistant"
+    assert message_dicts[2]["content"] == "Hi there!"
+    assert "tool_calls" in message_dicts[2]
+    assert message_dicts[2]["tool_calls"][0]["function"]["name"] == "get_weather"
+
+    assert params["model"] == "gpt-4o"
+    assert params["api_key"] == "test-key"
+    assert params["api_base"] == "https://test.com"
+    assert params["temperature"] == 0.7
+    assert params["max_tokens"] == 100
+    assert params["stop"] == ["END"]
+
+
+def test_chat_anyllm_create_chat_result() -> None:
+    """Test that ChatAnyLLM properly converts API responses to Langchain format with token usage."""
+    chat_model = ChatAnyLLM(
+        model="gpt-4o",
+        api_key=None,
+        api_base=None,
+        model_kwargs={},
+    )
+
+    response = ChatCompletion(
+        id="chatcmpl-123",
+        choices=[
+            Choice(
+                finish_reason="stop",
+                index=0,
+                message=ChatCompletionMessage(
+                    content="This is a test response",
+                    role="assistant",
+                ),
+            )
+        ],
+        created=1234567890,
+        model="gpt-4o",
+        object="chat.completion",
+        usage=CompletionUsage(
+            prompt_tokens=10,
+            completion_tokens=5,
+            total_tokens=15,
+        ),
+    )
+
+    result = chat_model._create_chat_result(response)
+
+    assert len(result.generations) == 1
+    generation = result.generations[0]
+    assert generation.message.content == "This is a test response"
+    assert isinstance(generation.message, AIMessage)
+    assert generation.generation_info is not None
+    assert generation.generation_info["finish_reason"] == "stop"
+
+    assert generation.message.usage_metadata is not None
+    assert generation.message.usage_metadata["input_tokens"] == 10
+    assert generation.message.usage_metadata["output_tokens"] == 5
+    assert generation.message.usage_metadata["total_tokens"] == 15
+
+    assert result.llm_output is not None
+    assert result.llm_output["model"] == "gpt-4o"
+    assert result.llm_output["token_usage"] is not None
+    assert result.llm_output["token_usage"].prompt_tokens == 10
+
+
+def test_chat_anyllm_bind_tools() -> None:
+    """Test that ChatAnyLLM properly binds tools and converts them to OpenAI format."""
+
+    @tool
+    def get_weather(location: str) -> str:
+        """Get the weather for a location."""
+        return f"Weather in {location}"
+
+    @tool
+    def calculate(expression: str) -> float:
+        """Calculate a mathematical expression."""
+        return 42.0
+
+    chat_model = ChatAnyLLM(
+        model="gpt-4o",
+        api_key=None,
+        api_base=None,
+        model_kwargs={},
+    )
+
+    bound_model = chat_model.bind_tools([get_weather, calculate], tool_choice="auto")
+    assert hasattr(bound_model, "kwargs")
+    assert "tools" in bound_model.kwargs
+    assert "tool_choice" in bound_model.kwargs
+    assert bound_model.kwargs["tool_choice"] == "auto"
+
+    tools = bound_model.kwargs["tools"]
+    assert len(tools) == 2
+    assert tools[0]["type"] == "function"
+    assert tools[0]["function"]["name"] == "get_weather"
+    assert "location" in tools[0]["function"]["parameters"]["properties"]
+    assert tools[1]["function"]["name"] == "calculate"
