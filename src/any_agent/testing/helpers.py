@@ -18,7 +18,7 @@ LLM_IMPORT_PATHS = {
     AgentFramework.AGNO: "any_agent.frameworks.agno.acompletion",
     AgentFramework.OPENAI: "any_llm.AnyLLM.acompletion",
     AgentFramework.SMOLAGENTS: "any_llm.completion",
-    AgentFramework.LLAMA_INDEX: "litellm.acompletion",
+    AgentFramework.LLAMA_INDEX: "any_llm.AnyLLM.acompletion",
 }
 
 
