@@ -156,7 +156,7 @@ Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agen
     agent = AnyAgent.create(
         "tinyagent",
         AgentConfig(
-            model_id="gpt-4.1-nano",
+            model_id="openai:gpt-4.1-nano",
             instructions="Use the tools to find an answer",
             tools=[search_web, visit_webpage],
             callbacks=[
@@ -177,7 +177,7 @@ Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agen
     agent = AnyAgent.create(
         "tinyagent",
         AgentConfig(
-            model_id="gpt-4.1-nano",
+            model_id="openai:gpt-4.1-nano",
             instructions="Use the tools to find an answer",
             tools=[search_web, visit_webpage],
             callbacks=[
@@ -333,7 +333,7 @@ callback = InjectReminderCallback(
 )
 
 config = AgentConfig(
-    model_id="gpt-4o-mini",
+    model_id="openai:gpt-4o-mini",
     instructions="You are a helpful assistant.",
     callbacks=[callback],
 )
