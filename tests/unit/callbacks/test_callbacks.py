@@ -84,7 +84,7 @@ def create_agent(
 ) -> AnyAgent:
     """Helper function to create an agent with common configuration."""
     config = AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="nebius:openai/gpt-oss-20b",
         instructions=instructions,
         callbacks=callbacks,
     )

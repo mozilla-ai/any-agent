@@ -14,12 +14,12 @@ def test_load_agno_default() -> None:
         patch("any_agent.frameworks.agno.DEFAULT_MODEL_TYPE", mock_model),
     ):
         AnyAgent.create(
-            AgentFramework.AGNO, AgentConfig(model_id="mistral/mistral-small-latest")
+            AgentFramework.AGNO, AgentConfig(model_id="nebius:openai/gpt-oss-20b")
         )
         mock_agent.assert_called_once_with(
             name="any_agent",
             instructions=None,
-            model=mock_model(model="mistral/mistral-small-latest"),
+            model=mock_model(model="nebius:openai/gpt-oss-20b"),
             tools=[],
         )
 
@@ -29,7 +29,7 @@ def test_load_agno_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.AGNO,
-                AgentConfig(model_id="mistral/mistral-small-latest"),
+                AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
             )
 
 
@@ -51,7 +51,7 @@ def test_run_agno_custom_args() -> None:
         patch("any_agent.frameworks.agno.DEFAULT_MODEL_TYPE", mock_model),
     ):
         agent = AnyAgent.create(
-            AgentFramework.AGNO, AgentConfig(model_id="mistral/mistral-small-latest")
+            AgentFramework.AGNO, AgentConfig(model_id="nebius:openai/gpt-oss-20b")
         )
         result = agent.run("foo", retries=2)
 

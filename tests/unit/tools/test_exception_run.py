@@ -45,7 +45,7 @@ def test_tool_error_llm_mocked(
 
     kwargs = {}
 
-    kwargs["model_id"] = "mistral/mistral-small-latest"
+    kwargs["model_id"] = "nebius:openai/gpt-oss-20b"
 
     model_args = {"temperature": 0.0}
 

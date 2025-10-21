@@ -70,7 +70,7 @@ def test_load_smolagents_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.SMOLAGENTS,
-                AgentConfig(model_id="mistral/mistral-small-latest"),
+                AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
             )
 
 

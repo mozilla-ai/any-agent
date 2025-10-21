@@ -34,11 +34,11 @@ def test_load_langchain_agent_default() -> None:
     ):
         AnyAgent.create(
             AgentFramework.LANGCHAIN,
-            AgentConfig(model_id="mistral/mistral-small-latest"),
+            AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
         )
 
         model_mock.assert_called_once_with(
-            model="mistral/mistral-small-latest",
+            model="nebius:openai/gpt-oss-20b",
             api_base=None,
             api_key=None,
             model_kwargs={},
@@ -56,7 +56,7 @@ def test_load_langchain_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.LANGCHAIN,
-                AgentConfig(model_id="mistral/mistral-small-latest"),
+                AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
             )
 
 
@@ -73,7 +73,7 @@ def test_run_langchain_agent_custom_args() -> None:
     ):
         agent = AnyAgent.create(
             AgentFramework.LANGCHAIN,
-            AgentConfig(model_id="mistral/mistral-small-latest"),
+            AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
         )
         agent.run("foo", debug=True)
         agent_mock.ainvoke.assert_called_once_with(

@@ -38,6 +38,7 @@ jobs:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
         run: pytest tests/integration/frameworks -v -k "TINYAGENT" --cov --cov-report=xml --cov-append
 
       - name: Upload coverage reports to Codecov
@@ -63,6 +64,7 @@ jobs:
       - env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
         run: pytest tests/integration/frameworks -n auto -v -k "not TINYAGENT" --cov --cov-report=xml --cov-append
 
       - name: Run Tool tests
@@ -96,7 +98,7 @@ jobs:
       - run: uv sync -U --group tests --extra all --extra a2a
 
       - env:
-          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
         run: pytest tests/integration/a2a -n auto -v --cov --cov-report=xml --cov-append
 
       - name: Upload coverage reports to Codecov
@@ -120,7 +122,7 @@ jobs:
       - run: uv sync -U --group tests --extra all
 
       - env:
-          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
         run: pytest tests/integration/mcp -n auto -v --cov --cov-report=xml --cov-append
 
       - name: Upload coverage reports to Codecov
