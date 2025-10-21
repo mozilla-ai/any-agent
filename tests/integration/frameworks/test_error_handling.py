@@ -16,7 +16,7 @@ from any_agent.testing.helpers import (
 )
 from any_agent.tracing.otel_types import StatusCode
 
-EXCEPTION_REASON = "error_handling trap"
+
 
 
 class LimitLLMCalls(Callback):
@@ -47,6 +47,7 @@ def test_runtime_error(
     The `AgentRunError.trace` should be retrieved.
     """
     kwargs = {}
+    TEST_RUNTIME_ERROR_MESSAGE = "runtime error trap"
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
 
@@ -55,7 +56,7 @@ def test_runtime_error(
         patch_function = "any_llm.completion"
 
     with patch(patch_function) as llm_completion_path:
-        llm_completion_path.side_effect = RuntimeError(EXCEPTION_REASON)
+        llm_completion_path.side_effect = RuntimeError(TEST_RUNTIME_ERROR_MESSAGE)
         agent_config = AgentConfig(
             model_id=kwargs["model_id"],
             tools=[],
@@ -72,7 +73,7 @@ def test_runtime_error(
             assert any(
                 span.status.status_code == StatusCode.ERROR
                 and span.status.description is not None
-                and EXCEPTION_REASON in span.status.description
+                and TEST_RUNTIME_ERROR_MESSAGE in span.status.description
                 for span in spans
             )
 
@@ -86,6 +87,7 @@ def test_tool_error(
     We make sure an appropriate Status is set to the tool execution span.
     We allow the Agent to try to recover from the tool calling failure.
     """
+    EXCEPTION_REASON = "tool error trap"
 
     def search_web(query: str) -> str:
         """Perform a duckduckgo web search based on your query then returns the top search results.
