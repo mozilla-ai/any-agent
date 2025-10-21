@@ -70,7 +70,7 @@ class AnyLLMModel(ApiModel):
         }
 
     def create_client(self) -> Any:
-        """Create the AnyLLM client, required method for ApiModel subclasses."""
+        """Create the any-llm client, required method for ApiModel subclasses."""
         import any_llm
 
         return any_llm

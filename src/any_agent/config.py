@@ -222,7 +222,7 @@ class AgentConfig(BaseModel):
     model_args: MutableMapping[str, Any] | None = None
     """Pass arguments to the model instance like `temperature`, `top_k`, as well as any other provider-specific parameters.
 
-    Refer to [AnyLLM Completion API Docs](https://mozilla-ai.github.io/any-llm/api/completion/) for more info.
+    Refer to [any-llm Completion API Docs](https://mozilla-ai.github.io/any-llm/api/completion/) for more info.
     """
 
     output_type: type[BaseModel] | None = None

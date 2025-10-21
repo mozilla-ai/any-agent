@@ -1,4 +1,4 @@
-"""Vendoring https://github.com/Akshay-Dongare/langchain-litellm/blob/main/langchain_litellm/chat_models/litellm.py and edited to use AnyLLM instead of LitellM. Marking as vendored since the logic contained here is nearly identical to the litellm version."""
+"""Vendoring https://github.com/Akshay-Dongare/langchain-litellm/blob/main/langchain_litellm/chat_models/litellm.py and edited to use any-llm instead of LiteLLM. Marking as vendored since the logic contained here is nearly identical to the litellm version."""
 
 from __future__ import annotations
 
