@@ -239,53 +239,80 @@ def mock_any_llm_tool_call_response() -> ChatCompletion:
 
 
 @pytest.fixture
-def mock_litellm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
+def mock_any_llm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
     """
-    Create a fixture that returns an async generator function to mock streaming responses.
+    Create a fixture that returns an async generator function to mock any-llm streaming responses.
     This returns a function that can be used as a side_effect.
     """
 
     async def _mock_streaming_response(
         *args: Any, **kwargs: Any
     ) -> AsyncGenerator[Any, None]:
-        # First chunk with role
-        yield {
-            "choices": [
-                {
-                    "delta": {"role": "assistant", "content": "The state "},
-                    "index": 0,
-                    "finish_reason": None,
-                }
-            ]
-        }
+        from any_llm.types.completion import ChatCompletionChunk
 
-        # Middle chunks with content
-        yield {
-            "choices": [
-                {"delta": {"content": "capital of "}, "index": 0, "finish_reason": None}
-            ]
-        }
+        yield ChatCompletionChunk.model_validate(
+            {
+                "id": "chatcmpl-test",
+                "choices": [
+                    {
+                        "delta": {"role": "assistant", "content": "The state "},
+                        "index": 0,
+                        "finish_reason": None,
+                    }
+                ],
+                "created": 1747157127,
+                "model": "mistral-small-latest",
+                "object": "chat.completion.chunk",
+            }
+        )
 
-        yield {
-            "choices": [
-                {
-                    "delta": {"content": "Pennsylvania is "},
-                    "index": 0,
-                    "finish_reason": None,
-                }
-            ]
-        }
+        yield ChatCompletionChunk.model_validate(
+            {
+                "id": "chatcmpl-test",
+                "choices": [
+                    {
+                        "delta": {"content": "capital of "},
+                        "index": 0,
+                        "finish_reason": None,
+                    }
+                ],
+                "created": 1747157127,
+                "model": "mistral-small-latest",
+                "object": "chat.completion.chunk",
+            }
+        )
 
-        # Final chunk with finish reason
-        yield {
-            "choices": [
-                {
-                    "delta": {"content": "Harrisburg."},
-                    "index": 0,
-                    "finish_reason": "stop",
-                }
-            ]
-        }
+        yield ChatCompletionChunk.model_validate(
+            {
+                "id": "chatcmpl-test",
+                "choices": [
+                    {
+                        "delta": {"content": "Pennsylvania is "},
+                        "index": 0,
+                        "finish_reason": None,
+                    }
+                ],
+                "created": 1747157127,
+                "model": "mistral-small-latest",
+                "object": "chat.completion.chunk",
+            }
+        )
+
+        yield ChatCompletionChunk.model_validate(
+            {
+                "id": "chatcmpl-test",
+                "choices": [
+                    {
+                        "delta": {"content": "Harrisburg."},
+                        "index": 0,
+                        "finish_reason": "stop",
+                    }
+                ],
+                "created": 1747157127,
+                "model": "mistral-small-latest",
+                "object": "chat.completion.chunk",
+            }
+        )
 
     return _mock_streaming_response
 

@@ -73,26 +73,29 @@ def test_model_args(
 
 
 def test_model_args_streaming(
-    agent_framework: AgentFramework, mock_litellm_streaming: Any
+    agent_framework: AgentFramework,
+    mock_any_llm_streaming: Any,
 ) -> None:
     if agent_framework != AgentFramework.LLAMA_INDEX:
         pytest.skip("This test is only for LlamaIndex framework")
 
     agent = create_agent_with_model_args(agent_framework)
 
-    # Patch the appropriate litellm import path for LlamaIndex
+    # Patch the appropriate import path for LlamaIndex
     import_path = LLM_IMPORT_PATHS[agent_framework]
-    with patch(import_path, side_effect=mock_litellm_streaming) as mock_litellm:
+    mock_streaming = mock_any_llm_streaming
+
+    with patch(import_path, side_effect=mock_streaming) as mock_llm:
         # Run the agent
         result = agent.run(TEST_QUERY)
 
         # Verify results
         assert result.final_output
         assert "Harrisburg" in result.final_output
-        assert mock_litellm.call_args.kwargs["stream"] is True
-        assert mock_litellm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
-        assert mock_litellm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
-        assert mock_litellm.call_count > 0
+        assert mock_llm.call_args.kwargs["stream"] is True
+        assert mock_llm.call_args.kwargs["temperature"] == TEST_TEMPERATURE
+        assert mock_llm.call_args.kwargs["frequency_penalty"] == TEST_PENALTY
+        assert mock_llm.call_count > 0
 
 
 @pytest.mark.asyncio

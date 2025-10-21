@@ -9,6 +9,7 @@ from litellm.types.utils import (
     ModelResponse,
     ModelResponseStream,
     StreamingChoices,
+    Usage,
 )
 from any_llm.types.completion import (
     ChatCompletion,
@@ -97,7 +98,8 @@ def test_tool_error_llm_mocked(
     )
 
     fake_give_up_chunk = ModelResponseStream(
-        choices=[StreamingChoices(delta=Delta(content=give_up))]
+        choices=[StreamingChoices(delta=Delta(content=give_up))],
+        usage=Usage(prompt_tokens=10, completion_tokens=20, total_tokens=30),
     )
 
     fake_smolagents_final_answer_response = ModelResponse(
@@ -180,7 +182,8 @@ def test_tool_error_llm_mocked(
     )
 
     fake_tool_fail_chunk = ModelResponseStream(
-        choices=[StreamingChoices(delta=Delta(tool_calls=[tool_call]))]
+        choices=[StreamingChoices(delta=Delta(tool_calls=[tool_call]))],
+        usage=Usage(prompt_tokens=10, completion_tokens=5, total_tokens=15),
     )
 
     async def async_fake_tool_fail_chunk() -> AsyncIterator[ModelResponseStream]:
