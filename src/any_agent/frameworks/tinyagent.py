@@ -70,7 +70,7 @@ class ToolExecutor:
             return str(result)
 
         except Exception as e:
-            return f"Error executing tool: {e}"
+            return f"Error calling tool: {e}"
 
 
 def final_answer(answer: str) -> str:

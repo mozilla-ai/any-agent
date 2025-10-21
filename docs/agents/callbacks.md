@@ -112,7 +112,7 @@ from any_agent.tools import search_web, visit_webpage
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage],
         callbacks=[]

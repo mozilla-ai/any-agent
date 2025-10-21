@@ -1,6 +1,8 @@
+from typing import Any
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.callbacks import Callback, Context
 from any_agent.serving import A2AServingConfig
 from any_agent.testing.helpers import (
     DEFAULT_HTTP_KWARGS,
@@ -17,6 +19,23 @@ from .conftest import (
     assert_contains_current_date_info,
     get_datetime,
 )
+
+
+class LimitLLMCalls(Callback):
+    def __init__(self, max_llm_calls: int) -> None:
+        self.max_llm_calls = max_llm_calls
+
+    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+        if "n_llm_calls" not in context.shared:
+            context.shared["n_llm_calls"] = 0
+
+        context.shared["n_llm_calls"] += 1
+
+        if context.shared["n_llm_calls"] > self.max_llm_calls:
+            msg = "Reached limit of LLM Calls"
+            raise RuntimeError(msg)
+
+        return context
 
 
 def _assert_valid_agent_trace(agent_trace: AgentTrace) -> None:
@@ -55,6 +74,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
         description="Agent that can return the current date.",
         tools=[get_datetime],
         model_args=get_default_agent_model_args(agent_framework),
+        callbacks=[LimitLLMCalls(max_llm_calls=10)],
     )
     date_agent = await AnyAgent.create_async(
         agent_framework=agent_framework,
@@ -77,6 +97,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             model_id=DEFAULT_SMALL_MODEL_ID,
             tools=[await a2a_tool_async(server_url, http_kwargs=DEFAULT_HTTP_KWARGS)],
             model_args=get_default_agent_model_args(agent_framework),
+            callbacks=[LimitLLMCalls(max_llm_calls=10)],
         )
 
         main_agent = await AnyAgent.create_async(

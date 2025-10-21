@@ -122,7 +122,7 @@ async def test_tool_executor_without_casting() -> None:
     }
 
     result = await agent.clients["sample_tool"].call_tool(request_uncast)
-    assert "Error executing tool" in result
+    assert "Error calling tool" in result
     assert "arg1 should be an int" in result
 
     request_typed = {

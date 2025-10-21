@@ -9,7 +9,7 @@ import requests
 from any_agent.config import AgentFramework
 from any_agent.tracing.agent_trace import AgentSpan
 
-DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
+DEFAULT_SMALL_MODEL_ID = "mistral:mistral-small-latest"
 
 LLM_IMPORT_PATHS = {
     AgentFramework.GOOGLE: "any_agent.frameworks.google.acompletion",

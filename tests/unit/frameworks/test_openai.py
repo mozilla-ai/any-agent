@@ -21,11 +21,11 @@ def test_load_openai_default() -> None:
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_model),
     ):
         AnyAgent.create(
-            AgentFramework.OPENAI, AgentConfig(model_id="mistral/mistral-small-latest")
+            AgentFramework.OPENAI, AgentConfig(model_id="mistral:mistral-small-latest")
         )
 
         mock_model.assert_called_once_with(
-            model="mistral/mistral-small-latest",
+            model="mistral:mistral-small-latest",
             base_url=None,
             api_key=None,
         )
@@ -51,11 +51,11 @@ def test_openai_with_api_base() -> None:
         AnyAgent.create(
             AgentFramework.OPENAI,
             AgentConfig(
-                model_id="mistral/mistral-small-latest", model_args={}, api_base="FOO"
+                model_id="mistral:mistral-small-latest", model_args={}, api_base="FOO"
             ),
         )
         mock_model.assert_called_once_with(
-            model="mistral/mistral-small-latest",
+            model="mistral:mistral-small-latest",
             base_url="FOO",
             api_key=None,
         )
@@ -74,11 +74,11 @@ def test_openai_with_api_key() -> None:
         AnyAgent.create(
             AgentFramework.OPENAI,
             AgentConfig(
-                model_id="mistral/mistral-small-latest", model_args={}, api_key="FOO"
+                model_id="mistral:mistral-small-latest", model_args={}, api_key="FOO"
             ),
         )
         mock_model.assert_called_once_with(
-            model="mistral/mistral-small-latest",
+            model="mistral:mistral-small-latest",
             base_url=None,
             api_key="FOO",
         )
@@ -109,7 +109,7 @@ def test_load_openai_with_mcp_server() -> None:
         AnyAgent.create(
             AgentFramework.OPENAI,
             AgentConfig(
-                model_id="mistral/mistral-small-latest",
+                model_id="mistral:mistral-small-latest",
                 tools=[
                     MCPStdio(
                         command="docker",
@@ -139,7 +139,7 @@ def test_load_openai_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.OPENAI,
-                AgentConfig(model_id="mistral/mistral-small-latest"),
+                AgentConfig(model_id="mistral:mistral-small-latest"),
             )
 
 
@@ -154,7 +154,7 @@ def test_run_openai_with_custom_args() -> None:
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE"),
     ):
         agent = AnyAgent.create(
-            AgentFramework.OPENAI, AgentConfig(model_id="mistral/mistral-small-latest")
+            AgentFramework.OPENAI, AgentConfig(model_id="mistral:mistral-small-latest")
         )
         agent.run("foo", max_turns=30)
         mock_runner.run.assert_called_once_with(
@@ -173,7 +173,7 @@ def test_run_openai_with_inf_max_turns() -> None:
         patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE"),
     ):
         agent = AnyAgent.create(
-            AgentFramework.OPENAI, AgentConfig(model_id="mistral/mistral-small-latest")
+            AgentFramework.OPENAI, AgentConfig(model_id="mistral:mistral-small-latest")
         )
         agent.run("foo")
         mock_runner.run.assert_called_once_with(

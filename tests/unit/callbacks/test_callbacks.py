@@ -84,7 +84,7 @@ def create_agent(
 ) -> AnyAgent:
     """Helper function to create an agent with common configuration."""
     config = AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions=instructions,
         callbacks=callbacks,
     )
