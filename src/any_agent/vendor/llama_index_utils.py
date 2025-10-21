@@ -5,17 +5,16 @@ from collections.abc import Sequence
 from typing import Any, cast
 
 from llama_index.core.base.llms.types import ChatMessage, ChatResponse
+from llama_index.core.base.llms.types import (
+    AudioBlock,
+    DocumentBlock,
+    ImageBlock,
+    TextBlock,
+)
 
 
 def to_openailike_message_dict(message: ChatMessage) -> dict[str, Any]:
     """Convert a ChatMessage to an OpenAI-like message dict."""
-    from llama_index.core.base.llms.types import (
-        AudioBlock,
-        DocumentBlock,
-        ImageBlock,
-        TextBlock,
-    )
-
     content = []
     content_txt = ""
     for block in message.blocks:

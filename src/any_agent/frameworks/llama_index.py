@@ -274,8 +274,6 @@ try:
 
             message_dicts = to_openai_message_dicts(messages)
             all_kwargs = self._get_all_kwargs(**kwargs)
-            if "max_tokens" in all_kwargs and all_kwargs["max_tokens"] is None:
-                all_kwargs.pop("max_tokens")
 
             response_result = self._client.completion(
                 messages=cast(
