@@ -2234,7 +2234,7 @@
 </span><span id="__span-0-152"><a id="__codelineno-0-152" name="__codelineno-0-152"></a>    <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span>
 </span><span id="__span-0-153"><a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Select the underlying model used by the agent.</span>
 </span><span id="__span-0-154"><a id="__codelineno-0-154" name="__codelineno-0-154"></a>
-</span><span id="__span-0-155"><a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    If you are using the default model_type (LiteLLM), you can refer to [LiteLLM Provider Docs](https://docs.litellm.ai/docs/providers) for the list of providers and how to access them.</span>
+</span><span id="__span-0-155"><a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">    If you are using the default model_type (AnyLLM), you can refer to [AnyLLM Provider Docs](https://mozilla-ai.github.io/any-llm/providers/) for the list of providers and how to access them.</span>
 </span><span id="__span-0-156"><a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="__span-0-157"><a id="__codelineno-0-157" name="__codelineno-0-157"></a>
 </span><span id="__span-0-158"><a id="__codelineno-0-158" name="__codelineno-0-158"></a>    <span class="n">api_base</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2298,13 +2298,13 @@
 </span><span id="__span-0-216"><a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="n">model_type</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="__span-0-217"><a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Control the type of model class that is used by the agent framework, and is unique to the agent framework being used.</span>
 </span><span id="__span-0-218"><a id="__codelineno-0-218" name="__codelineno-0-218"></a>
-</span><span id="__span-0-219"><a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    For each framework, we leverage their support for LiteLLM and use it as default model_type, allowing you to use the same model_id syntax across these frameworks.</span>
+</span><span id="__span-0-219"><a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    For each framework, we use AnyLLM as the default model_type, allowing you to use the same model_id syntax across these frameworks.</span>
 </span><span id="__span-0-220"><a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="__span-0-221"><a id="__codelineno-0-221" name="__codelineno-0-221"></a>
 </span><span id="__span-0-222"><a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="n">model_args</span><span class="p">:</span> <span class="n">MutableMapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="__span-0-223"><a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pass arguments to the model instance like `temperature`, `top_k`, as well as any other provider-specific parameters.</span>
 </span><span id="__span-0-224"><a id="__codelineno-0-224" name="__codelineno-0-224"></a>
-</span><span id="__span-0-225"><a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    Refer to LiteLLM Completion API Docs for more info.</span>
+</span><span id="__span-0-225"><a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="sd">    Refer to [any-llm Completion API Docs](https://mozilla-ai.github.io/any-llm/api/completion/) for more info.</span>
 </span><span id="__span-0-226"><a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="__span-0-227"><a id="__codelineno-0-227" name="__codelineno-0-227"></a>
 </span><span id="__span-0-228"><a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="n">output_type</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2478,7 +2478,7 @@
     <div class="doc doc-contents ">
 
         <p>Pass arguments to the model instance like <code>temperature</code>, <code>top_k</code>, as well as any other provider-specific parameters.</p>
-<p>Refer to LiteLLM Completion API Docs for more info.</p>
+<p>Refer to <a href="https://mozilla-ai.github.io/any-llm/api/completion/">any-llm Completion API Docs</a> for more info.</p>
 
     </div>
 
@@ -2501,7 +2501,7 @@
     <div class="doc doc-contents ">
 
         <p>Select the underlying model used by the agent.</p>
-<p>If you are using the default model_type (LiteLLM), you can refer to <a href="https://docs.litellm.ai/docs/providers">LiteLLM Provider Docs</a> for the list of providers and how to access them.</p>
+<p>If you are using the default model_type (AnyLLM), you can refer to <a href="https://mozilla-ai.github.io/any-llm/providers/">AnyLLM Provider Docs</a> for the list of providers and how to access them.</p>
 
     </div>
 
@@ -2525,7 +2525,7 @@
     <div class="doc doc-contents ">
 
         <p>Control the type of model class that is used by the agent framework, and is unique to the agent framework being used.</p>
-<p>For each framework, we leverage their support for LiteLLM and use it as default model_type, allowing you to use the same model_id syntax across these frameworks.</p>
+<p>For each framework, we use AnyLLM as the default model_type, allowing you to use the same model_id syntax across these frameworks.</p>
 
     </div>
 

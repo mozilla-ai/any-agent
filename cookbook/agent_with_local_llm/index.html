@@ -1921,7 +1921,7 @@ Note: you may need to restart the kernel to use updated packages.
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="set-up-your-own-llm-locally">Set up your own LLM locally<a class="anchor-link" href="#set-up-your-own-llm-locally">¶</a></h2><p>Regardless of which agent framework you choose in any-agent, all of them support LiteLLM, which is a proxy that
+<h2 id="set-up-your-own-llm-locally">Set up your own LLM locally<a class="anchor-link" href="#set-up-your-own-llm-locally">¶</a></h2><p>Regardless of which agent framework you choose in any-agent, all of them support any-llm, which is a proxy that
 allows us to use whichever LLM inside the framework, hosted on by any provider. For example,
 we could use a local model via llama.cpp or <a href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a>, a
 google hosted gemini model, or a AWS bedrock hosted Llama model. For this example,
@@ -2073,7 +2073,6 @@ For this example, we will use the smolagents framework.</p>
     <span class="c1"># Don't need to worry about this when running locally.</span>
     <span class="c1"># We use this for out automated testing https://github.com/mozilla-ai/any-agent/blob/main/.github/workflows/tests-cookbook.yaml</span>
     <span class="c1"># HF_ENDPOINT points to a Qwen/Qwen3-1.7B running in https://endpoints.huggingface.co/</span>
-    <span class="c1"># See https://docs.litellm.ai/docs/providers/huggingface#dedicated-inference-endpoints for more info.</span>
     <span class="n">model_id</span> <span class="o">=</span> <span class="s2">"huggingface/tgi"</span>
     <span class="n">model_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"api_base"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"HF_ENDPOINT"</span><span class="p">]}</span>
 <span class="k">else</span><span class="p">:</span>
@@ -2099,7 +2098,6 @@ if os.getenv("IN_PYTEST") == "1":
     # Don't need to worry about this when running locally.
     # We use this for out automated testing https://github.com/mozilla-ai/any-agent/blob/main/.github/workflows/tests-cookbook.yaml
     # HF_ENDPOINT points to a Qwen/Qwen3-1.7B running in https://endpoints.huggingface.co/
-    # See https://docs.litellm.ai/docs/providers/huggingface#dedicated-inference-endpoints for more info.
     model_id = "huggingface/tgi"
     model_args = {"api_base": os.environ["HF_ENDPOINT"]}
 else:
