@@ -80,7 +80,8 @@ class ChatAnyLLM(BaseChatModel):
             )
             return generate_from_stream(stream_iter)
 
-        message_dicts, params = self._create_message_dicts(messages, stop)
+        message_dicts = [_convert_message_to_dict(m) for m in messages]
+        params = self._create_params(stop)
         params = {**params, **kwargs}
         response = completion(messages=message_dicts, **params)  # type: ignore[arg-type]
         if not isinstance(response, ChatCompletion):
@@ -115,9 +116,7 @@ class ChatAnyLLM(BaseChatModel):
         }
         return ChatResult(generations=generations, llm_output=llm_output)
 
-    def _create_message_dicts(
-        self, messages: list[BaseMessage], stop: list[str] | None = None
-    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    def _create_params(self, stop: list[str] | None = None) -> dict[str, Any]:
         params = {
             "api_key": self.api_key,
             "api_base": self.api_base,
@@ -129,8 +128,7 @@ class ChatAnyLLM(BaseChatModel):
                 error_message = "`stop` found in both the input and default params."
                 raise ValueError(error_message)
             params["stop"] = stop
-        message_dicts = [_convert_message_to_dict(m) for m in messages]
-        return message_dicts, params
+        return params
 
     def _stream(
         self,
@@ -139,7 +137,8 @@ class ChatAnyLLM(BaseChatModel):
         run_manager: CallbackManagerForLLMRun | None = None,
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
-        message_dicts, params = self._create_message_dicts(messages, stop)
+        message_dicts = [_convert_message_to_dict(m) for m in messages]
+        params = self._create_params(stop)
         params = {**params, **kwargs, "stream": True}
 
         default_chunk_class: type[BaseMessageChunk] = AIMessageChunk
@@ -168,7 +167,8 @@ class ChatAnyLLM(BaseChatModel):
         run_manager: AsyncCallbackManagerForLLMRun | None = None,
         **kwargs: Any,
     ) -> AsyncIterator[ChatGenerationChunk]:
-        message_dicts, params = self._create_message_dicts(messages, stop)
+        message_dicts = [_convert_message_to_dict(m) for m in messages]
+        params = self._create_params(stop)
         params = {**params, **kwargs, "stream": True}
 
         default_chunk_class: type[BaseMessageChunk] = AIMessageChunk
@@ -208,7 +208,8 @@ class ChatAnyLLM(BaseChatModel):
             )
             return await agenerate_from_stream(stream_iter)
 
-        message_dicts, params = self._create_message_dicts(messages, stop)
+        message_dicts = [_convert_message_to_dict(m) for m in messages]
+        params = self._create_params(stop)
         params = {**params, **kwargs}
         response = await acompletion(messages=message_dicts, **params)  # type: ignore[arg-type]
         if not isinstance(response, ChatCompletion):

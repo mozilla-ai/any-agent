@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.frameworks.langchain import ChatAnyLLM
+from any_agent.vendor.langchain_any_llm import _convert_message_to_dict
 
 if TYPE_CHECKING:
     from any_agent.frameworks.langchain import LangchainAgent
@@ -149,7 +150,8 @@ def test_chat_anyllm_create_message_dicts() -> None:
         ),
     ]
 
-    message_dicts, params = chat_model._create_message_dicts(messages, stop=["END"])
+    message_dicts = [_convert_message_to_dict(m) for m in messages]
+    params = chat_model._create_params(stop=["END"])
 
     assert len(message_dicts) == 3
     assert message_dicts[0] == {
