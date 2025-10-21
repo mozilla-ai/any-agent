@@ -1924,7 +1924,7 @@ else:
 <span class="n">time</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
-        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"I'm an agent to help with getting the time"</span><span class="p">,</span>
         <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">],</span>
     <span class="p">),</span>
@@ -1974,7 +1974,7 @@ time_tool = MCPStdio(
 time = await AnyAgent.create_async(
     "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         description="I'm an agent to help with getting the time",
         tools=[time_tool],
     ),

@@ -82,7 +82,7 @@ Check [`AgentConfig`][any_agent.config.AgentConfig] for more info on how to conf
 agent = AnyAgent.create(
     "openai",  # See other options under `Frameworks`
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
     ),
@@ -131,7 +131,7 @@ async def main():
     agent = await AnyAgent.create_async(
         "openai",
         AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
             instructions="Use the tools to find an answer",
             tools=[search_web, visit_webpage]
         )
@@ -181,7 +181,7 @@ from any_agent import AgentConfig, AnyAgent
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="You are a helpful assistant. Use previous conversation context when available.",
     )
 )
@@ -231,7 +231,7 @@ from any_agent.tools.user_interaction import send_console_message
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="You are a helpful travel assistant. Send console messages to ask more questions. Do not stop until you've answered the question.",
         tools=[send_console_message]
     )
@@ -370,7 +370,7 @@ from any_agent.tools import search_web, visit_webpage
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage],
         callbacks=[]
@@ -700,7 +700,7 @@ from any_agent.config import MCPStdio
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="You must use the available tools to find an answer",
         tools=[
             MCPStdio(
@@ -751,7 +751,7 @@ from any_agent import AgentConfig
 from any_agent.tools import search_web
 
 main_agent = AgentConfig(
-    model_id="mistral/mistral-small-latest",
+    model_id="mistral:mistral-small-latest",
     tools=[search_web]
 )
 ```
@@ -774,7 +774,7 @@ from composio import Composio
 cpo = Composio(CallableProvider())
 
 main_agent = AgentConfig(
-    model_id="mistral/mistral-small-latest",
+    model_id="mistral:mistral-small-latest",
     tools=cpo.tools.get(
         user_id="daavoo",
         toolkits=["GITHUB", "HACKERNEWS"],
@@ -796,7 +796,7 @@ google_agent = await AnyAgent.create_async(
     "google",
     AgentConfig(
         name="google_expert",
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="Use the available tools to answer questions about the Google ADK",
         description="An agent that can answer questions about the Google Agents Development Kit (ADK).",
         tools=[search_web]
@@ -877,7 +877,7 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
     from any_agent.config import MCPStdio
 
     main_agent = AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         tools=[
             MCPStdio(
                 command="docker",
@@ -897,7 +897,7 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
     from any_agent.config import MCPStreamableHttp
 
     main_agent = AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         tools=[
             MCPStreamableHttp(
                 url="http://localhost:8000/mcp"
@@ -915,7 +915,7 @@ MCP can either be run locally ([MCPStdio][any_agent.config.MCPStdio]) or you can
     from any_agent.config import MCPSse
 
     main_agent = AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         tools=[
             MCPSse(
                 url="http://localhost:8000/sse"
@@ -946,7 +946,7 @@ async def main():
     async with await AnyAgent.create_async(
         "tinyagent",
         AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
             tools=[time_tool],
         ),
     ) as agent:
@@ -975,7 +975,7 @@ async def main():
     agent = await AnyAgent.create_async(
         "tinyagent",
         AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
             tools=[time_tool],
         ),
     )
@@ -1102,7 +1102,7 @@ from any_agent.tools import search_web
 agent = AnyAgent.create(
     "openai",
     agent_config=AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
             tools=[search_web],
     )
 )
@@ -1206,7 +1206,7 @@ from any_agent.tools import search_web
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         tools=[search_web]
     ),
 )
@@ -1252,7 +1252,7 @@ from any_agent.evaluation import LlmJudge
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         tools=[search_web]
     ),
 )
@@ -1264,7 +1264,7 @@ trace = agent.run(
 )
 
 # Evaluate the quality of the agent's response multiple times
-judge = LlmJudge(model_id="mistral/mistral-small-latest")
+judge = LlmJudge(model_id="mistral:mistral-small-latest")
 evaluation_questions = [
     "Did it provide clear, step-by-step instructions?",
     "Was the tone empathetic and appropriate for a frustrated, non-technical customer?",
@@ -1311,7 +1311,7 @@ The `AgentJudge` automatically has access to these evaluation tools:
 from any_agent.evaluation import AgentJudge
 
 # Create an agent judge
-judge = AgentJudge(model_id="mistral/mistral-small-latest")
+judge = AgentJudge(model_id="mistral:mistral-small-latest")
 
 # Evaluate with access to trace inspection tools
 eval_trace = judge.run(
@@ -1341,7 +1341,7 @@ def current_ios_version() -> str:
     """
     return "iOS 18.5"
 
-judge = AgentJudge(model_id="mistral/mistral-small-latest")
+judge = AgentJudge(model_id="mistral:mistral-small-latest")
 eval_trace = judge.run(
     trace=trace,
     question="Does the final answer provided by the trace mention and correctly specify the most recent major version of iOS? If the final answer does not mention the version at all, this criteria should fail",
@@ -1363,7 +1363,7 @@ class DetailedEvaluation(BaseModel):
     suggestions: list[str]
 
 judge = LlmJudge(
-    model_id="mistral/mistral-small-latest",
+    model_id="mistral:mistral-small-latest",
     output_type=DetailedEvaluation
 )
 
@@ -1415,7 +1415,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
             "google",
             AgentConfig(
                 name="google_expert",
-                model_id="mistral/mistral-small-latest",
+                model_id="mistral:mistral-small-latest",
                 instructions="You can answer questions about the Google Agents Development Kit (ADK) but nothing else",
                 description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK).",
                 tools=[search_web]
@@ -1456,7 +1456,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
             "openai",
             AgentConfig(
                 name="openai_expert",
-                model_id="mistral/mistral-small-latest",
+                model_id="mistral:mistral-small-latest",
                 instructions="You can answer questions about the OpenAI Agents SDK but nothing else.",
                 description="An agent that can answer questions specifically and only about the OpenAI Agents SDK.",
                 tools=[search_web]

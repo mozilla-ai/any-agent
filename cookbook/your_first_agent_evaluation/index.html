@@ -1956,7 +1956,7 @@ else:
 <span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
-        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">]</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">]</span>
     <span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
@@ -1966,7 +1966,7 @@ from any_agent.tools import search_tavily, visit_webpage
 agent = AnyAgent.create(
     "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
-        model_id="mistral/mistral-small-latest", tools=[search_tavily, visit_webpage]
+        model_id="mistral:mistral-small-latest", tools=[search_tavily, visit_webpage]
     ),
 )</div>
 </div>
@@ -2044,7 +2044,7 @@ agent_trace = agent.run(prompt)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭──────────────────────────────────── CALL_LLM: mistral/mistral-small-latest ─────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭──────────────────────────────────── CALL_LLM: mistral:mistral-small-latest ─────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─ INPUT ─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -2117,7 +2117,7 @@ agent_trace = agent.run(prompt)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭──────────────────────────────────── CALL_LLM: mistral/mistral-small-latest ─────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭──────────────────────────────────── CALL_LLM: mistral:mistral-small-latest ─────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─ OUTPUT ────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -2261,7 +2261,7 @@ agent_trace = agent.run(prompt)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭──────────────────────────────────── CALL_LLM: mistral/mistral-small-latest ─────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭──────────────────────────────────── CALL_LLM: mistral:mistral-small-latest ─────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─ OUTPUT ────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>

@@ -1883,13 +1883,13 @@ from any_agent.tools import search_tavily</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>
-    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">]),</span>
+    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">]),</span>
 <span class="p">)</span>
 <span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"What are 5 LLM agent frameworks that are trending in 2025?"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">agent = AnyAgent.create(
     "tinyagent",
-    AgentConfig(model_id="mistral/mistral-small-latest", tools=[search_tavily]),
+    AgentConfig(model_id="mistral:mistral-small-latest", tools=[search_tavily]),
 )
 agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 2025?")</div>
 </div>
@@ -1903,7 +1903,7 @@ agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 20
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral:mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -1993,7 +1993,7 @@ agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 20
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral:mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Here are 5 LLM agent frameworks that are trending in 2025:                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -2153,7 +2153,7 @@ class SensitiveDataOffloader(Callback):
 <span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
-        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span>
         <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">],</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">SensitiveDataOffloader</span><span class="p">(</span><span class="s2">"sensitive-info"</span><span class="p">),</span> <span class="o">*</span><span class="n">get_default_callbacks</span><span class="p">()],</span>
     <span class="p">),</span>
@@ -2165,7 +2165,7 @@ class SensitiveDataOffloader(Callback):
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         tools=[search_tavily],
         callbacks=[SensitiveDataOffloader("sensitive-info"), *get_default_callbacks()],
     ),
@@ -2182,7 +2182,7 @@ agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 20
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral:mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #000080; text-decoration-color: #000080; font-weight: bold">"ref"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">: </span><span style="color: #008000; text-decoration-color: #008000">"sensitive-info/320624889481214829213442967250469732873.txt"</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                       │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -2265,7 +2265,7 @@ agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 20
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────</span> CALL_LLM: mistral:mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ Here are 5 LLM agent frameworks that are trending in 2025:                                                  │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│                                                                                                             │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>

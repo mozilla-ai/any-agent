@@ -1887,7 +1887,7 @@ else:
 <span class="n">time</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
-        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">"time_agent"</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"I'm an agent to help with getting the time"</span><span class="p">,</span>
         <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">],</span>
@@ -1898,7 +1898,7 @@ else:
 <span class="n">weather_expert</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
-        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">"weather_expert"</span><span class="p">,</span>
         <span class="n">instructions</span><span class="o">=</span><span class="s2">"You're an expert that is an avid skier, recommend a great location to ski given a time of the year"</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">"I'm an agent that is an expert in recommending my favorite location given a time of the year"</span><span class="p">,</span>
@@ -1953,7 +1953,7 @@ time_tool = MCPStdio(
 time = await AnyAgent.create_async(
     "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         name="time_agent",
         description="I'm an agent to help with getting the time",
         tools=[time_tool],
@@ -1964,7 +1964,7 @@ time_handle = await time.serve_async(A2AServingConfig(port=0, endpoint="/time"))
 weather_expert = await AnyAgent.create_async(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         name="weather_expert",
         instructions="You're an expert that is an avid skier, recommend a great location to ski given a time of the year",
         description="I'm an agent that is an expert in recommending my favorite location given a time of the year",
@@ -2037,7 +2037,7 @@ async with httpx.AsyncClient() as client:
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">a2a_tool_async</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
-    <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral/mistral-small-latest"</span><span class="p">,</span>
+    <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span>
     <span class="n">instructions</span><span class="o">=</span><span class="s2">"Use the available tools to obtain additional information to answer the query."</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="s2">"The orchestrator that can use other agents via tools using the A2A protocol."</span><span class="p">,</span>
     <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
@@ -2069,7 +2069,7 @@ async with httpx.AsyncClient() as client:
 from any_agent.tools import a2a_tool_async
 
 config = AgentConfig(
-    model_id="mistral/mistral-small-latest",
+    model_id="mistral:mistral-small-latest",
     instructions="Use the available tools to obtain additional information to answer the query.",
     description="The orchestrator that can use other agents via tools using the A2A protocol.",
     tools=[
@@ -2145,7 +2145,7 @@ print(agent_trace.final_output)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral:mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -2199,7 +2199,7 @@ print(agent_trace.final_output)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral:mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> OUTPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ The current date is June 27, 2025.                                                                          │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
@@ -2238,7 +2238,7 @@ print(agent_trace.final_output)</div>
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral/mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #808000; text-decoration-color: #808000">╭────────────────────────────────────────────</span> CALL_LLM: mistral:mistral-small-latest <span style="color: #808000; text-decoration-color: #808000">─────────────────────────────────────────────╮</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">╭─</span><span style="color: #808000; text-decoration-color: #808000"> INPUT </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">─────────────────────────────────────────────────────────────────────────────────────────────────────╮</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">[</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                           │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
 <span style="color: #808000; text-decoration-color: #808000">│ </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">│   </span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0; font-weight: bold">{</span><span style="color: #c0c0c0; text-decoration-color: #c0c0c0">                                                                                                         │</span><span style="color: #808000; text-decoration-color: #808000"> │</span>
