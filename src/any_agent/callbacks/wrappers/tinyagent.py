@@ -26,6 +26,20 @@ class _TinyAgentWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+
+            if "messages" in kwargs:
+                context.framework_state.messages = kwargs["messages"]
+
+                def get_messages():
+                    return context.framework_state.messages
+
+                def set_messages(messages):
+                    context.framework_state.messages = messages
+                    kwargs["messages"] = messages
+
+                context.framework_state._message_getter = get_messages
+                context.framework_state._message_setter = set_messages
+
             for callback in agent.config.callbacks:
                 context = callback.before_llm_call(context, **kwargs)
 
@@ -42,6 +56,7 @@ class _TinyAgentWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+
             for callback in agent.config.callbacks:
                 context = callback.before_tool_execution(context, request)
 

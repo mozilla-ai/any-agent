@@ -54,6 +54,26 @@ property so that callbacks can access information in a framework-agnostic way.
 
 You can see what attributes are available for LLM Calls and Tool Executions by examining the [`GenAI`][any_agent.tracing.attributes.GenAI] class.
 
+### Framework State
+
+In addition to the span attributes, callbacks can access and modify framework-specific objects through [`Context.framework_state`][any_agent.callbacks.context.Context.framework_state].
+
+This allows callbacks to directly manipulate the agent's execution, such as:
+
+- Modifying messages before they're sent to the LLM
+- Injecting prompts mid-execution
+- Changing user queries dynamically
+
+#### Helper Methods
+
+The `framework_state` provides helper methods to work with messages in a normalized format:
+
+**`get_messages()`**: Get messages as a list of dicts with `role` and `content` keys
+
+**`set_messages()`**: Set messages from a list of dicts with `role` and `content` keys
+
+These methods handle framework-specific message formats internally, providing a consistent API across frameworks.
+
 ## Implementing Callbacks
 
 All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and can choose to implement any subset of the available callback methods. These methods include:
@@ -271,4 +291,57 @@ class LimitToolExecutions(Callback):
             raise RuntimeError("Reached limit of Tool Executions")
 
         return context
+```
+
+## Example: Modifying prompts dynamically
+
+You can use callbacks to modify the prompt being sent to the LLM. This is useful for injecting instructions or reminders mid-execution:
+
+```python
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+
+class InjectReminderCallback(Callback):
+    def __init__(self, reminder: str, every_n_calls: int = 5):
+        self.reminder = reminder
+        self.every_n_calls = every_n_calls
+        self.call_count = 0
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+        self.call_count += 1
+
+        if self.call_count % self.every_n_calls == 0:
+            try:
+                messages = context.framework_state.get_messages()
+                if messages:
+                    messages[-1]["content"] += f"\n\n{self.reminder}"
+                    context.framework_state.set_messages(messages)
+            except NotImplementedError:
+                pass
+
+        return context
+```
+
+Example usage:
+
+```python
+from any_agent import AgentConfig, AnyAgent
+
+callback = InjectReminderCallback(
+    reminder="Remember to use the Todo tool to track your tasks!",
+    every_n_calls=5
+)
+
+config = AgentConfig(
+    model_id="gpt-4o-mini",
+    instructions="You are a helpful assistant.",
+    callbacks=[callback],
+)
+
+agent = await AnyAgent.create_async("tinyagent", config)
+```
+
+!!! tip
+
+    Use try/except to gracefully handle frameworks that don't support message modification yet. The callback will simply skip modification for unsupported frameworks.
 ```
