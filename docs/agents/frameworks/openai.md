@@ -9,8 +9,8 @@ Check the reference to find additional supported `agent_args`.
 
 ## Default Model Type
 
-We use [`agents.extensions.models.litellm_model.LitellmModel`](https://openai.github.io/openai-agents-python/ref/extensions/litellm/) as default.
-Check the reference to find additional supported `model_args`.
+We use [`any_llm`](https://mozilla-ai.github.io/any-llm/) as the default model provider.
+Check the [AnyLLM documentation](https://mozilla-ai.github.io/any-llm/) for supported providers and `model_args`.
 
 ## Run args
 

@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING, Any
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
-    from litellm.types.utils import (
+    from any_llm.types.completion import (
+        ChatCompletion,
         ChatCompletionMessageToolCall,
-        ModelResponse,
-        Usage,
+        CompletionUsage,
     )
 
     from any_agent.callbacks.context import Context
@@ -24,7 +24,7 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
         )
 
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
-        response: ModelResponse = args[0]
+        response: ChatCompletion = args[0]
 
         if not response.choices:
             return context
@@ -50,19 +50,12 @@ class _TinyAgentSpanGeneration(_SpanGeneration):
 
         input_tokens = 0
         output_tokens = 0
-        token_usage: Usage | None
+        token_usage: CompletionUsage | None
 
-        # If litellm
-        if token_usage := getattr(response, "model_extra", {}).get("usage"):
+        if token_usage := getattr(response, "usage", None):
             if token_usage:
                 input_tokens = token_usage.prompt_tokens
                 output_tokens = token_usage.completion_tokens
-        # else it's any-llm
-        else:
-            if token_usage := getattr(response, "usage", None):
-                if token_usage:
-                    input_tokens = token_usage.prompt_tokens
-                    output_tokens = token_usage.completion_tokens
 
         return self._set_llm_output(context, output, input_tokens, output_tokens)
 

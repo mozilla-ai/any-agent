@@ -79,7 +79,7 @@ def final_answer(answer: str) -> str:
 
 
 class TinyAgent(AnyAgent):
-    """A lightweight agent implementation using litellm.
+    """A lightweight agent implementation using any-llm.
 
     Modeled after JS implementation https://huggingface.co/blog/tiny-agents.
     """

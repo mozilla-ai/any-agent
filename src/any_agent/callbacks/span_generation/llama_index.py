@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
-    from litellm.types.utils import ChatCompletionMessageToolCall, Usage
+    from any_llm.types.completion import ChatCompletionMessageToolCall, CompletionUsage
     from llama_index.core.agent.workflow.workflow_events import AgentOutput
     from llama_index.core.base.llms.types import ChatMessage
     from llama_index.core.tools import ToolMetadata
@@ -40,9 +40,8 @@ class _LlamaIndexSpanGeneration(_SpanGeneration):
 
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         response = args[0]
-        token_usage: Usage | None
-        # Handle litellm ModelResponse (from call_model wrapper)
-        if hasattr(response, "choices") and hasattr(response, "model_extra"):
+        token_usage: CompletionUsage | None
+        if hasattr(response, "choices"):
             if not response.choices:
                 return context
 
@@ -70,7 +69,7 @@ class _LlamaIndexSpanGeneration(_SpanGeneration):
             input_tokens = 0
             output_tokens = 0
 
-            if token_usage := getattr(response, "model_extra", {}).get("usage"):
+            if token_usage := getattr(response, "usage", None):
                 if token_usage:
                     input_tokens = token_usage.prompt_tokens
                     output_tokens = token_usage.completion_tokens

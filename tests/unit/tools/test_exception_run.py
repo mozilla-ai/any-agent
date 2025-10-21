@@ -1,16 +1,6 @@
 from collections.abc import AsyncIterator, Iterator
 from unittest.mock import patch
 
-from litellm.types.utils import (
-    Choices,
-    Delta,
-    Function,
-    Message,
-    ModelResponse,
-    ModelResponseStream,
-    StreamingChoices,
-    Usage,
-)
 from any_llm.types.completion import (
     ChatCompletion,
     ChatCompletionMessage,
@@ -18,6 +8,11 @@ from any_llm.types.completion import (
     Choice,
     CompletionUsage,
     Function as AnyllmFunction,
+    ChatCompletionChunk,
+    ChunkChoice,
+    ChoiceDelta,
+    ChoiceDeltaToolCall,
+    ChoiceDeltaToolCallFunction,
 )
 
 from any_agent import (
@@ -30,12 +25,12 @@ from any_agent.testing.helpers import LLM_IMPORT_PATHS
 
 
 class StreamingEndpoint:
-    _responses: list[AsyncIterator[ModelResponseStream]]
+    _responses: list[AsyncIterator[ChatCompletionChunk]]
 
-    def __init__(self, responses: list[AsyncIterator[ModelResponseStream]]):
+    def __init__(self, responses: list[AsyncIterator[ChatCompletionChunk]]):
         self._responses = responses
 
-    def next(self, **kwargs) -> AsyncIterator[ModelResponseStream]:  # type: ignore[no-untyped-def]
+    def next(self, **kwargs) -> AsyncIterator[ChatCompletionChunk]:  # type: ignore[no-untyped-def]
         return self._responses.pop(0)
 
 
@@ -92,42 +87,68 @@ def test_tool_error_llm_mocked(
     If you need detailed comparisons or specific recommendations, I can help with that as well. Would you like me to do that?
     """
 
-    # for frameworks using litellm, we need ModelResponse
-    fake_give_up_response = ModelResponse(
-        choices=[Choices(message=Message(content=give_up))]
-    )
-
-    fake_give_up_chunk = ModelResponseStream(
-        choices=[StreamingChoices(delta=Delta(content=give_up))],
-        usage=Usage(prompt_tokens=10, completion_tokens=20, total_tokens=30),
-    )
-
-    fake_smolagents_final_answer_response = ModelResponse(
+    fake_give_up_chunk = ChatCompletionChunk(
+        id="chatcmpl-test",
+        created=1747157127,
+        model="mistral-small-latest",
+        object="chat.completion.chunk",
         choices=[
-            Choices(
-                message=Message(
+            ChunkChoice(index=0, delta=ChoiceDelta(content=give_up), finish_reason=None)
+        ],
+        usage=CompletionUsage(prompt_tokens=10, completion_tokens=20, total_tokens=30),
+    )
+
+    fake_smolagents_final_answer_response = ChatCompletion(
+        id="chatcmpl-final",
+        created=1747157128,
+        model="mistral-small-latest",
+        object="chat.completion",
+        choices=[
+            Choice(
+                finish_reason="tool_calls",
+                index=0,
+                message=ChatCompletionMessage(
+                    role="assistant",
                     tool_calls=[
-                        {
-                            "id": "call_67890abc",
-                            "type": "function",
-                            "function": Function(
-                                name="final_answer", arguments={"answer": give_up}
+                        ChatCompletionMessageFunctionToolCall(
+                            id="call_67890abc",
+                            type="function",
+                            function=AnyllmFunction(
+                                name="final_answer",
+                                arguments='{"answer": "' + give_up + '"}',
                             ),
-                        }
-                    ]
-                )
+                        )
+                    ],
+                ),
             )
-        ]
+        ],
+        usage=CompletionUsage(
+            prompt_tokens=50, completion_tokens=100, total_tokens=150
+        ),
     )
 
-    function = Function(
-        name="search_web", arguments={"query": "which agent framework is the best"}
+    tool_call = ChatCompletionMessageFunctionToolCall(
+        id="call_12345xyz",
+        type="function",
+        function=AnyllmFunction(
+            name="search_web",
+            arguments='{"query": "which agent framework is the best"}',
+        ),
     )
 
-    tool_call = {"id": "call_12345xyz", "type": "function", "function": function}
-
-    fake_tool_fail_response = ModelResponse(
-        choices=[Choices(message=Message(tool_calls=[tool_call]))]
+    fake_tool_fail_response = ChatCompletion(
+        id="chatcmpl-tool-fail",
+        created=1747157127,
+        model="mistral-small-latest",
+        object="chat.completion",
+        choices=[
+            Choice(
+                finish_reason="tool_calls",
+                index=0,
+                message=ChatCompletionMessage(role="assistant", tool_calls=[tool_call]),
+            )
+        ],
+        usage=CompletionUsage(prompt_tokens=50, completion_tokens=20, total_tokens=70),
     )
 
     # for frameworks using any_llm, we need ChatCompletion
@@ -181,15 +202,37 @@ def test_tool_error_llm_mocked(
         ),
     )
 
-    fake_tool_fail_chunk = ModelResponseStream(
-        choices=[StreamingChoices(delta=Delta(tool_calls=[tool_call]))],
-        usage=Usage(prompt_tokens=10, completion_tokens=5, total_tokens=15),
+    fake_tool_fail_chunk = ChatCompletionChunk(
+        id="chatcmpl-chunk-fail",
+        created=1747157127,
+        model="mistral-small-latest",
+        object="chat.completion.chunk",
+        choices=[
+            ChunkChoice(
+                index=0,
+                delta=ChoiceDelta(
+                    tool_calls=[
+                        ChoiceDeltaToolCall(
+                            index=0,
+                            id="call_12345xyz",
+                            type="function",
+                            function=ChoiceDeltaToolCallFunction(
+                                name="search_web",
+                                arguments='{"query": "which agent framework is the best"}',
+                            ),
+                        )
+                    ]
+                ),
+                finish_reason=None,
+            )
+        ],
+        usage=CompletionUsage(prompt_tokens=10, completion_tokens=5, total_tokens=15),
     )
 
-    async def async_fake_tool_fail_chunk() -> AsyncIterator[ModelResponseStream]:
+    async def async_fake_tool_fail_chunk() -> AsyncIterator[ChatCompletionChunk]:
         yield fake_tool_fail_chunk
 
-    async def async_fake_give_up_chunk() -> AsyncIterator[ModelResponseStream]:
+    async def async_fake_give_up_chunk() -> AsyncIterator[ChatCompletionChunk]:
         yield fake_give_up_chunk
 
     streaming = StreamingEndpoint(
@@ -197,7 +240,6 @@ def test_tool_error_llm_mocked(
     )
 
     import_path = LLM_IMPORT_PATHS[agent_framework]
-    uses_anyllm = "litellm" not in import_path
 
     with (
         patch(import_path) as llm_mock,
@@ -207,7 +249,7 @@ def test_tool_error_llm_mocked(
         elif agent_framework in (AgentFramework.SMOLAGENTS):
             # For smolagents, we need to handle the ReAct pattern properly
             # First call should be the tool failure, then final_answer calls
-            def smolagents_mock_generator() -> Iterator[ModelResponse]:
+            def smolagents_mock_generator() -> Iterator[ChatCompletion]:
                 yield fake_tool_fail_response
                 # After tool failure, keep returning final_answer until agent terminates
                 while True:
@@ -215,23 +257,13 @@ def test_tool_error_llm_mocked(
 
             llm_mock.side_effect = smolagents_mock_generator()
         else:
-            # For other frameworks, use the appropriate mock type (anyllm or litellm)
-            if uses_anyllm:
 
-                def anyllm_mock_generator() -> Iterator[ChatCompletion]:
-                    yield fake_tool_fail_response_anyllm
-                    while True:
-                        yield fake_give_up_response_anyllm
+            def anyllm_mock_generator() -> Iterator[ChatCompletion]:
+                yield fake_tool_fail_response_anyllm
+                while True:
+                    yield fake_give_up_response_anyllm
 
-                llm_mock.side_effect = anyllm_mock_generator()
-            else:
-
-                def other_mock_generator() -> Iterator[ModelResponse]:
-                    yield fake_tool_fail_response
-                    while True:
-                        yield fake_give_up_response
-
-                llm_mock.side_effect = other_mock_generator()
+            llm_mock.side_effect = anyllm_mock_generator()
 
         agent_trace = agent.run(
             "Check in the web which agent framework is the best.",

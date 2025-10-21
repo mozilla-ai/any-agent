@@ -152,7 +152,7 @@ class AgentConfig(BaseModel):
     model_id: str
     """Select the underlying model used by the agent.
 
-    If you are using the default model_type (LiteLLM), you can refer to [LiteLLM Provider Docs](https://docs.litellm.ai/docs/providers) for the list of providers and how to access them.
+    If you are using the default model_type (AnyLLM), you can refer to [AnyLLM Provider Docs](https://mozilla-ai.github.io/any-llm/providers/) for the list of providers and how to access them.
     """
 
     api_base: str | None = None
@@ -216,13 +216,13 @@ class AgentConfig(BaseModel):
     model_type: Callable[..., Any] | None = None
     """Control the type of model class that is used by the agent framework, and is unique to the agent framework being used.
 
-    For each framework, we leverage their support for LiteLLM and use it as default model_type, allowing you to use the same model_id syntax across these frameworks.
+    For each framework, we use AnyLLM as the default model_type, allowing you to use the same model_id syntax across these frameworks.
     """
 
     model_args: MutableMapping[str, Any] | None = None
     """Pass arguments to the model instance like `temperature`, `top_k`, as well as any other provider-specific parameters.
 
-    Refer to LiteLLM Completion API Docs for more info.
+    Refer to [AnyLLM Completion API Docs](https://mozilla-ai.github.io/any-llm/api/completion/) for more info.
     """
 
     output_type: type[BaseModel] | None = None
