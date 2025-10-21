@@ -1,6 +1,8 @@
 from typing import Any
 from unittest.mock import patch
 
+import pytest
+
 from any_agent import (
     AgentConfig,
     AgentFramework,
@@ -34,6 +36,7 @@ class LimitLLMCalls(Callback):
         return context
 
 
+@pytest.mark.xdist_group(name="error_handling")
 def test_runtime_error(
     agent_framework: AgentFramework,
 ) -> None:
@@ -74,6 +77,7 @@ def test_runtime_error(
             )
 
 
+@pytest.mark.xdist_group(name="error_handling")
 def test_tool_error(
     agent_framework: AgentFramework,
 ) -> None:
