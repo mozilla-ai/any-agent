@@ -1,13 +1,12 @@
 from unittest.mock import patch
 
-import pytest
-
 from any_agent import (
     AgentConfig,
     AgentFramework,
     AgentRunError,
     AnyAgent,
 )
+from any_agent.callbacks import Callback, Context
 from any_agent.testing.helpers import (
     DEFAULT_SMALL_MODEL_ID,
     get_default_agent_model_args,
@@ -15,6 +14,24 @@ from any_agent.testing.helpers import (
 from any_agent.tracing.otel_types import StatusCode
 
 EXCEPTION_REASON = "error_handling trap"
+
+
+class LimitLLMCalls(Callback):
+    def __init__(self, max_llm_calls: int) -> None:
+        self.max_llm_calls = max_llm_calls
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+        if "n_llm_calls" not in context.shared:
+            context.shared["n_llm_calls"] = 0
+
+        context.shared["n_llm_calls"] += 1
+
+        if context.shared["n_llm_calls"] > self.max_llm_calls:
+            msg = "Reached limit of LLM Calls"
+            raise RuntimeError(msg)
+
+        return context
+
 
 def test_runtime_error(
     agent_framework: AgentFramework,
@@ -28,7 +45,6 @@ def test_runtime_error(
     kwargs = {}
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
-
 
     patch_function = "any_llm.acompletion"
     if agent_framework is AgentFramework.SMOLAGENTS:
@@ -88,12 +104,12 @@ def test_tool_error(
         instructions="You must use the available tools to answer questions.",
         tools=[search_web],
         model_args=get_default_agent_model_args(agent_framework),
+        callbacks=[LimitLLMCalls(max_llm_calls=5)],
     )
 
     agent = AnyAgent.create(agent_framework, agent_config)
-
     agent_trace = agent.run(
-        "Check in the web which agent framework is the best.",
+        "Check in the web which agent framework is the best. If the tool fails, don't try again, return final answer as failure.",
     )
     assert any(
         span.is_tool_execution()
