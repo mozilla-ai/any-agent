@@ -9,26 +9,26 @@ from any_agent.testing.helpers import (
 )
 
 
-def mock_capital(query: str) -> str:
-    """Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results.
-
-    Args:
-        query (str): The search query to perform.
-
-    Returns:
-        The top search results.
-
-    """
-    if "France" in query:
-        return "The capital of France is Paris."
-    if "Spain" in query:
-        return "The capital of Spain is Madrid."
-    return "No info"
-
-
 @pytest.mark.asyncio
 async def test_run_agent_concurrently(agent_framework: AgentFramework) -> None:
     """When an agent is run concurrently, state from the first run shouldn't bleed into the second run"""
+
+    def mock_capital(query: str) -> str:
+        """Perform a duckduckgo web search based on your query (think a Google search) then returns the top search results.
+
+        Args:
+            query (str): The search query to perform.
+
+        Returns:
+            The top search results.
+
+        """
+        if "France" in query:
+            return "The capital of France is Paris."
+        if "Spain" in query:
+            return "The capital of Spain is Madrid."
+        return "No info"
+
     model_id = DEFAULT_SMALL_MODEL_ID
 
     agent = await AnyAgent.create_async(

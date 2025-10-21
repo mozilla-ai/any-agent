@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import patch
 
 from any_agent import (
@@ -20,7 +21,7 @@ class LimitLLMCalls(Callback):
     def __init__(self, max_llm_calls: int) -> None:
         self.max_llm_calls = max_llm_calls
 
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
         if "n_llm_calls" not in context.shared:
             context.shared["n_llm_calls"] = 0
 
@@ -73,20 +74,6 @@ def test_runtime_error(
             )
 
 
-def search_web(query: str) -> str:
-    """Perform a duckduckgo web search based on your query then returns the top search results.
-
-    Args:
-        query (str): The search query to perform.
-
-    Returns:
-        The top search results.
-
-    """
-    msg = EXCEPTION_REASON
-    raise ValueError(msg)
-
-
 def test_tool_error(
     agent_framework: AgentFramework,
 ) -> None:
@@ -95,6 +82,20 @@ def test_tool_error(
     We make sure an appropriate Status is set to the tool execution span.
     We allow the Agent to try to recover from the tool calling failure.
     """
+
+    def search_web(query: str) -> str:
+        """Perform a duckduckgo web search based on your query then returns the top search results.
+
+        Args:
+            query (str): The search query to perform.
+
+        Returns:
+            The top search results.
+
+        """
+        msg = EXCEPTION_REASON
+        raise ValueError(msg)
+
     kwargs = {}
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID

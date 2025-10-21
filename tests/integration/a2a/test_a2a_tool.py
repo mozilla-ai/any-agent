@@ -1,3 +1,4 @@
+from typing import Any
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
@@ -24,7 +25,7 @@ class LimitLLMCalls(Callback):
     def __init__(self, max_llm_calls: int) -> None:
         self.max_llm_calls = max_llm_calls
 
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
         if "n_llm_calls" not in context.shared:
             context.shared["n_llm_calls"] = 0
 
