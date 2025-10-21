@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID
 
 
 def test_load_smolagent_default() -> None:
@@ -18,7 +19,7 @@ def test_load_smolagent_default() -> None:
         AnyAgent.create(
             AgentFramework.SMOLAGENTS,
             AgentConfig(
-                model_id="openai/o3-mini",
+                model_id=DEFAULT_SMALL_MODEL_ID,
             ),
         )
 
@@ -29,7 +30,7 @@ def test_load_smolagent_default() -> None:
             tools=[],
         )
         mock_model.assert_called_once_with(
-            model_id="openai/o3-mini", api_base=None, api_key=None
+            model_id=DEFAULT_SMALL_MODEL_ID, api_base=None, api_key=None
         )
 
 
@@ -46,7 +47,7 @@ def test_load_smolagent_with_api_base() -> None:
         AnyAgent.create(
             AgentFramework.SMOLAGENTS,
             AgentConfig(
-                model_id="openai/o3-mini",
+                model_id=DEFAULT_SMALL_MODEL_ID,
                 model_args={},
                 api_base="https://custom-api.example.com",
             ),
@@ -59,7 +60,7 @@ def test_load_smolagent_with_api_base() -> None:
             verbosity_level=-1,
         )
         mock_model.assert_called_once_with(
-            model_id="openai/o3-mini",
+            model_id=DEFAULT_SMALL_MODEL_ID,
             api_base="https://custom-api.example.com",
             api_key=None,
         )
@@ -70,7 +71,7 @@ def test_load_smolagents_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.SMOLAGENTS,
-                AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
+                AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID),
             )
 
 
@@ -88,7 +89,7 @@ def test_load_smolagent_final_answer() -> None:
         agent = AnyAgent.create(
             AgentFramework.SMOLAGENTS,
             AgentConfig(
-                model_id="openai/o3-mini",
+                model_id=DEFAULT_SMALL_MODEL_ID,
             ),
         )
 
@@ -106,7 +107,7 @@ def test_run_smolagent_custom_args() -> None:
         agent = AnyAgent.create(
             AgentFramework.SMOLAGENTS,
             AgentConfig(
-                model_id="openai/o3-mini",
+                model_id=DEFAULT_SMALL_MODEL_ID,
             ),
         )
         agent.run("foo", max_steps=30)

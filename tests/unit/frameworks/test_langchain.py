@@ -15,6 +15,7 @@ from pydantic import BaseModel
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.frameworks.langchain import ChatAnyLLM
 from any_agent.vendor.langchain_any_llm import _convert_message_to_dict
+from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID
 
 if TYPE_CHECKING:
     from any_agent.frameworks.langchain import LangchainAgent
@@ -34,11 +35,11 @@ def test_load_langchain_agent_default() -> None:
     ):
         AnyAgent.create(
             AgentFramework.LANGCHAIN,
-            AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
+            AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID),
         )
 
         model_mock.assert_called_once_with(
-            model="nebius:openai/gpt-oss-20b",
+            model=DEFAULT_SMALL_MODEL_ID,
             api_base=None,
             api_key=None,
             model_kwargs={},
@@ -56,7 +57,7 @@ def test_load_langchain_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.LANGCHAIN,
-                AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
+                AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID),
             )
 
 
@@ -73,7 +74,7 @@ def test_run_langchain_agent_custom_args() -> None:
     ):
         agent = AnyAgent.create(
             AgentFramework.LANGCHAIN,
-            AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
+            AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID),
         )
         agent.run("foo", debug=True)
         agent_mock.ainvoke.assert_called_once_with(

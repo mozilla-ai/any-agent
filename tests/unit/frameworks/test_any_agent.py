@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
-from any_agent.testing.helpers import LLM_IMPORT_PATHS
+from any_agent.testing.helpers import LLM_IMPORT_PATHS, DEFAULT_SMALL_MODEL_ID
 
 TEST_TEMPERATURE = 0.54321
 TEST_PENALTY = 0.5
@@ -19,7 +19,7 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
     return AnyAgent.create(
         framework,
         AgentConfig(
-            model_id="nebius:openai/gpt-oss-20b",
+            model_id=DEFAULT_SMALL_MODEL_ID,
             model_args={
                 "temperature": TEST_TEMPERATURE,
                 "frequency_penalty": TEST_PENALTY,
@@ -30,23 +30,21 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
 
 def test_create_any_with_framework(agent_framework: AgentFramework) -> None:
     agent = AnyAgent.create(
-        agent_framework, AgentConfig(model_id="nebius:openai/gpt-oss-20b")
+        agent_framework, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
     )
     assert agent
 
 
 def test_create_any_with_valid_string(agent_framework: AgentFramework) -> None:
     agent = AnyAgent.create(
-        agent_framework.name, AgentConfig(model_id="nebius:openai/gpt-oss-20b")
+        agent_framework.name, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
     )
     assert agent
 
 
 def test_create_any_with_invalid_string() -> None:
     with pytest.raises(ValueError, match="Unsupported agent framework"):
-        AnyAgent.create(
-            "non-existing", AgentConfig(model_id="nebius:openai/gpt-oss-20b")
-        )
+        AnyAgent.create("non-existing", AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID))
 
 
 def test_model_args(
@@ -102,14 +100,14 @@ async def test_create_sync_in_async_context() -> None:
     ):
         AnyAgent.create(
             AgentFramework.TINYAGENT,
-            AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
+            AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID),
         )
 
 
 @pytest.mark.asyncio
 async def test_run_sync_in_async_context() -> None:
     agent = await AnyAgent.create_async(
-        AgentFramework.TINYAGENT, AgentConfig(model_id="nebius:openai/gpt-oss-20b")
+        AgentFramework.TINYAGENT, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
     )
     with pytest.raises(
         RuntimeError,
@@ -126,7 +124,7 @@ async def test_cleanup_async_disconnects_mcp_clients() -> None:
     agent = await AnyAgent.create_async(
         AgentFramework.TINYAGENT,
         AgentConfig(
-            model_id="nebius:openai/gpt-oss-20b",
+            model_id=DEFAULT_SMALL_MODEL_ID,
         ),
     )
 
@@ -149,7 +147,7 @@ async def test_context_manager_automatically_cleans_up() -> None:
     async with await AnyAgent.create_async(
         AgentFramework.TINYAGENT,
         AgentConfig(
-            model_id="nebius:openai/gpt-oss-20b",
+            model_id=DEFAULT_SMALL_MODEL_ID,
         ),
     ) as agent:
         agent._mcp_clients.append(mock_mcp_client)

@@ -172,7 +172,7 @@ def mock_any_llm_response() -> ChatCompletion:
                 }
             ],
             "created": 1747157127,
-            "model": "mistral-small-latest",
+            "model": "openai/gpt-oss-20b",
             "object": "chat.completion",
             "usage": {
                 "completion_tokens": 11,
@@ -210,7 +210,7 @@ def mock_any_llm_tool_call_response() -> ChatCompletion:
                 }
             ],
             "created": 1754649356,
-            "model": "mistral-small-latest",
+            "model": "openai/gpt-oss-20b",
             "object": "chat.completion",
             "usage": {
                 "completion_tokens": 19,
@@ -244,7 +244,7 @@ def mock_any_llm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
                     }
                 ],
                 "created": 1747157127,
-                "model": "mistral-small-latest",
+                "model": "openai/gpt-oss-20b",
                 "object": "chat.completion.chunk",
             }
         )
@@ -260,7 +260,7 @@ def mock_any_llm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
                     }
                 ],
                 "created": 1747157127,
-                "model": "mistral-small-latest",
+                "model": "openai/gpt-oss-20b",
                 "object": "chat.completion.chunk",
             }
         )
@@ -276,7 +276,7 @@ def mock_any_llm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
                     }
                 ],
                 "created": 1747157127,
-                "model": "mistral-small-latest",
+                "model": "openai/gpt-oss-20b",
                 "object": "chat.completion.chunk",
             }
         )
@@ -292,7 +292,7 @@ def mock_any_llm_streaming() -> Callable[..., AsyncGenerator[Any, None]]:
                     }
                 ],
                 "created": 1747157127,
-                "model": "mistral-small-latest",
+                "model": "openai/gpt-oss-20b",
                 "object": "chat.completion.chunk",
             }
         )

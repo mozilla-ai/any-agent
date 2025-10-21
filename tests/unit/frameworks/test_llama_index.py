@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID
 
 
 def test_load_llama_index_agent_default() -> None:
@@ -46,7 +47,7 @@ def test_load_llama_index_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.LLAMA_INDEX,
-                AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
+                AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID),
             )
 
 

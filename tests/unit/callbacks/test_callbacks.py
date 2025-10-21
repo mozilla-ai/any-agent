@@ -8,7 +8,7 @@ import pytest
 
 from any_agent import AgentConfig, AgentFramework, AgentRunError, AnyAgent
 from any_agent.callbacks import Callback, Context
-from any_agent.testing.helpers import LLM_IMPORT_PATHS
+from any_agent.testing.helpers import LLM_IMPORT_PATHS, DEFAULT_SMALL_MODEL_ID
 
 
 class SampleCallback(Callback):
@@ -84,7 +84,7 @@ def create_agent(
 ) -> AnyAgent:
     """Helper function to create an agent with common configuration."""
     config = AgentConfig(
-        model_id="nebius:openai/gpt-oss-20b",
+        model_id=DEFAULT_SMALL_MODEL_ID,
         instructions=instructions,
         callbacks=callbacks,
     )

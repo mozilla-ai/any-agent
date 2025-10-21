@@ -21,7 +21,7 @@ from any_agent import (
     AnyAgent,
 )
 from any_agent.tracing.otel_types import StatusCode
-from any_agent.testing.helpers import LLM_IMPORT_PATHS
+from any_agent.testing.helpers import LLM_IMPORT_PATHS, DEFAULT_SMALL_MODEL_ID
 
 
 class StreamingEndpoint:
@@ -45,7 +45,7 @@ def test_tool_error_llm_mocked(
 
     kwargs = {}
 
-    kwargs["model_id"] = "nebius:openai/gpt-oss-20b"
+    kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
 
     model_args = {"temperature": 0.0}
 
@@ -90,7 +90,7 @@ def test_tool_error_llm_mocked(
     fake_give_up_chunk = ChatCompletionChunk(
         id="chatcmpl-test",
         created=1747157127,
-        model="mistral-small-latest",
+        model="openai/gpt-oss-20b",
         object="chat.completion.chunk",
         choices=[
             ChunkChoice(index=0, delta=ChoiceDelta(content=give_up), finish_reason=None)
@@ -101,7 +101,7 @@ def test_tool_error_llm_mocked(
     fake_smolagents_final_answer_response = ChatCompletion(
         id="chatcmpl-final",
         created=1747157128,
-        model="mistral-small-latest",
+        model="openai/gpt-oss-20b",
         object="chat.completion",
         choices=[
             Choice(
@@ -139,7 +139,7 @@ def test_tool_error_llm_mocked(
     fake_tool_fail_response = ChatCompletion(
         id="chatcmpl-tool-fail",
         created=1747157127,
-        model="mistral-small-latest",
+        model="openai/gpt-oss-20b",
         object="chat.completion",
         choices=[
             Choice(
@@ -162,7 +162,7 @@ def test_tool_error_llm_mocked(
             )
         ],
         created=1747157127,
-        model="mistral-small-latest",
+        model="openai/gpt-oss-20b",
         object="chat.completion",
         usage=CompletionUsage(
             completion_tokens=100,
@@ -193,7 +193,7 @@ def test_tool_error_llm_mocked(
             )
         ],
         created=1747157127,
-        model="mistral-small-latest",
+        model="openai/gpt-oss-20b",
         object="chat.completion",
         usage=CompletionUsage(
             completion_tokens=20,
@@ -205,7 +205,7 @@ def test_tool_error_llm_mocked(
     fake_tool_fail_chunk = ChatCompletionChunk(
         id="chatcmpl-chunk-fail",
         created=1747157127,
-        model="mistral-small-latest",
+        model="openai/gpt-oss-20b",
         object="chat.completion.chunk",
         choices=[
             ChunkChoice(

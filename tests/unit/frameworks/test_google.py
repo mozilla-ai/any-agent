@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID
 
 
 def test_load_google_default() -> None:
@@ -23,12 +24,12 @@ def test_load_google_default() -> None:
         patch("google.adk.tools.FunctionTool", MockedFunctionTool),
     ):
         AnyAgent.create(
-            AgentFramework.GOOGLE, AgentConfig(model_id="nebius:openai/gpt-oss-20b")
+            AgentFramework.GOOGLE, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
         )
         mock_agent.assert_called_once_with(
             name="any_agent",
             instruction="",
-            model=mock_model(model="nebius:openai/gpt-oss-20b"),
+            model=mock_model(model=DEFAULT_SMALL_MODEL_ID),
             tools=[],
             output_key="response",
         )
@@ -39,7 +40,7 @@ def test_load_google_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.GOOGLE,
-                AgentConfig(model_id="nebius:openai/gpt-oss-20b"),
+                AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID),
             )
 
 
@@ -68,7 +69,7 @@ def test_run_google_custom_args() -> None:
         patch("google.adk.tools.FunctionTool"),
     ):
         agent = AnyAgent.create(
-            AgentFramework.GOOGLE, AgentConfig(model_id="nebius:openai/gpt-oss-20b")
+            AgentFramework.GOOGLE, AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID)
         )
         result = agent.run("foo", user_id="1", session_id="2", run_config=run_config)
 
