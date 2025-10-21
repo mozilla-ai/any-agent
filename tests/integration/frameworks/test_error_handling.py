@@ -12,11 +12,10 @@ from any_agent import (
 from any_agent.callbacks import Callback, Context
 from any_agent.testing.helpers import (
     DEFAULT_SMALL_MODEL_ID,
+    LLM_IMPORT_PATHS,
     get_default_agent_model_args,
 )
 from any_agent.tracing.otel_types import StatusCode
-
-
 
 
 class LimitLLMCalls(Callback):
@@ -36,7 +35,6 @@ class LimitLLMCalls(Callback):
         return context
 
 
-@pytest.mark.xdist_group(name="error_handling")
 def test_runtime_error(
     agent_framework: AgentFramework,
 ) -> None:
@@ -47,16 +45,17 @@ def test_runtime_error(
     The `AgentRunError.trace` should be retrieved.
     """
     kwargs = {}
-    TEST_RUNTIME_ERROR_MESSAGE = "runtime error trap"
+    test_runtime_error_msg = "runtime error trap"
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
 
-    patch_function = "any_llm.acompletion"
-    if agent_framework is AgentFramework.SMOLAGENTS:
-        patch_function = "any_llm.completion"
+    patch_function = LLM_IMPORT_PATHS.get(agent_framework)
+    if not patch_function:
+        err_msg = f"No patch function found for agent framework: {agent_framework}"
+        raise ValueError(err_msg)
 
     with patch(patch_function) as llm_completion_path:
-        llm_completion_path.side_effect = RuntimeError(TEST_RUNTIME_ERROR_MESSAGE)
+        llm_completion_path.side_effect = RuntimeError(test_runtime_error_msg)
         agent_config = AgentConfig(
             model_id=kwargs["model_id"],
             tools=[],
@@ -73,12 +72,11 @@ def test_runtime_error(
             assert any(
                 span.status.status_code == StatusCode.ERROR
                 and span.status.description is not None
-                and TEST_RUNTIME_ERROR_MESSAGE in span.status.description
+                and test_runtime_error_msg in span.status.description
                 for span in spans
             )
 
 
-@pytest.mark.xdist_group(name="error_handling")
 def test_tool_error(
     agent_framework: AgentFramework,
 ) -> None:
@@ -87,7 +85,7 @@ def test_tool_error(
     We make sure an appropriate Status is set to the tool execution span.
     We allow the Agent to try to recover from the tool calling failure.
     """
-    EXCEPTION_REASON = "tool error trap"
+    exception_reason = "tool error trap"
 
     def search_web(query: str) -> str:
         """Perform a duckduckgo web search based on your query then returns the top search results.
@@ -99,7 +97,7 @@ def test_tool_error(
             The top search results.
 
         """
-        msg = EXCEPTION_REASON
+        msg = exception_reason
         raise ValueError(msg)
 
     kwargs = {}
@@ -121,6 +119,6 @@ def test_tool_error(
     assert any(
         span.is_tool_execution()
         and span.status.status_code == StatusCode.ERROR
-        and EXCEPTION_REASON in getattr(span.status, "description", "")
+        and exception_reason in getattr(span.status, "description", "")
         for span in agent_trace.spans
     )

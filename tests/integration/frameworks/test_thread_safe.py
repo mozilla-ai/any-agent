@@ -10,7 +10,6 @@ from any_agent.testing.helpers import (
 
 
 @pytest.mark.asyncio
-@pytest.mark.xdist_group(name="thread_safe")
 async def test_run_agent_concurrently(agent_framework: AgentFramework) -> None:
     """When an agent is run concurrently, state from the first run shouldn't bleed into the second run"""
 
