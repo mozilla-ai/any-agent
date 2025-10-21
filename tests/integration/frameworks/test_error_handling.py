@@ -30,10 +30,8 @@ def test_runtime_error(
 
     exc_reason = "It's a trap!"
 
-    patch_function = "litellm.acompletion"
-    if agent_framework is AgentFramework.GOOGLE:
-        patch_function = "google.adk.models.lite_llm.acompletion"
-    elif agent_framework is AgentFramework.SMOLAGENTS:
+    patch_function = "any_llm.acompletion"
+    if agent_framework is AgentFramework.SMOLAGENTS:
         patch_function = "any_llm.completion"
 
     with patch(patch_function) as llm_completion_path:

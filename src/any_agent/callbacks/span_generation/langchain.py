@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, Any
 from any_agent.callbacks.span_generation.base import _SpanGeneration
 
 if TYPE_CHECKING:
+    from any_llm.types.completion import ChatCompletionMessageToolCall, CompletionUsage
     from langchain_core.messages import BaseMessage
-    from litellm.types.utils import ChatCompletionMessageToolCall, Usage
 
     from any_agent.callbacks.context import Context
 
@@ -43,8 +43,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         response = args[0]
 
-        # Handle litellm ModelResponse (from call_model wrapper)
-        if hasattr(response, "choices") and hasattr(response, "model_extra"):
+        if hasattr(response, "choices"):
             if not response.choices:
                 return context
 
@@ -52,7 +51,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
             if not message:
                 return context
 
-            output: str | list[dict[str, Any]]
+            output: str | list[dict[str, Any]] = ""
             if content := getattr(message, "content", None):
                 output = content
 
@@ -71,8 +70,8 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
             input_tokens = 0
             output_tokens = 0
-            token_usage: Usage | None
-            if token_usage := getattr(response, "model_extra", {}).get("usage"):
+            token_usage: CompletionUsage | None
+            if token_usage := getattr(response, "usage", None):
                 if token_usage:
                     input_tokens = token_usage.prompt_tokens
                     output_tokens = token_usage.completion_tokens
@@ -84,6 +83,7 @@ class _LangchainSpanGeneration(_SpanGeneration):
 
             generation = response.generations[0][0]
 
+            output = ""
             if text := generation.text:
                 output = text
             elif message := getattr(generation, "message", None):

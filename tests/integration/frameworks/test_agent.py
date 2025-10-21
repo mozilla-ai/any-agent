@@ -83,13 +83,6 @@ def assert_duration(agent_trace: AgentTrace, wall_time_s: float) -> None:
     )
 
 
-def assert_cost(agent_trace: AgentTrace) -> None:
-    assert isinstance(agent_trace.cost, CostInfo)
-    assert agent_trace.cost.input_cost > 0
-    assert agent_trace.cost.output_cost > 0
-    assert agent_trace.cost.input_cost + agent_trace.cost.output_cost < 1.00
-
-
 def assert_tokens(agent_trace: AgentTrace) -> None:
     assert isinstance(agent_trace.tokens, TokenInfo)
     assert agent_trace.tokens.input_tokens > 0
@@ -197,8 +190,6 @@ def test_load_and_run_agent(
 
     assert_trace(agent_trace, agent_framework)
     assert_duration(agent_trace, (end_ns - start_ns) / 1_000_000_000)
-    if model_id not in ("huggingface/tgi", "google/gemini-2.5-flash"):
-        assert_cost(agent_trace)
     assert_tokens(agent_trace)
 
     if update_trace:

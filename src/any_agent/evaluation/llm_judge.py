@@ -1,9 +1,9 @@
 import builtins
 from typing import Any
 
+from any_llm import acompletion
+from any_llm.types.completion import ChatCompletion
 from any_llm.utils.aio import run_async_in_sync
-from litellm import acompletion
-from litellm.utils import supports_response_schema
 from pydantic import BaseModel
 
 from any_agent.config import AgentFramework
@@ -55,9 +55,7 @@ class LlmJudge:
         self.system_prompt = system_prompt.format(
             response_schema=self.output_type.model_json_schema()
         )
-        # If LiteLLM detects that the model supports response_format, set it to the output_type automatically
-        if supports_response_schema(model=self.model_id):
-            self.model_args["response_format"] = self.output_type
+        self.model_args["response_format"] = self.output_type
 
     def _create_prompt(self, context: str, question: str, prompt: str) -> str:
         if "{context}" not in prompt or "{question}" not in prompt:
@@ -118,7 +116,10 @@ class LlmJudge:
             ],
             **self.model_args,
         )
-
-        return self.output_type.model_validate_json(
-            response.choices[0].message["content"]
-        )
+        if not isinstance(response, ChatCompletion):
+            error_message = f"Expected ChatCompletion, got {type(response)}"
+            raise ValueError(error_message)
+        if response.choices[0].message.content is None:
+            error_message = "No content in the response"
+            raise ValueError(error_message)
+        return self.output_type.model_validate_json(response.choices[0].message.content)

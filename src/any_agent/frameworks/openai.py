@@ -71,7 +71,7 @@ class Converter(BaseConverter):
 class AnyllmModel(Model):
     """Enables using any model via AnyLLM.
 
-    AnyLLM allows you to access OpenAI, Anthropic, Gemini, Mistral, and many other models.
+    any-llm allows you to access OpenAI, Anthropic, Gemini, Mistral, and many other models.
     See supported providers/models here: https://mozilla-ai.github.io/any-llm/providers/
     """
 

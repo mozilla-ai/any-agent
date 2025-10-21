@@ -157,7 +157,7 @@ def test_tool_execution_callbacks(mock_any_llm_tool_call_response: Any) -> None:
     assert callback.after_tool_called
 
 
-def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> None:
+def test_callback_exception_causes_agent_exit(mock_any_llm_response: Any) -> None:
     """Test that throwing an exception in a callback results in the agent exiting."""
     callback = ExceptionCallback("Test callback exception")
     agent = create_agent(
@@ -168,7 +168,7 @@ def test_callback_exception_causes_agent_exit(mock_litellm_response: Any) -> Non
     run_agent_with_mock(
         agent=agent,
         prompt="Search for information about the latest AI developments and summarize what you find",
-        mock_response=mock_litellm_response,
+        mock_response=mock_any_llm_response,
         expected_exception=AgentRunError,
         exception_message="Test callback exception",
     )

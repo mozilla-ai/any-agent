@@ -73,7 +73,7 @@ class _LlamaIndexWrapper:
             wrapped = WrappedAcall(tool.metadata, tool.acall)
             tool.acall = wrapped.acall
 
-        # Wrap call_model to capture litellm calls during structured output processing
+        # Wrap call_model to capture any-llm calls during structured output processing
         self._original_llm_call = agent.call_model
 
         async def wrap_call_model(**kwargs):

@@ -126,7 +126,7 @@ class _LangChainWrapper:
 
         agent._agent.ainvoke = wrap_ainvoke
 
-        # Wrap call_model to capture litellm calls during structured output processing
+        # Wrap call_model to capture any-llm calls during structured output processing
         self._original_llm_call = agent.call_model
 
         async def wrap_call_model(**kwargs):
