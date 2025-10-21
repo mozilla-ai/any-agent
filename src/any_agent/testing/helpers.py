@@ -13,7 +13,7 @@ DEFAULT_SMALL_MODEL_ID = "mistral/mistral-small-latest"
 
 LLM_IMPORT_PATHS = {
     AgentFramework.GOOGLE: "any_agent.frameworks.google.acompletion",
-    AgentFramework.LANGCHAIN: "litellm.acompletion",
+    AgentFramework.LANGCHAIN: "any_agent.frameworks.langchain.acompletion",
     AgentFramework.TINYAGENT: "any_agent.frameworks.tinyagent.acompletion",
     AgentFramework.AGNO: "any_agent.frameworks.agno.acompletion",
     AgentFramework.OPENAI: "any_llm.AnyLLM.acompletion",
