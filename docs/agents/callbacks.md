@@ -337,8 +337,7 @@ config = AgentConfig(
     instructions="You are a helpful assistant.",
     callbacks=[callback],
 )
-
-agent = await AnyAgent.create_async("tinyagent", config)
+# ... Continue to create and run agent
 ```
 
 !!! tip
