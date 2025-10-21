@@ -18,7 +18,7 @@ Check [`AgentConfig`][any_agent.config.AgentConfig] for more info on how to conf
 agent = AnyAgent.create(
     "openai",  # See other options under `Frameworks`
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="Use the tools to find an answer",
         tools=[search_web, visit_webpage]
     ),
@@ -67,7 +67,7 @@ async def main():
     agent = await AnyAgent.create_async(
         "openai",
         AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
             instructions="Use the tools to find an answer",
             tools=[search_web, visit_webpage]
         )
@@ -117,7 +117,7 @@ from any_agent import AgentConfig, AnyAgent
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="You are a helpful assistant. Use previous conversation context when available.",
     )
 )
@@ -167,7 +167,7 @@ from any_agent.tools.user_interaction import send_console_message
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
-        model_id="mistral/mistral-small-latest",
+        model_id="mistral:mistral-small-latest",
         instructions="You are a helpful travel assistant. Send console messages to ask more questions. Do not stop until you've answered the question.",
         tools=[send_console_message]
     )

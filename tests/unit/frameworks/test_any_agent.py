@@ -19,7 +19,7 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
     return AnyAgent.create(
         framework,
         AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
             model_args={
                 "temperature": TEST_TEMPERATURE,
                 "frequency_penalty": TEST_PENALTY,
@@ -30,14 +30,14 @@ def create_agent_with_model_args(framework: AgentFramework) -> AnyAgent:
 
 def test_create_any_with_framework(agent_framework: AgentFramework) -> None:
     agent = AnyAgent.create(
-        agent_framework, AgentConfig(model_id="mistral/mistral-small-latest")
+        agent_framework, AgentConfig(model_id="mistral:mistral-small-latest")
     )
     assert agent
 
 
 def test_create_any_with_valid_string(agent_framework: AgentFramework) -> None:
     agent = AnyAgent.create(
-        agent_framework.name, AgentConfig(model_id="mistral/mistral-small-latest")
+        agent_framework.name, AgentConfig(model_id="mistral:mistral-small-latest")
     )
     assert agent
 
@@ -45,7 +45,7 @@ def test_create_any_with_valid_string(agent_framework: AgentFramework) -> None:
 def test_create_any_with_invalid_string() -> None:
     with pytest.raises(ValueError, match="Unsupported agent framework"):
         AnyAgent.create(
-            "non-existing", AgentConfig(model_id="mistral/mistral-small-latest")
+            "non-existing", AgentConfig(model_id="mistral:mistral-small-latest")
         )
 
 
@@ -102,14 +102,14 @@ async def test_create_sync_in_async_context() -> None:
     ):
         AnyAgent.create(
             AgentFramework.TINYAGENT,
-            AgentConfig(model_id="mistral/mistral-small-latest"),
+            AgentConfig(model_id="mistral:mistral-small-latest"),
         )
 
 
 @pytest.mark.asyncio
 async def test_run_sync_in_async_context() -> None:
     agent = await AnyAgent.create_async(
-        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral/mistral-small-latest")
+        AgentFramework.TINYAGENT, AgentConfig(model_id="mistral:mistral-small-latest")
     )
     with pytest.raises(
         RuntimeError,
@@ -126,7 +126,7 @@ async def test_cleanup_async_disconnects_mcp_clients() -> None:
     agent = await AnyAgent.create_async(
         AgentFramework.TINYAGENT,
         AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
         ),
     )
 
@@ -149,7 +149,7 @@ async def test_context_manager_automatically_cleans_up() -> None:
     async with await AnyAgent.create_async(
         AgentFramework.TINYAGENT,
         AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
         ),
     ) as agent:
         agent._mcp_clients.append(mock_mcp_client)

@@ -10,11 +10,11 @@ from any_agent.logging import logger
 from any_agent.tools.web_browsing import search_tavily, search_web, visit_webpage
 
 MODEL_OPTIONS = [
-    "openai/gpt-4.1-nano",
-    "openai/gpt-4.1-mini",
-    "openai/gpt-4o",
-    "gemini/gemini-2.0-flash-lite",
-    "gemini/gemini-2.0-flash",
+    "openai:gpt-4.1-nano",
+    "openai:gpt-4.1-mini",
+    "openai:gpt-4o",
+    "gemini:gemini-2.0-flash-lite",
+    "gemini:gemini-2.0-flash",
 ]
 
 DEFAULT_EVALUATION_MODEL = MODEL_OPTIONS[0]

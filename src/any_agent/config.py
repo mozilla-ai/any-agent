@@ -203,7 +203,7 @@ class AgentConfig(BaseModel):
 
     agent = AnyAgent.create(
         AgentConfig(
-            model_id="mistral/mistral-small-latest",
+            model_id="mistral:mistral-small-latest",
             instructions="Extract calendar events from text",
             agent_args={
                 "output_type": CalendarEvent

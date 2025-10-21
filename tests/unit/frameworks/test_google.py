@@ -23,12 +23,12 @@ def test_load_google_default() -> None:
         patch("google.adk.tools.FunctionTool", MockedFunctionTool),
     ):
         AnyAgent.create(
-            AgentFramework.GOOGLE, AgentConfig(model_id="mistral/mistral-small-latest")
+            AgentFramework.GOOGLE, AgentConfig(model_id="mistral:mistral-small-latest")
         )
         mock_agent.assert_called_once_with(
             name="any_agent",
             instruction="",
-            model=mock_model(model="mistral/mistral-small-latest"),
+            model=mock_model(model="mistral:mistral-small-latest"),
             tools=[],
             output_key="response",
         )
@@ -39,7 +39,7 @@ def test_load_google_agent_missing() -> None:
         with pytest.raises(ImportError):
             AnyAgent.create(
                 AgentFramework.GOOGLE,
-                AgentConfig(model_id="mistral/mistral-small-latest"),
+                AgentConfig(model_id="mistral:mistral-small-latest"),
             )
 
 
@@ -68,7 +68,7 @@ def test_run_google_custom_args() -> None:
         patch("google.adk.tools.FunctionTool"),
     ):
         agent = AnyAgent.create(
-            AgentFramework.GOOGLE, AgentConfig(model_id="mistral/mistral-small-latest")
+            AgentFramework.GOOGLE, AgentConfig(model_id="mistral:mistral-small-latest")
         )
         result = agent.run("foo", user_id="1", session_id="2", run_config=run_config)
 

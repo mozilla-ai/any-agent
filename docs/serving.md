@@ -34,7 +34,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
             "google",
             AgentConfig(
                 name="google_expert",
-                model_id="mistral/mistral-small-latest",
+                model_id="mistral:mistral-small-latest",
                 instructions="You can answer questions about the Google Agents Development Kit (ADK) but nothing else",
                 description="An agent that can answer questions specifically and only about the Google Agents Development Kit (ADK).",
                 tools=[search_web]
@@ -75,7 +75,7 @@ For illustrative purposes, we are going to define 2 separate scripts, each defin
             "openai",
             AgentConfig(
                 name="openai_expert",
-                model_id="mistral/mistral-small-latest",
+                model_id="mistral:mistral-small-latest",
                 instructions="You can answer questions about the OpenAI Agents SDK but nothing else.",
                 description="An agent that can answer questions specifically and only about the OpenAI Agents SDK.",
                 tools=[search_web]

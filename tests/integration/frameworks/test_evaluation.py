@@ -9,7 +9,7 @@ from any_agent.testing.helpers import get_default_agent_model_args
 
 def test_llm_judge(agent_trace: AgentTrace) -> None:
     llm_judge = LlmJudge(
-        model_id="openai/gpt-4.1-nano",
+        model_id="openai:gpt-4.1-nano",
         model_args={
             "temperature": 0.0,
         },  # Because it's an llm not agent, the default_model_args are not used
@@ -26,7 +26,7 @@ def test_llm_judge(agent_trace: AgentTrace) -> None:
 
 def test_agent_judge(agent_trace: AgentTrace) -> None:
     agent_judge = AgentJudge(
-        model_id="openai/gpt-4.1-mini",
+        model_id="openai:gpt-4.1-mini",
         model_args=get_default_agent_model_args(AgentFramework.TINYAGENT),
     )
 

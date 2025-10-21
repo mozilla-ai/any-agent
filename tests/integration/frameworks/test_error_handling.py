@@ -14,6 +14,7 @@ from any_agent.testing.helpers import (
 )
 from any_agent.tracing.otel_types import StatusCode
 
+EXCEPTION_REASON = "error_handling trap"
 
 def test_runtime_error(
     agent_framework: AgentFramework,
@@ -28,14 +29,13 @@ def test_runtime_error(
 
     kwargs["model_id"] = DEFAULT_SMALL_MODEL_ID
 
-    exc_reason = "It's a trap!"
 
     patch_function = "any_llm.acompletion"
     if agent_framework is AgentFramework.SMOLAGENTS:
         patch_function = "any_llm.completion"
 
     with patch(patch_function) as llm_completion_path:
-        llm_completion_path.side_effect = RuntimeError(exc_reason)
+        llm_completion_path.side_effect = RuntimeError(EXCEPTION_REASON)
         agent_config = AgentConfig(
             model_id=kwargs["model_id"],
             tools=[],
@@ -52,7 +52,7 @@ def test_runtime_error(
             assert any(
                 span.status.status_code == StatusCode.ERROR
                 and span.status.description is not None
-                and exc_reason in span.status.description
+                and EXCEPTION_REASON in span.status.description
                 for span in spans
             )
 
@@ -67,7 +67,7 @@ def search_web(query: str) -> str:
         The top search results.
 
     """
-    msg = "It's a trap!"
+    msg = EXCEPTION_REASON
     raise ValueError(msg)
 
 
@@ -98,6 +98,6 @@ def test_tool_error(
     assert any(
         span.is_tool_execution()
         and span.status.status_code == StatusCode.ERROR
-        and "It's a trap!" in getattr(span.status, "description", "")
+        and EXCEPTION_REASON in getattr(span.status, "description", "")
         for span in agent_trace.spans
     )
