@@ -66,7 +66,7 @@ class AnyLLMModel(ApiModel):
             "model": model_id,
             "api_key": api_key,
             "api_base": api_base,
-            "allow_running_loop": True, # Because smolagents uses sync api
+            "allow_running_loop": True,  # Because smolagents uses sync api
             **kwargs,
         }
 

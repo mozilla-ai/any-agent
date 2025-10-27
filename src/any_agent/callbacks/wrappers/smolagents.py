@@ -9,6 +9,8 @@ from opentelemetry.trace import get_current_span
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from smolagents.models import ChatMessage
+
     from any_agent.callbacks.context import Context
     from any_agent.frameworks.smolagents import SmolagentsAgent
 
@@ -21,8 +23,6 @@ class _SmolagentsWrapper:
 
     async def wrap(self, agent: SmolagentsAgent) -> None:
         try:
-            from smolagents.models import ChatMessage, MessageRole
-
             smolagents_available = True
         except ImportError:
             smolagents_available = False
@@ -64,18 +64,15 @@ class _SmolagentsWrapper:
 
             def set_messages(new_messages):
                 if len(new_messages) != len(messages):
-                    raise ValueError(
-                        "Number of messages must match, Smolagents only allows for modification of message content, not the number of messages"
-                    )
+                    msg = f"Number of messages must match, Smolagents only allows for modification of message content, not the number of messages. Expected {len(messages)} messages, got {len(new_messages)} messages."
+                    raise ValueError(msg)
                 for i, msg_dict in enumerate(new_messages):
                     text = msg_dict["content"]
                     if i == 1:
                         # Because of https://github.com/huggingface/smolagents/blob/317b57336c955e4e7518c42cc4ba53d880dd621a/src/smolagents/memory.py#L192
                         # Smolagents expects the first user message to start with the hardcoded string "New task:"
                         text = f"New task:\n{text}"
-                    messages[i].content = [
-                        {"type": "text", "text": text}
-                    ]
+                    messages[i].content = [{"type": "text", "text": text}]
 
             context.framework_state._message_getter = get_messages
             context.framework_state._message_setter = set_messages
