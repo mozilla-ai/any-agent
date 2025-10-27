@@ -8,7 +8,7 @@ from typing import Any
 class LLMInputModifier(Callback):
     """Callback that modifies LLM input messages."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.original_messages: list[dict[str, Any]] = []
         self.modified_messages: list[dict[str, Any]] = []
 
@@ -35,7 +35,7 @@ class LLMInputModifier(Callback):
 class SecondModifier(Callback):
     """Second callback to test sequential modifications."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.saw_first_modification = False
 
     def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
@@ -56,7 +56,7 @@ class SecondModifier(Callback):
 class AfterLLMModifier(Callback):
     """Callback that modifies messages after LLM response."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.llm_response_messages: list[dict[str, Any]] = []
         self.saw_llm_response = False
 
@@ -70,8 +70,8 @@ class AfterLLMModifier(Callback):
             last_msg = messages[-1]
             # The LLM should have responded with hello and goodbye
             self.saw_llm_response = (
-                "hello" in last_msg.get("content", "").lower() and
-                "goodbye" in last_msg.get("content", "").lower()
+                "hello" in last_msg.get("content", "").lower()
+                and "goodbye" in last_msg.get("content", "").lower()
             )
 
             # Modify the LLM's response by appending text
@@ -123,14 +123,20 @@ async def test_modify_llm_input(agent_framework: AgentFramework) -> None:
         )
 
         # Verify we captured the original message before modification
-        assert len(modifier.original_messages) > 0, "Should have captured original messages"
+        assert len(modifier.original_messages) > 0, (
+            "Should have captured original messages"
+        )
         assert "Say goodbye" in modifier.original_messages[-1]["content"], (
             "Original message should contain 'Say goodbye'"
         )
 
         # Verify message structure was preserved
-        assert "role" in modifier.modified_messages[-1], "Modified message should have 'role' key"
-        assert "content" in modifier.modified_messages[-1], "Modified message should have 'content' key"
+        assert "role" in modifier.modified_messages[-1], (
+            "Modified message should have 'role' key"
+        )
+        assert "content" in modifier.modified_messages[-1], (
+            "Modified message should have 'content' key"
+        )
 
         # Verify sequential callback execution
         assert second_modifier.saw_first_modification, (
