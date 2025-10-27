@@ -20,18 +20,70 @@ class _SmolagentsWrapper:
         self._original_tools: Any | None = None
 
     async def wrap(self, agent: SmolagentsAgent) -> None:
+        try:
+            from smolagents.models import ChatMessage, MessageRole
+
+            smolagents_available = True
+        except ImportError:
+            smolagents_available = False
+
+        if not smolagents_available:
+            msg = "Smolagents is not installed"
+            raise ImportError(msg)
+
         self._original_llm_call = agent._agent.model.generate
 
-        def wrap_generate(*args, **kwargs):
+        def wrap_generate(messages: list[ChatMessage], **kwargs):
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
             context.shared["model_id"] = str(agent._agent.model.model_id)
 
-            for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+            def get_messages():
+                normalized_messages = []
+                for msg in messages:
+                    msg_dict = msg.dict()
 
-            output = self._original_llm_call(*args, **kwargs)
+                    # Handle content that might be a list
+                    content = msg_dict.get("content")
+                    if isinstance(content, list):
+                        text_parts = [
+                            part.get("text", "")
+                            for part in content
+                            if isinstance(part, dict) and part.get("type") == "text"
+                        ]
+                        if text_parts and len(text_parts) == len(content):
+                            msg_dict["content"] = (
+                                " ".join(text_parts)
+                                if len(text_parts) > 1
+                                else text_parts[0]
+                            )
+
+                    normalized_messages.append(msg_dict)
+                return normalized_messages
+
+            def set_messages(new_messages):
+                if len(new_messages) != len(messages):
+                    raise ValueError(
+                        "Number of messages must match, Smolagents only allows for modification of message content, not the number of messages"
+                    )
+                for i, msg_dict in enumerate(new_messages):
+                    text = msg_dict["content"]
+                    if i == 1:
+                        # Because of https://github.com/huggingface/smolagents/blob/317b57336c955e4e7518c42cc4ba53d880dd621a/src/smolagents/memory.py#L192
+                        # Smolagents expects the first user message to start with the hardcoded string "New task:"
+                        text = f"New task:\n{text}"
+                    messages[i].content = [
+                        {"type": "text", "text": text}
+                    ]
+
+            context.framework_state._message_getter = get_messages
+            context.framework_state._message_setter = set_messages
+
+            for callback in agent.config.callbacks:
+                context = callback.before_llm_call(context, messages, **kwargs)
+
+            output = self._original_llm_call(messages, **kwargs)
 
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, output)
