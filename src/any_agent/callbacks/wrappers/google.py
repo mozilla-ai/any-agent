@@ -65,7 +65,6 @@ def _message_to_llm_response(message: dict[str, Any]):
 
     parts = []
 
-    # Handle content
     content = message.get("content")
     if content:
         if isinstance(content, str):
@@ -75,7 +74,6 @@ def _message_to_llm_response(message: dict[str, Any]):
                 if isinstance(part, dict) and part.get("type") == "text":
                     parts.append(types.Part.from_text(text=part.get("text", "")))
 
-    # Handle tool calls
     tool_calls = message.get("tool_calls")
     if tool_calls:
         for tool_call in tool_calls:
@@ -112,17 +110,14 @@ class _GoogleADKWrapper:
                 get_current_span().get_span_context().trace_id
             ]
 
-            # Set up message getters/setters if llm_request is present
             llm_request = kwargs.get("llm_request")
             if llm_request is not None:
                 _messages_from_content, _messages_to_contents = (
                     _import_google_converters()
                 )
 
-                # Convert to normalized format
                 messages = _messages_from_content(llm_request)
 
-                # Normalize content to strings when it's just text parts
                 for message in messages:
                     content = message.get("content")
                     if isinstance(content, list):
@@ -132,14 +127,12 @@ class _GoogleADKWrapper:
                             if isinstance(part, dict) and part.get("type") == "text"
                         ]
                         if text_parts and len(text_parts) == len(content):
-                            # All parts are text, so join them
                             message["content"] = (
                                 " ".join(text_parts)
                                 if len(text_parts) > 1
                                 else text_parts[0]
                             )
 
-                # Add system instruction as a message if present
                 if llm_request.config and llm_request.config.system_instruction:
                     messages.insert(
                         0,
@@ -156,7 +149,6 @@ class _GoogleADKWrapper:
 
                 def set_messages(new_messages):
                     context.framework_state.messages = new_messages
-                    # Convert back to Google ADK format
                     system_instruction, contents = _messages_to_contents(new_messages)
                     llm_request.contents = contents
                     if llm_request.config:
@@ -182,16 +174,10 @@ class _GoogleADKWrapper:
                 get_current_span().get_span_context().trace_id
             ]
 
-            # Set up message getters/setters to include the LLM response
             llm_response = kwargs.get("llm_response")
             if llm_response is not None:
-                # Convert response to normalized message format
                 response_message = _llm_response_to_message(llm_response)
-
-                # Get existing messages and append the response
                 existing_messages = context.framework_state.messages.copy()
-
-                # If the response has content as a list, convert to string for easier modification
                 if isinstance(response_message.get("content"), list):
                     text_parts = [
                         part.get("text", "")
@@ -204,7 +190,6 @@ class _GoogleADKWrapper:
                 all_messages = [*existing_messages, response_message]
                 context.framework_state.messages = all_messages
 
-                # Track the original response message for comparison
                 original_response_content = response_message.get("content")
 
                 def get_messages():
@@ -219,12 +204,10 @@ class _GoogleADKWrapper:
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, *args, **kwargs)
 
-            # Check if the response was modified and return the new response if so
             if llm_response is not None:
                 final_messages = context.framework_state.messages
                 if final_messages:
                     final_response_message = final_messages[-1]
-                    # If the content changed, convert back and return new response
                     if (
                         final_response_message.get("content")
                         != original_response_content
