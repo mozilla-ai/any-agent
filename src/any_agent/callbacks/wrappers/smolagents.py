@@ -9,8 +9,6 @@ from opentelemetry.trace import get_current_span
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from smolagents.models import ChatMessage
-
     from any_agent.callbacks.context import Context
     from any_agent.frameworks.smolagents import SmolagentsAgent
 
@@ -23,6 +21,9 @@ class _SmolagentsWrapper:
 
     async def wrap(self, agent: SmolagentsAgent) -> None:
         try:
+            from smolagents.memory import TaskStep
+            from smolagents.models import ChatMessage
+
             smolagents_available = True
         except ImportError:
             smolagents_available = False
@@ -63,36 +64,58 @@ class _SmolagentsWrapper:
                 return normalized_messages
 
             def set_messages(new_messages):
-                if len(new_messages) != len(messages):
-                    msg = f"Number of messages must match, Smolagents only allows for modification of message content, not the number of messages. Expected {len(messages)} messages, got {len(new_messages)} messages."
-                    raise ValueError(msg)
-                for i, msg_dict in enumerate(new_messages):
-                    text = msg_dict["content"]
-                    if i == 1:
-                        # Because of https://github.com/huggingface/smolagents/blob/317b57336c955e4e7518c42cc4ba53d880dd621a/src/smolagents/memory.py#L192
-                        # Smolagents expects the first user message to start with the hardcoded string "New task:"
-                        text = f"New task:\n{text}"
-                    messages[i].content = [{"type": "text", "text": text}]
+                messages.clear()
+                for msg_dict in new_messages:
+                    content = msg_dict["content"]
+                    if isinstance(content, str):
+                        content = [{"type": "text", "text": content}]
+
+                    new_msg_dict = {**msg_dict, "content": content}
+                    messages.append(ChatMessage.from_dict(new_msg_dict))
+
+                # Update TaskStep in memory so modifications persist through write_memory_to_messages()
+                # This is necessary because smolagents rebuilds messages from memory on every LLM call
+                if len(new_messages) >= 2:
+                    for step in agent._agent.memory.steps:
+                        if isinstance(step, TaskStep):
+                            # Extract the task text (remove "New task:\n" prefix if present)
+                            new_task = new_messages[1]["content"]
+                            if isinstance(new_task, str):
+                                new_task = new_task.removeprefix("New task:\n")
+                            step.task = new_task
+                            break
 
             context.framework_state._message_getter = get_messages
             context.framework_state._message_setter = set_messages
 
-            for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, messages, **kwargs)
+            # Only invoke callbacks on the first LLM call, not on retry attempts
+            # Retries can be detected by checking if there are error messages in the history
+            is_retry = any(
+                "Error:" in str(msg.content) and "Now let's retry" in str(msg.content)
+                for msg in messages
+            )
+
+            if not is_retry:
+                for callback in agent.config.callbacks:
+                    context = callback.before_llm_call(context, messages, **kwargs)
 
             output = self._original_llm_call(messages, **kwargs)
 
-            for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+            if not is_retry:
+                for callback in agent.config.callbacks:
+                    context = callback.after_llm_call(context, output)
 
             return output
 
         agent._agent.model.generate = wrap_generate
 
         def wrapped_tool_execution(original_tool, original_call, *args, **kwargs):
-            context = self.callback_context[
-                get_current_span().get_span_context().trace_id
-            ]
+            trace_id = get_current_span().get_span_context().trace_id
+
+            if trace_id == 0 or trace_id not in self.callback_context:
+                return original_call(**kwargs)
+
+            context = self.callback_context[trace_id]
             context.shared["original_tool"] = original_tool
 
             for callback in agent.config.callbacks:

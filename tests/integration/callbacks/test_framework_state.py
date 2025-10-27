@@ -1,3 +1,5 @@
+import pytest
+
 from any_agent import AgentConfig, AnyAgent
 from any_agent.callbacks import Callback, Context
 from any_agent.config import AgentFramework
@@ -59,7 +61,7 @@ async def test_modify_llm_input(agent_framework: AgentFramework) -> None:
     second_modifier = SecondModifier()
 
     config = AgentConfig(
-        model_id=DEFAULT_SMALL_MODEL_ID,
+        model_id="openai:gpt-4.1-mini",
         instructions="You are a helpful assistant.",
         callbacks=[modifier, second_modifier],
     )

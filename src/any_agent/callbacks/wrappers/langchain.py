@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Any
 
 from opentelemetry.trace import get_current_span
 
+from any_agent.logging import logger
+
 if TYPE_CHECKING:
     from collections.abc import Callable
     from uuid import UUID
@@ -16,11 +18,22 @@ if TYPE_CHECKING:
     from any_agent.frameworks.langchain import LangchainAgent
 
 
+def _import_langchain_converters() -> tuple[Any, Any]:
+    """Import conversion functions from langchain vendor module."""
+    from any_agent.vendor.langchain_any_llm import (
+        _convert_dict_to_message,
+        _convert_message_to_dict,
+    )
+
+    return _convert_dict_to_message, _convert_message_to_dict
+
+
 class _LangChainWrapper:
     def __init__(self) -> None:
         self.callback_context: dict[int, Context] = {}
         self._original_ainvoke: Any | None = None
         self._original_llm_call: Callable[..., Any] | None = None
+        self._original_agenerate: Callable[..., Any] | None = None
 
     async def wrap(self, agent: LangchainAgent) -> None:
         from langchain_core.callbacks.base import BaseCallbackHandler
@@ -30,6 +43,8 @@ class _LangChainWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+            # Note: Message getters/setters are set up in wrap_agenerate
+            # This callback is for span generation via on_chat_model_start
             for callback in agent.config.callbacks:
                 context = callback.before_llm_call(context, *args, **kwargs)
 
@@ -126,6 +141,56 @@ class _LangChainWrapper:
 
         agent._agent.ainvoke = wrap_ainvoke
 
+        if agent._model is not None and hasattr(agent._model, "_agenerate"):
+            self._original_agenerate = agent._model._agenerate
+
+            async def wrap_agenerate(messages, *args, **kwargs):
+                messages_list = list(messages)
+
+                try:
+                    context = self.callback_context[
+                        get_current_span().get_span_context().trace_id
+                    ]
+                    _convert_dict_to_message, _convert_message_to_dict = (
+                        _import_langchain_converters()
+                    )
+
+                    normalized_messages = [
+                        _convert_message_to_dict(msg) for msg in messages_list
+                    ]
+                    context.framework_state.messages = normalized_messages
+
+                    def get_messages():
+                        return context.framework_state.messages
+
+                    def set_messages(new_messages):
+                        nonlocal messages_list
+                        context.framework_state.messages = new_messages
+                        messages_list[:] = [
+                            _convert_dict_to_message(msg) for msg in new_messages
+                        ]
+
+                    context.framework_state._message_getter = get_messages
+                    context.framework_state._message_setter = set_messages
+
+                    # Call user callbacks (but not span generation, that will happen in on_chat_model_start)
+                    for callback in agent.config.callbacks:
+                        if not hasattr(callback, "_set_llm_input"):
+                            context = callback.before_llm_call(
+                                context, None, [messages_list], **kwargs
+                            )
+
+                except Exception:
+                    # If we can't get context, just proceed without modification
+                    logger.warning(
+                        "Could not get context, proceeding without modification"
+                    )
+
+                return await self._original_agenerate(messages_list, *args, **kwargs)
+
+            agent._model._agenerate = wrap_agenerate
+        else:
+            logger.warning("Could not wrap _agenerate, proceeding without modification")
         self._original_llm_call = agent.call_model
 
         async def wrap_call_model(**kwargs):
@@ -148,6 +213,13 @@ class _LangChainWrapper:
     async def unwrap(self, agent: LangchainAgent) -> None:
         if self._original_ainvoke is not None:
             agent._agent.ainvoke = self._original_ainvoke
+
+        if (
+            self._original_agenerate is not None
+            and agent._model is not None
+            and hasattr(agent._model, "_agenerate")
+        ):
+            agent._model._agenerate = self._original_agenerate
 
         if self._original_llm_call is not None:
             agent.call_model = self._original_llm_call
