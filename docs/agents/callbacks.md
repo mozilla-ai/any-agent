@@ -347,7 +347,3 @@ config = AgentConfig(
 )
 # ... Continue to create and run agent
 ```
-
-!!! tip
-
-    Use try/except to gracefully handle frameworks that don't support message modification yet. The callback will simply skip modification for unsupported frameworks.
