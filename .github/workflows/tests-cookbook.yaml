@@ -40,7 +40,7 @@ jobs:
           pytest tests/cookbooks -v -n 4 --cov --cov-report=xml
 
       - name: Upload finished cookbooks
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           path: "docs/cookbook/executed_*.ipynb"
