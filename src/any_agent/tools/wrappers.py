@@ -53,6 +53,7 @@ def _wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
     if isinstance(tool, BaseTool):
         return tool
 
+    print("tool",tool)
     return langchain_tool(tool)  # type: ignore[arg-type]
 
 
