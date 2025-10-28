@@ -53,16 +53,7 @@ def _wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
     if isinstance(tool, BaseTool):
         return tool
 
-    print("tool",tool)
-    # List all attributes
-    for attr in dir(tool):
-        # skip dunder names if you want
-        print(f"{attr} = {getattr(tool, attr)}")
-    
-    return_direct = False
-    if getattr(tool, "__name__") == "get_user_info":
-        return_direct = True
-    return langchain_tool(tool, return_direct=return_direct)  # type: ignore[arg-type]
+    return langchain_tool(tool)  # type: ignore[arg-type]
 
 
 def _wrap_tool_smolagents(tool: "Tool | SmolagentsTool") -> "SmolagentsTool":
