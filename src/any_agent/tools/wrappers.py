@@ -53,15 +53,15 @@ def _wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
     if isinstance(tool, BaseTool):
         return tool
 
-    print("tool",tool)
-    print("__doc__",getattr(tool, "__doc__"))
+    # print("tool",tool)
+    # print("__doc__",getattr(tool, "__doc__"))
     
     return_direct = False
     if "@@__return_direct__@@" in getattr(tool, "__doc__"):
         tool.__doc__ = tool.__doc__.replace("@@__return_direct__@@","")
         return_direct = True
 
-    print("__doc__",getattr(tool, "__doc__"))
+    # print("__doc__",getattr(tool, "__doc__"))
     return langchain_tool(tool, return_direct=return_direct)  # type: ignore[arg-type]
 
 
