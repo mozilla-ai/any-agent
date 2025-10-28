@@ -54,10 +54,10 @@ class _LangChainWrapper:
             for callback in agent.config.callbacks:
                 context = callback.after_tool_execution(context, *args, **kwargs)
             
-            if "final_output" in context.shared:
-                print("final_output",context.shared["final_output"])
-                from langchain_core.agents import AgentFinish
-                return AgentFinish(return_values={"output": context.shared["final_output"]}, log="Agent stopped after run return_direct tool.")
+            # if "final_output" in context.shared:
+            #     print("final_output",context.shared["final_output"])
+            #     from langchain_core.agents import AgentFinish
+            #     return AgentFinish(return_values={"output": context.shared["final_output"]}, log="Agent stopped after run return_direct tool.")
 
         class _LangChainTracingCallback(BaseCallbackHandler):
             def on_chat_model_start(

@@ -188,7 +188,6 @@ class AnyAgent(ABC):
                 f"invoke_agent [{self.config.name}]"
             ) as invoke_span:
                 async with self._lock:
-                    print("self_current_session_id",self.config.current_session_id)
                     trace_id = invoke_span.get_span_context().trace_id
                     self._wrapper.callback_context[trace_id] = Context(
                         current_span=invoke_span,
