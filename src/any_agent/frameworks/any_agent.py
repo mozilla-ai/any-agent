@@ -222,6 +222,7 @@ class AnyAgent(ABC):
                 final_output = await self._run_async(prompt, **kwargs)
 
         except Exception as e:
+            print("hereeee",e)
             async with self._lock:
                 if len(self._wrapper.callback_context) == 1:
                     await self._wrapper.unwrap(self)  # type: ignore[arg-type]
