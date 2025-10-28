@@ -56,9 +56,8 @@ def _wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
     print("tool",tool)
     # List all attributes
     for attr in dir(tool):
-        if not attr.startswith('__') and not attr.endswith('__'):
-            # skip dunder names if you want
-            print(f"{attr} = {getattr(tool, attr)}")
+        # skip dunder names if you want
+        print(f"{attr} = {getattr(tool, attr)}")
 
     return langchain_tool(tool)  # type: ignore[arg-type]
 
