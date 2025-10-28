@@ -54,6 +54,7 @@ def _wrap_tool_langchain(tool: "Tool | LangchainTool") -> "LangchainTool":
         return tool
 
     print("tool",tool)
+    print(dir(tool))
     return langchain_tool(tool)  # type: ignore[arg-type]
 
 
