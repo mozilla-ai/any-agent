@@ -188,7 +188,6 @@ class AnyAgent(ABC):
                 f"invoke_agent [{self.config.name}]"
             ) as invoke_span:
                 async with self._lock:
-                    print("self_current_session_id",self.config.current_session_id)
                     trace_id = invoke_span.get_span_context().trace_id
                     self._wrapper.callback_context[trace_id] = Context(
                         current_span=invoke_span,
@@ -223,6 +222,7 @@ class AnyAgent(ABC):
                 final_output = await self._run_async(prompt, **kwargs)
 
         except Exception as e:
+            print("hereeee",e)
             async with self._lock:
                 if len(self._wrapper.callback_context) == 1:
                     await self._wrapper.unwrap(self)  # type: ignore[arg-type]
