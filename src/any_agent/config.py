@@ -156,7 +156,18 @@ class AgentConfig(BaseModel):
     """
 
     api_base: str | None = None
+    """Custom API endpoint URL for the model provider.
+
+    Use this to specify custom endpoints for local models (Ollama, llama.cpp, etc.) or proxy services.
+    For example: `http://localhost:11434/v1` for Ollama.
+    """
+
     api_key: str | None = None
+    """API key for authenticating with the model provider.
+
+    By default, any-llm automatically searches for common environment variables (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.).
+    Only set this explicitly when using custom environment variable names or providing keys dynamically.
+    """
 
     description: str | None = None
     """Description of the agent."""
