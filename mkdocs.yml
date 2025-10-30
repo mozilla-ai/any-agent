@@ -7,6 +7,7 @@ nav:
   - Intro: index.md
   - Agents:
     - Defining and Running Agents: agents/index.md
+    - Models: agents/models.md
     - Callbacks: agents/callbacks.md
     - Frameworks:
       - Agno: agents/frameworks/agno.md
