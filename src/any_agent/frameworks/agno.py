@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from any_llm import acompletion, completion
+from any_llm import acompletion, completion, AnyLLM as AnyLLMClient
 
 from any_agent.config import AgentConfig, AgentFramework
 
@@ -21,8 +21,9 @@ except ImportError:
 
 
 if TYPE_CHECKING:
-    from agno.agent import RunResponse
+    from agno.agent import RunOutput
     from agno.models.message import Message
+    from agno.models.metrics import Metrics
     from pydantic import BaseModel
 
 
@@ -103,8 +104,8 @@ class AnyLLM(Model):
         tool_choice: str | dict[str, Any] | None = None,
     ) -> Any:
         completion_kwargs = self.get_request_params(tools=tools)
-        completion_kwargs["messages"] = self._format_messages(messages)
-        return completion(**completion_kwargs)
+        raw_response = completion(**completion_kwargs)
+        return self._parse_provider_response(raw_response)
 
     async def ainvoke(
         self,
@@ -112,10 +113,13 @@ class AnyLLM(Model):
         response_format: Any | None = None,
         tools: list[dict[str, Any]] | None = None,
         tool_choice: str | dict[str, Any] | None = None,
+        assistant_message: Message | None = None,
+        run_response: RunOutput | None = None,
     ) -> Any:
         completion_kwargs = self.get_request_params(tools=tools)
         completion_kwargs["messages"] = self._format_messages(messages)
-        return await acompletion(**completion_kwargs)
+        raw_response = await acompletion(**completion_kwargs)
+        return self._parse_provider_response(raw_response)
 
     def invoke_stream(
         self,
@@ -127,7 +131,8 @@ class AnyLLM(Model):
         completion_kwargs = self.get_request_params(tools=tools)
         completion_kwargs["messages"] = self._format_messages(messages)
         completion_kwargs["stream"] = True
-        return completion(**completion_kwargs)
+        for chunk in completion(**completion_kwargs):
+            yield self._parse_provider_response_delta(chunk)
 
     async def ainvoke_stream(
         self,
@@ -139,13 +144,17 @@ class AnyLLM(Model):
         completion_kwargs = self.get_request_params(tools=tools)
         completion_kwargs["messages"] = self._format_messages(messages)
         completion_kwargs["stream"] = True
-        return acompletion(**completion_kwargs)
+        async for chunk in acompletion(**completion_kwargs):
+            yield self._parse_provider_response_delta(chunk)
 
-    def parse_provider_response(self, response: Any, **kwargs) -> ModelResponse:  # type: ignore[no-untyped-def]
+    def _parse_provider_response(self, response: Any, **kwargs) -> ModelResponse:  # type: ignore[no-untyped-def]
         """Parse the provider response."""
         model_response = ModelResponse()
 
         response_message = response.choices[0].message
+
+        if response_message.role is not None:
+            model_response.role = response_message.role
 
         if response_message.content is not None:
             model_response.content = response_message.content
@@ -165,11 +174,15 @@ class AnyLLM(Model):
                 )
 
         if response.usage is not None:
-            model_response.response_usage = response.usage
+            model_response.response_usage = Metrics(
+                input_tokens=response.usage.prompt_tokens,
+                output_tokens=response.usage.completion_tokens,
+                total_tokens=response.usage.total_tokens,
+            )
 
         return model_response
 
-    def parse_provider_response_delta(self, response_delta: Any) -> ModelResponse:
+    def _parse_provider_response_delta(self, response_delta: Any) -> ModelResponse:
         """Parse the provider response delta for streaming responses."""
         model_response = ModelResponse()
 
@@ -218,7 +231,11 @@ class AnyLLM(Model):
                     model_response.tool_calls = processed_tool_calls
 
         if hasattr(response_delta, "usage") and response_delta.usage is not None:
-            model_response.response_usage = response_delta.usage
+            model_response.response_usage = Metrics(
+                input_tokens=response_delta.usage.prompt_tokens,
+                output_tokens=response_delta.usage.completion_tokens,
+                total_tokens=response_delta.usage.total_tokens,
+            )
 
         return model_response
 
@@ -240,9 +257,12 @@ class AgnoAgent(AnyAgent):
     def _get_model(self, agent_config: AgentConfig) -> Model:
         """Get the model configuration for an Agno agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
+        provider, model_id = AnyLLMClient.split_model_provider(agent_config.model_id)
 
         return model_type(
-            id=agent_config.model_id,
+            id=model_id,
+            provider=provider,
+            name=provider,
             api_base=agent_config.api_base,
             api_key=agent_config.api_key,
             request_params=agent_config.model_args or {},  # type: ignore[arg-type]
