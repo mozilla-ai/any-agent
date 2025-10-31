@@ -139,7 +139,7 @@ class AnyLLM(Model):
         completion_kwargs = self.get_request_params(tools=tools)
         completion_kwargs["messages"] = self._format_messages(messages)
         completion_kwargs["stream"] = True
-        return acompletion(**completion_kwargs)
+        return await acompletion(**completion_kwargs)
 
     def parse_provider_response(self, response: Any, **kwargs) -> ModelResponse:  # type: ignore[no-untyped-def]
         """Parse the provider response."""

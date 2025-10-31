@@ -250,6 +250,7 @@ class LangchainAgent(AnyAgent):
     def __init__(self, config: AgentConfig):
         super().__init__(config)
         self._agent: CompiledStateGraph[Any] | None = None
+        self._model: LanguageModelLike | None = None
 
     @property
     def framework(self) -> AgentFramework:
@@ -280,9 +281,10 @@ class LangchainAgent(AnyAgent):
         self._tools = imported_tools
         agent_type = self.config.agent_type or DEFAULT_AGENT_TYPE
         agent_args = self.config.agent_args or {}
+        self._model = self._get_model(self.config)
         self._agent = agent_type(
             name=self.config.name,
-            model=self._get_model(self.config),
+            model=self._model,
             tools=imported_tools,
             prompt=self.config.instructions,
             **agent_args,

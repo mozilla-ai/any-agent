@@ -1,8 +1,8 @@
 from .base import Callback
-from .context import Context
+from .context import Context, FrameworkState
 from .span_print import ConsolePrintSpan
 
-__all__ = ["Callback", "ConsolePrintSpan", "Context"]
+__all__ = ["Callback", "ConsolePrintSpan", "Context", "FrameworkState"]
 
 
 def get_default_callbacks() -> list[Callback]:
