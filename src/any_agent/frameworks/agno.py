@@ -1,3 +1,4 @@
+# mypy: disable-error-code="no-untyped-call"
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -21,8 +22,8 @@ except ImportError:
 
 
 if TYPE_CHECKING:
-    from agno.agent import RunResponse
     from agno.models.message import Message
+    from agno.run.agent import RunOutput
     from pydantic import BaseModel
 
 
@@ -98,50 +99,98 @@ class AnyLLM(Model):
     def invoke(
         self,
         messages: list[Message],
+        assistant_message: Message,
         response_format: Any | None = None,
         tools: list[dict[str, Any]] | None = None,
         tool_choice: str | dict[str, Any] | None = None,
+        run_response: RunOutput | None = None,
     ) -> Any:
         completion_kwargs = self.get_request_params(tools=tools)
         completion_kwargs["messages"] = self._format_messages(messages)
-        return completion(**completion_kwargs)
+
+        if run_response and run_response.metrics:
+            run_response.metrics.set_time_to_first_token()
+
+        assistant_message.metrics.start_timer()
+        provider_response = completion(**completion_kwargs)
+        assistant_message.metrics.stop_timer()
+
+        return self._parse_provider_response(
+            provider_response, response_format=response_format
+        )
 
     async def ainvoke(
         self,
         messages: list[Message],
+        assistant_message: Message,
         response_format: Any | None = None,
         tools: list[dict[str, Any]] | None = None,
         tool_choice: str | dict[str, Any] | None = None,
+        run_response: RunOutput | None = None,
     ) -> Any:
         completion_kwargs = self.get_request_params(tools=tools)
         completion_kwargs["messages"] = self._format_messages(messages)
-        return await acompletion(**completion_kwargs)
+
+        if run_response and run_response.metrics:
+            run_response.metrics.set_time_to_first_token()
+
+        assistant_message.metrics.start_timer()
+        provider_response = await acompletion(**completion_kwargs)
+        assistant_message.metrics.stop_timer()
+
+        return self._parse_provider_response(
+            provider_response, response_format=response_format
+        )
 
     def invoke_stream(
         self,
         messages: list[Message],
+        assistant_message: Message,
         response_format: Any | None = None,
         tools: list[dict[str, Any]] | None = None,
         tool_choice: str | dict[str, Any] | None = None,
+        run_response: RunOutput | None = None,
     ) -> Any:
         completion_kwargs = self.get_request_params(tools=tools)
         completion_kwargs["messages"] = self._format_messages(messages)
         completion_kwargs["stream"] = True
-        return completion(**completion_kwargs)
+
+        if run_response and run_response.metrics:
+            run_response.metrics.set_time_to_first_token()
+
+        assistant_message.metrics.start_timer()
+        stream = completion(**completion_kwargs)
+
+        for chunk in stream:
+            yield self._parse_provider_response_delta(chunk)
+
+        assistant_message.metrics.stop_timer()
 
     async def ainvoke_stream(
         self,
         messages: list[Message],
+        assistant_message: Message,
         response_format: Any | None = None,
         tools: list[dict[str, Any]] | None = None,
         tool_choice: str | dict[str, Any] | None = None,
+        run_response: RunOutput | None = None,
     ) -> Any:
         completion_kwargs = self.get_request_params(tools=tools)
         completion_kwargs["messages"] = self._format_messages(messages)
         completion_kwargs["stream"] = True
-        return acompletion(**completion_kwargs)
 
-    def parse_provider_response(self, response: Any, **kwargs) -> ModelResponse:  # type: ignore[no-untyped-def]
+        if run_response and run_response.metrics:
+            run_response.metrics.set_time_to_first_token()
+
+        assistant_message.metrics.start_timer()
+        stream = await acompletion(**completion_kwargs)
+
+        async for chunk in stream:
+            yield self._parse_provider_response_delta(chunk)
+
+        assistant_message.metrics.stop_timer()
+
+    def _parse_provider_response(self, response: Any, **kwargs) -> ModelResponse:  # type: ignore[no-untyped-def]
         """Parse the provider response."""
         model_response = ModelResponse()
 
@@ -165,11 +214,30 @@ class AnyLLM(Model):
                 )
 
         if response.usage is not None:
-            model_response.response_usage = response.usage
+            usage = response.usage
+            if hasattr(usage, "prompt_tokens") and not hasattr(usage, "input_tokens"):
+                class UsageWrapper:
+                    def __init__(self, original_usage: Any):
+                        self._original = original_usage
+                        self.prompt_tokens = original_usage.prompt_tokens
+                        self.completion_tokens = original_usage.completion_tokens
+                        self.total_tokens = getattr(
+                            original_usage, "total_tokens",
+                            original_usage.prompt_tokens + original_usage.completion_tokens
+                        )
+                        self.input_tokens = original_usage.prompt_tokens
+                        self.output_tokens = original_usage.completion_tokens
+
+                    def __getattr__(self, name: str) -> Any:
+                        return getattr(self._original, name, 0)
+
+                model_response.response_usage = UsageWrapper(usage)
+            else:
+                model_response.response_usage = usage
 
         return model_response
 
-    def parse_provider_response_delta(self, response_delta: Any) -> ModelResponse:
+    def _parse_provider_response_delta(self, response_delta: Any) -> ModelResponse:
         """Parse the provider response delta for streaming responses."""
         model_response = ModelResponse()
 
@@ -218,7 +286,26 @@ class AnyLLM(Model):
                     model_response.tool_calls = processed_tool_calls
 
         if hasattr(response_delta, "usage") and response_delta.usage is not None:
-            model_response.response_usage = response_delta.usage
+            usage = response_delta.usage
+            if hasattr(usage, "prompt_tokens") and not hasattr(usage, "input_tokens"):
+                class UsageWrapper:
+                    def __init__(self, original_usage: Any):
+                        self._original = original_usage
+                        self.prompt_tokens = original_usage.prompt_tokens
+                        self.completion_tokens = original_usage.completion_tokens
+                        self.total_tokens = getattr(
+                            original_usage, "total_tokens",
+                            original_usage.prompt_tokens + original_usage.completion_tokens
+                        )
+                        self.input_tokens = original_usage.prompt_tokens
+                        self.output_tokens = original_usage.completion_tokens
+
+                    def __getattr__(self, name: str) -> Any:
+                        return getattr(self._original, name, 0)
+
+                model_response.response_usage = UsageWrapper(usage)
+            else:
+                model_response.response_usage = usage
 
         return model_response
 
@@ -269,7 +356,7 @@ class AgnoAgent(AnyAgent):
 
         agent_args = self.config.agent_args or {}
         if self.config.output_type:
-            agent_args["response_model"] = self.config.output_type
+            agent_args["output_schema"] = self.config.output_type
         self._agent = Agent(
             name=self.config.name,
             instructions=self.config.instructions,
@@ -282,7 +369,7 @@ class AgnoAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
-        result: RunResponse = await self._agent.arun(prompt, **kwargs)
+        result: RunOutput = await self._agent.arun(prompt, **kwargs)
         return result.content  # type: ignore[return-value]
 
     async def update_output_type_async(
@@ -305,7 +392,7 @@ class AgnoAgent(AnyAgent):
             # Recreate the agent with the new configuration
             agent_args = self.config.agent_args or {}
             if output_type:
-                agent_args["response_model"] = output_type
+                agent_args["output_schema"] = output_type
 
             self._agent = Agent(
                 name=self.config.name,
