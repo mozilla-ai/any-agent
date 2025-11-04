@@ -64,13 +64,15 @@ class _AgnoWrapper:
             context.framework_state._message_getter = get_messages
             context.framework_state._message_setter = set_messages
 
+            callback_kwargs = {**kwargs, "messages": messages}
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, *args, **kwargs)
+                context = callback.before_llm_call(context, *args, **callback_kwargs)
 
             result = await self._original_ainvoke(messages, *args, **kwargs)
 
+            callback_kwargs = {**kwargs, "assistant_message": result}
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, result, *args, **kwargs)
+                context = callback.after_llm_call(context, *args, **callback_kwargs)
 
             return result
 
