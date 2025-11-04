@@ -186,7 +186,18 @@ class _LangChainWrapper:
                         "Could not get context, proceeding without modification"
                     )
 
-                return await self._original_agenerate(messages_list, *args, **kwargs)
+                result = await self._original_agenerate(messages_list, *args, **kwargs)
+
+                try:
+                    context = self.callback_context[
+                        get_current_span().get_span_context().trace_id
+                    ]
+                    context.framework_state._message_getter = None
+                    context.framework_state._message_setter = None
+                except Exception:
+                    pass
+
+                return result
 
             agent._model._agenerate = wrap_agenerate
         else:

@@ -204,6 +204,9 @@ class _GoogleADKWrapper:
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, *args, **kwargs)
 
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
+
             if llm_response is not None:
                 final_messages = context.framework_state.messages
                 if final_messages:

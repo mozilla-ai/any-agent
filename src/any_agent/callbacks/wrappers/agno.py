@@ -74,6 +74,9 @@ class _AgnoWrapper:
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, *args, **callback_kwargs)
 
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
+
             return result
 
         agent._agent.model.ainvoke = wrapped_ainvoke

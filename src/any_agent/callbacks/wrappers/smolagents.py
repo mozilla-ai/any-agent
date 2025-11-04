@@ -105,6 +105,9 @@ class _SmolagentsWrapper:
                 for callback in agent.config.callbacks:
                     context = callback.after_llm_call(context, output)
 
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
+
             return output
 
         agent._agent.model.generate = wrap_generate

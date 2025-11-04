@@ -48,6 +48,9 @@ class _TinyAgentWrapper:
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, output)
 
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
+
             return output
 
         agent.call_model = wrap_call_model

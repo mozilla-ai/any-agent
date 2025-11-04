@@ -67,6 +67,9 @@ class _LlamaIndexWrapper:
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, output)
 
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
+
             return output
 
         # bypass Pydantic validation because _agent is a BaseModel

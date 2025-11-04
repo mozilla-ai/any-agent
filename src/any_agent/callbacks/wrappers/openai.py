@@ -66,6 +66,9 @@ class _OpenAIAgentsWrapper:
                     output,
                 )
 
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
+
             return output
 
         agent._agent.model.get_response = wrapped_llm_call
