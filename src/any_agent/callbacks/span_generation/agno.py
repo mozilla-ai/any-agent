@@ -39,7 +39,9 @@ class _AgnoSpanGeneration(_SpanGeneration):
                             output = [
                                 {
                                     "tool.name": getattr(
-                                        getattr(tool, "function", None), "name", "No name"
+                                        getattr(tool, "function", None),
+                                        "name",
+                                        "No name",
                                     ),
                                     "tool.args": getattr(
                                         getattr(tool, "function", None),
@@ -63,7 +65,9 @@ class _AgnoSpanGeneration(_SpanGeneration):
                 if tool_calls := getattr(assistant_message, "tool_calls", None):
                     output = [
                         {
-                            "tool.name": tool.get("function", {}).get("name", "No name"),
+                            "tool.name": tool.get("function", {}).get(
+                                "name", "No name"
+                            ),
                             "tool.args": tool.get("function", {}).get(
                                 "arguments", "No args"
                             ),
