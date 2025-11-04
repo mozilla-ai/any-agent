@@ -57,7 +57,7 @@ To define any agent system you will always use the same imports:
 from any_agent import AgentConfig, AnyAgent
 ```
 For this example we use a model hosted by Mistral, but you may need to set the relevant API key for whichever provider being used.
-See [our Model docs](https://mozilla-ai.github.io/any-agent/frameworks/#models) for more information about using different models.
+See our [Model Configuration docs](https://mozilla-ai.github.io/any-agent/agents/models/) for more information about configuring models.
 
 ```bash
 export MISTRAL_API_KEY="YOUR_KEY_HERE"  # or OPENAI_API_KEY, etc
