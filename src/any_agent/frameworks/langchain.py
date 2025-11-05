@@ -77,7 +77,8 @@ class LangchainAgent(AnyAgent):
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
         inputs = {"messages": [("user", prompt)]}
-        result = await self._agent.ainvoke(inputs, **kwargs)
+        config = {'recursion_limit': 100}
+        result = await self._agent.ainvoke(inputs, config=config, **kwargs)
 
         if not result.get("messages"):
             msg = "No messages returned from the agent."
