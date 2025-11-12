@@ -102,7 +102,9 @@ class TinyAgent(AnyAgent):
             **(self.config.model_args or {}),
         }
 
-        provider_name, _ = AnyLLM.split_model_provider(self.config.model_id)
+        provider_name, model_id = AnyLLM.split_model_provider(self.config.model_id)
+        if provider_name == "gateway":
+            provider_name, model_id = AnyLLM.split_model_provider(model_id)
         self.uses_openai = provider_name == LLMProvider.OPENAI
         if not self.uses_openai and self.completion_params["tool_choice"] == "required":
             self.config.tools.append(final_answer)
