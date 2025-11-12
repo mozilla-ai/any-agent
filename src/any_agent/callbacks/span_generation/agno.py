@@ -23,26 +23,62 @@ class _AgnoSpanGeneration(_SpanGeneration):
 
     def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
         output: str | list[dict[str, Any]] = ""
-        if assistant_message := kwargs.get("assistant_message"):
-            if content := getattr(assistant_message, "content", None):
-                output = str(content)
-            if tool_calls := getattr(assistant_message, "tool_calls", None):
-                output = [
-                    {
-                        "tool.name": tool.get("function", {}).get("name", "No name"),
-                        "tool.args": tool.get("function", {}).get(
-                            "arguments", "No args"
-                        ),
-                    }
-                    for tool in tool_calls
-                ]
+        input_tokens: int = 0
+        output_tokens: int = 0
 
-            metrics: MessageMetrics | None
-            input_tokens: int = 0
-            output_tokens: int = 0
-            if metrics := getattr(assistant_message, "metrics", None):
-                input_tokens = metrics.input_tokens
-                output_tokens = metrics.output_tokens
+        if assistant_message := kwargs.get("assistant_message"):
+            if hasattr(assistant_message, "choices"):
+                choices = getattr(assistant_message, "choices", [])
+                if choices and len(choices) > 0:
+                    choice = choices[0]
+                    message = getattr(choice, "message", None)
+                    if message:
+                        if content := getattr(message, "content", None):
+                            output = str(content)
+                        if tool_calls := getattr(message, "tool_calls", None):
+                            output = [
+                                {
+                                    "tool.name": getattr(
+                                        getattr(tool, "function", None),
+                                        "name",
+                                        "No name",
+                                    ),
+                                    "tool.args": getattr(
+                                        getattr(tool, "function", None),
+                                        "arguments",
+                                        "No args",
+                                    ),
+                                }
+                                for tool in tool_calls
+                            ]
+
+                if usage := getattr(assistant_message, "usage", None):
+                    input_tokens = getattr(usage, "input_tokens", 0) or getattr(
+                        usage, "prompt_tokens", 0
+                    )
+                    output_tokens = getattr(usage, "output_tokens", 0) or getattr(
+                        usage, "completion_tokens", 0
+                    )
+            else:
+                if content := getattr(assistant_message, "content", None):
+                    output = str(content)
+                if tool_calls := getattr(assistant_message, "tool_calls", None):
+                    output = [
+                        {
+                            "tool.name": tool.get("function", {}).get(
+                                "name", "No name"
+                            ),
+                            "tool.args": tool.get("function", {}).get(
+                                "arguments", "No args"
+                            ),
+                        }
+                        for tool in tool_calls
+                    ]
+
+                metrics: MessageMetrics | None
+                if metrics := getattr(assistant_message, "metrics", None):
+                    input_tokens = metrics.input_tokens
+                    output_tokens = metrics.output_tokens
 
             context = self._set_llm_output(context, output, input_tokens, output_tokens)
 

@@ -36,6 +36,187 @@ ADK_TO_ANY_LLM_ROLE: dict[str, str] = {
     "model": "assistant",
 }
 
+ANY_LLM_TO_ADK_ROLE: dict[str, str] = {
+    "user": "user",
+    "assistant": "model",
+}
+
+
+def _messages_from_content(llm_request: LlmRequest) -> list[dict[str, Any]]:
+    """Convert Google ADK LlmRequest to normalized message format.
+
+    Args:
+        llm_request: The LlmRequest to convert.
+
+    Returns:
+        List of message dicts with 'role' and 'content' keys.
+
+    """
+    messages: list[dict[str, Any]] = []
+    for content in llm_request.contents:
+        message: dict[str, Any] = {
+            "role": ADK_TO_ANY_LLM_ROLE[str(content.role)],
+        }
+        message_content: list[Any] = []
+        tool_calls: list[Any] = []
+        if parts := content.parts:
+            for part in parts:
+                if part.function_response:
+                    messages.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": part.function_response.id,
+                            "content": _safe_json_serialize(
+                                part.function_response.response
+                            ),
+                        }
+                    )
+                elif part.text:
+                    message_content.append({"type": "text", "text": part.text})
+                elif (
+                    part.inline_data
+                    and part.inline_data.data
+                    and part.inline_data.mime_type
+                ):
+                    # TODO Handle multimodal input
+                    msg = f"Part of type {part.inline_data.mime_type} is not supported."
+                    raise NotImplementedError(msg)
+                elif part.function_call:
+                    tool_calls.append(
+                        {
+                            "type": "function",
+                            "id": part.function_call.id,
+                            "function": {
+                                "name": part.function_call.name,
+                                "arguments": _safe_json_serialize(
+                                    part.function_call.args
+                                ),
+                            },
+                        }
+                    )
+
+        message["content"] = message_content or None
+        message["tool_calls"] = tool_calls or None
+        # messages from function_response were directly appended before
+        if message["content"] or message["tool_calls"]:
+            messages.append(message)
+
+    return messages
+
+
+def _messages_to_contents(
+    messages: list[dict[str, Any]],
+) -> tuple[str | None, list[types.Content]]:
+    """Convert normalized messages back to Google ADK format.
+
+    This function performs a round-trip conversion from normalized message dicts
+    back to Google ADK Content objects and system instruction.
+
+    Args:
+        messages: List of message dicts with 'role' and 'content' keys.
+
+    Returns:
+        Tuple of (system_instruction, contents_list).
+
+    """
+    system_instruction: str | None = None
+    system_parts: list[str] = []
+    contents: list[types.Content] = []
+
+    # Track pending tool responses to group them with the next user message
+    pending_tool_responses: list[types.Part] = []
+
+    for message in messages:
+        role = message.get("role", "user")
+
+        # Extract system messages
+        if role == "system":
+            content = message.get("content", "")
+            if isinstance(content, str):
+                system_parts.append(content)
+            elif isinstance(content, list):
+                # Handle content as list of parts
+                for part in content:
+                    if isinstance(part, dict) and part.get("type") == "text":
+                        system_parts.append(part.get("text", ""))
+            continue
+
+        # Handle tool responses - accumulate them
+        if role == "tool":
+            tool_call_id = message.get("tool_call_id", "")
+            content = message.get("content", "")
+            # Parse the content as JSON if it's a string
+            try:
+                response_data = (
+                    json.loads(content) if isinstance(content, str) else content
+                )
+            except json.JSONDecodeError:
+                response_data = content
+
+            part = types.Part(
+                function_response=types.FunctionResponse(
+                    name="",  # Name is not stored in tool messages
+                    id=tool_call_id,
+                    response=response_data,
+                )
+            )
+            pending_tool_responses.append(part)
+            continue
+
+        # Process user/assistant messages
+        parts: list[types.Part] = []
+
+        # If there are pending tool responses and this is a user message, add them first
+        if pending_tool_responses and role == "user":
+            parts.extend(pending_tool_responses)
+            pending_tool_responses = []
+
+        # Handle content
+        content = message.get("content")
+        if content:
+            if isinstance(content, str):
+                parts.append(types.Part.from_text(text=content))
+            elif isinstance(content, list):
+                # Handle content as list of parts
+                for part in content:
+                    if isinstance(part, dict) and part.get("type") == "text":
+                        parts.append(types.Part.from_text(text=part.get("text", "")))
+
+        # Handle tool calls
+        tool_calls = message.get("tool_calls")
+        if tool_calls:
+            for tool_call in tool_calls:
+                if tool_call.get("type") == "function":
+                    function_data = tool_call.get("function", {})
+                    args_str = function_data.get("arguments", "{}")
+                    # Parse arguments if they're a string
+                    try:
+                        args = (
+                            json.loads(args_str)
+                            if isinstance(args_str, str)
+                            else args_str
+                        )
+                    except json.JSONDecodeError:
+                        args = {}
+
+                    part = types.Part.from_function_call(
+                        name=function_data.get("name", ""),
+                        args=args,
+                    )
+                    part.function_call.id = tool_call.get("id", "")
+                    parts.append(part)
+
+        # Only add content if there are parts
+        if parts:
+            adk_role = ANY_LLM_TO_ADK_ROLE.get(role, "user")
+            contents.append(types.Content(role=adk_role, parts=parts))
+
+    # Combine system messages into a single instruction
+    if system_parts:
+        system_instruction = "\n".join(system_parts)
+
+    return system_instruction, contents
+
 
 def _safe_json_serialize(obj: Any) -> str:
     """Convert any Python object to a JSON-serializable type or string.
@@ -62,59 +243,6 @@ class AnyLlm(BaseLlm):
     def __init__(self, model: str, **kwargs: Any) -> None:
         super().__init__(model=model)
         self._kwargs = kwargs or {}
-
-    @staticmethod
-    def _messages_from_content(llm_request: LlmRequest) -> list[dict[str, Any]]:
-        messages: list[dict[str, Any]] = []
-        for content in llm_request.contents:
-            message: dict[str, Any] = {
-                "role": ADK_TO_ANY_LLM_ROLE[str(content.role)],
-            }
-            message_content: list[Any] = []
-            tool_calls: list[Any] = []
-            if parts := content.parts:
-                for part in parts:
-                    if part.function_response:
-                        messages.append(
-                            {
-                                "role": "tool",
-                                "tool_call_id": part.function_response.id,
-                                "content": _safe_json_serialize(
-                                    part.function_response.response
-                                ),
-                            }
-                        )
-                    elif part.text:
-                        message_content.append({"type": "text", "text": part.text})
-                    elif (
-                        part.inline_data
-                        and part.inline_data.data
-                        and part.inline_data.mime_type
-                    ):
-                        # TODO Handle multimodal input
-                        msg = f"Part of type {part.inline_data.mime_type} is not supported."
-                        raise NotImplementedError(msg)
-                    elif part.function_call:
-                        tool_calls.append(
-                            {
-                                "type": "function",
-                                "id": part.function_call.id,
-                                "function": {
-                                    "name": part.function_call.name,
-                                    "arguments": _safe_json_serialize(
-                                        part.function_call.args
-                                    ),
-                                },
-                            }
-                        )
-
-            message["content"] = message_content or None
-            message["tool_calls"] = tool_calls or None
-            # messages from function_response were directly appended before
-            if message["content"] or message["tool_calls"]:
-                messages.append(message)
-
-        return messages
 
     def _schema_to_dict(self, schema: types.Schema) -> dict[str, Any]:
         """Recursively converts a types.Schema to a pure-python dict.
@@ -204,7 +332,7 @@ class AnyLlm(BaseLlm):
     def _llm_request_to_completion_args(
         self, llm_request: LlmRequest
     ) -> dict[str, Any]:
-        messages = self._messages_from_content(llm_request)
+        messages = _messages_from_content(llm_request)
         if llm_request.config.system_instruction:
             messages.insert(
                 0, {"role": "system", "content": llm_request.config.system_instruction}

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Self, assert_never, overload
 from any_llm.utils.aio import run_async_in_sync
 from opentelemetry import trace as otel_trace
 
-from any_agent.callbacks.context import Context
+from any_agent.callbacks.context import Context, FrameworkState
 from any_agent.callbacks.wrappers import (
     _get_wrapper_by_framework,
 )
@@ -217,6 +217,7 @@ class AnyAgent(ABC):
                         trace=AgentTrace(),
                         tracer=self._tracer,
                         shared={},
+                        framework_state=FrameworkState(),
                     )
 
                     if len(self._wrapper.callback_context) == 1:

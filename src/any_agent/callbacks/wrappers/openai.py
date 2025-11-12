@@ -27,6 +27,33 @@ class _OpenAIAgentsWrapper:
                 get_current_span().get_span_context().trace_id
             ]
             context.shared["model_id"] = getattr(agent._agent.model, "model", None)
+            # import inside the wrap to avoid cases where the user hasn't installed the agents sdk
+            from any_agent.frameworks.openai import Converter
+
+            system_instructions = kwargs.get("system_instructions")
+            input_data = kwargs.get("input")
+
+            if input_data is not None:
+                converted_messages = Converter.params_to_messages(
+                    system_instructions, input_data
+                )
+
+                context.framework_state.messages = converted_messages
+
+                def get_messages():
+                    return context.framework_state.messages
+
+                def set_messages(messages):
+                    context.framework_state.messages = messages
+
+                    new_system_instructions, new_input = Converter.messages_to_params(
+                        messages
+                    )
+                    kwargs["system_instructions"] = new_system_instructions
+                    kwargs["input"] = new_input
+
+                context.framework_state._message_getter = get_messages
+                context.framework_state._message_setter = set_messages
 
             for callback in agent.config.callbacks:
                 context = callback.before_llm_call(context, *args, **kwargs)
@@ -38,6 +65,9 @@ class _OpenAIAgentsWrapper:
                     context,
                     output,
                 )
+
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
 
             return output
 
