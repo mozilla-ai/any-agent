@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from any_llm import AnyLLM, LLMProvider
 from pydantic import BaseModel
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
@@ -247,3 +248,21 @@ def test_structured_output_without_tools() -> None:
         # Verify that response_format is set for structured output
         assert "response_format" in second_call_args
         assert second_call_args["response_format"] == SampleOutput
+
+
+@pytest.mark.parametrize(
+    ("model_id", "expected_uses_openai"),
+    [
+        ("gateway:openai:gpt-4.1-mini", True),
+        ("gateway:anthropic:claude-3", False),
+        ("openai:gpt-4", True),
+        ("anthropic:claude-3", False),
+    ],
+)
+def test_uses_openai_handles_gateway_provider(
+    model_id: str, expected_uses_openai: bool
+) -> None:
+    config = AgentConfig(model_id=model_id)
+    agent: TinyAgent = AnyAgent.create(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
+
+    assert agent.uses_openai is expected_uses_openai
