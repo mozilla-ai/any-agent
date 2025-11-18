@@ -3,11 +3,11 @@ requires = ["setuptools>=48", "setuptools_scm[toml]>=6.3.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "any-agent"
+name = "realtimex-any-agent"
+version = "0.1.0"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
-dynamic = ["version"]
 dependencies = [
   "any-llm-sdk>=0.20.2,<1",
   "litellm>=1.75.8",
@@ -59,7 +59,7 @@ composio = [
 ]
 
 deepagents = [
-  "deepagents @ git+https://github.com/therealtimex/deepagents.git@realtimex"
+  "realtimex_deepagents"
 ]
 
 all = [
