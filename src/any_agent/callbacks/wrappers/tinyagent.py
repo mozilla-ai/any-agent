@@ -1,6 +1,7 @@
 # mypy: disable-error-code="method-assign,misc,no-untyped-call,no-untyped-def,union-attr"
 from __future__ import annotations
 
+import asyncio
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
@@ -27,12 +28,20 @@ class _TinyAgentWrapper:
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_llm_call(context, **kwargs)
+                result = callback.before_llm_call(context, **kwargs)
+                if asyncio.iscoroutinefunction(callback.before_llm_call):
+                    context = await result
+                else:
+                    context = result
 
             output = await self._original_llm_call(**kwargs)
 
             for callback in agent.config.callbacks:
-                context = callback.after_llm_call(context, output)
+                result = callback.after_llm_call(context, output)
+                if asyncio.iscoroutinefunction(callback.after_llm_call):
+                    context = await result
+                else:
+                    context = result
 
             return output
 
@@ -43,12 +52,20 @@ class _TinyAgentWrapper:
                 get_current_span().get_span_context().trace_id
             ]
             for callback in agent.config.callbacks:
-                context = callback.before_tool_execution(context, request)
+                result = callback.before_tool_execution(context, request)
+                if asyncio.iscoroutinefunction(callback.before_tool_execution):
+                    context = await result
+                else:
+                    context = result
 
             output = await original_call(request)
 
             for callback in agent.config.callbacks:
-                context = callback.after_tool_execution(context, output)
+                result = callback.after_tool_execution(context, output)
+                if asyncio.iscoroutinefunction(callback.after_tool_execution):
+                    context = await result
+                else:
+                    context = result
 
             return output
 
