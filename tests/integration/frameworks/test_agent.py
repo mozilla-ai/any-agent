@@ -106,7 +106,6 @@ class Steps(BaseModel):
         # because that is not supported in some providers.
         # "anthropic:claude-3-5-haiku-latest",
         "gemini:gemini-2.5-flash",
-        "huggingface:tgi",  # This is a Qwen/Qwen3-1.7B hosted in https://endpoints.huggingface.co/mozilla-ai/endpoints/dedicated
         "openai:gpt-4.1-nano",
         "xai:grok-3-mini-latest",
         DEFAULT_SMALL_MODEL_ID,
