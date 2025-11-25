@@ -188,9 +188,10 @@ class TinyAgent(AnyAgent):
             logger.warning(
                 "`max_turns` is deprecated and has no effect. See https://mozilla-ai.github.io/any-agent/agents/callbacks/#example-limit-the-number-of-steps"
             )
-        completion_params = self.completion_params.copy()
 
         while True:
+            completion_params = self.completion_params.copy()
+
             completion_params["messages"] = messages
 
             response: ChatCompletion = await self.call_model(**completion_params)
