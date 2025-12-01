@@ -22,6 +22,7 @@ try:
     from any_llm import AnyLLM
     from openai import NOT_GIVEN, NotGiven, Omit
     from openai.types.responses import Response
+    from openai.types.responses.response_input_item_param import Message
     from openai.types.responses.response_usage import (
         InputTokensDetails,
         OutputTokensDetails,
@@ -66,6 +67,62 @@ class Converter(BaseConverter):
             f" Got tool type: {type(tool)}, tool: {tool}"
         )
         raise UserError(msg)
+
+    @classmethod
+    def params_to_messages(
+        cls,
+        system_instructions: str | None,
+        input_data: str | list[TResponseInputItem],
+    ) -> list[dict[str, Any]]:
+        """Convert system_instructions and input parameters to unified message format.
+
+        Args:
+            system_instructions: Optional system instructions to prepend
+            input_data: Either a string or list of response input items
+
+        Returns:
+            List of message dicts with 'role' and 'content' keys
+
+        """
+        converted_messages: list[dict[str, Any]]
+        if isinstance(input_data, str):
+            converted_messages = [{"role": "user", "content": input_data}]
+        else:
+            converted_messages = [
+                dict(msg) for msg in cls.items_to_messages(input_data)
+            ]
+
+        if system_instructions:
+            converted_messages.insert(
+                0, {"content": system_instructions, "role": "system"}
+            )
+
+        return converted_messages
+
+    @classmethod
+    def messages_to_params(
+        cls, messages: list[dict[str, Any]]
+    ) -> tuple[str | None, str | list[TResponseInputItem]]:
+        """Convert unified message format back to system_instructions and input parameters.
+
+        Args:
+            messages: List of message dicts with 'role' and 'content' keys
+
+        Returns:
+            Tuple of (system_instructions, input) where input is either a string or list of items
+
+        """
+        if messages and messages[0].get("role") == "system":
+            system_instructions = messages[0]["content"]
+            remaining_messages = messages[1:]
+        else:
+            system_instructions = None
+            remaining_messages = messages
+
+        return system_instructions, [
+            Message(role=msg["role"], content=msg["content"])
+            for msg in remaining_messages
+        ]
 
 
 class AnyllmModel(Model):
@@ -265,16 +322,7 @@ class AnyllmModel(Model):
         any_llm.types.completion.ChatCompletion
         | tuple[Response, AsyncIterator[any_llm.types.completion.ChatCompletionChunk]]
     ):
-        converted_messages = Converter.items_to_messages(input)
-
-        if system_instructions:
-            converted_messages.insert(
-                0,
-                {
-                    "content": system_instructions,
-                    "role": "system",
-                },
-            )
+        converted_messages = Converter.params_to_messages(system_instructions, input)
         converted_messages = _to_dump_compatible(converted_messages)
 
         if tracing.include_data():

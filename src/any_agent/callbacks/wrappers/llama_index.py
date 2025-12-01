@@ -10,6 +10,16 @@ if TYPE_CHECKING:
     from any_agent.frameworks.llama_index import LlamaIndexAgent
 
 
+def _import_llama_index_converters() -> tuple[Any, Any]:
+    """Import conversion functions from llama_index vendor module."""
+    from any_agent.vendor.llama_index_utils import (
+        from_openai_message_dict,
+        to_openai_message_dicts,
+    )
+
+    return to_openai_message_dicts, from_openai_message_dict
+
+
 class _LlamaIndexWrapper:
     def __init__(self) -> None:
         self.callback_context: dict[int, Context] = {}
@@ -26,6 +36,27 @@ class _LlamaIndexWrapper:
             ]
             context.shared["model_id"] = getattr(agent._agent.llm, "model", "No model")
 
+            if len(args) > 1 and isinstance(args[1], list):
+                to_openai_message_dicts, from_openai_message_dict = (
+                    _import_llama_index_converters()
+                )
+
+                normalized_messages = to_openai_message_dicts(args[1])
+                context.framework_state.messages = normalized_messages
+
+                def get_messages():
+                    return context.framework_state.messages
+
+                def set_messages(new_messages):
+                    context.framework_state.messages = new_messages
+                    args[1].clear()
+                    args[1].extend(
+                        [from_openai_message_dict(msg) for msg in new_messages]
+                    )
+
+                context.framework_state._message_getter = get_messages
+                context.framework_state._message_setter = set_messages
+
             for callback in agent.config.callbacks:
                 context = callback.before_llm_call(context, *args, **kwargs)
 
@@ -35,6 +66,9 @@ class _LlamaIndexWrapper:
 
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, output)
+
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
 
             return output
 
@@ -73,7 +107,6 @@ class _LlamaIndexWrapper:
             wrapped = WrappedAcall(tool.metadata, tool.acall)
             tool.acall = wrapped.acall
 
-        # Wrap call_model to capture any-llm calls during structured output processing
         self._original_llm_call = agent.call_model
 
         async def wrap_call_model(**kwargs):

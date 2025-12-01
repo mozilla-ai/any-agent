@@ -27,6 +27,20 @@ class _TinyAgentWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+
+            if "messages" in kwargs:
+                context.framework_state.messages = kwargs["messages"]
+
+                def get_messages():
+                    return context.framework_state.messages
+
+                def set_messages(messages):
+                    context.framework_state.messages = messages
+                    kwargs["messages"] = messages
+
+                context.framework_state._message_getter = get_messages
+                context.framework_state._message_setter = set_messages
+
             for callback in agent.config.callbacks:
                 result = callback.before_llm_call(context, **kwargs)
                 if asyncio.iscoroutinefunction(callback.before_llm_call):
@@ -43,6 +57,9 @@ class _TinyAgentWrapper:
                 else:
                     context = result
 
+            context.framework_state._message_getter = None
+            context.framework_state._message_setter = None
+
             return output
 
         agent.call_model = wrap_call_model
@@ -51,6 +68,7 @@ class _TinyAgentWrapper:
             context = self.callback_context[
                 get_current_span().get_span_context().trace_id
             ]
+
             for callback in agent.config.callbacks:
                 result = callback.before_tool_execution(context, request)
                 if asyncio.iscoroutinefunction(callback.before_tool_execution):

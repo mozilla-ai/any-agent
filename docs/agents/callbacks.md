@@ -54,6 +54,34 @@ property so that callbacks can access information in a framework-agnostic way.
 
 You can see what attributes are available for LLM Calls and Tool Executions by examining the [`GenAI`][any_agent.tracing.attributes.GenAI] class.
 
+### Framework State
+
+In addition to the span attributes, callbacks can access and modify framework-specific objects through [`Context.framework_state`][any_agent.callbacks.context.Context.framework_state].
+
+This allows callbacks to directly manipulate the agent's execution, such as:
+
+- Modifying messages before they're sent to the LLM
+- Modifying the LLM's response after generation
+- Injecting prompts mid-execution
+- Changing user queries dynamically
+
+#### Helper Methods
+
+The `framework_state` provides helper methods to work with messages in a normalized format:
+
+**`get_messages()`**: Get messages as a list of dicts with `role` and `content` keys
+
+**`set_messages()`**: Set messages from a list of dicts with `role` and `content` keys
+
+These methods handle framework-specific message formats internally, providing a consistent API across frameworks.
+
+!!! note "Availability"
+
+    The `get_messages()` and `set_messages()` methods are **only available in `before_llm_call` callbacks**.
+
+    - In `before_llm_call`: You can read and modify the messages that will be sent to the LLM
+    - In other callbacks (`after_llm_call`, `before_tool_execution`, `after_tool_execution`, etc.): These methods will raise `NotImplementedError`
+
 ## Implementing Callbacks
 
 All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.Callback] class and can choose to implement any subset of the available callback methods. These methods include:
@@ -61,7 +89,7 @@ All callbacks must inherit from the base [`Callback`][any_agent.callbacks.base.C
 | Callback Method | Description |
 |:----------------:|:------------:|
 | before_agent_invocation | Should be used to check the Context before the agent is invoked. |
-| befor_llm_call | Should be used before the chat history hits the LLM. |
+| before_llm_call | Should be used before the chat history hits the LLM. |
 | after_llm_call | Should be used once LLM output is generated, before it appends to the chat history. |
 | before_tool_execution | Should be used to check the Context before tool execution. |
 | after_tool_execution | Should be used once tool has been executed, before the output is appended to chat history. |
@@ -136,7 +164,7 @@ Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agen
     agent = AnyAgent.create(
         "tinyagent",
         AgentConfig(
-            model_id="gpt-4.1-nano",
+            model_id="openai:gpt-4.1-nano",
             instructions="Use the tools to find an answer",
             tools=[search_web, visit_webpage],
             callbacks=[
@@ -157,7 +185,7 @@ Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agen
     agent = AnyAgent.create(
         "tinyagent",
         AgentConfig(
-            model_id="gpt-4.1-nano",
+            model_id="openai:gpt-4.1-nano",
             instructions="Use the tools to find an answer",
             tools=[search_web, visit_webpage],
             callbacks=[
@@ -271,4 +299,51 @@ class LimitToolExecutions(Callback):
             raise RuntimeError("Reached limit of Tool Executions")
 
         return context
+```
+
+## Example: Modifying prompts dynamically
+
+You can use callbacks to modify the prompt being sent to the LLM. This is useful for injecting instructions or reminders mid-execution:
+
+```python
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+
+class InjectReminderCallback(Callback):
+    def __init__(self, reminder: str, every_n_calls: int = 5):
+        self.reminder = reminder
+        self.every_n_calls = every_n_calls
+        self.call_count = 0
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
+        self.call_count += 1
+
+        if self.call_count % self.every_n_calls == 0:
+            try:
+                messages = context.framework_state.get_messages()
+                if messages:
+                    messages[-1]["content"] += f"\n\n{self.reminder}"
+                    context.framework_state.set_messages(messages)
+            except NotImplementedError:
+                pass
+
+        return context
+```
+
+Example usage:
+
+```python
+from any_agent import AgentConfig, AnyAgent
+
+callback = InjectReminderCallback(
+    reminder="Remember to use the Todo tool to track your tasks!",
+    every_n_calls=5
+)
+
+config = AgentConfig(
+    model_id="openai:gpt-4o-mini",
+    instructions="You are a helpful assistant.",
+    callbacks=[callback],
+)
+# ... Continue to create and run agent
 ```
