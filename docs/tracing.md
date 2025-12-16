@@ -55,7 +55,7 @@ Here is what the console output looks like:
 
 ## Spans
 
-Here's what the returned [`agent_trace.spans`][any_agent.AgentTrace.spans] look like when [dumped to JSON format](#dumping-to-file):
+Here's what the returned [`agent_trace.spans`][any_agent.tracing.agent_trace.AgentTrace.spans] look like when [dumped to JSON format](#dumping-to-file):
 
 === "AGNO"
     ~~~json
