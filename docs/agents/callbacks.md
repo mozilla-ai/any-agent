@@ -155,7 +155,7 @@ agent = AnyAgent.create(
 
 ## Registering your own Callbacks
 
-Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agent.AgentConfig.callbacks] property.
+Callbacks are provided to the agent using the [`AgentConfig.callbacks`][any_agent.config.AgentConfig.callbacks] property.
 
 === "Extending default callbacks"
 

@@ -115,7 +115,7 @@ with open("agent_trace.json", "w", encoding="utf-8") as f:
 !!! tip
 
     Passing `serialize_as_any=True` makes sure that the `final_output` gets dumped
-    even when [`AgentConfig.output_type`][any_agent.AgentConfig.output_type] is used.
+    even when [`AgentConfig.output_type`][any_agent.config.AgentConfig.output_type] is used.
 
 ## Adding an OpenTelemetry exporter
 
