@@ -55,7 +55,7 @@ Here is what the console output looks like:
 
 ## Spans
 
-Here's what the returned [`agent_trace.spans`][any_agent.AgentTrace.spans] look like when [dumped to JSON format](#dumping-to-file):
+Here's what the returned [`agent_trace.spans`][any_agent.tracing.agent_trace.AgentTrace.spans] look like when [dumped to JSON format](#dumping-to-file):
 
 === "AGNO"
     ~~~json
@@ -115,7 +115,7 @@ with open("agent_trace.json", "w", encoding="utf-8") as f:
 !!! tip
 
     Passing `serialize_as_any=True` makes sure that the `final_output` gets dumped
-    even when [`AgentConfig.output_type`][any_agent.AgentConfig.output_type] is used.
+    even when [`AgentConfig.output_type`][any_agent.config.AgentConfig.output_type] is used.
 
 ## Adding an OpenTelemetry exporter
 
