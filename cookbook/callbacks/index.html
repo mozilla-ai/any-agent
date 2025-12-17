@@ -958,10 +958,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#running-with-default-callbacks" class="md-nav__link">
+  <a href="#configure-llm-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Running with default callbacks
+        Configure LLM Keys
       
     </span>
   </a>
@@ -969,10 +969,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adding-callback-to-offload-sensitive-information" class="md-nav__link">
+  <a href="#running-an-agent-with-default-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adding Callback to offload sensitive information
+        Running an agent (with default callbacks)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#count-tool-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Count Tool Usage ()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enforce-rate-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enforce Rate Limits
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bonus-protect-sensitive-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bonus : Protect Sensitive Data
       
     </span>
   </a>
@@ -1414,10 +1447,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#running-with-default-callbacks" class="md-nav__link">
+  <a href="#configure-llm-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Running with default callbacks
+        Configure LLM Keys
       
     </span>
   </a>
@@ -1425,10 +1458,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adding-callback-to-offload-sensitive-information" class="md-nav__link">
+  <a href="#running-an-agent-with-default-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adding Callback to offload sensitive information
+        Running an agent (with default callbacks)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#count-tool-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Count Tool Usage ()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enforce-rate-limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enforce Rate Limits
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bonus-protect-sensitive-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bonus : Protect Sensitive Data
       
     </span>
   </a>
@@ -1902,9 +1968,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="using-callbacks">Using Callbacks<a class="anchor-link" href="#using-callbacks">¶</a></h1><p>This cookbook illustrates how to implement and use custom callbacks in <code>any-agent</code>.</p>
-<p>You can find more information about callbacks in the docs:</p>
-<p><a href="https://mozilla-ai.github.io/any-agent/agents/callbacks/">https://mozilla-ai.github.io/any-agent/agents/callbacks/</a></p>
+<h1 id="using-callbacks">Using Callbacks<a class="anchor-link" href="#using-callbacks">¶</a></h1><p>This cookbook shows you how to monitor, control, and secure your agents using callbacks.
+We'll build three callbacks of increasing complexity: counting tool usage, enforcing
+rate limits, and protecting sensitive data.</p>
+<p>You can find more information about callbacks in the <a href="https://mozilla-ai.github.io/any-agent/agents/callbacks/">docs</a></p>
 </div>
 </div>
 </div>
@@ -1927,15 +1994,29 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span> <span class="o">--</span><span class="n">quiet</span>
+<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">ddgs</span> <span class="o">--</span><span class="n">quiet</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
 
+<span class="c1"># Suppress technical warnings to reduce noise for the user</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+
 <span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent'
+<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent' --quiet
+%pip install ddgs --quiet
+
+import warnings
 
 import nest_asyncio
+
+# Suppress technical warnings to reduce noise for the user
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 nest_asyncio.apply()</div>
 </div>
@@ -1943,8 +2024,25 @@ nest_asyncio.apply()</div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="configure-llm-keys">Configure LLM Keys<a class="anchor-link" href="#configure-llm-keys">¶</a></h2><p>For this tutorial, we'll use Mistral's mistral-small-latest (fast and affordable).
+You could also use:</p>
+<ul>
+<li><code>gpt-4o-mini</code></li>
+<li><code>claude-3-5-sonnet-latest</code></li>
+<li>Any other model supported by any-agent</li>
+</ul>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -1965,33 +2063,21 @@ nest_asyncio.apply()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getpass</span>
 
-<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"MISTRAL_API_KEY"</span><span class="p">,</span> <span class="s2">"TAVILY_API_KEY"</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> not found in environment!"</span><span class="p">)</span>
-        <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Please enter your </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: "</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_key</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> set for this session!"</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> found in environment."</span><span class="p">)</span>
+<span class="k">if</span> <span class="s2">"MISTRAL_API_KEY"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"MISTRAL_API_KEY"</span><span class="p">]</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">"Enter your Mistral API Key: "</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import os
 from getpass import getpass
 
-for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
-    if key not in os.environ:
-        print(f"{key} not found in environment!")
-        api_key = getpass(f"Please enter your {key}: ")
-        os.environ[key] = api_key
-        print(f"{key} set for this session!")
-    else:
-        print(f"{key} found in environment.")</div>
+if "MISTRAL_API_KEY" not in os.environ:
+    os.environ["MISTRAL_API_KEY"] = getpass("Enter your Mistral API Key: ")</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2010,23 +2096,12 @@ for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_tavily</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
-from any_agent.tools import search_tavily</div>
+from any_agent.tools import search_web</div>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="running-with-default-callbacks">Running with default callbacks<a class="anchor-link" href="#running-with-default-callbacks">¶</a></h2>
 </div>
 </div>
 </div>
@@ -2037,16 +2112,26 @@ from any_agent.tools import search_tavily</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>any-agent</code> comes with a set of default callbacks that will be used by default (if you don't pass a value to <code>AgentConfig.callbacks</code>):</p>
+<h2 id="running-an-agent-with-default-callbacks">Running an agent (with default callbacks)<a class="anchor-link" href="#running-an-agent-with-default-callbacks">¶</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><code>any-agent</code> comes with a default callback that will always be used unless you pass a value to <code>AgentConfig.callbacks</code>:</p>
 <ul>
-<li><a href="https://mozilla-ai.github.io/any-agent/api/callbacks/#any_agent.callbacks.span_cost.AddCostInfo"><code>AddCostInfo</code></a></li>
 <li><a href="https://mozilla-ai.github.io/any-agent/api/callbacks/#any_agent.callbacks.span_print.ConsolePrintSpan"><code>ConsolePrintSpan</code></a></li>
 </ul>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2066,14 +2151,18 @@ from any_agent.tools import search_tavily</div>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>
-    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">]),</span>
+    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">]),</span>
 <span class="p">)</span>
+
+<span class="c1">## Let's run a simple web search</span>
 <span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"What are 5 LLM agent frameworks that are trending in 2025?"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">agent = AnyAgent.create(
     "tinyagent",
-    AgentConfig(model_id="mistral:mistral-small-latest", tools=[search_tavily]),
+    AgentConfig(model_id="mistral:mistral-small-latest", tools=[search_web]),
 )
+
+## Let's run a simple web search
 agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 2025?")</div>
 </div>
 </div>
@@ -2081,20 +2170,24 @@ agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 20
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="adding-callback-to-offload-sensitive-information">Adding Callback to offload sensitive information<a class="anchor-link" href="#adding-callback-to-offload-sensitive-information">¶</a></h2><p>Some inputs and/or outputs in your traces might contain sensitive information that you don't want
-to be exposed in the <a href="https://mozilla-ai.github.io/any-agent/tracing/">traces</a>.</p>
-<p>We are going to implement a callback that takes the value of the input messages (which contain the instructions and the user prompt), writes it to an external destination (in this example, a local file), and replaces the value of the attribute in the span with a reference to that external destination.</p>
+<h2 id="count-tool-usage-contextshared">Count Tool Usage (<code>Context.shared</code>)<a class="anchor-link" href="#count-tool-usage-contextshared">¶</a></h2><p>To control our agent, we first need to measure it. We will create a <code>StepCounter</code> callback.</p>
+<p><strong>The Callback Contract:</strong></p>
+<ol>
+<li>Callbacks receive a <code>context</code> object.</li>
+<li>They can store data in <code>context.shared</code>.</li>
+<li>They <strong>must</strong> return the <code>context</code> object.</li>
+</ol>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2112,56 +2205,46 @@ to be exposed in the <a href="https://mozilla-ai.github.io/any-agent/tracing/">t
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span><span class="p">,</span> <span class="n">Context</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tracing.attributes</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenAI</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">SensitiveDataOffloader</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolUsageCounter</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">before_tool_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+        <span class="c1"># 1. Initialize our counter if it doesn't exist yet</span>
+        <span class="k">if</span> <span class="s2">"tool_usage_count"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">:</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">"tool_usage_count"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">before_llm_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
-        <span class="n">span</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span>
+        <span class="c1"># 2. Increment the counter</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">"tool_usage_count"</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="k">if</span> <span class="n">input_messages</span> <span class="o">:=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GenAI</span><span class="o">.</span><span class="n">INPUT_MESSAGES</span><span class="p">):</span>
-            <span class="n">output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">span</span><span class="o">.</span><span class="n">get_span_context</span><span class="p">()</span><span class="o">.</span><span class="n">trace_id</span><span class="si">}</span><span class="s2">.txt"</span>
-            <span class="n">output_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">input_messages</span><span class="p">))</span>
+        <span class="c1"># 3. Print for visibility (optional)</span>
+        <span class="n">current_count</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="p">[</span><span class="s2">"tool_usage_count"</span><span class="p">]</span>
+        <span class="n">tool_name</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GenAI</span><span class="o">.</span><span class="n">TOOL_NAME</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🧮 Tracker: Tool '</span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">' called. (Count: </span><span class="si">{</span><span class="n">current_count</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
 
-            <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span>
-                <span class="n">GenAI</span><span class="o">.</span><span class="n">INPUT_MESSAGES</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"ref"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_file</span><span class="p">)})</span>
-            <span class="p">)</span>
-
+        <span class="c1"># 4. MUST return context</span>
         <span class="k">return</span> <span class="n">context</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">import json
-from pathlib import Path
-
-from any_agent.callbacks.base import Callback
-from any_agent.callbacks.context import Context
+<div class="clipboard-copy-txt" id="cell-5">from any_agent.callbacks import Callback, Context
 from any_agent.tracing.attributes import GenAI
 
 
-class SensitiveDataOffloader(Callback):
-    def __init__(self, output_dir: str) -&gt; None:
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True, parents=True)
+class ToolUsageCounter(Callback):
+    def before_tool_execution(self, context: Context, *args, **kwargs) -&gt; Context:
+        # 1. Initialize our counter if it doesn't exist yet
+        if "tool_usage_count" not in context.shared:
+            context.shared["tool_usage_count"] = 0
 
-    def before_llm_call(self, context: Context, *args, **kwargs) -&gt; Context:
-        span = context.current_span
+        # 2. Increment the counter
+        context.shared["tool_usage_count"] += 1
 
-        if input_messages := span.attributes.get(GenAI.INPUT_MESSAGES):
-            output_file = self.output_dir / f"{span.get_span_context().trace_id}.txt"
-            output_file.write_text(str(input_messages))
+        # 3. Print for visibility (optional)
+        current_count = context.shared["tool_usage_count"]
+        tool_name = context.current_span.attributes.get(GenAI.TOOL_NAME)
+        print(f"🧮 Tracker: Tool '{tool_name}' called. (Count: {current_count})")
 
-            span.set_attribute(
-                GenAI.INPUT_MESSAGES, json.dumps({"ref": str(output_file)})
-            )
-
+        # 4. MUST return context
         return context</div>
 </div>
 </div>
@@ -2169,20 +2252,19 @@ class SensitiveDataOffloader(Callback):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>We can now provide our callback to the agent.</p>
-<p>You can find more information in:</p>
-<p><a href="https://mozilla-ai.github.io/any-agent/agents/callbacks/#providing-your-own-callbacks">https://mozilla-ai.github.io/any-agent/agents/callbacks/#providing-your-own-callbacks</a></p>
+<h2 id="enforce-rate-limits">Enforce Rate Limits<a class="anchor-link" href="#enforce-rate-limits">¶</a></h2><p>Now that we are counting steps, we can act on that data.</p>
+<p>We will create a <code>BudgetLimit</code> callback. If the tool usage exceeds our limit, we will raise an exception to immediately halt the agent. This prevents run-away costs.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -2200,25 +2282,275 @@ class SensitiveDataOffloader(Callback):
 </div>
 </clipboard-copy>
 </div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BudgetLimit</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_tools</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_tools</span> <span class="o">=</span> <span class="n">max_tools</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">before_tool_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+        <span class="c1"># We can access the data set by the previous callback!</span>
+        <span class="n">current_count</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tool_usage_count"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">current_count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_tools</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Exceeded limit of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_tools</span><span class="si">}</span><span class="s2"> tool calls"</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">context</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-6">class BudgetLimit(Callback):
+    def __init__(self, max_tools: int):
+        self.max_tools = max_tools
+
+    def before_tool_execution(self, context: Context, *args, **kwargs) -&gt; Context:
+        # We can access the data set by the previous callback!
+        current_count = context.shared.get("tool_usage_count", 0)
+
+        if current_count &gt; self.max_tools:
+            msg = f"Exceeded limit of {self.max_tools} tool calls"
+            raise RuntimeError(msg)
+
+        return context</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Let's put this all together.</p>
+<ol>
+<li>We register our callbacks in <code>AgentConfig</code>.</li>
+<li>We use <code>get_default_callbacks()</code> to keep the nice console logging.</li>
+<li>We give the agent a <strong>hard task</strong> that requires multiple steps ("Find the weather in 3 different cities") to intentionally trigger our limit.</li>
+</ol>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=13">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_callbacks</span>
+
+<span class="c1"># 1. Configure Agent with our custom stack</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">AgentConfig</span><span class="p">(</span>
+    <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">],</span>
+    <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">ToolUsageCounter</span><span class="p">(),</span>  <span class="c1"># Runs first: Counts the step</span>
+        <span class="n">BudgetLimit</span><span class="p">(</span>
+            <span class="n">max_tools</span><span class="o">=</span><span class="mi">2</span>
+        <span class="p">),</span>  <span class="c1"># Runs second: Checks the limit (set low to force a crash)</span>
+        <span class="o">*</span><span class="n">get_default_callbacks</span><span class="p">(),</span>  <span class="c1"># Runs last: Logs to console</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">"tinyagent"</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+<span class="c1"># 2. Run with a complex prompt</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"--- Starting Stress Test ---"</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"Find the current weather in Tokyo, New York, and London."</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">✅ Success! The agent was stopped: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-7">from any_agent.callbacks import get_default_callbacks
+
+# 1. Configure Agent with our custom stack
+config = AgentConfig(
+    model_id="mistral:mistral-small-latest",
+    tools=[search_web],
+    callbacks=[
+        ToolUsageCounter(),  # Runs first: Counts the step
+        BudgetLimit(
+            max_tools=2
+        ),  # Runs second: Checks the limit (set low to force a crash)
+        *get_default_callbacks(),  # Runs last: Logs to console
+    ],
+)
+
+agent = AnyAgent.create("tinyagent", config)
+
+# 2. Run with a complex prompt
+print("--- Starting Stress Test ---")
+try:
+    agent.run("Find the current weather in Tokyo, New York, and London.")
+except RuntimeError as e:
+    print(f"\n✅ Success! The agent was stopped: {e}")</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=14">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="bonus-protect-sensitive-data">Bonus : Protect Sensitive Data<a class="anchor-link" href="#bonus-protect-sensitive-data">¶</a></h2><p>Beyond stopping the agent, callbacks can also <strong>modify data</strong> before it gets logged to your <a href="https://mozilla-ai.github.io/any-agent/tracing/">traces</a>. This is critical for preventing Sensitive Information (PII) from leaking into your logs.</p>
+<p>In the example below, we are going to implement a callback that:</p>
+<ol>
+<li>Detects <code>INPUT_MESSAGES</code> in <code>Context.current_span</code>.</li>
+<li>Writes this text to a secure local file.</li>
+<li><strong>Replaces</strong> the content in the current span with a reference link, so the trace remains clean.</li>
+</ol>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=15">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SensitiveDataOffloader</span><span class="p">(</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">before_llm_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Context</span><span class="p">:</span>
+        <span class="n">span</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">current_span</span>
+
+        <span class="c1"># 1. Check if we have input messages to scrub</span>
+        <span class="k">if</span> <span class="n">input_messages</span> <span class="o">:=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GenAI</span><span class="o">.</span><span class="n">INPUT_MESSAGES</span><span class="p">):</span>
+            <span class="c1"># 2. Generate a secure filename based on the trace id</span>
+            <span class="n">output_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">span</span><span class="o">.</span><span class="n">get_span_context</span><span class="p">()</span><span class="o">.</span><span class="n">trace_id</span><span class="si">}</span><span class="s2">.txt"</span>
+
+            <span class="c1"># 3. "Offload" the data to the secure location</span>
+            <span class="n">output_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">input_messages</span><span class="p">))</span>
+
+            <span class="c1"># 4. Replace the span attribute with a reference</span>
+            <span class="n">span</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span>
+                <span class="n">GenAI</span><span class="o">.</span><span class="n">INPUT_MESSAGES</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"ref"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">output_file</span><span class="p">)})</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">context</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-8">import json
+from pathlib import Path
+
+from any_agent.callbacks.base import Callback
+from any_agent.callbacks.context import Context
+
+
+class SensitiveDataOffloader(Callback):
+    def __init__(self, output_dir: str) -&gt; None:
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(exist_ok=True, parents=True)
+
+    def before_llm_call(self, context: Context, *args, **kwargs) -&gt; Context:
+        span = context.current_span
+
+        # 1. Check if we have input messages to scrub
+        if input_messages := span.attributes.get(GenAI.INPUT_MESSAGES):
+            # 2. Generate a secure filename based on the trace id
+            output_file = self.output_dir / f"{span.get_span_context().trace_id}.txt"
+
+            # 3. "Offload" the data to the secure location
+            output_file.write_text(str(input_messages))
+
+            # 4. Replace the span attribute with a reference
+            span.set_attribute(
+                GenAI.INPUT_MESSAGES, json.dumps({"ref": str(output_file)})
+            )
+
+        return context</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>We can now provide our callback to the agent.</p>
+<p>You can find more information in <a href="https://mozilla-ai.github.io/any-agent/agents/callbacks/#providing-your-own-callbacks">our docs</a>.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=17">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_callbacks</span>
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
         <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span>
-        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">],</span>
+        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">],</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">SensitiveDataOffloader</span><span class="p">(</span><span class="s2">"sensitive-info"</span><span class="p">),</span> <span class="o">*</span><span class="n">get_default_callbacks</span><span class="p">()],</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">"What are 5 LLM agent frameworks that are trending in 2025?"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">from any_agent.callbacks import get_default_callbacks
+<div class="clipboard-copy-txt" id="cell-9">from any_agent.callbacks import get_default_callbacks
 
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
         model_id="mistral:mistral-small-latest",
-        tools=[search_tavily],
+        tools=[search_web],
         callbacks=[SensitiveDataOffloader("sensitive-info"), *get_default_callbacks()],
     ),
 )
@@ -2228,8 +2560,51 @@ agent_trace = agent.run("What are 5 LLM agent frameworks that are trending in 20
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=18">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=11">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># Show that sensitive data was offloaded</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">"sensitive-info"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Created </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span><span class="si">}</span><span class="s2"> secure file(s)"</span><span class="p">)</span>
+
+<span class="c1"># Peek at what was saved (first 200 chars)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">"sensitive-info/</span><span class="si">{</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Offloaded data preview: </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()[:</span><span class="mi">200</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-10"># Show that sensitive data was offloaded
+import os
+
+files = os.listdir("sensitive-info")
+print(f"Created {len(files)} secure file(s)")
+
+# Peek at what was saved (first 200 chars)
+with open(f"sensitive-info/{files[0]}") as f:
+    print(f"Offloaded data preview: {f.read()[:200]}...")</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>

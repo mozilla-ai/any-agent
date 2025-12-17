@@ -2059,13 +2059,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span> <span class="s1">'mcp-server-time'</span> <span class="o">--</span><span class="n">quiet</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
 
 <span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent'
+<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent' 'mcp-server-time' --quiet
 
 import nest_asyncio
 
@@ -2084,14 +2084,14 @@ nest_asyncio.apply()</div>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="configure-the-agent">Configure the Agent<a class="anchor-link" href="#configure-the-agent">¶</a></h2><p>Now it's time to configure the agent! At this stage you have a few choices:</p>
 <h3 id="pick-the-framework">Pick the framework<a class="anchor-link" href="#pick-the-framework">¶</a></h3><p>We support a variety of underlying agent frameworks (OpenAI, Smolagents, Langchain, TinyAgent, etc), which all have their own particular agentic AI implementations. For this tutorial's simple use case, any of the frameworks should work just fine, but any-agent makes it easy to try out a different framework later, if we so choose. For this example, we will use the <a href="frameworks/tinyagent.md">TinyAgent</a> framework.</p>
-<h3 id="pick-an-llm">Pick an LLM<a class="anchor-link" href="#pick-an-llm">¶</a></h3><p>Regardless of which agent framework you choose, each framework supports any-llm, which is a proxy that allows us to use whichever LLM inside the framework, hosted on by any provider. For example, we could use a local model via llama.cpp or llamafile, a google hosted gemini model, or a AWS bedrock hosted Llama model. For this example, let's use Mistral AI's mistral:mistral-small-latest.</p>
+<h3 id="pick-an-llm">Pick an LLM<a class="anchor-link" href="#pick-an-llm">¶</a></h3><p>Regardless of which agent framework you choose, each framework supports any-llm, which is a proxy that allows us to use whichever LLM inside the framework, hosted by any provider. For example, we could use a local model via llama.cpp or llamafile, a Google-hosted gGemini model, or a AWS bedrock hosted Llama model. For this example, let's use Mistral AI's mistral:mistral-small-latest.</p>
 <h3 id="pick-which-tools-to-use">Pick which tools to use<a class="anchor-link" href="#pick-which-tools-to-use">¶</a></h3><p>In this example, we'll add a few MCP servers that we host locally, which means we'll use a Stdio MCP server. If an MCP Server is already running and hosted elsewhere, you can use an SSE connection to access it. You can browse some of the officially supported MCP servers <a href="https://github.com/modelcontextprotocol/servers/tree/main?tab=readme-ov-file">here</a>.</p>
-<p>Lets give use two MCP servers:</p>
+<p>Let's use two MCP servers:</p>
 <ul>
 <li><a href="https://github.com/modelcontextprotocol/servers/tree/main/src/time">Time</a>: so the agent can know what time/day it is.</li>
-<li><a href="https://github.com/openbnb-org/mcp-server-airbnb">Airbnb</a>: so the agent can browse airbnb listings</li>
+<li><a href="https://github.com/openbnb-org/mcp-server-airbnb">Airbnb</a>: so the agent can browse airbnb listings (Needs <a href="https://docs.npmjs.com/cli/v8/commands/npx">npx</a>)</li>
 </ul>
-<p>I will also add a custom send_message tool, that way it can ask us additional questions before getting its final answer!</p>
+<p>We will also add a custom send_message tool, that way it can ask us additional questions before getting its final answer!</p>
 </div>
 </div>
 </div>
@@ -2115,6 +2115,7 @@ nest_asyncio.apply()</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getpass</span>
 
 <span class="k">if</span> <span class="s2">"MISTRAL_API_KEY"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
@@ -2124,8 +2125,15 @@ nest_asyncio.apply()</div>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"MISTRAL_API_KEY set for this session!"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"MISTRAL_API_KEY found in environment."</span><span class="p">)</span>
+
+<span class="c1"># Quick Environment Check (Airbnb tool requires npx/Node.js)\n",</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">"npx"</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">"⚠️ Warning: 'npx' was not found in your path. The Airbnb tool requires Node.js/npm to run."</span>
+    <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import os
+import shutil
 from getpass import getpass
 
 if "MISTRAL_API_KEY" not in os.environ:
@@ -2134,7 +2142,13 @@ if "MISTRAL_API_KEY" not in os.environ:
     os.environ["MISTRAL_API_KEY"] = api_key
     print("MISTRAL_API_KEY set for this session!")
 else:
-    print("MISTRAL_API_KEY found in environment.")</div>
+    print("MISTRAL_API_KEY found in environment.")
+
+# Quick Environment Check (Airbnb tool requires npx/Node.js)\n",
+if not shutil.which("npx"):
+    print(
+        "⚠️ Warning: 'npx' was not found in your path. The Airbnb tool requires Node.js/npm to run."
+    )</div>
 </div>
 </div>
 </div>
@@ -2159,28 +2173,76 @@ else:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span>
 
-<span class="c1"># This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/</span>
 <span class="n">time_tool</span> <span class="o">=</span> <span class="n">MCPStdio</span><span class="p">(</span>
-    <span class="n">command</span><span class="o">=</span><span class="s2">"uvx"</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"mcp-server-time"</span><span class="p">,</span> <span class="s2">"--local-timezone=America/New_York"</span><span class="p">],</span>
+    <span class="n">command</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-u"</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"mcp_server_time"</span><span class="p">,</span> <span class="s2">"--local-timezone"</span><span class="p">,</span> <span class="s2">"America/New_York"</span><span class="p">],</span>
     <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
         <span class="s2">"get_current_time"</span><span class="p">,</span>
     <span class="p">],</span>
     <span class="n">client_session_timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Done init time_tool"</span><span class="p">)</span>
 <span class="c1"># This MCP tool relies upon npx https://docs.npmjs.com/cli/v8/commands/npx which comes standard with npm</span>
 <span class="n">airbnb_tool</span> <span class="o">=</span> <span class="n">MCPStdio</span><span class="p">(</span>
     <span class="n">command</span><span class="o">=</span><span class="s2">"npx"</span><span class="p">,</span>
     <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-y"</span><span class="p">,</span> <span class="s2">"@openbnb/mcp-server-airbnb"</span><span class="p">,</span> <span class="s2">"--ignore-robots-txt"</span><span class="p">],</span>
     <span class="n">client_session_timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Done init airbnb_tool"</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-3">import sys
 
+from any_agent import AgentConfig, AnyAgent
+from any_agent.config import MCPStdio
 
-<span class="c1"># This is a custom tool that we will provide to the agent. For the agent to use the tool, we must provide a docstring</span>
+time_tool = MCPStdio(
+    command=sys.executable,
+    args=["-u", "-m", "mcp_server_time", "--local-timezone", "America/New_York"],
+    tools=[
+        "get_current_time",
+    ],
+    client_session_timeout_seconds=30,
+)
+
+print("Done init time_tool")
+# This MCP tool relies upon npx https://docs.npmjs.com/cli/v8/commands/npx which comes standard with npm
+airbnb_tool = MCPStdio(
+    command="npx",
+    args=["-y", "@openbnb/mcp-server-airbnb", "--ignore-robots-txt"],
+    client_session_timeout_seconds=30,
+)
+print("Done init airbnb_tool")</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># This is a custom tool that we will provide to the agent. For the agent to use the tool, we must provide a docstring</span>
 <span class="c1"># and also have proper python typing for input and output parameters</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">send_message</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Display a message to the user and wait for their response.</span>
@@ -2196,38 +2258,8 @@ else:
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"IN_PYTEST"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"1"</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">"2 people, next weekend, low budget. Do not ask for any more information or confirmation."</span>
     <span class="k">return</span> <span class="nb">input</span><span class="p">(</span><span class="n">message</span> <span class="o">+</span> <span class="s2">" "</span><span class="p">)</span>
-
-
-<span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
-    <span class="n">AgentConfig</span><span class="p">(</span>
-        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span>
-        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">airbnb_tool</span><span class="p">,</span> <span class="n">time_tool</span><span class="p">,</span> <span class="n">send_message</span><span class="p">],</span>
-    <span class="p">),</span>
-<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
-from any_agent.config import MCPStdio
-
-# This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/
-time_tool = MCPStdio(
-    command="uvx",
-    args=["mcp-server-time", "--local-timezone=America/New_York"],
-    tools=[
-        "get_current_time",
-    ],
-    client_session_timeout_seconds=30,
-)
-
-# This MCP tool relies upon npx https://docs.npmjs.com/cli/v8/commands/npx which comes standard with npm
-airbnb_tool = MCPStdio(
-    command="npx",
-    args=["-y", "@openbnb/mcp-server-airbnb", "--ignore-robots-txt"],
-    client_session_timeout_seconds=30,
-)
-
-
-# This is a custom tool that we will provide to the agent. For the agent to use the tool, we must provide a docstring
+<div class="clipboard-copy-txt" id="cell-4"># This is a custom tool that we will provide to the agent. For the agent to use the tool, we must provide a docstring
 # and also have proper python typing for input and output parameters
 def send_message(message: str) -&gt; str:
     """Display a message to the user and wait for their response.
@@ -2242,16 +2274,56 @@ def send_message(message: str) -&gt; str:
     """
     if os.environ.get("IN_PYTEST") == "1":
         return "2 people, next weekend, low budget. Do not ask for any more information or confirmation."
-    return input(message + " ")
-
-
-agent = AnyAgent.create(
-    "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
-    AgentConfig(
-        model_id="mistral:mistral-small-latest",
-        tools=[airbnb_tool, time_tool, send_message],
-    ),
-)</div>
+    return input(message + " ")</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Start creating agent"</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">agent</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
+        <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
+        <span class="n">AgentConfig</span><span class="p">(</span>
+            <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-large-latest"</span><span class="p">,</span>
+            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">,</span> <span class="n">airbnb_tool</span><span class="p">,</span> <span class="n">send_message</span><span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"❌ Failed to create agent: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Done creating agent"</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">print("Start creating agent")
+try:
+    agent = await AnyAgent.create_async(
+        "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
+        AgentConfig(
+            model_id="mistral:mistral-large-latest",
+            tools=[time_tool, airbnb_tool, send_message],
+        ),
+    )
+except Exception as e:
+    print(f"❌ Failed to create agent: {e}")
+print("Done creating agent")</div>
 </div>
 </div>
 </div>
@@ -2277,7 +2349,7 @@ agent = AnyAgent.create(
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -2288,16 +2360,30 @@ agent = AnyAgent.create(
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">"""</span>
-<span class="s2">I am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this? Figure out the time, then ask me some questions and lets figure this out together. Once I tell you what you need to know, find and return some options for me.</span>
+<span class="s2">I am planning a trip to New York, NY for next weekend. Please act as my travel planner.</span>
+
+<span class="s2">Follow these steps in strict order:</span>
+<span class="s2">1. **Time Check:** Use the time tool to identify the specific dates for "next weekend."</span>
+<span class="s2">2. **Information Gathering:** Ask me about my budget and number of guests. Do NOT search yet.</span>
+<span class="s2">3. **Wait:** Wait for my response.</span>
+<span class="s2">4. **Search:** ONLY after I reply, search for listings.</span>
+<span class="s2">   **CRITICAL:** You MUST set the `location` parameter explicitly to "New York, NY" in the tool call.</span>
 <span class="s2">"""</span>
 
-<span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+<span class="n">agent_trace</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agent</span><span class="o">.</span><span class="n">run_async</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">prompt = """
-I am looking to book an airbnb next weekend near Ohiopyle, PA. Can you help me plan this? Figure out the time, then ask me some questions and lets figure this out together. Once I tell you what you need to know, find and return some options for me.
+<div class="clipboard-copy-txt" id="cell-6">prompt = """
+I am planning a trip to New York, NY for next weekend. Please act as my travel planner.
+
+Follow these steps in strict order:
+1. **Time Check:** Use the time tool to identify the specific dates for "next weekend."
+2. **Information Gathering:** Ask me about my budget and number of guests. Do NOT search yet.
+3. **Wait:** Wait for my response.
+4. **Search:** ONLY after I reply, search for listings.
+   **CRITICAL:** You MUST set the `location` parameter explicitly to "New York, NY" in the tool call.
 """
 
-agent_trace = agent.run(prompt)</div>
+agent_trace = await agent.run_async(prompt)</div>
 </div>
 </div>
 </div>
@@ -2334,7 +2420,7 @@ agent_trace = agent.run(prompt)</div>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -2349,7 +2435,7 @@ agent_trace = agent.run(prompt)</div>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Tokens: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">total_tokens</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total Cost (USD): </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">total_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">print(agent_trace.final_output)  # Final answer
+<div class="clipboard-copy-txt" id="cell-7">print(agent_trace.final_output)  # Final answer
 print(f"Duration: {agent_trace.duration.total_seconds():.2f} seconds")
 print(f"Total Tokens: {agent_trace.tokens.total_tokens:,}")
 print(f"Total Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>

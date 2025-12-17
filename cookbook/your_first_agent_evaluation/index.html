@@ -2068,7 +2068,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="evaluating-your-first-agent">Evaluating your first agent<a class="anchor-link" href="#evaluating-your-first-agent">¶</a></h1><p>In this tutorial, we'll build upon the web search agent from <a href="https://github.com/mozilla-ai/any-agent/blob/main/docs/cookbook/your_first_agent.ipynb">my_first_agent.ipynb</a> and demonstrate how to evaluate its performance using any-agent's evaluation framework. We'll explore different evaluation methods including custom code evaluation, an LLM-based judge, and an agent-based judge.</p>
+<h1 id="evaluating-your-first-agent">Evaluating your first agent<a class="anchor-link" href="#evaluating-your-first-agent">¶</a></h1><p>In this tutorial, we'll build upon the web search agent from <a href="https://github.com/mozilla-ai/any-agent/blob/main/docs/cookbook/your_first_agent.ipynb">your_first_agent.ipynb</a> and demonstrate how to evaluate its performance using any-agent's evaluation framework. We'll explore different evaluation methods including custom code evaluation, an LLM-based judge, and an agent-based judge.</p>
 <p>Note: Since we are building on the previous notebook, we encourage you to run that one first to read through details and choices available while building the agent before evaluating it.</p>
 </div>
 </div>
@@ -2103,11 +2103,31 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span> <span class="o">--</span><span class="n">quiet</span>
+<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">ddgs</span> <span class="o">--</span><span class="n">quiet</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
+
+<span class="c1"># Suppress technical warnings to reduce noise for the user</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
 
 <span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import nest_asyncio
+<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent' --quiet
+%pip install ddgs --quiet
+
+import warnings
+
+import nest_asyncio
+
+# Suppress technical warnings to reduce noise for the user
+warnings.simplefilter("ignore", category=DeprecationWarning)
+warnings.simplefilter("ignore", category=RuntimeWarning)
+warnings.simplefilter("ignore", category=UserWarning)
 
 nest_asyncio.apply()</div>
 </div>
@@ -2191,22 +2211,22 @@ else:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_tavily</span><span class="p">,</span> <span class="n">visit_webpage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span>
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
-        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">]</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">,</span> <span class="n">visit_webpage</span><span class="p">]</span>
     <span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
-from any_agent.tools import search_tavily, visit_webpage
+from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
     "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
     AgentConfig(
-        model_id="mistral:mistral-small-latest", tools=[search_tavily, visit_webpage]
+        model_id="mistral:mistral-small-latest", tools=[search_web, visit_webpage]
     ),
 )</div>
 </div>
@@ -2292,15 +2312,29 @@ agent_trace = agent.run(prompt)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>  <span class="c1"># Final answer</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duration: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Usage: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">total_tokens</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cost (USD): </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">total_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⏱️ Duration: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"💰 Cost: $</span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">total_cost</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- Final Answer ---"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- Tool Execution Path ---"</span><span class="p">)</span>
+<span class="c1"># Show the exact steps the agent took so we can verify if it "Cheated" or not</span>
+<span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">agent_trace</span><span class="o">.</span><span class="n">spans</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">span</span><span class="o">.</span><span class="n">is_tool_execution</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🛠️ Tool Used: </span><span class="si">{</span><span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'gen_ai.tool.name'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">print(agent_trace.final_output)  # Final answer
-print(f"Duration: {agent_trace.duration.total_seconds():.2f} seconds")
-print(f"Usage: {agent_trace.tokens.total_tokens:,}")
-print(f"Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
+<div class="clipboard-copy-txt" id="cell-5">print(f"⏱️ Duration: {agent_trace.duration.total_seconds():.2f}s")
+print(f"💰 Cost: ${agent_trace.cost.total_cost:.6f}")
+
+print("\n--- Final Answer ---")
+print(agent_trace.final_output)
+
+print("\n--- Tool Execution Path ---")
+# Show the exact steps the agent took so we can verify if it "Cheated" or not
+for span in agent_trace.spans:
+    if span.is_tool_execution():
+        print(f"🛠️ Tool Used: {span.attributes.get('gen_ai.tool.name')}")</div>
 </div>
 </div>
 </div>
@@ -2358,7 +2392,7 @@ print(f"Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
     <span class="n">final_output</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">final_output</span>
     <span class="n">duration</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
     <span class="c1"># Check if web search tools were used</span>
-    <span class="n">used_search</span> <span class="o">=</span> <span class="n">check_tool_usage</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s2">"search_tavily"</span><span class="p">)</span>
+    <span class="n">used_search</span> <span class="o">=</span> <span class="n">check_tool_usage</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s2">"search_web"</span><span class="p">)</span>
     <span class="n">used_visit</span> <span class="o">=</span> <span class="n">check_tool_usage</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="s2">"visit_webpage"</span><span class="p">)</span>
     <span class="c1"># Apply quantitative criteria</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
@@ -2366,8 +2400,7 @@ print(f"Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
         <span class="o">&lt;</span> <span class="mi">20000</span><span class="p">,</span>  <span class="c1"># Magic number alert: adjust to what you consider reasonable for your budget</span>
         <span class="s2">"step_efficient"</span><span class="p">:</span> <span class="n">step_count</span>
         <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">,</span>  <span class="c1"># A high number of steps would point at problems, but this is also a debatable limit</span>
-        <span class="s2">"has_output"</span><span class="p">:</span> <span class="n">final_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">final_output</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">,</span>
-        <span class="s2">"short_output"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">final_output</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">final_output</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"has_output"</span><span class="p">:</span> <span class="n">final_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">final_output</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">,</span>
         <span class="s2">"used_web_search"</span><span class="p">:</span> <span class="n">used_search</span><span class="p">,</span>
         <span class="s2">"used_webpage_visit"</span><span class="p">:</span> <span class="n">used_visit</span><span class="p">,</span>
         <span class="s2">"reasonable_duration"</span><span class="p">:</span> <span class="n">duration</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">,</span>
@@ -2379,7 +2412,6 @@ print(f"Cost (USD): {agent_trace.cost.total_cost:.6f}")</div>
             <span class="n">results</span><span class="p">[</span><span class="s2">"step_efficient"</span><span class="p">],</span>
             <span class="n">results</span><span class="p">[</span><span class="s2">"has_output"</span><span class="p">],</span>
             <span class="n">results</span><span class="p">[</span><span class="s2">"used_web_search"</span><span class="p">],</span>
-            <span class="n">results</span><span class="p">[</span><span class="s2">"short_output"</span><span class="p">],</span>
         <span class="p">]</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">results</span>
@@ -2405,7 +2437,7 @@ def evaluate_web_search_efficiency(trace: AgentTrace) -&gt; dict:
     final_output = trace.final_output
     duration = trace.duration.total_seconds()
     # Check if web search tools were used
-    used_search = check_tool_usage(trace, "search_tavily")
+    used_search = check_tool_usage(trace, "search_web")
     used_visit = check_tool_usage(trace, "visit_webpage")
     # Apply quantitative criteria
     results = {
@@ -2413,8 +2445,7 @@ def evaluate_web_search_efficiency(trace: AgentTrace) -&gt; dict:
         &lt; 20000,  # Magic number alert: adjust to what you consider reasonable for your budget
         "step_efficient": step_count
         &lt;= 10,  # A high number of steps would point at problems, but this is also a debatable limit
-        "has_output": final_output is not None and len(str(final_output)) &gt; 5,
-        "short_output": len(str(final_output)) &lt; 10 if final_output else 0,
+        "has_output": final_output is not None and len(str(final_output)) &gt; 50,
         "used_web_search": used_search,
         "used_webpage_visit": used_visit,
         "reasonable_duration": duration &lt; 60,
@@ -2426,7 +2457,6 @@ def evaluate_web_search_efficiency(trace: AgentTrace) -&gt; dict:
             results["step_efficient"],
             results["has_output"],
             results["used_web_search"],
-            results["short_output"],
         ]
     )
     return results</div>
@@ -2513,13 +2543,13 @@ for key, value in evaluation.items():
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">LlmJudge</span>
 
 <span class="c1"># Create an LLM judge</span>
-<span class="n">judge</span> <span class="o">=</span> <span class="n">LlmJudge</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"gpt-4.1-mini"</span><span class="p">)</span>
+<span class="n">judge</span> <span class="o">=</span> <span class="n">LlmJudge</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-large-latest"</span><span class="p">)</span>
 
 <span class="c1"># Define evaluation questions - notice the last one is not like the others</span>
 <span class="n">evaluation_questions</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">"Did the agent provide a clear and concise answer?"</span><span class="p">,</span>
     <span class="s2">"Did the agent correctly identify the genre?"</span><span class="p">,</span>
-    <span class="s2">"Did the agent provide a brief description (under 10 words) of the film?"</span><span class="p">,</span>
+    <span class="s2">"Did the agent include a Rotten Tomatoes score in its response?"</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="c1"># Run evaluations</span>
@@ -2542,13 +2572,13 @@ for key, value in evaluation.items():
 <div class="clipboard-copy-txt" id="cell-8">from any_agent.evaluation import LlmJudge
 
 # Create an LLM judge
-judge = LlmJudge(model_id="gpt-4.1-mini")
+judge = LlmJudge(model_id="mistral:mistral-large-latest")
 
 # Define evaluation questions - notice the last one is not like the others
 evaluation_questions = [
     "Did the agent provide a clear and concise answer?",
     "Did the agent correctly identify the genre?",
-    "Did the agent provide a brief description (under 10 words) of the film?",
+    "Did the agent include a Rotten Tomatoes score in its response?",
 ]
 
 # Run evaluations
@@ -2602,17 +2632,6 @@ print(f"\nOverall: {passed_count}/{len(results)} criteria passed")</div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Notice, if you do not have a <a href="https://www.tavily.com/">Tavily API key</a>, you can import and use <code>search_web</code> (Duck Duck Go Search).</p>
-</div>
-</div>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -2633,10 +2652,10 @@ print(f"\nOverall: {passed_count}/{len(results)} criteria passed")</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentJudge</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_tavily</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span>
 
 <span class="c1"># Create an agent judge</span>
-<span class="n">agent_judge</span> <span class="o">=</span> <span class="n">AgentJudge</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"gpt-4.1-mini"</span><span class="p">)</span>
+<span class="n">agent_judge</span> <span class="o">=</span> <span class="n">AgentJudge</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-large-latest"</span><span class="p">)</span>
 
 <span class="c1"># Define a complex evaluation question that requires trace inspection</span>
 <span class="n">complex_question</span> <span class="o">=</span> <span class="s2">"""</span>
@@ -2654,7 +2673,7 @@ print(f"\nOverall: {passed_count}/{len(results)} criteria passed")</div>
     <span class="n">trace</span><span class="o">=</span><span class="n">agent_trace</span><span class="p">,</span>
     <span class="n">question</span><span class="o">=</span><span class="n">complex_question</span><span class="p">,</span>
     <span class="n">additional_tools</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">search_tavily</span>
+        <span class="n">search_web</span>
     <span class="p">],</span>  <span class="c1"># Give the judge access to web search for verification</span>
 <span class="p">)</span>
 
@@ -2667,10 +2686,10 @@ print(f"\nOverall: {passed_count}/{len(results)} criteria passed")</div>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9">from any_agent.evaluation import AgentJudge
-from any_agent.tools import search_tavily
+from any_agent.tools import search_web
 
 # Create an agent judge
-agent_judge = AgentJudge(model_id="gpt-4.1-mini")
+agent_judge = AgentJudge(model_id="mistral:mistral-large-latest")
 
 # Define a complex evaluation question that requires trace inspection
 complex_question = """
@@ -2688,7 +2707,7 @@ eval_trace = agent_judge.run(
     trace=agent_trace,
     question=complex_question,
     additional_tools=[
-        search_tavily
+        search_web
     ],  # Give the judge access to web search for verification
 )
 

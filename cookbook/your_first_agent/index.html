@@ -925,17 +925,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pick-the-framework" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pick the framework
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#pick-an-llm" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -947,10 +936,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pick-which-tools-to-use" class="md-nav__link">
+  <a href="#pick-tools" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pick which tools to use
+        Pick Tools
       
     </span>
   </a>
@@ -1498,17 +1487,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#pick-the-framework" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pick the framework
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#pick-an-llm" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1520,10 +1498,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pick-which-tools-to-use" class="md-nav__link">
+  <a href="#pick-tools" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pick which tools to use
+        Pick Tools
       
     </span>
   </a>
@@ -2059,15 +2037,29 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span> <span class="o">--</span><span class="n">quiet</span>
+<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">ddgs</span> <span class="o">--</span><span class="n">quiet</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
 
+<span class="c1"># Suppress technical warnings to reduce noise for the user</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+
 <span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent'
+<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent' --quiet
+%pip install ddgs --quiet
+
+import warnings
 
 import nest_asyncio
+
+# Suppress technical warnings to reduce noise for the user
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 nest_asyncio.apply()</div>
 </div>
@@ -2082,10 +2074,14 @@ nest_asyncio.apply()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="configure-the-agent">Configure the Agent<a class="anchor-link" href="#configure-the-agent">¶</a></h2><p>Now it's time to configure the agent! At this stage you have a few choices:</p>
-<h3 id="pick-the-framework">Pick the framework<a class="anchor-link" href="#pick-the-framework">¶</a></h3><p>We support a variety of underlying agent frameworks (OpenAI, Smolagents, Langchain, TinyAgent, etc), which all have their own particular agentic AI implementations. For this tutorial's simple use case, any of the frameworks should work just fine, but any-agent makes it easy to try out a different framework later, if we so choose. For this example, we will use the <a href="frameworks/tinyagent.md">TinyAgent</a> framework.</p>
-<h3 id="pick-an-llm">Pick an LLM<a class="anchor-link" href="#pick-an-llm">¶</a></h3><p>Regardless of which agent framework you choose, each framework supports any-llm, which is a proxy that allows us to use whichever LLM inside the framework, hosted on by any provider. For example, we could use a local model via llama.cpp or llamafile, a google hosted gemini model, or a AWS bedrock hosted Llama model. For this example, let's use Mistral AI's mistral:mistral-small-latest LLM.</p>
-<h3 id="pick-which-tools-to-use">Pick which tools to use<a class="anchor-link" href="#pick-which-tools-to-use">¶</a></h3><p>In this tutorial, we will provide the agent with access to web searches and web page visits. In later examples we will show more advanced tool usage like Model Context Protocol (MCP) tool use or inter-agent communication using Agent-2-Agent (A2A).</p>
+<h2 id="configure-the-agent">Configure the Agent<a class="anchor-link" href="#configure-the-agent">¶</a></h2><h3 id="pick-an-llm">Pick an LLM<a class="anchor-link" href="#pick-an-llm">¶</a></h3><p>For this tutorial, we'll use Mistral's mistral-small-latest (fast and affordable).
+You could also use:</p>
+<ul>
+<li><code>gpt-4o-mini</code></li>
+<li><code>claude-3-5-sonnet-latest</code></li>
+<li>Any other model supported by any-agent</li>
+</ul>
+<h3 id="pick-tools">Pick Tools<a class="anchor-link" href="#pick-tools">¶</a></h3><p>We'll use <code>search_web</code>(DuckDuckGo), which provides Duck Duck Go search for free with no API key required.</p>
 </div>
 </div>
 </div>
@@ -2111,39 +2107,16 @@ nest_asyncio.apply()</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">getpass</span><span class="w"> </span><span class="kn">import</span> <span class="n">getpass</span>
 
-<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"MISTRAL_API_KEY"</span><span class="p">,</span> <span class="s2">"TAVILY_API_KEY"</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> not found in environment!"</span><span class="p">)</span>
-        <span class="n">api_key</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Please enter your </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: "</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_key</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> set for this session!"</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> found in environment."</span><span class="p">)</span>
+<span class="k">if</span> <span class="s2">"MISTRAL_API_KEY"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"MISTRAL_API_KEY"</span><span class="p">]</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="s2">"Enter your Mistral API Key: "</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">import os
 from getpass import getpass
 
-for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
-    if key not in os.environ:
-        print(f"{key} not found in environment!")
-        api_key = getpass(f"Please enter your {key}: ")
-        os.environ[key] = api_key
-        print(f"{key} set for this session!")
-    else:
-        print(f"{key} found in environment.")</div>
+if "MISTRAL_API_KEY" not in os.environ:
+    os.environ["MISTRAL_API_KEY"] = getpass("Enter your Mistral API Key: ")</div>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>We will use Tavily web search. For it, you will need a (free) <a href="https://www.tavily.com/">Tavily API key</a>. Alternatively, you can import and use <code>search_web</code> (Duck Duck Go Search).</p>
 </div>
 </div>
 </div>
@@ -2167,19 +2140,21 @@ for key in ("MISTRAL_API_KEY", "TAVILY_API_KEY"):
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_tavily</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_web</span>
 
+<span class="c1"># We use the 'mistral-small-latest' model we promised in the text</span>
 <span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="s2">"tinyagent"</span><span class="p">,</span>  <span class="c1"># See all options in https://mozilla-ai.github.io/any-agent/</span>
-    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_tavily</span><span class="p">]),</span>
+    <span class="s2">"tinyagent"</span><span class="p">,</span>
+    <span class="n">AgentConfig</span><span class="p">(</span><span class="n">model_id</span><span class="o">=</span><span class="s2">"mistral:mistral-small-latest"</span><span class="p">,</span> <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">search_web</span><span class="p">]),</span>
 <span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from any_agent import AgentConfig, AnyAgent
-from any_agent.tools import search_tavily
+from any_agent.tools import search_web
 
+# We use the 'mistral-small-latest' model we promised in the text
 agent = AnyAgent.create(
-    "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
-    AgentConfig(model_id="mistral:mistral-small-latest", tools=[search_tavily]),
+    "tinyagent",
+    AgentConfig(model_id="mistral:mistral-small-latest", tools=[search_web]),
 )</div>
 </div>
 </div>

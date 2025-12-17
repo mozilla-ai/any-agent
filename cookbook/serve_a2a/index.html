@@ -2039,13 +2039,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent[a2a]'</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent[a2a]'</span> <span class="s1">'mcp-server-time'</span> <span class="o">--</span><span class="n">quiet</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
 
 <span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent[a2a]'
+<div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent[a2a]' 'mcp-server-time' --quiet
 
 import nest_asyncio
 
@@ -2133,6 +2133,7 @@ else:
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
 
@@ -2140,13 +2141,13 @@ else:
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCPStdio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.serving</span><span class="w"> </span><span class="kn">import</span> <span class="n">A2AServingConfig</span>
 
-<span class="c1"># This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/</span>
 <span class="n">time_tool</span> <span class="o">=</span> <span class="n">MCPStdio</span><span class="p">(</span>
-    <span class="n">command</span><span class="o">=</span><span class="s2">"uvx"</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"mcp-server-time"</span><span class="p">,</span> <span class="s2">"--local-timezone=America/New_York"</span><span class="p">],</span>
+    <span class="n">command</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-u"</span><span class="p">,</span> <span class="s2">"-m"</span><span class="p">,</span> <span class="s2">"mcp_server_time"</span><span class="p">,</span> <span class="s2">"--local-timezone"</span><span class="p">,</span> <span class="s2">"America/New_York"</span><span class="p">],</span>
     <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
         <span class="s2">"get_current_time"</span><span class="p">,</span>
     <span class="p">],</span>
+    <span class="n">client_session_timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">time</span> <span class="o">=</span> <span class="k">await</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create_async</span><span class="p">(</span>
@@ -2157,6 +2158,7 @@ else:
         <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">time_tool</span><span class="p">],</span>
     <span class="p">),</span>
 <span class="p">)</span>
+
 <span class="n">time_handle</span> <span class="o">=</span> <span class="k">await</span> <span class="n">time</span><span class="o">.</span><span class="n">serve_async</span><span class="p">(</span><span class="n">A2AServingConfig</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
 
 <span class="n">server_port</span> <span class="o">=</span> <span class="n">time_handle</span><span class="o">.</span><span class="n">port</span>
@@ -2183,6 +2185,7 @@ else:
             <span class="k">raise</span> <span class="ne">ConnectionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">import asyncio
+import sys
 
 import httpx
 
@@ -2190,13 +2193,13 @@ from any_agent import AgentConfig, AnyAgent
 from any_agent.config import MCPStdio
 from any_agent.serving import A2AServingConfig
 
-# This MCP Tool relies upon uvx https://docs.astral.sh/uv/getting-started/installation/
 time_tool = MCPStdio(
-    command="uvx",
-    args=["mcp-server-time", "--local-timezone=America/New_York"],
+    command=sys.executable,
+    args=["-u", "-m", "mcp_server_time", "--local-timezone", "America/New_York"],
     tools=[
         "get_current_time",
     ],
+    client_session_timeout_seconds=30,
 )
 
 time = await AnyAgent.create_async(
@@ -2207,6 +2210,7 @@ time = await AnyAgent.create_async(
         tools=[time_tool],
     ),
 )
+
 time_handle = await time.serve_async(A2AServingConfig(port=0))
 
 server_port = time_handle.port

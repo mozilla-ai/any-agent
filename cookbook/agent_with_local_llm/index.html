@@ -2106,7 +2106,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <p>This tutorial will guide on how to run agent, fully locally / offline i.e., running with a local LLM and a couple of local tools (Callable Python functions), so no data will leave your machine!</p>
 <p>This can be especially useful for privacy-sensitive applications or when you want to avoid any cloud dependencies.</p>
 <p>In this example, we will showcase how to let an agent read and write in your local filesystem! Specifically,
-we will give read-access to the agent to some files in our codebase and ask it to create a short report of potential vulnerabilities or bugs in the codebase, and write it to a file.</p>
+we will give read-access to the agent to some files in our codebase and ask it to create a short summary of what this code does, and write it to a file.</p>
 </div>
 </div>
 </div>
@@ -2142,12 +2142,18 @@ this means we need to enable the use of nested event loops. We'll install any-ag
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="s1">'any-agent'</span> <span class="o">--</span><span class="n">quiet</span>
+<span class="o">%</span><span class="n">pip</span> <span class="n">install</span> <span class="n">ipywidgets</span> <span class="o">--</span><span class="n">quiet</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">nest_asyncio</span>
 
 <span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">%pip install 'any-agent' --quiet
+%pip install ipywidgets --quiet
+
+from pathlib import Path
 
 import nest_asyncio
 
@@ -2181,23 +2187,27 @@ we will use <a href="https://ollama.com/">Ollama</a> to run our LLM locally!</p>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h3 id="ollama-setup">Ollama setup<a class="anchor-link" href="#ollama-setup">¶</a></h3><p>First, install Ollama by following their instructions: <a href="https://ollama.com/download">https://ollama.com/download</a></p>
 <h3 id="picking-an-llm">Picking an LLM<a class="anchor-link" href="#picking-an-llm">¶</a></h3><p>Pick a model that you can run locally based on your hardware and download it from your terminal. For example:</p>
-<p>16-24GB RAM -&gt; <code>granite3.3:8b</code>  or  <code>gemma3:12b</code> with ~10–20k context length</p>
+<p>16-24GB RAM -&gt; qwen2.5:14b (Recommended for Agents), granite3.3:8b, or gemma3:12b with ~10–20k context length</p>
 <p>24+GB RAM -&gt; <code>mistral-small3.2:24b</code> or <code>devstral:24b</code> with ~20k+ context length</p>
 <p><strong><em>NOTE:</em></strong> Smaller models have shown to be more inconsistent and less capable, especially as task complexity increases. If you have the hardware, we highly recommend using the larger models like <code>mistral-small3.2:24b</code> for better performance.</p>
 <h3 id="serving-the-model-with-the-appropriate-context-length">Serving the model with the appropriate context length<a class="anchor-link" href="#serving-the-model-with-the-appropriate-context-length">¶</a></h3><p>By default, Ollama forces a context length of 8192 tokens to all models, which is not enough for our agent to work properly.
 We can simply pass to the AgentConfig of <code>any-agent</code> as a model argument (<code>num_ctx</code> is ollama-specific) our desired value of context length like so:</p>
 <pre><code>    AgentConfig(
-        model_id="ollama/granite3.3:8b",
+        model_id="ollama/qwen2.5:14b",
         instructions="You must use the available tools to solve the task.",
         tools=[mcp_filesystem, show_plan],
-        model_args={"num_ctx": 14000},
+        model_args={"num_ctx": 32000},
+    )
 </code></pre>
 <p>References: <a href="https://mozilla-ai.github.io/any-agent/api/config/">AgentConfig</a>, <a href="https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values">num_ctx</a></p>
 <p>All four of the models above have a max context length of 128k tokens, but if you have limited RAM if you
-set it to 128k it might cause you memory issues. For this example, we will set it to 14.000 tokens and provide a relatively small codebase.</p>
+set it to 128k it might cause you memory issues. For this example, we will set it to 32,000 tokens and provide a relatively small codebase.</p>
 <h3 id="load-the-model">Load the model<a class="anchor-link" href="#load-the-model">¶</a></h3><p>Firstly, download the Ollama model locally:</p>
-<pre><code>ollama pull granite3.3:8b
+<pre><code>ollama pull qwen2.5:14b
 </code></pre>
+<blockquote>
+<p><strong>Note</strong>: You will need <a href="https://docs.ollama.com/">Ollama CLI installed</a></p>
+</blockquote>
 </div>
 </div>
 </div>
@@ -2275,20 +2285,6 @@ servers. In this example we are using python callable functions as tools, but we
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Now that you have downloaded your LLM and you have defined your tools, you need to pick your
-agent framework to build your agent. Note that the agent you'll build with any-agent can be run across multiple
-agent frameworks (Smolagent, TinyAgent, OpenAI, etc) and across various LLMs (Llama, DeepSeek, Mistral, etc).
-For this example, we will use the smolagents framework.</p>
-</div>
-</div>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -2308,52 +2304,145 @@ For this example, we will use the smolagents framework.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">write_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Write content to a file at the specified file path.</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
+<span class="sd">    Args:</span>
+<span class="sd">        file_path: The path of the file to write.</span>
+<span class="sd">        content: The content to write to the file.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">abs_file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">abs_file_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Successfully wrote to file: </span><span class="si">{</span><span class="n">abs_file_path</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Error writing file: </span><span class="si">{</span><span class="n">abs_file_path</span><span class="si">}</span><span class="s2"> </span><span class="se">\n\n</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-3">def write_file(file_path: str, content: str) -&gt; str:
+    """
+    Write content to a file at the specified file path.
 
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">"IN_PYTEST"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"1"</span><span class="p">:</span>
-    <span class="c1"># Don't need to worry about this when running locally.</span>
-    <span class="c1"># We use this for out automated testing https://github.com/mozilla-ai/any-agent/blob/main/.github/workflows/tests-cookbook.yaml</span>
-    <span class="c1"># HF_ENDPOINT points to a Qwen/Qwen3-1.7B running in https://endpoints.huggingface.co/</span>
-    <span class="n">model_id</span> <span class="o">=</span> <span class="s2">"huggingface/tgi"</span>
-    <span class="n">model_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"api_base"</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"HF_ENDPOINT"</span><span class="p">]}</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">model_id</span> <span class="o">=</span> <span class="s2">"ollama/granite3.3:8b"</span>
-    <span class="n">model_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"num_ctx"</span><span class="p">:</span> <span class="mi">32000</span><span class="p">}</span>
+    Args:
+        file_path: The path of the file to write.
+        content: The content to write to the file.
+    """
+    try:
+        abs_file_path = Path(file_path).resolve()
+        with open(abs_file_path, "w") as file:
+            file.write(content)
+        result = f"Successfully wrote to file: {abs_file_path}"
+    except Exception as e:
+        result = f"Error writing file: {abs_file_path} \n\n {e}"
+    return result</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Now that you have downloaded your LLM and you have defined your tools, you need to pick your
+agent framework to build your agent. Note that the agent you'll build with any-agent can be run across multiple
+agent frameworks (Smolagent, TinyAgent, OpenAI, etc) and across various LLMs (Llama, DeepSeek, Mistral, etc).
+For this example, we will use the tinyagent framework.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentConfig</span><span class="p">,</span> <span class="n">AnyAgent</span>
 
+<span class="n">model_id</span> <span class="o">=</span> <span class="s2">"ollama/qwen2.5:14b"</span>
+
+<span class="n">model_args</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"num_ctx"</span><span class="p">:</span> <span class="mi">32000</span><span class="p">,</span>
+    <span class="s2">"temperature"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="c1"># Note: We use a strict 'WAIT' stop token to force the local model to pause and let the Python kernel execute the tool.</span>
+    <span class="c1"># Without this, local models often hallucinate the tool output.</span>
+    <span class="s2">"stop"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"WAIT"</span><span class="p">],</span>
+<span class="p">}</span>
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">AnyAgent</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="s2">"tinyagent"</span><span class="p">,</span>
     <span class="n">AgentConfig</span><span class="p">(</span>
         <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
-        <span class="n">instructions</span><span class="o">=</span><span class="s2">"You are an expert summarizer."</span><span class="p">,</span>
-        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">read_file</span><span class="p">],</span>
+        <span class="n">instructions</span><span class="o">=</span><span class="s2">"""You are a precise tool-calling agent.</span>
+
+<span class="s2">        PROTOCOL:</span>
+<span class="s2">        1. Output valid JSON for the tool you want to use.</span>
+<span class="s2">        2. AFTER the JSON, write the word "WAIT".</span>
+<span class="s2">        3. The system will then pause and run the tool for you.</span>
+<span class="s2">        FORMAT:</span>
+<span class="s2">        {</span>
+<span class="s2">            "name": "tool_name",</span>
+<span class="s2">            "arguments": {</span>
+<span class="s2">                "arg_name": "value"</span>
+<span class="s2">            }</span>
+<span class="s2">        }</span>
+<span class="s2">        WAIT</span>
+<span class="s2">        """</span><span class="p">,</span>
+        <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="n">read_file</span><span class="p">,</span> <span class="n">write_file</span><span class="p">],</span>
         <span class="n">model_args</span><span class="o">=</span><span class="n">model_args</span><span class="p">,</span>
     <span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">import os
+<div class="clipboard-copy-txt" id="cell-4">from any_agent import AgentConfig, AnyAgent
 
-from any_agent import AgentConfig, AnyAgent
+model_id = "ollama/qwen2.5:14b"
 
-if os.getenv("IN_PYTEST") == "1":
-    # Don't need to worry about this when running locally.
-    # We use this for out automated testing https://github.com/mozilla-ai/any-agent/blob/main/.github/workflows/tests-cookbook.yaml
-    # HF_ENDPOINT points to a Qwen/Qwen3-1.7B running in https://endpoints.huggingface.co/
-    model_id = "huggingface/tgi"
-    model_args = {"api_base": os.environ["HF_ENDPOINT"]}
-else:
-    model_id = "ollama/granite3.3:8b"
-    model_args = {"num_ctx": 32000}
-
+model_args = {
+    "num_ctx": 32000,
+    "temperature": 0.0,
+    # Note: We use a strict 'WAIT' stop token to force the local model to pause and let the Python kernel execute the tool.
+    # Without this, local models often hallucinate the tool output.
+    "stop": ["WAIT"],
+}
 
 agent = AnyAgent.create(
     "tinyagent",
     AgentConfig(
         model_id=model_id,
-        instructions="You are an expert summarizer.",
-        tools=[read_file],
+        instructions="""You are a precise tool-calling agent.
+
+        PROTOCOL:
+        1. Output valid JSON for the tool you want to use.
+        2. AFTER the JSON, write the word "WAIT".
+        3. The system will then pause and run the tool for you.
+        FORMAT:
+        {
+            "name": "tool_name",
+            "arguments": {
+                "arg_name": "value"
+            }
+        }
+        WAIT
+        """,
+        tools=[read_file, write_file],
         model_args=model_args,
     ),
 )</div>
@@ -2382,7 +2471,7 @@ agent = AnyAgent.create(
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
 <div>
 <span class="notice" hidden="">Copied!</span>
 <svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
@@ -2392,18 +2481,54 @@ agent = AnyAgent.create(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">abs_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"../../demo/app.py"</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"agent_outputs"</span><span class="p">)</span>
+<span class="n">output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">output_file</span> <span class="o">=</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"code_summary.txt"</span>
 
-<span class="n">abs_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"../../demo/app.py"</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-<span class="n">agent_trace</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">"Carefully read the file in the path: </span><span class="si">{</span><span class="n">abs_path</span><span class="si">}</span><span class="s2"> and return summary of what the code does."</span>
+<span class="c1"># --- STEP 1: FORCE READ ---</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🤖 Step 1: Reading file..."</span><span class="p">)</span>
+<span class="n">read_agent</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Output the JSON to read the file at: '</span><span class="si">{</span><span class="n">abs_path</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+<span class="c1"># The framework executes the tool and returns the trace</span>
+<span class="c1"># We assume the last message contains the file content (or we grab it manually)</span>
+<span class="c1"># Note: In a real app, you'd extract the tool output programmatically.</span>
+<span class="c1"># For this cookbook, we can just feed the file content explicitly if the agent fails,</span>
+<span class="c1"># but usually, the agent trace contains the history.</span>
+
+<span class="c1"># --- STEP 2: FORCE WRITE ---</span>
+<span class="c1"># We feed the Previous History + New Instruction</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🤖 Step 2: Summarizing and Writing..."</span><span class="p">)</span>
+<span class="n">write_agent</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">    I have read the file.</span>
+<span class="s2">    Here is the content: </span><span class="si">{</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">abs_path</span><span class="p">))</span><span class="si">}</span>
+<span class="s2">    Task: Write a summary of this content to: '</span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">'</span>
+<span class="s2">    """</span>
 <span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">from pathlib import Path
+<div class="clipboard-copy-txt" id="cell-5">abs_path = Path("../../demo/app.py").resolve()
+output_dir = Path("agent_outputs")
+output_dir.mkdir(exist_ok=True)
+output_file = output_dir / "code_summary.txt"
 
-abs_path = Path("../../demo/app.py").resolve()
-agent_trace = agent.run(
-    f"Carefully read the file in the path: {abs_path} and return summary of what the code does."
+# --- STEP 1: FORCE READ ---
+print("🤖 Step 1: Reading file...")
+read_agent = agent.run(f"Output the JSON to read the file at: '{abs_path}'")
+# The framework executes the tool and returns the trace
+# We assume the last message contains the file content (or we grab it manually)
+# Note: In a real app, you'd extract the tool output programmatically.
+# For this cookbook, we can just feed the file content explicitly if the agent fails,
+# but usually, the agent trace contains the history.
+
+# --- STEP 2: FORCE WRITE ---
+# We feed the Previous History + New Instruction
+print("🤖 Step 2: Summarizing and Writing...")
+write_agent = agent.run(
+    f"""
+    I have read the file.
+    Here is the content: {read_file(str(abs_path))}
+    Task: Write a summary of this content to: '{output_file}'
+    """
 )</div>
 </div>
 </div>
@@ -2441,35 +2566,6 @@ agent_trace = agent.run(
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">)</span>  <span class="c1"># Final answer</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duration: </span><span class="si">{</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-5">print(agent_trace.final_output)  # Final answer
-print(f"Duration: {agent_trace.duration.total_seconds():.2f} seconds")</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
 <div>
 <span class="notice" hidden="">Copied!</span>
@@ -2480,9 +2576,79 @@ print(f"Duration: {agent_trace.duration.total_seconds():.2f} seconds")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">any_agent.tracing.attributes</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenAI</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print_step_analysis</span><span class="p">(</span><span class="n">step_name</span><span class="p">,</span> <span class="n">trace</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">=== Analysis: </span><span class="si">{</span><span class="n">step_name</span><span class="si">}</span><span class="s2"> ==="</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Duration: </span><span class="si">{</span><span class="n">trace</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds"</span><span class="p">)</span>
+
+    <span class="n">tools_found</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">trace</span><span class="o">.</span><span class="n">spans</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">span</span><span class="o">.</span><span class="n">is_tool_execution</span><span class="p">():</span>
+            <span class="n">tool_name</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">GenAI</span><span class="o">.</span><span class="n">TOOL_NAME</span><span class="p">,</span> <span class="s2">"Unknown"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✓ Tool Called: </span><span class="si">{</span><span class="n">tool_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">tools_found</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tools_found</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"⚠️  No tools were called in this step."</span><span class="p">)</span>
+        <span class="c1"># Optional: Print raw output to debug why</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Raw Output: </span><span class="si">{</span><span class="n">trace</span><span class="o">.</span><span class="n">final_output</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">..."</span><span class="p">)</span>
+
+
+<span class="c1"># 1. Inspect the Read Step</span>
+<span class="n">print_step_analysis</span><span class="p">(</span><span class="s2">"Step 1 (Force Read)"</span><span class="p">,</span> <span class="n">read_agent</span><span class="p">)</span>
+
+<span class="c1"># 2. Inspect the Write Step</span>
+<span class="n">print_step_analysis</span><span class="p">(</span><span class="s2">"Step 2 (Summarize &amp; Write)"</span><span class="p">,</span> <span class="n">write_agent</span><span class="p">)</span>
+
+<span class="c1"># 3. Verify the physical file</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">=== Final File Verification ==="</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">output_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✓ SUCCESS: File created at: </span><span class="si">{</span><span class="n">output_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📄 File Contents:"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">output_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✗ FAILURE: File not found at </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6"></div>
+<div class="clipboard-copy-txt" id="cell-6">from any_agent.tracing.attributes import GenAI
+
+
+def print_step_analysis(step_name, trace):
+    print(f"\n=== Analysis: {step_name} ===")
+    print(f"Duration: {trace.duration.total_seconds():.2f} seconds")
+
+    tools_found = False
+    for span in trace.spans:
+        if span.is_tool_execution():
+            tool_name = span.attributes.get(GenAI.TOOL_NAME, "Unknown")
+            print(f"✓ Tool Called: {tool_name}")
+            tools_found = True
+
+    if not tools_found:
+        print("⚠️  No tools were called in this step.")
+        # Optional: Print raw output to debug why
+        print(f"Raw Output: {trace.final_output[:100]}...")
+
+
+# 1. Inspect the Read Step
+print_step_analysis("Step 1 (Force Read)", read_agent)
+
+# 2. Inspect the Write Step
+print_step_analysis("Step 2 (Summarize &amp; Write)", write_agent)
+
+# 3. Verify the physical file
+print("\n=== Final File Verification ===")
+if output_file.exists():
+    print(f"✓ SUCCESS: File created at: {output_file.name}")
+    print("\n📄 File Contents:")
+    print("-" * 50)
+    print(output_file.read_text())
+    print("-" * 50)
+else:
+    print(f"✗ FAILURE: File not found at {output_file}")</div>
 </div>
 </div>
 </div>

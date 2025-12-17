@@ -5,7 +5,7 @@
 - [Introduction](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/index.md): Requirements - Installation - For AI Systems
 - [Agents - Index](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/index.md): Defining Agents - Running Agents
 - [Agents - Models](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/models.md): Overview - Configuration Parameters
-- [Agents - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/callbacks.md): Context - Implementing Callbacks - Default Callbacks - Providing your own Callbacks - Example: Offloading sensitive information - Example: Limit the number of steps
+- [Agents - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/callbacks.md): Implementing Callbacks - Managing State (`Context`) - Inspecting Data (`Context.current_span`) - How it Works - Default Callbacks - Registering your own Callbacks - Examples
 - [Agents - Frameworks - Agno](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/agno.md): Default Agent Type - Default Model Type
 - [Agents - Frameworks - Google Adk](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/google_adk.md): Default Agent Type - Default Model Type - Run args
 - [Agents - Frameworks - Langchain](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/agents/frameworks/langchain.md): Default Agent Type - Default Model Type - Run args
