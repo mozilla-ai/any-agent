@@ -48,20 +48,90 @@ class CountSearchWeb(Callback):
         return context
 ```
 
-Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic:
+## Stopping Execution
+
+Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic.
+
+!!! warning "Exceptions act as a circuit breaker"
+
+    Raising any exception from a callback immediately halts the agent loop. Use this intentionally to enforce limits or abort on invalid states.
+
+### Using `AgentCancel` (Recommended)
+
+For intentional cancellation (rate limits, guardrails, validation), subclass [`AgentCancel`][any_agent.AgentCancel]. These exceptions propagate directly to your code, allowing you to catch them by their specific type:
 
 ```python
+from any_agent import AgentCancel, AgentConfig, AnyAgent
+from any_agent.callbacks import Callback
+from any_agent.callbacks.context import Context
+
+class SearchLimitReached(AgentCancel):
+    """Raised when the search limit is exceeded."""
+
 class LimitSearchWeb(Callback):
     def __init__(self, max_calls: int):
         self.max_calls = max_calls
 
     def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        if context.shared["search_web_count"] > self.max_calls:
-            raise RuntimeError("Reached limit of `search_web` calls.")
-```
-!!! warning
+        if context.shared.get("search_web_count", 0) > self.max_calls:
+            raise SearchLimitReached(f"Exceeded {self.max_calls} search calls")
+        return context
 
-    Raising an exception is the standard way to halt execution. This effectively acts as a 'circuit breaker' for your agent.
+# In your application code:
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="gpt-4.1-nano",
+        callbacks=[LimitSearchWeb(max_calls=3)],
+    ),
+)
+try:
+    trace = agent.run("Find information about Python")
+except SearchLimitReached as e:
+    print(f"Search limit reached: {e}")
+    print(f"Trace: {e.trace}")  # Access spans collected before cancellation
+```
+
+### Using Regular Exceptions
+
+Regular exceptions (like `RuntimeError`) are automatically wrapped in [`AgentRunError`][any_agent.AgentRunError] by the framework, which provides access to the execution trace but requires you to inspect the wrapped exception:
+
+```python
+from any_agent import AgentConfig, AgentRunError, AnyAgent
+from any_agent.callbacks import Callback
+from any_agent.callbacks.context import Context
+
+class LimitSearchWeb(Callback):
+    def __init__(self, max_calls: int):
+        self.max_calls = max_calls
+
+    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
+        if context.shared.get("search_web_count", 0) > self.max_calls:
+            msg = "Reached limit of `search_web` calls."
+            raise RuntimeError(msg)
+        return context
+
+# In your application code:
+agent = AnyAgent.create(
+    "tinyagent",
+    AgentConfig(
+        model_id="gpt-4.1-nano",
+        callbacks=[LimitSearchWeb(max_calls=3)],
+    ),
+)
+try:
+    trace = agent.run("Find information about Python")
+except AgentRunError as e:
+    print(f"Error: {e.original_exception}")
+    print(f"Trace: {e.trace}")
+```
+
+!!! tip "Choosing the right exception type"
+
+    - **`AgentCancel`**: Use when cancellation is expected behavior and you want to handle it distinctly (e.g., rate limits, safety guardrails).
+    - **Regular exceptions**: Use when something unexpected goes wrong and you want consistent error handling via `AgentRunError`.
+
+    Both expose the execution trace via `.trace` for debugging and inspection.
 
 ## Inspecting Data (`Context.current_span`)
 
@@ -264,46 +334,57 @@ You can find a working example in the [Callbacks Cookbook](../cookbook/callbacks
 
 ### Limit the number of steps
 
-Some agent frameworks allow to limit how many steps an agent can take and some don't. In addition,
-each framework defines a `step` differently: some count the llm calls, some the tool executions,
+Some agent frameworks allow you to limit how many steps an agent can take and some don't. In addition,
+each framework defines a `step` differently: some count the LLM calls, some the tool executions,
 and some the sum of both.
 
 You can use callbacks to limit how many steps an agent can take, and you can decide what to count
 as a `step`:
 
 ```python
+from any_agent import AgentCancel
 from any_agent.callbacks.base import Callback
 from any_agent.callbacks.context import Context
+
+
+class LLMCallLimitReached(AgentCancel):
+    """Raised when the LLM call limit is exceeded."""
+
+
+class ToolExecutionLimitReached(AgentCancel):
+    """Raised when the tool execution limit is exceeded."""
+
 
 class LimitLLMCalls(Callback):
     def __init__(self, max_llm_calls: int) -> None:
         self.max_llm_calls = max_llm_calls
 
     def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
-
         if "n_llm_calls" not in context.shared:
             context.shared["n_llm_calls"] = 0
 
         context.shared["n_llm_calls"] += 1
 
         if context.shared["n_llm_calls"] > self.max_llm_calls:
-            raise RuntimeError("Reached limit of LLM Calls")
+            raise LLMCallLimitReached(f"Exceeded {self.max_llm_calls} LLM calls")
 
         return context
+
 
 class LimitToolExecutions(Callback):
     def __init__(self, max_tool_executions: int) -> None:
         self.max_tool_executions = max_tool_executions
 
     def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-
         if "n_tool_executions" not in context.shared:
             context.shared["n_tool_executions"] = 0
 
         context.shared["n_tool_executions"] += 1
 
         if context.shared["n_tool_executions"] > self.max_tool_executions:
-            raise RuntimeError("Reached limit of Tool Executions")
+            raise ToolExecutionLimitReached(
+                f"Exceeded {self.max_tool_executions} tool executions"
+            )
 
         return context
 ```
