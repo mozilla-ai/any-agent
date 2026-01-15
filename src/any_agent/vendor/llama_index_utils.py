@@ -70,8 +70,12 @@ def to_openailike_message_dict(message: ChatMessage) -> dict[str, Any]:
                 file_buffer = block.resolve_document()
                 b64_string = block._get_b64_string(file_buffer)
                 mimetype = block.document_mimetype or block._guess_mimetype()
-            else:
+            elif isinstance(block.data, bytes):
                 b64_string = block.data.decode("utf-8")
+                mimetype = block.document_mimetype or block._guess_mimetype()
+            else:
+                # block.data is IOBase.
+                b64_string = block._get_b64_string(block.data)
                 mimetype = block.document_mimetype or block._guess_mimetype()
             content.append(
                 {
