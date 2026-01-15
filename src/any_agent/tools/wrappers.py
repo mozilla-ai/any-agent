@@ -9,7 +9,7 @@ from any_agent.tools.mcp import MCPClient, SmolagentsMCPClient
 
 if TYPE_CHECKING:
     from agents import Tool as AgentTool
-    from google.adk.tools import BaseTool as GoogleTool
+    from google.adk.tools import BaseTool as GoogleTool  # type: ignore[attr-defined]
     from langchain_core.tools import BaseTool as LangchainTool
     from llama_index.core.tools import FunctionTool as LlamaIndexTool
     from smolagents import Tool as SmolagentsTool
@@ -78,7 +78,7 @@ def _wrap_tool_llama_index(tool: "Tool | LlamaIndexTool") -> "LlamaIndexTool":
 
 
 def _wrap_tool_google(tool: "Tool | GoogleTool") -> "GoogleTool":
-    from google.adk.tools import BaseTool, FunctionTool
+    from google.adk.tools import BaseTool, FunctionTool  # type: ignore[attr-defined]
 
     if isinstance(tool, BaseTool):
         return tool
