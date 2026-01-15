@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 
 from any_agent import (
+    AgentCancel,
     AgentConfig,
     AgentFramework,
     AgentRunError,
@@ -122,3 +123,40 @@ def test_tool_error(
         and exception_reason in getattr(span.status, "description", "")
         for span in agent_trace.spans
     )
+
+
+class StopExecution(AgentCancel):
+    """Test exception for cancelling agent execution."""
+
+
+class StopBeforeFirstLLMCall(Callback):
+    """Callback that raises StopExecution before the first LLM call."""
+
+    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+        msg = "Stopped by callback"
+        raise StopExecution(msg)
+
+
+def test_agent_cancel_not_wrapped(
+    agent_framework: AgentFramework,
+) -> None:
+    """AgentCancel subclasses should propagate without being wrapped in AgentRunError.
+
+    When a callback raises an exception that inherits from AgentCancel,
+    the exception should propagate directly to the caller without being
+    wrapped in AgentRunError, and the trace should be attached.
+    """
+    agent_config = AgentConfig(
+        model_id=DEFAULT_SMALL_MODEL_ID,
+        tools=[],
+        callbacks=[StopBeforeFirstLLMCall()],
+        model_args=get_default_agent_model_args(agent_framework),
+    )
+    agent = AnyAgent.create(agent_framework, agent_config)
+
+    with pytest.raises(StopExecution) as exc_info:
+        agent.run("test")
+
+    # The exception should have a trace attached.
+    assert exc_info.value.trace is not None
+    assert len(exc_info.value.trace.spans) > 0
