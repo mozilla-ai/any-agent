@@ -134,6 +134,6 @@ async def test_mcp_serve(agent_framework: AgentFramework, test_port: int) -> Non
             # Clean up MCP clients
             for mcp_client in main_agent._mcp_clients:
                 await mcp_client.disconnect()
-        AppStatus.get_or_create_exit_event().set()
+        AppStatus.should_exit = True
         if server_handle:
             await server_handle.shutdown()
