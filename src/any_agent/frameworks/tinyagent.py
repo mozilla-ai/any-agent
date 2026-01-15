@@ -215,6 +215,7 @@ class TinyAgent(AnyAgent):
                         tool_message["content"] = (
                             f"Error calling tool: No tool found with name: {tool_name}"
                         )
+                        messages.append(tool_message)
                         continue
 
                     tool_args = {}

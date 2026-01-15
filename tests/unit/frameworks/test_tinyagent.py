@@ -266,3 +266,127 @@ def test_uses_openai_handles_gateway_provider(
     agent: TinyAgent = AnyAgent.create(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
 
     assert agent.uses_openai is expected_uses_openai
+
+
+@pytest.mark.asyncio
+async def test_tool_result_appended_when_tool_not_found() -> None:
+    """Test that tool_result message is appended when a tool is not found.
+
+    This test verifies that when the LLM calls a tool that doesn't exist,
+    the error message is properly appended to the messages list. Without this,
+    Anthropic API returns 400 errors about tool_use without tool_result.
+    """
+    nonexistent_tool_name = "nonexistent_tool"
+    nonexistent_tool_call_id = "call_nonexistent"
+    nonexistent_tool_args = '{"query": "test"}'
+    final_tool_call_id = "call_final"
+    final_answer_text = "Done"
+    final_tool_args = f'{{"answer": "{final_answer_text}"}}'
+
+    config = AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID, tools=[sample_tool_function])
+    agent: TinyAgent = await AnyAgent.create_async(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
+
+    def create_mock_nonexistent_tool_response() -> MagicMock:
+        """Mock a tool call response for a non-existent tool.
+
+        The LLM expects the response to contain a tool_result, even if that
+        result is an error. A response with it missing causes the Anthropic
+        API to return 400 errors about tool_use without tool_result.
+        """
+        mock_message = MagicMock()
+        mock_message.content = None
+        mock_message.role = "assistant"
+
+        mock_tool_call = MagicMock()
+        mock_tool_call.id = nonexistent_tool_call_id
+        mock_function = MagicMock()
+        mock_function.name = nonexistent_tool_name
+        mock_function.arguments = nonexistent_tool_args
+        mock_tool_call.function = mock_function
+        mock_message.tool_calls = [mock_tool_call]
+
+        mock_message.model_dump.return_value = {
+            "content": None,
+            "role": "assistant",
+            "tool_calls": [
+                {
+                    "id": nonexistent_tool_call_id,
+                    "function": {
+                        "name": nonexistent_tool_name,
+                        "arguments": nonexistent_tool_args,
+                    },
+                    "type": "function",
+                }
+            ],
+        }
+        return MagicMock(choices=[MagicMock(message=mock_message)])
+
+    def create_mock_final_response() -> MagicMock:
+        """Mock a final_answer tool call to end the agent loop.
+
+        This allows the test to complete successfully after the nonexistent
+        tool error is handled.
+        """
+        mock_message = MagicMock()
+        mock_message.content = None
+        mock_message.role = "assistant"
+
+        mock_tool_call = MagicMock()
+        mock_tool_call.id = final_tool_call_id
+        mock_function = MagicMock()
+        mock_function.name = "final_answer"
+        mock_function.arguments = final_tool_args
+        mock_tool_call.function = mock_function
+        mock_message.tool_calls = [mock_tool_call]
+
+        mock_message.model_dump.return_value = {
+            "content": None,
+            "role": "assistant",
+            "tool_calls": [
+                {
+                    "id": final_tool_call_id,
+                    "function": {
+                        "name": "final_answer",
+                        "arguments": final_tool_args,
+                    },
+                    "type": "function",
+                }
+            ],
+        }
+        return MagicMock(choices=[MagicMock(message=mock_message)])
+
+    with patch(LLM_IMPORT_PATHS[AgentFramework.TINYAGENT]) as mock_acompletion:
+        mock_acompletion.side_effect = [
+            create_mock_nonexistent_tool_response(),
+            create_mock_final_response(),
+        ]
+
+        result = await agent.run_async("Call a tool")
+
+        assert result.final_output == final_answer_text
+        assert mock_acompletion.call_count == 2
+
+        # Verify the second call includes the tool_result for the nonexistent tool.
+        second_call_messages = mock_acompletion.call_args_list[1][1]["messages"]
+
+        # Find the assistant message containing the tool_use for the nonexistent tool.
+        assistant_msg_index = None
+        for i, msg in enumerate(second_call_messages):
+            if msg.get("role") == "assistant":
+                tool_calls = msg.get("tool_calls", [])
+                if tool_calls and tool_calls[0].get("id") == nonexistent_tool_call_id:
+                    assistant_msg_index = i
+                    break
+
+        assert assistant_msg_index is not None
+
+        # Verify tool_result immediately follows the assistant message.
+        # Anthropic requires tool_result blocks immediately after tool_use.
+        tool_result_msg = second_call_messages[assistant_msg_index + 1]
+        assert tool_result_msg.get("role") == "tool"
+        assert tool_result_msg.get("tool_call_id") == nonexistent_tool_call_id
+        assert tool_result_msg.get("name") == nonexistent_tool_name
+        assert (
+            f"No tool found with name: {nonexistent_tool_name}"
+            in tool_result_msg["content"]
+        )
