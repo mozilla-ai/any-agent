@@ -8,6 +8,7 @@ from typing import Any
 
 from any_agent import AgentCancel, AgentConfig, AgentFramework, AgentRunError, AnyAgent
 from any_agent.callbacks import Callback, Context
+from any_agent.frameworks.any_agent import _unwrap_agent_cancel
 from any_agent.testing.helpers import DEFAULT_SMALL_MODEL_ID, LLM_IMPORT_PATHS
 from any_agent.tracing.agent_trace import AgentTrace
 
@@ -148,3 +149,71 @@ class TestRunAsyncExceptionHandling:
         assert str(exc_info.value.original_exception) == "Unexpected error"
         assert exc_info.value.trace is not None
         assert len(exc_info.value.trace.spans) > 0
+
+
+class TestUnwrapAgentCancel:
+    """Tests for _unwrap_agent_cancel helper function."""
+
+    def test_returns_none_for_regular_exception(self) -> None:
+        """Returns None when exception chain contains no AgentCancel."""
+        exc = RuntimeError("regular error")
+        assert _unwrap_agent_cancel(exc) is None
+
+    def test_returns_none_for_chained_regular_exceptions(self) -> None:
+        """Returns None when chained exceptions contain no AgentCancel."""
+        inner = ValueError("inner")
+        outer = RuntimeError("outer")
+        outer.__cause__ = inner
+        assert _unwrap_agent_cancel(outer) is None
+
+    def test_finds_direct_agent_cancel(self) -> None:
+        """Returns the exception itself if it is an AgentCancel."""
+        exc = StopAgent("direct")
+        result = _unwrap_agent_cancel(exc)
+        assert result is exc
+
+    def test_finds_agent_cancel_via_cause(self) -> None:
+        """Finds AgentCancel in __cause__ (explicit raise from)."""
+        cancel = StopAgent("wrapped")
+        wrapper = RuntimeError("framework error")
+        wrapper.__cause__ = cancel
+        result = _unwrap_agent_cancel(wrapper)
+        assert result is cancel
+
+    def test_finds_agent_cancel_via_context(self) -> None:
+        """Finds AgentCancel in __context__ (implicit chaining)."""
+        cancel = StopAgent("wrapped")
+        wrapper = RuntimeError("framework error")
+        wrapper.__context__ = cancel
+        result = _unwrap_agent_cancel(wrapper)
+        assert result is cancel
+
+    def test_finds_deeply_nested_agent_cancel(self) -> None:
+        """Finds AgentCancel nested multiple levels deep."""
+        cancel = StopAgent("deep")
+        middle = ValueError("middle")
+        middle.__cause__ = cancel
+        outer = RuntimeError("outer")
+        outer.__cause__ = middle
+        result = _unwrap_agent_cancel(outer)
+        assert result is cancel
+
+    def test_prefers_cause_over_context(self) -> None:
+        """When both __cause__ and __context__ exist, follows __cause__ first."""
+        cause_cancel = StopAgent("from cause")
+        context_cancel = SpecificStopAgent("from context")
+        wrapper = RuntimeError("wrapper")
+        wrapper.__cause__ = cause_cancel
+        wrapper.__context__ = context_cancel
+        result = _unwrap_agent_cancel(wrapper)
+        assert result is cause_cancel
+
+    def test_finds_subclass_of_agent_cancel(self) -> None:
+        """Finds subclasses of AgentCancel (e.g., SpecificStopAgent)."""
+        cancel = SpecificStopAgent("specific")
+        wrapper = RuntimeError("wrapper")
+        wrapper.__cause__ = cancel
+        result = _unwrap_agent_cancel(wrapper)
+        assert result is cancel
+        assert isinstance(result, StopAgent)
+        assert isinstance(result, AgentCancel)
