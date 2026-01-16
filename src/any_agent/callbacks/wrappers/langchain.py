@@ -55,6 +55,12 @@ class _LangChainWrapper:
                 context = callback.after_tool_execution(context, *args, **kwargs)
 
         class _LangChainTracingCallback(BaseCallbackHandler):
+            # Propagate exceptions from callbacks instead of swallowing them.
+            # LangChain defaults to raise_error=False which logs warnings but
+            # continues execution. We need exceptions (especially AgentCancel)
+            # to propagate so they can be handled by run_async.
+            raise_error = True
+
             def on_chat_model_start(
                 self,
                 serialized: dict[str, Any],
