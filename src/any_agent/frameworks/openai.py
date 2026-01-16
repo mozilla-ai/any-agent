@@ -333,8 +333,7 @@ class AnyllmModel(Model):
             parallel_tool_calls=parallel_tool_calls,
             stream=stream,
             stream_options=stream_options,
-            # TODO: Remove type: ignore after any-llm adds xhigh support.
-            reasoning_effort=reasoning_effort,  # type: ignore[arg-type]
+            reasoning_effort=reasoning_effort,
             top_logprobs=model_settings.top_logprobs,
             **extra_kwargs,  # type: ignore[arg-type]
         )
