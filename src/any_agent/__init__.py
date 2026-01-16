@@ -1,7 +1,7 @@
 from importlib.metadata import PackageNotFoundError, version
 
 from .config import AgentConfig, AgentFramework
-from .frameworks.any_agent import AgentRunError, AnyAgent
+from .frameworks.any_agent import AgentCancel, AgentRunError, AnyAgent
 from .tracing.agent_trace import AgentTrace
 
 try:
@@ -12,6 +12,7 @@ except PackageNotFoundError:
     __version__ = "0.0.0-dev"
 
 __all__ = [
+    "AgentCancel",
     "AgentConfig",
     "AgentFramework",
     "AgentRunError",

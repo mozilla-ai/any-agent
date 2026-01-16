@@ -35,8 +35,94 @@ if TYPE_CHECKING:
 INSIDE_NOTEBOOK = hasattr(builtins, "__IPYTHON__")
 
 
+class AgentCancel(ABC, Exception):  # noqa: N818
+    """Abstract base class for control-flow exceptions raised in callbacks.
+
+    Within a callback, raise an exception inherited from AgentCancel when you
+    want to intentionally stop agent execution and handle that specific case in
+    your application code.
+
+    Unlike regular exceptions (which are wrapped in AgentRunError), AgentCancel
+    subclasses propagate directly to the caller, allowing you to catch them by
+    their specific type.
+
+    When to use AgentCancel vs regular exceptions:
+        - Use AgentCancel: When stopping execution is expected behavior
+          (rate limits, safety guardrails, validation failures) and you
+          want to handle it distinctly in your application.
+        - Use regular exceptions: When something unexpected goes wrong,
+          and you want consistent error handling via AgentRunError.
+
+    Example:
+        class StopOnLimit(AgentCancel):
+            pass
+
+        class LimitCallsCallback(Callback):
+            def before_tool_execution(self, context, *args, **kwargs):
+                if context.shared.get("call_count", 0) > 10:
+                    raise StopOnLimit("Exceeded call limit")
+                return context
+
+        try:
+            agent.run("prompt")
+        except StopOnLimit as e:
+            # Handle the expected cancellation.
+            print(f"Canceled: {e}")
+            print(f"Collected {len(e.trace.spans)} spans")
+        except AgentRunError as e:
+            # Handle unexpected errors.
+            print(f"Unexpected error: {e.original_exception}")
+
+    """
+
+    _trace: AgentTrace | None
+
+    def __new__(cls, *args: Any, **kwargs: Any) -> Self:
+        if cls is AgentCancel:
+            msg = "AgentCancel cannot be instantiated directly; subclass it instead"
+            raise TypeError(msg)
+        return super().__new__(cls)
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._trace = None
+
+    @property
+    def trace(self) -> AgentTrace | None:
+        """Execution trace collected before cancellation.
+
+        Returns None if accessed before the framework processes the exception.
+        """
+        return self._trace
+
+
 class AgentRunError(Exception):
-    """Error that wraps underlying framework specific errors and carries spans."""
+    """Wrapper for unexpected exceptions that occur during agent execution.
+
+    When an unexpected exception is raised during agent execution (from
+    callbacks, tools, or the underlying framework), it is caught and
+    wrapped in AgentRunError.
+
+    Note: Exceptions that inherit from AgentCancel are not wrapped,
+        they propagate directly to the caller.
+
+    AgentRunError ensures:
+
+    * The execution trace is preserved - you can inspect what happened
+       before the error via the `trace` property.
+    * Consistent error handling - all unexpected errors are wrapped in
+       the same type, regardless of the underlying framework.
+    * Original exception access - the wrapped exception is available
+       via `original_exception` for debugging.
+
+    Example:
+        try:
+            agent.run("prompt")
+        except AgentRunError as e:
+            print(f"Error: {e.original_exception}")
+            print(f"Trace had {len(e.trace.spans)} spans before failure")
+
+    """
 
     _trace: AgentTrace
     _original_exception: Exception
@@ -44,15 +130,16 @@ class AgentRunError(Exception):
     def __init__(self, trace: AgentTrace, original_exception: Exception):
         self._trace = trace
         self._original_exception = original_exception
-        # Set the exception message to be the original exception's message
         super().__init__(str(original_exception))
 
     @property
     def trace(self) -> AgentTrace:
+        """The execution trace collected up to the point of failure."""
         return self._trace
 
     @property
     def original_exception(self) -> Exception:
+        """The underlying exception that was caught."""
         return self._original_exception
 
     def __str__(self) -> str:
@@ -262,6 +349,12 @@ class AnyAgent(ABC):
                         )
 
             trace.add_span(invoke_span)
+
+            # Preserve control-flow exceptions without wrapping.
+            if isinstance(e, AgentCancel):
+                e._trace = trace
+                raise
+
             raise AgentRunError(trace, e) from e
 
         async with self._lock:

@@ -50,7 +50,7 @@ def _wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
     )
 
     if isinstance(tool, agent_tool_types):
-        return tool  # type: ignore[return-value]
+        return tool  # type: ignore[no-any-return]
 
     # Enabling strict mode required else
     # throws error "Only strict function tools can be auto-parsed"
