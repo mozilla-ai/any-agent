@@ -37,10 +37,19 @@ def _wrap_no_exception(tool: Any) -> Any:
 
 
 def _wrap_tool_openai(tool: "Tool | AgentTool") -> "AgentTool":
+    from typing import get_args, get_origin
+
     from agents import Tool as AgentTool
     from agents import function_tool
 
-    if isinstance(tool, AgentTool):  # type: ignore[arg-type, misc]
+    # Extract safe types for isinstance check.
+    # AgentTool is a Union that may contain subscripted generics (e.g. ComputerTool[Any])
+    # which cannot be used with isinstance(). We extract the origin class for those.
+    agent_tool_types = tuple(
+        get_origin(t) if get_origin(t) is not None else t for t in get_args(AgentTool)
+    )
+
+    if isinstance(tool, agent_tool_types):
         return tool  # type: ignore[return-value]
 
     # Enabling strict mode required else
