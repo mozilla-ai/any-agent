@@ -7,7 +7,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 
 
 def test_load_google_default() -> None:
-    from google.adk.tools import FunctionTool
+    from google.adk.tools import FunctionTool  # type: ignore[attr-defined]
 
     mock_agent = MagicMock()
     mock_model = MagicMock()

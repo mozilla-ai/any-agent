@@ -88,4 +88,4 @@ async def test_serve_streaming_async(
 
         # 4 responses are for tool calls: 2 for get_datetime and 2 for final_answer
         assert len(responses) == 6
-        AppStatus.get_or_create_exit_event().set()
+        AppStatus.should_exit = True

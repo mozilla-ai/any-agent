@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from agents.tool import Tool as OpenaiClass
 from any_llm.utils.aio import run_async_in_sync
-from google.adk.tools import FunctionTool as GoogleClass
+from google.adk.tools import FunctionTool as GoogleClass  # type: ignore[attr-defined]
 from langchain_core.tools import BaseTool as LangchainClass
 from llama_index.core.tools import FunctionTool as LlamaindexClass
 from smolagents.tools import Tool as SmolagentsClass

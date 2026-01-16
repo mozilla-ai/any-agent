@@ -224,7 +224,7 @@ class ChatAnyLLM(BaseChatModel):
         ],
         tool_choice: dict[str, Any] | str | bool | None = None,
         **kwargs: Any,
-    ) -> Runnable[LanguageModelInput, BaseMessage]:
+    ) -> Runnable[LanguageModelInput, AIMessage]:
         """Bind tool-like objects to this chat model."""
         formatted_tools = [convert_to_openai_tool(tool) for tool in tools]
         return super().bind(tools=formatted_tools, tool_choice=tool_choice, **kwargs)
