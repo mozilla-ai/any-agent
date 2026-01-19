@@ -151,6 +151,51 @@ class AgentRunError(Exception):
         return f"AgentRunError({self._original_exception!r})"
 
 
+def _unwrap_agent_cancel(exc: BaseException) -> AgentCancel | None:
+    """Traverse an exception chain to find an AgentCancel if present.
+
+    When callbacks raise AgentCancel subclasses, some frameworks catch and
+    re-raise them wrapped in their own error types. For example:
+
+        - smolagents wraps with AgentGenerationError using `raise ... from e`
+        - Other frameworks may use similar patterns
+
+    Python's exception chaining stores the original exception in __cause__
+    (explicit: `raise X from Y`) or __context__ (implicit: `raise X` inside
+    an except block). This function walks that chain to find any AgentCancel.
+
+    Note:
+        This is a defensive catch-all for frameworks that properly chain
+        exceptions. Some frameworks may swallow exceptions entirely (e.g.,
+        LangChain's default callback behavior) and require framework-specific
+        fixes to ensure AgentCancel propagates. See wrapper implementations
+        for details.
+
+    Args:
+        exc: The exception to inspect.
+
+    Returns:
+        The first AgentCancel found in the exception chain, or None if the
+        chain contains no AgentCancel instances.
+
+    Example:
+        try:
+            framework.run()  # Raises FrameworkError from AgentCancel
+        except Exception as e:
+            if cancel := _unwrap_agent_cancel(e):
+                # Found the wrapped AgentCancel, re-raise it directly.
+                raise cancel from e
+
+    """
+    current: BaseException | None = exc
+    while current is not None:
+        if isinstance(current, AgentCancel):
+            return current
+        # Check both explicit (raise from) and implicit (raise in except) chaining.
+        current = current.__cause__ or current.__context__
+    return None
+
+
 class AnyAgent(ABC):
     """Base abstract class for all agent implementations.
 
@@ -354,6 +399,11 @@ class AnyAgent(ABC):
             if isinstance(e, AgentCancel):
                 e._trace = trace
                 raise
+
+            # Check if the framework wrapped an AgentCancel in its own error type.
+            if cancel := _unwrap_agent_cancel(e):
+                cancel._trace = trace
+                raise cancel from e
 
             raise AgentRunError(trace, e) from e
 
