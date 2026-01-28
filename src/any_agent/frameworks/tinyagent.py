@@ -5,7 +5,7 @@ import inspect
 import json
 from typing import TYPE_CHECKING, Any
 
-from any_llm import AnyLLM, LLMProvider, acompletion
+from any_llm import AnyLLM, LLMProvider
 from mcp.types import CallToolResult, TextContent
 
 from any_agent.config import AgentConfig, AgentFramework
@@ -95,24 +95,28 @@ class TinyAgent(AnyAgent):
         super().__init__(config)
         self.clients: dict[str, ToolExecutor] = {}
 
-        self.completion_params = {
-            "model": self.config.model_id,
+        provider_name, model_id = AnyLLM.split_model_provider(self.config.model_id)
+        if provider_name == "gateway":
+            provider_name, model_id = AnyLLM.split_model_provider(model_id)
+        self.uses_openai = provider_name == LLMProvider.OPENAI
+
+        # Create the LLM instance using the AnyLLM class pattern
+        llm_kwargs: dict[str, Any] = {}
+        if self.config.api_key:
+            llm_kwargs["api_key"] = self.config.api_key
+        if self.config.api_base:
+            llm_kwargs["api_base"] = self.config.api_base
+        self.llm = AnyLLM.create(provider_name, **llm_kwargs)
+
+        self.completion_params: dict[str, Any] = {
+            "model": model_id,
             "tools": [],
             "tool_choice": "required",
             **(self.config.model_args or {}),
         }
 
-        provider_name, model_id = AnyLLM.split_model_provider(self.config.model_id)
-        if provider_name == "gateway":
-            provider_name, model_id = AnyLLM.split_model_provider(model_id)
-        self.uses_openai = provider_name == LLMProvider.OPENAI
         if not self.uses_openai and self.completion_params["tool_choice"] == "required":
             self.config.tools.append(final_answer)
-
-        if self.config.api_key:
-            self.completion_params["api_key"] = self.config.api_key
-        if self.config.api_base:
-            self.completion_params["api_base"] = self.config.api_base
 
     async def _load_agent(self) -> None:
         """Load the agent and its tools."""
@@ -288,7 +292,7 @@ class TinyAgent(AnyAgent):
         )
 
     async def call_model(self, **completion_params: dict[str, Any]) -> ChatCompletion:
-        return await acompletion(**completion_params)  # type: ignore[return-value, arg-type]
+        return await self.llm.acompletion(**completion_params)  # type: ignore[return-value, arg-type]
 
     async def update_output_type_async(
         self, output_type: type[BaseModel] | None

@@ -1,9 +1,17 @@
 import os
 from collections.abc import Generator
+from unittest.mock import patch
 
 import pytest
 
 from any_agent.config import AgentFramework
+
+
+@pytest.fixture(autouse=True)
+def mock_verify_api_key() -> Generator[None, None, None]:
+    """Mock AnyLLM._verify_and_set_api_key to skip API key validation in unit tests."""
+    with patch("any_llm.AnyLLM._verify_and_set_api_key"):
+        yield
 
 
 @pytest.fixture(autouse=True)
