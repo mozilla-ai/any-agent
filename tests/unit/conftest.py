@@ -3,6 +3,7 @@ from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
+from any_llm import AnyLLM
 
 from any_agent.config import AgentFramework
 
@@ -12,6 +13,15 @@ def mock_verify_api_key() -> Generator[None, None, None]:
     """Mock AnyLLM._verify_and_set_api_key to skip API key validation in unit tests."""
     with patch("any_llm.AnyLLM._verify_and_set_api_key"):
         yield
+
+
+@pytest.fixture(autouse=True)
+def clear_any_llm_key() -> Generator[None, None, None]:
+    """Clear ANY_LLM_KEY to prevent platform provider path in unit tests."""
+    original = os.environ.pop(AnyLLM.ANY_LLM_KEY, None)
+    yield
+    if original is not None:
+        os.environ[AnyLLM.ANY_LLM_KEY] = original
 
 
 @pytest.fixture(autouse=True)
