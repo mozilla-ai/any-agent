@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from any_agent import AgentConfig, AgentFramework, AnyAgent
+from any_agent.frameworks.smolagents import AnyLLMModel
 
 
 def test_load_smolagent_default() -> None:
@@ -111,3 +112,83 @@ def test_run_smolagent_custom_args() -> None:
         )
         agent.run("foo", max_steps=30)
         mock_agent.return_value.run.assert_called_once_with("foo", max_steps=30)
+
+
+class TestAnyLLMModel:
+    """Tests for AnyLLMModel class directly."""
+
+    def test_malformed_model_id_raises_clear_error(self) -> None:
+        """Test that malformed model_id raises ValueError with helpful message."""
+        with pytest.raises(ValueError, match="Invalid model_id format"):
+            AnyLLMModel(model_id="invalid-no-provider")
+
+    def test_parses_model_id_correctly(self) -> None:
+        """Test that model_id is parsed into provider and model."""
+        with patch("any_llm.AnyLLM.create"):
+            model = AnyLLMModel(
+                model_id="openai:gpt-4o",
+                api_key="test-key",
+                api_base="https://api.example.com",
+            )
+
+        assert model._provider.value == "openai"
+        assert model._anyllm_completion_kwargs["model"] == "gpt-4o"
+        assert model._api_key == "test-key"
+        assert model._api_base == "https://api.example.com"
+
+    def test_create_client_creates_anyllm_instance(self) -> None:
+        """Test that create_client() creates an AnyLLM instance with correct args."""
+        mock_anyllm_create = MagicMock()
+
+        with patch("any_llm.AnyLLM.create", mock_anyllm_create):
+            model = AnyLLMModel(
+                model_id="anthropic:claude-sonnet-4-20250514",
+                api_key="test-key",
+                api_base="https://api.example.com",
+            )
+            # create_client is called by ApiModel.__init__, but we can call it again.
+            model.create_client()
+
+        # Verify create was called with correct provider config.
+        mock_anyllm_create.assert_called_with(
+            provider=model._provider,
+            api_key="test-key",
+            api_base="https://api.example.com",
+        )
+
+    def test_client_reused_across_multiple_calls(self) -> None:
+        """Regression test for GitHub issue #824.
+
+        The original implementation returned the any_llm module from create_client(),
+        causing each completion to go through the functional API. This led to
+        "Event loop is closed" errors on subsequent calls. The fix creates an
+        AnyLLM instance once and reuses it.
+
+        This test verifies:
+        1. AnyLLM.create() is called exactly once during initialization
+        2. The client instance is stored and reusable for multiple calls
+        """
+        mock_client = MagicMock()
+        mock_create = MagicMock(return_value=mock_client)
+
+        with patch("any_llm.AnyLLM.create", mock_create):
+            model = AnyLLMModel(model_id="openai:gpt-4o")
+
+            # Verify AnyLLM.create was called exactly once during init.
+            assert mock_create.call_count == 1
+
+            # Verify the client is the mock we provided.
+            assert model.client is mock_client
+
+            # Simulate multiple completion calls (the scenario that caused the bug).
+            # In the old implementation, each call would go through the functional
+            # API and potentially create new event loop resources.
+            model.client.completion(messages=[{"role": "user", "content": "Hello"}])
+            model.client.completion(messages=[{"role": "user", "content": "World"}])
+            model.client.completion(messages=[{"role": "user", "content": "Test"}])
+
+            # Verify all calls went to the same client instance.
+            assert mock_client.completion.call_count == 3
+
+            # Verify AnyLLM.create was NOT called again.
+            assert mock_create.call_count == 1

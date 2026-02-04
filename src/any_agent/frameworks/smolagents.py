@@ -30,6 +30,7 @@ except ImportError:
     smolagents_available = False
 
 if TYPE_CHECKING:
+    from any_llm import AnyLLM
     from any_llm.types.completion import ChatCompletion, ChatCompletionChunk
     from smolagents import MultiStepAgent
 
@@ -55,6 +56,29 @@ class AnyLLMModel(ApiModel):
         flatten_messages_as_text: bool | None = None,
         **kwargs: Any,
     ) -> None:
+        from any_llm import AnyLLM as AnyLLMClass
+
+        try:
+            provider, model = AnyLLMClass.split_model_provider(model_id)
+        except ValueError as e:
+            msg = (
+                f"Invalid model_id format: {model_id}. "
+                "Expected 'provider:model' (e.g., 'openai:gpt-4o')."
+            )
+            raise ValueError(msg) from e
+
+        # Store provider config for client creation (must be set before
+        # super().__init__ because ApiModel calls create_client()).
+        self._provider = provider
+        self._api_key = api_key
+        self._api_base = api_base
+
+        # Store model and kwargs for completion calls.
+        self._anyllm_completion_kwargs: dict[str, Any] = {
+            "model": model,
+            **kwargs,
+        }
+
         super().__init__(
             model_id=model_id,
             custom_role_conversions=custom_role_conversions,
@@ -62,18 +86,25 @@ class AnyLLMModel(ApiModel):
             **kwargs,
         )
 
-        self._anyllm_common_kwargs: dict[str, Any] = {
-            "model": model_id,
-            "api_key": api_key,
-            "api_base": api_base,
-            **kwargs,
-        }
+    def create_client(self) -> "AnyLLM":
+        """Create the any-llm client, required method for ApiModel subclasses.
 
-    def create_client(self) -> Any:
-        """Create the any-llm client, required method for ApiModel subclasses."""
-        import any_llm
+        The client is instantiated once (by ApiModel.__init__) and reused for
+        all completion calls. This avoids "Event loop is closed" errors that
+        occur when using the functional API, which creates per-call async
+        resources tied to an event loop that may be closed between calls.
 
-        return any_llm
+        Note: We rely on ApiModel caching self.client rather than implementing
+        caching here. This follows the pattern used by tinyagent and openai
+        framework implementations.
+        """
+        from any_llm import AnyLLM as AnyLLMClass
+
+        return AnyLLMClass.create(
+            provider=self._provider,
+            api_key=self._api_key,
+            api_base=self._api_base,
+        )
 
     def _prepare_completion_kwargs(
         self,
@@ -133,8 +164,11 @@ class AnyLLMModel(ApiModel):
             convert_images_to_image_urls=True,
             **kwargs,
         )
-        payload = {**self._anyllm_common_kwargs, **completion_kwargs}
-        response: ChatCompletion = self.client.completion(**payload)
+        payload = {**self._anyllm_completion_kwargs, **completion_kwargs}
+        # allow_running_loop=True permits sync completion calls in async contexts.
+        response: ChatCompletion = self.client.completion(
+            **payload, allow_running_loop=True
+        )
 
         return ChatMessage.from_dict(
             response.choices[0].message.model_dump(
@@ -169,9 +203,14 @@ class AnyLLMModel(ApiModel):
         # Ensure usage information is included in the streamed chunks when the provider supports it
         completion_kwargs.setdefault("stream_options", {"include_usage": True})
 
-        payload = {**self._anyllm_common_kwargs, **completion_kwargs, "stream": True}
+        payload = {
+            **self._anyllm_completion_kwargs,
+            **completion_kwargs,
+            "stream": True,
+        }
+        # allow_running_loop=True permits sync completion calls in async contexts.
         response_iterator: Generator[ChatCompletionChunk] = self.client.completion(
-            **payload
+            **payload, allow_running_loop=True
         )
 
         for event in response_iterator:
