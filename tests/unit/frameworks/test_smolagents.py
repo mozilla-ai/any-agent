@@ -146,8 +146,6 @@ class TestAnyLLMModel:
                 api_key="test-key",
                 api_base="https://api.example.com",
             )
-            # create_client is called by ApiModel.__init__, but we can call it again.
-            model.create_client()
 
         # Verify create was called with correct provider config.
         mock_anyllm_create.assert_called_with(
@@ -181,8 +179,6 @@ class TestAnyLLMModel:
             assert model.client is mock_client
 
             # Simulate multiple completion calls (the scenario that caused the bug).
-            # In the old implementation, each call would go through the functional
-            # API and potentially create new event loop resources.
             model.client.completion(messages=[{"role": "user", "content": "Hello"}])
             model.client.completion(messages=[{"role": "user", "content": "World"}])
             model.client.completion(messages=[{"role": "user", "content": "Test"}])
