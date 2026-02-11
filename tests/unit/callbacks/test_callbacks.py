@@ -62,7 +62,7 @@ class AsyncSampleCallback(Callback):
         self.before_tool_called = False
         self.after_tool_called = False
 
-    async def after_agent_invocation(
+    async def after_agent_invocation(  # type: ignore[override]
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
         self.after_agent_invocation_called = True
@@ -78,7 +78,7 @@ class AsyncSampleCallback(Callback):
         self.after_tool_called = True
         return context
 
-    async def before_agent_invocation(
+    async def before_agent_invocation(  # type: ignore[override]
         self, context: Context, *args: Any, **kwargs: Any
     ) -> Context:
         self.before_agent_invocation_called = True
