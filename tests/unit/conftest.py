@@ -18,10 +18,11 @@ def mock_verify_api_key() -> Generator[None, None, None]:
 @pytest.fixture(autouse=True)
 def clear_any_llm_key() -> Generator[None, None, None]:
     """Clear ANY_LLM_KEY to prevent platform provider path in unit tests."""
-    original = os.environ.pop(AnyLLM.ANY_LLM_KEY, None)
+    key = getattr(AnyLLM, "ANY_LLM_KEY", None)
+    original = os.environ.pop(key, None) if key else None
     yield
-    if original is not None:
-        os.environ[AnyLLM.ANY_LLM_KEY] = original
+    if original is not None and key is not None:
+        os.environ[key] = original
 
 
 @pytest.fixture(autouse=True)

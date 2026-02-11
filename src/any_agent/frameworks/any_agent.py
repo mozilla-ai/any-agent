@@ -374,9 +374,11 @@ class AnyAgent(ABC):
 
                 context = self._wrapper.callback_context[trace_id]
                 for callback in self.config.callbacks:
-                    context = callback.before_agent_invocation(
-                        context, prompt, **kwargs
-                    )
+                    result = callback.before_agent_invocation(context, prompt, **kwargs)
+                    if asyncio.iscoroutinefunction(callback.before_agent_invocation):
+                        context = await result
+                    else:
+                        context = result
 
                 final_output = await self._run_async(prompt, **kwargs)
 
@@ -389,9 +391,13 @@ class AnyAgent(ABC):
                 ):
                     trace = wrapped_context.trace
                     for callback in self.config.callbacks:
-                        wrapped_context = callback.after_agent_invocation(
+                        result = callback.after_agent_invocation(
                             wrapped_context, prompt, **kwargs
                         )
+                        if asyncio.iscoroutinefunction(callback.after_agent_invocation):
+                            wrapped_context = await result
+                        else:
+                            wrapped_context = result
 
             trace.add_span(invoke_span)
 
@@ -413,9 +419,13 @@ class AnyAgent(ABC):
             if wrapped_context := self._wrapper.callback_context.pop(trace_id, None):
                 trace = wrapped_context.trace
                 for callback in self.config.callbacks:
-                    wrapped_context = callback.after_agent_invocation(
+                    result = callback.after_agent_invocation(
                         wrapped_context, prompt, **kwargs
                     )
+                    if asyncio.iscoroutinefunction(callback.after_agent_invocation):
+                        wrapped_context = await result
+                    else:
+                        wrapped_context = result
 
         trace.add_span(invoke_span)
         trace.final_output = final_output
