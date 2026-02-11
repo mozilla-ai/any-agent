@@ -386,9 +386,7 @@ class AnyAgent(ABC):
             async with self._lock:
                 if len(self._wrapper.callback_context) == 1:
                     await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-                wrapped_context = self._wrapper.callback_context.pop(
-                    trace_id, None
-                )
+                wrapped_context = self._wrapper.callback_context.pop(trace_id, None)
                 if wrapped_context is not None:
                     trace = wrapped_context.trace
                     for callback in self.config.callbacks:
