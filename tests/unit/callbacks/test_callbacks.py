@@ -53,6 +53,48 @@ class SampleCallback(Callback):
         return context
 
 
+class AsyncSampleCallback(Callback):
+    def __init__(self) -> None:
+        self.before_agent_invocation_called = False
+        self.after_agent_invocation_called = False
+        self.before_llm_called = False
+        self.after_llm_called = False
+        self.before_tool_called = False
+        self.after_tool_called = False
+
+    async def after_agent_invocation(  # type: ignore[override]
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        self.after_agent_invocation_called = True
+        return context
+
+    def after_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+        self.after_llm_called = True
+        return context
+
+    def after_tool_execution(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        self.after_tool_called = True
+        return context
+
+    async def before_agent_invocation(  # type: ignore[override]
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        self.before_agent_invocation_called = True
+        return context
+
+    def before_tool_execution(
+        self, context: Context, *args: Any, **kwargs: Any
+    ) -> Context:
+        self.before_tool_called = True
+        return context
+
+    def before_llm_call(self, context: Context, *args: Any, **kwargs: Any) -> Context:
+        self.before_llm_called = True
+        return context
+
+
 class ExceptionCallback(SampleCallback):
     """Callback that throws an exception in before_llm_call."""
 
@@ -179,3 +221,50 @@ def test_callback_exception_causes_agent_exit(mock_any_llm_response: Any) -> Non
     assert callback.after_llm_called is False
     assert callback.before_tool_called is False
     assert callback.after_tool_called is False
+
+
+def test_async_callbacks(mock_any_llm_response: Any) -> None:
+    callback = AsyncSampleCallback()
+    agent = create_agent(
+        instructions="Use the available tools to find information when needed",
+        callbacks=[callback],
+    )
+
+    run_agent_with_mock(
+        agent=agent,
+        prompt="Hello!",
+        mock_response=mock_any_llm_response,
+    )
+
+    # Verify that the async callback methods were called
+    assert callback.before_agent_invocation_called
+    assert callback.after_agent_invocation_called
+    assert callback.before_llm_called
+    assert callback.after_llm_called
+    assert callback.before_tool_called is False
+    assert callback.after_tool_called is False
+
+
+def test_async_tool_execution_callbacks(
+    mock_any_llm_tool_call_response: Any,
+) -> None:
+    callback = AsyncSampleCallback()
+    agent = create_agent(
+        instructions="You must use the search_web tool to find information",
+        callbacks=[callback],
+        tools=[search_web],
+    )
+
+    run_agent_with_mock(
+        agent=agent,
+        prompt="Hello!",
+        mock_response=mock_any_llm_tool_call_response,
+    )
+
+    # Verify that all callback methods were called
+    assert callback.before_agent_invocation_called
+    assert callback.after_agent_invocation_called
+    assert callback.before_llm_called
+    assert callback.after_llm_called
+    assert callback.before_tool_called
+    assert callback.after_tool_called

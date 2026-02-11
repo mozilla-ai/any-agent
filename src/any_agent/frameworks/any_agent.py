@@ -374,9 +374,11 @@ class AnyAgent(ABC):
 
                 context = self._wrapper.callback_context[trace_id]
                 for callback in self.config.callbacks:
-                    context = callback.before_agent_invocation(
-                        context, prompt, **kwargs
-                    )
+                    result = callback.before_agent_invocation(context, prompt, **kwargs)
+                    if asyncio.iscoroutinefunction(callback.before_agent_invocation):
+                        context = await result  # type: ignore[misc]
+                    else:
+                        context = result
 
                 final_output = await self._run_async(prompt, **kwargs)
 
@@ -384,14 +386,18 @@ class AnyAgent(ABC):
             async with self._lock:
                 if len(self._wrapper.callback_context) == 1:
                     await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-                if wrapped_context := self._wrapper.callback_context.pop(
-                    trace_id, None
-                ):
+                wrapped_context = self._wrapper.callback_context.pop(trace_id, None)
+                if wrapped_context is not None:
                     trace = wrapped_context.trace
                     for callback in self.config.callbacks:
-                        wrapped_context = callback.after_agent_invocation(
+                        assert wrapped_context is not None
+                        result = callback.after_agent_invocation(
                             wrapped_context, prompt, **kwargs
                         )
+                        if asyncio.iscoroutinefunction(callback.after_agent_invocation):
+                            wrapped_context = await result  # type: ignore[misc]
+                        else:
+                            wrapped_context = result
 
             trace.add_span(invoke_span)
 
@@ -410,12 +416,18 @@ class AnyAgent(ABC):
         async with self._lock:
             if len(self._wrapper.callback_context) == 1:
                 await self._wrapper.unwrap(self)  # type: ignore[arg-type]
-            if wrapped_context := self._wrapper.callback_context.pop(trace_id, None):
+            wrapped_context = self._wrapper.callback_context.pop(trace_id, None)
+            if wrapped_context is not None:
                 trace = wrapped_context.trace
                 for callback in self.config.callbacks:
-                    wrapped_context = callback.after_agent_invocation(
+                    assert wrapped_context is not None
+                    result = callback.after_agent_invocation(
                         wrapped_context, prompt, **kwargs
                     )
+                    if asyncio.iscoroutinefunction(callback.after_agent_invocation):
+                        wrapped_context = await result  # type: ignore[misc]
+                    else:
+                        wrapped_context = result
 
         trace.add_span(invoke_span)
         trace.final_output = final_output
