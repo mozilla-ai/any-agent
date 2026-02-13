@@ -84,6 +84,31 @@ def test_openai_with_api_key() -> None:
         )
 
 
+def test_openai_forwards_any_llm_args() -> None:
+    mock_agent = MagicMock()
+    mock_model = MagicMock()
+    any_llm_args = {"timeout": 42, "headers": {"x-test": "1"}}
+
+    with (
+        patch("any_agent.frameworks.openai.Agent", mock_agent),
+        patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_model),
+    ):
+        AnyAgent.create(
+            AgentFramework.OPENAI,
+            AgentConfig(
+                model_id="mistral:mistral-small-latest",
+                any_llm_args=any_llm_args,
+            ),
+        )
+
+        mock_model.assert_called_once_with(
+            model="mistral:mistral-small-latest",
+            base_url=None,
+            api_key=None,
+            any_llm_args=any_llm_args,
+        )
+
+
 def test_load_openai_with_mcp_server() -> None:
     mock_agent = MagicMock()
     mock_function_tool = MagicMock()

@@ -102,6 +102,7 @@ try:
             max_retries: int = 10,
             api_key: str | None = None,
             api_base: str | None = None,
+            any_llm_args: dict[str, Any] | None = None,
             **kwargs: Any,
         ) -> None:
             additional_kwargs = additional_kwargs or {}
@@ -116,10 +117,14 @@ try:
             )
 
             self._parse_model(model)
+            llm_create_kwargs: dict[str, Any] = dict(any_llm_args or {})
+            if api_key is not None:
+                llm_create_kwargs["api_key"] = api_key
+            if api_base is not None:
+                llm_create_kwargs["api_base"] = api_base
             self._client = AnyLLM.create(
                 provider=self._provider,
-                api_key=api_key,
-                api_base=api_base,
+                **llm_create_kwargs,
             )
 
         def _parse_model(self, model: str) -> None:
@@ -512,14 +517,18 @@ class LlamaIndexAgent(AnyAgent):
 
         model_id = agent_config.model_id
 
+        model_kwargs: dict[str, Any] = {
+            "model": model_id,
+            "api_key": agent_config.api_key,
+            "api_base": agent_config.api_base,
+            "additional_kwargs": additional_kwargs,
+        }
+        if model_type is DEFAULT_MODEL_TYPE and agent_config.any_llm_args is not None:
+            model_kwargs["any_llm_args"] = agent_config.any_llm_args
+
         return cast(
             "LLM",
-            model_type(
-                model=model_id,
-                api_key=agent_config.api_key,
-                api_base=agent_config.api_base,
-                additional_kwargs=additional_kwargs,  # type: ignore[arg-type]
-            ),
+            model_type(**model_kwargs),
         )
 
     async def _load_agent(self) -> None:

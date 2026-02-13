@@ -80,12 +80,19 @@ class AnyllmModel(Model):
         model: str,
         base_url: str | None = None,
         api_key: str | None = None,
+        any_llm_args: dict[str, Any] | None = None,
     ):
         provider, model_id = AnyLLM.split_model_provider(model)
         self.model = model
         self.base_url = base_url
         self.api_key = api_key
-        self.llm = AnyLLM.create(provider=provider, api_key=api_key, api_base=base_url)
+        llm_create_kwargs: dict[str, Any] = dict(any_llm_args or {})
+        if api_key is not None:
+            llm_create_kwargs["api_key"] = api_key
+        if base_url is not None:
+            llm_create_kwargs["api_base"] = base_url
+
+        self.llm = AnyLLM.create(provider=provider, **llm_create_kwargs)
         self.model_id = model_id
 
     async def get_response(
@@ -399,11 +406,14 @@ class OpenAIAgent(AnyAgent):
         base_url = agent_config.api_base or cast(
             "str | None", model_args.get("api_base")
         )
-        return model_type(
-            model=agent_config.model_id,
-            base_url=base_url,
-            api_key=agent_config.api_key,
-        )
+        model_kwargs: dict[str, Any] = {
+            "model": agent_config.model_id,
+            "base_url": base_url,
+            "api_key": agent_config.api_key,
+        }
+        if model_type is DEFAULT_MODEL_TYPE and agent_config.any_llm_args is not None:
+            model_kwargs["any_llm_args"] = agent_config.any_llm_args
+        return model_type(**model_kwargs)
 
     async def _load_agent(self) -> None:
         """Load the OpenAI agent with the given configuration."""

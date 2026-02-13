@@ -101,7 +101,7 @@ class TinyAgent(AnyAgent):
         self.uses_openai = provider_name == LLMProvider.OPENAI
 
         # Create the LLM instance using the AnyLLM class pattern
-        llm_kwargs: dict[str, Any] = {}
+        llm_kwargs: dict[str, Any] = dict(self.config.any_llm_args or {})
         if self.config.api_key:
             llm_kwargs["api_key"] = self.config.api_key
         if self.config.api_base:
