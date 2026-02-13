@@ -528,7 +528,7 @@ class LlamaIndexAgent(AnyAgent):
 
         return cast(
             "LLM",
-            model_type(**model_kwargs),  # type: ignore[arg-type]
+            model_type(**model_kwargs),
         )
 
     async def _load_agent(self) -> None:
