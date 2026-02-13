@@ -236,6 +236,13 @@ class AgentConfig(BaseModel):
     Refer to [any-llm Completion API Docs](https://mozilla-ai.github.io/any-llm/api/completion/) for more info.
     """
 
+    any_llm_args: MutableMapping[str, Any] | None = None
+    """Pass arguments to `AnyLLM.create()` when using integrations backed by any-llm.
+
+    Use this for provider/client initialization options that are not completion-time
+    generation params (which should be passed via `model_args`).
+    """
+
     output_type: type[BaseModel] | None = None
     """Control the output schema from calling `run`. By default, the agent will return a type str.
 

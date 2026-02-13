@@ -268,6 +268,21 @@ def test_uses_openai_handles_gateway_provider(
     assert agent.uses_openai is expected_uses_openai
 
 
+def test_tinyagent_forwards_any_llm_args_to_anyllm_create() -> None:
+    any_llm_args = {"timeout": 99, "organization": "test-org"}
+    provider, _ = AnyLLM.split_model_provider(DEFAULT_SMALL_MODEL_ID)
+
+    with patch("any_agent.frameworks.tinyagent.AnyLLM.create") as mock_create:
+        TinyAgent(
+            AgentConfig(
+                model_id=DEFAULT_SMALL_MODEL_ID,
+                any_llm_args=any_llm_args,
+            )
+        )
+
+        mock_create.assert_called_once_with(provider, **any_llm_args)
+
+
 @pytest.mark.asyncio
 async def test_tool_result_appended_when_tool_not_found() -> None:
     """Test that tool_result message is appended when a tool is not found.

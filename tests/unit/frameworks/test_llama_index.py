@@ -70,3 +70,34 @@ def test_run_llama_index_agent_custom_args() -> None:
         )
         agent.run("foo", timeout=10)
         agent_mock.run.assert_called_once_with("foo", timeout=10)
+
+
+def test_load_llama_index_agent_forwards_any_llm_args() -> None:
+    model_mock = MagicMock()
+    create_mock = MagicMock()
+    create_mock.return_value = MagicMock()
+    any_llm_args = {"timeout": 17, "max_retries": 3}
+
+    from llama_index.core.tools import FunctionTool
+
+    with (
+        patch("any_agent.frameworks.llama_index.DEFAULT_AGENT_TYPE", create_mock),
+        patch("any_agent.frameworks.llama_index.DEFAULT_MODEL_TYPE", model_mock),
+        patch.object(FunctionTool, "from_defaults"),
+    ):
+        AnyAgent.create(
+            AgentFramework.LLAMA_INDEX,
+            AgentConfig(
+                model_id="gemini/gemini-2.0-flash",
+                instructions="You are a helpful assistant",
+                any_llm_args=any_llm_args,
+            ),
+        )
+
+        model_mock.assert_called_once_with(
+            model="gemini/gemini-2.0-flash",
+            api_key=None,
+            api_base=None,
+            additional_kwargs={},
+            any_llm_args=any_llm_args,
+        )
