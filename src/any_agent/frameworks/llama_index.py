@@ -563,10 +563,15 @@ class LlamaIndexAgent(AnyAgent):
             **self.config.agent_args or {},
         )
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str | list[dict[str, Any]], **kwargs: Any
+    ) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
+        if not isinstance(prompt, str):
+            msg = "LlamaIndex framework does not support list of messages as input. Use a plain string prompt."
+            raise NotImplementedError(msg)
         result: AgentOutput = await self._agent.run(prompt, **kwargs)
         # assert that it's a TextBlock
         if not result.response.blocks or not hasattr(result.response.blocks[0], "text"):

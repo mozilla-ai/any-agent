@@ -351,7 +351,7 @@ class GoogleAgent(AnyAgent):
 
     async def _run_async(  # type: ignore[no-untyped-def]
         self,
-        prompt: str,
+        prompt: str | list[dict[str, Any]],
         user_id: str | None = None,
         session_id: str | None = None,
         **kwargs,
@@ -359,6 +359,9 @@ class GoogleAgent(AnyAgent):
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
+        if not isinstance(prompt, str):
+            msg = "Google framework does not support list of messages as input. Use a plain string prompt."
+            raise NotImplementedError(msg)
         runner = InMemoryRunner(self._agent)
         user_id = user_id or str(uuid4())
         session_id = session_id or str(uuid4())

@@ -362,10 +362,15 @@ class SmolagentsAgent(AnyAgent):
 
         assert self._agent
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str | list[dict[str, Any]], **kwargs: Any
+    ) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
+        if not isinstance(prompt, str):
+            msg = "Smolagents framework does not support list of messages as input. Use a plain string prompt."
+            raise NotImplementedError(msg)
         result = self._agent.run(prompt, **kwargs)
         if self.config.output_type:
             result_json = (
