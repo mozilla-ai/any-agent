@@ -201,3 +201,20 @@ def test_load_and_run_agent(
         html_output = console.export_html(inline_styles=True)
         with open(f"{trace_path}_trace.html", "w", encoding="utf-8") as f:
             f.write(html_output.replace("<!DOCTYPE html>", ""))
+
+
+def test_tinyagent_run_with_messages() -> None:
+    """Test that TinyAgent.run accepts a list of message dicts instead of a plain string."""
+    agent = AnyAgent.create(
+        AgentFramework.TINYAGENT,
+        AgentConfig(model_id=DEFAULT_SMALL_MODEL_ID),
+    )
+
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant. Be concise."},
+        {"role": "user", "content": "What is 2 + 2? Reply with just the number."},
+    ]
+
+    agent_trace = agent.run(messages)
+    assert agent_trace.final_output
+    assert "4" in str(agent_trace.final_output)

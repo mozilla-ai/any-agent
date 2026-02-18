@@ -171,22 +171,27 @@ class TinyAgent(AnyAgent):
             self.completion_params["tools"].append(function_def)
             self.clients[tool_name] = ToolExecutor(tool)
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str | list[dict[str, Any]], **kwargs: Any
+    ) -> str | BaseModel:
         if self.uses_openai:
             self.completion_params["tool_choice"] = "auto"
             if self.config.output_type:
                 self.completion_params["response_format"] = self.config.output_type
 
-        messages = [
-            {
-                "role": "system",
-                "content": self.config.instructions or DEFAULT_SYSTEM_PROMPT,
-            },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ]
+        if isinstance(prompt, list):
+            messages = prompt
+        else:
+            messages = [
+                {
+                    "role": "system",
+                    "content": self.config.instructions or DEFAULT_SYSTEM_PROMPT,
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ]
 
         if kwargs.pop("max_turns", None):
             logger.warning(

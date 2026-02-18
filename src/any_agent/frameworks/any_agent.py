@@ -314,17 +314,25 @@ class AnyAgent(ABC):
         """Exit the async context manager and clean up resources."""
         await self.cleanup_async()
 
-    def run(self, prompt: str, **kwargs: Any) -> AgentTrace:
+    def run(self, prompt: str | list[dict[str, Any]], **kwargs: Any) -> AgentTrace:
         """Run the agent with the given prompt."""
         return run_async_in_sync(
             self.run_async(prompt, **kwargs), allow_running_loop=INSIDE_NOTEBOOK
         )
 
-    async def run_async(self, prompt: str, **kwargs: Any) -> AgentTrace:
+    async def run_async(
+        self, prompt: str | list[dict[str, Any]], **kwargs: Any
+    ) -> AgentTrace:
         """Run the agent asynchronously with the given prompt.
 
         Args:
-            prompt: The user prompt to be passed to the agent.
+            prompt: The user prompt to be passed to the agent. Can be a plain
+                string or a list of message dicts (e.g.
+                ``[{"role": "user", "content": "hello"}]``) following the
+                OpenAI chat-completion message format. When a list is provided
+                it is forwarded directly to the underlying LLM, giving callers
+                full control over the conversation structure.
+                Note: passing a list is only supported by the ``TINYAGENT`` framework.
 
             kwargs: Will be passed to the underlying runner used
                 by the framework.
@@ -530,7 +538,9 @@ class AnyAgent(ABC):
         """Load the agent instance."""
 
     @abstractmethod
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str | list[dict[str, Any]], **kwargs: Any
+    ) -> str | BaseModel:
         """To be implemented by each framework."""
 
     @abstractmethod

@@ -449,10 +449,15 @@ class OpenAIAgent(AnyAgent):
         # The OpenAI framework can handle them as regular tools.
         return tools
 
-    async def _run_async(self, prompt: str, **kwargs: Any) -> str | BaseModel:
+    async def _run_async(
+        self, prompt: str | list[dict[str, Any]], **kwargs: Any
+    ) -> str | BaseModel:
         if not self._agent:
             error_message = "Agent not loaded. Call load_agent() first."
             raise ValueError(error_message)
+        if not isinstance(prompt, str):
+            msg = "OpenAI framework does not support list of messages as input. Use a plain string prompt."
+            raise NotImplementedError(msg)
         if not kwargs.get("max_turns"):
             kwargs["max_turns"] = math.inf
         result = await Runner.run(self._agent, prompt, **kwargs)
