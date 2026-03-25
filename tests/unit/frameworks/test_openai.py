@@ -168,6 +168,44 @@ def test_load_openai_agent_missing() -> None:
             )
 
 
+def test_openai_managed_agents_creates_handoffs() -> None:
+    mock_agent = MagicMock()
+    mock_model = MagicMock()
+
+    with (
+        patch("any_agent.frameworks.openai.Agent", mock_agent),
+        patch("any_agent.frameworks.openai.DEFAULT_MODEL_TYPE", mock_model),
+    ):
+        sub_config = AgentConfig(
+            model_id="mistral:mistral-small-latest",
+            name="researcher",
+            description="A research agent",
+            instructions="You research things.",
+        )
+        AnyAgent.create(
+            AgentFramework.OPENAI,
+            AgentConfig(
+                model_id="mistral:mistral-small-latest",
+                name="orchestrator",
+            ),
+            managed_agents=[sub_config],
+        )
+
+        # Agent should be called twice: once for sub-agent, once for main agent
+        assert mock_agent.call_count == 2
+
+        # First call is the sub-agent
+        sub_call = mock_agent.call_args_list[0]
+        assert sub_call.kwargs["name"] == "researcher"
+        assert sub_call.kwargs["description"] == "A research agent"
+        assert sub_call.kwargs["instructions"] == "You research things."
+
+        # Second call is the main agent with handoffs
+        main_call = mock_agent.call_args_list[1]
+        assert main_call.kwargs["name"] == "orchestrator"
+        assert main_call.kwargs["handoffs"] == [mock_agent.return_value]
+
+
 def test_run_openai_with_custom_args() -> None:
     mock_agent = MagicMock()
     mock_runner = AsyncMock()

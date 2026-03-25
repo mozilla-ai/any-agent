@@ -142,6 +142,24 @@ async def test_cleanup_async_disconnects_mcp_clients() -> None:
 
 
 @pytest.mark.asyncio
+async def test_managed_agents_unsupported_framework_raises() -> None:
+    sub_config = AgentConfig(
+        model_id="mistral:mistral-small-latest",
+        name="sub_agent",
+        instructions="You are a sub-agent.",
+    )
+    with pytest.raises(
+        NotImplementedError, match="Native multi-agent.*is not supported"
+    ):
+        await AnyAgent.create_async(
+            AgentFramework.TINYAGENT,
+            AgentConfig(model_id="mistral:mistral-small-latest"),
+            managed_agents=[sub_config],
+        )
+
+
+
+@pytest.mark.asyncio
 async def test_context_manager_automatically_cleans_up() -> None:
     mock_mcp_client = Mock()
     mock_mcp_client.disconnect = AsyncMock()

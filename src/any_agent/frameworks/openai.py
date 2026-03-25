@@ -432,6 +432,26 @@ class OpenAIAgent(AnyAgent):
         if self.config.output_type:
             kwargs_["output_type"] = self.config.output_type
 
+        # Build sub-agents as handoffs
+        self._handoffs: list[Agent] = []
+        if self._managed_agent_configs:
+            for sub_config in self._managed_agent_configs:
+                sub_tools = await self._load_tools(sub_config.tools)
+                sub_kwargs = sub_config.agent_args or {}
+                if sub_config.model_args:
+                    sub_kwargs["model_settings"] = ModelSettings(**sub_config.model_args)
+                sub_agent = Agent(
+                    name=sub_config.name,
+                    description=sub_config.description,
+                    instructions=sub_config.instructions,
+                    model=self._get_model(sub_config),
+                    tools=sub_tools,
+                    mcp_servers=[],
+                    **sub_kwargs,
+                )
+                self._handoffs.append(sub_agent)
+            kwargs_["handoffs"] = self._handoffs
+
         self._tools = tools
         self._agent = Agent(
             name=self.config.name,
@@ -486,6 +506,8 @@ class OpenAIAgent(AnyAgent):
                 kwargs_["model_settings"] = ModelSettings(**self.config.model_args)
             if output_type:
                 kwargs_["output_type"] = output_type
+            if self._handoffs:
+                kwargs_["handoffs"] = self._handoffs
 
             self._agent = Agent(
                 name=self.config.name,

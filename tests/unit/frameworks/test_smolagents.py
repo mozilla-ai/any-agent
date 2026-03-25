@@ -96,6 +96,45 @@ def test_load_smolagent_final_answer() -> None:
         assert isinstance(agent._agent.tools["final_answer"], FinalAnswerTool)  # type: ignore[attr-defined]
 
 
+def test_smolagents_managed_agents() -> None:
+    mock_agent = MagicMock()
+    mock_model = MagicMock()
+    mock_tool = MagicMock()
+
+    with (
+        patch("any_agent.frameworks.smolagents.DEFAULT_AGENT_TYPE", mock_agent),
+        patch("any_agent.frameworks.smolagents.DEFAULT_MODEL_TYPE", mock_model),
+        patch("smolagents.tool", mock_tool),
+    ):
+        sub_config = AgentConfig(
+            model_id="openai:o3-mini",
+            name="researcher",
+            description="A research agent",
+            instructions="You research things.",
+        )
+        AnyAgent.create(
+            AgentFramework.SMOLAGENTS,
+            AgentConfig(
+                model_id="openai:o3-mini",
+                name="orchestrator",
+            ),
+            managed_agents=[sub_config],
+        )
+
+        # Agent type should be called twice: once for sub-agent, once for main
+        assert mock_agent.call_count == 2
+
+        # First call is the sub-agent
+        sub_call = mock_agent.call_args_list[0]
+        assert sub_call.kwargs["name"] == "researcher"
+        assert sub_call.kwargs["description"] == "A research agent"
+
+        # Second call is the main agent with managed_agents
+        main_call = mock_agent.call_args_list[1]
+        assert main_call.kwargs["name"] == "orchestrator"
+        assert main_call.kwargs["managed_agents"] == [mock_agent.return_value]
+
+
 def test_run_smolagent_custom_args() -> None:
     mock_agent = MagicMock()
     mock_agent.return_value = MagicMock()

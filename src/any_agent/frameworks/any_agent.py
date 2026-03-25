@@ -202,11 +202,16 @@ class AnyAgent(ABC):
     This provides a unified interface for different agent frameworks.
     """
 
+    _MULTI_AGENT_FRAMEWORKS: frozenset[AgentFramework] = frozenset(
+        {AgentFramework.OPENAI, AgentFramework.SMOLAGENTS}
+    )
+
     def __init__(self, config: AgentConfig):
         self.config = config
 
         self._mcp_clients: list[MCPClient] = []
         self._tools: list[Any] = []
+        self._managed_agent_configs: list[AgentConfig] | None = None
 
         self._add_span_callbacks()
         self._wrapper = _get_wrapper_by_framework(self.framework)
@@ -264,12 +269,14 @@ class AnyAgent(ABC):
         cls,
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
         return run_async_in_sync(
             cls.create_async(
                 agent_framework=agent_framework,
                 agent_config=agent_config,
+                managed_agents=managed_agents,
             ),
             allow_running_loop=INSIDE_NOTEBOOK,
         )
@@ -279,10 +286,22 @@ class AnyAgent(ABC):
         cls,
         agent_framework: AgentFramework | str,
         agent_config: AgentConfig,
+        managed_agents: list[AgentConfig] | None = None,
     ) -> AnyAgent:
         """Create an agent using the given framework and config."""
-        agent_cls = cls._get_agent_type_by_framework(agent_framework)
+        framework = AgentFramework.from_string(agent_framework)
+
+        if managed_agents and framework not in cls._MULTI_AGENT_FRAMEWORKS:
+            msg = (
+                f"Native multi-agent (managed_agents) is not supported by the {framework.value} framework. "
+                f"Supported frameworks: {', '.join(f.value for f in cls._MULTI_AGENT_FRAMEWORKS)}. "
+                "Consider using A2A protocol for multi-agent with this framework."
+            )
+            raise NotImplementedError(msg)
+
+        agent_cls = cls._get_agent_type_by_framework(framework)
         agent = agent_cls(agent_config)
+        agent._managed_agent_configs = managed_agents
         await agent._load_agent()
         return agent
 

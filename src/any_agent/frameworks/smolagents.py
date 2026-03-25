@@ -345,6 +345,26 @@ class SmolagentsAgent(AnyAgent):
 
         agent_args = self.config.agent_args or {}
 
+        # Build managed sub-agents
+        if self._managed_agent_configs:
+            sub_agents = []
+            for sub_config in self._managed_agent_configs:
+                sub_tools = await self._load_tools(sub_config.tools)
+                sub_agent_type = sub_config.agent_type or DEFAULT_AGENT_TYPE
+                sub_agent_args = sub_config.agent_args or {}
+                sub_agent = sub_agent_type(
+                    name=sub_config.name,
+                    description=sub_config.description or sub_config.name,
+                    model=self._get_model(sub_config),
+                    tools=sub_tools,
+                    verbosity_level=-1,
+                    **sub_agent_args,
+                )
+                if sub_config.instructions:
+                    sub_agent.prompt_templates["system_prompt"] = sub_config.instructions
+                sub_agents.append(sub_agent)
+            agent_args["managed_agents"] = sub_agents
+
         self._tools = tools
         self._agent = main_agent_type(
             name=self.config.name,

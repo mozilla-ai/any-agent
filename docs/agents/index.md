@@ -34,7 +34,42 @@ agent = AnyAgent.create(
     As stated before, carefully consider whether you need to adopt this pattern to
     solve the task.
 
-Multi-Agent systems can be implemented [using Agent-As-Tools](./tools.md#using-agents-as-tools).
+You can create a multi-agent team by passing `managed_agents` to `AnyAgent.create()`. Each sub-agent is defined with its own `AgentConfig`:
+
+```python
+agent = AnyAgent.create(
+    "openai",  # Also supported: "smolagents"
+    AgentConfig(
+        model_id="openai:gpt-4o",
+        name="orchestrator",
+        instructions="Delegate tasks to your sub-agents.",
+        tools=[search_web],
+    ),
+    managed_agents=[
+        AgentConfig(
+            model_id="openai:gpt-4o-mini",
+            name="researcher",
+            description="Researches topics thoroughly.",
+            instructions="You are a research specialist.",
+            tools=[search_web, visit_webpage],
+        ),
+        AgentConfig(
+            model_id="openai:gpt-4o-mini",
+            name="writer",
+            description="Writes polished content.",
+            instructions="You are a writing specialist.",
+        ),
+    ],
+)
+```
+
+!!! note
+
+    Native multi-agent is currently supported by the **OpenAI** and **smolagents** frameworks.
+    For OpenAI, sub-agents are wired as [handoffs](https://openai.github.io/openai-agents-python/handoffs/).
+    For smolagents, sub-agents are wired as [managed agents](https://huggingface.co/docs/smolagents/guided_tour#multi-agent-systems).
+
+    For other frameworks, multi-agent systems can be implemented [using Agent-As-Tools](./tools.md#using-agents-as-tools).
 
 ### Framework Specific Arguments
 
