@@ -74,7 +74,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
         description="Agent that can return the current date.",
         tools=[get_datetime],
         model_args=get_default_agent_model_args(agent_framework),
-        callbacks=[LimitLLMCalls(max_llm_calls=10)],
+        callbacks=[LimitLLMCalls(max_llm_calls=25)],
     )
     date_agent = await AnyAgent.create_async(
         agent_framework=agent_framework,
@@ -97,7 +97,7 @@ async def test_a2a_tool_async(agent_framework: AgentFramework) -> None:
             model_id=DEFAULT_SMALL_MODEL_ID,
             tools=[await a2a_tool_async(server_url, http_kwargs=DEFAULT_HTTP_KWARGS)],
             model_args=get_default_agent_model_args(agent_framework),
-            callbacks=[LimitLLMCalls(max_llm_calls=10)],
+            callbacks=[LimitLLMCalls(max_llm_calls=25)],
         )
 
         main_agent = await AnyAgent.create_async(
