@@ -18,7 +18,9 @@ import textwrap
 from pathlib import Path
 from typing import Any, get_type_hints
 
-DOCS_API_DIR = Path(__file__).parent.parent / "docs" / "src" / "content" / "docs" / "api"
+DOCS_API_DIR = (
+    Path(__file__).parent.parent / "docs" / "src" / "content" / "docs" / "api"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -96,7 +98,9 @@ def _format_annotation(annotation: Any) -> str:
             parts = ["None" if p == "NoneType" else p for p in parts]
             return " | ".join(parts)
         if origin_name == "Literal" or "Literal" in str(origin):
-            formatted_args = ", ".join(repr(a) if isinstance(a, str) else str(a) for a in args)
+            formatted_args = ", ".join(
+                repr(a) if isinstance(a, str) else str(a) for a in args
+            )
             return f"Literal[{formatted_args}]"
         formatted_args = ", ".join(_format_annotation(a) for a in args)
         return f"{origin_name}[{formatted_args}]"
@@ -137,7 +141,11 @@ def _get_signature_block(func: Any, func_name: str | None = None) -> str:
             seen_kw_only = True
             if lines:
                 lines.append("    *,")
-        ann = _format_annotation(p.annotation) if p.annotation is not inspect.Parameter.empty else ""
+        ann = (
+            _format_annotation(p.annotation)
+            if p.annotation is not inspect.Parameter.empty
+            else ""
+        )
         default = _format_default(p.default)
         if p.kind == inspect.Parameter.VAR_KEYWORD:
             part = f"**{p.name}"
@@ -208,7 +216,9 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
         elif current_section == "raises":
             m = re.match(r"^(\w+)\s*:\s*(.*)", stripped)
             if m:
-                result["raises"].append({"type": m.group(1), "desc": m.group(2).strip()})
+                result["raises"].append(
+                    {"type": m.group(1), "desc": m.group(2).strip()}
+                )
             elif result["raises"] and stripped:
                 result["raises"][-1]["desc"] += " " + stripped
 
@@ -225,7 +235,11 @@ def _param_table(func: Any, parsed_doc: dict[str, Any]) -> str:
 
     rows = []
     for name, param in sig.parameters.items():
-        ann = _format_annotation(param.annotation) if param.annotation is not inspect.Parameter.empty else ""
+        ann = (
+            _format_annotation(param.annotation)
+            if param.annotation is not inspect.Parameter.empty
+            else ""
+        )
         default = _format_default(param.default)
         if param.kind == inspect.Parameter.VAR_KEYWORD:
             display_name = f"**{name}"
@@ -437,7 +451,9 @@ def generate_agent_page() -> str:
     # cleanup_async
     parts.append("### `AnyAgent.cleanup_async()`")
     parts.append("")
-    parts.append("Clean up resources (MCP connections, etc.). Called automatically when using the async context manager pattern.")
+    parts.append(
+        "Clean up resources (MCP connections, etc.). Called automatically when using the async context manager pattern."
+    )
     parts.append("")
 
     # AgentCancel
@@ -449,11 +465,15 @@ def generate_agent_page() -> str:
     if parsed["summary"]:
         parts.append(parsed["summary"])
         parts.append("")
-    parts.append("Base exception class for intentional cancellation from callbacks. Must be subclassed.")
+    parts.append(
+        "Base exception class for intentional cancellation from callbacks. Must be subclassed."
+    )
     parts.append("")
     parts.append("**Properties:**")
     parts.append("")
-    parts.append("- `trace` - `AgentTrace | None`: Execution trace collected before cancellation.")
+    parts.append(
+        "- `trace` - `AgentTrace | None`: Execution trace collected before cancellation."
+    )
     parts.append("")
 
     # AgentRunError
@@ -469,8 +489,12 @@ def generate_agent_page() -> str:
     parts.append("")
     parts.append("**Properties:**")
     parts.append("")
-    parts.append("- `trace` - `AgentTrace`: The execution trace collected up to failure point.")
-    parts.append("- `original_exception` - `Exception`: The underlying exception that was caught.")
+    parts.append(
+        "- `trace` - `AgentTrace`: The execution trace collected up to failure point."
+    )
+    parts.append(
+        "- `original_exception` - `Exception`: The underlying exception that was caught."
+    )
     parts.append("")
 
     return "\n".join(parts)
@@ -478,7 +502,13 @@ def generate_agent_page() -> str:
 
 def generate_config_page() -> str:
     """Generate api/config.md."""
-    from any_agent.config import AgentConfig, AgentFramework, MCPSse, MCPStdio, MCPStreamableHttp
+    from any_agent.config import (
+        AgentConfig,
+        AgentFramework,
+        MCPSse,
+        MCPStdio,
+        MCPStreamableHttp,
+    )
 
     parts = [
         "---",
@@ -523,7 +553,9 @@ def generate_config_page() -> str:
     parts.append("")
     parts.append("## MCPStreamableHttp")
     parts.append("")
-    parts.append("Configuration for connecting to an MCP server via Streamable HTTP transport.")
+    parts.append(
+        "Configuration for connecting to an MCP server via Streamable HTTP transport."
+    )
     parts.append("")
     table = _pydantic_field_table(MCPStreamableHttp)
     if table:
@@ -537,7 +569,9 @@ def generate_config_page() -> str:
     parts.append("")
     parts.append("## MCPSse")
     parts.append("")
-    parts.append("Configuration for connecting to an MCP server via SSE transport (deprecated).")
+    parts.append(
+        "Configuration for connecting to an MCP server via SSE transport (deprecated)."
+    )
     parts.append("")
     table = _pydantic_field_table(MCPSse)
     if table:
@@ -580,7 +614,9 @@ def generate_config_page() -> str:
         parts.append("")
         parts.append("## A2AServingConfig")
         parts.append("")
-        parts.append("Configuration for serving agents via A2A. Install `any-agent[a2a]` for full docs.")
+        parts.append(
+            "Configuration for serving agents via A2A. Install `any-agent[a2a]` for full docs."
+        )
         parts.append("")
         parts.append("## MCPServingConfig")
         parts.append("")
@@ -607,7 +643,6 @@ def generate_config_page() -> str:
 def generate_callbacks_page() -> str:
     """Generate api/callbacks.md."""
     from any_agent.callbacks import Callback, Context, get_default_callbacks
-    from any_agent.callbacks.span_print import ConsolePrintSpan
 
     parts = [
         "---",
@@ -624,7 +659,9 @@ def generate_callbacks_page() -> str:
     if parsed["summary"]:
         parts.append(parsed["summary"])
         parts.append("")
-    parts.append("Base class for AnyAgent callbacks. Subclass and override any subset of the lifecycle methods.")
+    parts.append(
+        "Base class for AnyAgent callbacks. Subclass and override any subset of the lifecycle methods."
+    )
     parts.append("")
 
     for method_name in [
@@ -655,16 +692,22 @@ def generate_callbacks_page() -> str:
     if parsed["summary"]:
         parts.append(parsed["summary"])
         parts.append("")
-    parts.append("Shared context object passed through all callbacks during an agent run.")
+    parts.append(
+        "Shared context object passed through all callbacks during an agent run."
+    )
     parts.append("")
     parts.append("### Fields")
     parts.append("")
     parts.append("| Field | Type | Description |")
     parts.append("|-------|------|-------------|")
-    parts.append("| `current_span` | `Span` | The active OpenTelemetry span with attributes (see GenAI) |")
+    parts.append(
+        "| `current_span` | `Span` | The active OpenTelemetry span with attributes (see GenAI) |"
+    )
     parts.append("| `trace` | `AgentTrace` | Current execution trace |")
     parts.append("| `tracer` | `Tracer` | OpenTelemetry tracer instance |")
-    parts.append("| `shared` | `dict[str, Any]` | Arbitrary shared state across callbacks |")
+    parts.append(
+        "| `shared` | `dict[str, Any]` | Arbitrary shared state across callbacks |"
+    )
     parts.append("")
 
     # ConsolePrintSpan
@@ -672,13 +715,17 @@ def generate_callbacks_page() -> str:
     parts.append("")
     parts.append("## ConsolePrintSpan")
     parts.append("")
-    parts.append("Default callback that prints span information to the console using Rich formatting.")
+    parts.append(
+        "Default callback that prints span information to the console using Rich formatting."
+    )
     parts.append("")
 
     # get_default_callbacks
     parts.append("---")
     parts.append("")
-    parts.append(_generate_function_doc(get_default_callbacks, "##", "any_agent.callbacks"))
+    parts.append(
+        _generate_function_doc(get_default_callbacks, "##", "any_agent.callbacks")
+    )
     parts.append("")
 
     return "\n".join(parts)
@@ -716,7 +763,9 @@ def generate_tracing_page() -> str:
     parts.append("### Properties")
     parts.append("")
     parts.append("- `duration` - `timedelta`: Duration of the agent invocation span.")
-    parts.append("- `tokens` - `TokenInfo`: Total token usage across all LLM calls (cached).")
+    parts.append(
+        "- `tokens` - `TokenInfo`: Total token usage across all LLM calls (cached)."
+    )
     parts.append("- `cost` - `CostInfo`: Total cost across all LLM calls (cached).")
     parts.append("")
 
@@ -750,7 +799,13 @@ def generate_tracing_page() -> str:
 
     parts.append("### Methods")
     parts.append("")
-    for method_name in ["is_agent_invocation", "is_llm_call", "is_tool_execution", "get_input_messages", "get_output_content"]:
+    for method_name in [
+        "is_agent_invocation",
+        "is_llm_call",
+        "is_tool_execution",
+        "get_input_messages",
+        "get_output_content",
+    ]:
         method = getattr(AgentSpan, method_name, None)
         if method:
             parts.append(f"#### `AgentSpan.{method_name}()`")
@@ -783,7 +838,9 @@ def generate_tracing_page() -> str:
     if table:
         parts.append(table)
         parts.append("")
-    parts.append("**Properties:** `total_tokens` - `int`: Total tokens (input + output).")
+    parts.append(
+        "**Properties:** `total_tokens` - `int`: Total tokens (input + output)."
+    )
     parts.append("")
 
     # GenAI
@@ -791,7 +848,9 @@ def generate_tracing_page() -> str:
     parts.append("")
     parts.append("## GenAI")
     parts.append("")
-    parts.append("Constants for accessing span attributes following OpenTelemetry semantic conventions for generative AI systems.")
+    parts.append(
+        "Constants for accessing span attributes following OpenTelemetry semantic conventions for generative AI systems."
+    )
     parts.append("")
     parts.append("### Attributes")
     parts.append("")
@@ -829,7 +888,9 @@ def generate_evaluation_page() -> str:
     if parsed["summary"]:
         parts.append(parsed["summary"])
         parts.append("")
-    parts.append("Evaluates agent performance by passing trace text and a question to an LLM.")
+    parts.append(
+        "Evaluates agent performance by passing trace text and a question to an LLM."
+    )
     parts.append("")
 
     parts.append("### Constructor")
@@ -925,7 +986,9 @@ def generate_tools_page() -> str:
         tool_func = getattr(tools_module, tool_name)
         if not callable(tool_func) or inspect.isclass(tool_func):
             continue
-        parts.append(_generate_function_doc(tool_func, "##", "any_agent.tools", tool_name))
+        parts.append(
+            _generate_function_doc(tool_func, "##", "any_agent.tools", tool_name)
+        )
         parts.append("")
 
     return "\n".join(parts)
@@ -950,7 +1013,9 @@ def generate_serving_page() -> str:
         if parsed["summary"]:
             parts.append(parsed["summary"])
             parts.append("")
-        parts.append("Lifecycle management for async servers returned by `AnyAgent.serve_async()`.")
+        parts.append(
+            "Lifecycle management for async servers returned by `AnyAgent.serve_async()`."
+        )
         parts.append("")
         parts.append("### Fields")
         parts.append("")
@@ -974,12 +1039,16 @@ def generate_serving_page() -> str:
 
         parts.append("### Properties")
         parts.append("")
-        parts.append("- `port` - `int`: The actual server port (useful when port=0 for OS-assigned ports).")
+        parts.append(
+            "- `port` - `int`: The actual server port (useful when port=0 for OS-assigned ports)."
+        )
         parts.append("")
     except ImportError:
         parts.append("## ServerHandle")
         parts.append("")
-        parts.append("Lifecycle management for async servers. Install the full package for complete docs.")
+        parts.append(
+            "Lifecycle management for async servers. Install the full package for complete docs."
+        )
         parts.append("")
 
     return "\n".join(parts)
@@ -1023,7 +1092,7 @@ def generate_logging_page() -> str:
         "### Example: Custom Log Format",
         "",
         "```python",
-        "setup_logger(log_format=\"%(asctime)s - %(levelname)s - %(message)s\")",
+        'setup_logger(log_format="%(asctime)s - %(levelname)s - %(message)s")',
         "```",
         "",
         "### Example: Propagate Logs",

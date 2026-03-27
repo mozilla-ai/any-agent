@@ -16,12 +16,12 @@ DOCS_DIR = pathlib.Path("docs/src/content/docs")
     [
         f
         for f in sorted(DOCS_DIR.glob("**/*.md")) + sorted(DOCS_DIR.glob("**/*.mdx"))
-        if f.name not in ("evaluation.md",)
+        if f.name != "evaluation.md"
     ],
     ids=str,
 )
 def test_files_all(fpath: pathlib.Path) -> None:
-    if fpath.name in ("serving.mdx",):
+    if fpath.name == "serving.mdx":
         # the serving markdown runs multiple servers in different processes
         # which is not supported by this testing.
         pytest.skip("Serving.mdx not supported by docs tester")

@@ -158,7 +158,13 @@ def main() -> int:
         return 1
 
     table = generate_table()
-    new_content = content[: start_idx + len(START_MARKER)] + "\n" + table + "\n" + content[end_idx:]
+    new_content = (
+        content[: start_idx + len(START_MARKER)]
+        + "\n"
+        + table
+        + "\n"
+        + content[end_idx:]
+    )
 
     FRAMEWORKS_PAGE.write_text(new_content, encoding="utf-8")
     print(f"Updated {FRAMEWORKS_PAGE}")

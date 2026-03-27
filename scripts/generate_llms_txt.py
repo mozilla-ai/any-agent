@@ -83,7 +83,9 @@ def extract_description_from_markdown(content: str) -> str:
             continue
 
         if (
-            stripped.startswith(("!!! ", "<", ":::", "##", "```", "---", "|", "- ", "* ", "import "))
+            stripped.startswith(
+                ("!!! ", "<", ":::", "##", "```", "---", "|", "- ", "* ", "import ")
+            )
             or (stripped.startswith("[") and stripped.endswith("]"))
             or re.match(r"^\d+\.", stripped)
         ):

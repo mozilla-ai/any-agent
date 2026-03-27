@@ -24,9 +24,8 @@ GITHUB_BASE = "https://colab.research.google.com/github/mozilla-ai/any-agent/blo
 
 def _fix_html_for_mdx(text: str) -> str:
     """Fix unclosed HTML tags for MDX compatibility."""
-    text = re.sub(r'<img\b([^>]*?)(?<!/)\s*>', r'<img\1 />', text)
-    text = re.sub(r'<br\s*(?!/)>', '<br />', text)
-    return text
+    text = re.sub(r"<img\b([^>]*?)(?<!/)\s*>", r"<img\1 />", text)
+    return re.sub(r"<br\s*(?!/)>", "<br />", text)
 
 
 def notebook_to_mdx(notebook_path: Path) -> str:
@@ -55,7 +54,9 @@ def notebook_to_mdx(notebook_path: Path) -> str:
     lines.append(f'title: "{safe_title}"')
     lines.append("---")
     lines.append("")
-    lines.append(f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colab_url})")
+    lines.append(
+        f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colab_url})"
+    )
     lines.append("")
 
     for cell in cells:
@@ -111,7 +112,9 @@ def generate_all() -> dict[Path, str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Convert cookbook notebooks to .mdx")
-    parser.add_argument("--check", action="store_true", help="Check if .mdx files are up-to-date")
+    parser.add_argument(
+        "--check", action="store_true", help="Check if .mdx files are up-to-date"
+    )
     args = parser.parse_args()
 
     pages = generate_all()
@@ -124,11 +127,17 @@ def main() -> int:
         for dest, content in pages.items():
             if not dest.exists():
                 print(f"Missing: {dest}", file=sys.stderr)
-                print("Run 'python scripts/generate_cookbooks.py' to generate cookbook pages.", file=sys.stderr)
+                print(
+                    "Run 'python scripts/generate_cookbooks.py' to generate cookbook pages.",
+                    file=sys.stderr,
+                )
                 return 1
             if dest.read_text(encoding="utf-8") != content:
                 print(f"Out of date: {dest}", file=sys.stderr)
-                print("Run 'python scripts/generate_cookbooks.py' to regenerate cookbook pages.", file=sys.stderr)
+                print(
+                    "Run 'python scripts/generate_cookbooks.py' to regenerate cookbook pages.",
+                    file=sys.stderr,
+                )
                 return 1
         print(f"All {len(pages)} cookbook page(s) up to date")
         return 0
