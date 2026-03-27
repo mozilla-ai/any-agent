@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [README.md](README.md): high-level usage and supported frameworks.
 - [CONTRIBUTING.md](CONTRIBUTING.md): canonical dev setup, test matrix, and contribution workflow.
 - [pyproject.toml](pyproject.toml) and [.pre-commit-config.yaml](.pre-commit-config.yaml): formatting/lint/typecheck configuration.
-- [docs/](docs/): MkDocs site sources (configured by [mkdocs.yml](mkdocs.yml)).
+- [docs/](docs/): Astro/Starlight docs site (configured by [docs/astro.config.mjs](docs/astro.config.mjs)).
 
 ## Project Structure & Module Organization
 
@@ -33,7 +33,7 @@ This repo uses `uv` for local dev (Python 3.11+). For the full, up-to-date comma
 - Single test file: `uv run pytest -v tests/unit/frameworks/test_tinyagent.py`
 - Single test: `uv run pytest -v tests/unit/frameworks/test_tinyagent.py::test_function_name`
 - Integration tests (require API keys): `uv run pytest -v tests/integration`
-- Docs preview: `uv run mkdocs serve`
+- Docs preview: `cd docs && npm run dev`
 
 ## Coding Style & Naming Conventions
 
