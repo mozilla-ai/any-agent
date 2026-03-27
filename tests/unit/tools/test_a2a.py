@@ -219,7 +219,7 @@ async def test_handles_task_response() -> None:
                 "context_id": task_response.status.message.context_id,
                 "timestamp": task_response.status.timestamp,
                 "status": task_response.status.state,
-                "message": {"Task completed successfully"},
+                "message": "Task completed successfully",
             }
             assert result == expected_result
             mock_client.send_message.assert_called_once()
