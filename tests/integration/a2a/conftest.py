@@ -4,7 +4,7 @@ from asyncio import Task
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from types import TracebackType
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 from uuid import uuid4
 
 import httpx
@@ -119,7 +119,7 @@ class A2AServedAgent:
         self.server: Server | None = None
         self.server_url = ""
 
-    async def __aenter__(self) -> "A2AServedAgent":
+    async def __aenter__(self) -> Self:
         """Start serving the agent."""
         server_handle = await self.agent.serve_async(serving_config=self.serving_config)
 

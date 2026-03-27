@@ -38,6 +38,7 @@ repos:
         types: [python]
         require_serial: true
         verbose: true
+        exclude: demo|scripts
 
   - repo: https://github.com/codespell-project/codespell
     rev: "v2.4.1"
