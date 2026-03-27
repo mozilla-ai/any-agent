@@ -116,27 +116,23 @@ async def a2a_tool_async(
                     if task.status.message:
                         response_dict["task_id"] = task.status.message.task_id
                         response_dict["context_id"] = task.status.message.context_id
-                        response_dict["message"] = {
-                            " ".join(
-                                [
-                                    part.root.text
-                                    for part in task.status.message.parts
-                                    if isinstance(part.root, TextPart)
-                                ]
-                            )
-                        }
+                        response_dict["message"] = " ".join(
+                            [
+                                part.root.text
+                                for part in task.status.message.parts
+                                if isinstance(part.root, TextPart)
+                            ]
+                        )
                 # Message
                 else:
                     response_dict = {
-                        "message": {
-                            " ".join(
-                                [
-                                    part.root.text
-                                    for part in response.root.result.parts
-                                    if isinstance(part.root, TextPart)
-                                ]
-                            )
-                        },
+                        "message": " ".join(
+                            [
+                                part.root.text
+                                for part in response.root.result.parts
+                                if isinstance(part.root, TextPart)
+                            ]
+                        ),
                         "task_id": response.root.result.task_id,
                     }
             else:
