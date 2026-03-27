@@ -10,7 +10,6 @@ from any_agent.config import AgentConfig, AgentFramework
 from .any_agent import AnyAgent
 
 try:
-    import any_llm
     from agents import Agent, FunctionTool, Model, ModelSettings, Runner, Tool, Usage
     from agents.exceptions import UserError
     from agents.items import ModelResponse
@@ -20,6 +19,7 @@ try:
     from agents.tracing import generation_span
     from agents.util._json import _to_dump_compatible
     from any_llm import AnyLLM
+    from any_llm.types.completion import Choice
     from openai import NOT_GIVEN, NotGiven, Omit
     from openai.types.responses import Response
     from openai.types.responses.response_usage import (
@@ -41,6 +41,7 @@ if TYPE_CHECKING:
     from agents.models.interface import ModelTracing
     from agents.tracing.span_data import GenerationSpanData
     from agents.tracing.spans import Span
+    from any_llm.types.completion import ChatCompletion, ChatCompletionChunk
     from openai.types.chat import ChatCompletionToolParam
     from pydantic import BaseModel
 
@@ -127,7 +128,7 @@ class AnyllmModel(Model):
                 prompt=prompt,
             )
 
-            assert isinstance(response.choices[0], any_llm.types.completion.Choice)
+            assert isinstance(response.choices[0], Choice)
 
             usage = Usage()
             if hasattr(response, "usage") and response.usage:
@@ -237,9 +238,7 @@ class AnyllmModel(Model):
         tracing: ModelTracing,
         stream: Literal[True],
         prompt: Any | None = None,
-    ) -> tuple[
-        Response, AsyncIterator[any_llm.types.completion.ChatCompletionChunk]
-    ]: ...
+    ) -> tuple[Response, AsyncIterator[ChatCompletionChunk]]: ...
 
     @overload
     async def _fetch_response(
@@ -254,7 +253,7 @@ class AnyllmModel(Model):
         tracing: ModelTracing,
         stream: Literal[False],
         prompt: Any | None = None,
-    ) -> any_llm.types.completion.ChatCompletion: ...
+    ) -> ChatCompletion: ...
 
     async def _fetch_response(
         self,
@@ -268,10 +267,7 @@ class AnyllmModel(Model):
         tracing: ModelTracing,
         stream: bool = False,
         prompt: Any | None = None,
-    ) -> (
-        any_llm.types.completion.ChatCompletion
-        | tuple[Response, AsyncIterator[any_llm.types.completion.ChatCompletionChunk]]
-    ):
+    ) -> ChatCompletion | tuple[Response, AsyncIterator[ChatCompletionChunk]]:
         converted_messages = Converter.items_to_messages(input)
 
         if system_instructions:
@@ -328,7 +324,7 @@ class AnyllmModel(Model):
 
         ret = await self.llm.acompletion(
             model=self.model_id,
-            messages=converted_messages,  # type: ignore[arg-type]
+            messages=converted_messages,
             tools=converted_tools,
             temperature=model_settings.temperature,
             top_p=model_settings.top_p,
@@ -342,10 +338,12 @@ class AnyllmModel(Model):
             stream_options=stream_options,
             reasoning_effort=reasoning_effort,
             top_logprobs=model_settings.top_logprobs,
-            **extra_kwargs,  # type: ignore[arg-type]
+            **extra_kwargs,
         )
 
-        if isinstance(ret, any_llm.types.completion.ChatCompletion):
+        from any_llm.types.completion import ChatCompletion as _ChatCompletion
+
+        if isinstance(ret, _ChatCompletion):
             return ret
 
         # If we reach here AND stream=False, something went wrong!
@@ -420,9 +418,6 @@ class OpenAIAgent(AnyAgent):
         if not agents_available:
             msg = "You need to `pip install 'any-agent[openai]'` to use this agent"
             raise ImportError(msg)
-        if not agents_available:
-            msg = "You need to `pip install openai-agents` to use this agent"
-            raise ImportError(msg)
 
         tools = await self._load_tools(self.config.tools)
 
@@ -441,13 +436,6 @@ class OpenAIAgent(AnyAgent):
             mcp_servers=[],  # No longer needed with unified approach
             **kwargs_,
         )
-
-    def _filter_mcp_tools(self, tools: list[Any], mcp_clients: list[Any]) -> list[Any]:
-        """OpenAI framework doesn't expect the mcp tool to be included in `tools`."""
-        # With the new MCPClient approach, MCP tools are already converted to regular callables
-        # and included in the tools list, so we don't need to filter them out anymore.
-        # The OpenAI framework can handle them as regular tools.
-        return tools
 
     async def _run_async(
         self, prompt: str | list[dict[str, Any]], **kwargs: Any

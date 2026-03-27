@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 def _create_mcp_server_instance(agent: AnyAgent) -> MCPServer[Any]:
     server = MCPServer[Any]("any-agent-mcp-server")
 
-    @server.list_tools()  # type: ignore[no-untyped-call,misc]
+    @server.list_tools()  # type: ignore[no-untyped-call,untyped-decorator]
     async def handle_list_tools() -> list[mcptypes.Tool]:
         return [
             mcptypes.Tool(
@@ -42,7 +42,7 @@ def _create_mcp_server_instance(agent: AnyAgent) -> MCPServer[Any]:
             )
         ]
 
-    @server.call_tool()  # type: ignore[misc]
+    @server.call_tool()  # type: ignore[untyped-decorator]
     async def handle_call_tool(
         name: str, arguments: dict[str, Any]
     ) -> list[mcptypes.TextContent | mcptypes.ImageContent | mcptypes.EmbeddedResource]:

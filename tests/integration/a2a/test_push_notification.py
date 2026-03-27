@@ -61,7 +61,7 @@ class MockConversationAgent(TinyAgent):
         await super()._load_agent()
 
     async def run_async(
-        self, prompt: str, instrument: bool = True, **kwargs: Any
+        self, prompt: str | list[dict[str, Any]], instrument: bool = True, **kwargs: Any
     ) -> AgentTrace:
         envelope = self.output_type(
             task_status=TaskState.input_required,
