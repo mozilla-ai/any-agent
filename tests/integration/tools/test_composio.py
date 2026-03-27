@@ -21,7 +21,7 @@ def test_composio(agent_framework: AgentFramework) -> None:
         AgentConfig(
             model_id="openai:gpt-4.1-mini",
             instructions="You summarize GitHub Issues",
-            tools=tools,
+            tools=tools,  # type: ignore[arg-type]
         ),
     )
     agent_trace = agent.run(

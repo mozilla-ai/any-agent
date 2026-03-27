@@ -41,11 +41,13 @@ async def test_serve_async(
         server_url,
     ):
         await wait_for_server_async(server_url)
-        request = a2a_test_helpers.create_send_message_request(
+        send_request = a2a_test_helpers.create_send_message_request(
             text="What is an agent?",
             message_id=uuid4().hex,
         )
-        response = await client.send_message(request, http_kwargs=DEFAULT_HTTP_KWARGS)
+        response = await client.send_message(
+            send_request, http_kwargs=DEFAULT_HTTP_KWARGS
+        )
         assert response is not None
 
 
@@ -75,13 +77,13 @@ async def test_serve_streaming_async(
         server_url,
     ):
         await wait_for_server_async(server_url)
-        request = a2a_test_helpers.create_send_streaming_message_request(
+        stream_request = a2a_test_helpers.create_send_streaming_message_request(
             text=DATE_PROMPT,
             message_id=uuid4().hex,
         )
         responses = []
         async for response in client.send_message_streaming(
-            request, http_kwargs=DEFAULT_HTTP_KWARGS
+            stream_request, http_kwargs=DEFAULT_HTTP_KWARGS
         ):
             responses.append(response)
             assert response is not None

@@ -22,7 +22,7 @@ class TraceTools:
         for attr_name in dir(self):
             if not attr_name.startswith("_") and attr_name != "get_all_tools":
                 attr = getattr(self, attr_name)
-                if callable(attr) and attr_name not in ["trace"]:
+                if callable(attr) and attr_name != "trace":
                     tools.append(attr)
         return tools
 

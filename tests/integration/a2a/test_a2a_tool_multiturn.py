@@ -73,8 +73,9 @@ class MockConversationAgent(TinyAgent):
         await super()._load_agent()
 
     async def run_async(
-        self, prompt: str, instrument: bool = True, **kwargs: Any
+        self, prompt: str | list[dict[str, Any]], instrument: bool = True, **kwargs: Any
     ) -> AgentTrace:
+        assert isinstance(prompt, str)
         # Verify that we don't have recursive "Previous conversation:" prefixes
         conversation_count = prompt.count("Previous conversation:")
 

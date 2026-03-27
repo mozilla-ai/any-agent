@@ -65,7 +65,7 @@ def test_get_output_panel(
         json_mock.assert_called_once()
         panel_mock.assert_called_once()
 
-    if request.node.callspec.id not in ("LLAMA_INDEX_trace",):
+    if request.node.callspec.id != "LLAMA_INDEX_trace":
         # First TOOL execution returns JSON
         panel_mock = MagicMock()
         json_mock = MagicMock()

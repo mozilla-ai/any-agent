@@ -112,7 +112,7 @@ class _LangChainWrapper:
 
         self._original_ainvoke = agent._agent.ainvoke
 
-        async def wrap_ainvoke(*args, **kwargs):  # type: ignore[no-untyped-def]
+        async def wrap_ainvoke(*args, **kwargs):
             if "config" in kwargs:
                 if callbacks := kwargs["config"].get("callbacks"):
                     if isinstance(callbacks, list):
@@ -128,7 +128,7 @@ class _LangChainWrapper:
             else:
                 kwargs["config"] = RunnableConfig(callbacks=[tracing_callback])
 
-            return await self._original_ainvoke(*args, **kwargs)  # type: ignore[misc]
+            return await self._original_ainvoke(*args, **kwargs)
 
         agent._agent.ainvoke = wrap_ainvoke
 

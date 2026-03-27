@@ -31,7 +31,7 @@ def test_files_all(fpath: pathlib.Path) -> None:
         patch("any_agent.tools.a2a_tool_async", mock_a2a_tool),
         patch("composio.Composio", MagicMock()),
     ):
-        check_md_file(fpath=fpath, memory=True)
+        check_md_file(fpath=fpath, memory=True)  # type: ignore[no-untyped-call]
 
 
 def test_evaluation_md() -> None:
@@ -64,4 +64,4 @@ def test_evaluation_md() -> None:
         patch("any_agent.evaluation.LlmJudge", return_value=mock_judge),
         patch("any_agent.evaluation.AgentJudge", return_value=mock_judge),
     ):
-        check_md_file(fpath=pathlib.Path("docs/evaluation.md"), memory=True)
+        check_md_file(fpath=pathlib.Path("docs/evaluation.md"), memory=True)  # type: ignore[no-untyped-call]

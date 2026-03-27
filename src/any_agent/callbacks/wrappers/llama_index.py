@@ -29,9 +29,7 @@ class _LlamaIndexWrapper:
             for callback in agent.config.callbacks:
                 context = callback.before_llm_call(context, *args, **kwargs)
 
-            output = await self._original_take_step(  # type: ignore[misc]
-                *args, **kwargs
-            )
+            output = await self._original_take_step(*args, **kwargs)
 
             for callback in agent.config.callbacks:
                 context = callback.after_llm_call(context, output)
