@@ -32,7 +32,7 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: "uv run mypy"
+        entry: "uv run --extra all --extra a2a --extra composio mypy"
         args: []
         language: system
         types: [python]
