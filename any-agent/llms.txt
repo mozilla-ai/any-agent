@@ -1,0 +1,35 @@
+# any-agent
+
+## Docs
+
+- [Introduction](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/index.mdx)
+- [Agents - Index](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/index.md): from any_agent.tools import search_web, visit_webpage
+- [Agents - Models](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/models.md)
+- [Agents - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/callbacks.mdx): def before_llm_call(self, context: Context, args, *kwargs) -> Context:
+- [Agents - Tools](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/tools.mdx)
+- [Agents - Frameworks - Agno](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/frameworks/agno.md)
+- [Agents - Frameworks - Google Adk](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/frameworks/google-adk.md)
+- [Agents - Frameworks - Langchain](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/frameworks/langchain.md)
+- [Agents - Frameworks - Llama Index](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/frameworks/llama-index.md)
+- [Agents - Frameworks - Openai](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/frameworks/openai.md)
+- [Agents - Frameworks - Smolagents](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/frameworks/smolagents.md)
+- [Agents - Frameworks - Tinyagent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/agents/frameworks/tinyagent.md)
+- [Frameworks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/frameworks.md)
+- [Tracing](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/tracing.mdx)
+- [Evaluation](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/evaluation.md): token_count = trace.tokens.total_tokens
+- [Serving](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/serving.mdx): from any_agent import AgentConfig, AnyAgent
+- [Cookbook - Your First Agent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/cookbook/your-first-agent.mdx): warnings.filterwarnings("ignore", category=DeprecationWarning)
+- [Cookbook - Agent With Local Llm](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/cookbook/agent-with-local-llm.mdx): # Without this, local models often hallucinate the tool output.
+- [Cookbook - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/cookbook/callbacks.mdx): warnings.filterwarnings("ignore", category=DeprecationWarning)
+- [Cookbook - Serve A2A](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/cookbook/serve-a2a.mdx): if "MISTRAL_API_KEY" not in os.environ:
+- [Cookbook - A2A As Tool](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/cookbook/a2a-as-tool.mdx): if "MISTRAL_API_KEY" not in os.environ:
+- [Cookbook - Mcp Agent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/cookbook/mcp-agent.mdx): if not shutil.which("npx"):
+- [Cookbook - Your First Agent Evaluation](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/cookbook/your-first-agent-evaluation.mdx): warnings.simplefilter("ignore", category=DeprecationWarning)
+- [Api - Logging](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/api/logging.md): any-agent comes with a logger powered by Rich.
+- [Api - Agent](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/api/agent.md)
+- [Api - Config](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/api/config.md)
+- [Api - Serving](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/api/serving.md)
+- [Api - Tools](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/api/tools.md)
+- [Api - Callbacks](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/api/callbacks.md)
+- [Api - Tracing](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/api/tracing.md)
+- [Api - Evaluation](https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/api/evaluation.md)
