@@ -42,7 +42,9 @@ def get_area(area_name: str) -> dict:
     """
     response = requests.get(
         f"https://nominatim.openstreetmap.org/search?q={area_name}&format=jsonv2",
-        headers={"User-Agent": "any-agent-demo/1.0 (https://github.com/mozilla-ai/any-agent)"},
+        headers={
+            "User-Agent": "any-agent-demo/1.0 (https://github.com/mozilla-ai/any-agent)"
+        },
         timeout=5,
     )
     response.raise_for_status()
