@@ -180,3 +180,4 @@ cython_debug/
 .pypirc
 
 .vscode
+.DS_Store
