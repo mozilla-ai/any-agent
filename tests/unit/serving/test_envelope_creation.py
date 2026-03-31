@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from pydantic import BaseModel
 
@@ -31,7 +33,9 @@ class MockAgent(AnyAgent):
     async def _load_agent(self) -> None:
         pass
 
-    async def _run_async(self, prompt: str, **kwargs: object) -> str:
+    async def _run_async(
+        self, prompt: str | list[dict[str, Any]], **kwargs: Any
+    ) -> str:
         return "mock result"
 
     async def update_output_type_async(

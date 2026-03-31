@@ -4,17 +4,23 @@ on:
   push:
     branches: [main]
     paths:
-      - mkdocs.yml
       - 'docs/**'
       - 'src/**'
-      - 'scripts/hooks.py'
+      - 'scripts/generate_api_docs.py'
+      - 'scripts/generate_cookbooks.py'
+      - 'scripts/generate_framework_table.py'
+      - 'scripts/generate_llms_txt.py'
+      - '.github/workflows/docs.yaml'
       - 'pyproject.toml'
   pull_request:
     paths:
-      - mkdocs.yml
       - 'docs/**'
       - 'src/**'
-      - 'scripts/hooks.py'
+      - 'scripts/generate_api_docs.py'
+      - 'scripts/generate_cookbooks.py'
+      - 'scripts/generate_framework_table.py'
+      - 'scripts/generate_llms_txt.py'
+      - '.github/workflows/docs.yaml'
       - 'pyproject.toml'
   workflow_dispatch:
 
@@ -22,6 +28,8 @@ jobs:
   docs:
     permissions:
       contents: write
+      pages: write
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
@@ -35,19 +43,39 @@ jobs:
           python-version: 3.13
           activate-environment: true
 
-      - name: Configure git
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
 
-      - name: Install requirements
-        run: |
-          uv sync -U --group docs
+      - name: Install Python dependencies
+        run: uv sync --group docs --extra all
+
+      - name: Install docs dependencies
+        working-directory: docs
+        run: npm ci
+
+      - name: Generate framework table
+        run: uv run python scripts/generate_framework_table.py
+
+      - name: Generate API docs
+        run: uv run python scripts/generate_api_docs.py
+
+      - name: Generate cookbook pages
+        run: uv run python scripts/generate_cookbooks.py
 
       - name: Build docs
-        if: github.event_name == 'pull_request'
-        run: mkdocs build -s
+        working-directory: docs
+        run: npm run build
+        env:
+          CI: true
 
-      - name: Publish docs
+      - name: Generate llms.txt
+        run: uv run python scripts/generate_llms_txt.py
+
+      - name: Deploy to GitHub Pages
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        run: mkdocs gh-deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/dist

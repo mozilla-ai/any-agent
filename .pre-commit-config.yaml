@@ -29,32 +29,22 @@ repos:
       - id: ruff-format
 
   - repo: local
-    # Thanks to https://jaredkhan.com/blog/mypy-pre-commit
-    # We do not use pre-commit/mirrors-mypy,
-    # as it is difficult to configure to run
-    # with the dependencies correctly installed.
     hooks:
       - id: mypy
         name: mypy
-        entry: "./scripts/run-mypy.sh"
-        language: python
-        language_version: python3.13
-        additional_dependencies:
-          - mypy==1.15.0
-          - pip
-          - types-requests
-          - types-pyyaml
+        entry: "uv run --extra all --extra a2a --extra composio mypy"
+        args: []
+        language: system
         types: [python]
-        # use require_serial so that script is only called once per commit
         require_serial: true
-        # Print the number of files as a sanity-check
         verbose: true
+        exclude: demo|scripts
 
   - repo: https://github.com/codespell-project/codespell
     rev: "v2.4.1"
     hooks:
       - id: codespell
-        exclude: CODE_OF_CONDUCT.md|tests/assets
+        exclude: CODE_OF_CONDUCT.md|tests/assets|package-lock\.json
 
   - repo: https://github.com/kynan/nbstripout
     rev: 0.9.1

@@ -296,8 +296,8 @@ class TinyAgent(AnyAgent):
             response.choices[0].message.content  # type: ignore[arg-type]
         )
 
-    async def call_model(self, **completion_params: dict[str, Any]) -> ChatCompletion:
-        return await self.llm.acompletion(**completion_params)  # type: ignore[return-value, arg-type]
+    async def call_model(self, **completion_params: Any) -> ChatCompletion:
+        return await self.llm.acompletion(**completion_params)  # type: ignore[no-any-return]
 
     async def update_output_type_async(
         self, output_type: type[BaseModel] | None

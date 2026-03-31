@@ -12,7 +12,7 @@ import pytest
 )
 @pytest.mark.timeout(180)
 def test_cookbook_notebook(
-    notebook_path: pathlib.Path, capsys: pytest.CaptureFixture
+    notebook_path: pathlib.Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """Test that cookbook notebooks execute without errors using jupyter execute."""
     if notebook_path.stem == "mcp_agent":

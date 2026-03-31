@@ -3,7 +3,7 @@ docs/cookbook/sensitive-info
 
 uv.lock
 output/
-traces/
+/traces/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

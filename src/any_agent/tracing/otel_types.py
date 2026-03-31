@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class SpanKind(str, Enum):
+class SpanKind(StrEnum):
     """String-based enum for span kind to make it serializable."""
 
     INTERNAL = "internal"
@@ -79,7 +79,7 @@ class SpanContext(BaseModel):
         )
 
 
-class StatusCode(str, Enum):
+class StatusCode(StrEnum):
     """String-based enum for status code to make it serializable."""
 
     UNSET = "unset"
