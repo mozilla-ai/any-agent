@@ -57,6 +57,14 @@ SUMMARY = """\
 """
 
 
+ADMONITION_STYLES = {
+    "note": "info",
+    "tip": "success",
+    "caution": "warning",
+    "danger": "danger",
+}
+
+
 def convert_content(content: str) -> str:
     """Strip Astro/MDX-specific syntax from a file's content."""
     lines = content.split("\n")
@@ -65,6 +73,20 @@ def convert_content(content: str) -> str:
     for line in lines:
         # Strip MDX import statements
         if re.match(r"^import\s+.*from\s+['\"].*['\"];?\s*$", line):
+            continue
+
+        # Convert Starlight admonitions to GitBook hints
+        # Matches :::note, :::tip, :::tip[Title], :::caution, :::danger
+        admonition_open = re.match(r"^:::(\w+)(?:\[([^\]]*)\])?$", line.strip())
+        if admonition_open:
+            kind = admonition_open.group(1).lower()
+            style = ADMONITION_STYLES.get(kind, "info")
+            out.append(f'{{% hint style="{style}" %}}')
+            continue
+
+        # Closing :::
+        if line.strip() == ":::":
+            out.append("{% endhint %}")
             continue
 
         # Strip Tabs wrapper (keep contents)
