@@ -8,9 +8,7 @@ any-agent is a Python library providing a single interface to different agent fr
 [Get Started](agents/index.md)
 {% endcontent-ref %}
 
-{% content-ref url="https://github.com/mozilla-ai/any-agent" %}
-[View on GitHub](https://github.com/mozilla-ai/any-agent)
-{% endcontent-ref %}
+↗ [**View on GitHub**](https://github.com/mozilla-ai/any-agent)
 
 any-agent helps you:
 
