@@ -12,6 +12,12 @@ any-agent is a Python library providing a single interface to different agent fr
 [View on GitHub](https://github.com/mozilla-ai/any-agent)
 {% endcontent-ref %}
 
+any-agent helps you:
+
+- switch between agent frameworks with a consistent interface
+- standardize tools, callbacks, tracing, and evaluation
+- serve and compose agents without framework-specific rewrites
+
 ---
 
 ## Requirements
