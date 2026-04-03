@@ -8,14 +8,14 @@
 
 ## Configuring and Serving Agents
 
-You can configure and serve an agent using the [A2AServingConfig](/any-agent/api/config/) or [MCPServingConfig](/any-agent/api/config/) and the `AnyAgent.serve_async` method.
+You can configure and serve an agent using the [A2AServingConfig](api/config.md) or [MCPServingConfig](api/config.md) and the `AnyAgent.serve_async` method.
 
 For illustrative purposes, we are going to define 2 separate scripts, each defining an agent to answer questions about a specific agent framework (either Google ADK or OpenAI Agents SDK):
 
-:::note
+{% hint style="info" %}
 We are using here the `google` and `openai` frameworks for each corresponding "expert" but we could actually use
 any of the supported frameworks, as the actual behavior is defined by the `instructions` and `description`.
-:::
+{% endhint %}
 
 #### Google Expert
 
@@ -54,7 +54,6 @@ if __name__ == "__main__":
     parser.add_argument("protocol", choices=["a2a", "mcp"])
     args = parser.parse_args()
     asyncio.run(serve_agent(args.protocol))
-
 ```
 
 #### OpenAI Expert
@@ -94,7 +93,6 @@ if __name__ == "__main__":
     parser.add_argument("protocol", choices=["a2a", "mcp"])
     args = parser.parse_args()
     asyncio.run(serve_agent(args.protocol))
-
 ```
 
 We can now run each of the scripts in a separate terminal and leave them running in the background:
@@ -115,7 +113,7 @@ of each protocol:
 - [A2A Client](https://a2a-protocol.org/latest/tutorials/python/6-interact-with-server/#understanding-the-client-code)
 - [MCP Client](https://modelcontextprotocol.io/quickstart/client)
 
-Alternatively, as described in [Using Agents-As-Tools](/any-agent/agents/tools/#using-agents-as-tools), we can run another python script containing the main agent that can use the served agents:
+Alternatively, as described in [Using Agents-As-Tools](agents/tools.md#using-agents-as-tools), we can run another python script containing the main agent that can use the served agents:
 
 ```python
 import asyncio
@@ -145,13 +143,11 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
 ```
 
 ## More Examples
 
 Check out our cookbook example for building and serving an agent via A2A:
 
-- [Serve an Agent with A2A (Jupyter Notebook)](/any-agent/cookbook/serve-a2a/)
-
-- [Use an A2A Agent as a tool (Jupyter Notebook)](/any-agent/cookbook/a2a-as-tool/)
+- [Serve an Agent with A2A](cookbook/serve-a2a.md)
+- [Use an A2A Agent as a tool](cookbook/a2a-as-tool.md)

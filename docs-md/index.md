@@ -1,12 +1,12 @@
 # any-agent
 
-:::caution
+{% hint style="warning" %}
 Compared to traditional code-defined workflows, agent frameworks introduce complexity,
 additional security implications to consider, and demand much more computational power.
 
 Before jumping to use one, carefully consider and evaluate how much value you
 would get compared to manually defining a sequence of tools and LLM calls.
-:::
+{% endhint %}
 
 ## Requirements
 
@@ -14,7 +14,7 @@ would get compared to manually defining a sequence of tools and LLM calls.
 
 ## Installation
 
-You can install the bare bones library as follows (only [TinyAgent](/any-agent/agents/frameworks/tinyagent/) will be available):
+You can install the bare bones library as follows (only [TinyAgent](agents/frameworks/tinyagent.md) will be available):
 
 ```bash
 pip install any-agent
@@ -30,13 +30,10 @@ Refer to [pyproject.toml](https://github.com/mozilla-ai/any-agent/blob/main/pypr
 
 ## Why any-agent
 
-  - **Framework agnostic**: Switch between Agno, Google ADK, LangChain, LlamaIndex, OpenAI, smolagents, and TinyAgent with a single parameter change.
-
-  - **Unified tracing**: Standardized OpenTelemetry traces across all frameworks for consistent observability.
-
-  - **Built-in evaluation**: LLM-as-a-judge and agent-as-a-judge evaluation tools to assess agent performance.
-
-  - **Serve anywhere**: Serve agents via A2A or MCP protocols and compose them as tools for other agents.
+- **Framework agnostic**: Switch between Agno, Google ADK, LangChain, LlamaIndex, OpenAI, smolagents, and TinyAgent with a single parameter change.
+- **Unified tracing**: Standardized OpenTelemetry traces across all frameworks for consistent observability.
+- **Built-in evaluation**: LLM-as-a-judge and agent-as-a-judge evaluation tools to assess agent performance.
+- **Serve anywhere**: Serve agents via A2A or MCP protocols and compose them as tools for other agents.
 
 ## For AI Systems
 

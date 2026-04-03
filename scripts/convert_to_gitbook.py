@@ -1,7 +1,11 @@
-"""Convert Astro/Starlight docs to plain Markdown for GitBook.
+"""Build the GitBook site output from docs-md/.
 
-Reads from docs/src/content/docs/, strips MDX/JSX syntax, and writes
-to a site/ output directory along with a SUMMARY.md for GitBook navigation.
+Copies docs-md/ (pre-converted GitBook Markdown) into site/, generates the
+API reference from Python docstrings, copies static assets, and writes
+SUMMARY.md for GitBook navigation.
+
+When docs-md/ is eventually merged back into docs/, update DOCS_SRC to point
+at the new location.
 
 Usage:
     python scripts/convert_to_gitbook.py
@@ -9,14 +13,14 @@ Usage:
 
 from __future__ import annotations
 
-import re
 import shutil
 from pathlib import Path
 
-DOCS_SRC = Path("docs/src/content/docs")
+DOCS_SRC = Path("docs-md")
+API_SRC = Path("docs/src/content/docs/api")
+PUBLIC_SRC = Path("docs/public")
 SITE_DIR = Path("site")
 
-# Mirrors the sidebar in astro.config.mjs — used to build SUMMARY.md
 SUMMARY = """\
 # Table of Contents
 
@@ -44,6 +48,16 @@ SUMMARY = """\
 * [Evaluation](evaluation.md)
 * [Serving](serving.md)
 
+## Cookbook
+
+* [Your First Agent](cookbook/your-first-agent.md)
+* [Your First Agent Evaluation](cookbook/your-first-agent-evaluation.md)
+* [Using Callbacks](cookbook/callbacks.md)
+* [MCP Agent](cookbook/mcp-agent.md)
+* [Serve with A2A](cookbook/serve-a2a.md)
+* [Use an Agent as a Tool (A2A)](cookbook/a2a-as-tool.md)
+* [Local Agent](cookbook/agent-with-local-llm.md)
+
 ## API Reference
 
 * [Agent](api/agent.md)
@@ -56,92 +70,71 @@ SUMMARY = """\
 * [Tracing](api/tracing.md)
 """
 
+FRAMEWORKS_INDEX = """\
+# Agent Frameworks
 
-ADMONITION_STYLES = {
-    "note": "info",
-    "tip": "success",
-    "caution": "warning",
-    "danger": "danger",
-}
+any-agent supports multiple agent frameworks through a unified interface.
 
-
-def convert_content(content: str) -> str:
-    """Strip Astro/MDX-specific syntax from a file's content."""
-    lines = content.split("\n")
-    out = []
-
-    for line in lines:
-        # Strip MDX import statements
-        if re.match(r"^import\s+.*from\s+['\"].*['\"];?\s*$", line):
-            continue
-
-        # Convert Starlight admonitions to GitBook hints
-        # Matches :::note, :::tip, :::tip[Title], :::caution, :::danger
-        admonition_open = re.match(r"^:::(\w+)(?:\[([^\]]*)\])?$", line.strip())
-        if admonition_open:
-            kind = admonition_open.group(1).lower()
-            style = ADMONITION_STYLES.get(kind, "info")
-            out.append(f'{{% hint style="{style}" %}}')
-            continue
-
-        # Closing :::
-        if line.strip() == ":::":
-            out.append("{% endhint %}")
-            continue
-
-        # Strip Tabs wrapper (keep contents)
-        if line.strip() in ("<Tabs>", "</Tabs>"):
-            continue
-
-        # Convert TabItem to a bold header, drop closing tag
-        tab_match = re.match(r"^\s*<TabItem\s+label=[\"']([^\"']+)[\"']>", line)
-        if tab_match:
-            out.append(f"\n**{tab_match.group(1)}**\n")
-            continue
-        if line.strip() == "</TabItem>":
-            continue
-
-        # Strip iframe tags (not renderable in GitBook)
-        if re.match(r"^\s*<iframe\s+", line):
-            out.append("*[Interactive trace — view on the docs site]*")
-            continue
-
-        # Strip other JSX self-closing or block tags (e.g. <Badge />, <CardGrid>)
-        if re.match(r"^\s*<[A-Z][^>]*/>\s*$", line) or re.match(
-            r"^\s*</?[A-Z][^>]*>\s*$", line
-        ):
-            continue
-
-        out.append(line)
-
-    return "\n".join(out)
+| Framework | Page |
+|-----------|------|
+| Agno | [agno.md](agno.md) |
+| Google ADK | [google-adk.md](google-adk.md) |
+| LangChain | [langchain.md](langchain.md) |
+| LlamaIndex | [llama-index.md](llama-index.md) |
+| OpenAI Agents SDK | [openai.md](openai.md) |
+| smolagents | [smolagents.md](smolagents.md) |
+| TinyAgent | [tinyagent.md](tinyagent.md) |
+"""
 
 
-def process_file(src: Path, dst: Path) -> None:
-    """Convert a single .md or .mdx file and write to dst."""
+def copy_docs() -> None:
+    """Copy all Markdown files from docs-md/ into site/."""
+    for src in sorted(DOCS_SRC.rglob("*.md")):
+        rel = src.relative_to(DOCS_SRC)
+        dst = SITE_DIR / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+        print(f"  {rel}")
+
+
+def generate_frameworks_index() -> None:
+    """Generate the frameworks index page (no source equivalent in docs-md)."""
+    dst = SITE_DIR / "agents" / "frameworks" / "index.md"
     dst.parent.mkdir(parents=True, exist_ok=True)
-    content = src.read_text()
-    content = convert_content(content)
-    # Always write as .md regardless of source extension
-    dst.with_suffix(".md").write_text(content)
+    dst.write_text(FRAMEWORKS_INDEX)
+    print("  agents/frameworks/index.md (generated)")
+
+
+def copy_api_docs() -> None:
+    """Copy generated API docs from docs/src/content/docs/api/ into site/api/."""
+    if not API_SRC.exists():
+        print("  WARNING: API docs not found — run generate_api_docs.py first")
+        return
+    dst = SITE_DIR / "api"
+    shutil.copytree(API_SRC, dst)
+    print(f"  Copied {len(list(dst.rglob('*.md')))} API docs from {API_SRC}/")
+
+
+def copy_assets() -> None:
+    """Copy static assets from docs/public into site/."""
+    for subdir in ("images", "traces"):
+        src = PUBLIC_SRC / subdir
+        if src.exists():
+            shutil.copytree(src, SITE_DIR / subdir)
+            print(f"  Copied {len(list(src.rglob('*')))} assets from public/{subdir}/")
 
 
 def main() -> None:
-    """Convert all docs and write to site/."""
+    """Build site/ from docs-md/ and generated API docs."""
     if SITE_DIR.exists():
         shutil.rmtree(SITE_DIR)
     SITE_DIR.mkdir()
 
-    # Process all .md and .mdx source files
-    for src in sorted(DOCS_SRC.rglob("*")):
-        if src.suffix not in (".md", ".mdx"):
-            continue
-        rel = src.relative_to(DOCS_SRC)
-        dst = SITE_DIR / rel.with_suffix(".md")
-        print(f"  {rel}")
-        process_file(src, dst)
+    copy_docs()
+    generate_frameworks_index()
+    copy_api_docs()
+    copy_assets()
 
-    # Write SUMMARY.md and GitBook config
     (SITE_DIR / "SUMMARY.md").write_text(SUMMARY)
     shutil.copy(".gitbook.yaml", SITE_DIR / ".gitbook.yaml")
 

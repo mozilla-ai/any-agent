@@ -6,7 +6,7 @@ Model configuration in `any-agent` is designed to be consistent across all suppo
 
 ## Configuration Parameters
 
-The model configuration is defined through several parameters in [AgentConfig](/any-agent/api/config/):
+The model configuration is defined through several parameters in [AgentConfig](../api/config.md):
 
 The `model_id` parameter selects which language model your agent will use. The format depends on the provider.
 

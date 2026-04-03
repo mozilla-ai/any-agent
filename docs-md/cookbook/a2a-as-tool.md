@@ -2,7 +2,7 @@
 
 Multi-Agent systems are complicated! Enter the [A2A](https://github.com/google-a2a/A2A) protocol by Google: this protocol allows for simpler communication between agents, and easily enables the use of an agent as a tool for another agent. In this tutorial we'll show how you can create a few agents with any-agent and have an agent be provided as a tool for the other agent.
 
-This tutorial assumes basic familiarity with any-agent: if you haven't used any-agent before you may also find the [Creating your first agent](./../your_first_agent) cookbook to be useful. You also may find the other A2A related cookbook to be useful: [Serve an Agent with A2A](./../serve_a2a)
+This tutorial assumes basic familiarity with any-agent: if you haven't used any-agent before you may also find the [Creating your first agent](your-first-agent.md) cookbook to be useful. You also may find the other A2A related cookbook to be useful: [Serve an Agent with A2A](serve-a2a.md)
 
 Note: because this tutorial relies upon advanced stdio/stderr communication using the MCP Server, it cannot be run on Google Colab.
 
@@ -104,7 +104,7 @@ async with httpx.AsyncClient() as client:
             raise ConnectionError(msg)
 ```
 
-### Configure and use the Third Agent 
+### Configure and use the Third Agent
 
 Now that the first two agents are serving over A2A, our main agent can be given access to use it just like a tool! In order to do this you use the `a2a_tool_async` function which retrieves the info about the agent and allows you to call it.
 

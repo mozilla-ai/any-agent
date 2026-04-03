@@ -10,7 +10,7 @@ from any_agent import AgentConfig, AnyAgent, AgentRunError
 from any_agent.tools import search_web, visit_webpage
 ```
 
-Check [AgentConfig](/any-agent/api/config/) for more info on how to configure agents.
+Check [AgentConfig](../api/config.md) for more info on how to configure agents.
 
 ### Single Agent
 
@@ -27,14 +27,14 @@ agent = AnyAgent.create(
 
 ### Multi-Agent
 
-:::caution
+{% hint style="warning" %}
 A multi-agent system introduces even more complexity than a single agent.
 
 As stated before, carefully consider whether you need to adopt this pattern to
 solve the task.
-:::
+{% endhint %}
 
-Multi-Agent systems can be implemented [using Agent-As-Tools](/any-agent/agents/tools/#using-agents-as-tools).
+Multi-Agent systems can be implemented [using Agent-As-Tools](tools.md#using-agents-as-tools).
 
 ### Framework Specific Arguments
 
@@ -52,9 +52,9 @@ except AgentRunError as e:
     agent_trace = e.trace
 ```
 
-Check [AgentTrace](/any-agent/api/tracing/) for more info on the return type.
+Check [AgentTrace](../api/tracing.md) for more info on the return type.
 
-Exceptions are wrapped in an [AgentRunError](/any-agent/api/agent/), that carries the original exception in the `__cause__` attribute. Additionally, its `trace` property holds the trace containing the spans collected so far.
+Exceptions are wrapped in an [AgentRunError](../api/agent.md), that carries the original exception in the `__cause__` attribute. Additionally, its `trace` property holds the trace containing the spans collected so far.
 
 ### Async
 
@@ -100,11 +100,12 @@ async def process_batch():
 
 For scenarios where you need to maintain conversation history across multiple agent interactions, you can leverage the `spans_to_messages` method built into the AgentTrace. This function converts agent traces into a standardized message format that can be used to provide context in subsequent conversations.
 
-:::tip[When to Use Each Approach]
+{% hint style="success" %}
+**When to Use Each Approach**
 - **Multi-turn with `spans_to_messages`**: When you need to maintain context across separate agent invocations or implement complex conversation management logic
 - **User interaction tools**: When you want the agent to naturally interact with users during its execution, asking questions as needed to complete its task
 - **Hybrid approach**: Combine both patterns for sophisticated agents that maintain long-term context while also gathering real-time user input
-:::
+{% endhint %}
 
 #### Basic Multi-Turn Example
 
@@ -181,4 +182,4 @@ agent_trace = agent.run(prompt)
 print(f"Final recommendations: {agent_trace.final_output}")
 ```
 
-This approach is demonstrated in our [MCP Agent cookbook example](/any-agent/cookbook/mcp-agent/), where an agent uses user interaction tools to gather trip planning information dynamically. The agent can ask clarifying questions, get user preferences, and provide personalized recommendations all within a single `run()` call.
+This approach is demonstrated in our [MCP Agent cookbook example](../cookbook/mcp-agent.md), where an agent uses user interaction tools to gather trip planning information dynamically.

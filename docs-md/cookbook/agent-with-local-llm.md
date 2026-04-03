@@ -60,7 +60,7 @@ We can simply pass to the AgentConfig of `any-agent` as a model argument (`num_c
     )
 ```
 
-References: [AgentConfig](https://mozilla-ai.github.io/any-agent/api/config/), [num_ctx](https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values)
+References: [AgentConfig](../api/config.md), [num_ctx](https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values)
 
 All four of the models above have a max context length of 128k tokens, but if you have limited RAM if you
 set it to 128k it might cause you memory issues. For this example, we will set it to 32,000 tokens and provide a relatively small codebase.

@@ -22,7 +22,7 @@ Now it's time to configure the agent! At this stage you have a few choices:
 
 ### Pick the framework
 
-We support a variety of underlying agent frameworks (OpenAI, Smolagents, Langchain, TinyAgent, etc), which all have their own particular agentic AI implementations. For this tutorial's simple use case, any of the frameworks should work just fine, but any-agent makes it easy to try out a different framework later, if we so choose. For this example, we will use the [TinyAgent](frameworks/tinyagent.md) framework.  
+We support a variety of underlying agent frameworks (OpenAI, Smolagents, Langchain, TinyAgent, etc), which all have their own particular agentic AI implementations. For this tutorial's simple use case, any of the frameworks should work just fine, but any-agent makes it easy to try out a different framework later, if we so choose. For this example, we will use the [TinyAgent](../agents/frameworks/tinyagent.md) framework.
 
 ### Pick an LLM
 
@@ -32,8 +32,8 @@ Regardless of which agent framework you choose, each framework supports any-llm,
 
  In this example, we'll add a few MCP servers that we host locally, which means we'll use a Stdio MCP server. If an MCP Server is already running and hosted elsewhere, you can use an SSE connection to access it. You can browse some of the officially supported MCP servers [here](https://github.com/modelcontextprotocol/servers/tree/main?tab=readme-ov-file).
 
- Let's use two MCP servers: 
- 
+ Let's use two MCP servers:
+
  * [Time](https://github.com/modelcontextprotocol/servers/tree/main/src/time): so the agent can know what time/day it is.
  * [Airbnb](https://github.com/openbnb-org/mcp-server-airbnb): so the agent can browse airbnb listings (Needs [npx](https://docs.npmjs.com/cli/v8/commands/npx))
 
@@ -52,7 +52,7 @@ if "MISTRAL_API_KEY" not in os.environ:
 else:
     print("MISTRAL_API_KEY found in environment.")
 
-# Quick Environment Check (Airbnb tool requires npx/Node.js)\n",
+# Quick Environment Check (Airbnb tool requires npx/Node.js)
 if not shutil.which("npx"):
     print(
         "⚠️ Warning: 'npx' was not found in your path. The Airbnb tool requires Node.js/npm to run."

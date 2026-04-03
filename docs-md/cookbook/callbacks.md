@@ -1,10 +1,10 @@
 # Using Callbacks
 
-This cookbook shows you how to monitor, control, and secure your agents using callbacks. 
-We'll build three callbacks of increasing complexity: counting tool usage, enforcing 
+This cookbook shows you how to monitor, control, and secure your agents using callbacks.
+We'll build three callbacks of increasing complexity: counting tool usage, enforcing
 rate limits, and protecting sensitive data.
 
-You can find more information about callbacks in the [docs](https://mozilla-ai.github.io/any-agent/agents/callbacks/)
+You can find more information about callbacks in the [docs](../agents/callbacks.md)
 
 ```python
 %pip install 'any-agent' --quiet
@@ -21,12 +21,12 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 nest_asyncio.apply()
 ```
 
-## Configure LLM Keys 
+## Configure LLM Keys
 
 For this tutorial, we'll use Mistral's mistral-small-latest (fast and affordable).
 You could also use:
-- `gpt-4o-mini` 
-- `claude-3-5-sonnet-latest` 
+- `gpt-4o-mini`
+- `claude-3-5-sonnet-latest`
 - Any other model supported by any-agent
 
 ```python
@@ -46,7 +46,7 @@ from any_agent.tools import search_web
 
 `any-agent` comes with a default callback that will always be used unless you pass a value to `AgentConfig.callbacks`:
 
-- [`ConsolePrintSpan`](https://mozilla-ai.github.io/any-agent/api/callbacks/#any_agent.callbacks.span_print.ConsolePrintSpan)
+- [`ConsolePrintSpan`](../api/callbacks.md)
 
 ```python
 agent = AnyAgent.create(
@@ -91,7 +91,7 @@ class ToolUsageCounter(Callback):
 
 ## Enforce Rate Limits
 
-Now that we are counting steps, we can act on that data. 
+Now that we are counting steps, we can act on that data.
 
 We will create a `BudgetLimit` callback. If the tool usage exceeds our limit, we will raise an exception to immediately halt the agent. This prevents run-away costs.
 
@@ -145,11 +145,11 @@ except RuntimeError as e:
 
 ## Bonus : Protect Sensitive Data
 
-Beyond stopping the agent, callbacks can also **modify data** before it gets logged to your [traces](https://mozilla-ai.github.io/any-agent/tracing/). This is critical for preventing Sensitive Information (PII) from leaking into your logs. 
+Beyond stopping the agent, callbacks can also **modify data** before it gets logged to your [traces](../tracing.md). This is critical for preventing Sensitive Information (PII) from leaking into your logs.
 
 In the example below, we are going to implement a callback that:
-1. Detects `INPUT_MESSAGES` in `Context.current_span`. 
-2. Writes this text to a secure local file. 
+1. Detects `INPUT_MESSAGES` in `Context.current_span`.
+2. Writes this text to a secure local file.
 3. **Replaces** the content in the current span with a reference link, so the trace remains clean.
 
 ```python
@@ -183,9 +183,9 @@ class SensitiveDataOffloader(Callback):
         return context
 ```
 
-We can now provide our callback to the agent. 
+We can now provide our callback to the agent.
 
-You can find more information in [our docs](https://mozilla-ai.github.io/any-agent/agents/callbacks/#providing-your-own-callbacks).
+You can find more information in [our docs](../agents/callbacks.md#providing-your-own-callbacks).
 
 ```python
 from any_agent.callbacks import get_default_callbacks

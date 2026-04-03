@@ -4,7 +4,7 @@ Callbacks provide hooks into the lifecycle of an `AnyAgent` execution. Using cal
 
 ## Implementing Callbacks
 
-All callbacks must inherit from the base [Callback](/any-agent/api/callbacks/) class and can choose to implement any subset of the available callback methods. These methods include:
+All callbacks must inherit from the base [Callback](../api/callbacks.md) class and can choose to implement any subset of the available callback methods. These methods include:
 
 | Callback Method | When It Fires | Example Use Cases |
 |:----------------:|:------------:|:----------------|
@@ -23,7 +23,7 @@ def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
 
 ## Managing State (`Context`)
 
-During an agent run (`agent.run_async` or `agent.run`), a unique [Context](/any-agent/api/callbacks/) object is created and shared across all callbacks.
+During an agent run (`agent.run_async` or `agent.run`), a unique [Context](../api/callbacks.md) object is created and shared across all callbacks.
 
 Use `Context.shared` (a dictionary) to persist data across different steps and callbacks.
 
@@ -31,7 +31,7 @@ Use `Context.shared` (a dictionary) to persist data across different steps and c
 
 `any-agent` populates the `Context.current_span` property so that callbacks can access information in a framework-agnostic way.
 
-You can see what attributes are available for LLM Calls and Tool Executions by examining the [GenAI](/any-agent/api/tracing/) class.
+You can see what attributes are available for LLM Calls and Tool Executions by examining the [GenAI](../api/tracing.md) class.
 
 **Common Pattern**: Initialize a counter in one callback and check it in another.
 
@@ -52,13 +52,14 @@ class CountSearchWeb(Callback):
 
 Callbacks can raise exceptions to stop agent execution. This is useful for implementing safety guardrails or validation logic.
 
-:::caution[Exceptions act as a circuit breaker]
+{% hint style="warning" %}
+**Exceptions act as a circuit breaker**
 Raising any exception from a callback immediately halts the agent loop. Use this intentionally to enforce limits or abort on invalid states.
-:::
+{% endhint %}
 
 ### Using `AgentCancel` (Recommended)
 
-For intentional cancellation (rate limits, guardrails, validation), subclass [AgentCancel](/any-agent/api/agent/). These exceptions propagate directly to your code, allowing you to catch them by their specific type:
+For intentional cancellation (rate limits, guardrails, validation), subclass [AgentCancel](../api/agent.md). These exceptions propagate directly to your code, allowing you to catch them by their specific type:
 
 ```python
 from any_agent import AgentCancel, AgentConfig, AnyAgent
@@ -94,7 +95,7 @@ except SearchLimitReached as e:
 
 ### Using Regular Exceptions
 
-Regular exceptions (like `RuntimeError`) are automatically wrapped in [AgentRunError](/any-agent/api/agent/) by the framework, which provides access to the execution trace but requires you to inspect the wrapped exception:
+Regular exceptions (like `RuntimeError`) are automatically wrapped in [AgentRunError](../api/agent.md) by the framework, which provides access to the execution trace but requires you to inspect the wrapped exception:
 
 ```python
 from any_agent import AgentConfig, AgentRunError, AnyAgent
@@ -126,12 +127,13 @@ except AgentRunError as e:
     print(f"Trace: {e.trace}")
 ```
 
-:::tip[Choosing the right exception type]
+{% hint style="success" %}
+**Choosing the right exception type**
 - **`AgentCancel`**: Use when cancellation is expected behavior and you want to handle it distinctly (e.g., rate limits, safety guardrails).
 - **Regular exceptions**: Use when something unexpected goes wrong and you want consistent error handling via `AgentRunError`.
 
 Both expose the execution trace via `.trace` for debugging and inspection.
-:::
+{% endhint %}
 
 ## Inspecting Data (`Context.current_span`)
 
@@ -204,7 +206,7 @@ Advanced designs such as safety guardrails or custom side-effects can be integra
 
 `any-agent` comes with a set of default callbacks that will be used by default (if you don't pass a value to `AgentConfig.callbacks`):
 
-- [ConsolePrintSpan](/any-agent/api/callbacks/)
+- [ConsolePrintSpan](../api/callbacks.md)
 
 If you want to disable these default callbacks, you can pass an empty list:
 
@@ -229,7 +231,7 @@ Callbacks are provided to the agent using the `AgentConfig.callbacks` property.
 
 #### Extending default callbacks
 
-`any-agent` includes default callbacks (like console logging). Use [get_default_callbacks](/any-agent/api/callbacks/) to keep them:
+`any-agent` includes default callbacks (like console logging). Use [get_default_callbacks](../api/callbacks.md) to keep them:
 
 ```py
 from any_agent import AgentConfig, AnyAgent
@@ -273,7 +275,7 @@ agent = AnyAgent.create(
 )
 ```
 
-:::caution
+{% hint style="warning" %}
 Callbacks will be called in the order that they are added, so it is important to pay attention to the order in which you set the callback configuration.
 
 In the above example, passing:
@@ -286,14 +288,14 @@ In the above example, passing:
 ```
 
 Would fail because `context.shared["search_web_count"]` was not set yet.
-:::
+{% endhint %}
 
 ## Examples
 
 ### Offloading sensitive information
 
 Some inputs and/or outputs in your traces might contain sensitive information that you don't want
-to be exposed in the [traces](/any-agent/tracing/).
+to be exposed in the [traces](../tracing.md).
 
 You can use callbacks to offload the sensitive information to an external location and replace the span
 attributes with a reference to that location:
@@ -330,7 +332,7 @@ class SensitiveDataOffloader(Callback):
         return context
 ```
 
-You can find a working example in the [Callbacks Cookbook](/any-agent/cookbook/callbacks/).
+You can find a working example in the [Callbacks Cookbook](../cookbook/callbacks.md).
 
 ### Limit the number of steps
 

@@ -2,9 +2,9 @@
 
 `any-agent` provides 2 options to specify what `tools` are available to your agent: `Callables` and `MCP` ([Model Context Protocol](https://modelcontextprotocol.io/introduction)).
 
-:::tip
+{% hint style="success" %}
 Multi-agent can be implemented [using Agents-As-Tools](#using-agents-as-tools).
-:::
+{% endhint %}
 
 You can use any combination of options within the same agent.
 
@@ -16,9 +16,9 @@ You can define them in the same script, import it from an external package, etc.
 Under the hood, `any-agent` takes care of wrapping the
 tool so it becomes usable by the selected framework.
 
-:::tip
-Check all the [built-in callable tools](/any-agent/api/tools/) that any-agent provides.
-:::
+{% hint style="success" %}
+Check all the [built-in callable tools](../api/tools.md) that any-agent provides.
+{% endhint %}
 
 ```python
 from any_agent import AgentConfig
@@ -35,9 +35,9 @@ main_agent = AgentConfig(
 We have a custom [Composio](https://github.com/ComposioHQ/composio) provider that allows to use
 any [Composio tools](https://docs.composio.dev/toolkits/introduction) in `any-agent`:
 
-:::tip
+{% hint style="success" %}
 Check the different options for [Fetching and Filtering Composio Tools](https://docs.composio.dev/docs/fetching-tools).
-:::
+{% endhint %}
 
 ```python
 from any_agent import AgentConfig
@@ -131,19 +131,19 @@ main_agent = await AnyAgent.create_async(
 
 ## MCP
 
-MCP can either be run locally ([MCPStdio](/any-agent/api/config/)) or you can connect to an MCP that is running elsewhere (using either [MCPSse](/any-agent/api/config/) or [MCPStreamableHttp](/any-agent/api/config/)).
+MCP can either be run locally ([MCPStdio](../api/config.md)) or you can connect to an MCP that is running elsewhere (using either [MCPSse](../api/config.md) or [MCPStreamableHttp](../api/config.md)).
 
-:::tip
+{% hint style="success" %}
 There are tools like [SuperGateway](https://github.com/supercorp-ai/supergateway) providing an easy way to turn a Stdio server into an SSE server.
-:::
+{% endhint %}
 
-:::caution
+{% hint style="warning" %}
 The SSE remote transport has been deprecated as of [MCP specification version 2025-03-26](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http). Please use the HTTP Stream Transport instead.
-:::
+{% endhint %}
 
 #### MCP (Stdio)
 
-See the [MCPStdio](/any-agent/api/config/) API Reference.
+See the [MCPStdio](../api/config.md) API Reference.
 
 ```python
 from any_agent import AgentConfig
@@ -163,7 +163,7 @@ main_agent = AgentConfig(
 
 #### MCP (Streamable HTTP)
 
-See the [MCPStreamableHttp](/any-agent/api/config/) API Reference.
+See the [MCPStreamableHttp](../api/config.md) API Reference.
 
 ```python
 from any_agent import AgentConfig
@@ -181,7 +181,7 @@ main_agent = AgentConfig(
 
 #### MCP (SSE)
 
-See the [MCPSse](/any-agent/api/config/) API Reference.
+See the [MCPSse](../api/config.md) API Reference.
 
 ```python
 from any_agent import AgentConfig
