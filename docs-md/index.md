@@ -1,20 +1,12 @@
 # One interface. Every agent framework.
 
-![any-agent logo](images/any-agent-logo-mark.png)
+<img src="images/any-agent-logo-mark.png" alt="any-agent logo" width="120" />
 
 any-agent is a Python library providing a single interface to different agent frameworks.
 
 [**Get Started →**](agents/index.md)      [**View on GitHub ↗**](https://github.com/mozilla-ai/any-agent)
 
 ---
-
-{% hint style="warning" %}
-Compared to traditional code-defined workflows, agent frameworks introduce complexity,
-additional security implications to consider, and demand much more computational power.
-
-Before jumping to use one, carefully consider and evaluate how much value you
-would get compared to manually defining a sequence of tools and LLM calls.
-{% endhint %}
 
 ## Requirements
 
