@@ -4,7 +4,13 @@
 
 any-agent is a Python library providing a single interface to different agent frameworks.
 
-[**Get Started →**](agents/index.md)      [**View on GitHub ↗**](https://github.com/mozilla-ai/any-agent)
+{% content-ref url="agents/index.md" %}
+[Get Started](agents/index.md)
+{% endcontent-ref %}
+
+{% content-ref url="https://github.com/mozilla-ai/any-agent" %}
+[View on GitHub](https://github.com/mozilla-ai/any-agent)
+{% endcontent-ref %}
 
 ---
 
