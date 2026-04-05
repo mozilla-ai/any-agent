@@ -10,13 +10,12 @@ any-agent is a Python library providing a single interface to different agent fr
 
 ↗ [**View on GitHub**](https://github.com/mozilla-ai/any-agent)
 
-any-agent helps you:
+## Why any-agent
 
-- switch between agent frameworks with a consistent interface
-- standardize tools, callbacks, tracing, and evaluation
-- serve and compose agents without framework-specific rewrites
-
----
+- **Framework agnostic**: Switch between Agno, Google ADK, LangChain, LlamaIndex, OpenAI, smolagents, and TinyAgent with a single parameter change.
+- **Unified tracing**: Standardized OpenTelemetry traces across all frameworks for consistent observability.
+- **Built-in evaluation**: LLM-as-a-judge and agent-as-a-judge evaluation tools to assess agent performance.
+- **Serve anywhere**: Serve agents via A2A or MCP protocols and compose them as tools for other agents.
 
 ## Requirements
 
@@ -38,12 +37,6 @@ pip install any-agent[agno,openai]
 
 Refer to [pyproject.toml](https://github.com/mozilla-ai/any-agent/blob/main/pyproject.toml) for a list of the options available.
 
-## Why any-agent
-
-- **Framework agnostic**: Switch between Agno, Google ADK, LangChain, LlamaIndex, OpenAI, smolagents, and TinyAgent with a single parameter change.
-- **Unified tracing**: Standardized OpenTelemetry traces across all frameworks for consistent observability.
-- **Built-in evaluation**: LLM-as-a-judge and agent-as-a-judge evaluation tools to assess agent performance.
-- **Serve anywhere**: Serve agents via A2A or MCP protocols and compose them as tools for other agents.
 
 ## For AI Systems
 
