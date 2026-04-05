@@ -1,6 +1,6 @@
 # One interface. Every agent framework.
 
-<img src="images/any-agent-logo-mark.png" alt="any-agent logo" width="120" />
+<img src="images/any-agent-logo-mark.png" alt="any-agent logo" width="72" />
 
 any-agent is a Python library providing a single interface to different agent frameworks.
 
