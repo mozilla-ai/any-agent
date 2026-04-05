@@ -28,7 +28,7 @@ SUMMARY = """\
 
 ## Agents
 
-* [Defining and Running Agents](agents/index.md)
+* [Define and Run Agents](agents/index.md)
 * [Models](agents/models.md)
 * [Callbacks](agents/callbacks.md)
 * [Frameworks](agents/frameworks/index.md)
