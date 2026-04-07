@@ -1,6 +1,4 @@
----
-title: Agno
----
+# Agno
 
 [https://github.com/agno-agi/agno](https://github.com/agno-agi/agno)
 

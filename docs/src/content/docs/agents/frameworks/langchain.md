@@ -1,6 +1,4 @@
----
-title: LangChain
----
+# LangChain
 
 [https://github.com/langchain-ai/langchain](https://github.com/langchain-ai/langchain)
 

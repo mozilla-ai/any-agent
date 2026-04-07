@@ -1,6 +1,4 @@
----
-title: Google Agent Development Kit (ADK)
----
+# Google Agent Development Kit (ADK)
 
 [https://github.com/google/adk-python](https://github.com/google/adk-python)
 

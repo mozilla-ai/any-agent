@@ -1,6 +1,4 @@
----
-title: OpenAI Agents SDK
----
+# OpenAI Agents SDK
 
 [https://github.com/openai/openai-agents-python](https://github.com/openai/openai-agents-python)
 

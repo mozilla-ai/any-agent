@@ -1,11 +1,7 @@
-"""Build the GitBook site output from docs-md/.
+"""Build the GitBook site output from docs/src/content/docs/.
 
-Copies docs-md/ (pre-converted GitBook Markdown) into site/, generates the
-API reference from Python docstrings, copies static assets, and writes
+Copies the docs source into site/, copies static assets, and writes
 SUMMARY.md for GitBook navigation.
-
-When docs-md/ is eventually merged back into docs/, update DOCS_SRC to point
-at the new location.
 
 Usage:
     python scripts/convert_to_gitbook.py
@@ -16,8 +12,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
-DOCS_SRC = Path("docs-md")
-API_SRC = Path("docs/src/content/docs/api")
+DOCS_SRC = Path("docs/src/content/docs")
 PUBLIC_SRC = Path("docs/public")
 SITE_DIR = Path("site")
 
@@ -88,7 +83,7 @@ any-agent supports multiple agent frameworks through a unified interface.
 
 
 def copy_docs() -> None:
-    """Copy all Markdown files from docs-md/ into site/."""
+    """Copy all Markdown files from docs/src/content/docs/ into site/."""
     for src in sorted(DOCS_SRC.rglob("*.md")):
         rel = src.relative_to(DOCS_SRC)
         dst = SITE_DIR / rel
@@ -98,21 +93,11 @@ def copy_docs() -> None:
 
 
 def generate_frameworks_index() -> None:
-    """Generate the frameworks index page (no source equivalent in docs-md)."""
+    """Generate the frameworks index page."""
     dst = SITE_DIR / "agents" / "frameworks" / "index.md"
     dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text(FRAMEWORKS_INDEX)
     print("  agents/frameworks/index.md (generated)")
-
-
-def copy_api_docs() -> None:
-    """Copy generated API docs from docs/src/content/docs/api/ into site/api/."""
-    if not API_SRC.exists():
-        print("  WARNING: API docs not found — run generate_api_docs.py first")
-        return
-    dst = SITE_DIR / "api"
-    shutil.copytree(API_SRC, dst)
-    print(f"  Copied {len(list(dst.rglob('*.md')))} API docs from {API_SRC}/")
 
 
 def copy_assets() -> None:
@@ -125,14 +110,13 @@ def copy_assets() -> None:
 
 
 def main() -> None:
-    """Build site/ from docs-md/ and generated API docs."""
+    """Build site/ from docs source and static assets."""
     if SITE_DIR.exists():
         shutil.rmtree(SITE_DIR)
     SITE_DIR.mkdir()
 
     copy_docs()
     generate_frameworks_index()
-    copy_api_docs()
     copy_assets()
 
     (SITE_DIR / "SUMMARY.md").write_text(SUMMARY)

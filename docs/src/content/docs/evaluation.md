@@ -1,12 +1,10 @@
----
-title: Agent Evaluation
----
+# Agent Evaluation
 
 The any-agent evaluation module encourages three approaches for evaluating agent traces:
 
 1. **Custom Code Evaluation**: Direct programmatic inspection of traces for deterministic checks
-2. **[LlmJudge](/any-agent/api/evaluation/)**: LLM-as-a-judge for evaluations that can be answered with a direct LLM call alongside a custom context
-3. **[AgentJudge](/any-agent/api/evaluation/)**: Complex LLM-based evaluations that utilize built-in and customizable tools to inspect specific parts of the trace or other custom information provided to the agent as a tool
+2. **[LlmJudge](api/evaluation.md)**: LLM-as-a-judge for evaluations that can be answered with a direct LLM call alongside a custom context
+3. **[AgentJudge](api/evaluation.md)**: Complex LLM-based evaluations that utilize built-in and customizable tools to inspect specific parts of the trace or other custom information provided to the agent as a tool
 
 ## Choosing the Right Evaluation Method
 
@@ -20,7 +18,7 @@ Both judges work with any-agent's unified tracing format and return structured e
 
 ## Custom Code Evaluation
 
-Before automatically using an LLM based approach, it is worthwhile to consider whether it is necessary. For deterministic evaluations where you know exactly what to check, you may not want an LLM-based judge at all. Writing a custom evaluation function that directly examines the trace can be more efficient, reliable, and cost-effective. the any-agent [AgentTrace](/any-agent/api/tracing/) provides a few helpful methods that can be used to extract common information.
+Before automatically using an LLM based approach, it is worthwhile to consider whether it is necessary. For deterministic evaluations where you know exactly what to check, you may not want an LLM-based judge at all. Writing a custom evaluation function that directly examines the trace can be more efficient, reliable, and cost-effective. the any-agent [AgentTrace](api/tracing.md) provides a few helpful methods that can be used to extract common information.
 
 ### Example: Custom Evaluation Function
 
@@ -129,7 +127,6 @@ evaluation_questions = [
     "Does the description specify which version of iOS this works with?"
 ]
 
-
 # Run evaluation 4 times to check consistency
 results = []
 for evaluation_question in evaluation_questions:
@@ -144,9 +141,9 @@ for i, result in enumerate(results, 1):
     print("-" * 50)
 ```
 
-:::tip[Async Usage]
+{% hint style="success" %}
 For async applications, use `judge.run_async()` instead of `judge.run()`.
-:::
+{% endhint %}
 
 ## AgentJudge
 
@@ -182,9 +179,9 @@ print(f"Passed: {result.passed}")
 print(f"Reasoning: {result.reasoning}")
 ```
 
-:::tip[Async Usage]
+{% hint style="success" %}
 For async applications, use `judge.run_async()` instead of `judge.run()`.
-:::
+{% endhint %}
 
 ### Adding Custom Tools
 

@@ -1,6 +1,4 @@
----
-title: smolagents
----
+# smolagents
 
 [https://github.com/huggingface/smolagents](https://github.com/huggingface/smolagents)
 
