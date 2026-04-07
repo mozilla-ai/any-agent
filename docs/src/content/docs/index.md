@@ -7,7 +7,7 @@ any-agent gives you a single interface for building agents across multiple frame
 Choose a path:
 
 {% content-ref url="cookbook/your-first-agent.md" %}
-[Your First Agent](./cookbook/your-first-agent.md)
+[Your First Agent](cookbook/your-first-agent.md)
 {% endcontent-ref %}
 
 {% content-ref url="agents/index.md" %}
