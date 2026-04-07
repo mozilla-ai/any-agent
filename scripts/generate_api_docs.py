@@ -184,7 +184,13 @@ def _join_summary_lines(lines: list[str]) -> str:
             paragraphs.append([])
         else:
             paragraphs[-1].append(line)
-    return "\n\n".join(" ".join(p) for p in paragraphs if p).strip()
+
+    def _render_paragraph(p: list[str]) -> str:
+        if any(line.startswith(("- ", "* ")) for line in p):
+            return "\n".join(p)
+        return " ".join(p)
+
+    return "\n\n".join(_render_paragraph(p) for p in paragraphs if p).strip()
 
 
 def _parse_docstring(docstring: str | None) -> dict[str, Any]:
