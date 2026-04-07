@@ -4,17 +4,17 @@
 
 any-agent gives you a single interface for building agents across multiple frameworks.
 
-Choose a path :
+Choose a path:
 
 {% content-ref url="cookbook/your-first-agent.md" %}
-[Your First Agent](cookbook/your-first-agent.md)
+[Your First Agent](./cookbook/your-first-agent.md)
 {% endcontent-ref %}
 
 {% content-ref url="agents/index.md" %}
 [Define and Run Agents](agents/index.md)
 {% endcontent-ref %}
 
-[**View on GitHub**](https://github.com/mozilla-ai/any-agent)
+[View on GitHub](https://github.com/mozilla-ai/any-agent)
 
 ## Why any-agent
 
