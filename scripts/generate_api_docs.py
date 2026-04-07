@@ -240,7 +240,12 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
                 result["args"][current_arg] += " " + stripped
         elif current_section == "returns":
             if stripped:
-                result["returns"] += (" " if result["returns"] else "") + stripped
+                sep = (
+                    "\n"
+                    if stripped.startswith(("- ", "* "))
+                    else (" " if result["returns"] else "")
+                )
+                result["returns"] += sep + stripped
         elif current_section == "raises":
             m = re.match(r"^(\w+)\s*:\s*(.*)", stripped)
             if m:
