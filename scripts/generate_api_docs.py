@@ -176,16 +176,30 @@ def _get_signature_block(func: Any, func_name: str | None = None) -> str:
     return _clean_qualified_names(result)
 
 
+def _join_summary_lines(lines: list[str]) -> str:
+    """Join summary lines preserving paragraph breaks (empty lines)."""
+    paragraphs: list[list[str]] = [[]]
+    for line in lines:
+        if line == "":
+            paragraphs.append([])
+        else:
+            paragraphs[-1].append(line)
+    return "\n\n".join(" ".join(p) for p in paragraphs if p).strip()
+
+
 def _parse_docstring(docstring: str | None) -> dict[str, Any]:
     """Parse a Google-style docstring into sections."""
     result: dict[str, Any] = {"summary": "", "args": {}, "returns": "", "raises": []}
     if not docstring:
         return result
 
-    lines = textwrap.dedent(docstring).strip().split("\n")
+    dedented = textwrap.dedent(docstring).strip()
+    lines = dedented.split("\n")
     current_section = "summary"
     current_arg = ""
     summary_lines: list[str] = []
+    example_lines: list[str] = []
+    example_indent: int = 0
 
     for line in lines:
         stripped = line.strip()
@@ -199,9 +213,19 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
         if stripped == "Raises:":
             current_section = "raises"
             continue
+        if re.match(r"^Examples?:$", stripped):
+            current_section = "example"
+            continue
 
         if current_section == "summary":
             summary_lines.append(stripped)
+        elif current_section == "example":
+            if example_lines or stripped:
+                if not example_lines and stripped:
+                    example_indent = len(line) - len(line.lstrip())
+                example_lines.append(
+                    line[example_indent:] if example_indent else stripped
+                )
         elif current_section == "args":
             m = re.match(r"^(\*{0,2}\w+)\s*(?:\(.*?\))?\s*:\s*(.*)", stripped)
             if m:
@@ -222,7 +246,15 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
             elif result["raises"] and stripped:
                 result["raises"][-1]["desc"] += " " + stripped
 
-    result["summary"] = " ".join(summary_lines).strip()
+    summary = _join_summary_lines(summary_lines)
+    if example_lines:
+        code = "\n".join(example_lines).strip()
+        summary = (
+            f"{summary}\n\n**Example:**\n\n```python\n{code}\n```"
+            if summary
+            else f"**Example:**\n\n```python\n{code}\n```"
+        )
+    result["summary"] = summary
     return result
 
 
