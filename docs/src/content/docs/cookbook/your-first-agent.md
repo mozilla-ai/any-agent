@@ -1,3 +1,7 @@
+---
+description: Build and run your first agent with any-agent using simple web tools.
+---
+
 # Your First Agent
 
 [![Your first agent](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mozilla-ai/any-agent/blob/main/docs/cookbook/your_first_agent.ipynb)
