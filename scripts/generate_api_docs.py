@@ -247,6 +247,9 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
     summary = _join_summary_lines(summary_lines)
     if example_lines:
         code = "\n".join(example_lines).strip()
+        # Strip pre-existing fence markers (``` or ```python) so we don't double-wrap
+        code = re.sub(r"^```[a-z]*\n?", "", code)
+        code = re.sub(r"\n?```$", "", code).strip()
         summary = (
             f"{summary}\n\n**Example:**\n\n```python\n{code}\n```"
             if summary
