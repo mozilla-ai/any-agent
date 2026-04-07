@@ -6,7 +6,7 @@ description: Build and run your first agent with any-agent using simple web tool
 
 If you're looking to build your first agent using a few simple tools, this is a great place to start. In this cookbook example, we will create and run a simple agent that has access to a few web tools. This can be easily expanded to add more advanced tools and features.
 
-[![Your first agent](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mozilla-ai/any-agent/blob/main/docs/cookbook/your_first_agent.ipynb)
+[▶ Open in Google Colab](https://colab.research.google.com/github/mozilla-ai/any-agent/blob/main/docs/cookbook/your_first_agent.ipynb)
 
 ## Install Dependencies
 
