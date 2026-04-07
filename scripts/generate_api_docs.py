@@ -223,9 +223,7 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
             if example_lines or stripped:
                 if not example_lines and stripped:
                     example_indent = len(line) - len(line.lstrip())
-                example_lines.append(
-                    line[example_indent:] if example_indent else stripped
-                )
+                example_lines.append(line[example_indent:])
         elif current_section == "args":
             m = re.match(r"^(\*{0,2}\w+)\s*(?:\(.*?\))?\s*:\s*(.*)", stripped)
             if m:
