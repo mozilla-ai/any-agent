@@ -512,10 +512,6 @@ def generate_agent_page() -> str:
     if parsed["summary"]:
         parts.append(parsed["summary"])
         parts.append("")
-    parts.append(
-        "Base exception class for intentional cancellation from callbacks. Must be subclassed."
-    )
-    parts.append("")
     parts.append("**Properties:**")
     parts.append("")
     parts.append(
@@ -532,8 +528,6 @@ def generate_agent_page() -> str:
     if parsed["summary"]:
         parts.append(parsed["summary"])
         parts.append("")
-    parts.append("Wrapper for unexpected exceptions during agent execution.")
-    parts.append("")
     parts.append("**Properties:**")
     parts.append("")
     parts.append(
