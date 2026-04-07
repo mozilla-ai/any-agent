@@ -27,10 +27,7 @@ jobs:
           uv sync --group docs --extra all
           uv pip install -e .
 
-      - name: Generate API docs
-        run: uv run python scripts/generate_api_docs.py
-
-      - name: Convert to GitBook format
+      - name: Build GitBook site
         run: uv run python scripts/convert_to_gitbook.py
 
       - name: Deploy to staging branch

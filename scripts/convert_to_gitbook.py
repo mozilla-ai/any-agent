@@ -1,7 +1,7 @@
 """Build the GitBook site output from docs/src/content/docs/.
 
-Copies the docs source into site/, copies static assets, and writes
-SUMMARY.md for GitBook navigation.
+Generates API reference docs, copies the docs source into site/, copies
+static assets, and writes SUMMARY.md for GitBook navigation.
 
 Usage:
     python scripts/convert_to_gitbook.py
@@ -10,7 +10,11 @@ Usage:
 from __future__ import annotations
 
 import shutil
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+import generate_api_docs
 
 DOCS_SRC = Path("docs/src/content/docs")
 PUBLIC_SRC = Path("docs/public")
@@ -111,6 +115,8 @@ def copy_assets() -> None:
 
 def main() -> None:
     """Build site/ from docs source and static assets."""
+    generate_api_docs.main()
+
     if SITE_DIR.exists():
         shutil.rmtree(SITE_DIR)
     SITE_DIR.mkdir()

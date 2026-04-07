@@ -82,7 +82,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/dist
 
-      - name: Convert to GitBook format
+      - name: Build GitBook site
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         run: uv run python scripts/convert_to_gitbook.py
 
