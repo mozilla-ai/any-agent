@@ -268,6 +268,8 @@ def _param_table(func: Any, parsed_doc: dict[str, Any]) -> str:
 
     rows = []
     for name, param in sig.parameters.items():
+        if name == "self":
+            continue
         ann = (
             _format_annotation(param.annotation)
             if param.annotation is not inspect.Parameter.empty
