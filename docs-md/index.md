@@ -1,16 +1,18 @@
 # One interface. Every agent framework.
 
-any-agent is a Python library providing a single interface to different agent frameworks.
+any-agent gives you a single interface for building agents across multiple frameworks.
 
-{% content-ref url="agents/index.md" %}
-[Define and Run Agents](agents/index.md)
-{% endcontent-ref %}
+Choose a path :
 
 {% content-ref url="cookbook/your-first-agent.md" %}
 [Your First Agent](cookbook/your-first-agent.md)
 {% endcontent-ref %}
 
-↗ [**View on GitHub**](https://github.com/mozilla-ai/any-agent)
+{% content-ref url="agents/index.md" %}
+[Define and Run Agents](agents/index.md)
+{% endcontent-ref %}
+
+[**View on GitHub**](https://github.com/mozilla-ai/any-agent)
 
 ## Why any-agent
 
