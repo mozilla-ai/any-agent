@@ -289,13 +289,19 @@ def _param_table(func: Any, parsed_doc: dict[str, Any]) -> str:
             default = "*required*"
         elif not default:
             default = ""
-        rows.append(f"| `{display_name}` | `{ann_escaped}` | {default} | {doc_desc} |")
+        rows.append((display_name, ann_escaped, default, doc_desc))
 
     if not rows:
         return ""
 
-    header = "| Parameter | Type | Default | Description |\n|-----------|------|---------|-------------|"
-    return _clean_qualified_names(header + "\n" + "\n".join(rows))
+    has_descriptions = any(r[3] for r in rows)
+    if has_descriptions:
+        header = "| Parameter | Type | Default | Description |\n|-----------|------|---------|-------------|"
+        table_rows = [f"| `{r[0]}` | `{r[1]}` | {r[2]} | {r[3]} |" for r in rows]
+    else:
+        header = "| Parameter | Type | Default |\n|-----------|------|---------|"
+        table_rows = [f"| `{r[0]}` | `{r[1]}` | {r[2]} |" for r in rows]
+    return _clean_qualified_names(header + "\n" + "\n".join(table_rows))
 
 
 def _generate_function_doc(
