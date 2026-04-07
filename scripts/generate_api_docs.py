@@ -80,7 +80,8 @@ def _clean_qualified_names(text: str) -> str:
     ]
     for old, new in replacements:
         text = text.replace(old, new)
-    return text
+    # Convert MkDocs cross-references [`Text`][module.path] -> `Text`
+    return re.sub(r"\[(`[^`]+`)\]\[[^\]]+\]", r"\1", text)
 
 
 def _format_annotation(annotation: Any) -> str:
@@ -266,7 +267,8 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
             if summary
             else f"**Example:**\n\n```python\n{code}\n```"
         )
-    result["summary"] = summary
+    result["summary"] = _clean_qualified_names(summary)
+    result["returns"] = _clean_qualified_names(result["returns"])
     return result
 
 
