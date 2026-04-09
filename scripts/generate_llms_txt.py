@@ -13,9 +13,11 @@ import re
 import sys
 from pathlib import Path
 
-DOCS_CONTENT_DIR = Path(__file__).parent.parent / "docs" / "src" / "content" / "docs"
-BUILD_OUTPUT_DIR = Path(__file__).parent.parent / "docs" / "dist" / "any-agent"
-BASE_URL = "https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/src/content/docs/"
+DOCS_CONTENT_DIR = Path(__file__).parent.parent / "docs"
+BUILD_OUTPUT_DIR = Path(__file__).parent.parent / "site"
+BASE_URL = (
+    "https://raw.githubusercontent.com/mozilla-ai/any-agent/refs/heads/main/docs/"
+)
 MARKDOWN_EXTENSION = ".md"
 ENCODING = "utf-8"
 TOC_PATTERN = r"^\s*\[\[TOC\]\]\s*$"

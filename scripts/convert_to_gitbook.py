@@ -1,4 +1,4 @@
-"""Build the GitBook site output from docs/src/content/docs/.
+"""Build the GitBook site output from docs/.
 
 Generates API reference docs, copies the docs source into site/, copies
 static assets, and writes SUMMARY.md for GitBook navigation.
@@ -16,8 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import generate_api_docs
 
-DOCS_SRC = Path("docs/src/content/docs")
-PUBLIC_SRC = Path("docs/public")
+DOCS_SRC = Path("docs")
 SITE_DIR = Path("site")
 
 SUMMARY = """\
@@ -87,7 +86,7 @@ any-agent supports multiple agent frameworks through a unified interface.
 
 
 def copy_docs() -> None:
-    """Copy all Markdown files from docs/src/content/docs/ into site/."""
+    """Copy all Markdown files from docs/ into site/."""
     for src in sorted(DOCS_SRC.rglob("*.md")):
         rel = src.relative_to(DOCS_SRC)
         dst = SITE_DIR / rel
@@ -105,16 +104,16 @@ def generate_frameworks_index() -> None:
 
 
 def copy_assets() -> None:
-    """Copy static assets from docs/public into site/."""
+    """Copy static assets from docs/ into site/."""
     for subdir in ("images", "traces"):
-        src = PUBLIC_SRC / subdir
+        src = DOCS_SRC / subdir
         if src.exists():
             shutil.copytree(src, SITE_DIR / subdir)
-            print(f"  Copied {len(list(src.rglob('*')))} assets from public/{subdir}/")
+            print(f"  Copied {len(list(src.rglob('*')))} assets from docs/{subdir}/")
 
 
 def main() -> None:
-    """Build site/ from docs source and static assets."""
+    """Build site/ from docs/ source and static assets."""
     generate_api_docs.main()
 
     if SITE_DIR.exists():

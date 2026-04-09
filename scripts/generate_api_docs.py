@@ -2,8 +2,8 @@
 """Generate API reference documentation from Python source code.
 
 Extracts docstrings and signatures from the any-agent source and generates
-Starlight-compatible markdown pages. Generated files are written to
-docs/src/content/docs/api/ and should never be committed to git.
+markdown pages. Generated files are written to
+docs/api/ and should never be committed to git.
 
 Usage:
     python scripts/generate_api_docs.py
@@ -18,9 +18,7 @@ import textwrap
 from pathlib import Path
 from typing import Any, get_type_hints
 
-DOCS_API_DIR = (
-    Path(__file__).parent.parent / "docs" / "src" / "content" / "docs" / "api"
-)
+DOCS_API_DIR = Path(__file__).parent.parent / "docs" / "api"
 
 
 # ---------------------------------------------------------------------------
