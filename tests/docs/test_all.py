@@ -6,7 +6,7 @@ import pytest
 from mktestdocs import check_md_file
 
 
-DOCS_DIR = pathlib.Path("docs/src/content/docs")
+DOCS_DIR = pathlib.Path("docs")
 
 
 # Note the use of `str`, makes for pretty output
@@ -15,16 +15,18 @@ DOCS_DIR = pathlib.Path("docs/src/content/docs")
     "fpath",
     [
         f
-        for f in sorted(DOCS_DIR.glob("**/*.md")) + sorted(DOCS_DIR.glob("**/*.mdx"))
+        for f in sorted(DOCS_DIR.glob("**/*.md"))
         if f.name != "evaluation.md"
+        and "api/" not in f.as_posix()
+        and "cookbook/" not in f.as_posix()
     ],
     ids=str,
 )
 def test_files_all(fpath: pathlib.Path) -> None:
-    if fpath.name == "serving.mdx":
+    if fpath.name == "serving.md":
         # the serving markdown runs multiple servers in different processes
         # which is not supported by this testing.
-        pytest.skip("Serving.mdx not supported by docs tester")
+        pytest.skip("serving.md not supported by docs tester")
 
     mock_agent = MagicMock()
     mock_create = MagicMock(return_value=mock_agent)
