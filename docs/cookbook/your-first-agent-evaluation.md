@@ -46,7 +46,7 @@ from any_agent import AgentConfig, AnyAgent
 from any_agent.tools import search_web, visit_webpage
 
 agent = AnyAgent.create(
-    "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
+    "tinyagent",  # See all options in https://docs.mozilla.ai/any-agent/
     AgentConfig(
         model_id="mistral:mistral-small-latest", tools=[search_web, visit_webpage]
     ),

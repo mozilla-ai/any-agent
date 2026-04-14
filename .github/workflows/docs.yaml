@@ -7,7 +7,6 @@ on:
       - 'docs/**'
       - 'src/**'
       - 'scripts/generate_api_docs.py'
-      - 'scripts/generate_llms_txt.py'
       - 'scripts/convert_to_gitbook.py'
       - '.github/workflows/docs.yaml'
       - 'pyproject.toml'
@@ -16,7 +15,6 @@ on:
       - 'docs/**'
       - 'src/**'
       - 'scripts/generate_api_docs.py'
-      - 'scripts/generate_llms_txt.py'
       - 'scripts/convert_to_gitbook.py'
       - '.github/workflows/docs.yaml'
       - 'pyproject.toml'
@@ -44,9 +42,6 @@ jobs:
 
       - name: Build GitBook site
         run: uv run python scripts/convert_to_gitbook.py
-
-      - name: Generate llms.txt
-        run: uv run python scripts/generate_llms_txt.py
 
       - name: Deploy to gitbook-docs branch
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}

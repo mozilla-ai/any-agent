@@ -107,7 +107,7 @@ def send_message(message: str) -> str:
 print("Start creating agent")
 try:
     agent = await AnyAgent.create_async(
-        "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
+        "tinyagent",  # See all options in https://docs.mozilla.ai/any-agent/
         AgentConfig(
             model_id="mistral:mistral-large-latest",
             tools=[time_tool, airbnb_tool, send_message],

@@ -55,7 +55,7 @@ time_tool = MCPStdio(
 )
 
 time = await AnyAgent.create_async(
-    "tinyagent",  # See all options in https://mozilla-ai.github.io/any-agent/
+    "tinyagent",  # See all options in https://docs.mozilla.ai/any-agent/
     AgentConfig(
         model_id="mistral:mistral-small-latest",
         name="time_agent",
