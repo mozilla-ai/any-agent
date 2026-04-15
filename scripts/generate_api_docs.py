@@ -2,8 +2,8 @@
 """Generate API reference documentation from Python source code.
 
 Extracts docstrings and signatures from the any-agent source and generates
-Starlight-compatible markdown pages. Generated files are written to
-docs/src/content/docs/api/ and should never be committed to git.
+markdown pages. Generated files are written to
+docs/api/ and should never be committed to git.
 
 Usage:
     python scripts/generate_api_docs.py
@@ -18,9 +18,7 @@ import textwrap
 from pathlib import Path
 from typing import Any, get_type_hints
 
-DOCS_API_DIR = (
-    Path(__file__).parent.parent / "docs" / "src" / "content" / "docs" / "api"
-)
+DOCS_API_DIR = Path(__file__).parent.parent / "docs" / "api"
 
 
 # ---------------------------------------------------------------------------
@@ -80,7 +78,8 @@ def _clean_qualified_names(text: str) -> str:
     ]
     for old, new in replacements:
         text = text.replace(old, new)
-    return text
+    # Convert MkDocs cross-references [`Text`][module.path] -> `Text`
+    return re.sub(r"\[(`[^`]+`)\]\[[^\]]+\]", r"\1", text)
 
 
 def _format_annotation(annotation: Any) -> str:
@@ -176,16 +175,36 @@ def _get_signature_block(func: Any, func_name: str | None = None) -> str:
     return _clean_qualified_names(result)
 
 
+def _join_summary_lines(lines: list[str]) -> str:
+    """Join summary lines preserving paragraph breaks (empty lines)."""
+    paragraphs: list[list[str]] = [[]]
+    for line in lines:
+        if line == "":
+            paragraphs.append([])
+        else:
+            paragraphs[-1].append(line)
+
+    def _render_paragraph(p: list[str]) -> str:
+        if any(line.startswith(("- ", "* ")) for line in p):
+            return "\n".join(p)
+        return " ".join(p)
+
+    return "\n\n".join(_render_paragraph(p) for p in paragraphs if p).strip()
+
+
 def _parse_docstring(docstring: str | None) -> dict[str, Any]:
     """Parse a Google-style docstring into sections."""
     result: dict[str, Any] = {"summary": "", "args": {}, "returns": "", "raises": []}
     if not docstring:
         return result
 
-    lines = textwrap.dedent(docstring).strip().split("\n")
+    dedented = textwrap.dedent(docstring).strip()
+    lines = dedented.split("\n")
     current_section = "summary"
     current_arg = ""
     summary_lines: list[str] = []
+    example_lines: list[str] = []
+    example_indent: int = 0
 
     for line in lines:
         stripped = line.strip()
@@ -199,9 +218,17 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
         if stripped == "Raises:":
             current_section = "raises"
             continue
+        if re.match(r"^Examples?:$", stripped):
+            current_section = "example"
+            continue
 
         if current_section == "summary":
             summary_lines.append(stripped)
+        elif current_section == "example":
+            if example_lines or stripped:
+                if not example_lines and stripped:
+                    example_indent = len(line) - len(line.lstrip())
+                example_lines.append(line[example_indent:])
         elif current_section == "args":
             m = re.match(r"^(\*{0,2}\w+)\s*(?:\(.*?\))?\s*:\s*(.*)", stripped)
             if m:
@@ -212,7 +239,12 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
                 result["args"][current_arg] += " " + stripped
         elif current_section == "returns":
             if stripped:
-                result["returns"] += (" " if result["returns"] else "") + stripped
+                sep = (
+                    "\n"
+                    if stripped.startswith(("- ", "* "))
+                    else (" " if result["returns"] else "")
+                )
+                result["returns"] += sep + stripped
         elif current_section == "raises":
             m = re.match(r"^(\w+)\s*:\s*(.*)", stripped)
             if m:
@@ -222,7 +254,19 @@ def _parse_docstring(docstring: str | None) -> dict[str, Any]:
             elif result["raises"] and stripped:
                 result["raises"][-1]["desc"] += " " + stripped
 
-    result["summary"] = " ".join(summary_lines).strip()
+    summary = _join_summary_lines(summary_lines)
+    if example_lines:
+        code = "\n".join(example_lines).strip()
+        # Strip pre-existing fence markers (``` or ```python) so we don't double-wrap
+        code = re.sub(r"^```[a-z]*\n?", "", code)
+        code = re.sub(r"\n?```$", "", code).strip()
+        summary = (
+            f"{summary}\n\n**Example:**\n\n```python\n{code}\n```"
+            if summary
+            else f"**Example:**\n\n```python\n{code}\n```"
+        )
+    result["summary"] = _clean_qualified_names(summary)
+    result["returns"] = _clean_qualified_names(result["returns"])
     return result
 
 
@@ -235,6 +279,8 @@ def _param_table(func: Any, parsed_doc: dict[str, Any]) -> str:
 
     rows = []
     for name, param in sig.parameters.items():
+        if name == "self":
+            continue
         ann = (
             _format_annotation(param.annotation)
             if param.annotation is not inspect.Parameter.empty
@@ -254,13 +300,19 @@ def _param_table(func: Any, parsed_doc: dict[str, Any]) -> str:
             default = "*required*"
         elif not default:
             default = ""
-        rows.append(f"| `{display_name}` | `{ann_escaped}` | {default} | {doc_desc} |")
+        rows.append((display_name, ann_escaped, default, doc_desc))
 
     if not rows:
         return ""
 
-    header = "| Parameter | Type | Default | Description |\n|-----------|------|---------|-------------|"
-    return _clean_qualified_names(header + "\n" + "\n".join(rows))
+    has_descriptions = any(r[3] for r in rows)
+    if has_descriptions:
+        header = "| Parameter | Type | Default | Description |\n|-----------|------|---------|-------------|"
+        table_rows = [f"| `{r[0]}` | `{r[1]}` | {r[2]} | {r[3]} |" for r in rows]
+    else:
+        header = "| Parameter | Type | Default |\n|-----------|------|---------|"
+        table_rows = [f"| `{r[0]}` | `{r[1]}` | {r[2]} |" for r in rows]
+    return _clean_qualified_names(header + "\n" + "\n".join(table_rows))
 
 
 def _generate_function_doc(
@@ -465,10 +517,6 @@ def generate_agent_page() -> str:
     if parsed["summary"]:
         parts.append(parsed["summary"])
         parts.append("")
-    parts.append(
-        "Base exception class for intentional cancellation from callbacks. Must be subclassed."
-    )
-    parts.append("")
     parts.append("**Properties:**")
     parts.append("")
     parts.append(
@@ -485,8 +533,6 @@ def generate_agent_page() -> str:
     if parsed["summary"]:
         parts.append(parsed["summary"])
         parts.append("")
-    parts.append("Wrapper for unexpected exceptions during agent execution.")
-    parts.append("")
     parts.append("**Properties:**")
     parts.append("")
     parts.append(

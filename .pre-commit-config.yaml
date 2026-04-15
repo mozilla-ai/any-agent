@@ -50,3 +50,4 @@ repos:
     rev: 0.9.1
     hooks:
       - id: nbstripout
+        language_version: python3.13

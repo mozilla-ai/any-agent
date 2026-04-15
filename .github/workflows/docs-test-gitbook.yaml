@@ -1,0 +1,39 @@
+name: Test GitBook Migration
+
+on:
+  push:
+    branches: [test-gitbook-docs]
+  workflow_dispatch:
+
+jobs:
+  test-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: 3.13
+          activate-environment: true
+
+      - name: Install dependencies
+        run: |
+          uv sync --group docs --extra all
+          uv pip install -e .
+
+      - name: Build GitBook site
+        run: uv run python scripts/convert_to_gitbook.py
+
+      - name: Deploy to staging branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gitbook-staging
+          force_orphan: true

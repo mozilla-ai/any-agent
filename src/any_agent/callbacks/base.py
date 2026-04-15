@@ -8,7 +8,19 @@ if TYPE_CHECKING:
 
 
 class Callback:
-    """Base class for AnyAgent callbacks."""
+    """Base class for AnyAgent callbacks.
+
+    Subclass `Callback` and override any subset of the available lifecycle methods
+    to observe, control, or extend agent execution without modifying the underlying
+    agent implementation.
+
+    Each hook receives a `Context` object and should return that same `Context`,
+    optionally after inspecting `context.current_span` or storing shared state in
+    `context.shared`.
+
+    Common uses include logging, validation, guardrails, metrics collection, cost
+    tracking, and intentional cancellation.
+    """
 
     def before_agent_invocation(self, context: Context, *args, **kwargs) -> Context:
         """Will be called before the Agent invocation starts."""

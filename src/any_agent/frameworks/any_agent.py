@@ -38,20 +38,20 @@ INSIDE_NOTEBOOK = hasattr(builtins, "__IPYTHON__")
 class AgentCancel(ABC, Exception):  # noqa: N818
     """Abstract base class for control-flow exceptions raised in callbacks.
 
-    Within a callback, raise an exception inherited from AgentCancel when you
+    Within a callback, raise an exception inherited from `AgentCancel` when you
     want to intentionally stop agent execution and handle that specific case in
     your application code.
 
-    Unlike regular exceptions (which are wrapped in AgentRunError), AgentCancel
+    Unlike regular exceptions (which are wrapped in `AgentRunError`), `AgentCancel`
     subclasses propagate directly to the caller, allowing you to catch them by
     their specific type.
 
     When to use AgentCancel vs regular exceptions:
-        - Use AgentCancel: When stopping execution is expected behavior
-          (rate limits, safety guardrails, validation failures) and you
-          want to handle it distinctly in your application.
-        - Use regular exceptions: When something unexpected goes wrong,
-          and you want consistent error handling via AgentRunError.
+    - Use `AgentCancel`: When stopping execution is expected behavior
+      (rate limits, safety guardrails, validation failures) and you
+      want to handle it distinctly in your application.
+    - Use regular exceptions: When something unexpected goes wrong,
+      and you want consistent error handling via `AgentRunError`.
 
     Example:
         class StopOnLimit(AgentCancel):
@@ -108,12 +108,14 @@ class AgentRunError(Exception):
 
     AgentRunError ensures:
 
-    * The execution trace is preserved - you can inspect what happened
+    - The execution trace is preserved - you can inspect what happened
        before the error via the `trace` property.
-    * Consistent error handling - all unexpected errors are wrapped in
+    - Consistent error handling - all unexpected errors are wrapped in
        the same type, regardless of the underlying framework.
-    * Original exception access - the wrapped exception is available
+    - Original exception access - the wrapped exception is available
        via `original_exception` for debugging.
+
+    Catch this when you want access to the collected trace even on failure.
 
     Example:
         try:
@@ -197,9 +199,15 @@ def _unwrap_agent_cancel(exc: BaseException) -> AgentCancel | None:
 
 
 class AnyAgent(ABC):
-    """Base abstract class for all agent implementations.
+    """Base class for all any-agent integrations.
 
-    This provides a unified interface for different agent frameworks.
+    `AnyAgent` defines the common interface for creating, running, and serving
+    agents across supported frameworks. Rather than instantiating subclasses
+    directly, most users should call `AnyAgent.create()` or
+    `AnyAgent.create_async()` with an `AgentConfig`.
+
+    Methods like `run()` and `run_async()` return an `AgentTrace`, which includes
+    the final output as well as spans, tool activity, and other execution metadata.
     """
 
     def __init__(self, config: AgentConfig):

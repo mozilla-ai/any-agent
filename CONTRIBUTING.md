@@ -175,8 +175,13 @@ Documentation to update:
 Preview documentation locally:
 
 ```bash
-mkdocs serve
+uv run mkdocs serve
 ```
+
+This serves the docs at `http://127.0.0.1:8000`. Note that GitBook-specific syntax
+(`{% hint %}`, `{% content-ref %}`) will appear as raw text — the content is fully
+readable but won't render with GitBook styling. For an exact preview, push your branch
+and check the `gitbook-staging` deployment.
 
 ### 6. Commit Your Changes
 
