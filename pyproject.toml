@@ -48,7 +48,7 @@ smolagents = [
 ]
 
 a2a = [
-  "a2a-sdk>=0.3.0",
+  "a2a-sdk>=0.3.0,<1.0.0",
   "httpx",
 ]
 
@@ -61,7 +61,7 @@ all = [
 ]
 
 [project.urls]
-Documentation = "https://mozilla-ai.github.io/any-agent/"
+Documentation = "https://docs.mozilla.ai/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
 Source = "https://github.com/mozilla-ai/any-agent"
 
