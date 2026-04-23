@@ -61,7 +61,7 @@ all = [
 ]
 
 [project.urls]
-Documentation = "https://mozilla-ai.github.io/any-agent/"
+Documentation = "https://docs.mozilla.ai/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
 Source = "https://github.com/mozilla-ai/any-agent"
 
