@@ -7,12 +7,12 @@ The TinyAgent loop now lives in the standalone `tinyagent` package
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from tinyagent.agent import (
-    DEFAULT_SYSTEM_PROMPT,  # noqa: F401  (re-exported for backwards compat)
-    ToolExecutor,  # noqa: F401  (re-exported for backwards compat)
-    final_answer,  # noqa: F401  (re-exported for backwards compat)
+    DEFAULT_SYSTEM_PROMPT,
+    ToolExecutor,
+    final_answer,
 )
 from tinyagent.agent import TinyAgent as _TinyAgentImpl
 
@@ -22,6 +22,9 @@ from .any_agent import AnyAgent
 
 if TYPE_CHECKING:
     from pydantic import BaseModel
+    from tinyagent.config import AgentConfig as _TinyAgentConfig
+
+__all__ = ["DEFAULT_SYSTEM_PROMPT", "TinyAgent", "ToolExecutor", "final_answer"]
 
 
 class TinyAgent(AnyAgent):
@@ -35,7 +38,7 @@ class TinyAgent(AnyAgent):
 
     def __init__(self, config: AgentConfig) -> None:
         super().__init__(config)
-        self._inner = _TinyAgentImpl(config)
+        self._inner = _TinyAgentImpl(cast("_TinyAgentConfig", config))
 
     @property
     def llm(self) -> Any:
@@ -60,7 +63,7 @@ class TinyAgent(AnyAgent):
     async def _load_agent(self) -> None:
         await self._inner._load_agent()
         self._tools = self._inner._tools
-        self._mcp_clients.extend(self._inner._mcp_clients)
+        self._mcp_clients.extend(self._inner._mcp_clients)  # type: ignore[arg-type]
 
     async def _run_async(
         self, prompt: str | list[dict[str, Any]], **kwargs: Any

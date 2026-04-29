@@ -1,4 +1,4 @@
-# mypy: disable-error-code="method-assign,misc,no-untyped-call,no-untyped-def,union-attr"
+# mypy: disable-error-code="method-assign,misc,no-untyped-call,no-untyped-def,override,union-attr"
 """Wrapper for the TinyAgent framework.
 
 The actual wrapping logic lives in the standalone `tinyagent` package; this

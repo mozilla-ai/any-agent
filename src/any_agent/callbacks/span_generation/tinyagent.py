@@ -5,6 +5,8 @@ this module preserves the historic `any_agent.callbacks.span_generation.tinyagen
 import path that older code may rely on.
 """
 
-from tinyagent.callbacks.span_generation import _SpanGeneration as _TinyAgentSpanGeneration
+from tinyagent.callbacks.span_generation import (
+    _SpanGeneration as _TinyAgentSpanGeneration,
+)
 
 __all__ = ["_TinyAgentSpanGeneration"]
