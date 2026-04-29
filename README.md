@@ -38,6 +38,9 @@ A single interface to use and evaluate different agent frameworks.
 
 [Open Github tickets for new frameworks](https://github.com/mozilla-ai/any-agent/issues?q=is%3Aissue%20state%3Aopen%20label%3Aframeworks)
 
+> [!NOTE]
+> The TinyAgent loop now lives in the standalone [`mozilla-ai-tinyagent`](https://github.com/mozilla-ai/tinyagent) package, which `any-agent` depends on. If you only need TinyAgent and don't need the multi-framework abstraction, install `mozilla-ai-tinyagent` directly for a leaner footprint.
+
 ## Requirements
 
 - Python 3.11 or newer

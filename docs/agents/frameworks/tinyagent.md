@@ -1,8 +1,10 @@
 # TinyAgent
 
-As part of the bare bones library, we provide our own Python implementation based on [HuggingFace Tiny Agents](https://huggingface.co/blog/tiny-agents).
+A small Python implementation of an agent loop based on [HuggingFace Tiny Agents](https://huggingface.co/blog/tiny-agents).
 
-You can find it in [`any_agent.frameworks.tinyagent`](https://github.com/mozilla-ai/any-agent/blob/main/src/any_agent/frameworks/tinyagent.py).
+The loop lives in the standalone [`mozilla-ai-tinyagent`](https://github.com/mozilla-ai/tinyagent) package. `any-agent` re-exposes it through the `AgentFramework.TINYAGENT` backend so that switching between TinyAgent and any other framework remains a single-parameter change.
+
+If you only need the TinyAgent loop and don't need the multi-framework abstraction, install [`mozilla-ai-tinyagent`](https://pypi.org/project/mozilla-ai-tinyagent/) directly for a leaner footprint.
 
 ## Examples
 

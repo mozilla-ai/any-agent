@@ -1,72 +1,12 @@
-# mypy: disable-error-code="method-assign,no-untyped-def"
-from __future__ import annotations
+"""Re-export tinyagent's span generation callback so identity-based checks line up.
 
-from typing import TYPE_CHECKING, Any
+The class lives in `tinyagent.callbacks.span_generation`; importing it through
+this module preserves the historic `any_agent.callbacks.span_generation.tinyagent._TinyAgentSpanGeneration`
+import path that older code may rely on.
+"""
 
-from any_agent.callbacks.span_generation.base import _SpanGeneration
+from tinyagent.callbacks.span_generation import (
+    _SpanGeneration as _TinyAgentSpanGeneration,
+)
 
-if TYPE_CHECKING:
-    from any_llm.types.completion import (
-        ChatCompletion,
-        ChatCompletionMessageToolCall,
-        CompletionUsage,
-    )
-
-    from any_agent.callbacks.context import Context
-
-
-class _TinyAgentSpanGeneration(_SpanGeneration):
-    def before_llm_call(self, context: Context, *args, **kwargs) -> Context:
-        return self._set_llm_input(
-            context,
-            model_id=kwargs.get("model", "No model"),
-            input_messages=kwargs.get("messages", []),
-        )
-
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
-        response: ChatCompletion = args[0]
-
-        if not response.choices:
-            return context
-
-        message = getattr(response.choices[0], "message", None)
-        if not message:
-            return context
-
-        output: str | list[dict[str, str]] = ""
-        if content := getattr(message, "content", None):
-            output = content
-
-        tool_calls: list[ChatCompletionMessageToolCall] | None
-        if tool_calls := getattr(message, "tool_calls", None):
-            output = [
-                {
-                    "tool.name": getattr(tool_call.function, "name", "No name"),
-                    "tool.args": getattr(tool_call.function, "arguments", "No name"),
-                }
-                for tool_call in tool_calls
-                if tool_call.function
-            ]
-
-        input_tokens = 0
-        output_tokens = 0
-        token_usage: CompletionUsage | None
-
-        if token_usage := getattr(response, "usage", None):
-            if token_usage:
-                input_tokens = token_usage.prompt_tokens
-                output_tokens = token_usage.completion_tokens
-
-        return self._set_llm_output(context, output, input_tokens, output_tokens)
-
-    def before_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        request: dict[str, Any] = args[0]
-
-        return self._set_tool_input(
-            context,
-            name=request.get("name", "No name"),
-            args=request.get("arguments", {}),
-        )
-
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        return self._set_tool_output(context, args[0])
+__all__ = ["_TinyAgentSpanGeneration"]

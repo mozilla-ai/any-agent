@@ -43,6 +43,8 @@ pip install any-agent[agno,openai]
 
 Refer to [pyproject.toml](https://github.com/mozilla-ai/any-agent/blob/main/pyproject.toml) for a list of the options available.
 
+> If you only need the TinyAgent loop (no multi-framework abstraction), install [`mozilla-ai-tinyagent`](https://pypi.org/project/mozilla-ai-tinyagent/) directly. `any-agent` depends on it and re-exposes it as `AgentFramework.TINYAGENT`.
+
 ## For AI Systems
 
 This documentation is available in two AI-friendly formats:

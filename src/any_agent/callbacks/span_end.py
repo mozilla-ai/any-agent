@@ -1,19 +1,10 @@
-# mypy: disable-error-code="no-untyped-def"
-from any_agent.callbacks.base import Callback
-from any_agent.callbacks.context import Context
+"""Re-export tinyagent's span-end callback so identity-based checks line up.
 
+`tinyagent.TinyAgent` registers `tinyagent.callbacks.span_end.SpanEndCallback`
+on construction. By aliasing it here, both `any-agent`'s and the inner
+TinyAgent's `_add_span_callbacks` see the same class and avoid double-registering.
+"""
 
-def _span_end(context: Context) -> Context:
-    context.current_span.end()
-    context.trace.add_span(context.current_span)
-    return context
+from tinyagent.callbacks.span_end import SpanEndCallback
 
-
-class SpanEndCallback(Callback):
-    """End the current span and add it to the corresponding `AgentTrace`."""
-
-    def after_llm_call(self, context: Context, *args, **kwargs) -> Context:
-        return _span_end(context)
-
-    def after_tool_execution(self, context: Context, *args, **kwargs) -> Context:
-        return _span_end(context)
+__all__ = ["SpanEndCallback"]

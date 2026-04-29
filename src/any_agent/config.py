@@ -1,12 +1,29 @@
-import warnings
-from collections.abc import Callable, Mapping, MutableMapping, Sequence
+from collections.abc import Callable, MutableMapping
 from enum import StrEnum, auto
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
+from tinyagent.config import (
+    MCPParams,
+    MCPSse,
+    MCPStdio,
+    MCPStreamableHttp,
+    Tool,
+)
 
 from any_agent.callbacks import get_default_callbacks
 from any_agent.callbacks.base import Callback
+
+__all__ = [
+    "AgentConfig",
+    "AgentFramework",
+    "MCPParams",
+    "MCPSse",
+    "MCPStdio",
+    "MCPStreamableHttp",
+    "ServingConfig",
+    "Tool",
+]
 
 
 class AgentFramework(StrEnum):
@@ -34,90 +51,6 @@ class AgentFramework(StrEnum):
         return cls[formatted_value]
 
 
-class MCPStdio(BaseModel):
-    command: str
-    """The executable to run to start the server.
-
-    For example, `docker`, `uvx`, `npx`.
-    """
-
-    args: Sequence[str]
-    """Command line args to pass to the command executable.
-
-    For example, `["run", "-i", "--rm", "mcp/fetch"]`.
-    """
-
-    env: dict[str, str] | None = None
-    """The environment variables to set for the server."""
-
-    tools: Sequence[str] | None = None
-    """List of tool names to use from the MCP Server.
-
-    Use it to limit the tools accessible by the agent.
-    For example, if you use [`mcp/filesystem`](https://hub.docker.com/r/mcp/filesystem),
-    you can pass `tools=["read_file", "list_directory"]` to limit the agent to read-only operations.
-
-    If none is specified, the default behavior is that the agent will have access to all tools under that MCP server.
-    """
-
-    client_session_timeout_seconds: float | None = 5
-    """the read timeout passed to the MCP ClientSession."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-
-class MCPSse(BaseModel):
-    @model_validator(mode="before")
-    @classmethod
-    def sse_deprecation(cls, data: Any) -> Any:
-        warnings.warn(
-            "SSE is deprecated in the MCP specification in favor of Streamable HTTP as of version 2025-03-26",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return data
-
-    url: str
-    """The URL of the server."""
-
-    headers: Mapping[str, str] | None = None
-    """The headers to send to the server."""
-
-    tools: Sequence[str] | None = None
-    """List of tool names to use from the MCP Server.
-
-    Use it to limit the tools accessible by the agent.
-    For example, if you use [`mcp/filesystem`](https://hub.docker.com/r/mcp/filesystem),
-    you can pass `tools=["read_file", "list_directory"]` to limit the agent to read-only operations.
-    """
-
-    client_session_timeout_seconds: float | None = 5
-    """the read timeout passed to the MCP ClientSession."""
-
-    model_config = ConfigDict(frozen=True)
-
-
-class MCPStreamableHttp(BaseModel):
-    url: str
-    """The URL of the server."""
-
-    headers: Mapping[str, str] | None = None
-    """The headers to send to the server."""
-
-    tools: Sequence[str] | None = None
-    """List of tool names to use from the MCP Server.
-
-    Use it to limit the tools accessible by the agent.
-    For example, if you use [`mcp/filesystem`](https://hub.docker.com/r/mcp/filesystem),
-    you can pass `tools=["read_file", "list_directory"]` to limit the agent to read-only operations.
-    """
-
-    client_session_timeout_seconds: float | None = 5
-    """the read timeout passed to the MCP ClientSession."""
-
-    model_config = ConfigDict(frozen=True)
-
-
 class ServingConfig(BaseModel):
     """Configuration for serving an agent using the Agent2Agent Protocol (A2A).
 
@@ -139,11 +72,6 @@ class ServingConfig(BaseModel):
     """Will be passed as argument to the `uvicorn` server."""
 
     version: str = "0.1.0"
-
-
-MCPParams = MCPStdio | MCPSse | MCPStreamableHttp
-
-Tool = str | MCPParams | Callable[..., Any]
 
 
 class AgentConfig(BaseModel):

@@ -10,4 +10,6 @@
 | [LlamaIndex](agents/frameworks/llama-index.md) | [docs](https://docs.llamaindex.ai/) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
 | [OpenAI Agents SDK](agents/frameworks/openai.md) | [docs](https://openai.github.io/openai-agents-python/) | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
 | [smolagents](agents/frameworks/smolagents.md) | [docs](https://huggingface.co/docs/smolagents/) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
-| [TinyAgent](agents/frameworks/tinyagent.md) | [docs](https://github.com/mozilla-ai/any-agent/blob/main/src/any_agent/frameworks/tinyagent.py) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| [TinyAgent](agents/frameworks/tinyagent.md) | [docs](https://github.com/mozilla-ai/tinyagent) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+
+> TinyAgent ships separately as [`mozilla-ai-tinyagent`](https://github.com/mozilla-ai/tinyagent); `any-agent` re-exposes it for parity. Install the standalone package directly if you don't need the multi-framework abstraction.
