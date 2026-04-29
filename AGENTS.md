@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Structure & Module Organization
 
 - `src/any_agent/`: Core library. `AnyAgent` is the main entry point; `AgentConfig` and `AgentFramework` define config.
-- `src/any_agent/frameworks/`: One module per supported framework (agno, google, langchain, llama_index, openai, smolagents, tinyagent). Each implements `AnyAgent`'s abstract methods via lazy imports to keep optional dependencies isolated.
+- `src/any_agent/frameworks/`: One module per supported framework (agno, google, langchain, llama_index, openai, smolagents, tinyagent). Each implements `AnyAgent`'s abstract methods via lazy imports to keep optional dependencies isolated. The `tinyagent` module is a thin shim that delegates to the standalone [`mozilla-ai-tinyagent`](https://github.com/mozilla-ai/tinyagent) package; the loop itself lives there.
 - `src/any_agent/callbacks/`: Callback system with per-framework wrappers (`wrappers/`) and span generation (`span_generation/`). Base class is `Callback` in `base.py`.
 - `src/any_agent/tools/`: Built-in tools (web browsing, user interaction, final output) plus MCP client integration (`mcp/`), A2A tools, and Composio integration.
 - `src/any_agent/tracing/`: OpenTelemetry-based tracing. `AgentTrace` / `AgentSpan` are the primary types.
