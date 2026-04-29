@@ -19,9 +19,9 @@ def test_console_print_span(
     panel_mock = MagicMock()
     markdown_mock = MagicMock()
     with (
-        patch("any_agent.callbacks.span_print.Console", console_mock),
-        patch("any_agent.callbacks.span_print.Markdown", markdown_mock),
-        patch("any_agent.callbacks.span_print.Panel", panel_mock),
+        patch("tinyagent.callbacks.span_print.Console", console_mock),
+        patch("tinyagent.callbacks.span_print.Markdown", markdown_mock),
+        patch("tinyagent.callbacks.span_print.Panel", panel_mock),
     ):
         callback = ConsolePrintSpan()
 
@@ -58,8 +58,8 @@ def test_get_output_panel(
     panel_mock = MagicMock()
     json_mock = MagicMock()
     with (
-        patch("any_agent.callbacks.span_print.Panel", panel_mock),
-        patch("any_agent.callbacks.span_print.JSON", json_mock),
+        patch("tinyagent.callbacks.span_print.Panel", panel_mock),
+        patch("tinyagent.callbacks.span_print.JSON", json_mock),
     ):
         _get_output_panel(readable_spans[0])
         json_mock.assert_called_once()
@@ -70,8 +70,8 @@ def test_get_output_panel(
         panel_mock = MagicMock()
         json_mock = MagicMock()
         with (
-            patch("any_agent.callbacks.span_print.Panel", panel_mock),
-            patch("any_agent.callbacks.span_print.JSON", json_mock),
+            patch("tinyagent.callbacks.span_print.Panel", panel_mock),
+            patch("tinyagent.callbacks.span_print.JSON", json_mock),
         ):
             _get_output_panel(readable_spans[1])
             json_mock.assert_called_once()
@@ -81,8 +81,8 @@ def test_get_output_panel(
     panel_mock = MagicMock()
     json_mock = MagicMock()
     with (
-        patch("any_agent.callbacks.span_print.Panel", panel_mock),
-        patch("any_agent.callbacks.span_print.JSON", json_mock),
+        patch("tinyagent.callbacks.span_print.Panel", panel_mock),
+        patch("tinyagent.callbacks.span_print.JSON", json_mock),
     ):
         _get_output_panel(readable_spans[-1])
         json_mock.assert_not_called()

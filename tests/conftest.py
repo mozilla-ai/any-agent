@@ -98,8 +98,10 @@ async def echo_sse_server() -> AsyncGenerator[dict[str, Any]]:
     """
     import asyncio
 
+    import sys
+
     process = await asyncio.create_subprocess_exec(
-        "python",
+        sys.executable,
         "-c",
         SSE_MCP_SERVER_SCRIPT,
     )
@@ -128,8 +130,10 @@ async def date_streamable_http_server(worker_id: str) -> AsyncGenerator[dict[str
     if worker_id and "gw" in worker_id:
         port += int(worker_id.strip("gw"))
 
+    import sys
+
     process = await asyncio.create_subprocess_exec(
-        "python",
+        sys.executable,
         "-c",
         STRHTTP_MCP_SERVER_SCRIPT.format(port=port),
     )

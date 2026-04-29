@@ -272,7 +272,7 @@ def test_tinyagent_forwards_any_llm_args_to_anyllm_create() -> None:
     any_llm_args = {"timeout": 99, "organization": "test-org"}
     provider, _ = AnyLLM.split_model_provider(DEFAULT_SMALL_MODEL_ID)
 
-    with patch("any_agent.frameworks.tinyagent.AnyLLM.create") as mock_create:
+    with patch("tinyagent.agent.AnyLLM.create") as mock_create:
         TinyAgent(
             AgentConfig(
                 model_id=DEFAULT_SMALL_MODEL_ID,

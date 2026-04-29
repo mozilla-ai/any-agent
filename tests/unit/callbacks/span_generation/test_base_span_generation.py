@@ -43,7 +43,7 @@ def test_set_tool_output_error() -> None:
     error = "Error calling tool: It's a trap!"
     context = MagicMock()
     status_mock = MagicMock()
-    with patch("any_agent.callbacks.span_generation.base.Status", status_mock):
+    with patch("tinyagent.callbacks.span_generation.Status", status_mock):
         _SpanGeneration()._set_tool_output(context, error)
 
         context.current_span.set_attributes.assert_called_with(

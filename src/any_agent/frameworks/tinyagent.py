@@ -1,314 +1,79 @@
+"""Thin shim around `mozilla-ai-tinyagent` to keep `any-agent`'s framework abstraction.
+
+The TinyAgent loop now lives in the standalone `tinyagent` package
+(PyPI: ``mozilla-ai-tinyagent``). This module re-exposes it through the
+`AnyAgent` framework interface so existing `any-agent` callers keep working.
+"""
+
 from __future__ import annotations
 
-import asyncio
-import inspect
-import json
 from typing import TYPE_CHECKING, Any
 
-from any_llm import AnyLLM, LLMProvider
-from mcp.types import CallToolResult, TextContent
+from tinyagent.agent import (
+    DEFAULT_SYSTEM_PROMPT,  # noqa: F401  (re-exported for backwards compat)
+    ToolExecutor,  # noqa: F401  (re-exported for backwards compat)
+    final_answer,  # noqa: F401  (re-exported for backwards compat)
+)
+from tinyagent.agent import TinyAgent as _TinyAgentImpl
 
 from any_agent.config import AgentConfig, AgentFramework
-from any_agent.logging import logger
-from any_agent.utils.cast import safe_cast_argument
 
 from .any_agent import AnyAgent
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
-    from any_llm.types.completion import ChatCompletion
     from pydantic import BaseModel
 
 
-DEFAULT_SYSTEM_PROMPT = """
-You are an agent that uses tools (whenever they are available) to answer the user's query.
-
-You will keep calling tools until you find a final answer.
-Once you have a final answer, you MUST call the `final_answer` tool.
-
-You MUST plan extensively before each function call, and reflect extensively on the outcomes of the previous function calls.
-""".strip()
-
-
-class ToolExecutor:
-    """Executor for tools that wraps tool functions to work with the MCP client."""
-
-    def __init__(self, tool_function: Callable[..., Any]) -> None:
-        """Initialize the tool executor.
-
-        Args:
-            tool_function: The tool function to execute
-
-        """
-        self.tool_function = tool_function
-
-    async def call_tool(self, request: dict[str, Any]) -> str:
-        """Call the tool function.
-
-        Args:
-            request: The tool request with name and arguments
-
-        Returns:
-            Tool execution result
-
-        """
-        try:
-            arguments = request.get("arguments", {})
-
-            if asyncio.iscoroutinefunction(self.tool_function):
-                result = await self.tool_function(**arguments)
-            else:
-                result = self.tool_function(**arguments)
-
-            if (
-                isinstance(result, CallToolResult)
-                and result.content
-                and isinstance(result.content[0], TextContent)
-            ):
-                result = result.content[0].text
-            return str(result)
-
-        except Exception as e:
-            return f"Error calling tool: {e}"
-
-
-def final_answer(answer: str) -> str:
-    """Return the final answer to the user."""
-    return answer
-
-
 class TinyAgent(AnyAgent):
-    """A lightweight agent implementation using any-llm.
+    """A lightweight agent implementation using `any-llm`.
 
-    Modeled after JS implementation https://huggingface.co/blog/tiny-agents.
+    Modeled after the JS implementation https://huggingface.co/blog/tiny-agents.
+
+    The agent loop is provided by the standalone `tinyagent` package; this class
+    adapts it to the `AnyAgent` framework interface used by `any-agent`.
     """
 
     def __init__(self, config: AgentConfig) -> None:
-        """Initialize the TinyAgent.
-
-        Args:
-            config: Agent configuration
-            tracing: Optional tracing configuration
-
-        """
         super().__init__(config)
-        self.clients: dict[str, ToolExecutor] = {}
+        self._inner = _TinyAgentImpl(config)
 
-        provider_name, model_id = AnyLLM.split_model_provider(self.config.model_id)
-        if provider_name == "gateway":
-            provider_name, model_id = AnyLLM.split_model_provider(model_id)
-        self.uses_openai = provider_name == LLMProvider.OPENAI
+    @property
+    def llm(self) -> Any:
+        return self._inner.llm
 
-        # Create the LLM instance using the AnyLLM class pattern
-        llm_kwargs: dict[str, Any] = dict(self.config.any_llm_args or {})
-        if self.config.api_key:
-            llm_kwargs["api_key"] = self.config.api_key
-        if self.config.api_base:
-            llm_kwargs["api_base"] = self.config.api_base
-        self.llm = AnyLLM.create(provider_name, **llm_kwargs)
+    @property
+    def uses_openai(self) -> bool:
+        return self._inner.uses_openai
 
-        self.completion_params: dict[str, Any] = {
-            "model": model_id,
-            "tools": [],
-            "tool_choice": "required",
-            **(self.config.model_args or {}),
-        }
+    @property
+    def completion_params(self) -> dict[str, Any]:
+        return self._inner.completion_params
 
-        if not self.uses_openai and self.completion_params["tool_choice"] == "required":
-            self.config.tools.append(final_answer)
+    @property
+    def clients(self) -> dict[str, ToolExecutor]:
+        return self._inner.clients
+
+    @clients.setter
+    def clients(self, value: dict[str, ToolExecutor]) -> None:
+        self._inner.clients = value
 
     async def _load_agent(self) -> None:
-        """Load the agent and its tools."""
-        wrapped_tools = await self._load_tools(self.config.tools)
-
-        self._tools = wrapped_tools
-
-        for tool in wrapped_tools:
-            tool_name = tool.__name__
-            tool_desc = tool.__doc__ or f"Tool to {tool_name}"
-
-            if not hasattr(tool, "__input_schema__"):
-                sig = inspect.signature(tool)
-                properties = {}
-                required = []
-
-                for param_name, param in sig.parameters.items():
-                    if param.kind in (
-                        inspect.Parameter.VAR_POSITIONAL,
-                        inspect.Parameter.VAR_KEYWORD,
-                    ):
-                        continue
-
-                    properties[param_name] = {
-                        "type": "string",
-                        "description": f"Parameter {param_name}",
-                    }
-
-                    if param.default == inspect.Parameter.empty or self.uses_openai:
-                        required.append(param_name)
-
-                input_schema = {
-                    "type": "object",
-                    "properties": properties,
-                    "required": required,
-                }
-            else:
-                input_schema = tool.__input_schema__
-
-            function_def = {
-                "type": "function",
-                "function": {
-                    "name": tool_name,
-                    "description": tool_desc,
-                    "parameters": input_schema,
-                },
-            }
-            if self.uses_openai:
-                function_def["function"]["parameters"]["additionalProperties"] = False  # type: ignore[index]
-                function_def["function"]["strict"] = True  # type: ignore[index]
-
-            self.completion_params["tools"].append(function_def)
-            self.clients[tool_name] = ToolExecutor(tool)
+        await self._inner._load_agent()
+        self._tools = self._inner._tools
+        self._mcp_clients.extend(self._inner._mcp_clients)
 
     async def _run_async(
         self, prompt: str | list[dict[str, Any]], **kwargs: Any
     ) -> str | BaseModel:
-        if self.uses_openai:
-            self.completion_params["tool_choice"] = "auto"
-            if self.config.output_type:
-                self.completion_params["response_format"] = self.config.output_type
+        return await self._inner._run_async(prompt, **kwargs)
 
-        if isinstance(prompt, list):
-            messages = prompt
-        else:
-            messages = [
-                {
-                    "role": "system",
-                    "content": self.config.instructions or DEFAULT_SYSTEM_PROMPT,
-                },
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
-            ]
-
-        if kwargs.pop("max_turns", None):
-            logger.warning(
-                "`max_turns` is deprecated and has no effect. See https://docs.mozilla.ai/any-agent/agents/callbacks/#example-limit-the-number-of-steps"
-            )
-
-        while True:
-            completion_params = self.completion_params.copy()
-
-            completion_params["messages"] = messages
-
-            response: ChatCompletion = await self.call_model(**completion_params)
-
-            message = response.choices[0].message
-
-            messages.append(message.model_dump())
-
-            if message.tool_calls:
-                for tool_call in message.tool_calls:
-                    f = tool_call.function  # type: ignore[union-attr]
-                    tool_name = f.name
-                    tool_message = {
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": "",
-                        "name": tool_name,
-                    }
-
-                    if tool_name not in self.clients:
-                        tool_message["content"] = (
-                            f"Error calling tool: No tool found with name: {tool_name}"
-                        )
-                        messages.append(tool_message)
-                        continue
-
-                    tool_args = {}
-                    if f.arguments:
-                        tool_args = json.loads(f.arguments)
-
-                    client = self.clients[tool_name]
-
-                    if hasattr(client.tool_function, "__annotations__"):
-                        func_args = client.tool_function.__annotations__
-                        for arg_name, arg_type in func_args.items():
-                            if arg_name in tool_args:
-                                try:
-                                    tool_args[arg_name] = safe_cast_argument(
-                                        tool_args[arg_name], arg_type
-                                    )
-                                except Exception as e:
-                                    logger.warning(
-                                        f"Failed to cast argument '{arg_name}': {e}"
-                                    )
-
-                    result = await client.call_tool(
-                        {"name": tool_name, "arguments": tool_args}
-                    )
-                    tool_message["content"] = result
-                    messages.append(tool_message)
-
-                    if tool_name == "final_answer":
-                        if self.config.output_type:
-                            return await self._return_output_type(
-                                str(result), completion_params
-                            )
-                        return str(result)
-
-            elif message.role == "assistant" and message.content:
-                if self.config.output_type:
-                    return await self._return_output_type(
-                        str(message.content), completion_params
-                    )
-                return str(message.content)
-
-    async def _return_output_type(
-        self, output: str, completion_params: dict[str, Any]
-    ) -> str | BaseModel:
-        if not self.config.output_type:
-            return output
-
-        if self.uses_openai:
-            return self.config.output_type.model_validate_json(output)
-
-        completion_params["messages"] = [
-            {
-                "role": "system",
-                "content": "You are an expert that can convert raw text into structured JSON.",
-            },
-            {
-                "role": "user",
-                "content": f"Please conform this output:\n{output}\nTo match the following schema:\n{self.config.output_type.model_json_schema()}.",
-            },
-        ]
-
-        completion_params["response_format"] = self.config.output_type
-        if "tools" in completion_params:
-            completion_params.pop("tools")
-            completion_params.pop("tool_choice", None)
-            completion_params.pop("parallel_tool_calls", None)
-        response = await self.call_model(**completion_params)
-        return self.config.output_type.model_validate_json(
-            response.choices[0].message.content  # type: ignore[arg-type]
-        )
-
-    async def call_model(self, **completion_params: Any) -> ChatCompletion:
-        return await self.llm.acompletion(**completion_params)  # type: ignore[no-any-return]
+    async def call_model(self, **completion_params: Any) -> Any:
+        return await self._inner.call_model(**completion_params)
 
     async def update_output_type_async(
         self, output_type: type[BaseModel] | None
     ) -> None:
-        """Update the output type of the agent in-place.
-
-        Args:
-            output_type: The new output type to use, or None to remove output type constraint
-
-        """
-        self.config.output_type = output_type
+        await self._inner.update_output_type_async(output_type)
 
     @property
     def framework(self) -> AgentFramework:
