@@ -20,6 +20,11 @@ A single interface to use and evaluate different agent frameworks.
 
 </div>
 
+> [!IMPORTANT]
+> **`any-agent` is in soft deprecation.** It started as a research project to compare agent frameworks and refine a minimal common surface. That distillation has graduated to its own package: [`mozilla-ai-tinyagent`](https://github.com/mozilla-ai/tinyagent) (PyPI: `mozilla-ai-tinyagent`). For new projects we recommend using `tinyagent` directly.
+>
+> `any-agent` continues to be published and we'll take security/bug-fix PRs, but no new features are planned. Reach for `any-agent` when you specifically need to **run or evaluate agents across multiple frameworks** (Agno, Google ADK, LangChain, LlamaIndex, OpenAI Agents SDK, smolagents) under one API. If you only need the core agent loop, `mozilla-ai-tinyagent` is the leaner path.
+
 ## [Documentation](https://docs.mozilla.ai/any-agent/)
 
 - [Agents](https://docs.mozilla.ai/any-agent/agents/)
@@ -37,9 +42,6 @@ A single interface to use and evaluate different agent frameworks.
 ### Planned for Support (Contributions Welcome!)
 
 [Open Github tickets for new frameworks](https://github.com/mozilla-ai/any-agent/issues?q=is%3Aissue%20state%3Aopen%20label%3Aframeworks)
-
-> [!NOTE]
-> The TinyAgent loop now lives in the standalone [`mozilla-ai-tinyagent`](https://github.com/mozilla-ai/tinyagent) package, which `any-agent` depends on. If you only need TinyAgent and don't need the multi-framework abstraction, install `mozilla-ai-tinyagent` directly for a leaner footprint.
 
 ## Requirements
 
