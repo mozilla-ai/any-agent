@@ -11,8 +11,8 @@ Check the reference to find additional supported `agent_args`.
 
 ## Default Model Type
 
-We use [`any_llm`](https://mozilla-ai.github.io/any-llm/) as the default model provider.
-Check the [AnyLLM documentation](https://mozilla-ai.github.io/any-llm/) for supported providers and `model_args`.
+We use [`any_llm`](https://docs.mozilla.ai/any-llm/) as the default model provider.
+Check the [AnyLLM documentation](https://docs.mozilla.ai/any-llm/) for supported providers and `model_args`.
 
 ## Run args
 
