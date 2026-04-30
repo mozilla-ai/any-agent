@@ -31,7 +31,7 @@ class AnyLLM(Model):
     """A class for interacting with any-llm.
 
     any-llm allows you to use a unified interface for various LLM providers.
-    For more information, see: https://mozilla-ai.github.io/any-llm/
+    For more information, see: https://docs.mozilla.ai/any-llm/
     """
 
     id: str = "gpt-4o"

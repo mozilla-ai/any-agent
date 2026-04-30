@@ -14,7 +14,7 @@
     Callbacks:
       "Supports the any-agent <a href='/any-agent/agents/callbacks/'>callback system</a> for lifecycle hooks.",
     "any-llm Integration":
-      "Uses <a href='https://mozilla-ai.github.io/any-llm/' target='_blank'>any-llm</a> as the unified model provider.",
+      "Uses <a href='https://docs.mozilla.ai/any-llm/' target='_blank'>any-llm</a> as the unified model provider.",
   };
 
   document.addEventListener("DOMContentLoaded", function () {

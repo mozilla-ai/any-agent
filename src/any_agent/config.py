@@ -152,7 +152,7 @@ class AgentConfig(BaseModel):
     model_id: str
     """Select the underlying model used by the agent.
 
-    If you are using the default model_type (AnyLLM), you can refer to [AnyLLM Provider Docs](https://mozilla-ai.github.io/any-llm/providers/) for the list of providers and how to access them.
+    If you are using the default model_type (AnyLLM), you can refer to [AnyLLM Provider Docs](https://docs.mozilla.ai/any-llm/providers/) for the list of providers and how to access them.
     """
 
     api_base: str | None = None
@@ -233,7 +233,7 @@ class AgentConfig(BaseModel):
     model_args: MutableMapping[str, Any] | None = None
     """Pass arguments to the model instance like `temperature`, `top_k`, as well as any other provider-specific parameters.
 
-    Refer to [any-llm Completion API Docs](https://mozilla-ai.github.io/any-llm/api/completion/) for more info.
+    Refer to [any-llm Completion API Docs](https://docs.mozilla.ai/any-llm/api/completion/) for more info.
     """
 
     any_llm_args: MutableMapping[str, Any] | None = None

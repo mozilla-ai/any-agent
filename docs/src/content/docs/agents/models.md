@@ -4,7 +4,7 @@ title: Model Configuration
 
 ## Overview
 
-Model configuration in `any-agent` is designed to be consistent across all supported frameworks. We use [any-llm](https://mozilla-ai.github.io/any-llm/) as the default model provider, which acts as a unified interface allowing you to use any language model from any provider with the same syntax.
+Model configuration in `any-agent` is designed to be consistent across all supported frameworks. We use [any-llm](https://docs.mozilla.ai/any-llm/) as the default model provider, which acts as a unified interface allowing you to use any language model from any provider with the same syntax.
 
 ## Configuration Parameters
 
@@ -22,4 +22,4 @@ The `api_base` parameter allows you to specify a custom API endpoint. This is us
 
 The `api_key` parameter allows you to explicitly specify an API key for authentication. By default, `any-llm` will automatically search for common environment variables (like `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.).
 
-See the [AnyLLM Provider Documentation](https://mozilla-ai.github.io/any-llm/providers/) for the complete list of supported providers.
+See the [AnyLLM Provider Documentation](https://docs.mozilla.ai/any-llm/providers/) for the complete list of supported providers.
