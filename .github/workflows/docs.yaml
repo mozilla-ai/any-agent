@@ -50,6 +50,11 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           cp .gitbook-branch-readme.md site/README-BRANCH.md
 
+          # Stage the built site outside the working tree. Otherwise `rsync
+          # --delete` below sees `./site/` as extraneous in the destination
+          # and races to delete it while still reading from it.
+          mv site "${RUNNER_TEMP}/gitbook-site"
+
           git fetch origin gitbook-docs || true
           if git rev-parse --verify origin/gitbook-docs >/dev/null 2>&1; then
             git checkout gitbook-docs
@@ -58,7 +63,7 @@ jobs:
             git rm -rf .
           fi
 
-          rsync -a --delete site/ .
+          rsync -a --delete "${RUNNER_TEMP}/gitbook-site/" .
           git add -A
           if ! git diff --cached --quiet; then
             git commit -m "docs: update GitBook documentation from ${{ github.sha }}"
