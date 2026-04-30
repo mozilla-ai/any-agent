@@ -73,7 +73,7 @@ class AnyllmModel(Model):
     """Enables using any model via AnyLLM.
 
     any-llm allows you to access OpenAI, Anthropic, Gemini, Mistral, and many other models.
-    See supported providers/models here: https://mozilla-ai.github.io/any-llm/providers/
+    See supported providers/models here: https://docs.mozilla.ai/any-llm/providers/
     """
 
     def __init__(
