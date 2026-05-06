@@ -1,4 +1,4 @@
-any-agent[all]>=1.4.0
+any-agent[all]>=1.18.0
 geocoder
 nest_asyncio
 streamlit
