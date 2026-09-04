@@ -86,8 +86,8 @@ class AgentConfig(BaseModel):
     api_base: str | None = None
     """Custom API endpoint URL for the model provider.
 
-    Use this to specify custom endpoints for local models (Ollama, llama.cpp, etc.) or proxy services.
-    For example: `http://localhost:11434/v1` for Ollama.
+    Use this to specify custom endpoints for local models (Ollama, llmman, llama.cpp, etc.) or proxy services.
+    For example: `http://localhost:11434/v1` for Ollama, or `http://localhost:17434` for llmman.
     """
 
     api_key: str | None = None
