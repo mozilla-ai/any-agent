@@ -37,6 +37,9 @@ we will use [Ollama](https://ollama.com/) to run our LLM locally!
 
 First, install Ollama by following their instructions: https://ollama.com/download
 
+>**Note**: [llmman](https://github.com/llmmanorg/llmman) serves the same Ollama API on port `17434`.
+> To use it instead, keep the `ollama/` prefix in `model_id` and add `api_base="http://localhost:17434"` to your `AgentConfig`.
+
 ### Picking an LLM
 
 Pick a model that you can run locally based on your hardware and download it from your terminal. For example:
