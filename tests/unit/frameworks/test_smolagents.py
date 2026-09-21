@@ -2,6 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from any_llm import LLMProvider
+
 from any_agent import AgentConfig, AgentFramework, AnyAgent
 from any_agent.frameworks.smolagents import AnyLLMModel
 
@@ -131,7 +133,8 @@ class TestAnyLLMModel:
                 api_base="https://api.example.com",
             )
 
-        assert model._provider.value == "openai"
+        # any-llm 1.28 widened split_model_provider to return `str | LLMProvider`.
+        assert LLMProvider(model._provider) is LLMProvider.OPENAI
         assert model._anyllm_completion_kwargs["model"] == "gpt-4o"
         assert model._api_key == "test-key"
         assert model._api_base == "https://api.example.com"
