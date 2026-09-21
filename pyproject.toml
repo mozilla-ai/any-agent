@@ -69,9 +69,6 @@ Documentation = "https://docs.mozilla.ai/any-agent/"
 Issues = "https://github.com/mozilla-ai/any-agent/issues"
 Source = "https://github.com/mozilla-ai/any-agent"
 
-[project.scripts]
-any-agent-evaluate = "any_agent.evaluation.cli:main"
-
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
 
