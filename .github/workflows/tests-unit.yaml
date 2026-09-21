@@ -20,6 +20,11 @@ jobs:
   run-unit-tests:
     timeout-minutes: 30
 
+    # Dependabot branches and forks do not receive repository secrets, so this is
+    # empty there and the Codecov upload is skipped rather than failing the job.
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -42,7 +47,7 @@ jobs:
       - run: pytest tests/unit -v --cov --cov-report=xml
 
       - name: Upload coverage reports to Codecov
-        if: always()
+        if: always() && env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v6
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ env.CODECOV_TOKEN }}

@@ -24,19 +24,27 @@ jobs:
       - name: Install pre-commit
         run: uv sync -U --group lint
 
+      # Hook environments in the pre-commit cache are virtualenvs tied to one
+      # CPython patch release, so the cache key and its restore-keys prefix carry
+      # the resolved patch version. Keying only on "3.13" means a runner that has
+      # moved to a newer patch release restores environments it has to discard
+      # and rebuild.
+      - name: Resolve the Python patch version used for cache keys
+        run: echo "PYTHON_PATCH_VERSION=$(uv run python -c 'import platform; print(platform.python_version())')" >> "$GITHUB_ENV"
+
       - uses: actions/cache@v4
         with:
           path: .mypy_cache
-          key: ${{ runner.os }}-mypy-${{ hashFiles('pyproject.toml') }}
+          key: ${{ runner.os }}-py${{ env.PYTHON_PATCH_VERSION }}-mypy-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
-            ${{ runner.os }}-mypy-
+            ${{ runner.os }}-py${{ env.PYTHON_PATCH_VERSION }}-mypy-
 
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
-          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          key: ${{ runner.os }}-py${{ env.PYTHON_PATCH_VERSION }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pre-commit-
+            ${{ runner.os }}-py${{ env.PYTHON_PATCH_VERSION }}-pre-commit-
 
       - name: pre-commit
         run: uv run pre-commit run --all-files --verbose
