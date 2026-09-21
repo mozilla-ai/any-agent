@@ -53,5 +53,5 @@ Refer to [pyproject.toml](https://github.com/mozilla-ai/any-agent/blob/main/pypr
 
 This documentation is available in an AI-friendly format via the unified Mozilla.ai llms.txt:
 
-- **[llms.txt](https://docs.mozilla.ai/llms.txt)** - Structured overview of all Mozilla.ai documentation for AI systems
-- **[llms-full.txt](https://docs.mozilla.ai/llms-full.txt)** - Complete Mozilla.ai documentation concatenated into a single file
+- **[llms.txt](https://docs.mozilla.ai/llms.txt)** - Structured overview of all Mozilla.ai documentation, including an `any-agent` section that links every page
+- **[llms-full.txt](https://docs.mozilla.ai/llms-full.txt)** - Full text of all Mozilla.ai documentation, split across several linked pages
