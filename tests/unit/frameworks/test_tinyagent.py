@@ -250,18 +250,20 @@ def test_structured_output_without_tools() -> None:
         assert second_call_args["response_format"] == SampleOutput
 
 
+# The `gateway:` cases that used to live here are gone. any-llm retired the
+# `gateway` provider key in favour of `otari`, so `split_model_provider` raises
+# before tinyagent reaches its `if provider_name == "gateway"` strip, and `otari:`
+# cannot stand in because the otari SDK is not a dependency here. The strip lives
+# in the `tinyagent` package, so that behavior belongs to its test suite.
+# See https://github.com/mozilla-ai/tinyagent/issues/23
 @pytest.mark.parametrize(
     ("model_id", "expected_uses_openai"),
     [
-        ("gateway:openai:gpt-4.1-mini", True),
-        ("gateway:anthropic:claude-3", False),
         ("openai:gpt-4", True),
         ("anthropic:claude-3", False),
     ],
 )
-def test_uses_openai_handles_gateway_provider(
-    model_id: str, expected_uses_openai: bool
-) -> None:
+def test_uses_openai(model_id: str, expected_uses_openai: bool) -> None:
     config = AgentConfig(model_id=model_id)
     agent: TinyAgent = AnyAgent.create(AgentFramework.TINYAGENT, config)  # type: ignore[assignment]
 

@@ -145,7 +145,18 @@ class AnyllmModel(Model):
                                 response_usage.prompt_tokens_details, "cached_tokens", 0
                             )
                         )
-                        or 0
+                        or 0,
+                        # Required since openai 2.x. Older versions of the model allow
+                        # extra fields, so passing it stays compatible with those.
+                        cache_write_tokens=(
+                            getattr(response_usage, "prompt_tokens_details", None)
+                            and getattr(
+                                response_usage.prompt_tokens_details,
+                                "cache_write_tokens",
+                                0,
+                            )
+                        )
+                        or 0,
                     ),
                     output_tokens_details=OutputTokensDetails(
                         reasoning_tokens=(

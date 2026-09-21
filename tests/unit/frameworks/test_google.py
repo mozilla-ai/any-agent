@@ -7,7 +7,7 @@ from any_agent import AgentConfig, AgentFramework, AnyAgent
 
 
 def test_load_google_default() -> None:
-    from google.adk.tools import FunctionTool
+    from google.adk.tools.function_tool import FunctionTool
 
     mock_agent = MagicMock()
     mock_model = MagicMock()
@@ -20,7 +20,7 @@ def test_load_google_default() -> None:
     with (
         patch("any_agent.frameworks.google.LlmAgent", mock_agent),
         patch("any_agent.frameworks.google.DEFAULT_MODEL_TYPE", mock_model),
-        patch("google.adk.tools.FunctionTool", MockedFunctionTool),
+        patch("google.adk.tools.function_tool.FunctionTool", MockedFunctionTool),
     ):
         AnyAgent.create(
             AgentFramework.GOOGLE, AgentConfig(model_id="mistral:mistral-small-latest")
@@ -65,7 +65,7 @@ def test_run_google_custom_args() -> None:
         patch("any_agent.frameworks.google.LlmAgent", mock_agent),
         patch("any_agent.frameworks.google.InMemoryRunner", mock_runner),
         patch("any_agent.frameworks.google.DEFAULT_MODEL_TYPE"),
-        patch("google.adk.tools.FunctionTool"),
+        patch("google.adk.tools.function_tool.FunctionTool"),
     ):
         agent = AnyAgent.create(
             AgentFramework.GOOGLE, AgentConfig(model_id="mistral:mistral-small-latest")

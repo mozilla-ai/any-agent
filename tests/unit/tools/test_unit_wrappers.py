@@ -114,7 +114,7 @@ def test_wrap_tool_smolagents_builtin_tools() -> None:
 
 
 def test_wrap_tool_google() -> None:
-    from google.adk.tools import FunctionTool
+    from google.adk.tools.function_tool import FunctionTool
 
     wrapper = MagicMock()
     wrapper.return_value = None
@@ -125,7 +125,7 @@ def test_wrap_tool_google() -> None:
 
 
 def test_wrap_tool_google_already_wrapped() -> None:
-    from google.adk.tools import FunctionTool
+    from google.adk.tools.function_tool import FunctionTool
 
     wrapper = MagicMock()
     wrapper.return_value = None
@@ -137,7 +137,8 @@ def test_wrap_tool_google_already_wrapped() -> None:
 
 
 def test_wrap_tool_google_builtin_tools() -> None:
-    from google.adk.tools import FunctionTool, google_search
+    from google.adk.tools.function_tool import FunctionTool
+    from google.adk.tools.google_search_tool import google_search
 
     wrapper = MagicMock()
     wrapper.return_value = None
