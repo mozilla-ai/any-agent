@@ -14,6 +14,12 @@ on:
       - 'tests/**'
       - '.github/workflows/**'
       - 'pyproject.toml'
+  # any-agent is in soft deprecation, so pushes are rare and dependency drift in
+  # unpinned ranges can break the package for weeks without anyone noticing.
+  # uv.lock is gitignored, so every run resolves dependencies from scratch; the
+  # weekly schedule is what makes that resolution happen without a push.
+  schedule:
+    - cron: "0 6 * * 1"
   workflow_dispatch:
 
 jobs:
