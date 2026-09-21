@@ -24,6 +24,10 @@ dependencies = [
 
 [project.optional-dependencies]
 agno = [
+  # agno 2.x renamed the Model abstract methods to _parse_provider_response and
+  # _parse_provider_response_delta, and replaced Agent(response_model=) with
+  # output_schema=, which breaks AnyLLM in frameworks/agno.py and the structured
+  # output path. Tracked in #814; lift this cap only alongside that work.
   "agno>=1.7.0,<2",
 ]
 
@@ -52,6 +56,10 @@ smolagents = [
 ]
 
 a2a = [
+  # a2a-sdk 1.x moves a2a.types to protobuf generated classes: TaskState loses
+  # input_required, AgentSkill stops being a pydantic model, and a2a.server.apps
+  # is gone. That breaks serving/a2a and tools/a2a.py. any-agent is in soft
+  # deprecation and is not migrating; lift this cap only alongside that work.
   "a2a-sdk>=0.3.0,<1.0.0",
   "httpx",
 ]

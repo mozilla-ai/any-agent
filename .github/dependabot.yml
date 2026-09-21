@@ -6,6 +6,15 @@ updates:
       interval: "weekly"
     labels:
       - "maintenance"
+    # any-agent is in soft deprecation, so the agno 2.x and a2a-sdk 1.x migrations
+    # are not going to happen here. Both caps in pyproject.toml are deliberate gates
+    # rather than drift, and without these rules Dependabot reopens the same two PRs
+    # every week (the agno one has been opened and closed eight times so far).
+    ignore:
+      - dependency-name: "agno"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "a2a-sdk"
+        update-types: ["version-update:semver-major"]
 
   - directory: "/"
     package-ecosystem: "github-actions"
