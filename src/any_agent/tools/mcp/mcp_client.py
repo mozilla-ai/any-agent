@@ -27,6 +27,12 @@ try:
     from mcp.types import Tool as MCPTool
 except ImportError as e:
     missing_mcp_error = e
+    # `ClientSession` and `MCPTool` appear in annotations that are evaluated when
+    # this module is imported, so they need placeholders for the import to survive
+    # a missing or incompatible `mcp`. Without them the intended deferred error in
+    # `model_post_init` never runs and `import any_agent` fails with a NameError.
+    ClientSession = Any  # type: ignore[assignment, misc]
+    MCPTool = Any  # type: ignore[assignment, misc]
 
 
 class MCPClient(BaseModel):

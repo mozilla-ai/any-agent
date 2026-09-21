@@ -10,7 +10,10 @@ requires-python = ">=3.11,<3.14"
 dynamic = ["version"]
 dependencies = [
   "any-llm-sdk>=1.0,<2",
-  "mcp>=1.5.0",
+  # mcp 2.x renamed streamablehttp_client to streamable_http_client. mozilla-ai-tinyagent
+  # 0.1.1 still breaks at import time under it, and any-agent is in soft deprecation and is
+  # not migrating to mcp 2.x; lift this cap only alongside that work.
+  "mcp>=1.5.0,<2",
   "mozilla-ai-tinyagent",
   "opentelemetry-sdk",
   "pydantic",
