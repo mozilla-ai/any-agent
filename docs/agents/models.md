@@ -14,9 +14,20 @@ The `model_args` parameter allows you to pass additional arguments to the model,
 
 The `api_base` parameter allows you to specify a custom API endpoint. This is useful when:
 
-- Using a local model server (e.g., Ollama, llama.cpp, llamafile)
+- Using a local model server (e.g., Ollama, llmman, llama.cpp, llamafile)
 - Routing through a proxy
 - Using a self-hosted model endpoint
+
+For example, [llmman](https://github.com/llmmanorg/llmman) serves the Ollama API on port `17434` instead of `11434`, so it can be used through the `ollama/` provider by pointing `api_base` at it:
+
+```python
+from any_agent import AgentConfig
+
+config = AgentConfig(
+    model_id="ollama/gemma4",
+    api_base="http://localhost:17434",
+)
+```
 
 The `api_key` parameter allows you to explicitly specify an API key for authentication. By default, `any-llm` will automatically search for common environment variables (like `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.).
 
