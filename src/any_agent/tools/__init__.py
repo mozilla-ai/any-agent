@@ -7,7 +7,7 @@ from .user_interaction import (
     show_final_output,
     show_plan,
 )
-from .web_browsing import search_tavily, search_web, visit_webpage
+from .web_browsing import search_tavily, search_web, search_youcom, visit_webpage
 from .wrappers import _wrap_tools
 
 __all__ = [
@@ -19,6 +19,7 @@ __all__ = [
     "prepare_final_output",
     "search_tavily",
     "search_web",
+    "search_youcom",
     "send_console_message",
     "show_final_output",
     "show_plan",

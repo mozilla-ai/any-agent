@@ -1,5 +1,7 @@
+import json
 import os
 import re
+from typing import Any
 
 import requests
 from requests.exceptions import RequestException
@@ -109,3 +111,104 @@ def search_tavily(query: str, include_images: bool = False) -> str:
         return "\n\n".join(output) if output else "No results found."
     except Exception as e:
         return f"Error performing Tavily search: {e!s}"
+
+
+def search_youcom(query: str, max_results: int = 10, timeout: int = 30) -> str:
+    """Perform a You.com web search based on your query and return the top search results.
+
+    Uses the keyless free profile of the You.com MCP server, so no API key is
+    required. Set YDC_API_KEY to use the authenticated endpoint instead.
+
+    Args:
+        query (str): The search query to perform.
+        max_results (int): The maximum number of results to return (default=10).
+        timeout (int): The timeout in seconds for each HTTP request (default=30).
+
+    Returns:
+        The top search results as a formatted string.
+
+    """
+    api_key = os.getenv("YDC_API_KEY")
+    url = (
+        "https://api.you.com/mcp" if api_key else "https://api.you.com/mcp?profile=free"
+    )
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream",
+    }
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+
+    def _request(payload: dict[str, Any]) -> Any:
+        response = requests.post(url, headers=headers, json=payload, timeout=timeout)
+        response.raise_for_status()
+        if "Mcp-Session-Id" not in headers and response.headers.get("Mcp-Session-Id"):
+            headers["Mcp-Session-Id"] = response.headers["Mcp-Session-Id"]
+        if response.status_code in (202, 204) or not response.text.strip():
+            # Accepted notifications carry no payload.
+            return None
+        content_type = response.headers.get("Content-Type", "")
+        if "text/event-stream" in content_type:
+            for line in reversed(response.text.splitlines()):
+                if line.startswith("data:"):
+                    data = line.removeprefix("data:").strip()
+                    if data:
+                        return json.loads(data)
+            return None
+        return response.json()
+
+    try:
+        _request(
+            {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2025-03-26",
+                    "capabilities": {},
+                    "clientInfo": {"name": "any-agent", "version": "1.0"},
+                },
+            }
+        )
+        _request({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        response = _request(
+            {
+                "jsonrpc": "2.0",
+                "id": 2,
+                "method": "tools/call",
+                "params": {
+                    "name": "you-search",
+                    "arguments": {"query": query, "count": max_results},
+                },
+            }
+        )
+        call_result = (response or {}).get("result", {})
+        blocks = [block.get("text", "") for block in call_result.get("content", [])]
+        text = "\n".join(block for block in blocks if block)
+        try:
+            results = json.loads(text)
+        except (json.JSONDecodeError, TypeError):
+            results = None
+        if isinstance(results, dict):
+            # The you-search tool returns {"results": {"web": [...]}}.
+            results = (results.get("results") or {}).get("web")
+        if isinstance(results, list):
+            output = []
+            for result in results:
+                if not isinstance(result, dict):
+                    continue
+                snippet = result.get("description")
+                if not snippet:
+                    snippets = result.get("snippets") or []
+                    snippet = snippets[0] if snippets else ""
+                output.append(
+                    f"[{result.get('title', 'No Title')}]({result.get('url', '#')})\n{snippet}"
+                )
+            formatted = "\n\n".join(output) if output else "No results found."
+        else:
+            formatted = text or "No results found."
+    except RequestException as e:
+        return f"Error fetching You.com search: {e!s}"
+    except Exception as e:
+        return f"Error performing You.com search: {e!s}"
+    return formatted
