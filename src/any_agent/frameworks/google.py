@@ -311,13 +311,18 @@ class GoogleAgent(AnyAgent):
     def _get_model(self, agent_config: AgentConfig) -> BaseLlm:
         """Get the model configuration for a Google agent."""
         model_type = agent_config.model_type or DEFAULT_MODEL_TYPE
-        model_args = agent_config.model_args or {}
+        model_args = dict(agent_config.model_args or {})
+        legacy_api_base = model_args.pop("api_base", None)
         if self.config.output_type:
             model_args["tool_choice"] = "required"
         return model_type(
             model=agent_config.model_id,
             api_key=agent_config.api_key,
-            api_base=agent_config.api_base,
+            api_base=(
+                agent_config.api_base
+                if agent_config.api_base is not None
+                else legacy_api_base
+            ),
             **model_args,
         )
 
