@@ -35,17 +35,19 @@ class _OpenAIAgentsSpanGeneration(_SpanGeneration):
             return context
 
         output: str | list[dict[str, Any]] = ""
-        if isinstance(response.output[0], ResponseFunctionToolCall):
-            output = [
-                {
-                    "tool.name": response.output[0].name,
-                    "tool.args": response.output[0].arguments,
-                }
-            ]
-        elif isinstance(response.output[0], ResponseOutputMessage):
-            if content := response.output[0].content:
-                if isinstance(content[0], ResponseOutputText):
-                    output = content[0].text
+        tool_calls = [
+            {"tool.name": item.name, "tool.args": item.arguments}
+            for item in response.output
+            if isinstance(item, ResponseFunctionToolCall)
+        ]
+        if tool_calls:
+            output = tool_calls
+        else:
+            for item in response.output:
+                if isinstance(item, ResponseOutputMessage) and item.content:
+                    if isinstance(item.content[0], ResponseOutputText):
+                        output = item.content[0].text
+                        break
 
         input_tokens = 0
         output_tokens = 0
