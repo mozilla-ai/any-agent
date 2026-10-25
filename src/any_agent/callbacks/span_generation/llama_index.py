@@ -88,7 +88,7 @@ class _LlamaIndexSpanGeneration(_SpanGeneration):
                 output = [
                     {
                         "tool.name": getattr(tool_call, "tool_name", "No name"),
-                        "tool.args": getattr(tool_call, "tool_kwars", "{}"),
+                        "tool.args": getattr(tool_call, "tool_kwargs", "{}"),
                     }
                     for tool_call in agent_tool_calls
                 ]
