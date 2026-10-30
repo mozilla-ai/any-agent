@@ -42,6 +42,15 @@ def _convert_dict_to_message(_dict: Mapping[str, Any]) -> BaseMessage:
         if _dict.get("tool_calls"):
             additional_kwargs["tool_calls"] = _dict["tool_calls"]
 
+        # Keep provider-specific state that the tool loop must send back:
+        # thinking models (Kimi, DeepSeek) reject the follow-up request when
+        # `reasoning_content` is dropped, and `extra_content` carries
+        # provider fields such as Anthropic signatures.
+        if reasoning_content := _dict.get("reasoning_content"):
+            additional_kwargs["reasoning_content"] = reasoning_content
+        if extra_content := _dict.get("extra_content"):
+            additional_kwargs["extra_content"] = extra_content
+
         return AIMessage(content=content, additional_kwargs=additional_kwargs)
     if role == "system":
         return SystemMessage(content=_dict["content"])
@@ -113,6 +122,28 @@ def _lc_tool_call_to_openai_tool_call(tool_call: ToolCall) -> dict[str, Any]:
     }
 
 
+def _openai_tool_calls_from_message(message: AIMessage) -> list[dict[str, Any]]:
+    """Rebuild the wire-format tool calls, preserving provider extras.
+
+    The parsed LangChain form loses per-tool-call `extra_content` that any-llm
+    attached to the raw provider dicts, so those fields are merged back by id
+    when the raw tool calls survived in `additional_kwargs`.
+    """
+    parsed = [
+        _lc_tool_call_to_openai_tool_call(tc) for tc in message.tool_calls
+    ]
+    raw_by_id = {
+        raw.get("id"): raw
+        for raw in message.additional_kwargs.get("tool_calls", [])
+        if isinstance(raw, dict)
+    }
+    for out in parsed:
+        extra = raw_by_id.get(out["id"], {}).get("extra_content")
+        if extra is not None:
+            out["extra_content"] = extra
+    return parsed
+
+
 def _convert_message_to_dict(message: BaseMessage) -> dict[str, Any]:
     message_dict: dict[str, Any] = {"content": message.content}
     if isinstance(message, ChatMessage):
@@ -124,11 +155,16 @@ def _convert_message_to_dict(message: BaseMessage) -> dict[str, Any]:
         if "function_call" in message.additional_kwargs:
             message_dict["function_call"] = message.additional_kwargs["function_call"]
         if message.tool_calls:
-            message_dict["tool_calls"] = [
-                _lc_tool_call_to_openai_tool_call(tc) for tc in message.tool_calls
-            ]
+            message_dict["tool_calls"] = _openai_tool_calls_from_message(message)
         elif "tool_calls" in message.additional_kwargs:
             message_dict["tool_calls"] = message.additional_kwargs["tool_calls"]
+        # Send back the state captured by _convert_dict_to_message: thinking
+        # models require reasoning_content on assistant tool-call turns, and
+        # extra_content carries provider-specific fields.
+        if reasoning_content := message.additional_kwargs.get("reasoning_content"):
+            message_dict["reasoning_content"] = reasoning_content
+        if extra_content := message.additional_kwargs.get("extra_content"):
+            message_dict["extra_content"] = extra_content
     elif isinstance(message, SystemMessage):
         message_dict["role"] = "system"
     elif isinstance(message, FunctionMessage):
